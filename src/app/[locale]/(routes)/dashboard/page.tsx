@@ -10,7 +10,11 @@ export default async function DashboardPage() {
   const session = await auth();
   const t = await getTranslations("Dashboard");
 
-  const circles = await getUserCircles(session!.user!.id!, {
+  if (!session?.user?.id) {
+    return null;
+  }
+
+  const circles = await getUserCircles(session.user.id, {
     circleRepository: prismaCircleRepository,
   });
 

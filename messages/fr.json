@@ -43,35 +43,35 @@
   },
   "Dashboard": {
     "title": "Tableau de bord",
-    "myCircles": "Mes Circles",
-    "createCircle": "Créer un Circle",
+    "myCircles": "Mes Cercles",
+    "createCircle": "Créer un Cercle",
     "empty": {
-      "title": "Aucun Circle pour le moment",
-      "description": "Créez votre premier Circle pour commencer à construire votre communauté."
+      "title": "Aucun Cercle pour le moment",
+      "description": "Créez votre premier Cercle pour commencer à construire votre communauté."
     }
   },
   "Circle": {
     "create": {
-      "title": "Créer un Circle",
+      "title": "Créer un Cercle",
       "description": "Configurez votre espace communautaire"
     },
     "edit": {
-      "title": "Modifier le Circle",
-      "description": "Mettez à jour les paramètres de votre Circle"
+      "title": "Modifier le Cercle",
+      "description": "Mettez à jour les paramètres de votre Cercle"
     },
     "form": {
       "name": "Nom",
       "namePlaceholder": "Ma super communauté",
       "description": "Description",
-      "descriptionPlaceholder": "Décrivez votre Circle en quelques mots...",
+      "descriptionPlaceholder": "Décrivez votre Cercle en quelques mots...",
       "visibility": "Visibilité",
-      "visibilityPublic": "Public — tout le monde peut découvrir ce Circle",
+      "visibilityPublic": "Public — tout le monde peut découvrir ce Cercle",
       "visibilityPrivate": "Privé — accessible uniquement sur invitation"
     },
     "delete": {
-      "title": "Supprimer le Circle",
-      "description": "Êtes-vous sûr de vouloir supprimer ce Circle ? Cette action est irréversible. Tous les Moments et adhésions seront définitivement supprimés.",
-      "confirm": "Oui, supprimer ce Circle"
+      "title": "Supprimer le Cercle",
+      "description": "Êtes-vous sûr de vouloir supprimer ce Cercle ? Cette action est irréversible. Tous les Moments et adhésions seront définitivement supprimés.",
+      "confirm": "Oui, supprimer ce Cercle"
     },
     "detail": {
       "members": "Membres",
@@ -82,11 +82,11 @@
       "created": "Créé le"
     },
     "errors": {
-      "notFound": "Circle introuvable",
+      "notFound": "Cercle introuvable",
       "unauthorized": "Vous n'avez pas la permission d'effectuer cette action",
-      "createFailed": "Échec de la création du Circle",
-      "updateFailed": "Échec de la mise à jour du Circle",
-      "deleteFailed": "Échec de la suppression du Circle"
+      "createFailed": "Échec de la création du Cercle",
+      "updateFailed": "Échec de la mise à jour du Cercle",
+      "deleteFailed": "Échec de la suppression du Cercle"
     }
   }
 }

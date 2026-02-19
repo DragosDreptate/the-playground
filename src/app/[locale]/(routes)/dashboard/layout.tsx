@@ -3,6 +3,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { Link } from "@/i18n/navigation";
 import { signOutAction } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { getTranslations } from "next-intl/server";
 
 export default async function DashboardLayout({
@@ -25,10 +26,11 @@ export default async function DashboardLayout({
           <Link href="/dashboard" className="text-lg font-semibold">
             The Playground
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="text-muted-foreground text-sm">
               {session.user.email}
             </span>
+            <ThemeToggle />
             <form action={signOutAction}>
               <Button variant="ghost" size="sm" type="submit">
                 {t("signOut")}
