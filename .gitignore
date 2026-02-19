@@ -17,6 +17,9 @@ dist/
 .env.test.local
 .env.production.local
 
+# product spec
+spec/
+
 # next.js generated
 next-env.d.ts
 
