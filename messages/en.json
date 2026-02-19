@@ -1,0 +1,37 @@
+{
+  "HomePage": {
+    "title": "The Playground",
+    "subtitle": "The open platform for your communities"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "back": "Back"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Sign in to continue",
+      "google": "Continue with Google",
+      "github": "Continue with GitHub",
+      "emailPlaceholder": "your@email.com",
+      "magicLink": "Send a magic link",
+      "or": "or"
+    },
+    "verifyRequest": {
+      "title": "Check your email",
+      "description": "A sign-in link has been sent to your email address. Click it to sign in."
+    },
+    "error": {
+      "title": "Authentication error",
+      "backToSignIn": "Back to sign in"
+    },
+    "errors": {
+      "Configuration": "Server configuration error.",
+      "AccessDenied": "Access denied.",
+      "Verification": "The verification link has expired or has already been used.",
+      "Default": "An error occurred during sign in."
+    },
+    "signOut": "Sign out"
+  }
+}

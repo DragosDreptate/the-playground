@@ -1,0 +1,387 @@
+# The Playground - Guide projet
+
+## Vision
+
+Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetup.com centrée sur l'ownership des données, le design premium et l'IA. Benchmark UX : Luma (lu.ma).
+
+## Architecture sémantique
+
+| Concept | Description |
+|---------|-------------|
+| **Playground** | La plateforme |
+| **Circle** | Une communauté autonome (publique ou privée) |
+| **Track** | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
+| **Moment** | Événement individuel — unité virale de la plateforme, page autonome et partageable |
+| **Host** | Organisateur d'un Circle |
+| **Player** | Participant à un Moment / membre d'un Circle |
+
+## Règles métier clés
+
+- S'inscrire à un Moment inscrit automatiquement le Player au Circle (transparent, pas de friction)
+- Le Moment est la porte d'entrée. Le Circle est la couche de rétention
+- Parcours : découvrir un Moment → s'inscrire → découvrir le Circle → rester
+- Liste d'attente avec promotion automatique sur désistement
+- Fil de commentaires (pas de forum) sur chaque Moment
+
+## Principes structurants
+
+- Multi-tenant dès le départ
+- Architecture hexagonale obligatoire
+- **Design premium par défaut** — chaque page Moment doit être belle sans effort du Host
+- **Mobile-first** — le parcours Player est optimisé pour mobile
+- Données exportables (export complet : membres, événements, historique)
+- Pas d'algorithme de ranking global
+- Pas de feed social
+- Pas de marketplace (mais répertoire simple de Circles publics, filtrable par thème/localisation)
+- Ownership des données pour les Circles
+- Architecture notifications **multi-canal dès la conception** (V1 = email, puis SMS/push/WhatsApp)
+- **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour ajout de langues futur
+
+## Monétisation
+
+- **100% gratuit** — aucune commission plateforme, aucun abonnement requis
+- Seuls les frais Stripe (~2.9% + 0.30$) sur les Moments payants
+- The Playground ne prend aucune marge sur les transactions
+- Évolution future : Plan Pro (analytics, branding, IA avancée, API, multi-canal)
+
+## MVP V1 — Périmètre
+
+### Host
+- CRUD Circle / Moment (Track en Phase 2)
+- Pages Moment autonomes et partageables (URL propre)
+- Paramétrage capacité, prix
+- Liste d'attente
+- Check-in, export CSV, communication directe avec Players
+- Assistant IA basique (description Moment, email invitation, suggestions Circle)
+
+### Player
+- Découverte Moment via lien partagé
+- Inscription Moment = inscription Circle automatique
+- Paiement Stripe si nécessaire
+- Notifications email (confirmation, rappels 24h/1h, changements, annulations)
+- Fil de commentaires sur le Moment
+
+### Plateforme
+- Répertoire public de Circles (filtrable thème/localisation, sans ranking)
+- Stripe Connect pour événements payants
+
+## Stack technique
+
+### Core
+- **Framework** : Next.js 15 (App Router) — SSR pour les pages Moment, API Routes, i18n
+- **Langage** : TypeScript (strict) — types partagés front/back
+- **ORM** : Prisma — schema déclaratif, migrations
+- **Base de données** : PostgreSQL — multi-tenant
+- **Auth** : Auth.js (NextAuth v5) — magic link + OAuth (Google, GitHub), self-hosted
+- **Paiements** : Stripe Connect — reversement aux Hosts
+
+### UI / Design
+- **Styling** : Tailwind CSS 4
+- **Composants** : shadcn/ui — design premium, composants copiés (pas de dépendance)
+- **i18n** : next-intl — FR/EN natif
+
+### Services
+- **Email** : Resend + react-email (templates React)
+- **IA** : SDK Anthropic (Claude) — appels API directs
+- **File storage** : Uploadthing ou S3-compatible
+
+### Infrastructure
+- **Hosting app** : Vercel (région EU)
+- **Hosting DB** : Neon ou Supabase (PostgreSQL serverless, région EU)
+- **Monorepo** : Turborepo si packages partagés nécessaires
+
+### Dev tooling
+- **Package manager** : pnpm
+- **Linting** : ESLint + Prettier
+- **Tests unitaires** : Vitest
+- **Tests E2E** : Playwright
+- **CI/CD** : GitHub Actions
+
+### Scripts (`pnpm <script>`)
+
+| Commande | Description |
+|----------|-------------|
+| `pnpm test` | Lance tous les tests (unit + integration) une fois |
+| `pnpm test:watch` | Lance les tests en mode watch (relance sur changement) |
+| `pnpm test:unit` | Lance uniquement les tests unitaires |
+| `pnpm test:integration` | Lance uniquement les tests d'intégration |
+| `pnpm test:coverage` | Lance les tests avec rapport de couverture |
+| `pnpm typecheck` | Vérifie les types TypeScript (sans émission) |
+| `pnpm db:validate` | Valide le schema Prisma |
+| `pnpm db:generate` | Génère le client Prisma |
+| `pnpm db:migrate` | Crée et applique une migration Prisma |
+| `pnpm db:push` | Push le schema vers la DB sans migration |
+| `pnpm db:studio` | Ouvre Prisma Studio (UI de visualisation DB) |
+
+> **Note Claude** : ne pas lancer les tests automatiquement. Lancer uniquement quand l'utilisateur le demande explicitement.
+
+## Architecture hexagonale — CONTRAT STRICT
+
+> **Cette section est normative.** Tout code produit dans ce projet DOIT respecter ces règles. Aucune exception.
+
+### Principe fondamental
+
+L'architecture hexagonale (Ports & Adapters) sépare le code en 3 zones avec une **règle de dépendance unidirectionnelle** :
+
+```
+app/ (UI, routes) ──→ domain/ (métier pur) ←── infrastructure/ (adapters)
+```
+
+**Le domaine ne dépend de RIEN.** Ni de Prisma, ni de Next.js, ni de Stripe, ni d'aucune librairie externe. Le domaine est testable en isolation totale.
+
+### Structure des dossiers
+
+```
+src/
+  app/                    → Couche APPLICATION (Next.js App Router)
+    (routes)/             → Pages et API routes
+    actions/              → Server Actions (orchestrent les usecases)
+
+  components/             → Composants React réutilisables (UI pure)
+
+  domain/                 → Couche DOMAINE (logique métier pure)
+    models/               → Entités et Value Objects
+      user.ts             → Entité User
+      circle.ts           → Entité Circle + CircleMembership
+      moment.ts           → Entité Moment + LocationType + MomentStatus
+      registration.ts     → Entité Registration + RegistrationStatus + PaymentStatus
+      comment.ts          → Entité Comment
+    ports/                → Interfaces (contrats abstraits)
+      repositories/       → Interfaces des repositories (persistance)
+      services/           → Interfaces des services externes (email, paiement, IA)
+    usecases/             → Cas d'usage métier (logique applicative)
+    errors/               → Erreurs métier typées
+
+  infrastructure/         → Couche INFRASTRUCTURE (implémentations concrètes)
+    repositories/         → Implémentations Prisma des ports/repositories
+    services/             → Implémentations concrètes des ports/services
+      stripe/             → Adapter Stripe Connect
+      email/              → Adapter Resend
+      ai/                 → Adapter Anthropic Claude
+      storage/            → Adapter file storage
+    auth/                 → Configuration Auth.js
+    db/                   → Client Prisma, schema, migrations
+
+  lib/                    → Utilitaires partagés (helpers purs, sans dépendance infra)
+  i18n/                   → Messages FR/EN (next-intl)
+```
+
+### Règles strictes
+
+#### 1. Le domaine est pur
+- `domain/` ne contient **AUCUN import** de : Prisma, Next.js, Stripe, Resend, Anthropic, ou toute autre librairie externe
+- `domain/` n'importe que depuis `domain/` et `lib/` (si lib est pur)
+- Les entités dans `domain/models/` sont des classes ou types TypeScript purs, PAS des modèles Prisma
+- Les erreurs métier dans `domain/errors/` sont des classes Error typées, pas des HTTP errors
+
+#### 2. Les ports sont des interfaces TypeScript
+- Chaque dépendance externe est abstraite par une interface dans `domain/ports/`
+- Exemple : `CircleRepository` (port) → `PrismaCircleRepository` (adapter dans infrastructure/)
+- Exemple : `PaymentService` (port) → `StripePaymentService` (adapter dans infrastructure/)
+- Exemple : `EmailService` (port) → `ResendEmailService` (adapter dans infrastructure/)
+- Exemple : `AIService` (port) → `ClaudeAIService` (adapter dans infrastructure/)
+
+#### 3. Les usecases orchestrent la logique métier
+- Un usecase reçoit ses dépendances par **injection** (paramètres du constructeur ou de la fonction)
+- Un usecase ne connaît que les ports (interfaces), jamais les implémentations concrètes
+- Un usecase retourne des entités du domaine ou des types du domaine, jamais des objets Prisma ou des Response HTTP
+- Nommage : verbe + nom → `CreateMoment`, `JoinMoment`, `CancelRegistration`, etc.
+
+#### 4. L'infrastructure implémente les ports
+- `infrastructure/repositories/` contient les implémentations Prisma qui satisfont les interfaces de `domain/ports/repositories/`
+- `infrastructure/services/` contient les implémentations concrètes (Stripe, Resend, Claude) qui satisfont les interfaces de `domain/ports/services/`
+- Le mapping Prisma model ↔ Domain entity se fait dans les repositories (pas dans le domaine)
+
+#### 5. La couche app orchestre le tout
+- `app/` (routes, server actions) est le point d'entrée qui :
+  1. Instancie les adapters concrets (repositories Prisma, services Stripe, etc.)
+  2. Les injecte dans les usecases
+  3. Appelle les usecases
+  4. Transforme le résultat en réponse HTTP ou en props pour les composants
+- Les composants React dans `components/` reçoivent des **données typées du domaine**, pas des objets Prisma
+
+#### 6. Sens des imports — JAMAIS violer
+
+| Depuis | Peut importer | NE PEUT PAS importer |
+|--------|--------------|---------------------|
+| `domain/` | `domain/`, `lib/` (si pur) | `app/`, `infrastructure/`, `components/`, librairies externes |
+| `infrastructure/` | `domain/`, `lib/`, librairies externes | `app/`, `components/` |
+| `app/` | `domain/`, `infrastructure/`, `components/`, `lib/`, `i18n/` | — |
+| `components/` | `domain/models/` (types only), `lib/`, `i18n/` | `infrastructure/`, `app/` |
+
+### Exemple de flux : "Un Player s'inscrit à un Moment"
+
+```
+1. app/actions/joinMoment.ts (Server Action)
+   → Instancie PrismaMomentRepository, PrismaPlayerRepository, ResendEmailService
+   → Injecte dans JoinMomentUseCase
+   → Appelle usecase.execute({ momentId, playerData })
+
+2. domain/usecases/JoinMoment.ts
+   → Utilise MomentRepository (port) pour charger le Moment
+   → Vérifie la capacité, gère la liste d'attente (logique métier pure)
+   → Utilise PlayerRepository (port) pour créer/lier le Player
+   → Utilise EmailService (port) pour envoyer la confirmation
+   → Retourne un résultat typé du domaine
+
+3. infrastructure/repositories/PrismaMomentRepository.ts
+   → Implémente MomentRepository
+   → Traduit les appels en queries Prisma
+   → Mappe les résultats Prisma → entités domaine
+```
+
+### Stratégie de tests — CONTRAT STRICT
+
+> **Cette section est normative.** Tout code produit DOIT être accompagné de tests. Les tests sont maintenus tout au long du projet.
+
+#### Méthodologie : BDD lightweight + Specification by Example
+
+- **BDD sans Gherkin** : philosophie Given/When/Then dans les `describe`/`it` Vitest natifs, sans fichiers `.feature` ni step definitions
+- **Specification by Example** : cas limites encodés en tables de données (`test.each` / `describe.each`)
+- **Langage métier** : les noms de tests utilisent le vocabulaire domaine (Circle, Moment, Player, Host, Registration)
+
+#### 3 niveaux de tests
+
+| Niveau | Outil | Cible | Style |
+|--------|-------|-------|-------|
+| **Unitaire domaine** | Vitest | Models, usecases, logique métier pure | Given/When/Then dans `describe`/`it`, `test.each` pour spec by example. Mocks des ports. Pas de DB, pas de réseau. |
+| **Intégration** | Vitest + DB test | Repositories, services (adapters) | Vérifient le contrat ports/adapters avec une vraie DB PostgreSQL de test |
+| **E2E fonctionnel** | Playwright | Parcours utilisateur complets | Scénarios nommés en langage métier, couvrent les flux critiques |
+
+#### Règles
+
+1. **Tout usecase a ses tests unitaires** — les ports sont mockés, la logique métier est testée en isolation
+2. **Tout adapter a ses tests d'intégration** — vérification que l'implémentation respecte le contrat du port
+3. **Tout parcours critique a un test E2E** — inscription Moment, paiement, liste d'attente, etc.
+4. **Les tests documentent le comportement** — un nouveau développeur doit comprendre les règles métier en lisant les tests
+5. **Pas de test sans assertion** — chaque `it()` vérifie un comportement précis
+6. **Les tests sont maintenus à chaque changement** — code modifié = tests mis à jour
+
+#### Convention de nommage des tests
+
+```
+describe("[UseCaseName]", () => {
+  describe("given [contexte initial]", () => {
+    it("should [comportement attendu]", ...)
+  })
+})
+```
+
+#### Structure des fichiers de test
+
+```
+src/
+  domain/
+    usecases/
+      __tests__/           → Tests unitaires des usecases
+    models/
+      __tests__/           → Tests unitaires des models (si logique)
+  infrastructure/
+    repositories/
+      __tests__/           → Tests d'intégration repositories
+    services/
+      __tests__/           → Tests d'intégration services
+tests/
+  e2e/                     → Tests Playwright (parcours utilisateur)
+```
+
+#### Tests complémentaires
+
+##### Autorisation (sécurité)
+
+Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'accès :
+- Un Player ne peut pas accéder aux données d'un Circle dont il n'est pas membre
+- Un non-Host ne peut pas modifier/supprimer un Moment
+- Un User ne peut pas voir les inscriptions d'un Moment d'un autre Circle
+- Ces tests sont intégrés dans les tests unitaires des usecases (pas un outil séparé)
+
+##### Dépendances (sécurité)
+
+- `pnpm audit` en CI — détection des vulnérabilités dans les dépendances
+
+##### Performance pages
+
+- **Lighthouse CI** sur les pages Moment (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
+- **Détection N+1 queries** dans les tests d'intégration des repositories
+- **Load testing** (k6/Artillery) : uniquement en phase pré-lancement, pas dans le MVP
+
+##### Accessibilité (a11y)
+
+- **axe-core** intégré dans les tests Playwright E2E — détecte les erreurs de contraste, labels manquants, navigation clavier
+
+##### Hors scope MVP
+
+- Visual regression testing (Chromatic/Percy) → post-MVP si nécessaire
+- SAST/DAST complet (Snyk/SonarCloud) → quand CI en place
+- Pentest externe → pré-lancement
+- Chaos engineering → sans objet (pas de microservices)
+
+#### Roadmap qualité
+
+| Type | MVP V1 | Pré-lancement | Post-lancement |
+|------|--------|---------------|----------------|
+| Unitaire + fonctionnel | Vitest BDD | — | — |
+| E2E | Playwright | — | — |
+| Autorisation (sécu) | Tests Vitest dédiés | — | — |
+| Dépendances (sécu) | `pnpm audit` en CI | — | — |
+| Performance pages | Lighthouse CI | Load testing basique | Monitoring APM |
+| Accessibilité | axe-core dans Playwright | Audit a11y manuel | — |
+| Pentest | — | Pentest externe | Récurrent |
+
+## Data Model
+
+### Entités domaine (`src/domain/models/`)
+
+Types TypeScript purs — aucune dépendance externe. Le mapping Prisma ↔ domaine se fait dans les repositories (infrastructure).
+
+| Entité | Fichier | Description |
+|--------|---------|-------------|
+| User | `user.ts` | Utilisateur plateforme (peut être Host et/ou Player selon les Circles) |
+| Circle | `circle.ts` | Communauté autonome, tenant principal multi-tenant |
+| CircleMembership | `circle.ts` | Relation User ↔ Circle avec rôle (HOST / PLAYER) |
+| Moment | `moment.ts` | Événement individuel, page autonome partageable |
+| Registration | `registration.ts` | Inscription User à un Moment (+ liste d'attente, check-in, paiement) |
+| Comment | `comment.ts` | Commentaire sur un Moment |
+
+### Schema Prisma (`prisma/schema.prisma`)
+
+Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationToken). Tables en snake_case via `@@map`.
+
+### Règles encodées dans le modèle
+
+- **Prix en centimes** (int) — convention Stripe, pas de floating point. 1500 = 15,00€
+- **Slug global pour Moments** — URL courte `/m/[slug]`, pas scoped au Circle
+- **Contrainte unique (userId, circleId, role)** — un User peut être HOST et PLAYER du même Circle
+- **Contrainte unique (momentId, userId)** — un User ne peut s'inscrire qu'une fois à un Moment
+- **Inscription auto au Circle** — logique dans le usecase, pas dans le schema
+
+## Décisions prises
+
+| Date | Décision |
+|------|----------|
+| 2026-02-19 | Le Moment est l'unité virale, page autonome partageable (inspiration Luma) |
+| 2026-02-19 | Inscription Moment = inscription automatique Circle (pas de friction) |
+| 2026-02-19 | Design-first comme principe structurant (Luma = benchmark UX) |
+| 2026-02-19 | 100% gratuit, 0% commission plateforme, seuls frais Stripe |
+| 2026-02-19 | IA basique dès le MVP (descriptions, emails, suggestions) |
+| 2026-02-19 | Liste d'attente dans le MVP (pas en Phase 2) |
+| 2026-02-19 | Notifications multi-canal en architecture, email-only en V1 |
+| 2026-02-19 | Répertoire public de Circles (annuaire simple, pas de marketplace) |
+| 2026-02-19 | On garde le nom "Circle" malgré la collision avec Circle.so |
+| 2026-02-19 | Fil de commentaires sur Moment (pas de forum complet) |
+| 2026-02-19 | Mobile-first pour le parcours Player |
+| 2026-02-19 | Export données ambitieux (CSV + JSON + API Pro) |
+| 2026-02-19 | UI bilingue FR/EN dès V1, architecture i18n native pour multi-langue futur |
+| 2026-02-19 | Lancement France d'abord, puis expansion européenne et internationale |
+| 2026-02-19 | Stack technique : TypeScript full-stack (Next.js 15, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon/Supabase) |
+| 2026-02-19 | Architecture hexagonale : domain/ (models, ports, usecases) + infrastructure/ (repositories, services) + app/ (routes Next.js) |
+| 2026-02-19 | Questions ouvertes résolues : découverte publique = oui, freemium = non, langue = bilingue FR/EN, géo = France d'abord |
+| 2026-02-19 | Track retiré du MVP V1 → Phase 2. MVP se concentre sur Circle + Moment |
+| 2026-02-19 | Auth : Magic link + OAuth (Google, GitHub) via Auth.js v5 |
+| 2026-02-19 | Data model V1 : User, Circle, CircleMembership, Moment, Registration, Comment |
+| 2026-02-19 | Modèle User unique (pas d'entités Host/Player séparées) — rôle via CircleMembership |
+| 2026-02-19 | Prix en centimes (int) — convention Stripe, pas de floating point |
+| 2026-02-19 | Tests : BDD lightweight (Given/When/Then natif Vitest) + Specification by Example (test.each), pas de Gherkin/Cucumber |
+| 2026-02-19 | Sécu MVP : tests d'autorisation multi-tenant dans Vitest + pnpm audit en CI. Pentest → pré-lancement |
+| 2026-02-19 | Perf MVP : Lighthouse CI sur pages Moment + détection N+1. Load testing → pré-lancement |
+| 2026-02-19 | A11y : axe-core intégré dans tests Playwright E2E |

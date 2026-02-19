@@ -1,0 +1,37 @@
+{
+  "HomePage": {
+    "title": "The Playground",
+    "subtitle": "La plateforme ouverte pour vos communautés"
+  },
+  "Common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "back": "Retour"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Connexion",
+      "subtitle": "Connectez-vous pour continuer",
+      "google": "Continuer avec Google",
+      "github": "Continuer avec GitHub",
+      "emailPlaceholder": "votre@email.com",
+      "magicLink": "Envoyer un lien magique",
+      "or": "ou"
+    },
+    "verifyRequest": {
+      "title": "Vérifiez votre email",
+      "description": "Un lien de connexion a été envoyé à votre adresse email. Cliquez dessus pour vous connecter."
+    },
+    "error": {
+      "title": "Erreur d'authentification",
+      "backToSignIn": "Retour à la connexion"
+    },
+    "errors": {
+      "Configuration": "Erreur de configuration du serveur.",
+      "AccessDenied": "Accès refusé.",
+      "Verification": "Le lien de vérification a expiré ou a déjà été utilisé.",
+      "Default": "Une erreur est survenue lors de la connexion."
+    },
+    "signOut": "Se déconnecter"
+  }
+}

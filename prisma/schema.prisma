@@ -1,0 +1,216 @@
+// ─────────────────────────────────────────────
+// The Playground — Prisma Schema
+// ─────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum CircleVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum CircleMemberRole {
+  HOST
+  PLAYER
+}
+
+enum LocationType {
+  IN_PERSON
+  ONLINE
+  HYBRID
+}
+
+enum MomentStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+  PAST
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  WAITLISTED
+  CANCELLED
+  CHECKED_IN
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  PAID
+  REFUNDED
+}
+
+// ─────────────────────────────────────────────
+// Auth.js models
+// ─────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  access_token      String? @db.Text
+  refresh_token     String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  sessionToken String   @unique
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─────────────────────────────────────────────
+// Domain models
+// ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  firstName     String?
+  lastName      String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts    Account[]
+  sessions    Session[]
+  memberships CircleMembership[]
+  moments     Moment[]           @relation("CreatedMoments")
+  registrations Registration[]
+  comments    Comment[]
+
+  @@map("users")
+}
+
+model Circle {
+  id                    String           @id @default(cuid())
+  slug                  String           @unique
+  name                  String
+  description           String           @db.Text
+  logo                  String?
+  visibility            CircleVisibility @default(PUBLIC)
+  stripeConnectAccountId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  memberships CircleMembership[]
+  moments     Moment[]
+
+  @@map("circles")
+}
+
+model CircleMembership {
+  id       String           @id @default(cuid())
+  userId   String
+  circleId String
+  role     CircleMemberRole
+  joinedAt DateTime         @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  circle Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, circleId, role])
+  @@map("circle_memberships")
+}
+
+model Moment {
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  circleId        String
+  createdById     String
+  title           String
+  description     String       @db.Text
+  startsAt        DateTime
+  endsAt          DateTime?
+  locationType    LocationType
+  locationName    String?
+  locationAddress String?
+  videoLink       String?
+  capacity        Int?
+  price           Int          @default(0)
+  currency        String       @default("EUR")
+  status          MomentStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  circle    Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  createdBy User   @relation("CreatedMoments", fields: [createdById], references: [id])
+
+  registrations Registration[]
+  comments      Comment[]
+
+  @@map("moments")
+}
+
+model Registration {
+  id                    String             @id @default(cuid())
+  momentId              String
+  userId                String
+  status                RegistrationStatus @default(REGISTERED)
+  paymentStatus         PaymentStatus      @default(NONE)
+  stripePaymentIntentId String?
+  registeredAt          DateTime           @default(now())
+  cancelledAt           DateTime?
+  checkedInAt           DateTime?
+
+  moment Moment @relation(fields: [momentId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([momentId, userId])
+  @@map("registrations")
+}
+
+model Comment {
+  id       String @id @default(cuid())
+  momentId String
+  userId   String
+  content  String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  moment Moment @relation(fields: [momentId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}

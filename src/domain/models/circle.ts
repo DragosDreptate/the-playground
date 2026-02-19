@@ -1,0 +1,23 @@
+export type CircleVisibility = "PUBLIC" | "PRIVATE";
+
+export type CircleMemberRole = "HOST" | "PLAYER";
+
+export type Circle = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  logo: string | null;
+  visibility: CircleVisibility;
+  stripeConnectAccountId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CircleMembership = {
+  id: string;
+  userId: string;
+  circleId: string;
+  role: CircleMemberRole;
+  joinedAt: Date;
+};
