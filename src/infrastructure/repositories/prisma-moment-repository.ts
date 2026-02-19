@@ -1,0 +1,104 @@
+import { prisma } from "@/infrastructure/db/prisma";
+import type {
+  MomentRepository,
+  CreateMomentInput,
+  UpdateMomentInput,
+} from "@/domain/ports/repositories/moment-repository";
+import type { Moment } from "@/domain/models/moment";
+import type { Moment as PrismaMoment } from "@prisma/client";
+
+function toDomainMoment(record: PrismaMoment): Moment {
+  return {
+    id: record.id,
+    slug: record.slug,
+    circleId: record.circleId,
+    createdById: record.createdById,
+    title: record.title,
+    description: record.description,
+    startsAt: record.startsAt,
+    endsAt: record.endsAt,
+    locationType: record.locationType,
+    locationName: record.locationName,
+    locationAddress: record.locationAddress,
+    videoLink: record.videoLink,
+    capacity: record.capacity,
+    price: record.price,
+    currency: record.currency,
+    status: record.status,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+  };
+}
+
+export const prismaMomentRepository: MomentRepository = {
+  async create(input: CreateMomentInput): Promise<Moment> {
+    const record = await prisma.moment.create({
+      data: {
+        slug: input.slug,
+        circleId: input.circleId,
+        createdById: input.createdById,
+        title: input.title,
+        description: input.description,
+        startsAt: input.startsAt,
+        endsAt: input.endsAt,
+        locationType: input.locationType,
+        locationName: input.locationName,
+        locationAddress: input.locationAddress,
+        videoLink: input.videoLink,
+        capacity: input.capacity,
+        price: input.price,
+        currency: input.currency,
+        status: input.status,
+      },
+    });
+    return toDomainMoment(record);
+  },
+
+  async findById(id: string): Promise<Moment | null> {
+    const record = await prisma.moment.findUnique({ where: { id } });
+    return record ? toDomainMoment(record) : null;
+  },
+
+  async findBySlug(slug: string): Promise<Moment | null> {
+    const record = await prisma.moment.findUnique({ where: { slug } });
+    return record ? toDomainMoment(record) : null;
+  },
+
+  async findByCircleId(circleId: string): Promise<Moment[]> {
+    const records = await prisma.moment.findMany({
+      where: { circleId },
+      orderBy: { startsAt: "asc" },
+    });
+    return records.map(toDomainMoment);
+  },
+
+  async update(id: string, input: UpdateMomentInput): Promise<Moment> {
+    const record = await prisma.moment.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.startsAt !== undefined && { startsAt: input.startsAt }),
+        ...(input.endsAt !== undefined && { endsAt: input.endsAt }),
+        ...(input.locationType !== undefined && { locationType: input.locationType }),
+        ...(input.locationName !== undefined && { locationName: input.locationName }),
+        ...(input.locationAddress !== undefined && { locationAddress: input.locationAddress }),
+        ...(input.videoLink !== undefined && { videoLink: input.videoLink }),
+        ...(input.capacity !== undefined && { capacity: input.capacity }),
+        ...(input.price !== undefined && { price: input.price }),
+        ...(input.currency !== undefined && { currency: input.currency }),
+        ...(input.status !== undefined && { status: input.status }),
+      },
+    });
+    return toDomainMoment(record);
+  },
+
+  async delete(id: string): Promise<void> {
+    await prisma.moment.delete({ where: { id } });
+  },
+
+  async slugExists(slug: string): Promise<boolean> {
+    const count = await prisma.moment.count({ where: { slug } });
+    return count > 0;
+  },
+};

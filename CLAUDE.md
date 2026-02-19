@@ -8,14 +8,16 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 
 ## Architecture sémantique
 
-| Concept | Description |
-| --- | --- |
-| **Playground** | La plateforme |
-| **Circle** | Une communauté autonome (publique ou privée) |
-| **Track** | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
-| **Moment** | Événement individuel — unité virale de la plateforme, page autonome et partageable |
-| **Host** | Organisateur d'un Circle |
-| **Player** | Participant à un Moment / membre d'un Circle |
+| Concept | FR (i18n) | Description |
+| --- | --- | --- |
+| **Playground** | — | La plateforme |
+| **Circle** | Cercle | Une communauté autonome (publique ou privée) |
+| **Track** | — | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
+| **Moment** | Moment | Événement individuel — unité virale de la plateforme, page autonome et partageable |
+| **Host** | Organisateur | Organisateur d'un Circle |
+| **Player** | Participant | Participant à un Moment / membre d'un Circle |
+
+> **Règle i18n** : En code (types, variables, DB), on utilise toujours les termes anglais (Circle, Host, Player). Les termes français (Cercle, Organisateur, Participant) ne sont utilisés que dans les fichiers i18n (`messages/fr.json`) et le texte visible par l'utilisateur en français.
 
 ## Règles métier clés
 

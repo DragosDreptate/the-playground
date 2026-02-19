@@ -1,7 +1,8 @@
 {
   "HomePage": {
     "title": "The Playground",
-    "subtitle": "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience."
+    "subtitle": "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.",
+    "cta": "Commencer"
   },
   "Common": {
     "loading": "Chargement...",
@@ -87,6 +88,78 @@
       "createFailed": "Échec de la création du Cercle",
       "updateFailed": "Échec de la mise à jour du Cercle",
       "deleteFailed": "Échec de la suppression du Cercle"
+    }
+  },
+  "Moment": {
+    "create": {
+      "title": "Créer un Moment",
+      "description": "Configurez votre événement"
+    },
+    "edit": {
+      "title": "Modifier le Moment",
+      "description": "Mettez à jour les détails de votre événement"
+    },
+    "form": {
+      "title": "Titre",
+      "titlePlaceholder": "Rencontre hebdomadaire de la communauté",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez votre Moment en quelques mots...",
+      "startsAt": "Date et heure de début",
+      "endsAt": "Date et heure de fin",
+      "locationType": "Type de lieu",
+      "locationInPerson": "En présentiel",
+      "locationOnline": "En ligne",
+      "locationHybrid": "Hybride",
+      "locationName": "Nom du lieu",
+      "locationNamePlaceholder": "Café Central",
+      "locationAddress": "Adresse",
+      "locationAddressPlaceholder": "123 rue Principale, Paris",
+      "videoLink": "Lien vidéo",
+      "videoLinkPlaceholder": "https://meet.google.com/...",
+      "advancedOptions": "Options avancées",
+      "capacity": "Capacité",
+      "capacityPlaceholder": "Laisser vide pour illimité",
+      "price": "Prix (en centimes)",
+      "pricePlaceholder": "0",
+      "priceHint": "En centimes. 1500 = 15,00. Laisser 0 pour gratuit.",
+      "currency": "Devise",
+      "status": "Statut"
+    },
+    "delete": {
+      "title": "Supprimer le Moment",
+      "description": "Êtes-vous sûr de vouloir supprimer ce Moment ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
+      "confirm": "Oui, supprimer ce Moment"
+    },
+    "detail": {
+      "when": "Quand",
+      "where": "Où",
+      "capacity": "Capacité",
+      "price": "Prix",
+      "created": "Créé le",
+      "shareableLink": "Lien partageable"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "published": "Publié",
+      "cancelled": "Annulé",
+      "past": "Passé"
+    },
+    "public": {
+      "hostedBy": "Organisé par",
+      "free": "Gratuit",
+      "spotsAvailable": "{count} places",
+      "registerFree": "S'inscrire gratuitement",
+      "registerPaid": "S'inscrire — {price} {currency}"
+    },
+    "empty": {
+      "description": "Aucun Moment pour le moment. Créez votre premier événement."
+    },
+    "errors": {
+      "notFound": "Moment introuvable",
+      "unauthorized": "Vous n'avez pas la permission de gérer ce Moment",
+      "createFailed": "Échec de la création du Moment",
+      "updateFailed": "Échec de la mise à jour du Moment",
+      "deleteFailed": "Échec de la suppression du Moment"
     }
   }
 }

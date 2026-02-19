@@ -1,7 +1,8 @@
 {
   "HomePage": {
     "title": "The Playground",
-    "subtitle": "Launch your community. Organize your events. Own your audience."
+    "subtitle": "Launch your community. Organize your events. Own your audience.",
+    "cta": "Get started"
   },
   "Common": {
     "loading": "Loading...",
@@ -87,6 +88,78 @@
       "createFailed": "Failed to create Circle",
       "updateFailed": "Failed to update Circle",
       "deleteFailed": "Failed to delete Circle"
+    }
+  },
+  "Moment": {
+    "create": {
+      "title": "Create a Moment",
+      "description": "Set up your event"
+    },
+    "edit": {
+      "title": "Edit Moment",
+      "description": "Update your event details"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Weekly Community Meetup",
+      "description": "Description",
+      "descriptionPlaceholder": "Tell people what this Moment is about...",
+      "startsAt": "Start date & time",
+      "endsAt": "End date & time",
+      "locationType": "Location type",
+      "locationInPerson": "In person",
+      "locationOnline": "Online",
+      "locationHybrid": "Hybrid",
+      "locationName": "Venue name",
+      "locationNamePlaceholder": "Cafe Central",
+      "locationAddress": "Address",
+      "locationAddressPlaceholder": "123 Main Street, Paris",
+      "videoLink": "Video link",
+      "videoLinkPlaceholder": "https://meet.google.com/...",
+      "advancedOptions": "Advanced options",
+      "capacity": "Capacity",
+      "capacityPlaceholder": "Leave empty for unlimited",
+      "price": "Price (in cents)",
+      "pricePlaceholder": "0",
+      "priceHint": "In cents. 1500 = 15.00. Leave 0 for free.",
+      "currency": "Currency",
+      "status": "Status"
+    },
+    "delete": {
+      "title": "Delete Moment",
+      "description": "Are you sure you want to delete this Moment? This action cannot be undone. All registrations will be permanently removed.",
+      "confirm": "Yes, delete this Moment"
+    },
+    "detail": {
+      "when": "When",
+      "where": "Where",
+      "capacity": "Capacity",
+      "price": "Price",
+      "created": "Created",
+      "shareableLink": "Shareable link"
+    },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "cancelled": "Cancelled",
+      "past": "Past"
+    },
+    "public": {
+      "hostedBy": "Hosted by",
+      "free": "Free",
+      "spotsAvailable": "{count} spots",
+      "registerFree": "Register for free",
+      "registerPaid": "Register — {price} {currency}"
+    },
+    "empty": {
+      "description": "No Moments yet. Create your first event."
+    },
+    "errors": {
+      "notFound": "Moment not found",
+      "unauthorized": "You don't have permission to manage this Moment",
+      "createFailed": "Failed to create Moment",
+      "updateFailed": "Failed to update Moment",
+      "deleteFailed": "Failed to delete Moment"
     }
   }
 }
