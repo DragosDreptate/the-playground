@@ -2,12 +2,14 @@
 
 ## Vision
 
+**Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.**
+
 Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetup.com centrée sur l'ownership des données, le design premium et l'IA. Benchmark UX : Luma (lu.ma).
 
 ## Architecture sémantique
 
 | Concept | Description |
-|---------|-------------|
+| --- | --- |
 | **Playground** | La plateforme |
 | **Circle** | Une communauté autonome (publique ou privée) |
 | **Track** | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
@@ -28,14 +30,48 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 - Multi-tenant dès le départ
 - Architecture hexagonale obligatoire
 - **Design premium par défaut** — chaque page Moment doit être belle sans effort du Host
-- **Mobile-first** — le parcours Player est optimisé pour mobile
+- **Mobile-first** — le parcours Player est optimisé pour mobile (lien partagé via WhatsApp/Instagram/Slack → toujours sur mobile)
+- **Marque visible mais discrète** — "Powered by The Playground" en footer, couleur accent reconnaissable, mais le Host et son Circle restent au premier plan. On construit de la notoriété sans cannibaliser l'identité des communautés
 - Données exportables (export complet : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
 - Pas de marketplace (mais répertoire simple de Circles publics, filtrable par thème/localisation)
 - Ownership des données pour les Circles
+- **Distribution par les Hosts** — pas d'algo de distribution, la viralité vient des liens partageables + intégration calendrier + export. Le Host génère la distribution, pas la plateforme
 - Architecture notifications **multi-canal dès la conception** (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour ajout de langues futur
+
+## Principes UX — Benchmark Luma
+
+> Inspirés de l'analyse de Luma (lu.ma). Ces principes guident toutes les décisions UI/UX.
+
+### La page Moment = 80% de la valeur
+
+La page Moment est LE produit. Structure obligatoire :
+- **Titre clair** — immédiatement lisible
+- **Date visible immédiatement** — pas cachée dans un détail
+- **Lieu explicite** — adresse ou "En ligne"
+- **CTA évident** — bouton d'inscription dominant, au-dessus de la ligne de flottaison
+- **Social proof** — liste des inscrits avec avatars/initiales, nombre de places restantes
+
+### Friction zéro à l'inscription
+
+- Magic link / OAuth — pas de création de compte lourde avant inscription
+- Minimum d'étapes entre "je vois le Moment" et "je suis inscrit"
+- L'inscription au Circle est transparente (pas de popup ni de validation supplémentaire)
+
+### Minimalisme du formulaire de création (Host)
+
+- Le Host ne remplit que l'essentiel : **titre, date, lieu, description**
+- Tout le reste (capacité, prix, paramètres avancés) est masqué dans des options secondaires
+- Moins de réglages = meilleure adoption
+
+### Ce qu'on ne copie PAS de Luma
+
+- La neutralité totale — on construit une marque (branding discret mais présent)
+- Le modèle commission — on reste 100% gratuit
+- L'absence de couche communautaire forte — notre Circle est structurant
+- L'absence d'IA — c'est notre levier de différenciation
 
 ## Monétisation
 
@@ -48,8 +84,8 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 
 ### Host
 - CRUD Circle / Moment (Track en Phase 2)
-- Pages Moment autonomes et partageables (URL propre)
-- Paramétrage capacité, prix
+- Pages Moment autonomes et partageables (URL propre `/m/[slug]`)
+- Formulaire de création minimaliste (titre, date, lieu, description) — options avancées (capacité, prix) masquées par défaut
 - Liste d'attente
 - Check-in, export CSV, communication directe avec Players
 - Assistant IA basique (description Moment, email invitation, suggestions Circle)
@@ -57,6 +93,8 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 ### Player
 - Découverte Moment via lien partagé
 - Inscription Moment = inscription Circle automatique
+- Social proof sur la page Moment : liste des inscrits (avatars/initiales), nombre de places restantes
+- Bouton "Ajouter à mon calendrier" après inscription (Google Calendar, Apple Calendar, ICS)
 - Paiement Stripe si nécessaire
 - Notifications email (confirmation, rappels 24h/1h, changements, annulations)
 - Fil de commentaires sur le Moment
@@ -100,7 +138,7 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 ### Scripts (`pnpm <script>`)
 
 | Commande | Description |
-|----------|-------------|
+| --- | --- |
 | `pnpm test` | Lance tous les tests (unit + integration) une fois |
 | `pnpm test:watch` | Lance les tests en mode watch (relance sur changement) |
 | `pnpm test:unit` | Lance uniquement les tests unitaires |
@@ -203,7 +241,7 @@ src/
 #### 6. Sens des imports — JAMAIS violer
 
 | Depuis | Peut importer | NE PEUT PAS importer |
-|--------|--------------|---------------------|
+| --- | --- | --- |
 | `domain/` | `domain/`, `lib/` (si pur) | `app/`, `infrastructure/`, `components/`, librairies externes |
 | `infrastructure/` | `domain/`, `lib/`, librairies externes | `app/`, `components/` |
 | `app/` | `domain/`, `infrastructure/`, `components/`, `lib/`, `i18n/` | — |
@@ -243,7 +281,7 @@ src/
 #### 3 niveaux de tests
 
 | Niveau | Outil | Cible | Style |
-|--------|-------|-------|-------|
+| --- | --- | --- | --- |
 | **Unitaire domaine** | Vitest | Models, usecases, logique métier pure | Given/When/Then dans `describe`/`it`, `test.each` pour spec by example. Mocks des ports. Pas de DB, pas de réseau. |
 | **Intégration** | Vitest + DB test | Repositories, services (adapters) | Vérifient le contrat ports/adapters avec une vraie DB PostgreSQL de test |
 | **E2E fonctionnel** | Playwright | Parcours utilisateur complets | Scénarios nommés en langage métier, couvrent les flux critiques |
@@ -319,7 +357,7 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 #### Roadmap qualité
 
 | Type | MVP V1 | Pré-lancement | Post-lancement |
-|------|--------|---------------|----------------|
+| --- | --- | --- | --- |
 | Unitaire + fonctionnel | Vitest BDD | — | — |
 | E2E | Playwright | — | — |
 | Autorisation (sécu) | Tests Vitest dédiés | — | — |
@@ -335,7 +373,7 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 Types TypeScript purs — aucune dépendance externe. Le mapping Prisma ↔ domaine se fait dans les repositories (infrastructure).
 
 | Entité | Fichier | Description |
-|--------|---------|-------------|
+| --- | --- | --- |
 | User | `user.ts` | Utilisateur plateforme (peut être Host et/ou Player selon les Circles) |
 | Circle | `circle.ts` | Communauté autonome, tenant principal multi-tenant |
 | CircleMembership | `circle.ts` | Relation User ↔ Circle avec rôle (HOST / PLAYER) |
@@ -358,7 +396,7 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 ## Décisions prises
 
 | Date | Décision |
-|------|----------|
+| --- | --- |
 | 2026-02-19 | Le Moment est l'unité virale, page autonome partageable (inspiration Luma) |
 | 2026-02-19 | Inscription Moment = inscription automatique Circle (pas de friction) |
 | 2026-02-19 | Design-first comme principe structurant (Luma = benchmark UX) |
@@ -385,3 +423,9 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Sécu MVP : tests d'autorisation multi-tenant dans Vitest + pnpm audit en CI. Pentest → pré-lancement |
 | 2026-02-19 | Perf MVP : Lighthouse CI sur pages Moment + détection N+1. Load testing → pré-lancement |
 | 2026-02-19 | A11y : axe-core intégré dans tests Playwright E2E |
+| 2026-02-19 | Benchmark Luma intégré : page Moment = 80% de la valeur (titre, date, lieu, CTA, social proof) |
+| 2026-02-19 | Social proof MVP : liste inscrits avec avatars/initiales + places restantes sur page Moment |
+| 2026-02-19 | Ajout calendrier natif post-inscription (Google Calendar, Apple Calendar, ICS) |
+| 2026-02-19 | Formulaire création Moment minimaliste : titre/date/lieu/description, options avancées masquées |
+| 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Host au premier plan |
+| 2026-02-19 | Distribution par les Hosts (liens partageables + calendrier), pas d'algo de distribution plateforme |

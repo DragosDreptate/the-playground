@@ -1,12 +1,19 @@
 {
   "HomePage": {
     "title": "The Playground",
-    "subtitle": "The open platform for your communities"
+    "subtitle": "Launch your community. Organize your events. Own your audience."
   },
   "Common": {
     "loading": "Loading...",
     "error": "An error occurred",
-    "back": "Back"
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "create": "Create",
+    "edit": "Edit",
+    "public": "Public",
+    "private": "Private"
   },
   "Auth": {
     "signIn": {
@@ -33,5 +40,53 @@
       "Default": "An error occurred during sign in."
     },
     "signOut": "Sign out"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "myCircles": "My Circles",
+    "createCircle": "Create a Circle",
+    "empty": {
+      "title": "No Circles yet",
+      "description": "Create your first Circle to start building your community."
+    }
+  },
+  "Circle": {
+    "create": {
+      "title": "Create a Circle",
+      "description": "Set up your community space"
+    },
+    "edit": {
+      "title": "Edit Circle",
+      "description": "Update your Circle settings"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "My awesome community",
+      "description": "Description",
+      "descriptionPlaceholder": "Tell people what your Circle is about...",
+      "visibility": "Visibility",
+      "visibilityPublic": "Public — anyone can discover this Circle",
+      "visibilityPrivate": "Private — only accessible via invitation"
+    },
+    "delete": {
+      "title": "Delete Circle",
+      "description": "Are you sure you want to delete this Circle? This action cannot be undone. All Moments and memberships will be permanently removed.",
+      "confirm": "Yes, delete this Circle"
+    },
+    "detail": {
+      "members": "Members",
+      "moments": "Moments",
+      "settings": "Settings",
+      "editCircle": "Edit",
+      "deleteCircle": "Delete",
+      "created": "Created"
+    },
+    "errors": {
+      "notFound": "Circle not found",
+      "unauthorized": "You don't have permission to perform this action",
+      "createFailed": "Failed to create Circle",
+      "updateFailed": "Failed to update Circle",
+      "deleteFailed": "Failed to delete Circle"
+    }
   }
 }

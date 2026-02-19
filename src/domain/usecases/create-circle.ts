@@ -1,0 +1,49 @@
+import type { Circle } from "@/domain/models/circle";
+import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { CircleVisibility } from "@/domain/models/circle";
+import { SlugAlreadyExistsError } from "@/domain/errors";
+import { generateSlug } from "@/lib/slug";
+
+type CreateCircleInput = {
+  name: string;
+  description: string;
+  visibility: CircleVisibility;
+  userId: string;
+};
+
+type CreateCircleDeps = {
+  circleRepository: CircleRepository;
+};
+
+type CreateCircleResult = {
+  circle: Circle;
+};
+
+export async function createCircle(
+  input: CreateCircleInput,
+  deps: CreateCircleDeps
+): Promise<CreateCircleResult> {
+  const { circleRepository } = deps;
+
+  let slug = generateSlug(input.name);
+
+  if (await circleRepository.slugExists(slug)) {
+    const suffix = Date.now().toString(36);
+    slug = `${slug}-${suffix}`;
+
+    if (await circleRepository.slugExists(slug)) {
+      throw new SlugAlreadyExistsError(slug);
+    }
+  }
+
+  const circle = await circleRepository.create({
+    name: input.name,
+    slug,
+    description: input.description,
+    visibility: input.visibility,
+  });
+
+  await circleRepository.addMembership(circle.id, input.userId, "HOST");
+
+  return { circle };
+}
