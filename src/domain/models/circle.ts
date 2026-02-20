@@ -21,3 +21,7 @@ export type CircleMembership = {
   role: CircleMemberRole;
   joinedAt: Date;
 };
+
+export type CircleWithRole = Circle & {
+  memberRole: CircleMemberRole;
+};

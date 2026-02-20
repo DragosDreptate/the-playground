@@ -14,6 +14,7 @@ export function createMockCircleRepository(
     delete: vi.fn<CircleRepository["delete"]>().mockResolvedValue(undefined),
     slugExists: vi.fn<CircleRepository["slugExists"]>().mockResolvedValue(false),
     addMembership: vi.fn<CircleRepository["addMembership"]>().mockResolvedValue(makeMembership()),
+    findAllByUserId: vi.fn<CircleRepository["findAllByUserId"]>().mockResolvedValue([]),
     findMembership: vi.fn<CircleRepository["findMembership"]>().mockResolvedValue(null),
     ...overrides,
   };

@@ -1,6 +1,6 @@
 export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
-export type MomentStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "PAST";
+export type MomentStatus = "PUBLISHED" | "CANCELLED" | "PAST";
 
 export type Moment = {
   id: string;

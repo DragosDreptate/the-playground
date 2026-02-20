@@ -66,7 +66,7 @@ export default async function CircleDetailPage({
           </p>
         </div>
         <div className="flex shrink-0 gap-2">
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" size="sm">
             <Link href={`/dashboard/circles/${circle.slug}/edit`}>
               {t("detail.editCircle")}
             </Link>

@@ -4,6 +4,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
@@ -69,6 +70,7 @@ export async function createMomentAction(
       {
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        registrationRepository: prismaRegistrationRepository,
       }
     );
     return { success: true, data: result.moment };

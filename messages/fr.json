@@ -55,10 +55,20 @@
       "title": "Créez d'abord un Cercle",
       "description": "Vous devez créer un Cercle avant de créer un Moment."
     },
-    "empty": {
-      "title": "Aucun Cercle pour le moment",
-      "description": "Créez votre premier Cercle pour commencer à construire votre communauté."
-    }
+    "upcomingMoments": "Mes prochains Moments",
+    "noUpcomingMoments": "Aucun Moment à venir.",
+    "noCirclesMember": "Vous n'êtes membre d'aucun Cercle.",
+    "role": {
+      "host": "Organisateur",
+      "player": "Participant"
+    },
+    "registrationStatus": {
+      "registered": "Inscrit",
+      "waitlisted": "Liste d'attente"
+    },
+    "online": "En ligne",
+    "hybrid": "Hybride",
+    "hostTools": "Outils Organisateur"
   },
   "Circle": {
     "create": {
@@ -157,7 +167,6 @@
       "shareableLink": "Lien partageable"
     },
     "status": {
-      "draft": "Brouillon",
       "published": "Publié",
       "cancelled": "Annulé",
       "past": "Passé"
@@ -167,7 +176,29 @@
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
       "registerFree": "S'inscrire gratuitement",
-      "registerPaid": "S'inscrire — {price} {currency}"
+      "registerPaid": "S'inscrire — {price} {currency}",
+      "comingSoon": "Bientôt disponible",
+      "registered": "Vous êtes inscrit !",
+      "waitlisted": "Vous êtes sur liste d'attente",
+      "joinWaitlist": "Rejoindre la liste d'attente",
+      "cancelRegistration": "Annuler mon inscription",
+      "cancelConfirmTitle": "Annuler l'inscription",
+      "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à ce Moment ?",
+      "confirmCancel": "Oui, annuler",
+      "spotsRemaining": "{count} places restantes",
+      "signInToRegister": "Se connecter pour s'inscrire",
+      "attendeesCount": "{count} participant(s)"
+    },
+    "registrations": {
+      "title": "Inscriptions",
+      "registered": "{count} inscrit(s)",
+      "waitlisted": "{count} en liste d'attente",
+      "capacity": "{count} places",
+      "empty": "Aucune inscription pour le moment.",
+      "status": {
+        "registered": "Inscrit",
+        "waitlisted": "Liste d'attente"
+      }
     },
     "empty": {
       "description": "Aucun Moment pour le moment. Créez votre premier événement."

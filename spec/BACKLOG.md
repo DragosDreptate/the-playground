@@ -15,19 +15,19 @@
 | CRUD Moment (domain, tests, UI, i18n, page publique `/m/[slug]`) | 2026-02-20 | `7c507cb` |
 | Refactor membership : Host extends Player | 2026-02-20 | `d9139f4` |
 | Neon branching dev/prod + script `db:dev:reset` | 2026-02-20 | `036d93e` |
+| Profil utilisateur + onboarding obligatoire au premier login | 2026-02-20 | `fd024a7` |
+| Registration : `JoinMoment` (inscription + auto-join Circle + liste d'attente) | 2026-02-20 | non commité |
+| Registration : `CancelRegistration` (annulation + promotion liste d'attente) | 2026-02-20 | non commité |
+| Registration : `GetMomentRegistrations`, `GetUserRegistration` | 2026-02-20 | non commité |
+| Page publique `/m/[slug]` : bouton inscription fonctionnel (`RegistrationButton`, `RegistrationsList`) | 2026-02-20 | non commité |
+| Dashboard Player-first : `GetUserCirclesWithRole`, `GetUserUpcomingMoments` | 2026-02-20 | non commité |
+| Dashboard Player-first : section "Mes prochains Moments" + "Mes Cercles" avec badge rôle | 2026-02-20 | non commité |
 
 ---
 
 ## MVP V1 — À faire
 
 ### Priorité haute (bloquant pour le lancement)
-
-- [ ] **Profil utilisateur + onboarding**
-  - Onboarding obligatoire au premier login (redirection `/dashboard/profile/setup`)
-  - Page `/dashboard/profile` pour modifier nom, prénom, etc.
-  - **Email non éditable** (clé unique de liaison entre providers Auth.js)
-  - Détection : `!user.firstName` ou flag dédié
-  - Les données OAuth sont souvent incomplètes — il faut des données propres dès le départ
 
 - [ ] **Admin plateforme**
   - Pages `/admin/*` (même stack, shadcn)
@@ -41,11 +41,9 @@
   - Gestion membres (inviter, retirer)
   - Stats Circle basiques
 
-- [ ] **Registration / Inscription à un Moment**
-  - Usecase `JoinMoment` : inscription = auto-join Circle
-  - Liste d'attente avec promotion automatique sur désistement
-  - Check-in
-  - Page publique `/m/[slug]` : bouton inscription fonctionnel (actuellement placeholder)
+- [ ] **Registration — reste à faire**
+  - Check-in (marquer présent sur place)
+  - Export CSV des inscrits
 
 - [ ] **Paiement Stripe Connect**
   - Moments payants : prix en centimes, reversement aux Hosts
@@ -109,3 +107,4 @@
 | 2026-02-20 | Email non éditable dans le profil (clé unique Auth.js, pivot de liaison entre providers) |
 | 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |
 | 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, page Circle = couche de rétention (absente chez Luma). Dashboard Host = Circle-first. |
+| 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) au Moment qu'il crée — règle métier dans `createMoment`. |

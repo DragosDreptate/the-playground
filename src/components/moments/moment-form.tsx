@@ -24,6 +24,7 @@ import { MomentFormOptionsSection } from "./moment-form-options-section";
 type MomentFormProps = {
   moment?: Moment;
   circleSlug: string;
+  circleName: string;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -43,7 +44,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -107,12 +108,17 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
         {/* Left column — Cover image placeholder */}
         <div className="w-full shrink-0 lg:w-[40%]">
           <div className="lg:sticky lg:top-6">
-            <MomentFormCoverPlaceholder />
+            <MomentFormCoverPlaceholder seed={moment?.title ?? circleName} />
           </div>
         </div>
 
         {/* Right column — Form fields */}
         <div className="flex min-w-0 flex-1 flex-col gap-5">
+          {/* Circle context */}
+          <p className="text-muted-foreground flex items-center gap-1.5 text-sm">
+            <span className="text-foreground font-medium">{circleName}</span>
+          </p>
+
           {/* Status select (edit mode only) */}
           {moment && (
             <div className="flex justify-end">
@@ -121,7 +127,6 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="DRAFT">{t("status.draft")}</SelectItem>
                   <SelectItem value="PUBLISHED">
                     {t("status.published")}
                   </SelectItem>
@@ -202,7 +207,7 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending} className="flex-1" size="lg">
+            <Button type="submit" disabled={isPending} className="flex-1">
               {isPending
                 ? tCommon("loading")
                 : moment
@@ -212,7 +217,6 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
             <Button
               type="button"
               variant="outline"
-              size="lg"
               onClick={() => router.back()}
             >
               {tCommon("cancel")}

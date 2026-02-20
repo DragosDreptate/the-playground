@@ -34,7 +34,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     capacity: 30,
     price: 0,
     currency: "EUR",
-    status: "DRAFT",
+    status: "PUBLISHED",
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,

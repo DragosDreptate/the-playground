@@ -45,7 +45,13 @@ export function DeleteCircleDialog({ circleId }: DeleteCircleDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">{tCommon("delete")}</Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
+          {tCommon("delete")}
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

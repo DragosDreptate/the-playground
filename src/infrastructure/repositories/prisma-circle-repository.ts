@@ -4,7 +4,7 @@ import type {
   CreateCircleInput,
   UpdateCircleInput,
 } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleMemberRole } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleWithRole } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -92,6 +92,18 @@ export const prismaCircleRepository: CircleRepository = {
       data: { circleId, userId, role },
     });
     return toDomainMembership(record);
+  },
+
+  async findAllByUserId(userId: string): Promise<CircleWithRole[]> {
+    const memberships = await prisma.circleMembership.findMany({
+      where: { userId },
+      include: { circle: true },
+      orderBy: { joinedAt: "desc" },
+    });
+    return memberships.map((m) => ({
+      ...toDomainCircle(m.circle),
+      memberRole: m.role,
+    }));
   },
 
   async findMembership(

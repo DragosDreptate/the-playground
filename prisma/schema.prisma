@@ -32,7 +32,6 @@ enum LocationType {
 }
 
 enum MomentStatus {
-  DRAFT
   PUBLISHED
   CANCELLED
   PAST
@@ -169,7 +168,7 @@ model Moment {
   capacity        Int?
   price           Int          @default(0)
   currency        String       @default("EUR")
-  status          MomentStatus @default(DRAFT)
+  status          MomentStatus @default(PUBLISHED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

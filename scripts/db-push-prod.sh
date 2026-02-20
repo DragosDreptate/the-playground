@@ -46,6 +46,6 @@ fi
 
 echo ""
 echo "🚀 Pushing schema to production..."
-DATABASE_URL="${PROD_URL}" npx prisma db push --skip-generate
+DATABASE_URL="${PROD_URL}" npx prisma db push --accept-data-loss
 echo ""
 echo "✅ Production database is now in sync with the Prisma schema."

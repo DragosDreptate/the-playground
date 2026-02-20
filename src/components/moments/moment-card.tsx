@@ -15,7 +15,6 @@ type MomentCardProps = {
 };
 
 const statusVariant = {
-  DRAFT: "secondary",
   PUBLISHED: "default",
   CANCELLED: "destructive",
   PAST: "outline",

@@ -1,15 +1,24 @@
 "use client";
 
 import { Camera } from "lucide-react";
+import { getMomentGradient } from "@/lib/gradient";
 
-export function MomentFormCoverPlaceholder() {
+type MomentFormCoverPlaceholderProps = {
+  seed?: string;
+};
+
+export function MomentFormCoverPlaceholder({ seed = "" }: MomentFormCoverPlaceholderProps) {
+  const gradient = getMomentGradient(seed);
+
   return (
-    <div className="bg-muted/50 relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl lg:aspect-auto lg:h-full">
-      {/* Gradient overlay */}
-      <div className="from-primary/10 via-primary/5 absolute inset-0 bg-gradient-to-br to-transparent" />
+    <div
+      className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl"
+      style={{ background: gradient }}
+    >
+      <div className="absolute inset-0 bg-black/20" />
       <div className="relative flex flex-col items-center gap-3 text-center">
-        <div className="bg-muted flex size-14 items-center justify-center rounded-full">
-          <Camera className="text-muted-foreground size-6" />
+        <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+          <Camera className="size-6 text-white" />
         </div>
       </div>
     </div>

@@ -173,7 +173,7 @@ function TimeSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-8 w-[80px] text-sm" size="sm">
+      <SelectTrigger className="h-8 w-[100px] text-sm" size="sm">
         <SelectValue />
       </SelectTrigger>
       <SelectContent position="popper" className="max-h-60">

@@ -137,6 +137,46 @@ C'est l'avantage structurel de The Playground. La page Circle montre :
 - Le paywall organisateur — 100% gratuit
 - L'UX lourde (compte obligatoire, formulaires longs) — friction zéro
 
+## Design system — Règles des boutons
+
+> **Ces règles sont normatives.** Tout bouton ajouté ou modifié DOIT les respecter.
+
+### Hiérarchie des variants
+
+| Variant | Rôle | Quand l'utiliser |
+|---|---|---|
+| `default` (rose/primary) | **Action principale** de la page ou du contexte | CTA inscription, Créer un Moment, Modifier, Enregistrer |
+| `outline` | **Action secondaire** | Créer un Cercle (quand Créer un Moment est le primary), Annuler, actions de navigation secondaires |
+| `ghost` | **Action tertiaire / utilitaire** | Copier, Voir (dans une toolbar), Se déconnecter, toggles UI |
+| `destructive` | **Jamais utilisé comme trigger visible** | Réservé aux `AlertDialogAction` de confirmation (dans la modale) |
+
+> **Règle d'or** : sur chaque page ou section, il ne doit y avoir qu'**un seul bouton `default`**. Si deux boutons sont en compétition, le moins important passe en `outline`.
+
+### Actions destructives (Supprimer)
+
+Le trigger du dialogue de suppression utilise **toujours** `variant="outline" size="sm"` avec les classes destructive :
+```tsx
+<Button
+  variant="outline"
+  size="sm"
+  className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+>
+  Supprimer
+</Button>
+```
+L'`AlertDialogAction` dans la modale de confirmation utilise `className="bg-destructive text-white hover:bg-destructive/90"`.
+
+### Tailles
+
+- **Pages et headers** : `size="sm"` pour les boutons d'action en haut de page
+- **Formulaires** : `size` non spécifié (default) pour Submit et Cancel
+- **CTAs fullwidth** (page publique Moment, inscription) : `size="lg"` avec `w-full`
+- **Utilitaires inline** (toolbar, copy) : `size="sm"` ou taille custom via className
+
+### Règle anti-doublon
+
+Ne jamais avoir deux boutons qui déclenchent la même action sur la même page. Si une action est déjà accessible via un élément UI (lien, icône), ne pas ajouter un bouton redondant.
+
 ## Monétisation
 
 - **100% gratuit** — aucune commission plateforme, aucun abonnement requis

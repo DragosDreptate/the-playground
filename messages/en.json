@@ -55,10 +55,20 @@
       "title": "Create a Circle first",
       "description": "You need a Circle before creating a Moment."
     },
-    "empty": {
-      "title": "No Circles yet",
-      "description": "Create your first Circle to start building your community."
-    }
+    "upcomingMoments": "My upcoming Moments",
+    "noUpcomingMoments": "No upcoming Moments.",
+    "noCirclesMember": "You are not a member of any Circle yet.",
+    "role": {
+      "host": "Host",
+      "player": "Player"
+    },
+    "registrationStatus": {
+      "registered": "Registered",
+      "waitlisted": "Waitlisted"
+    },
+    "online": "Online",
+    "hybrid": "Hybrid",
+    "hostTools": "Host tools"
   },
   "Circle": {
     "create": {
@@ -157,7 +167,6 @@
       "shareableLink": "Shareable link"
     },
     "status": {
-      "draft": "Draft",
       "published": "Published",
       "cancelled": "Cancelled",
       "past": "Past"
@@ -167,7 +176,29 @@
       "free": "Free",
       "spotsAvailable": "{count} spots",
       "registerFree": "Register for free",
-      "registerPaid": "Register — {price} {currency}"
+      "registerPaid": "Register — {price} {currency}",
+      "comingSoon": "Coming soon",
+      "registered": "You're registered!",
+      "waitlisted": "You're on the waitlist",
+      "joinWaitlist": "Join the waitlist",
+      "cancelRegistration": "Cancel my registration",
+      "cancelConfirmTitle": "Cancel registration",
+      "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Moment?",
+      "confirmCancel": "Yes, cancel",
+      "spotsRemaining": "{count} spots remaining",
+      "signInToRegister": "Sign in to register",
+      "attendeesCount": "{count} attendee(s)"
+    },
+    "registrations": {
+      "title": "Registrations",
+      "registered": "{count} registered",
+      "waitlisted": "{count} waitlisted",
+      "capacity": "{count} capacity",
+      "empty": "No registrations yet.",
+      "status": {
+        "registered": "Registered",
+        "waitlisted": "Waitlisted"
+      }
     },
     "empty": {
       "description": "No Moments yet. Create your first event."

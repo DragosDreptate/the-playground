@@ -10,3 +10,10 @@ export {
   UnauthorizedMomentActionError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
+export {
+  MomentNotOpenForRegistrationError,
+  PaidMomentNotSupportedError,
+  AlreadyRegisteredError,
+  RegistrationNotFoundError,
+  UnauthorizedRegistrationActionError,
+} from "./registration-errors";

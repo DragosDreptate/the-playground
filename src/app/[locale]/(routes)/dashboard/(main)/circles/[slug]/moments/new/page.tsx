@@ -26,5 +26,5 @@ export default async function NewMomentPage({
 
   const boundAction = createMomentAction.bind(null, circle.id);
 
-  return <MomentForm circleSlug={slug} action={boundAction} />;
+  return <MomentForm circleSlug={slug} circleName={circle.name} action={boundAction} />;
 }

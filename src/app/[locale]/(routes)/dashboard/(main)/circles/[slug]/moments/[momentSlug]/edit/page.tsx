@@ -47,6 +47,6 @@ export default async function EditMomentPage({
   const boundAction = updateMomentAction.bind(null, moment.id);
 
   return (
-    <MomentForm moment={moment} circleSlug={slug} action={boundAction} />
+    <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} action={boundAction} />
   );
 }

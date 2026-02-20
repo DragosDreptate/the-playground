@@ -1,6 +1,7 @@
 import type { Moment, LocationType } from "@/domain/models/moment";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
@@ -26,6 +27,7 @@ type CreateMomentInput = {
 type CreateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  registrationRepository: RegistrationRepository;
 };
 
 type CreateMomentResult = {
@@ -36,7 +38,7 @@ export async function createMoment(
   input: CreateMomentInput,
   deps: CreateMomentDeps
 ): Promise<CreateMomentResult> {
-  const { momentRepository, circleRepository } = deps;
+  const { momentRepository, circleRepository, registrationRepository } = deps;
 
   const membership = await circleRepository.findMembership(
     input.circleId,
@@ -73,7 +75,14 @@ export async function createMoment(
     capacity: input.capacity,
     price: input.price,
     currency: input.currency,
-    status: "DRAFT",
+    status: "PUBLISHED",
+  });
+
+  // L'organisateur est automatiquement inscrit en tant que Participant
+  await registrationRepository.create({
+    momentId: moment.id,
+    userId: input.userId,
+    status: "REGISTERED",
   });
 
   return { moment };

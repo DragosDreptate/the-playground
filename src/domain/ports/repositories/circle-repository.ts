@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleWithRole } from "@/domain/models/circle";
 
 export type CreateCircleInput = {
   name: string;
@@ -22,5 +22,6 @@ export interface CircleRepository {
   delete(id: string): Promise<void>;
   slugExists(slug: string): Promise<boolean>;
   addMembership(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
+  findAllByUserId(userId: string): Promise<CircleWithRole[]>;
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
 }

@@ -1,3 +1,5 @@
+import type { LocationType } from "@/domain/models/moment";
+
 export type RegistrationStatus =
   | "REGISTERED"
   | "WAITLISTED"
@@ -16,4 +18,27 @@ export type Registration = {
   registeredAt: Date;
   cancelledAt: Date | null;
   checkedInAt: Date | null;
+};
+
+export type RegistrationWithUser = Registration & {
+  user: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
+export type RegistrationWithMoment = Registration & {
+  moment: {
+    id: string;
+    slug: string;
+    title: string;
+    startsAt: Date;
+    endsAt: Date | null;
+    locationType: LocationType;
+    locationName: string | null;
+    circleName: string;
+  };
 };
