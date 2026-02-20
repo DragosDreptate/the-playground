@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/nextjs";
+
 export async function register() {
   if (process.env.NEXT_RUNTIME === "nodejs") {
     await import("./sentry.server.config");
@@ -8,4 +10,7 @@ export async function register() {
   }
 }
 
-export { onRequestError } from "@sentry/nextjs";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function onRequestError(...args: any[]) {
+  Sentry.captureRequestError(...(args as Parameters<typeof Sentry.captureRequestError>));
+}

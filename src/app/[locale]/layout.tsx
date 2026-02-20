@@ -41,6 +41,8 @@ export default async function LocaleLayout({
             <NextIntlClientProvider>{children}</NextIntlClientProvider>
           </SessionProvider>
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
