@@ -22,5 +22,5 @@ export interface CircleRepository {
   delete(id: string): Promise<void>;
   slugExists(slug: string): Promise<boolean>;
   addMembership(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
-  findMembership(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership | null>;
+  findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
 }

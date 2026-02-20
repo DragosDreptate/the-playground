@@ -42,11 +42,26 @@ describe("DeleteCircle", () => {
     });
   });
 
-  describe("given the user is not HOST", () => {
+  describe("given the user is not a member", () => {
     it("should throw UnauthorizedCircleActionError", async () => {
       const repo = createMockCircleRepository({
         findById: vi.fn().mockResolvedValue(makeCircle()),
         findMembership: vi.fn().mockResolvedValue(null),
+      });
+
+      await expect(
+        deleteCircle(defaultInput, { circleRepository: repo })
+      ).rejects.toThrow(UnauthorizedCircleActionError);
+    });
+  });
+
+  describe("given the user is PLAYER (not HOST)", () => {
+    it("should throw UnauthorizedCircleActionError", async () => {
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi
+          .fn()
+          .mockResolvedValue(makeMembership({ role: "PLAYER" })),
       });
 
       await expect(

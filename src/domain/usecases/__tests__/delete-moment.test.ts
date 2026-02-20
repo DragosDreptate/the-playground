@@ -53,8 +53,7 @@ describe("DeleteMoment", () => {
 
       expect(circleRepo.findMembership).toHaveBeenCalledWith(
         "circle-1",
-        "user-1",
-        "HOST"
+        "user-1"
       );
     });
   });
@@ -73,7 +72,7 @@ describe("DeleteMoment", () => {
     });
   });
 
-  describe("given a user who is not HOST of the Circle", () => {
+  describe("given a user who is not a member of the Circle", () => {
     it("should throw UnauthorizedMomentActionError", async () => {
       const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
       const momentRepo = createMockMomentRepository({
@@ -81,6 +80,27 @@ describe("DeleteMoment", () => {
       });
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(null),
+      });
+
+      await expect(
+        deleteMoment(defaultInput, {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(UnauthorizedMomentActionError);
+    });
+  });
+
+  describe("given a user who is PLAYER (not HOST) of the Circle", () => {
+    it("should throw UnauthorizedMomentActionError", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi
+          .fn()
+          .mockResolvedValue(makeMembership({ role: "PLAYER" })),
       });
 
       await expect(

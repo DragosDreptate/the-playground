@@ -148,7 +148,7 @@ model CircleMembership {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   circle Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, circleId, role])
+  @@unique([userId, circleId])
   @@map("circle_memberships")
 }
 

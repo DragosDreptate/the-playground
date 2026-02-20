@@ -96,12 +96,11 @@ export const prismaCircleRepository: CircleRepository = {
 
   async findMembership(
     circleId: string,
-    userId: string,
-    role: CircleMemberRole
+    userId: string
   ): Promise<CircleMembership | null> {
     const record = await prisma.circleMembership.findUnique({
       where: {
-        userId_circleId_role: { userId, circleId, role },
+        userId_circleId: { userId, circleId },
       },
     });
     return record ? toDomainMembership(record) : null;

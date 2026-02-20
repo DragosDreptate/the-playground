@@ -29,11 +29,10 @@ export async function deleteMoment(
 
   const membership = await circleRepository.findMembership(
     existing.circleId,
-    input.userId,
-    "HOST"
+    input.userId
   );
 
-  if (!membership) {
+  if (!membership || membership.role !== "HOST") {
     throw new UnauthorizedMomentActionError();
   }
 

@@ -431,3 +431,5 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Formulaire création Moment minimaliste : titre/date/lieu/description, options avancées masquées |
 | 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Host au premier plan |
 | 2026-02-19 | Distribution par les Hosts (liens partageables + calendrier), pas d'algo de distribution plateforme |
+| 2026-02-19 | Traductions FR : Circle → Cercle, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
+| 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience." |

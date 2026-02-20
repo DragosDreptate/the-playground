@@ -23,10 +23,9 @@ export async function deleteCircle(
 
   const membership = await circleRepository.findMembership(
     input.circleId,
-    input.userId,
-    "HOST"
+    input.userId
   );
-  if (!membership) {
+  if (!membership || membership.role !== "HOST") {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
   }
 
