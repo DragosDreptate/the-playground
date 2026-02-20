@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/infrastructure/db/prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  debug: process.env.NODE_ENV !== "production",
   adapter: PrismaAdapter(prisma),
   providers: [
     GitHub,
@@ -19,6 +20,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/auth/sign-in",
     verifyRequest: "/auth/verify-request",
     error: "/auth/error",
+  },
+  logger: {
+    error(error) {
+      console.error("[AUTH ERROR]", error);
+    },
   },
   callbacks: {
     session({ session, user }) {
