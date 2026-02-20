@@ -29,7 +29,7 @@ export default async function DashboardLayout({
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard/profile"
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground hidden max-w-[180px] truncate text-sm transition-colors sm:inline"
             >
               {session.user.email}
             </Link>

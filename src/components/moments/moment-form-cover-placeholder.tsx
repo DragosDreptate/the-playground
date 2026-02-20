@@ -12,7 +12,7 @@ export function MomentFormCoverPlaceholder({ seed = "" }: MomentFormCoverPlaceho
 
   return (
     <div
-      className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl"
+      className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl sm:aspect-square"
       style={{ background: gradient }}
     >
       <div className="absolute inset-0 bg-black/20" />
