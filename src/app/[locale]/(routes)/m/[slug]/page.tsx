@@ -30,7 +30,7 @@ export default async function PublicMomentPage({
     throw error;
   }
 
-  if (moment.status !== "PUBLISHED") notFound();
+  if (moment.status === "CANCELLED") notFound();
 
   const [circle, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),

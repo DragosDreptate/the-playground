@@ -68,7 +68,10 @@
     },
     "online": "En ligne",
     "hybrid": "Hybride",
-    "hostTools": "Outils Organisateur"
+    "hostTools": "Outils Organisateur",
+    "greeting": "Bonjour, {name}",
+    "greetingAnonymous": "Bonjour",
+    "memberCount": "{count} membres"
   },
   "Circle": {
     "create": {
@@ -202,7 +205,11 @@
       "signInToRegister": "Se connecter pour s'inscrire",
       "attendeesCount": "{count} participant(s)",
       "about": "À propos",
-      "viewOnMap": "Voir sur Google Maps"
+      "viewOnMap": "Voir sur Google Maps",
+      "eventTookPlace": "Cet événement a eu lieu le",
+      "eventEnded": "Événement terminé",
+      "attendedCount": "{count} personnes ont participé",
+      "viewCircleMoments": "Voir les prochains Moments du Cercle"
     },
     "registrations": {
       "title": "Inscriptions",

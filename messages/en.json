@@ -68,7 +68,10 @@
     },
     "online": "Online",
     "hybrid": "Hybrid",
-    "hostTools": "Host tools"
+    "hostTools": "Host tools",
+    "greeting": "Hello, {name}",
+    "greetingAnonymous": "Hello",
+    "memberCount": "{count} members"
   },
   "Circle": {
     "create": {
@@ -202,7 +205,11 @@
       "signInToRegister": "Sign in to register",
       "attendeesCount": "{count} attendee(s)",
       "about": "About",
-      "viewOnMap": "View on Google Maps"
+      "viewOnMap": "View on Google Maps",
+      "eventTookPlace": "This event took place on",
+      "eventEnded": "Event ended",
+      "attendedCount": "{count} people attended",
+      "viewCircleMoments": "See upcoming Moments from this Circle"
     },
     "registrations": {
       "title": "Registrations",

@@ -18,6 +18,8 @@ import {
   ExternalLink,
   Link as LinkIcon,
   ChevronRight,
+  Users,
+  ArrowRight,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────
@@ -156,7 +158,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               style={{ background: gradient }}
             />
             <div
-              className="relative w-full overflow-hidden rounded-2xl"
+              className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
               style={{ background: gradient, aspectRatio: "1 / 1" }}
             >
               <div className="absolute inset-0 bg-black/20" />
@@ -165,6 +167,13 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   <ImageIcon className="size-6 text-white" />
                 </div>
               </div>
+              {moment.status === "PAST" && (
+                <div className="absolute bottom-3 left-3">
+                  <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                    {t(`status.past`)}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -219,6 +228,27 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
             {moment.title}
           </h1>
+
+          {/* Banner Moment passé */}
+          {moment.status === "PAST" && (
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+              <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
+              <p className="text-sm">
+                {t("public.eventTookPlace")}{" "}
+                <span className="font-medium">
+                  {formatDateRange(moment.startsAt, moment.endsAt)}
+                </span>
+                {registeredCount > 0 && (
+                  <>
+                    {" · "}
+                    <span className="font-medium">
+                      {t("public.attendedCount", { count: registeredCount })}
+                    </span>
+                  </>
+                )}
+              </p>
+            </div>
+          )}
 
           {/* À propos */}
           {moment.description && (
@@ -328,20 +358,39 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* Public : inscription */}
+          {/* Public : inscription ou carte "événement terminé" */}
           {!isHostView && (
-            <div className="border-border bg-card rounded-xl border p-4">
-              <RegistrationButton
-                momentId={moment.id}
-                price={moment.price}
-                isAuthenticated={props.isAuthenticated}
-                existingRegistration={props.existingRegistration}
-                signInUrl={props.signInUrl}
-                isFull={props.isFull}
-                spotsRemaining={props.spotsRemaining}
-                isHost={props.isHost}
-              />
-            </div>
+            moment.status === "PAST" ? (
+              <div className="border-border bg-muted/30 space-y-3 rounded-xl border p-4">
+                <p className="font-semibold">{t("public.eventEnded")}</p>
+                {registeredCount > 0 && (
+                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                    <Users className="size-4 shrink-0" />
+                    <span>{t("public.attendedCount", { count: registeredCount })}</span>
+                  </div>
+                )}
+                <Link
+                  href={circleHref}
+                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
+                >
+                  {t("public.viewCircleMoments")}
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
+            ) : (
+              <div className="border-border bg-card rounded-xl border p-4">
+                <RegistrationButton
+                  momentId={moment.id}
+                  price={moment.price}
+                  isAuthenticated={props.isAuthenticated}
+                  existingRegistration={props.existingRegistration}
+                  signInUrl={props.signInUrl}
+                  isFull={props.isFull}
+                  spotsRemaining={props.spotsRemaining}
+                  isHost={props.isHost}
+                />
+              </div>
+            )
           )}
 
           {/* Liste des participants */}
