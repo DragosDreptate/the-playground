@@ -20,6 +20,8 @@
     "db:studio": "prisma studio",
     "db:dev:reset": "bash scripts/db-dev-reset.sh",
     "db:dev:wipe-user": "tsx scripts/db-dev-wipe-user.ts",
+    "test:mobile": "playwright test --config playwright.config.mobile.ts",
+    "test:mobile:setup": "tsx tests/mobile/setup-auth.ts",
     "postinstall": "prisma generate"
   },
   "keywords": [],
@@ -27,6 +29,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.30.0",
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^25.3.0",
     "@types/react": "^19.2.14",

@@ -59,3 +59,4 @@ nimbalyst-local/
 
 # typescript build info
 tsconfig.tsbuildinfo
+tests/mobile/.auth/
