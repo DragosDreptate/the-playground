@@ -22,9 +22,14 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">{t("myCircles")}</h1>
-        <Button asChild>
-          <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/moments/new">{t("createMoment")}</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+          </Button>
+        </div>
       </div>
 
       {circles.length === 0 ? (

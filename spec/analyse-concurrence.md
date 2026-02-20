@@ -4,10 +4,12 @@
 
 ---
 
-## 1. Meetup.com (Référentiel principal)
+## 1. Meetup.com (Référence modèle fonctionnel)
 
 ### Positionnement
 Plateforme de découverte et gestion de communautés locales. Unique par son modèle de **groupes récurrents locaux** avec marketplace de découverte intégrée.
+
+> **Pour The Playground** : Meetup est notre **référence modèle** (communautés persistantes, membres, événements récurrents). On reproduit ce modèle avec l'expérience Luma.
 
 ### Chiffres clés
 - 60M+ membres inscrits
@@ -95,10 +97,12 @@ Eventbrite est un concurrent **indirect** : orienté billetterie one-shot, pas c
 
 ---
 
-## 3. Luma (lu.ma)
+## 3. Luma (lu.ma) (Référence UX/design)
 
 ### Positionnement
-Plateforme d'événements community-first, design premium. Favori de l'écosystème tech/startup.
+Plateforme d'événements **event-centric** (malgré leur marketing "community-first"), design premium. Favori de l'écosystème tech/startup.
+
+> **Pour The Playground** : Luma est notre **référence UI/UX uniquement**. On calque le design et l'ergonomie, mais pas le modèle (event-centric, sans rétention communautaire).
 
 ### Business model
 
@@ -118,6 +122,7 @@ Plateforme d'événements community-first, design premium. Favori de l'écosyst�
 - API + Zapier
 
 ### Faiblesses
+- **Event-centric, pas de rétention communautaire** : pas de groupe persistant, pas de page communauté, les participants repartent après l'événement
 - **Pas de marketplace de découverte** : il faut apporter sa propre audience
 - 5% fee sur le tier gratuit
 - App mobile limitée
@@ -126,7 +131,7 @@ Plateforme d'événements community-first, design premium. Favori de l'écosyst�
 - Features enterprise limitées
 
 ### Pertinence pour The Playground
-Luma est le concurrent le plus **directement comparable**. Son positionnement community-first et son design moderne en font la référence à battre sur l'UX. Ses faiblesses (pas de découverte, fees, pas de récurrence native) sont des opportunités pour The Playground.
+Luma est notre **référence UI/UX** : design des pages événement, friction minimale, mobile-first. Mais pas notre référence modèle — Luma est event-centric (l'événement est terminal), The Playground est community-centric (le Moment mène au Circle). La page Circle (absente chez Luma) est notre avantage structurel pour la rétention.
 
 ---
 
@@ -275,7 +280,10 @@ Mobilizon valide la demande pour une alternative ouverte et souveraine. Ses limi
 
 | Critère | Meetup | Eventbrite | Luma | Bevy | The Playground (cible) |
 |---------|--------|-----------|------|------|----------------------|
+| **Approche** | Community-centric | Event-centric | Event-centric | Community enterprise | **Community-centric** |
 | **Modèle** | Abo organisateur | Commission tickets | Freemium + commission | SaaS enterprise | **100% gratuit (Stripe fees only)** |
+| **Communauté persistante** | Oui (groupes) | Non | Non | Oui (chapters) | **Oui (Circles)** |
+| **Rétention membres** | Oui (basique) | Non | Non | Oui | **Oui (page Circle)** |
 | **Discovery** | Oui (fort) | Oui (fort) | Non | Non | **Répertoire simple (sans algo)** |
 | **Récurrence native** | Basique | Non | Partielle (calendriers) | Oui | **Oui (Tracks)** |
 | **Ownership données** | Non (lock-in) | Limité | Export CSV | White-label | **Oui (export total CSV/JSON + API)** |
@@ -285,7 +293,7 @@ Mobilizon valide la demande pour une alternative ouverte et souveraine. Ses limi
 | **Multi-communautés** | Non (1 orga = 1 groupe) | Non | Non | Oui (chapters) | **Oui (Circles)** |
 | **UX/Design** | Daté | Fonctionnel | Excellent | Fonctionnel | **Design-first (benchmark Luma)** |
 | **Mobile-first** | Non | Partiel | Partiel | Non | **Oui** |
-| **Page event partageable** | Basique | Oui | Excellent | Non | **Oui (unité virale)** |
+| **Page event partageable** | Basique | Oui | Excellent | Non | **Oui (porte d'entrée virale)** |
 
 ---
 
@@ -294,19 +302,20 @@ Mobilizon valide la demande pour une alternative ouverte et souveraine. Ses limi
 ### 1. Timing parfait
 L'acquisition de Meetup ET Eventbrite par Bending Spoons crée un **exode massif d'organisateurs** cherchant des alternatives. Fenêtre d'opportunité de 12-18 mois.
 
-### 2. Positionnement différenciant confirmé
+### 2. Positionnement différenciant confirmé : modèle Meetup + expérience Luma + 100% gratuit
+- **Community-centric** (comme Meetup) avec UX premium (comme Luma) — aucun concurrent ne combine les deux
+- **Page Circle = couche de rétention** : prochains Moments, membres, identité — ce que Luma n'a pas, en mieux que Meetup
 - **100% gratuit (0% commission plateforme)** vs Meetup (abo payant), Luma (5% fee), Eventbrite (10-14% fee)
 - **Ownership total des données** (export CSV/JSON + API) vs Meetup (lock-in total)
 - **Récurrence native (Tracks)** vs Eventbrite (one-shot) et Luma (calendriers basiques)
 - **IA intégrée dès le MVP** : aucun concurrent ne propose d'assistant IA natif pour les organisateurs
-- **Design-first** avec Luma comme benchmark UX
 - **Répertoire public** de Circles : découverte simple que Luma n'offre pas, sans l'algorithme de Meetup
-- **Le Moment comme unité virale** : page autonome, partageable, design premium
+- **Le Moment comme porte d'entrée virale** : page autonome design premium (benchmark Luma), mais qui mène au Circle (contrairement à Luma où l'événement est terminal)
 
 ### 3. Faiblesses des concurrents à exploiter
-- Meetup : prix, lock-in, UX datée, support inexistant, acquisition Bending Spoons
+- Meetup : prix, lock-in, UX datée, support inexistant, acquisition Bending Spoons → **on prend leur modèle avec une meilleure UX**
 - Eventbrite : fees élevées, pas de communauté, rachat Bending Spoons
-- Luma : pas de découverte, fees 5%, pas de récurrence native
+- Luma : event-centric sans rétention, pas de découverte, fees 5%, pas de récurrence native → **on prend leur UX avec un vrai modèle communautaire**
 - Mobilizon : UX limitée, pas de paiement, adoption faible
 
 ### 4. Risques à surveiller

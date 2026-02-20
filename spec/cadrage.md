@@ -12,31 +12,57 @@ Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.
 
 # 1. Vision
 
-The Playground est une plateforme ouverte permettant à toute communauté de :
+**Le modèle Meetup avec l'expérience Luma, 100% gratuit.**
 
-- Lancer et structurer une communauté (Circle)
-- Organiser des événements (Moments)
+The Playground est une plateforme **community-centric** (pas event-centric) permettant à toute communauté de :
+
+- Lancer et structurer une communauté persistante (Circle)
+- Organiser des événements (Moments) comme points de rendez-vous récurrents
 - Gérer des séries récurrentes (Tracks — Phase 2)
+- Fidéliser ses membres dans la durée (rétention via le Circle)
 - Monétiser (ou pas) ses événements
 - Conserver la propriété et la maîtrise de son audience
 
 Ce n'est pas un réseau social.
 Ce n'est pas une marketplace.
-C'est une infrastructure.
+C'est une infrastructure communautaire.
 
 ---
 
 # 2. Positionnement
 
+## Deux références, un produit
+
+| | Meetup.com | Luma (lu.ma) | The Playground |
+|---|---|---|---|
+| **On prend** | Le modèle communautaire : groupes persistants, membres, événements récurrents | L'expérience UI/UX : pages premium, friction zéro, mobile-first, design soigné | Les deux |
+| **On ne prend pas** | L'UX datée, le paywall organisateur, l'inscription lourde | L'absence de rétention : pas de communauté, événement terminal | — |
+
+- **Meetup** = bon modèle (communautés persistantes), mauvaise expérience (UX datée, paywall organisateur)
+- **Luma** = bonne expérience (design premium, friction zéro), pas de rétention (event-centric, pas de communauté durable)
+- **The Playground** = le meilleur des deux + 100% gratuit
+
+## Community-centric vs Event-centric
+
+**Luma (event-centric)** : créer un événement → des gens viennent → ils repartent → recommencer à zéro. L'événement est terminal.
+
+**The Playground (community-centric)** : créer un Circle → des gens rejoignent via un Moment → ils restent membres → les Moments suivants sont des points de rendez-vous dans une communauté vivante.
+
+```
+Luma:           Event → Inscription → Event a lieu → Fin (pas de rétention)
+The Playground: Moment → Inscription → Membre du Circle → Prochains Moments → Rétention
+```
+
+Le Circle est l'entité centrale. Le Moment est la porte d'entrée virale. La page Circle est la couche de rétention que Luma n'a pas.
+
 ## Problème marché
 
 Les plateformes existantes sont :
 
-- Fermées
-- Payantes pour les organisateurs
-- Centrées sur la plateforme plutôt que sur la communauté
-- Peu innovantes
+- Fermées et payantes pour les organisateurs (Meetup)
+- Event-centric sans rétention communautaire (Luma)
 - Design daté (Meetup) ou fees élevées (Luma, Eventbrite)
+- Centrées sur la plateforme plutôt que sur la communauté
 
 Les communautés bricolent aujourd'hui :
 - Formulaires
@@ -48,11 +74,11 @@ Les communautés bricolent aujourd'hui :
 
 The Playground est :
 
-- Ouvert
-- Multi-communautés
-- Simple
+- **Community-centric** — le Circle (communauté) est l'entité centrale, pas l'événement
+- Ouvert et multi-communautés
+- Simple (UX Luma)
 - IA-native
-- Design-first
+- Design-first (benchmark Luma)
 - Centré sur la propriété des données
 - 100% gratuit (seuls les frais Stripe s'appliquent sur les événements payants)
 
@@ -71,13 +97,13 @@ Un espace autonome.
 Une série d'événements récurrents au sein d'une communauté (Circle). Retiré du MVP V1.
 
 ## 🟡 The Moment
-Un événement individuel d'une communauté (présentiel ou visio). Il peut faire partie d'un Track ou être indépendant. Le Moment est l'unité virale de la plateforme : chaque Moment dispose d'une page autonome, belle et partageable.
+Un événement individuel d'une communauté (présentiel ou visio). Il peut faire partie d'un Track ou être indépendant. Le Moment est la **porte d'entrée virale** de la plateforme : chaque Moment dispose d'une page autonome, belle et partageable. Mais le Moment n'est pas terminal — il mène au Circle.
 
 ## 🧑 The Host
-Organisateur d'un Circle.
+Organisateur d'un Circle. Son dashboard est **Circle-first** : le Circle est le cockpit, les Moments sont des actions lancées depuis ce cockpit.
 
 ## 🎟️ The Player
-Participant à un Moment et membre d'un Circle. S'inscrire à un Moment inscrit automatiquement le Player au Circle organisateur (de façon transparente). Le Circle se constitue organiquement via les inscriptions aux Moments.
+Participant à un Moment et membre persistant d'un Circle. S'inscrire à un Moment inscrit automatiquement le Player au Circle organisateur (de façon transparente). Le Circle se constitue organiquement via les inscriptions aux Moments. Après le Moment, le Player reste membre du Circle et découvre les prochains Moments.
 
 ---
 
@@ -140,8 +166,8 @@ Contient :
 
 ## Côté Player
 
-- Découvrir un Moment via un lien partagé (page autonome)
-- S'inscrire à un Moment (= rejoindre le Circle automatiquement)
+- Découvrir un Moment via un lien partagé (page autonome, design premium)
+- S'inscrire à un Moment (= rejoindre le Circle automatiquement, zéro friction)
 - Payer si nécessaire (Stripe)
 - Recevoir les notifications email :
   - Confirmation d'inscription
@@ -149,7 +175,7 @@ Contient :
   - Rappel 1h avant
   - Notification de changement (lieu, horaire, annulation)
 - Commenter sur le fil du Moment
-- Découvrir le Circle et ses prochains Moments
+- **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention
 
 ## Répertoire public
 
@@ -197,17 +223,31 @@ Contient :
 
 # 8. Différenciation clé
 
-## 1. 100% gratuit
+## 1. Community-centric (modèle Meetup) + UX premium (expérience Luma)
+
+The Playground combine le meilleur de deux mondes :
+- **De Meetup** : communautés persistantes, membres, événements récurrents dans un groupe, répertoire de découverte
+- **De Luma** : pages événement premium, inscription sans friction, design mobile-first, minimalisme
+
+Ce que Luma n'a pas : la rétention. Un événement Luma est terminal. Un Moment The Playground mène au Circle, qui retient les membres dans la durée.
+
+Ce que Meetup n'a pas : l'expérience. Le design Meetup est daté, l'inscription est lourde, le paywall bloque les organisateurs.
+
+## 2. 100% gratuit
 
 Aucune plateforme concurrente n'offre un service complet sans abonnement ni commission plateforme. Seuls les frais du processeur de paiement (Stripe) s'appliquent.
 
-## 2. Récurrence native (Tracks)
+## 3. La page Circle = couche de rétention
+
+La page Circle montre les prochains Moments, les Moments passés, les membres et l'identité de la communauté. C'est ce qui transforme des participants ponctuels en membres fidèles. Luma n'a pas d'équivalent.
+
+## 4. Récurrence native (Tracks — Phase 2)
 
 - Génération automatique des Moments
 - Statistiques cumulées
 - Gestion centralisée
 
-## 3. IA intégrée dès le MVP
+## 5. IA intégrée dès le MVP
 
 Assistant Host pour :
 
@@ -224,15 +264,15 @@ Assistant Host pour :
 - Insights performance
 - Optimisation créneaux
 
-## 4. Ownership total des données
+## 6. Ownership total des données
 
 - Export complet à tout moment (CSV, JSON)
 - API ouverte (Pro)
 - "Vos données vous appartiennent. Partez quand vous voulez, avec tout."
 
-## 5. Le Moment comme unité virale
+## 7. Le Moment comme porte d'entrée virale
 
-Chaque Moment est une page autonome, design premium, optimisée pour le partage social. Le parcours : découvrir un Moment → s'inscrire → découvrir le Circle → rester.
+Chaque Moment est une page autonome, design premium (benchmark Luma), optimisée pour le partage social. Mais contrairement à Luma, le Moment n'est pas terminal. Le parcours : découvrir un Moment → s'inscrire → devenir membre du Circle → découvrir les prochains Moments → rester.
 
 ---
 
@@ -294,11 +334,12 @@ Architecture hexagonale : `domain/` (logique métier pure) → `infrastructure/`
 
 The Playground est :
 
-- Un SaaS multi-communautés
+- Un SaaS multi-communautés, **community-centric** (pas event-centric)
+- Le modèle fonctionnel de Meetup (communautés persistantes, membres, récurrence) avec l'expérience UI/UX de Luma (design premium, friction zéro)
+- 100% gratuit — différenciation radicale vs tous les concurrents
 - Potentiellement indépendant de The Spark
 - Utilisable en dogfooding immédiat
 - Construit comme produit scalable
-- Positionné en référence design (Luma comme benchmark UX)
 - Lancement France d'abord, puis expansion européenne et internationale
 
 ---

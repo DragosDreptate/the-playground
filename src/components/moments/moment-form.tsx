@@ -1,11 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
+import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -13,14 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import type { Moment } from "@/domain/models/moment";
+import type { Moment, LocationType } from "@/domain/models/moment";
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
+import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
+import { MomentFormCoverPlaceholder } from "./moment-form-cover-placeholder";
+import { MomentFormDateCard } from "./moment-form-date-card";
+import { MomentFormLocationRow } from "./moment-form-location-row";
+import { MomentFormOptionsSection } from "./moment-form-options-section";
 
 type MomentFormProps = {
   moment?: Moment;
@@ -32,9 +31,16 @@ type FormState = {
   error?: string;
 };
 
-function formatDateTimeLocal(date: Date): string {
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+function getDefaultStartDate(): Date {
+  const d = new Date();
+  d.setHours(d.getHours() + 1, 0, 0, 0);
+  return d;
+}
+
+function getDefaultEndDate(start: Date): Date {
+  const d = new Date(start);
+  d.setHours(d.getHours() + 1);
+  return d;
 }
 
 export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
@@ -42,6 +48,30 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
   const tCommon = useTranslations("Common");
   const router = useRouter();
 
+  // --- Date/time state ---
+  const defaultStart = moment?.startsAt ?? getDefaultStartDate();
+  const defaultEnd = moment?.endsAt ?? getDefaultEndDate(defaultStart);
+
+  const [startDate, setStartDate] = useState<Date | undefined>(defaultStart);
+  const [startTime, setStartTime] = useState(
+    moment?.startsAt ? snapToSlot(extractTime(moment.startsAt)) : snapToSlot(extractTime(defaultStart))
+  );
+  const [endDate, setEndDate] = useState<Date | undefined>(defaultEnd);
+  const [endTime, setEndTime] = useState(
+    moment?.endsAt ? snapToSlot(extractTime(moment.endsAt)) : snapToSlot(extractTime(defaultEnd))
+  );
+
+  // --- Section state ---
+  const [locationOpen, setLocationOpen] = useState(
+    !!(moment?.locationName || moment?.locationAddress || moment?.videoLink)
+  );
+  const [locationType, setLocationType] = useState<LocationType>(
+    moment?.locationType ?? "IN_PERSON"
+  );
+  const [priceOpen, setPriceOpen] = useState(!!(moment?.price && moment.price > 0));
+  const [capacityOpen, setCapacityOpen] = useState(moment?.capacity != null);
+
+  // --- Form submission ---
   async function handleSubmit(
     _prev: FormState,
     formData: FormData
@@ -60,202 +90,135 @@ export function MomentForm({ moment, circleSlug, action }: MomentFormProps) {
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
 
+  // --- Computed hidden values ---
+  const startsAtValue = startDate ? combineDateAndTime(startDate, startTime) : "";
+  const endsAtValue = endDate ? combineDateAndTime(endDate, endTime) : "";
+
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="mx-auto max-w-5xl">
+      {/* Error banner */}
       {state.error && (
-        <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+        <div className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
           {state.error}
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="title">{t("form.title")}</Label>
-        <Input
-          id="title"
-          name="title"
-          placeholder={t("form.titlePlaceholder")}
-          defaultValue={moment?.title ?? ""}
-          required
-          maxLength={200}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">{t("form.description")}</Label>
-        <Textarea
-          id="description"
-          name="description"
-          placeholder={t("form.descriptionPlaceholder")}
-          defaultValue={moment?.description ?? ""}
-          required
-          rows={4}
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="startsAt">{t("form.startsAt")}</Label>
-          <Input
-            id="startsAt"
-            name="startsAt"
-            type="datetime-local"
-            defaultValue={
-              moment?.startsAt ? formatDateTimeLocal(moment.startsAt) : ""
-            }
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="endsAt">{t("form.endsAt")}</Label>
-          <Input
-            id="endsAt"
-            name="endsAt"
-            type="datetime-local"
-            defaultValue={
-              moment?.endsAt ? formatDateTimeLocal(moment.endsAt) : ""
-            }
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="locationType">{t("form.locationType")}</Label>
-        <Select
-          name="locationType"
-          defaultValue={moment?.locationType ?? "IN_PERSON"}
-        >
-          <SelectTrigger id="locationType">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="IN_PERSON">
-              {t("form.locationInPerson")}
-            </SelectItem>
-            <SelectItem value="ONLINE">{t("form.locationOnline")}</SelectItem>
-            <SelectItem value="HYBRID">{t("form.locationHybrid")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="locationName">{t("form.locationName")}</Label>
-          <Input
-            id="locationName"
-            name="locationName"
-            placeholder={t("form.locationNamePlaceholder")}
-            defaultValue={moment?.locationName ?? ""}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="locationAddress">{t("form.locationAddress")}</Label>
-          <Input
-            id="locationAddress"
-            name="locationAddress"
-            placeholder={t("form.locationAddressPlaceholder")}
-            defaultValue={moment?.locationAddress ?? ""}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="videoLink">{t("form.videoLink")}</Label>
-        <Input
-          id="videoLink"
-          name="videoLink"
-          type="url"
-          placeholder={t("form.videoLinkPlaceholder")}
-          defaultValue={moment?.videoLink ?? ""}
-        />
-      </div>
-
-      {moment && (
-        <div className="space-y-2">
-          <Label htmlFor="status">{t("form.status")}</Label>
-          <Select name="status" defaultValue={moment.status}>
-            <SelectTrigger id="status">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DRAFT">{t("status.draft")}</SelectItem>
-              <SelectItem value="PUBLISHED">
-                {t("status.published")}
-              </SelectItem>
-              <SelectItem value="CANCELLED">
-                {t("status.cancelled")}
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-
-      <Collapsible>
-        <CollapsibleTrigger asChild>
-          <Button type="button" variant="ghost" size="sm">
-            {t("form.advancedOptions")}
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-4 space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="capacity">{t("form.capacity")}</Label>
-            <Input
-              id="capacity"
-              name="capacity"
-              type="number"
-              min="1"
-              placeholder={t("form.capacityPlaceholder")}
-              defaultValue={moment?.capacity ?? ""}
-            />
+      <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+        {/* Left column — Cover image placeholder */}
+        <div className="w-full shrink-0 lg:w-[40%]">
+          <div className="lg:sticky lg:top-6">
+            <MomentFormCoverPlaceholder />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="price">{t("form.price")}</Label>
-              <Input
-                id="price"
-                name="price"
-                type="number"
-                min="0"
-                placeholder={t("form.pricePlaceholder")}
-                defaultValue={moment?.price ?? ""}
-              />
-              <p className="text-muted-foreground text-xs">
-                {t("form.priceHint")}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">{t("form.currency")}</Label>
-              <Select
-                name="currency"
-                defaultValue={moment?.currency ?? "EUR"}
-              >
-                <SelectTrigger id="currency">
+        </div>
+
+        {/* Right column — Form fields */}
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          {/* Status select (edit mode only) */}
+          {moment && (
+            <div className="flex justify-end">
+              <Select name="status" defaultValue={moment.status}>
+                <SelectTrigger className="w-auto">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="EUR">EUR</SelectItem>
-                  <SelectItem value="USD">USD</SelectItem>
+                  <SelectItem value="DRAFT">{t("status.draft")}</SelectItem>
+                  <SelectItem value="PUBLISHED">
+                    {t("status.published")}
+                  </SelectItem>
+                  <SelectItem value="CANCELLED">
+                    {t("status.cancelled")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+          )}
 
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending
-            ? tCommon("loading")
-            : moment
-              ? tCommon("save")
-              : tCommon("create")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-        >
-          {tCommon("cancel")}
-        </Button>
+          {/* Title — heading-style input */}
+          <input
+            name="title"
+            placeholder={t("form.eventName")}
+            defaultValue={moment?.title ?? ""}
+            required
+            maxLength={200}
+            className="placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-2xl font-bold tracking-tight outline-none lg:text-3xl"
+          />
+
+          {/* Hidden inputs for date/time */}
+          <input type="hidden" name="startsAt" value={startsAtValue} />
+          <input type="hidden" name="endsAt" value={endsAtValue} />
+
+          {/* Date/time card */}
+          <MomentFormDateCard
+            startDate={startDate}
+            startTime={startTime}
+            endDate={endDate}
+            endTime={endTime}
+            onStartDateChange={setStartDate}
+            onStartTimeChange={setStartTime}
+            onEndDateChange={setEndDate}
+            onEndTimeChange={setEndTime}
+          />
+
+          {/* Location row */}
+          <MomentFormLocationRow
+            open={locationOpen}
+            onOpenChange={setLocationOpen}
+            locationType={locationType}
+            onLocationTypeChange={setLocationType}
+            defaultLocationName={moment?.locationName ?? ""}
+            defaultLocationAddress={moment?.locationAddress ?? ""}
+            defaultVideoLink={moment?.videoLink ?? ""}
+          />
+
+          {/* Description */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 px-1">
+              <FileText className="text-muted-foreground size-5 shrink-0" />
+              <p className="text-sm font-medium">
+                {t("form.addDescription")}
+              </p>
+            </div>
+            <Textarea
+              id="description"
+              name="description"
+              placeholder={t("form.descriptionPlaceholder")}
+              defaultValue={moment?.description ?? ""}
+              required
+              rows={4}
+              className="resize-none"
+            />
+          </div>
+
+          {/* Options section (price + capacity) */}
+          <MomentFormOptionsSection
+            priceOpen={priceOpen}
+            onPriceOpenChange={setPriceOpen}
+            defaultPrice={moment?.price ?? 0}
+            defaultCurrency={moment?.currency ?? "EUR"}
+            capacityOpen={capacityOpen}
+            onCapacityOpenChange={setCapacityOpen}
+            defaultCapacity={moment?.capacity}
+          />
+
+          {/* Submit / Cancel */}
+          <div className="flex gap-3 pt-2">
+            <Button type="submit" disabled={isPending} className="flex-1" size="lg">
+              {isPending
+                ? tCommon("loading")
+                : moment
+                  ? tCommon("save")
+                  : t("form.createMoment")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => router.back()}
+            >
+              {tCommon("cancel")}
+            </Button>
+          </div>
+        </div>
       </div>
     </form>
   );

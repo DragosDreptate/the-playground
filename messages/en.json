@@ -46,6 +46,15 @@
     "title": "Dashboard",
     "myCircles": "My Circles",
     "createCircle": "Create a Circle",
+    "createMoment": "Create a Moment",
+    "selectCircle": {
+      "title": "Choose a Circle",
+      "description": "Which Circle should this Moment belong to?"
+    },
+    "noCircles": {
+      "title": "Create a Circle first",
+      "description": "You need a Circle before creating a Moment."
+    },
     "empty": {
       "title": "No Circles yet",
       "description": "Create your first Circle to start building your community."
@@ -101,11 +110,12 @@
     },
     "form": {
       "title": "Title",
-      "titlePlaceholder": "Weekly Community Meetup",
+      "eventName": "Event name",
       "description": "Description",
       "descriptionPlaceholder": "Tell people what this Moment is about...",
-      "startsAt": "Start date & time",
-      "endsAt": "End date & time",
+      "addLocation": "Add event location",
+      "addLocationHint": "Physical venue or virtual link",
+      "addDescription": "Add a description",
       "locationType": "Location type",
       "locationInPerson": "In person",
       "locationOnline": "Online",
@@ -116,14 +126,22 @@
       "locationAddressPlaceholder": "123 Main Street, Paris",
       "videoLink": "Video link",
       "videoLinkPlaceholder": "https://meet.google.com/...",
-      "advancedOptions": "Advanced options",
+      "eventOptions": "Event options",
+      "ticketPrice": "Ticket price",
+      "free": "Free",
       "capacity": "Capacity",
+      "capacityLabel": "Capacity",
+      "unlimited": "Unlimited",
       "capacityPlaceholder": "Leave empty for unlimited",
       "price": "Price (in cents)",
       "pricePlaceholder": "0",
       "priceHint": "In cents. 1500 = 15.00. Leave 0 for free.",
       "currency": "Currency",
-      "status": "Status"
+      "status": "Status",
+      "startLabel": "Start",
+      "endLabel": "End",
+      "pickDate": "Pick a date",
+      "createMoment": "Create a Moment"
     },
     "delete": {
       "title": "Delete Moment",

@@ -4,7 +4,50 @@
 
 **Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.**
 
-Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetup.com centrée sur l'ownership des données, le design premium et l'IA. Benchmark UX : Luma (lu.ma).
+Plateforme SaaS ouverte et 100% gratuite pour communautés. **Le modèle Meetup.com avec l'expérience Luma, 100% gratuit.**
+
+### Positionnement — Community-centric, pas event-centric
+
+The Playground est **community-centric** (comme Meetup), pas event-centric (comme Luma).
+
+- **Luma** : créer un événement → des gens viennent → ils repartent → recommencer à zéro. L'événement est terminal, aucune rétention.
+- **Meetup** : créer un groupe → des gens rejoignent → ils restent → les événements sont des rendez-vous dans la communauté. Bon modèle, mais UX datée et paywall organisateur.
+- **The Playground** : le modèle communautaire de Meetup + l'expérience premium de Luma + 100% gratuit.
+
+Le **Circle** (communauté) est l'entité centrale. Le **Moment** (événement) est un point d'entrée viral vers le Circle. L'inscription à un Moment rend le Player membre du Circle. Après le Moment, le Circle reste — avec ses membres, ses prochains Moments, son identité.
+
+```
+Luma:           Event → Inscription → Event a lieu → Fin (pas de rétention)
+The Playground: Moment → Inscription → Membre du Circle → Prochains Moments → Rétention
+```
+
+### Ce qu'on prend de chaque référence
+
+| | Meetup.com | Luma | The Playground |
+|---|---|---|---|
+| Communauté persistante | oui | non | **oui** |
+| Membres du groupe | oui | non | **oui** |
+| Page événement premium | non (datée) | oui | **oui** |
+| Inscription sans friction | non (compte obligatoire) | oui | **oui** |
+| Dashboard organisateur | basique | bon | **bon** |
+| Découverte publique | oui (annuaire) | non | **oui** (répertoire) |
+| Gratuit | non (abo organisateur) | commission | **100% gratuit** |
+
+### Parcours clés
+
+**Host (Organisateur)** :
+1. Créer son **Circle** (sa communauté) — c'est le cockpit
+2. Créer des **Moments** dans ce Circle
+3. Gérer ses **Players** de façon persistante (pas événement par événement)
+4. Communiquer avec sa communauté entre les Moments
+
+**Player (Participant)** :
+1. Reçoit un lien vers un Moment (viralité, comme Luma)
+2. S'inscrit → devient membre du Circle (transparent, zéro friction)
+3. Après le Moment : découvre la page Circle, les prochains Moments, les autres membres
+4. Revient naturellement pour les Moments suivants
+
+> Le dashboard Host est **Circle-first**, pas event-first. Le Circle est le cockpit, les Moments sont des actions lancées depuis ce cockpit.
 
 ## Architecture sémantique
 
@@ -21,9 +64,11 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 
 ## Règles métier clés
 
+- **Le Circle est l'entité centrale** — tout gravite autour de la communauté, pas de l'événement
 - S'inscrire à un Moment inscrit automatiquement le Player au Circle (transparent, pas de friction)
-- Le Moment est la porte d'entrée. Le Circle est la couche de rétention
-- Parcours : découvrir un Moment → s'inscrire → découvrir le Circle → rester
+- Le Moment est la **porte d'entrée virale**. Le Circle est la **couche de rétention**
+- Parcours : découvrir un Moment → s'inscrire → devenir membre du Circle → découvrir les prochains Moments → rester
+- **La page Circle est la page de rétention** : prochains Moments, Moments passés, membres, identité du Circle
 - Liste d'attente avec promotion automatique sur désistement
 - Fil de commentaires (pas de forum) sur chaque Moment
 
@@ -43,26 +88,37 @@ Plateforme SaaS ouverte et 100% gratuite pour communautés. Alternative à Meetu
 - Architecture notifications **multi-canal dès la conception** (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour ajout de langues futur
 
-## Principes UX — Benchmark Luma
+## Principes UX — Benchmark Luma + Meetup
 
-> Inspirés de l'analyse de Luma (lu.ma). Ces principes guident toutes les décisions UI/UX.
+> L'UI/UX est calquée sur Luma (lu.ma) pour le design premium. Le modèle fonctionnel s'inspire de Meetup pour la couche communautaire. On systématiquement challenge le design Luma : si on peut faire mieux, on propose l'alternative.
 
-### La page Moment = 80% de la valeur
+### La page Moment = porte d'entrée virale (benchmark Luma)
 
-La page Moment est LE produit. Structure obligatoire :
+La page Moment est la première chose que voit un Player. Design premium, inspiration directe Luma :
 - **Titre clair** — immédiatement lisible
 - **Date visible immédiatement** — pas cachée dans un détail
 - **Lieu explicite** — adresse ou "En ligne"
 - **CTA évident** — bouton d'inscription dominant, au-dessus de la ligne de flottaison
 - **Social proof** — liste des inscrits avec avatars/initiales, nombre de places restantes
+- **Lien vers le Circle** — visible sur la page Moment, invitation à explorer la communauté
 
-### Friction zéro à l'inscription
+### La page Circle = couche de rétention (ce que Luma n'a pas)
+
+C'est l'avantage structurel de The Playground. La page Circle montre :
+- Les **prochains Moments** du Circle
+- Les **Moments passés** (historique)
+- Les **membres** du Circle
+- L'**identité** du Circle (description, Host)
+
+> La page Circle n'existe pas chez Luma. C'est elle qui transforme des participants ponctuels en membres fidèles.
+
+### Friction zéro à l'inscription (benchmark Luma)
 
 - Magic link / OAuth — pas de création de compte lourde avant inscription
 - Minimum d'étapes entre "je vois le Moment" et "je suis inscrit"
 - L'inscription au Circle est transparente (pas de popup ni de validation supplémentaire)
 
-### Minimalisme du formulaire de création (Host)
+### Minimalisme du formulaire de création (benchmark Luma)
 
 - Le Host ne remplit que l'essentiel : **titre, date, lieu, description**
 - Tout le reste (capacité, prix, paramètres avancés) est masqué dans des options secondaires
@@ -72,8 +128,14 @@ La page Moment est LE produit. Structure obligatoire :
 
 - La neutralité totale — on construit une marque (branding discret mais présent)
 - Le modèle commission — on reste 100% gratuit
-- L'absence de couche communautaire forte — notre Circle est structurant
+- **L'absence de couche communautaire** — notre Circle est structurant, c'est la différence fondamentale
 - L'absence d'IA — c'est notre levier de différenciation
+
+### Ce qu'on ne copie PAS de Meetup
+
+- Le design daté — on vise le niveau Luma en qualité visuelle
+- Le paywall organisateur — 100% gratuit
+- L'UX lourde (compte obligatoire, formulaires longs) — friction zéro
 
 ## Monétisation
 
@@ -446,3 +508,4 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Distribution par les Hosts (liens partageables + calendrier), pas d'algo de distribution plateforme |
 | 2026-02-19 | Traductions FR : Circle → Cercle, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
 | 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience." |
+| 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, la page Circle est la couche de rétention absente chez Luma |

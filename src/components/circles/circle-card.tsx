@@ -11,13 +11,14 @@ import type { Circle } from "@/domain/models/circle";
 
 type CircleCardProps = {
   circle: Circle;
+  href?: string;
 };
 
-export function CircleCard({ circle }: CircleCardProps) {
+export function CircleCard({ circle, href }: CircleCardProps) {
   const t = useTranslations("Common");
 
   return (
-    <Link href={`/dashboard/circles/${circle.slug}`}>
+    <Link href={href ?? `/dashboard/circles/${circle.slug}`}>
       <Card className="transition-colors hover:border-primary/30">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">

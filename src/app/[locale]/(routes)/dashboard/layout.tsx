@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { Link } from "@/i18n/navigation";
@@ -16,14 +15,6 @@ export default async function DashboardLayout({
 
   if (!session?.user) {
     redirect("/auth/sign-in");
-  }
-
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") ?? "";
-  const isSetupPage = pathname.includes("/profile/setup");
-
-  if (!session.user.onboardingCompleted && !isSetupPage) {
-    redirect("/dashboard/profile/setup");
   }
 
   const t = await getTranslations("Auth");

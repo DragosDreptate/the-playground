@@ -108,3 +108,4 @@
 | 2026-02-20 | Onboarding profil obligatoire au premier login |
 | 2026-02-20 | Email non éditable dans le profil (clé unique Auth.js, pivot de liaison entre providers) |
 | 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |
+| 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, page Circle = couche de rétention (absente chez Luma). Dashboard Host = Circle-first. |

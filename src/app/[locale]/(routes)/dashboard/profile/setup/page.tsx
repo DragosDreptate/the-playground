@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getProfile } from "@/domain/usecases/get-profile";
 import { prismaUserRepository } from "@/infrastructure/repositories";
+import { shouldRedirectFromSetup } from "@/lib/onboarding";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { updateProfileAction } from "@/app/actions/profile";
@@ -23,7 +24,7 @@ export default async function ProfileSetupPage() {
     redirect("/auth/sign-in");
   }
 
-  if (session.user.onboardingCompleted) {
+  if (shouldRedirectFromSetup(session.user)) {
     redirect("/dashboard");
   }
 

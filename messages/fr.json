@@ -46,6 +46,15 @@
     "title": "Tableau de bord",
     "myCircles": "Mes Cercles",
     "createCircle": "Créer un Cercle",
+    "createMoment": "Créer un Moment",
+    "selectCircle": {
+      "title": "Choisir un Cercle",
+      "description": "À quel Cercle rattacher ce Moment ?"
+    },
+    "noCircles": {
+      "title": "Créez d'abord un Cercle",
+      "description": "Vous devez créer un Cercle avant de créer un Moment."
+    },
     "empty": {
       "title": "Aucun Cercle pour le moment",
       "description": "Créez votre premier Cercle pour commencer à construire votre communauté."
@@ -101,11 +110,12 @@
     },
     "form": {
       "title": "Titre",
-      "titlePlaceholder": "Rencontre hebdomadaire de la communauté",
+      "eventName": "Nom de l'événement",
       "description": "Description",
       "descriptionPlaceholder": "Décrivez votre Moment en quelques mots...",
-      "startsAt": "Date et heure de début",
-      "endsAt": "Date et heure de fin",
+      "addLocation": "Ajouter un lieu",
+      "addLocationHint": "Lieu physique ou lien virtuel",
+      "addDescription": "Ajouter une description",
       "locationType": "Type de lieu",
       "locationInPerson": "En présentiel",
       "locationOnline": "En ligne",
@@ -116,14 +126,22 @@
       "locationAddressPlaceholder": "123 rue Principale, Paris",
       "videoLink": "Lien vidéo",
       "videoLinkPlaceholder": "https://meet.google.com/...",
-      "advancedOptions": "Options avancées",
+      "eventOptions": "Options de l'événement",
+      "ticketPrice": "Prix du billet",
+      "free": "Gratuit",
       "capacity": "Capacité",
+      "capacityLabel": "Capacité",
+      "unlimited": "Illimitée",
       "capacityPlaceholder": "Laisser vide pour illimité",
       "price": "Prix (en centimes)",
       "pricePlaceholder": "0",
       "priceHint": "En centimes. 1500 = 15,00. Laisser 0 pour gratuit.",
       "currency": "Devise",
-      "status": "Statut"
+      "status": "Statut",
+      "startLabel": "Début",
+      "endLabel": "Fin",
+      "pickDate": "Choisir une date",
+      "createMoment": "Créer un Moment"
     },
     "delete": {
       "title": "Supprimer le Moment",

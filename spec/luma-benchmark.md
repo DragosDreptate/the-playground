@@ -2,13 +2,17 @@
 
 ## Référence
 
-Luma est aujourd’hui l’un des meilleurs benchmarks dans l’univers des plateformes d’événements modernes.
+> **Luma est notre benchmark UI/UX uniquement.** On calque l'expérience visuelle et l'ergonomie sur Luma, mais le modèle fonctionnel (communautés persistantes, membres, rétention) vient de Meetup. Luma est event-centric — The Playground est community-centric.
+
+Luma est aujourd'hui l'un des meilleurs benchmarks dans l'univers des plateformes d'événements modernes.
 
 Ils ont réussi à proposer :
 - Une UX extrêmement simple
 - Une esthétique moderne
 - Un modèle freemium cohérent
 - Une adoption rapide chez les community builders
+
+**Mais Luma n'a pas de rétention communautaire.** Un événement Luma est terminal : les gens viennent, puis repartent. Il n'y a pas de groupe persistant, pas de page communauté, pas de couche de fidélisation. C'est exactement le gap que The Playground comble en ajoutant le Circle.
 
 ---
 
@@ -35,13 +39,14 @@ L’identité est portée par le design, pas par un jargon spécifique.
 
 # 2. Ce que Luma fait très bien
 
-## 2.1 Event-first UX
+## 2.1 Event-first UX (ce qu'on copie / ce qu'on ne copie pas)
 
-Le cœur du produit est l’événement.
+Le cœur du produit Luma est l'événement. La communauté est secondaire.
 
-La communauté est secondaire.
+**Ce qu'on copie** : la qualité de la page événement (clean, rapide, friction minimale).
+**Ce qu'on ne copie pas** : l'absence de couche communautaire. Chez nous, le Moment mène au Circle.
 
-Priorité UX :
+Priorité UX Luma :
 - Page event ultra clean
 - Inscription rapide
 - Friction minimale
@@ -152,17 +157,28 @@ Focus sur l’outil.
 
 Luma est :
 
-- Excellent sur UX
-- Minimaliste
-- Event-centric
-- Peu AI-native
-- Peu orienté récurrence avancée
+- Excellent sur UX (**on copie**)
+- Minimaliste (**on copie**)
+- Event-centric (**on ne copie pas** — on est community-centric)
+- Peu AI-native (**on se différencie**)
+- Peu orienté récurrence avancée (**on se différencie**)
+- **Sans rétention communautaire** (**notre avantage structurel**)
 
 ---
 
-## 5.1 Différenciation possible
+## 5.1 Différenciation par rapport à Luma
 
-### A. Track natif (récurrence intelligente)
+### A. La page Circle — couche de rétention (absente chez Luma)
+
+C'est l'avantage structurel principal. La page Circle montre :
+- Les prochains Moments du Circle
+- Les Moments passés (historique)
+- Les membres du Circle
+- L'identité du Circle (description, Host)
+
+Luma n'a pas d'équivalent. C'est ce qui transforme des participants ponctuels en membres fidèles.
+
+### B. Track natif (récurrence intelligente — Phase 2)
 
 - Gestion native des séries
 - Statistiques cumulées
@@ -170,7 +186,7 @@ Luma est :
 
 ---
 
-### B. Analytics communautaires
+### C. Analytics communautaires
 
 - Taux de no-show
 - Rétention
@@ -179,9 +195,9 @@ Luma est :
 
 ---
 
-### C. IA intégrée
+### D. IA intégrée
 
-- Assistant création d’événement
+- Assistant création d'événement
 - Génération marketing
 - Recommandations
 - Analyse post-event
@@ -190,27 +206,41 @@ Luma est :
 
 # 6. Enseignements stratégiques
 
-Si The Playground benchmark Luma :
+Luma est le **benchmark UX uniquement**. Le modèle fonctionnel vient de Meetup.
 
-- Copier la simplicité
-- Copier la friction minimale
-- Copier le mobile-first
-- Copier Stripe natif
+**Ce qu'on copie de Luma (UX/design)** :
+- La simplicité et le minimalisme
+- La friction minimale à l'inscription
+- Le mobile-first
+- Le Stripe natif
+- La qualité de la page événement
 
-Mais ne pas copier la neutralité totale.
+**Ce qu'on ne copie PAS de Luma (modèle)** :
+- L'approche event-centric → on est community-centric
+- L'absence de couche communautaire → notre Circle est structurant
+- La neutralité totale → on construit une marque (discrète mais présente)
+- Le modèle commission → on reste 100% gratuit
+
+**Ce qu'on prend de Meetup (modèle)** :
+- Communautés persistantes (Circle = Group)
+- Membres durables (Player = Member)
+- Dashboard organisateur centré sur le groupe
+- Répertoire public de communautés
+
+**Ce qu'on ne copie PAS de Meetup (UX)** :
+- Le design daté
+- Le paywall organisateur
+- L'inscription lourde avec compte obligatoire
+- L'UX "unintuitive and unstable"
 
 ---
 
-# 7. Choix stratégiques à clarifier
+# 7. Choix stratégiques — résolus
 
-The Playground doit-il être :
+> ~~The Playground doit-il être invisible ou une marque visible ?~~
 
-A. Invisible (infrastructure discrète comme Luma)  
-ou  
-B. Une marque visible sur chaque Moment  
+**Résolu** : marque visible mais discrète. "Powered by The Playground" en footer, couleur accent reconnaissable, mais le Host et son Circle restent au premier plan.
 
-Ce choix impactera :
-- UX
-- Branding
-- Modèle d’acquisition
-- Positionnement stratégique
+> ~~Event-centric ou community-centric ?~~
+
+**Résolu** : community-centric. Le Circle est l'entité centrale. Le Moment est la porte d'entrée virale. La page Circle est la couche de rétention.
