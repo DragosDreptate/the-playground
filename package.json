@@ -16,6 +16,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
+    "db:push:prod": "bash scripts/db-push-prod.sh",
     "db:studio": "prisma studio",
     "db:dev:reset": "bash scripts/db-dev-reset.sh",
     "db:dev:wipe-user": "tsx scripts/db-dev-wipe-user.ts",

@@ -202,7 +202,9 @@ C'est l'avantage structurel de The Playground. La page Circle montre :
 - `.env.local` pointe vers la branche `dev` (utilisé en local)
 - Les variables Vercel pointent vers `production`
 - `pnpm db:dev:reset` recrée la branche `dev` depuis un snapshot frais de production
-- `pnpm db:push` applique le schema sur la branche pointée par `DATABASE_URL`
+- `pnpm db:push` applique le schema sur la branche dev (pointée par `DATABASE_URL` dans `.env.local`)
+- `pnpm db:push:prod` applique le schema sur la branche production (avec confirmation)
+- **IMPORTANT** : à chaque modification du schema Prisma, toujours pousser sur les DEUX branches : `pnpm db:push` (dev) puis `pnpm db:push:prod` (prod)
 
 ### Dev tooling
 - **Package manager** : pnpm
@@ -224,7 +226,8 @@ C'est l'avantage structurel de The Playground. La page Circle montre :
 | `pnpm db:validate` | Valide le schema Prisma |
 | `pnpm db:generate` | Génère le client Prisma |
 | `pnpm db:migrate` | Crée et applique une migration Prisma |
-| `pnpm db:push` | Push le schema vers la DB sans migration |
+| `pnpm db:push` | Push le schema vers la DB dev (sans migration) |
+| `pnpm db:push:prod` | Push le schema vers la DB **production** (avec confirmation) |
 | `pnpm db:studio` | Ouvre Prisma Studio (UI de visualisation DB) |
 | `pnpm db:dev:reset` | Recrée la branche Neon dev depuis un snapshot frais de production |
 
