@@ -109,7 +109,10 @@
       "memberCount": "{count} members",
       "upcomingMoments": "Upcoming Moments",
       "pastMoments": "Past Moments",
-      "noUpcomingMoments": "No upcoming Moments."
+      "noUpcomingMoments": "No upcoming Moments.",
+      "noPastMoments": "No past Moments.",
+      "today": "Today",
+      "manageMoment": "Manage this Moment"
     },
     "errors": {
       "notFound": "Circle not found",

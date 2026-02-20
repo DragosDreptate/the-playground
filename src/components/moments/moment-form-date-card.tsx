@@ -79,8 +79,7 @@ export function MomentFormDateCard({
             locale={dateFnsLocale}
             onSelect={(d) => {
               onStartDateChange(d);
-              // Auto-set end date if not yet set
-              if (d && !endDate) onEndDateChange(d);
+              if (d) onEndDateChange(d);
             }}
           />
           <TimeSelect

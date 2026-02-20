@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -12,7 +13,8 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
-import { MomentCard } from "@/components/moments/moment-card";
+import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
+import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import {
@@ -47,13 +49,17 @@ function formatHostNames(hosts: CircleMemberWithUser[]): string {
 
 export default async function CircleDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { slug } = await params;
+  const { tab } = await searchParams;
+  const activeTab = tab === "past" ? "past" : "upcoming";
+
   const t = await getTranslations("Circle");
   const tCommon = await getTranslations("Common");
-  const tMoment = await getTranslations("Moment");
   const tDashboard = await getTranslations("Dashboard");
 
   const session = await auth();
@@ -77,7 +83,7 @@ export default async function CircleDetailPage({
 
   const isHost = membership.role === "HOST";
 
-  const [hosts, players, moments] = await Promise.all([
+  const [hosts, players, allMoments] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     getCircleMoments(circle.id, {
@@ -87,8 +93,19 @@ export default async function CircleDetailPage({
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const upcomingMoments = moments.filter((m) => m.status === "PUBLISHED");
-  const pastMoments = moments.filter((m) => m.status === "PAST");
+  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
+  const pastMoments = allMoments.filter((m) => m.status === "PAST");
+  const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
+
+  // Fetch registration counts in parallel for displayed moments
+  const registrationCounts = await Promise.all(
+    displayedMoments.map((m) =>
+      prismaRegistrationRepository.countByMomentIdAndStatus(m.id, "REGISTERED")
+    )
+  );
+  const countByMomentId = new Map(
+    displayedMoments.map((m, i) => [m.id, registrationCounts[i]])
+  );
 
   const gradient = getMomentGradient(circle.name);
   const hostNames = formatHostNames(hosts);
@@ -176,7 +193,7 @@ export default async function CircleDetailPage({
               </p>
             </div>
             <div className="border-l pl-6">
-              <p className="text-2xl font-bold">{moments.length}</p>
+              <p className="text-2xl font-bold">{allMoments.length}</p>
               <p className="text-muted-foreground text-xs">
                 {t("detail.moments")}
               </p>
@@ -287,66 +304,46 @@ export default async function CircleDetailPage({
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Prochains Moments */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-muted-foreground text-sm font-semibold uppercase tracking-wider">
-                {t("detail.upcomingMoments")}
-              </h2>
-              {isHost && (
-                <Button asChild size="sm">
-                  <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
-                    {tMoment("create.title")}
-                  </Link>
-                </Button>
-              )}
-            </div>
+          {/* Moments — toggle + timeline */}
+          <div className="space-y-6">
+            <MomentsTabSelector
+              activeTab={activeTab}
+              isHost={isHost}
+              circleSlug={circle.slug}
+            />
 
-            {upcomingMoments.length === 0 ? (
+            {displayedMoments.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
                 <p className="text-muted-foreground text-sm">
-                  {t("detail.noUpcomingMoments")}
+                  {activeTab === "upcoming"
+                    ? t("detail.noUpcomingMoments")
+                    : t("detail.noPastMoments")}
                 </p>
-                {isHost && (
+                {isHost && activeTab === "upcoming" && (
                   <Button asChild className="mt-4" size="sm">
                     <Link
                       href={`/dashboard/circles/${circle.slug}/moments/new`}
                     >
-                      {tMoment("create.title")}
+                      {t("detail.manageMoment")}
                     </Link>
                   </Button>
                 )}
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {upcomingMoments.map((moment) => (
-                  <MomentCard
+              <div>
+                {displayedMoments.map((moment, i) => (
+                  <MomentTimelineItem
                     key={moment.id}
                     moment={moment}
                     circleSlug={circle.slug}
+                    registrationCount={countByMomentId.get(moment.id) ?? 0}
+                    isHost={isHost}
+                    isLast={i === displayedMoments.length - 1}
                   />
                 ))}
               </div>
             )}
           </div>
-
-          {/* Moments passés */}
-          {pastMoments.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-muted-foreground text-sm font-semibold uppercase tracking-wider">
-                {t("detail.pastMoments")}
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {pastMoments.map((moment) => (
-                  <MomentCard
-                    key={moment.id}
-                    moment={moment}
-                    circleSlug={circle.slug}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
