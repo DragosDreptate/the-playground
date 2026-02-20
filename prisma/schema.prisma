@@ -105,10 +105,11 @@ model User {
   name          String?
   firstName     String?
   lastName      String?
-  image         String?
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  image                String?
+  emailVerified        DateTime?
+  onboardingCompleted  Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   accounts    Account[]
   sessions    Session[]

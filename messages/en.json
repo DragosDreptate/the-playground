@@ -161,5 +161,29 @@
       "updateFailed": "Failed to update Moment",
       "deleteFailed": "Failed to delete Moment"
     }
+  },
+  "Profile": {
+    "setup": {
+      "title": "Complete your profile",
+      "description": "Tell us a bit about yourself to get started."
+    },
+    "edit": {
+      "title": "My profile",
+      "description": "Manage your personal information"
+    },
+    "form": {
+      "email": "Email",
+      "emailHint": "Your email is used to sign in and cannot be changed.",
+      "firstName": "First name",
+      "firstNamePlaceholder": "Alice",
+      "lastName": "Last name",
+      "lastNamePlaceholder": "Dupont",
+      "continue": "Continue",
+      "saved": "Profile updated successfully."
+    },
+    "errors": {
+      "notFound": "User not found",
+      "updateFailed": "Failed to update profile"
+    }
   }
 }

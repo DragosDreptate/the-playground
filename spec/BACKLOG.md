@@ -1,7 +1,7 @@
 # Backlog — The Playground
 
-> Ce fichier est tenu a jour avec les decisions prises au fil du developpement.
-> Il fait foi pour le perimetre restant du MVP et les evolutions futures.
+> Ce fichier est tenu à jour avec les décisions prises au fil du développement.
+> Il fait foi pour le périmètre restant du MVP et les évolutions futures.
 
 ---
 
@@ -18,18 +18,19 @@
 
 ---
 
-## MVP V1 — A faire
+## MVP V1 — À faire
 
-### Priorite haute (bloquant pour le lancement)
+### Priorité haute (bloquant pour le lancement)
 
 - [ ] **Profil utilisateur + onboarding**
   - Onboarding obligatoire au premier login (redirection `/dashboard/profile/setup`)
-  - Page `/dashboard/profile` pour modifier nom, prenom, etc.
-  - Detection : `!user.firstName` ou flag dedie
-  - Les donnees OAuth sont souvent incompletes — il faut des donnees propres des le depart
+  - Page `/dashboard/profile` pour modifier nom, prénom, etc.
+  - **Email non éditable** (clé unique de liaison entre providers Auth.js)
+  - Détection : `!user.firstName` ou flag dédié
+  - Les données OAuth sont souvent incomplètes — il faut des données propres dès le départ
 
 - [ ] **Admin plateforme**
-  - Pages `/admin/*` (meme stack, shadcn)
+  - Pages `/admin/*` (même stack, shadcn)
   - CRUD complet sur tous Circles / Users / Moments
   - Dashboard stats basiques
   - Champ `role` (USER/ADMIN) sur User, middleware guard sur `/admin/*`
@@ -40,9 +41,9 @@
   - Gestion membres (inviter, retirer)
   - Stats Circle basiques
 
-- [ ] **Registration / Inscription a un Moment**
+- [ ] **Registration / Inscription à un Moment**
   - Usecase `JoinMoment` : inscription = auto-join Circle
-  - Liste d'attente avec promotion automatique sur desistement
+  - Liste d'attente avec promotion automatique sur désistement
   - Check-in
   - Page publique `/m/[slug]` : bouton inscription fonctionnel (actuellement placeholder)
 
@@ -60,33 +61,33 @@
   - CRUD commentaire sur chaque Moment
   - Visible sur la page publique
 
-- [ ] **Repertoire public de Circles**
-  - Annuaire simple, filtrable par theme/localisation
+- [ ] **Répertoire public de Circles**
+  - Annuaire simple, filtrable par thème/localisation
   - Pas de ranking, pas de marketplace
 
-### Priorite moyenne
+### Priorité moyenne
 
-- [ ] **Export donnees**
-  - CSV export : membres, evenements, historique
+- [ ] **Export données**
+  - CSV export : membres, événements, historique
   - Pour les Hosts
 
 - [ ] **Assistant IA basique**
   - Description Moment, email invitation, suggestions Circle
   - SDK Anthropic (Claude)
 
-### Infrastructure / Qualite
+### Infrastructure / Qualité
 
 - [ ] **Baseliner les migrations Prisma** (actuellement `db:push` sans historique)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
 - [ ] **Tests E2E Playwright** (parcours critiques)
-- [ ] **Accessibilite axe-core** dans Playwright
+- [ ] **Accessibilité axe-core** dans Playwright
 
 ---
 
 ## Phase 2 (post-MVP)
 
-- [ ] Track (serie d'evenements recurrents dans un Circle)
-- [ ] Plan Pro (analytics, branding, IA avancee, API, multi-canal)
+- [ ] Track (série d'événements récurrents dans un Circle)
+- [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 - [ ] Visual regression testing (Chromatic/Percy)
 - [ ] SAST/DAST (Snyk/SonarCloud)
 - [ ] Load testing (k6/Artillery)
@@ -94,14 +95,16 @@
 
 ---
 
-## Decisions cles
+## Décisions clés
 
-| Date | Decision |
+| Date | Décision |
 |------|----------|
 | 2026-02-19 | Usecases = fonctions (pas de classes) |
 | 2026-02-19 | ActionResult pattern pour les server actions |
-| 2026-02-19 | Slug genere dans le usecase (regle metier) |
-| 2026-02-19 | Circle = Cercle en francais, Host/Player en anglais dans le code |
-| 2026-02-20 | Host = Player + droits de gestion (role hierarchique, une seule membership par user/circle) |
+| 2026-02-19 | Slug généré dans le usecase (règle métier) |
+| 2026-02-19 | Circle = Cercle en français, Host/Player en anglais dans le code |
+| 2026-02-20 | Host = Player + droits de gestion (rôle hiérarchique, une seule membership par user/circle) |
 | 2026-02-20 | Neon branching dev/prod (`pnpm db:dev:reset` pour snapshot frais) |
 | 2026-02-20 | Onboarding profil obligatoire au premier login |
+| 2026-02-20 | Email non éditable dans le profil (clé unique Auth.js, pivot de liaison entre providers) |
+| 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |

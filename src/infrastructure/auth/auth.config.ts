@@ -23,6 +23,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     session({ session, user }) {
       session.user.id = user.id;
+      session.user.onboardingCompleted = (user as unknown as { onboardingCompleted: boolean }).onboardingCompleted;
       return session;
     },
   },

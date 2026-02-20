@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { Link } from "@/i18n/navigation";
@@ -17,6 +18,14 @@ export default async function DashboardLayout({
     redirect("/auth/sign-in");
   }
 
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isSetupPage = pathname.includes("/profile/setup");
+
+  if (!session.user.onboardingCompleted && !isSetupPage) {
+    redirect("/dashboard/profile/setup");
+  }
+
   const t = await getTranslations("Auth");
 
   return (
@@ -27,9 +36,12 @@ export default async function DashboardLayout({
             The Playground
           </Link>
           <div className="flex items-center gap-3">
-            <span className="text-muted-foreground text-sm">
+            <Link
+              href="/dashboard/profile"
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+            >
               {session.user.email}
-            </span>
+            </Link>
             <ThemeToggle />
             <form action={signOutAction}>
               <Button variant="ghost" size="sm" type="submit">

@@ -9,3 +9,4 @@ export {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
 } from "./moment-errors";
+export { UserNotFoundError } from "./user-errors";

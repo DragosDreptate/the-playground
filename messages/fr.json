@@ -161,5 +161,29 @@
       "updateFailed": "Échec de la mise à jour du Moment",
       "deleteFailed": "Échec de la suppression du Moment"
     }
+  },
+  "Profile": {
+    "setup": {
+      "title": "Complétez votre profil",
+      "description": "Dites-nous en un peu plus sur vous pour commencer."
+    },
+    "edit": {
+      "title": "Mon profil",
+      "description": "Gérez vos informations personnelles"
+    },
+    "form": {
+      "email": "Email",
+      "emailHint": "Votre email est utilisé pour vous connecter et ne peut pas être modifié.",
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Alice",
+      "lastName": "Nom de famille",
+      "lastNamePlaceholder": "Dupont",
+      "continue": "Continuer",
+      "saved": "Profil mis à jour avec succès."
+    },
+    "errors": {
+      "notFound": "Utilisateur introuvable",
+      "updateFailed": "Échec de la mise à jour du profil"
+    }
   }
 }
