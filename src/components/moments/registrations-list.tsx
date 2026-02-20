@@ -40,7 +40,6 @@ export function RegistrationsList({
   variant = "host",
 }: RegistrationsListProps) {
   const t = useTranslations("Moment");
-  const isPublic = variant === "public";
 
   return (
     <div className="space-y-4">
@@ -69,7 +68,7 @@ export function RegistrationsList({
         <p className="text-muted-foreground py-4 text-center text-sm">
           {t("registrations.empty")}
         </p>
-      ) : isPublic ? (
+      ) : (
         <div className="flex flex-wrap gap-3">
           {registrations.map((reg) => (
             <div
@@ -94,63 +93,19 @@ export function RegistrationsList({
                   )}
                 </div>
               )}
-              <span className="text-sm">
-                {getDisplayName(
-                  reg.user.firstName,
-                  reg.user.lastName,
-                  reg.user.email
-                )}
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {registrations.map((reg) => (
-            <div
-              key={reg.id}
-              className="flex flex-wrap items-center justify-between gap-y-1 rounded-md border p-3"
-            >
-              <div className="flex items-center gap-3">
-                {reg.user.image ? (
-                  <img
-                    src={reg.user.image}
-                    alt=""
-                    className="h-8 w-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium">
-                    {getInitials(
-                      reg.user.firstName,
-                      reg.user.lastName,
-                      reg.user.email
-                    )}
-                  </div>
-                )}
-                <div>
-                  <p className="text-sm font-medium">
-                    {getDisplayName(
-                      reg.user.firstName,
-                      reg.user.lastName,
-                      reg.user.email
-                    )}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
+              <div className="min-w-0">
+                <p className="text-sm">
+                  {getDisplayName(
+                    reg.user.firstName,
+                    reg.user.lastName,
+                    reg.user.email
+                  )}
+                </p>
+                {variant === "host" && (
+                  <p className="text-muted-foreground truncate text-xs">
                     {reg.user.email}
                   </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge
-                  variant={
-                    reg.status === "REGISTERED" ? "default" : "secondary"
-                  }
-                >
-                  {t(`registrations.status.${reg.status.toLowerCase()}`)}
-                </Badge>
-                <span className="text-muted-foreground hidden text-xs sm:inline">
-                  {reg.registeredAt.toLocaleDateString()}
-                </span>
+                )}
               </div>
             </div>
           ))}
