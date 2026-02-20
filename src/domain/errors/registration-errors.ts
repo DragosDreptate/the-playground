@@ -39,3 +39,11 @@ export class UnauthorizedRegistrationActionError extends DomainError {
     super("You are not authorized to perform this action on this registration");
   }
 }
+
+export class HostCannotCancelRegistrationError extends DomainError {
+  readonly code = "HOST_CANNOT_CANCEL";
+
+  constructor() {
+    super("A Host cannot cancel their registration for a Moment they organize");
+  }
+}

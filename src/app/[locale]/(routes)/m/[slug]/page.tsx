@@ -5,13 +5,22 @@ import {
   prismaCircleRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
+import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
 import { MomentNotFoundError } from "@/domain/errors";
+import { Link } from "@/i18n/navigation";
 import { RegistrationButton } from "@/components/moments/registration-button";
+import { RegistrationsList } from "@/components/moments/registrations-list";
 import { getMomentGradient } from "@/lib/gradient";
-import { CalendarIcon, MapPin, Globe, Users, ImageIcon } from "lucide-react";
+import {
+  CalendarIcon,
+  MapPin,
+  Globe,
+  ImageIcon,
+  ExternalLink,
+} from "lucide-react";
 
 function formatDateRange(startsAt: Date, endsAt: Date | null): string {
   const dateStr = startsAt.toLocaleDateString(undefined, {
@@ -31,15 +40,15 @@ function formatDateRange(startsAt: Date, endsAt: Date | null): string {
   return `${dateStr} · ${startTime} – ${endTime}`;
 }
 
-function getInitials(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName)
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  if (firstName) return firstName[0].toUpperCase();
-  return email[0].toUpperCase();
+function formatHostNames(hosts: CircleMemberWithUser[]): string {
+  return hosts
+    .map((h) => {
+      if (h.user.firstName && h.user.lastName)
+        return `${h.user.firstName} ${h.user.lastName}`;
+      if (h.user.firstName) return h.user.firstName;
+      return h.user.email;
+    })
+    .join(", ");
 }
 
 export default async function PublicMomentPage({
@@ -62,10 +71,14 @@ export default async function PublicMomentPage({
 
   if (moment.status !== "PUBLISHED") notFound();
 
-  const circle = await prismaCircleRepository.findById(moment.circleId);
+  const [circle, hosts] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+  ]);
 
   const session = await auth();
   const isAuthenticated = !!session?.user?.id;
+  const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   let existingRegistration = null;
   if (isAuthenticated) {
@@ -101,64 +114,180 @@ export default async function PublicMomentPage({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
-  const displayedAttendees = allAttendees
-    .filter((r) => r.status === "REGISTERED")
-    .slice(0, 5);
+  const mapsUrl =
+    moment.locationAddress
+      ? `https://maps.google.com/?q=${encodeURIComponent(moment.locationAddress)}`
+      : null;
+
+  const waitlistedCount = allAttendees.filter(
+    (r) => r.status === "WAITLISTED"
+  ).length;
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
-      {/* Cover with glow blur */}
-      <div className="relative mb-8">
-        <div
-          className="absolute inset-x-8 bottom-0 h-20 opacity-40"
-          style={{ background: gradient, filter: "blur(32px)" }}
-        />
-        <div
-          className="relative w-full overflow-hidden rounded-2xl"
-          style={{ background: gradient, aspectRatio: "2 / 1" }}
-        >
-          <div className="absolute inset-0 bg-black/20" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <ImageIcon className="size-5 text-white" />
+      {/*
+        Layout : colonne gauche sticky (cover carré + host card) /
+                 colonne droite large (tout le contenu)
+        Mobile  : droite en premier (order-1), gauche en second (order-2)
+      */}
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+
+        {/* ─── LEFT column : cover + circle info ──────────────────── */}
+        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
+
+          {/* Cover — carré, glow blur en dessous comme Luma */}
+          <div className="relative">
+            <div
+              className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
+              style={{ background: gradient }}
+            />
+            <div
+              className="relative w-full overflow-hidden rounded-2xl"
+              style={{ background: gradient, aspectRatio: "1 / 1" }}
+            >
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                  <ImageIcon className="size-6 text-white" />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Two-column layout */}
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-        {/* Left column: hosted by + title + description */}
-        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          {/* Circle — cliquable vers la page Circle */}
           {circle && (
-            <div className="flex items-center gap-2">
+            <Link
+              href={`/dashboard/circles/${circle.slug}`}
+              className="group flex items-start gap-3 px-1"
+            >
               <div
-                className="size-5 shrink-0 rounded-full"
+                className="mt-0.5 size-9 shrink-0 rounded-lg"
                 style={{ background: circleGradient }}
               />
-              <span className="text-muted-foreground text-sm">
-                {t("public.hostedBy")}{" "}
-                <span className="text-foreground font-medium">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-snug group-hover:underline">
                   {circle.name}
-                </span>
+                </p>
+                {circle.description && (
+                  <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
+                    {circle.description}
+                  </p>
+                )}
+              </div>
+            </Link>
+          )}
+        </div>
+
+        {/* ─── RIGHT column : tout le contenu ─────────────────────── */}
+        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+
+          {/* Hosted by — noms des Hosts */}
+          {hosts.length > 0 && (
+            <p className="text-muted-foreground text-sm">
+              {t("public.hostedBy")}{" "}
+              <span className="text-foreground font-medium">
+                {formatHostNames(hosts)}
               </span>
-            </div>
+            </p>
           )}
 
+          {/* Titre — typographie inspirée du formulaire de création */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
             {moment.title}
           </h1>
 
+          {/* À propos — texte direct, pas de card lourde */}
           {moment.description && (
-            <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-              {moment.description}
-            </p>
+            <div className="space-y-2">
+              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                {t("public.about")}
+              </p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                {moment.description}
+              </p>
+            </div>
           )}
-        </div>
 
-        {/* Right column: sticky CTA + info cards */}
-        <div className="flex w-full flex-col gap-3 lg:w-80 lg:shrink-0 lg:sticky lg:top-6">
-          {/* CTA + social proof */}
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
+          {/* Quand & Où — lignes simples icon + texte, sans card border (style Luma) */}
+          <div className="flex flex-col gap-3">
+            {/* Date */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-4" />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t("detail.when")}</p>
+                <p className="text-sm font-medium">
+                  {formatDateRange(moment.startsAt, moment.endsAt)}
+                </p>
+              </div>
+            </div>
+
+            {/* Lieu */}
+            <div className="flex items-start gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <LocationIcon className="text-primary size-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{t("detail.where")}</p>
+                <p className="text-sm font-medium">{locationLabel}</p>
+                {moment.videoLink && (
+                  <a
+                    href={moment.videoLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary mt-1 block truncate text-xs hover:underline"
+                  >
+                    {moment.videoLink}
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Carte — seulement si adresse physique */}
+            {moment.locationAddress && (
+              <div className="border-border overflow-hidden rounded-xl border">
+                <iframe
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(moment.locationAddress)}&output=embed&z=15`}
+                  className="h-44 w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title={moment.locationAddress}
+                />
+                <div className="flex items-center justify-between px-3 py-2.5">
+                  <div className="min-w-0">
+                    {moment.locationName && (
+                      <p className="truncate text-sm font-medium">
+                        {moment.locationName}
+                      </p>
+                    )}
+                    <p className="text-muted-foreground truncate text-xs">
+                      {moment.locationAddress}
+                    </p>
+                  </div>
+                  {mapsUrl && (
+                    <a
+                      href={mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary ml-3 inline-flex shrink-0 items-center gap-1 text-xs hover:underline"
+                    >
+                      <ExternalLink className="size-3" />
+                      {t("public.viewOnMap")}
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
+          {/* Inscription */}
           <div className="border-border bg-card rounded-xl border p-4">
             <RegistrationButton
               momentId={moment.id}
@@ -168,121 +297,25 @@ export default async function PublicMomentPage({
               signInUrl={signInUrl}
               isFull={isFull}
               spotsRemaining={spotsRemaining}
+              isHost={isHost}
             />
-            {registeredCount > 0 && (
-              <div className="border-border mt-4 flex items-center gap-2.5 border-t pt-4">
-                <div className="flex -space-x-1.5">
-                  {displayedAttendees.map((r) => (
-                    <div
-                      key={r.id}
-                      className="border-card flex size-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold text-white"
-                      style={{
-                        background: getMomentGradient(r.user.email),
-                      }}
-                      title={r.user.firstName ?? r.user.email}
-                    >
-                      {getInitials(
-                        r.user.firstName,
-                        r.user.lastName,
-                        r.user.email
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <span className="text-muted-foreground text-sm">
-                  {t("public.attendeesCount", { count: registeredCount })}
-                </span>
-              </div>
-            )}
           </div>
 
-          {/* When */}
-          <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <CalendarIcon className="text-primary size-4" />
-            </div>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide opacity-50">
-                {t("detail.when")}
-              </p>
-              <p className="mt-0.5 text-sm font-medium">
-                {formatDateRange(moment.startsAt, moment.endsAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Where */}
-          <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <LocationIcon className="text-primary size-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-medium uppercase tracking-wide opacity-50">
-                {t("detail.where")}
-              </p>
-              <p className="mt-0.5 text-sm font-medium">{locationLabel}</p>
-              {moment.locationAddress && (
-                <p className="text-muted-foreground mt-0.5 truncate text-xs">
-                  {moment.locationAddress}
-                </p>
-              )}
-              {moment.videoLink && (
-                <a
-                  href={moment.videoLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary mt-0.5 block truncate text-xs hover:underline"
-                >
-                  {moment.videoLink}
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Capacity + price */}
-          {(moment.capacity || moment.price > 0) && (
-            <div className="border-border bg-card flex items-start gap-3 rounded-xl border p-4">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <Users className="text-primary size-4" />
-              </div>
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide opacity-50">
-                  {t("detail.capacity")} / {t("detail.price")}
-                </p>
-                <p className="mt-0.5 text-sm font-medium">
-                  {moment.capacity
-                    ? `${moment.capacity} places`
-                    : "Illimitée"}
-                  {" · "}
-                  {moment.price > 0
-                    ? `${(moment.price / 100).toFixed(2)} ${moment.currency}`
-                    : t("public.free")}
-                </p>
-              </div>
+          {/* Liste des participants */}
+          {allAttendees.length > 0 && (
+            <div className="border-border rounded-2xl border p-6">
+              <RegistrationsList
+                registrations={allAttendees}
+                registeredCount={registeredCount}
+                waitlistedCount={waitlistedCount}
+                capacity={moment.capacity}
+                variant="public"
+              />
             </div>
           )}
+
         </div>
       </div>
-
-      {/* Circle section */}
-      {circle && (
-        <div className="border-border bg-card mt-12 rounded-2xl border p-6">
-          <div className="flex items-start gap-4">
-            <div
-              className="size-12 shrink-0 rounded-xl"
-              style={{ background: circleGradient }}
-            />
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold">{circle.name}</p>
-              {circle.description && (
-                <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                  {circle.description}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 }

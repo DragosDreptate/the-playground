@@ -187,7 +187,9 @@
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",
       "signInToRegister": "Se connecter pour s'inscrire",
-      "attendeesCount": "{count} participant(s)"
+      "attendeesCount": "{count} participant(s)",
+      "about": "À propos",
+      "viewOnMap": "Voir sur Google Maps"
     },
     "registrations": {
       "title": "Inscriptions",

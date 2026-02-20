@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, Clock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,6 +30,7 @@ type RegistrationButtonProps = {
   signInUrl: string;
   isFull: boolean;
   spotsRemaining: number | null;
+  isHost?: boolean;
 };
 
 export function RegistrationButton({
@@ -40,6 +41,7 @@ export function RegistrationButton({
   signInUrl,
   isFull,
   spotsRemaining,
+  isHost = false,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -71,70 +73,81 @@ export function RegistrationButton({
     );
   }
 
-  // Already registered or waitlisted: show status + cancel option
+  // Already registered or waitlisted — compact Luma-style row
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
+    const isRegistered = localStatus === "REGISTERED";
     return (
       <div className="space-y-3">
-        <div className="flex items-center justify-center gap-2">
-          <Badge
-            variant={localStatus === "REGISTERED" ? "default" : "secondary"}
-            className="text-sm"
-          >
-            {localStatus === "REGISTERED"
-              ? t("public.registered")
-              : t("public.waitlisted")}
-          </Badge>
-        </div>
-
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="outline" size="sm" className="w-full">
-              {t("public.cancelRegistration")}
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {t("public.cancelConfirmTitle")}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {t("public.cancelConfirmDescription")}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            {error && (
-              <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                {error}
-              </div>
+        <div
+          className={`flex items-center justify-between rounded-lg border px-3 py-2.5 ${
+            isRegistered
+              ? "border-primary/20 bg-primary/5"
+              : "border-border bg-muted/50"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {isRegistered ? (
+              <CheckCircle2 className="text-primary size-4 shrink-0" />
+            ) : (
+              <Clock className="text-muted-foreground size-4 shrink-0" />
             )}
-            <AlertDialogFooter>
-              <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                disabled={isPending}
-                onClick={() => {
-                  if (!localRegistrationId) return;
-                  startTransition(async () => {
-                    setError(null);
-                    const result = await cancelRegistrationAction(
-                      localRegistrationId
-                    );
-                    if (result.success) {
-                      setLocalStatus(null);
-                      setLocalRegistrationId(null);
-                      router.refresh();
-                    } else {
-                      setError(result.error);
-                    }
-                  });
-                }}
-              >
-                {isPending
-                  ? tCommon("loading")
-                  : t("public.confirmCancel")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+            <span className="text-sm font-medium">
+              {isRegistered
+                ? t("public.registered")
+                : t("public.waitlisted")}
+            </span>
+          </div>
+
+          {!isHost && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="text-muted-foreground hover:text-foreground text-xs transition-colors underline-offset-2 hover:underline">
+                  {t("public.cancelRegistration")}
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("public.cancelConfirmTitle")}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("public.cancelConfirmDescription")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                {error && (
+                  <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+                    {error}
+                  </div>
+                )}
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="destructive"
+                    disabled={isPending}
+                    onClick={() => {
+                      if (!localRegistrationId) return;
+                      startTransition(async () => {
+                        setError(null);
+                        const result = await cancelRegistrationAction(
+                          localRegistrationId
+                        );
+                        if (result.success) {
+                          setLocalStatus(null);
+                          setLocalRegistrationId(null);
+                          router.refresh();
+                        } else {
+                          setError(result.error);
+                        }
+                      });
+                    }}
+                  >
+                    {isPending ? tCommon("loading") : t("public.confirmCancel")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
     );
   }

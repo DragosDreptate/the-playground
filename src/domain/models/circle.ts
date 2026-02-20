@@ -25,3 +25,13 @@ export type CircleMembership = {
 export type CircleWithRole = Circle & {
   memberRole: CircleMemberRole;
 };
+
+export type CircleMemberWithUser = CircleMembership & {
+  user: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};

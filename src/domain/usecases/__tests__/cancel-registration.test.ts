@@ -3,11 +3,41 @@ import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
+  HostCannotCancelRegistrationError,
 } from "@/domain/errors";
 import {
   createMockRegistrationRepository,
   makeRegistration,
 } from "./helpers/mock-registration-repository";
+import {
+  createMockMomentRepository,
+  makeMoment,
+} from "./helpers/mock-moment-repository";
+import {
+  createMockCircleRepository,
+  makeMembership,
+} from "./helpers/mock-circle-repository";
+
+function makeDeps(overrides: {
+  registrationRepo?: ReturnType<typeof createMockRegistrationRepository>;
+  momentRepo?: ReturnType<typeof createMockMomentRepository>;
+  circleRepo?: ReturnType<typeof createMockCircleRepository>;
+} = {}) {
+  return {
+    registrationRepository:
+      overrides.registrationRepo ?? createMockRegistrationRepository(),
+    momentRepository:
+      overrides.momentRepo ??
+      createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment()),
+      }),
+    circleRepository:
+      overrides.circleRepo ??
+      createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(null),
+      }),
+  };
+}
 
 describe("CancelRegistration", () => {
   const defaultInput = {
@@ -15,7 +45,7 @@ describe("CancelRegistration", () => {
     userId: "user-2",
   };
 
-  describe("given a REGISTERED user cancelling", () => {
+  describe("given a REGISTERED Player cancelling", () => {
     it("should set CANCELLED and promote first WAITLISTED", async () => {
       const waitlistedReg = makeRegistration({
         id: "registration-2",
@@ -41,9 +71,10 @@ describe("CancelRegistration", () => {
         findFirstWaitlisted: vi.fn().mockResolvedValue(waitlistedReg),
       });
 
-      const result = await cancelRegistration(defaultInput, {
-        registrationRepository: registrationRepo,
-      });
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo })
+      );
 
       expect(result.registration.status).toBe("CANCELLED");
       expect(result.promotedRegistration).not.toBeNull();
@@ -64,9 +95,10 @@ describe("CancelRegistration", () => {
         findFirstWaitlisted: vi.fn().mockResolvedValue(null),
       });
 
-      const result = await cancelRegistration(defaultInput, {
-        registrationRepository: registrationRepo,
-      });
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo })
+      );
 
       expect(result.registration.status).toBe("CANCELLED");
       expect(result.promotedRegistration).toBeNull();
@@ -74,7 +106,7 @@ describe("CancelRegistration", () => {
     });
   });
 
-  describe("given a WAITLISTED user cancelling", () => {
+  describe("given a WAITLISTED Player cancelling", () => {
     it("should cancel without promoting anyone", async () => {
       const registrationRepo = createMockRegistrationRepository({
         findById: vi.fn().mockResolvedValue(
@@ -85,13 +117,39 @@ describe("CancelRegistration", () => {
         ),
       });
 
-      const result = await cancelRegistration(defaultInput, {
-        registrationRepository: registrationRepo,
-      });
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo })
+      );
 
       expect(result.registration.status).toBe("CANCELLED");
       expect(result.promotedRegistration).toBeNull();
       expect(registrationRepo.findFirstWaitlisted).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a Host trying to cancel their registration", () => {
+    it("should throw HostCannotCancelRegistrationError", async () => {
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ userId: "user-2", circleId: "circle-1", role: "HOST" })
+        ),
+      });
+
+      await expect(
+        cancelRegistration(
+          defaultInput,
+          makeDeps({ registrationRepo, momentRepo, circleRepo })
+        )
+      ).rejects.toThrow(HostCannotCancelRegistrationError);
     });
   });
 
@@ -104,9 +162,10 @@ describe("CancelRegistration", () => {
       });
 
       await expect(
-        cancelRegistration(defaultInput, {
-          registrationRepository: registrationRepo,
-        })
+        cancelRegistration(
+          defaultInput,
+          makeDeps({ registrationRepo })
+        )
       ).rejects.toThrow(UnauthorizedRegistrationActionError);
     });
   });
@@ -118,9 +177,10 @@ describe("CancelRegistration", () => {
       });
 
       await expect(
-        cancelRegistration(defaultInput, {
-          registrationRepository: registrationRepo,
-        })
+        cancelRegistration(
+          defaultInput,
+          makeDeps({ registrationRepo })
+        )
       ).rejects.toThrow(RegistrationNotFoundError);
     });
   });
@@ -134,9 +194,10 @@ describe("CancelRegistration", () => {
       });
 
       await expect(
-        cancelRegistration(defaultInput, {
-          registrationRepository: registrationRepo,
-        })
+        cancelRegistration(
+          defaultInput,
+          makeDeps({ registrationRepo })
+        )
       ).rejects.toThrow(RegistrationNotFoundError);
     });
   });

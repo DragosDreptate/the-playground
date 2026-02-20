@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { getMomentGradient } from "@/lib/gradient";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
 type RegistrationsListProps = {
@@ -8,6 +9,7 @@ type RegistrationsListProps = {
   registeredCount: number;
   waitlistedCount: number;
   capacity: number | null;
+  variant?: "host" | "public";
 };
 
 function getInitials(firstName: string | null, lastName: string | null, email: string): string {
@@ -35,8 +37,10 @@ export function RegistrationsList({
   registeredCount,
   waitlistedCount,
   capacity,
+  variant = "host",
 }: RegistrationsListProps) {
   const t = useTranslations("Moment");
+  const isPublic = variant === "public";
 
   return (
     <div className="space-y-4">
@@ -65,6 +69,41 @@ export function RegistrationsList({
         <p className="text-muted-foreground py-4 text-center text-sm">
           {t("registrations.empty")}
         </p>
+      ) : isPublic ? (
+        <div className="flex flex-wrap gap-3">
+          {registrations.map((reg) => (
+            <div
+              key={reg.id}
+              className="flex items-center gap-2"
+            >
+              {reg.user.image ? (
+                <img
+                  src={reg.user.image}
+                  alt=""
+                  className="size-8 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  className="flex size-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                  style={{ background: getMomentGradient(reg.user.email) }}
+                >
+                  {getInitials(
+                    reg.user.firstName,
+                    reg.user.lastName,
+                    reg.user.email
+                  )}
+                </div>
+              )}
+              <span className="text-sm">
+                {getDisplayName(
+                  reg.user.firstName,
+                  reg.user.lastName,
+                  reg.user.email
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="space-y-2">
           {registrations.map((reg) => (

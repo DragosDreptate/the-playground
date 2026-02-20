@@ -16,4 +16,5 @@ export {
   AlreadyRegisteredError,
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
+  HostCannotCancelRegistrationError,
 } from "./registration-errors";

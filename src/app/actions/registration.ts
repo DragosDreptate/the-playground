@@ -51,6 +51,8 @@ export async function cancelRegistrationAction(
       { registrationId, userId: session.user.id },
       {
         registrationRepository: prismaRegistrationRepository,
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
       }
     );
     return { success: true, data: undefined };
