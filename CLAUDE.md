@@ -127,8 +127,20 @@ La page Moment est LE produit. Structure obligatoire :
 
 ### Infrastructure
 - **Hosting app** : Vercel (région EU)
-- **Hosting DB** : Neon ou Supabase (PostgreSQL serverless, région EU)
+- **Hosting DB** : Neon PostgreSQL serverless (région EU), branching dev/prod
 - **Monorepo** : Turborepo si packages partagés nécessaires
+
+### Base de données — Branching Neon
+
+| Branche | Usage | Endpoint |
+|---------|-------|----------|
+| `production` | Vercel prod | `ep-cool-bread-alja3wbs-pooler` |
+| `dev` | Développement local | `ep-still-boat-alw4v956-pooler` |
+
+- `.env.local` pointe vers la branche `dev` (utilisé en local)
+- Les variables Vercel pointent vers `production`
+- `pnpm db:dev:reset` recrée la branche `dev` depuis un snapshot frais de production
+- `pnpm db:push` applique le schema sur la branche pointée par `DATABASE_URL`
 
 ### Dev tooling
 - **Package manager** : pnpm
@@ -152,6 +164,7 @@ La page Moment est LE produit. Structure obligatoire :
 | `pnpm db:migrate` | Crée et applique une migration Prisma |
 | `pnpm db:push` | Push le schema vers la DB sans migration |
 | `pnpm db:studio` | Ouvre Prisma Studio (UI de visualisation DB) |
+| `pnpm db:dev:reset` | Recrée la branche Neon dev depuis un snapshot frais de production |
 
 > **Note Claude** : ne pas lancer les tests automatiquement. Lancer uniquement quand l'utilisateur le demande explicitement.
 
