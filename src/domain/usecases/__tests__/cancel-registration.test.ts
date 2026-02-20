@@ -201,4 +201,73 @@ describe("CancelRegistration", () => {
       ).rejects.toThrow(RegistrationNotFoundError);
     });
   });
+
+  describe("given a REGISTERED cancel that frees a spot with multiple waitlisted", () => {
+    it("should promote only the first waitlisted (by registeredAt)", async () => {
+      const firstWaitlisted = makeRegistration({
+        id: "reg-waitlisted-1",
+        userId: "user-3",
+        status: "WAITLISTED",
+        registeredAt: new Date("2026-02-15T10:00:00Z"),
+      });
+
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+        update: vi
+          .fn()
+          .mockResolvedValueOnce(
+            makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
+          )
+          .mockResolvedValueOnce(
+            makeRegistration({ id: "reg-waitlisted-1", status: "REGISTERED" })
+          ),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(firstWaitlisted),
+      });
+
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo })
+      );
+
+      expect(registrationRepo.findFirstWaitlisted).toHaveBeenCalledWith("moment-1");
+      expect(registrationRepo.update).toHaveBeenCalledTimes(2);
+      expect(registrationRepo.update).toHaveBeenLastCalledWith(
+        "reg-waitlisted-1",
+        { status: "REGISTERED" }
+      );
+      expect(result.promotedRegistration!.id).toBe("reg-waitlisted-1");
+    });
+  });
+
+  describe("given a Player who is also a HOST in another Circle", () => {
+    it("should allow cancellation (HOST check is per-Circle, not global)", async () => {
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "CANCELLED", cancelledAt: new Date() })
+        ),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(null),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1" })),
+      });
+      // User is PLAYER in this Circle (not HOST)
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ userId: "user-2", circleId: "circle-1", role: "PLAYER" })
+        ),
+      });
+
+      const result = await cancelRegistration(
+        defaultInput,
+        makeDeps({ registrationRepo, momentRepo, circleRepo })
+      );
+
+      expect(result.registration.status).toBe("CANCELLED");
+    });
+  });
 });

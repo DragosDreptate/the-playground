@@ -13,6 +13,7 @@ export function createMockMomentRepository(
     update: vi.fn<MomentRepository["update"]>().mockResolvedValue(makeMoment()),
     delete: vi.fn<MomentRepository["delete"]>().mockResolvedValue(undefined),
     slugExists: vi.fn<MomentRepository["slugExists"]>().mockResolvedValue(false),
+    transitionPastMoments: vi.fn<MomentRepository["transitionPastMoments"]>().mockResolvedValue(0),
     ...overrides,
   };
 }

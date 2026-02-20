@@ -20,6 +20,7 @@
     "db:studio": "prisma studio",
     "db:dev:reset": "bash scripts/db-dev-reset.sh",
     "db:dev:wipe-user": "tsx scripts/db-dev-wipe-user.ts",
+    "db:dev:seed-test-users": "tsx scripts/db-dev-seed-test-users.ts",
     "test:mobile": "playwright test --config playwright.config.mobile.ts",
     "test:mobile:setup": "tsx tests/mobile/setup-auth.ts",
     "postinstall": "prisma generate"
@@ -46,7 +47,8 @@
     "onlyBuiltDependencies": [
       "prisma",
       "@prisma/engines",
-      "esbuild"
+      "esbuild",
+      "@sentry/cli"
     ]
   },
   "dependencies": {
@@ -55,6 +57,9 @@
     "@prisma/adapter-neon": "^7.4.1",
     "@prisma/client": "^7.4.0",
     "@prisma/client-runtime-utils": "^7.4.1",
+    "@sentry/nextjs": "^10.39.0",
+    "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^1.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

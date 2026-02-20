@@ -101,4 +101,19 @@ export const prismaMomentRepository: MomentRepository = {
     const count = await prisma.moment.count({ where: { slug } });
     return count > 0;
   },
+
+  async transitionPastMoments(): Promise<number> {
+    const now = new Date();
+    const result = await prisma.moment.updateMany({
+      where: {
+        status: "PUBLISHED",
+        OR: [
+          { endsAt: { lte: now } },
+          { endsAt: null, startsAt: { lte: now } },
+        ],
+      },
+      data: { status: "PAST" },
+    });
+    return result.count;
+  },
 };

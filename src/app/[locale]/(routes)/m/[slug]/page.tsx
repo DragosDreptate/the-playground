@@ -17,6 +17,9 @@ export default async function PublicMomentPage({
 }) {
   const { slug, locale } = await params;
 
+  // Transition PUBLISHED → PAST for ended Moments
+  await prismaMomentRepository.transitionPastMoments();
+
   let moment;
   try {
     moment = await getMomentBySlug(slug, {

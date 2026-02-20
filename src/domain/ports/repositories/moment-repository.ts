@@ -41,4 +41,6 @@ export interface MomentRepository {
   update(id: string, input: UpdateMomentInput): Promise<Moment>;
   delete(id: string): Promise<void>;
   slugExists(slug: string): Promise<boolean>;
+  /** Transition PUBLISHED → PAST for Moments whose end time (or start time) has passed. */
+  transitionPastMoments(): Promise<number>;
 }

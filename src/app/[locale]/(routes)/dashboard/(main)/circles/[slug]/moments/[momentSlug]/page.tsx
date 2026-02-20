@@ -17,6 +17,9 @@ export default async function MomentDetailPage({
 }) {
   const { slug, momentSlug } = await params;
 
+  const session = await auth();
+  if (!session?.user?.id) notFound();
+
   let circle;
   try {
     circle = await getCircleBySlug(slug, {
@@ -26,6 +29,14 @@ export default async function MomentDetailPage({
     if (error instanceof CircleNotFoundError) notFound();
     throw error;
   }
+
+  const membership = await prismaCircleRepository.findMembership(
+    circle.id,
+    session.user.id
+  );
+  if (!membership) notFound();
+
+  const isHost = membership.role === "HOST";
 
   let moment;
   try {
@@ -41,8 +52,6 @@ export default async function MomentDetailPage({
 
   const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
 
-  const session = await auth();
-
   const allAttendees =
     await prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id);
   const registeredCount = allAttendees.filter(
@@ -53,6 +62,33 @@ export default async function MomentDetailPage({
   ).length;
 
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/m/${moment.slug}`;
+
+  if (!isHost) {
+    return (
+      <MomentDetailView
+        variant="public"
+        moment={moment}
+        circle={circle}
+        hosts={hosts}
+        registrations={allAttendees}
+        registeredCount={registeredCount}
+        waitlistedCount={waitlistedCount}
+        isAuthenticated={true}
+        isHost={false}
+        existingRegistration={
+          await prismaRegistrationRepository.findByMomentAndUser(
+            moment.id,
+            session.user.id
+          )
+        }
+        signInUrl=""
+        isFull={moment.capacity !== null && registeredCount >= moment.capacity}
+        spotsRemaining={
+          moment.capacity !== null ? moment.capacity - registeredCount : null
+        }
+      />
+    );
+  }
 
   return (
     <MomentDetailView

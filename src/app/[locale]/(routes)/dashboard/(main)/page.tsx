@@ -1,6 +1,7 @@
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
+  prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { getUserCirclesWithRole } from "@/domain/usecases/get-user-circles-with-role";
@@ -20,6 +21,9 @@ export default async function DashboardPage() {
   }
 
   const userId = session.user.id;
+
+  // Transition PUBLISHED → PAST for ended Moments
+  await prismaMomentRepository.transitionPastMoments();
 
   const [upcomingMoments, circles] = await Promise.all([
     getUserUpcomingMoments(userId, {

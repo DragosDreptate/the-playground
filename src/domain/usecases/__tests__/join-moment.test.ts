@@ -3,6 +3,7 @@ import { joinMoment } from "@/domain/usecases/join-moment";
 import {
   MomentNotFoundError,
   MomentNotOpenForRegistrationError,
+  MomentAlreadyStartedError,
   PaidMomentNotSupportedError,
   AlreadyRegisteredError,
 } from "@/domain/errors";
@@ -172,6 +173,27 @@ describe("JoinMoment", () => {
     );
   });
 
+  describe("given a Moment that has already started", () => {
+    it("should throw MomentAlreadyStartedError", async () => {
+      const pastStart = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", startsAt: pastStart, price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+      const circleRepo = createMockCircleRepository();
+
+      await expect(
+        joinMoment(defaultInput, {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(MomentAlreadyStartedError);
+    });
+  });
+
   describe("given a paid Moment", () => {
     it("should throw PaidMomentNotSupportedError", async () => {
       const momentRepo = createMockMomentRepository({
@@ -193,7 +215,7 @@ describe("JoinMoment", () => {
   });
 
   describe("given a user already registered", () => {
-    it("should throw AlreadyRegisteredError", async () => {
+    it("should throw AlreadyRegisteredError for REGISTERED status", async () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(
           makeMoment({ status: "PUBLISHED", price: 0 })
@@ -214,22 +236,109 @@ describe("JoinMoment", () => {
         })
       ).rejects.toThrow(AlreadyRegisteredError);
     });
+
+    it("should throw AlreadyRegisteredError for WAITLISTED status", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "WAITLISTED" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      await expect(
+        joinMoment(defaultInput, {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(AlreadyRegisteredError);
+    });
+
+    it("should throw AlreadyRegisteredError for CHECKED_IN status", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "CHECKED_IN" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      await expect(
+        joinMoment(defaultInput, {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(AlreadyRegisteredError);
+    });
   });
 
   describe("given a user who previously cancelled", () => {
-    it("should allow re-registration", async () => {
+    it("should re-activate via update (not create) with cancelledAt cleared", async () => {
+      const cancelledReg = makeRegistration({
+        id: "reg-existing",
+        status: "CANCELLED",
+        cancelledAt: new Date("2026-02-10"),
+      });
+      const reactivatedReg = makeRegistration({
+        id: "reg-existing",
+        status: "REGISTERED",
+        cancelledAt: null,
+      });
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(
           makeMoment({ status: "PUBLISHED", capacity: 30, price: 0 })
         ),
       });
       const registrationRepo = createMockRegistrationRepository({
-        findByMomentAndUser: vi.fn().mockResolvedValue(
-          makeRegistration({ status: "CANCELLED" })
-        ),
+        findByMomentAndUser: vi.fn().mockResolvedValue(cancelledReg),
         countByMomentIdAndStatus: vi.fn().mockResolvedValue(5),
-        create: vi.fn().mockResolvedValue(
-          makeRegistration({ status: "REGISTERED" })
+        update: vi.fn().mockResolvedValue(reactivatedReg),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "PLAYER" })),
+      });
+
+      const result = await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(registrationRepo.update).toHaveBeenCalledWith("reg-existing", {
+        status: "REGISTERED",
+        cancelledAt: null,
+      });
+      expect(registrationRepo.create).not.toHaveBeenCalled();
+      expect(result.registration.status).toBe("REGISTERED");
+      expect(result.registration.cancelledAt).toBeNull();
+    });
+
+    it("should re-activate as WAITLISTED when Moment is now full", async () => {
+      const cancelledReg = makeRegistration({
+        id: "reg-existing",
+        status: "CANCELLED",
+        cancelledAt: new Date("2026-02-10"),
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", capacity: 10, price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(cancelledReg),
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(10),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ id: "reg-existing", status: "WAITLISTED", cancelledAt: null })
         ),
       });
       const circleRepo = createMockCircleRepository({
@@ -242,7 +351,80 @@ describe("JoinMoment", () => {
         circleRepository: circleRepo,
       });
 
-      expect(result.registration.status).toBe("REGISTERED");
+      expect(registrationRepo.update).toHaveBeenCalledWith("reg-existing", {
+        status: "WAITLISTED",
+        cancelledAt: null,
+      });
+      expect(result.registration.status).toBe("WAITLISTED");
+    });
+
+    it("should not re-add Circle membership if already a member", async () => {
+      const cancelledReg = makeRegistration({
+        id: "reg-existing",
+        status: "CANCELLED",
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", capacity: 30, price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(cancelledReg),
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(5),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "REGISTERED" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "PLAYER" })),
+      });
+
+      await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(circleRepo.addMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a user who cancelled but Moment status changed meanwhile", () => {
+    it("should throw MomentNotOpenForRegistrationError if Moment was CANCELLED", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "CANCELLED", price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+      const circleRepo = createMockCircleRepository();
+
+      await expect(
+        joinMoment(defaultInput, {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(MomentNotOpenForRegistrationError);
+    });
+
+    it("should throw MomentAlreadyStartedError if Moment has started since cancellation", async () => {
+      const pastStart = new Date(Date.now() - 30 * 60 * 1000); // 30 min ago
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", startsAt: pastStart, price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+      const circleRepo = createMockCircleRepository();
+
+      await expect(
+        joinMoment(defaultInput, {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(MomentAlreadyStartedError);
     });
   });
 

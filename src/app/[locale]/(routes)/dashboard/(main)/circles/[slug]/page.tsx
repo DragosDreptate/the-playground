@@ -4,6 +4,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
 } from "@/infrastructure/repositories";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleNotFoundError } from "@/domain/errors";
@@ -24,6 +25,9 @@ export default async function CircleDetailPage({
   const tCommon = await getTranslations("Common");
   const tMoment = await getTranslations("Moment");
 
+  const session = await auth();
+  if (!session?.user?.id) notFound();
+
   let circle;
   try {
     circle = await getCircleBySlug(slug, {
@@ -35,6 +39,14 @@ export default async function CircleDetailPage({
     }
     throw error;
   }
+
+  const membership = await prismaCircleRepository.findMembership(
+    circle.id,
+    session.user.id
+  );
+  if (!membership) notFound();
+
+  const isHost = membership.role === "HOST";
 
   const moments = await getCircleMoments(circle.id, {
     momentRepository: prismaMomentRepository,
@@ -65,14 +77,16 @@ export default async function CircleDetailPage({
             {circle.createdAt.toLocaleDateString()}
           </p>
         </div>
-        <div className="flex shrink-0 gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/dashboard/circles/${circle.slug}/edit`}>
-              {t("detail.editCircle")}
-            </Link>
-          </Button>
-          <DeleteCircleDialog circleId={circle.id} />
-        </div>
+        {isHost && (
+          <div className="flex shrink-0 gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/dashboard/circles/${circle.slug}/edit`}>
+                {t("detail.editCircle")}
+              </Link>
+            </Button>
+            <DeleteCircleDialog circleId={circle.id} />
+          </div>
+        )}
       </div>
 
       <Separator />
@@ -80,11 +94,13 @@ export default async function CircleDetailPage({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{t("detail.moments")}</h2>
-          <Button asChild size="sm">
-            <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
-              {tMoment("create.title")}
-            </Link>
-          </Button>
+          {isHost && (
+            <Button asChild size="sm">
+              <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
+                {tMoment("create.title")}
+              </Link>
+            </Button>
+          )}
         </div>
 
         {moments.length === 0 ? (
@@ -92,11 +108,13 @@ export default async function CircleDetailPage({
             <p className="text-muted-foreground text-sm">
               {tMoment("empty.description")}
             </p>
-            <Button asChild className="mt-4" size="sm">
-              <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
-                {tMoment("create.title")}
-              </Link>
-            </Button>
+            {isHost && (
+              <Button asChild className="mt-4" size="sm">
+                <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
+                  {tMoment("create.title")}
+                </Link>
+              </Button>
+            )}
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">

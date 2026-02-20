@@ -8,6 +8,14 @@ export class MomentNotOpenForRegistrationError extends DomainError {
   }
 }
 
+export class MomentAlreadyStartedError extends DomainError {
+  readonly code = "MOMENT_ALREADY_STARTED";
+
+  constructor(momentId: string) {
+    super(`Moment has already started: ${momentId}`);
+  }
+}
+
 export class PaidMomentNotSupportedError extends DomainError {
   readonly code = "PAID_MOMENT_NOT_SUPPORTED";
 

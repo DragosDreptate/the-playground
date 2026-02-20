@@ -12,6 +12,7 @@ export {
 export { UserNotFoundError } from "./user-errors";
 export {
   MomentNotOpenForRegistrationError,
+  MomentAlreadyStartedError,
   PaidMomentNotSupportedError,
   AlreadyRegisteredError,
   RegistrationNotFoundError,

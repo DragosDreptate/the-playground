@@ -5,6 +5,7 @@ import type { RegistrationRepository } from "@/domain/ports/repositories/registr
 import {
   MomentNotFoundError,
   MomentNotOpenForRegistrationError,
+  MomentAlreadyStartedError,
   PaidMomentNotSupportedError,
   AlreadyRegisteredError,
 } from "@/domain/errors";
@@ -39,6 +40,10 @@ export async function joinMoment(
     throw new MomentNotOpenForRegistrationError(input.momentId);
   }
 
+  if (moment.startsAt <= new Date()) {
+    throw new MomentAlreadyStartedError(input.momentId);
+  }
+
   if (moment.price > 0) {
     throw new PaidMomentNotSupportedError(input.momentId);
   }
@@ -61,11 +66,17 @@ export async function joinMoment(
       ? "WAITLISTED"
       : "REGISTERED";
 
-  const registration = await registrationRepository.create({
-    momentId: input.momentId,
-    userId: input.userId,
-    status,
-  });
+  // Re-activate cancelled registration or create a new one
+  const registration = existing?.status === "CANCELLED"
+    ? await registrationRepository.update(existing.id, {
+        status,
+        cancelledAt: null,
+      })
+    : await registrationRepository.create({
+        momentId: input.momentId,
+        userId: input.userId,
+        status,
+      });
 
   // Auto-join Circle as PLAYER (idempotent)
   const membership = await circleRepository.findMembership(

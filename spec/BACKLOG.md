@@ -42,7 +42,6 @@
   - Stats Circle basiques
 
 - [ ] **Registration — reste à faire**
-  - Check-in (marquer présent sur place)
   - Export CSV des inscrits
 
 - [ ] **Paiement Stripe Connect**
@@ -60,7 +59,9 @@
   - Visible sur la page publique
 
 - [ ] **Répertoire public de Circles**
-  - Annuaire simple, filtrable par thème/localisation
+  - Annuaire de Circles uniquement (pas de Moments — distribution via lien partagé par le Host)
+  - Chaque card affiche le prochain Moment à venir du Circle (teaser)
+  - Filtrable par catégorie/thème et localisation
   - Pas de ranking, pas de marketplace
 
 ### Priorité moyenne
@@ -85,6 +86,7 @@
 ## Phase 2 (post-MVP)
 
 - [ ] Track (série d'événements récurrents dans un Circle)
+- [ ] Check-in (marquer présent sur place)
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 - [ ] Visual regression testing (Chromatic/Percy)
 - [ ] SAST/DAST (Snyk/SonarCloud)
@@ -108,3 +110,5 @@
 | 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |
 | 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, page Circle = couche de rétention (absente chez Luma). Dashboard Host = Circle-first. |
 | 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) au Moment qu'il crée — règle métier dans `createMoment`. |
+| 2026-02-20 | Check-in retiré du MVP → Phase 2 (pas prioritaire pour le lancement) |
+| 2026-02-20 | Répertoire public = Circles uniquement (pas de Moments). Distribution des Moments via lien partagé par le Host. Annuaire de Moments → Phase 2 si besoin. |
