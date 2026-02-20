@@ -1,14 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
-import { MapPin, Globe, Users, ArrowRight } from "lucide-react";
+import { MapPin, Globe, Users, ArrowRight, Check, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
+import type { RegistrationStatus } from "@/domain/models/registration";
 
 type Props = {
   moment: Moment;
   circleSlug: string;
   registrationCount: number;
+  userRegistrationStatus: RegistrationStatus | null;
   isHost: boolean;
   isLast: boolean;
 };
@@ -27,11 +29,24 @@ export async function MomentTimelineItem({
   moment,
   circleSlug,
   registrationCount,
+  userRegistrationStatus,
   isHost,
   isLast,
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
+  const tDashboard = await getTranslations("Dashboard");
+
+  const isRegistered =
+    userRegistrationStatus === "REGISTERED" ||
+    userRegistrationStatus === "CHECKED_IN";
+  const isWaitlisted = userRegistrationStatus === "WAITLISTED";
+
+  const dotClass = isRegistered
+    ? "bg-primary"
+    : isWaitlisted
+      ? "bg-amber-400"
+      : "bg-border";
 
   const gradient = getMomentGradient(moment.title);
   const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt);
@@ -68,7 +83,7 @@ export async function MomentTimelineItem({
 
       {/* Dot + vertical line */}
       <div className="flex shrink-0 flex-col items-center">
-        <div className="mt-2 size-2 shrink-0 rounded-full bg-border" />
+        <div className={`mt-2 size-2 shrink-0 rounded-full ${dotClass}`} />
         {!isLast && (
           <div className="mt-2 flex-1 border-l border-dashed border-border" />
         )}
@@ -99,7 +114,7 @@ export async function MomentTimelineItem({
                 </div>
               )}
 
-              {/* Inscriptions + actions */}
+              {/* Inscriptions + statut */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 {registrationCount > 0 && (
                   <div className="text-muted-foreground flex items-center gap-1 text-xs">
@@ -108,6 +123,20 @@ export async function MomentTimelineItem({
                       {t("registrations.registered", { count: registrationCount })}
                     </span>
                   </div>
+                )}
+
+                {isRegistered && (
+                  <Badge variant="default" className="gap-1 text-xs">
+                    <Check className="size-3" />
+                    {tDashboard("registrationStatus.registered")}
+                  </Badge>
+                )}
+
+                {isWaitlisted && (
+                  <Badge variant="secondary" className="gap-1 text-xs">
+                    <Clock className="size-3" />
+                    {tDashboard("registrationStatus.waitlisted")}
+                  </Badge>
                 )}
 
                 {moment.status === "PAST" && (

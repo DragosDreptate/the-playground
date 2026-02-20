@@ -97,14 +97,24 @@ export default async function CircleDetailPage({
   const pastMoments = allMoments.filter((m) => m.status === "PAST");
   const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
 
-  // Fetch registration counts in parallel for displayed moments
-  const registrationCounts = await Promise.all(
-    displayedMoments.map((m) =>
-      prismaRegistrationRepository.countByMomentIdAndStatus(m.id, "REGISTERED")
-    )
-  );
+  // Fetch registration counts + user registration status in parallel
+  const [registrationCounts, userRegistrations] = await Promise.all([
+    Promise.all(
+      displayedMoments.map((m) =>
+        prismaRegistrationRepository.countByMomentIdAndStatus(m.id, "REGISTERED")
+      )
+    ),
+    Promise.all(
+      displayedMoments.map((m) =>
+        prismaRegistrationRepository.findByMomentAndUser(m.id, session.user.id!)
+      )
+    ),
+  ]);
   const countByMomentId = new Map(
     displayedMoments.map((m, i) => [m.id, registrationCounts[i]])
+  );
+  const userStatusByMomentId = new Map(
+    displayedMoments.map((m, i) => [m.id, userRegistrations[i]?.status ?? null])
   );
 
   const gradient = getMomentGradient(circle.name);
@@ -337,6 +347,7 @@ export default async function CircleDetailPage({
                     moment={moment}
                     circleSlug={circle.slug}
                     registrationCount={countByMomentId.get(moment.id) ?? 0}
+                    userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                     isHost={isHost}
                     isLast={i === displayedMoments.length - 1}
                   />
