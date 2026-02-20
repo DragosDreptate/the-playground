@@ -99,7 +99,17 @@
       "settings": "Settings",
       "editCircle": "Edit",
       "deleteCircle": "Delete",
-      "created": "Created"
+      "created": "Created on",
+      "hosts": "Hosts",
+      "hostedBy": "Hosted by",
+      "about": "About",
+      "visibility": "Visibility",
+      "publicCircle": "Public Circle",
+      "privateCircle": "Private Circle",
+      "memberCount": "{count} members",
+      "upcomingMoments": "Upcoming Moments",
+      "pastMoments": "Past Moments",
+      "noUpcomingMoments": "No upcoming Moments."
     },
     "errors": {
       "notFound": "Circle not found",
@@ -212,6 +222,11 @@
       "updateFailed": "Failed to update Moment",
       "deleteFailed": "Failed to delete Moment"
     }
+  },
+  "UserMenu": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "signOut": "Sign out"
   },
   "Profile": {
     "setup": {

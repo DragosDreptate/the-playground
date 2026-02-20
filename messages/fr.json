@@ -99,7 +99,17 @@
       "settings": "Paramètres",
       "editCircle": "Modifier",
       "deleteCircle": "Supprimer",
-      "created": "Créé le"
+      "created": "Créé le",
+      "hosts": "Organisateurs",
+      "hostedBy": "Organisé par",
+      "about": "À propos",
+      "visibility": "Visibilité",
+      "publicCircle": "Cercle public",
+      "privateCircle": "Cercle privé",
+      "memberCount": "{count} membres",
+      "upcomingMoments": "Prochains Moments",
+      "pastMoments": "Moments passés",
+      "noUpcomingMoments": "Aucun Moment à venir."
     },
     "errors": {
       "notFound": "Cercle introuvable",
@@ -212,6 +222,11 @@
       "updateFailed": "Échec de la mise à jour du Moment",
       "deleteFailed": "Échec de la suppression du Moment"
     }
+  },
+  "UserMenu": {
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "signOut": "Se déconnecter"
   },
   "Profile": {
     "setup": {
