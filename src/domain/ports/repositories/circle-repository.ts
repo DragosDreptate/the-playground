@@ -25,4 +25,5 @@ export interface CircleRepository {
   findAllByUserId(userId: string): Promise<CircleWithRole[]>;
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
   findMembersByRole(circleId: string, role: CircleMemberRole): Promise<CircleMemberWithUser[]>;
+  countMembers(circleId: string): Promise<number>;
 }

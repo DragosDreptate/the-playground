@@ -41,11 +41,13 @@ export function MomentFormOptionsSection({
         {t("form.eventOptions")}
       </p>
 
-      <div className="divide-border divide-y rounded-lg">
+      <div className="space-y-3">
         {/* Ticket price row */}
-        <div className="px-1 py-2">
+        <div className="py-1">
           <div className="flex items-center gap-3">
-            <Ticket className="text-muted-foreground size-5 shrink-0" />
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <Ticket className="text-primary size-4" />
+            </div>
             <span className="flex-1 text-sm font-medium">
               {t("form.ticketPrice")}
             </span>
@@ -70,7 +72,7 @@ export function MomentFormOptionsSection({
           </div>
 
           {priceOpen && (
-            <div className="mt-2 grid gap-3 pl-8 sm:grid-cols-2">
+            <div className="mt-2 grid gap-3 pl-12 sm:grid-cols-2">
               <div className="space-y-1">
                 <Label htmlFor="price" className="text-xs">
                   {t("form.price")}
@@ -107,9 +109,11 @@ export function MomentFormOptionsSection({
         </div>
 
         {/* Capacity row */}
-        <div className="px-1 py-2">
+        <div className="py-1">
           <div className="flex items-center gap-3">
-            <Users className="text-muted-foreground size-5 shrink-0" />
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <Users className="text-primary size-4" />
+            </div>
             <span className="flex-1 text-sm font-medium">
               {t("form.capacityLabel")}
             </span>
@@ -134,7 +138,7 @@ export function MomentFormOptionsSection({
           </div>
 
           {capacityOpen && (
-            <div className="mt-2 pl-8">
+            <div className="mt-2 pl-12">
               <div className="max-w-xs space-y-1">
                 <Label htmlFor="capacity" className="text-xs">
                   {t("form.capacity")}

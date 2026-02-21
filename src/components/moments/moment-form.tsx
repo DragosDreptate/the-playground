@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
-import { FileText } from "lucide-react";
+import { AlignLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -145,7 +145,7 @@ export function MomentForm({ moment, circleSlug, circleName, action }: MomentFor
             defaultValue={moment?.title ?? ""}
             required
             maxLength={200}
-            className="placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-2xl font-bold tracking-tight outline-none lg:text-3xl"
+            className="placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-3xl font-bold tracking-tight outline-none lg:text-4xl"
           />
 
           {/* Hidden inputs for date/time */}
@@ -175,24 +175,35 @@ export function MomentForm({ moment, circleSlug, circleName, action }: MomentFor
             defaultVideoLink={moment?.videoLink ?? ""}
           />
 
+          {/* Separator */}
+          <div className="border-border border-t" />
+
           {/* Description */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 px-1">
-              <FileText className="text-muted-foreground size-5 shrink-0" />
-              <p className="text-sm font-medium">
-                {t("form.addDescription")}
-              </p>
+          <div className="flex items-start gap-3">
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <AlignLeft className="text-primary size-4" />
             </div>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder={t("form.descriptionPlaceholder")}
-              defaultValue={moment?.description ?? ""}
-              required
-              rows={4}
-              className="resize-none"
-            />
+            <div className="min-w-0 flex-1 space-y-2">
+              <div>
+                <p className="text-sm font-medium">{t("form.description")}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t("form.addDescription")}
+                </p>
+              </div>
+              <Textarea
+                id="description"
+                name="description"
+                placeholder={t("form.descriptionPlaceholder")}
+                defaultValue={moment?.description ?? ""}
+                required
+                rows={4}
+                className="resize-none"
+              />
+            </div>
           </div>
+
+          {/* Separator */}
+          <div className="border-border border-t" />
 
           {/* Options section (price + capacity) */}
           <MomentFormOptionsSection

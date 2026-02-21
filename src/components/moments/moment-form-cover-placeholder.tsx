@@ -11,14 +11,20 @@ export function MomentFormCoverPlaceholder({ seed = "" }: MomentFormCoverPlaceho
   const gradient = getMomentGradient(seed);
 
   return (
-    <div
-      className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl sm:aspect-square"
-      style={{ background: gradient }}
-    >
-      <div className="absolute inset-0 bg-black/20" />
-      <div className="relative flex flex-col items-center gap-3 text-center">
-        <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-          <Camera className="size-6 text-white" />
+    <div className="relative">
+      <div
+        className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
+        style={{ background: gradient }}
+      />
+      <div
+        className="relative w-full overflow-hidden rounded-2xl"
+        style={{ background: gradient, aspectRatio: "1 / 1" }}
+      >
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+            <Camera className="size-6 text-white" />
+          </div>
         </div>
       </div>
     </div>

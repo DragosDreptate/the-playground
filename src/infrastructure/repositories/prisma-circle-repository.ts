@@ -136,4 +136,8 @@ export const prismaCircleRepository: CircleRepository = {
       user: r.user,
     }));
   },
+
+  async countMembers(circleId: string): Promise<number> {
+    return prisma.circleMembership.count({ where: { circleId } });
+  },
 };

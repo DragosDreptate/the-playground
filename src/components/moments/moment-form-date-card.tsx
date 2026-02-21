@@ -65,58 +65,55 @@ export function MomentFormDateCard({
   }
 
   return (
-    <div className="border-border bg-card rounded-lg border p-3">
-      <div className="flex flex-col gap-2">
-        {/* Start row */}
-        <div className="flex items-center gap-2">
-          <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
-          <span className="text-muted-foreground w-12 shrink-0 text-sm">
-            {t("form.startLabel")}
-          </span>
-          <DatePickerButton
-            date={startDate}
-            label={formatDate(startDate)}
-            locale={dateFnsLocale}
-            onSelect={(d) => {
-              onStartDateChange(d);
-              if (d) onEndDateChange(d);
-            }}
-          />
-          <TimeSelect
-            value={startTime}
-            onChange={onStartTimeChange}
-            options={timeOptions}
-          />
+    <div className="space-y-2">
+      {/* Start row */}
+      <div className="flex items-center gap-3">
+        <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+          <CalendarIcon className="text-primary size-4" />
         </div>
+        <span className="text-muted-foreground w-12 shrink-0 text-sm">
+          {t("form.startLabel")}
+        </span>
+        <DatePickerButton
+          date={startDate}
+          label={formatDate(startDate)}
+          locale={dateFnsLocale}
+          onSelect={(d) => {
+            onStartDateChange(d);
+            if (d) onEndDateChange(d);
+          }}
+        />
+        <TimeSelect
+          value={startTime}
+          onChange={onStartTimeChange}
+          options={timeOptions}
+        />
+      </div>
 
-        {/* Dotted connector */}
-        <div className="ml-[7px] flex h-2 flex-col items-center">
-          <div className="border-muted-foreground/30 h-full border-l border-dashed" />
+      {/* End row */}
+      <div className="flex items-center gap-3">
+        <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+          <CalendarIcon className="text-primary size-4" />
         </div>
-
-        {/* End row */}
-        <div className="flex items-center gap-2">
-          <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
-          <span className="text-muted-foreground w-12 shrink-0 text-sm">
-            {t("form.endLabel")}
-          </span>
-          <DatePickerButton
-            date={endDate}
-            label={formatDate(endDate)}
-            locale={dateFnsLocale}
-            onSelect={onEndDateChange}
-          />
-          <TimeSelect
-            value={endTime}
-            onChange={onEndTimeChange}
-            options={timeOptions}
-          />
-        </div>
+        <span className="text-muted-foreground w-12 shrink-0 text-sm">
+          {t("form.endLabel")}
+        </span>
+        <DatePickerButton
+          date={endDate}
+          label={formatDate(endDate)}
+          locale={dateFnsLocale}
+          onSelect={onEndDateChange}
+        />
+        <TimeSelect
+          value={endTime}
+          onChange={onEndTimeChange}
+          options={timeOptions}
+        />
       </div>
 
       {/* Timezone badge */}
       {timezone && (
-        <div className="mt-2 flex justify-end">
+        <div className="pl-12">
           <Badge variant="secondary" className="text-xs font-normal">
             {timezone}
           </Badge>

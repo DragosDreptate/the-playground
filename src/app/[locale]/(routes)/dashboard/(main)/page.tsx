@@ -34,34 +34,59 @@ export default async function DashboardPage() {
     }),
   ]);
 
+  // Fetch member counts for all circles
+  const memberCounts = await Promise.all(
+    circles.map((c) => prismaCircleRepository.countMembers(c.id))
+  );
+  const memberCountById = new Map(
+    circles.map((c, i) => [c.id, memberCounts[i]])
+  );
+
   const isHost = circles.some((c) => c.memberRole === "HOST");
 
+  // Extract first name for greeting
+  const firstName = session.user.name?.split(" ")[0];
+
   return (
-    <div className="space-y-10">
-      {/* Section 1: Upcoming Moments */}
+    <div className="mx-auto max-w-2xl space-y-10">
+      {/* Greeting */}
+      <h1 className="text-3xl font-bold tracking-tight">
+        {firstName
+          ? t("greeting", { name: firstName })
+          : t("greetingAnonymous")}
+      </h1>
+
+      {/* Section 1: Upcoming Moments — Timeline */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight">
+        <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
           {t("upcomingMoments")}
-        </h2>
+        </p>
         {upcomingMoments.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             {t("noUpcomingMoments")}
           </p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {upcomingMoments.map((reg) => (
-              <UpcomingMomentCard key={reg.id} registration={reg} />
+          <div>
+            {upcomingMoments.map((reg, i) => (
+              <UpcomingMomentCard
+                key={reg.id}
+                registration={reg}
+                isLast={i === upcomingMoments.length - 1}
+              />
             ))}
           </div>
         )}
       </section>
 
+      {/* Separator */}
+      <div className="border-border border-t" />
+
       {/* Section 2: My Circles */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold tracking-tight">
+          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
             {t("myCircles")}
-          </h2>
+          </p>
           {isHost && (
             <div className="flex flex-wrap gap-2">
               <Button size="sm" asChild>
@@ -81,12 +106,13 @@ export default async function DashboardPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-4">
             {circles.map((circle) => (
               <CircleCard
                 key={circle.id}
                 circle={circle}
                 role={circle.memberRole}
+                memberCount={memberCountById.get(circle.id)}
               />
             ))}
           </div>
