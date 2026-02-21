@@ -34,8 +34,7 @@
     "ctaFinalTitle": "Ready to launch your community?",
     "ctaFinalSubtitle": "Create your Circle in 30 seconds. Free, forever.",
     "ctaFinal": "Get started for free",
-    "ctaExplore": "Start exploring",
-    "footerCopyright": "© 2026 The Playground · Launch your community, for free."
+    "ctaExplore": "Start exploring"
   },
   "Common": {
     "loading": "Loading...",
@@ -446,6 +445,142 @@
       "viewMomentCta": "View Moment",
       "cancelLink": "Cancel my registration",
       "footer": "Powered by The Playground — Launch your community, for free."
+    }
+  },
+  "Footer": {
+    "brand": {
+      "tagline": "Launch your community, for free.",
+      "copyright": "© 2026 The Playground. All rights reserved."
+    },
+    "product": {
+      "title": "Product",
+      "explore": "Explore",
+      "howItWorks": "How it works"
+    },
+    "legal": {
+      "title": "Legal",
+      "legalNotice": "Legal notice",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    }
+  },
+  "Legal": {
+    "lastUpdated": "Last updated: {date}",
+    "legalNotice": {
+      "title": "Legal notice",
+      "metaDescription": "Legal notice for The Playground — publisher, hosting and intellectual property information.",
+      "editor": {
+        "title": "Publisher",
+        "content": "The Playground is published by The Spark SASU, a simplified single-shareholder corporation registered in France.",
+        "siret": "SIRET: 93482575300015",
+        "address": "Registered office: 10 rue de la Paix, 75002 Paris, France",
+        "contact": "Contact: dragos@thespark.fr",
+        "director": "Publication director: Dragos Dreptate"
+      },
+      "host": {
+        "title": "Hosting provider",
+        "content": "The website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, United States."
+      },
+      "intellectualProperty": {
+        "title": "Intellectual property",
+        "content": "All content on this website (text, graphics, logos, icons, software) is the exclusive property of The Spark SASU, unless otherwise stated. Any reproduction, representation or distribution, in whole or in part, of the content of this site without authorization is prohibited."
+      },
+      "liability": {
+        "title": "Liability",
+        "content": "The Spark SASU strives to ensure the accuracy of the information published on the site, but cannot guarantee its completeness or timeliness. Use of the site is at the user's sole risk."
+      }
+    },
+    "privacy": {
+      "title": "Privacy policy",
+      "metaDescription": "Privacy policy for The Playground — data collected, purposes, GDPR rights and cookies.",
+      "intro": "The Playground, published by The Spark SASU, is committed to protecting the privacy of its users. This policy describes the data we collect, why we use it and what your rights are.",
+      "dataCollected": {
+        "title": "Data collected",
+        "items": {
+          "email": "Email address (sign-in via magic link or OAuth)",
+          "name": "First and last name (provided during onboarding)",
+          "oauth": "OAuth account identifier (Google, GitHub) — for authentication only",
+          "usage": "Anonymized usage data (Vercel Analytics)"
+        }
+      },
+      "purpose": {
+        "title": "Purpose of data processing",
+        "items": {
+          "auth": "Authentication and account management",
+          "service": "Service delivery (creating Circles, joining Moments)",
+          "email": "Sending transactional emails (registration confirmations, notifications)",
+          "analytics": "Service improvement through anonymized statistics"
+        }
+      },
+      "sharing": {
+        "title": "Data sharing",
+        "content": "Your personal data is never sold or shared with third parties for commercial purposes. It may be transmitted to our technical subcontractors (hosting, email delivery) solely to ensure the operation of the service."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "The Playground only uses cookies strictly necessary for the operation of the site (authentication session). No advertising or third-party tracking cookies are used."
+      },
+      "rights": {
+        "title": "Your rights (GDPR)",
+        "content": "In accordance with the General Data Protection Regulation (GDPR), you have the following rights:",
+        "items": {
+          "access": "Right to access your personal data",
+          "rectification": "Right to rectify inaccurate data",
+          "deletion": "Right to erasure of your data",
+          "portability": "Right to data portability",
+          "opposition": "Right to object to processing"
+        },
+        "contact": "To exercise these rights, contact us at dragos@thespark.fr."
+      },
+      "retention": {
+        "title": "Data retention",
+        "content": "Your data is retained as long as your account is active. If your account is deleted, your personal data will be erased within 30 days."
+      }
+    },
+    "terms": {
+      "title": "Terms of use",
+      "metaDescription": "Terms of use for The Playground — acceptance, service description, responsibilities and applicable law.",
+      "intro": "These terms of use (\"Terms\") govern the use of The Playground platform, published by The Spark SASU.",
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "content": "By using The Playground, you accept these Terms in their entirety. If you do not accept these conditions, please do not use the service."
+      },
+      "service": {
+        "title": "Service description",
+        "content": "The Playground is a free platform for creating communities (Circles) and organizing events (Moments). The service is accessible via the web and is provided \"as is\"."
+      },
+      "account": {
+        "title": "User account",
+        "content": "Access to the service requires creating an account via email (magic link) or via an OAuth provider (Google, GitHub). You are responsible for the confidentiality of your account and all activity that occurs under it."
+      },
+      "userContent": {
+        "title": "User content",
+        "content": "You are solely responsible for content you publish on The Playground (Circle descriptions, Moment descriptions, comments). Any unlawful, defamatory, discriminatory or otherwise inappropriate content is prohibited and may be removed without notice."
+      },
+      "hostResponsibilities": {
+        "title": "Host responsibilities",
+        "content": "As a Host, you are responsible for the accuracy of information related to your Moments (location, date, description). You agree to comply with all applicable laws regarding event organization."
+      },
+      "playerResponsibilities": {
+        "title": "Member responsibilities",
+        "content": "As a Member, you agree to respect the rules of each Circle and Moment you participate in. Joining a Moment constitutes a commitment to attend."
+      },
+      "pricing": {
+        "title": "Pricing",
+        "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Moments, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
+      },
+      "liability": {
+        "title": "Limitation of liability",
+        "content": "The Spark SASU shall not be liable for any direct or indirect damages resulting from the use of the service, including but not limited to service interruption, data loss or disputes between Hosts and Members."
+      },
+      "modification": {
+        "title": "Modification of Terms",
+        "content": "The Spark SASU reserves the right to modify these Terms at any time. Users will be notified of changes by email or notification on the platform. Continued use of the service after modification constitutes acceptance of the new conditions."
+      },
+      "law": {
+        "title": "Applicable law",
+        "content": "These Terms are governed by French law. In the event of a dispute, the competent courts of Paris shall have exclusive jurisdiction."
+      }
     }
   },
   "Profile": {

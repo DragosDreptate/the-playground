@@ -34,8 +34,7 @@
     "ctaFinalTitle": "Prêt à lancer votre communauté ?",
     "ctaFinalSubtitle": "Créez votre Cercle en 30 secondes. C'est gratuit, pour toujours.",
     "ctaFinal": "Commencer gratuitement",
-    "ctaExplore": "Commencez à explorer",
-    "footerCopyright": "© 2026 The Playground · Lancez votre communauté, gratuitement."
+    "ctaExplore": "Commencez à explorer"
   },
   "Common": {
     "loading": "Chargement...",
@@ -446,6 +445,142 @@
       "viewMomentCta": "Voir l'Escale",
       "cancelLink": "Annuler mon inscription",
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
+    }
+  },
+  "Footer": {
+    "brand": {
+      "tagline": "Lancez votre communauté, gratuitement.",
+      "copyright": "© 2026 The Playground. Tous droits réservés."
+    },
+    "product": {
+      "title": "Produit",
+      "explore": "La Carte",
+      "howItWorks": "Comment ça marche"
+    },
+    "legal": {
+      "title": "Légal",
+      "legalNotice": "Mentions légales",
+      "privacy": "Confidentialité",
+      "terms": "CGU"
+    }
+  },
+  "Legal": {
+    "lastUpdated": "Dernière mise à jour : {date}",
+    "legalNotice": {
+      "title": "Mentions légales",
+      "metaDescription": "Mentions légales de The Playground — informations sur l'éditeur, l'hébergeur et la propriété intellectuelle.",
+      "editor": {
+        "title": "Éditeur",
+        "content": "The Playground est édité par The Spark SASU, société par actions simplifiée unipersonnelle au capital social de 10 000 €.",
+        "siret": "SIRET : 93482575300015",
+        "address": "Siège social : 10 rue de la Paix, 75002 Paris",
+        "contact": "Contact : dragos@thespark.fr",
+        "director": "Directeur de la publication : Dragos Dreptate"
+      },
+      "host": {
+        "title": "Hébergeur",
+        "content": "Le site est hébergé par Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis."
+      },
+      "intellectualProperty": {
+        "title": "Propriété intellectuelle",
+        "content": "L'ensemble du contenu du site (textes, graphismes, logo, icônes, logiciels) est la propriété exclusive de The Spark SASU, sauf mention contraire. Toute reproduction, représentation ou diffusion, en tout ou partie, du contenu de ce site sans autorisation est interdite."
+      },
+      "liability": {
+        "title": "Responsabilité",
+        "content": "The Spark SASU s'efforce d'assurer l'exactitude des informations publiées sur le site, mais ne saurait garantir leur complétude ou leur actualité. L'utilisation du site se fait sous la seule responsabilité de l'utilisateur."
+      }
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "metaDescription": "Politique de confidentialité de The Playground — données collectées, finalités, droits RGPD et cookies.",
+      "intro": "The Playground, édité par The Spark SASU, s'engage à protéger la vie privée de ses utilisateurs. Cette politique décrit les données que nous collectons, pourquoi nous les utilisons et quels sont vos droits.",
+      "dataCollected": {
+        "title": "Données collectées",
+        "items": {
+          "email": "Adresse email (connexion via magic link ou OAuth)",
+          "name": "Prénom et nom (renseignés lors de l'onboarding)",
+          "oauth": "Identifiant du compte OAuth (Google, GitHub) — uniquement pour l'authentification",
+          "usage": "Données d'utilisation anonymisées (Vercel Analytics)"
+        }
+      },
+      "purpose": {
+        "title": "Finalités du traitement",
+        "items": {
+          "auth": "Authentification et gestion de votre compte",
+          "service": "Fourniture du service (création de Cercles, inscription aux Escales)",
+          "email": "Envoi d'emails transactionnels (confirmations d'inscription, notifications)",
+          "analytics": "Amélioration du service via des statistiques anonymisées"
+        }
+      },
+      "sharing": {
+        "title": "Partage des données",
+        "content": "Vos données personnelles ne sont jamais vendues ni partagées avec des tiers à des fins commerciales. Elles peuvent être transmises à nos sous-traitants techniques (hébergement, envoi d'emails) uniquement pour assurer le fonctionnement du service."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "The Playground utilise uniquement des cookies strictement nécessaires au fonctionnement du site (session d'authentification). Aucun cookie publicitaire ou de tracking tiers n'est utilisé."
+      },
+      "rights": {
+        "title": "Vos droits (RGPD)",
+        "content": "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :",
+        "items": {
+          "access": "Droit d'accès à vos données personnelles",
+          "rectification": "Droit de rectification des données inexactes",
+          "deletion": "Droit à l'effacement de vos données",
+          "portability": "Droit à la portabilité de vos données",
+          "opposition": "Droit d'opposition au traitement"
+        },
+        "contact": "Pour exercer ces droits, contactez-nous à dragos@thespark.fr."
+      },
+      "retention": {
+        "title": "Conservation des données",
+        "content": "Vos données sont conservées tant que votre compte est actif. En cas de suppression de compte, vos données personnelles sont effacées dans un délai de 30 jours."
+      }
+    },
+    "terms": {
+      "title": "Conditions générales d'utilisation",
+      "metaDescription": "Conditions générales d'utilisation de The Playground — acceptation, description du service, responsabilités et droit applicable.",
+      "intro": "Les présentes conditions générales d'utilisation (« CGU ») régissent l'utilisation de la plateforme The Playground, éditée par The Spark SASU.",
+      "acceptance": {
+        "title": "Acceptation des CGU",
+        "content": "En utilisant The Playground, vous acceptez les présentes CGU dans leur intégralité. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser le service."
+      },
+      "service": {
+        "title": "Description du service",
+        "content": "The Playground est une plateforme gratuite permettant de créer des communautés (Cercles) et d'organiser des événements (Escales). Le service est accessible via le web et est fourni « en l'état »."
+      },
+      "account": {
+        "title": "Compte utilisateur",
+        "content": "L'accès au service nécessite la création d'un compte via email (magic link) ou via un fournisseur OAuth (Google, GitHub). Vous êtes responsable de la confidentialité de votre compte et de toute activité qui s'y déroule."
+      },
+      "userContent": {
+        "title": "Contenu utilisateur",
+        "content": "Vous êtes seul responsable du contenu que vous publiez sur The Playground (descriptions de Cercles, d'Escales, commentaires). Tout contenu illicite, diffamatoire, discriminatoire ou contraire aux bonnes mœurs est interdit et pourra être supprimé sans préavis."
+      },
+      "hostResponsibilities": {
+        "title": "Responsabilités de l'Organisateur",
+        "content": "En tant qu'Organisateur, vous êtes responsable de l'exactitude des informations relatives à vos Escales (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
+      },
+      "playerResponsibilities": {
+        "title": "Responsabilités du Participant",
+        "content": "En tant que Participant, vous vous engagez à respecter les règles de chaque Cercle et Escale auxquels vous participez. L'inscription à une Escale vaut engagement de présence."
+      },
+      "pricing": {
+        "title": "Gratuité et tarification",
+        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les Escales payantes, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'Organisateur."
+      },
+      "liability": {
+        "title": "Limitation de responsabilité",
+        "content": "The Spark SASU ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du service, notamment en cas d'interruption, de perte de données ou de litige entre Organisateurs et Participants."
+      },
+      "modification": {
+        "title": "Modification des CGU",
+        "content": "The Spark SASU se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés des modifications par email ou notification sur la plateforme. L'utilisation continue du service après modification vaut acceptation des nouvelles conditions."
+      },
+      "law": {
+        "title": "Droit applicable",
+        "content": "Les présentes CGU sont régies par le droit français. En cas de litige, les tribunaux compétents de Paris seront seuls compétents."
+      }
     }
   },
   "Profile": {

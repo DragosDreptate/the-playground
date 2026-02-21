@@ -1,6 +1,7 @@
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -239,7 +240,7 @@ export default async function HomePage() {
         </section>
 
         {/* Comment ça marche */}
-        <section className="bg-muted/30 px-4 py-24 md:py-32">
+        <section id="how-it-works" className="bg-muted/30 px-4 py-24 md:py-32">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("howItWorks")}
@@ -335,9 +336,7 @@ export default async function HomePage() {
         </section>
       </main>
 
-      <footer className="text-muted-foreground border-t py-8 text-center text-xs">
-        {t("footerCopyright")}
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

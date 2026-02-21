@@ -1,5 +1,6 @@
 import { auth } from "@/infrastructure/auth/auth.config";
 import { SiteHeader } from "@/components/site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export default async function PublicMomentLayout({
   children,
@@ -9,9 +10,10 @@ export default async function PublicMomentLayout({
   const session = await auth();
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <SiteHeader user={session?.user} />
-      {children}
+      <div className="flex-1">{children}</div>
+      <SiteFooter />
     </div>
   );
 }
