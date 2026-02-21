@@ -103,6 +103,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
+  const tDashboard = await getTranslations("Dashboard");
 
   const gradient = getMomentGradient(moment.title);
   const circleGradient = getMomentGradient(circle.name);
@@ -131,6 +132,13 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
       {isHostView && (
         <div className="space-y-1">
           <div className="text-muted-foreground flex items-center gap-1 text-sm">
+            <Link
+              href="/dashboard"
+              className="hover:text-foreground transition-colors"
+            >
+              {tDashboard("title")}
+            </Link>
+            <ChevronRight className="size-3.5" />
             <Link
               href={`/dashboard/circles/${props.circleSlug}`}
               className="hover:text-foreground transition-colors"

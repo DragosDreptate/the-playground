@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { CircleCard } from "@/components/circles/circle-card";
+import { ChevronRight } from "lucide-react";
 
 export default async function NewMomentPage() {
   const session = await auth();
@@ -23,9 +24,22 @@ export default async function NewMomentPage() {
     redirect(`/dashboard/circles/${circles[0].slug}/moments/new`);
   }
 
+  const breadcrumb = (
+    <div className="text-muted-foreground flex items-center gap-1 text-sm">
+      <Link href="/dashboard" className="hover:text-foreground transition-colors">
+        {t("title")}
+      </Link>
+      <ChevronRight className="size-3.5" />
+      <span className="text-foreground truncate font-medium">
+        {t("createMoment")}
+      </span>
+    </div>
+  );
+
   if (circles.length === 0) {
     return (
       <div className="space-y-6">
+        {breadcrumb}
         <h1 className="text-2xl font-bold tracking-tight">
           {t("selectCircle.title")}
         </h1>
@@ -44,6 +58,7 @@ export default async function NewMomentPage() {
 
   return (
     <div className="space-y-6">
+      {breadcrumb}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           {t("selectCircle.title")}
