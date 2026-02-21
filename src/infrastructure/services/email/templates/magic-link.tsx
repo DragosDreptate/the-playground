@@ -1,21 +1,32 @@
-import { Button, Hr, Section, Text } from "@react-email/components";
+import { Button, Hr, Img, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
 type Props = {
   url: string;
+  baseUrl?: string;
 };
 
-export function MagicLinkEmail({ url }: Props) {
+export function MagicLinkEmail({ url, baseUrl }: Props) {
   return (
     <EmailLayout
       preview="Votre lien de connexion à The Playground"
       footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     >
       <Section style={iconSection}>
-        <Section style={iconWrapper}>
-          <Text style={iconText}>▶</Text>
-        </Section>
+        {baseUrl ? (
+          <Img
+            src={`${baseUrl}/icon.png`}
+            width={48}
+            height={48}
+            alt="The Playground"
+            style={iconImage}
+          />
+        ) : (
+          <Section style={iconWrapper}>
+            <Text style={iconText}>▶</Text>
+          </Section>
+        )}
         <Text style={brandName}>The Playground</Text>
       </Section>
 
@@ -48,6 +59,14 @@ const iconSection: React.CSSProperties = {
   marginBottom: "24px",
 };
 
+// Utilisé en production — icône PNG générée par Next.js (/icon.png)
+// Le PNG inclut déjà les coins arrondis (borderRadius dans ImageResponse)
+const iconImage: React.CSSProperties = {
+  display: "block",
+  margin: "0 auto 8px auto",
+};
+
+// Fallback en dev/preview quand baseUrl n'est pas disponible
 const iconWrapper: React.CSSProperties = {
   background: "linear-gradient(135deg, #ec4899, #a855f7)",
   borderRadius: "10px",
