@@ -2,16 +2,12 @@ import { Button, Hr, Img, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
-// L'icône est envoyée comme pièce jointe inline (CID) par auth.config.ts.
-// Cette référence est résolue par le client email — fonctionne dans Gmail,
-// Apple Mail et Outlook (standard RFC 2392).
-const ICON_CID = "cid:playground-icon";
-
 type Props = {
   url: string;
+  iconUrl: string;
 };
 
-export function MagicLinkEmail({ url }: Props) {
+export function MagicLinkEmail({ url, iconUrl }: Props) {
   return (
     <EmailLayout
       preview="Votre lien de connexion à The Playground"
@@ -19,7 +15,7 @@ export function MagicLinkEmail({ url }: Props) {
     >
       <Section style={iconSection}>
         <Img
-          src={ICON_CID}
+          src={iconUrl}
           width={48}
           height={48}
           alt="The Playground"
