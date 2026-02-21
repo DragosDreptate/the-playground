@@ -62,6 +62,11 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 // ─────────────────────────────────────────────
 // Auth.js models
 // ─────────────────────────────────────────────
@@ -118,6 +123,7 @@ model User {
   image                String?
   emailVerified        DateTime?
   onboardingCompleted  Boolean   @default(false)
+  role                 UserRole  @default(USER)
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 

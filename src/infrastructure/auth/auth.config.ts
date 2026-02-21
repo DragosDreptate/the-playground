@@ -29,7 +29,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     session({ session, user }) {
       session.user.id = user.id;
-      session.user.onboardingCompleted = (user as unknown as { onboardingCompleted: boolean }).onboardingCompleted;
+      const dbUser = user as unknown as { onboardingCompleted: boolean; role: "USER" | "ADMIN" };
+      session.user.onboardingCompleted = dbUser.onboardingCompleted;
+      session.user.role = dbUser.role;
       return session;
     },
   },

@@ -10,6 +10,7 @@ type SiteHeaderProps = {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: "USER" | "ADMIN";
   } | null;
 };
 

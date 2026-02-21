@@ -329,6 +329,87 @@
       "online": "Online"
     }
   },
+  "Admin": {
+    "title": "Administration",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "circles": "Circles",
+    "moments": "Moments",
+    "backToSite": "Back to site",
+    "stats": {
+      "totalUsers": "Users",
+      "totalCircles": "Circles",
+      "totalMoments": "Moments",
+      "totalRegistrations": "Registrations",
+      "thisWeek": "this week"
+    },
+    "table": {
+      "search": "Search...",
+      "noResults": "No results.",
+      "previous": "Previous",
+      "next": "Next",
+      "showing": "Showing {from} to {to} of {total}"
+    },
+    "actions": {
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "confirmDelete": "Are you sure? This action cannot be undone.",
+      "confirmCancel": "Are you sure you want to cancel this Moment?",
+      "cancelMoment": "Force cancel",
+      "view": "View"
+    },
+    "userDetail": {
+      "title": "User detail",
+      "role": "Role",
+      "onboarding": "Onboarding",
+      "completed": "Completed",
+      "pending": "Pending",
+      "memberSince": "Member since",
+      "circles": "Circles",
+      "noCircles": "No Circles."
+    },
+    "circleDetail": {
+      "title": "Circle detail",
+      "host": "Host",
+      "members": "Members",
+      "moments": "Moments",
+      "visibility": "Visibility",
+      "category": "Category",
+      "city": "City",
+      "description": "Description",
+      "recentMoments": "Recent Moments",
+      "noMoments": "No Moments."
+    },
+    "momentDetail": {
+      "title": "Moment detail",
+      "circle": "Circle",
+      "createdBy": "Created by",
+      "status": "Status",
+      "date": "Date",
+      "capacity": "Capacity",
+      "registrations": "Registrations",
+      "noRegistrations": "No registrations.",
+      "unlimited": "Unlimited"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "circles": "Circles",
+      "moments": "Moments",
+      "createdAt": "Joined",
+      "host": "Host",
+      "members": "Members",
+      "visibility": "Visibility",
+      "category": "Category",
+      "title": "Title",
+      "circle": "Circle",
+      "date": "Date",
+      "status": "Status",
+      "registrations": "Registrations",
+      "actions": "Actions"
+    }
+  },
   "UserMenu": {
     "dashboard": "My Playground",
     "profile": "Profile",

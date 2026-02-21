@@ -1,3 +1,5 @@
+export type UserRole = "USER" | "ADMIN";
+
 export type User = {
   id: string;
   email: string;
@@ -7,6 +9,7 @@ export type User = {
   image: string | null;
   emailVerified: Date | null;
   onboardingCompleted: boolean;
+  role: UserRole;
   createdAt: Date;
   updatedAt: Date;
 };

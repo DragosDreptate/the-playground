@@ -25,3 +25,4 @@ export {
   UnauthorizedRegistrationActionError,
   HostCannotCancelRegistrationError,
 } from "./registration-errors";
+export { AdminUnauthorizedError } from "./admin-errors";

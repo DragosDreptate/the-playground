@@ -329,6 +329,87 @@
       "online": "En ligne"
     }
   },
+  "Admin": {
+    "title": "Administration",
+    "dashboard": "Tableau de bord",
+    "users": "Utilisateurs",
+    "circles": "Cercles",
+    "moments": "Escales",
+    "backToSite": "Retour au site",
+    "stats": {
+      "totalUsers": "Utilisateurs",
+      "totalCircles": "Cercles",
+      "totalMoments": "Escales",
+      "totalRegistrations": "Inscriptions",
+      "thisWeek": "cette semaine"
+    },
+    "table": {
+      "search": "Rechercher...",
+      "noResults": "Aucun résultat.",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "showing": "Affichage de {from} à {to} sur {total}"
+    },
+    "actions": {
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "confirmDelete": "Êtes-vous sûr ? Cette action est irréversible.",
+      "confirmCancel": "Êtes-vous sûr de vouloir annuler cette Escale ?",
+      "cancelMoment": "Forcer l'annulation",
+      "view": "Voir"
+    },
+    "userDetail": {
+      "title": "Détail utilisateur",
+      "role": "Rôle",
+      "onboarding": "Onboarding",
+      "completed": "Complété",
+      "pending": "En attente",
+      "memberSince": "Membre depuis",
+      "circles": "Cercles",
+      "noCircles": "Aucun Cercle."
+    },
+    "circleDetail": {
+      "title": "Détail Cercle",
+      "host": "Organisateur",
+      "members": "Membres",
+      "moments": "Escales",
+      "visibility": "Visibilité",
+      "category": "Thématique",
+      "city": "Ville",
+      "description": "Description",
+      "recentMoments": "Escales récentes",
+      "noMoments": "Aucune Escale."
+    },
+    "momentDetail": {
+      "title": "Détail Escale",
+      "circle": "Cercle",
+      "createdBy": "Créé par",
+      "status": "Statut",
+      "date": "Date",
+      "capacity": "Capacité",
+      "registrations": "Inscriptions",
+      "noRegistrations": "Aucune inscription.",
+      "unlimited": "Illimitée"
+    },
+    "columns": {
+      "name": "Nom",
+      "email": "Email",
+      "role": "Rôle",
+      "circles": "Cercles",
+      "moments": "Escales",
+      "createdAt": "Inscrit le",
+      "host": "Organisateur",
+      "members": "Membres",
+      "visibility": "Visibilité",
+      "category": "Thématique",
+      "title": "Titre",
+      "circle": "Cercle",
+      "date": "Date",
+      "status": "Statut",
+      "registrations": "Inscrits",
+      "actions": "Actions"
+    }
+  },
   "UserMenu": {
     "dashboard": "Mon Playground",
     "profile": "Profil",

@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, LogOut, User } from "lucide-react";
+import { LayoutDashboard, LogOut, User, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { signOutAction } from "@/app/actions/auth";
@@ -20,6 +20,7 @@ type UserMenuProps = {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: "USER" | "ADMIN";
   };
 };
 
@@ -55,6 +56,14 @@ export function UserMenu({ user }: UserMenuProps) {
             {t("profile")}
           </Link>
         </DropdownMenuItem>
+        {user.role === "ADMIN" && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin" className="cursor-pointer">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"

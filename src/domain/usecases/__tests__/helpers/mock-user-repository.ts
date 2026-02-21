@@ -24,6 +24,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     image: null,
     emailVerified: new Date("2026-01-01"),
     onboardingCompleted: false,
+    role: "USER",
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,

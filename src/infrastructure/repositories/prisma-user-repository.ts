@@ -16,6 +16,7 @@ function toDomainUser(record: PrismaUser): User {
     image: record.image,
     emailVerified: record.emailVerified,
     onboardingCompleted: record.onboardingCompleted,
+    role: record.role,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
