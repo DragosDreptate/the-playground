@@ -96,7 +96,7 @@ export default async function DashboardPage({
             {t("myCircles")}
           </Link>
         </div>
-        <Button asChild variant="outline" size="sm">
+        <Button asChild size="sm">
           <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
         </Button>
       </div>
