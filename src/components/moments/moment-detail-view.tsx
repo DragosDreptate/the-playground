@@ -61,8 +61,14 @@ export type MomentDetailViewProps = HostViewProps | PublicViewProps;
 
 const statusVariant = {
   PUBLISHED: "default",
-  CANCELLED: "destructive",
+  CANCELLED: "outline",
   PAST: "outline",
+} as const;
+
+const statusClassName = {
+  PUBLISHED: "",
+  CANCELLED: "border-destructive/40 text-destructive",
+  PAST: "",
 } as const;
 
 function formatDateRange(startsAt: Date, endsAt: Date | null): string {
@@ -151,7 +157,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={statusVariant[moment.status]}>
+            <Badge variant={statusVariant[moment.status]} className={statusClassName[moment.status]}>
               {t(`status.${moment.status.toLowerCase()}`)}
             </Badge>
           </div>

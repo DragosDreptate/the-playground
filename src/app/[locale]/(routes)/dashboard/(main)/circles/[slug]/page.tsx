@@ -137,7 +137,10 @@ export default async function CircleDetailPage({
             {circle.name}
           </span>
         </div>
-        <Badge variant={isHost ? "default" : "secondary"}>
+        <Badge
+          variant={isHost ? "outline" : "secondary"}
+          className={isHost ? "border-primary/40 text-primary" : ""}
+        >
           {isHost ? tDashboard("role.host") : tDashboard("role.player")}
         </Badge>
       </div>

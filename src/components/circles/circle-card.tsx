@@ -43,7 +43,10 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
           <div className="flex items-start justify-between gap-2">
             <p className="truncate font-semibold leading-snug">{circle.name}</p>
             {role && (
-              <Badge variant={role === "HOST" ? "default" : "outline"} className="shrink-0">
+              <Badge
+                variant={role === "HOST" ? "outline" : "secondary"}
+                className={role === "HOST" ? "shrink-0 border-primary/40 text-primary" : "shrink-0"}
+              >
                 {role === "HOST" ? tDashboard("role.host") : tDashboard("role.player")}
               </Badge>
             )}

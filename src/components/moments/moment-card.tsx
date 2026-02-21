@@ -16,8 +16,14 @@ type MomentCardProps = {
 
 const statusVariant = {
   PUBLISHED: "default",
-  CANCELLED: "destructive",
+  CANCELLED: "outline",
   PAST: "outline",
+} as const;
+
+const statusClassName = {
+  PUBLISHED: "",
+  CANCELLED: "border-destructive/40 text-destructive",
+  PAST: "",
 } as const;
 
 export function MomentCard({ moment, circleSlug }: MomentCardProps) {
@@ -39,7 +45,7 @@ export function MomentCard({ moment, circleSlug }: MomentCardProps) {
                 {moment.startsAt.toLocaleDateString()}
               </p>
             </div>
-            <Badge variant={statusVariant[moment.status]}>
+            <Badge variant={statusVariant[moment.status]} className={statusClassName[moment.status]}>
               {t(`status.${moment.status.toLowerCase()}`)}
             </Badge>
           </div>
