@@ -35,6 +35,7 @@
 | Formulaire Moment : auto-sync date de fin = date de début à la sélection | 2026-02-21 | `0deec99` |
 | Indicateurs Moment passé : cover grisée + badge "Passé" overlay + banner contextuel + carte "Événement terminé" avec CTA rétention Circle | 2026-02-21 | `488ddb8` |
 | Fil de commentaires sur Moment : `CommentThread` (plat, chronologique) sur pages publique + dashboard Host/Player | 2026-02-21 | non commité |
+| Scripts données test : `db:seed-test-data` (réaliste, idempotent, FR) + `db:cleanup-test-data` (dry-run par défaut) + variantes prod | 2026-02-21 | non commité |
 
 ---
 
@@ -134,3 +135,4 @@
 | 2026-02-21 | Carte "Événement terminé" (vue publique Moment passé) inclut un CTA "Voir les prochains Moments du Cercle" — rétention vers le Circle. |
 | 2026-02-21 | Fil de commentaires plat (pas de réponses imbriquées). Max 2000 chars. Tout utilisateur authentifié peut commenter, même sans être membre. Auteur et Host peuvent supprimer. Sur Moments PAST, le formulaire est masqué mais les commentaires restent visibles. |
 | 2026-02-21 | Convention pérenne utilisateurs test : domaine `@test.playground` en dev ET en prod. Pas de champ DB supplémentaire. Suppression via `DELETE WHERE email LIKE '%@test.playground'`. |
+| 2026-02-21 | Scripts données test : seed idempotent (`upsert` partout), cleanup avec flag `--execute` (dry-run par défaut). Variantes prod via scripts shell Neon (même pattern que `db-push-prod.sh`). Données FR uniquement (noms, lieux). |

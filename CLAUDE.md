@@ -270,6 +270,11 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:push:prod` | Push le schema vers la DB **production** (avec confirmation) |
 | `pnpm db:studio` | Ouvre Prisma Studio (UI de visualisation DB) |
 | `pnpm db:dev:reset` | Recrée la branche Neon dev depuis un snapshot frais de production |
+| `pnpm db:seed-test-data` | Injecte des données de test réalistes (dev) — idempotent |
+| `pnpm db:seed-test-data:prod` | Injecte des données de test en production (avec confirmation) |
+| `pnpm db:cleanup-test-data` | Dry-run : affiche ce qui serait supprimé (@test.playground) |
+| `pnpm db:cleanup-test-data --execute` | Supprime les données test (dev) — utilisateurs @test.playground + leur data |
+| `pnpm db:cleanup-test-data:prod` | Supprime les données test en production (avec double confirmation) |
 
 > **Note Claude** : ne pas lancer les tests automatiquement. Lancer uniquement quand l'utilisateur le demande explicitement.
 
