@@ -1,26 +1,21 @@
-import { Button, Hr, Img, Section, Text } from "@react-email/components";
+import { Button, Hr, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
 type Props = {
   url: string;
-  baseUrl: string;
 };
 
-export function MagicLinkEmail({ url, baseUrl }: Props) {
+export function MagicLinkEmail({ url }: Props) {
   return (
     <EmailLayout
       preview="Votre lien de connexion à The Playground"
       footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     >
-      <Section style={brandSection}>
-        <Img
-          src={`${baseUrl}/icon.png`}
-          width={40}
-          height={40}
-          alt="The Playground"
-          style={iconStyle}
-        />
+      <Section style={iconSection}>
+        <Section style={iconWrapper}>
+          <Text style={iconText}>▶</Text>
+        </Section>
         <Text style={brandName}>The Playground</Text>
       </Section>
 
@@ -48,15 +43,27 @@ export function MagicLinkEmail({ url, baseUrl }: Props) {
   );
 }
 
-const brandSection: React.CSSProperties = {
+const iconSection: React.CSSProperties = {
   textAlign: "center" as const,
   marginBottom: "24px",
 };
 
-const iconStyle: React.CSSProperties = {
+const iconWrapper: React.CSSProperties = {
+  background: "linear-gradient(135deg, #ec4899, #a855f7)",
   borderRadius: "10px",
+  width: "48px",
+  height: "48px",
+  textAlign: "center" as const,
   margin: "0 auto 8px auto",
-  display: "block",
+};
+
+const iconText: React.CSSProperties = {
+  color: "#ffffff",
+  fontSize: "20px",
+  fontWeight: 700,
+  margin: 0,
+  padding: "10px 0 0 3px",
+  lineHeight: "1",
 };
 
 const brandName: React.CSSProperties = {
