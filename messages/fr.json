@@ -416,6 +416,38 @@
     "profile": "Profil",
     "signOut": "Se déconnecter"
   },
+  "Email": {
+    "registration": {
+      "subject": "Vous avez rejoint {momentTitle}",
+      "heading": "Inscription confirmée !",
+      "statusMessage": "Vous êtes inscrit(e) à {momentTitle}."
+    },
+    "waitlist": {
+      "subject": "Liste d'attente : {momentTitle}",
+      "heading": "Vous êtes sur la liste d'attente",
+      "statusMessage": "Vous êtes en liste d'attente pour {momentTitle}. Nous vous informerons si une place se libère."
+    },
+    "promotion": {
+      "subject": "Votre place est confirmée : {momentTitle}",
+      "heading": "Bonne nouvelle !",
+      "statusMessage": "Une place s'est libérée ! Votre inscription à {momentTitle} est confirmée."
+    },
+    "hostNotification": {
+      "subject": "{playerName} a rejoint {momentTitle}",
+      "heading": "Nouvelle inscription",
+      "message": "{playerName} a rejoint {momentTitle}",
+      "registrationInfo": "{count} inscrit(s) / {capacity} places",
+      "registrationInfoUnlimited": "{count} inscrit(s)",
+      "manageRegistrationsCta": "Gérer les inscriptions"
+    },
+    "common": {
+      "dateLabel": "Date",
+      "locationLabel": "Lieu",
+      "viewMomentCta": "Voir l'Escale",
+      "cancelLink": "Annuler mon inscription",
+      "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
+    }
+  },
   "Profile": {
     "setup": {
       "title": "Complétez votre profil",

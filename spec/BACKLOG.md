@@ -49,6 +49,7 @@
 | Homepage redesignée : hero split-screen (texte + mockup iPhone 3D tilt), section "Comment ça marche" (3 étapes), 3 piliers, CTA final, footer — i18n FR/EN complet | 2026-02-21 | — |
 | Scripts données démo : `db:seed-demo-data` (6 Circles, 20 users `@demo.playground`, 30 Moments 80%/20%, FR, idempotent) + `db:cleanup-demo-data` (dry-run par défaut) + variantes prod | 2026-02-21 | `0fa65f0` |
 | Admin plateforme : dashboard stats, listes paginées (Users/Circles/Moments) avec recherche, pages détail, suppression, forcer annulation Moment. Middleware guard `/admin/*`, `UserRole` (USER/ADMIN), lien Admin dans UserMenu, i18n FR/EN complet | 2026-02-21 | `dbe3dda` |
+| Emails transactionnels (Resend + react-email) : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Host nouvelle inscription. Port `EmailService` + adapter `ResendEmailService`. Templates React avec calendar badge (gradient rose→violet). Fire-and-forget depuis server actions. i18n FR/EN complet. | 2026-02-21 | — |
 
 ---
 
@@ -66,30 +67,29 @@
 
 #### Emails transactionnels (Resend + react-email)
 
-- [ ] **Email de confirmation d'inscription** (MVP-1 — parcours A)
+- [x] **Email de confirmation d'inscription** (MVP-1 — parcours A) ✅
   - Déclenché immédiatement après `JoinMoment`
   - Contenu : titre Moment, date, lieu, lien `/m/[slug]`, lien d'annulation
-  - Sans cet email, l'inscription est anxiogène et le taux d'absence explose
+  - Gère aussi le cas WAITLISTED (textes différents, même template)
 
 - [ ] ~~**Email de rappel pré-événement**~~ → **déprioritisé, post-MVP** (voir Phase 2)
   - Rappel 24h avant + rappel 1h avant — nécessite une infrastructure de jobs planifiés (Vercel Cron / QStash)
   - Complexité d'implémentation disproportionnée pour le MVP
 
-- [ ] **Email de promotion liste d'attente** (MVP-3 — parcours C)
+- [x] **Email de promotion liste d'attente** (MVP-3 — parcours C) ✅
   - Déclenché par `CancelRegistration` quand un inscrit se désiste et promeut un waitlisté
-  - Contenu : "Votre place est confirmée", détails du Moment, lien pour annuler si besoin
-  - Sans cet email, le Player promu ne le sait jamais → place perdue en pratique
+  - Contenu : "Votre place est confirmée", détails du Moment
 
-- [ ] **Email de notification Host : nouvelle inscription** (MVP-4 — parcours D)
+- [x] **Email de notification Host : nouvelle inscription** (MVP-4 — parcours D) ✅
   - Déclenché par chaque `JoinMoment` sur un Moment dont l'utilisateur est Host
   - Contenu : nom du nouvel inscrit, total inscrits / places restantes, lien vers gestion
-  - Sans cet email, le Host ne sait pas que ça "marche" → abandon early adopters
+  - Skip quand le Host s'inscrit lui-même
 
-- [ ] **Architecture email multi-canal** (infrastructure)
-  - `EmailService` port déjà défini dans le domaine → implémenter `ResendEmailService`
-  - Templates React (react-email) : cohérence visuelle avec la plateforme
-  - File d'attente ou jobs planifiés pour les rappels (Vercel Cron Jobs ou queue)
-  - Variables Vercel : `RESEND_API_KEY`, `EMAIL_FROM`
+- [x] **Architecture email multi-canal** (infrastructure) ✅
+  - Port `EmailService` (3 méthodes) + adapter `ResendEmailService`
+  - Templates React (react-email) : calendar badge gradient, layout blanc/gris
+  - Fire-and-forget depuis server actions (pas de queue pour le MVP)
+  - Clé API : `AUTH_RESEND_KEY` (partagée auth + transactionnel)
 
 #### UX post-inscription — "Et maintenant ?" (parcours A)
 
@@ -265,3 +265,4 @@
 | 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Métaphore voyage cohérente (Carte = destinations, Escale = étape). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). |
 | 2026-02-21 | Convention démo : domaine **`@demo.playground`** distinct de `@test.playground`. Démo = contenu réaliste pour présentation/validation produit. Test = données techniques pour QA/dev. Reset complet de base (dev + prod) via `prisma db push --force-reset` avant injection démo. |
 | 2026-02-21 | Données démo : 6 Circles publics (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 Moments (1 passé + 4 à venir par Circle), ratio 20%/80%, contenu entièrement en français. |
+| 2026-02-21 | Emails transactionnels : envoyés depuis les server actions (pas les usecases). Usecases restent purs (pas de side effects). Fire-and-forget (si email échoue, inscription réussit). Traductions i18n résolues dans le flux principal avant le fire-and-forget. Port `EmailService` avec 3 méthodes + adapter `ResendEmailService` (Resend + react-email). 4 emails MVP : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Host. |

@@ -416,6 +416,38 @@
     "profile": "Profile",
     "signOut": "Sign out"
   },
+  "Email": {
+    "registration": {
+      "subject": "You've joined {momentTitle}",
+      "heading": "Registration confirmed!",
+      "statusMessage": "You're registered for {momentTitle}."
+    },
+    "waitlist": {
+      "subject": "Waitlist: {momentTitle}",
+      "heading": "You're on the waitlist",
+      "statusMessage": "You're on the waitlist for {momentTitle}. We'll let you know if a spot opens up."
+    },
+    "promotion": {
+      "subject": "Your spot is confirmed: {momentTitle}",
+      "heading": "Great news!",
+      "statusMessage": "A spot opened up! Your registration for {momentTitle} is confirmed."
+    },
+    "hostNotification": {
+      "subject": "{playerName} joined {momentTitle}",
+      "heading": "New registration",
+      "message": "{playerName} joined {momentTitle}",
+      "registrationInfo": "{count} joined / {capacity} spots",
+      "registrationInfoUnlimited": "{count} joined",
+      "manageRegistrationsCta": "Manage registrations"
+    },
+    "common": {
+      "dateLabel": "Date",
+      "locationLabel": "Location",
+      "viewMomentCta": "View Moment",
+      "cancelLink": "Cancel my registration",
+      "footer": "Powered by The Playground — Launch your community, for free."
+    }
+  },
   "Profile": {
     "setup": {
       "title": "Complete your profile",
