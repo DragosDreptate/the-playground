@@ -270,8 +270,8 @@
     "OTHER": "Other"
   },
   "Explorer": {
-    "title": "The Directory",
-    "description": "Discover open communities for everyone.",
+    "title": "Explore",
+    "description": "Discover open communities and upcoming Moments.",
     "navLink": "Explore",
     "tabs": {
       "circles": "Circles",

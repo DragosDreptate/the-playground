@@ -270,9 +270,9 @@
     "OTHER": "Autre"
   },
   "Explorer": {
-    "title": "Le Répertoire",
-    "description": "Découvrez des communautés ouvertes à tous.",
-    "navLink": "Explorer",
+    "title": "La Carte",
+    "description": "Explorez les communautés et les Escales ouvertes à tous.",
+    "navLink": "La Carte",
     "tabs": {
       "circles": "Cercles",
       "moments": "Escales"

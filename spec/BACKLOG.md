@@ -45,6 +45,7 @@
 | Dashboard redesigné : pill tabs (Mes Moments / Mes Cercles), timeline unifiée (upcoming + past), `DashboardMomentCard` avec `CircleAvatar`, empty states CTA | 2026-02-21 | — |
 | `CircleMembersList` : section membres sur page Circle (Hosts avec Crown, emails visibles Host-only via `variant`) | 2026-02-21 | — |
 | Terminologie i18n : FR Moment → **Escale**, S'inscrire → **Rejoindre**, Dashboard → **Mon Playground** / EN Player → **Member**, Register → **Join**, Dashboard → **My Playground** | 2026-02-21 | — |
+| Renommage Répertoire → **La Carte** (FR) / **Explore** (EN). Route `/explorer` inchangée. | 2026-02-21 | — |
 
 ---
 
@@ -177,7 +178,7 @@
   - CRUD commentaire sur chaque Moment
   - Visible sur la page publique et la vue dashboard
 
-- [x] **Le Répertoire** ✅ — `spec/feature-explorer-repertoire.md`
+- [x] **La Carte** (ex-Répertoire) ✅ — `spec/feature-explorer-repertoire.md`
   - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
   - Tab **Cercles** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain Moment en teaser)
   - Tab **Événements** : agenda chronologique des Moments PUBLISHED de Circles publics (card community-first)
@@ -259,3 +260,4 @@
 | 2026-02-21 | Le Répertoire (spec/feature-explorer-repertoire.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : Répertoire = Circles + Moments à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
 | 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
 | 2026-02-21 | Terminologie i18n rebranding. FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée, cette/une Escale), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Code identifiers, clés JSON et noms de fichiers restent en anglais (Moment, Player). |
+| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Métaphore voyage cohérente (Carte = destinations, Escale = étape). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). |

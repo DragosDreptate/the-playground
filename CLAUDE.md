@@ -61,8 +61,8 @@ The Playground: Moment → Inscription → Membre du Circle → Prochains Moment
 | **Player** | Participant (FR) / Member (EN) | Participant à un Moment / membre d'un Circle |
 
 > **Règle i18n** : En code (types, variables, DB, noms de fichiers, clés JSON), on utilise toujours les termes anglais (Circle, Moment, Host, Player). Les traductions user-facing sont :
-> - **FR** : Circle → Cercle, Moment → **Escale** (féminin : une Escale, cette Escale, Publiée, Annulée, Passée), Host → Organisateur, Player → Participant, Register → Rejoindre, Dashboard → Mon Playground
-> - **EN** : Circle, Moment, Host restent inchangés. Player → **Member**, Register → **Join**, Dashboard → **My Playground**
+> - **FR** : Circle → Cercle, Moment → **Escale** (féminin : une Escale, cette Escale, Publiée, Annulée, Passée), Host → Organisateur, Player → Participant, Register → Rejoindre, Dashboard → Mon Playground, Explorer → **La Carte**
+> - **EN** : Circle, Moment, Host restent inchangés. Player → **Member**, Register → **Join**, Dashboard → **My Playground**, Explorer → **Explore**
 
 ## Règles métier clés
 
@@ -206,7 +206,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - Fil de commentaires sur le Moment
 
 ### Plateforme
-- Répertoire public de Circles (filtrable thème/localisation, sans ranking)
+- La Carte : répertoire public de Circles (filtrable thème/localisation, sans ranking)
 - Stripe Connect pour événements payants
 
 ## Stack technique
@@ -531,7 +531,7 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | IA basique dès le MVP (descriptions, emails, suggestions) |
 | 2026-02-19 | Liste d'attente dans le MVP (pas en Phase 2) |
 | 2026-02-19 | Notifications multi-canal en architecture, email-only en V1 |
-| 2026-02-19 | Répertoire public de Circles (annuaire simple, pas de marketplace) |
+| 2026-02-19 | La Carte : répertoire public de Circles (annuaire simple, pas de marketplace) |
 | 2026-02-19 | On garde le nom "Circle" malgré la collision avec Circle.so |
 | 2026-02-19 | Fil de commentaires sur Moment (pas de forum complet) |
 | 2026-02-19 | Mobile-first pour le parcours Player |
@@ -564,3 +564,4 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Hosts d'abord (Crown), emails visibles uniquement pour les Hosts (prop `variant`) |
 | 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
 | 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
+| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et clé i18n `Explorer` inchangées. La Boussole réservée pour l'assistant IA (futur). |
