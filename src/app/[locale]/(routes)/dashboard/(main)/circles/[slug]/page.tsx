@@ -227,7 +227,7 @@ export default async function CircleDetailPage({
             )}
             {isHost && (
               <div className="flex shrink-0 gap-2">
-                <Button asChild variant="outline" size="sm">
+                <Button asChild size="sm">
                   <Link href={`/dashboard/circles/${circle.slug}/edit`}>
                     {tCommon("edit")}
                   </Link>
