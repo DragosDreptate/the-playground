@@ -20,9 +20,9 @@ export function CopyLinkButton({ value }: CopyLinkButtonProps) {
   return (
     <Button
       type="button"
-      variant="ghost"
+      variant="outline"
       size="sm"
-      className="h-7 shrink-0 gap-1.5 px-2 text-xs"
+      className="h-8 shrink-0 gap-1.5 px-3"
       onClick={handleCopy}
     >
       {copied ? (
@@ -30,7 +30,7 @@ export function CopyLinkButton({ value }: CopyLinkButtonProps) {
       ) : (
         <Copy className="size-3.5" />
       )}
-      {copied ? "Copié !" : "Copier"}
+      {copied ? "Copié !" : "Copier le lien"}
     </Button>
   );
 }

@@ -367,18 +367,28 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Host : lien partageable */}
           {isHostView && (
-            <div className="border-border bg-card flex items-center gap-2 rounded-xl border px-4 py-3">
-              <LinkIcon className="text-muted-foreground size-4 shrink-0" />
-              <span className="text-muted-foreground min-w-0 flex-1 truncate font-mono text-sm">
-                /m/{moment.slug}
-              </span>
-              <CopyLinkButton value={props.publicUrl} />
-              <Button asChild variant="ghost" size="sm" className="h-7 shrink-0 gap-1 px-2 text-xs">
-                <Link href={`/m/${moment.slug}`} target="_blank">
-                  <ExternalLink className="size-3.5" />
-                  Voir
-                </Link>
-              </Button>
+            <div className="border-border bg-card space-y-3 rounded-xl border p-4">
+              {/* Label */}
+              <div className="flex items-center gap-2">
+                <LinkIcon className="text-muted-foreground size-4 shrink-0" />
+                <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
+              </div>
+              {/* URL affichée sans le protocole */}
+              <div className="border-border bg-muted/50 rounded-lg border px-3 py-2">
+                <span className="text-muted-foreground block truncate font-mono text-sm">
+                  {props.publicUrl.replace(/^https?:\/\//, "")}
+                </span>
+              </div>
+              {/* Actions */}
+              <div className="flex items-center justify-between gap-2">
+                <CopyLinkButton value={props.publicUrl} />
+                <Button asChild variant="ghost" size="sm" className="h-8 shrink-0 gap-1.5 px-3">
+                  <Link href={`/m/${moment.slug}`} target="_blank">
+                    <ExternalLink className="size-3.5" />
+                    Voir
+                  </Link>
+                </Button>
+              </div>
             </div>
           )}
 
