@@ -159,11 +159,6 @@ export async function MomentTimelineItem({
                       </Badge>
                     ) : null}
 
-                    {moment.status === "PAST" && (
-                      <Badge variant="outline" className="text-xs">
-                        {t("status.past")}
-                      </Badge>
-                    )}
                   </div>
                 )}
               </div>
