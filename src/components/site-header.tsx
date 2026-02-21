@@ -22,8 +22,14 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
         {/* Logo — left */}
-        <Link href={user ? "/dashboard" : "/"} className="text-lg font-semibold shrink-0">
-          The Playground
+        <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
+          {/* Icône cercle + point */}
+          <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
+            <div className="flex size-[15px] items-center justify-center rounded-full border-[2px] border-white">
+              <div className="size-[4px] rounded-full bg-white" />
+            </div>
+          </div>
+          <span className="text-lg font-semibold">The Playground</span>
         </Link>
 
         {/* Nav — center */}
