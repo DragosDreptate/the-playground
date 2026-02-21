@@ -35,6 +35,15 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: RegistrationConfirmationEmail({ ...data, baseUrl }),
+        ...(data.icsContent && {
+          attachments: [
+            {
+              filename: "event.ics",
+              content: Buffer.from(data.icsContent).toString("base64"),
+              contentType: "text/calendar; method=PUBLISH",
+            },
+          ],
+        }),
       });
     },
 
@@ -46,6 +55,15 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: WaitlistPromotionEmail({ ...data, baseUrl }),
+        ...(data.icsContent && {
+          attachments: [
+            {
+              filename: "event.ics",
+              content: Buffer.from(data.icsContent).toString("base64"),
+              contentType: "text/calendar; method=PUBLISH",
+            },
+          ],
+        }),
       });
     },
 

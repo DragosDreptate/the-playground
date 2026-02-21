@@ -14,6 +14,7 @@ export type RegistrationConfirmationEmailData = {
   circleName: string;
   circleSlug: string;
   status: RegistrationStatus; // REGISTERED or WAITLISTED
+  icsContent?: string; // iCalendar (.ics) attachment — only for REGISTERED
   strings: {
     subject: string;
     heading: string;
@@ -37,6 +38,7 @@ export type WaitlistPromotionEmailData = {
   locationText: string;
   circleName: string;
   circleSlug: string;
+  icsContent?: string; // iCalendar (.ics) attachment — promoted = confirmed
   strings: {
     subject: string;
     heading: string;

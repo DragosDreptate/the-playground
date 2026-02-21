@@ -12,6 +12,7 @@ import {
   prismaUserRepository,
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
+import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { DomainError } from "@/domain/errors";
@@ -156,6 +157,21 @@ async function sendRegistrationEmails(
   const isWaitlisted = registration.status === "WAITLISTED";
   const stringPrefix = isWaitlisted ? "waitlist" : "registration";
 
+  // Generate .ics calendar attachment (REGISTERED only — not for waitlist)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const icsContent = !isWaitlisted
+    ? generateIcs({
+        uid: moment.id,
+        title: moment.title,
+        description: moment.description,
+        startsAt: moment.startsAt,
+        endsAt: moment.endsAt,
+        location: locationText,
+        url: `${baseUrl}/m/${moment.slug}`,
+        organizerName: circle.name,
+      })
+    : undefined;
+
   // Send confirmation to player
   await emailService.sendRegistrationConfirmation({
     to: user.email,
@@ -169,6 +185,7 @@ async function sendRegistrationEmails(
     circleName: circle.name,
     circleSlug: circle.slug,
     status: registration.status,
+    icsContent,
     strings: {
       subject: t(`${stringPrefix}.subject`, { momentTitle: moment.title }),
       heading: t(`${stringPrefix}.heading`),
@@ -269,6 +286,20 @@ async function sendPromotionEmail(
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
+  // Promoted = confirmed → attach .ics calendar event
+  const promotionBaseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const icsContent = generateIcs({
+    uid: moment.id,
+    title: moment.title,
+    description: moment.description,
+    startsAt: moment.startsAt,
+    endsAt: moment.endsAt,
+    location: locationText,
+    url: `${promotionBaseUrl}/m/${moment.slug}`,
+    organizerName: circle.name,
+  });
+
   await emailService.sendWaitlistPromotion({
     to: user.email,
     playerName,
@@ -280,6 +311,7 @@ async function sendPromotionEmail(
     locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
+    icsContent,
     strings: {
       subject: t("promotion.subject", { momentTitle: moment.title }),
       heading: t("promotion.heading"),
