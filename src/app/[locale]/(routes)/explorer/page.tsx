@@ -9,6 +9,8 @@ import { PublicCircleCard } from "@/components/explorer/public-circle-card";
 import { PublicMomentCard } from "@/components/explorer/public-moment-card";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
+import { auth } from "@/infrastructure/auth/auth.config";
 import type { CircleCategory } from "@/domain/models/circle";
 
 export const revalidate = 60;
@@ -31,6 +33,8 @@ export default async function ExplorerPage({
   const category = categoryParam as CircleCategory | undefined;
 
   const t = await getTranslations("Explorer");
+  const tDashboard = await getTranslations("Dashboard");
+  const session = await auth();
 
   const [circles, moments] = await Promise.all([
     getPublicCircles(
@@ -46,9 +50,16 @@ export default async function ExplorerPage({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("description")}</p>
+        </div>
+        {session?.user && (
+          <Button asChild size="sm" className="shrink-0">
+            <Link href="/dashboard/circles/new">{tDashboard("createCircle")}</Link>
+          </Button>
+        )}
       </div>
 
       {/* Tabs */}
