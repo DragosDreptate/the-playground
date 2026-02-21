@@ -14,7 +14,9 @@
     "create": "Create",
     "edit": "Edit",
     "public": "Public",
-    "private": "Private"
+    "private": "Private",
+    "showMore": "Show more",
+    "showLess": "Show less"
   },
   "Auth": {
     "signIn": {
@@ -208,6 +210,7 @@
       "viewOnMap": "View on Google Maps",
       "eventTookPlace": "This event took place on",
       "eventEnded": "Event ended",
+      "eventCancelled": "Event cancelled",
       "attendedCount": "{count} people attended",
       "viewCircleMoments": "See upcoming Moments from this Circle"
     },
@@ -221,6 +224,21 @@
         "registered": "Registered",
         "waitlisted": "Waitlisted"
       }
+    },
+    "comments": {
+      "title": "Comments",
+      "count": "{count} comment(s)",
+      "empty": "No comments yet. Be the first to say something!",
+      "placeholder": "Share your thoughts...",
+      "submit": "Post",
+      "signInToComment": "Sign in to comment",
+      "deleteTitle": "Delete comment",
+      "deleteDescription": "Are you sure you want to delete this comment? This action cannot be undone.",
+      "confirmDelete": "Yes, delete",
+      "justNow": "Just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
     },
     "empty": {
       "description": "No Moments yet. Create your first event."

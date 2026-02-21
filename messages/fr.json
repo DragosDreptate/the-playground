@@ -14,7 +14,9 @@
     "create": "Créer",
     "edit": "Modifier",
     "public": "Public",
-    "private": "Privé"
+    "private": "Privé",
+    "showMore": "Voir plus",
+    "showLess": "Voir moins"
   },
   "Auth": {
     "signIn": {
@@ -208,6 +210,7 @@
       "viewOnMap": "Voir sur Google Maps",
       "eventTookPlace": "Cet événement a eu lieu le",
       "eventEnded": "Événement terminé",
+      "eventCancelled": "Événement annulé",
       "attendedCount": "{count} personnes ont participé",
       "viewCircleMoments": "Voir les prochains Moments du Cercle"
     },
@@ -221,6 +224,21 @@
         "registered": "Inscrit",
         "waitlisted": "Liste d'attente"
       }
+    },
+    "comments": {
+      "title": "Commentaires",
+      "count": "{count} commentaire(s)",
+      "empty": "Aucun commentaire pour le moment. Soyez le premier à réagir !",
+      "placeholder": "Partagez votre avis...",
+      "submit": "Publier",
+      "signInToComment": "Se connecter pour commenter",
+      "deleteTitle": "Supprimer le commentaire",
+      "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.",
+      "confirmDelete": "Oui, supprimer",
+      "justNow": "À l'instant",
+      "minutesAgo": "Il y a {count}min",
+      "hoursAgo": "Il y a {count}h",
+      "daysAgo": "Il y a {count}j"
     },
     "empty": {
       "description": "Aucun Moment pour le moment. Créez votre premier événement."

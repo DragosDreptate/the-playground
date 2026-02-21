@@ -34,6 +34,7 @@
 | Statut inscription dans la timeline : dot coloré (rose/amber) + badge (Inscrit / Liste d'attente) | 2026-02-21 | `b9a9993` |
 | Formulaire Moment : auto-sync date de fin = date de début à la sélection | 2026-02-21 | `0deec99` |
 | Indicateurs Moment passé : cover grisée + badge "Passé" overlay + banner contextuel + carte "Événement terminé" avec CTA rétention Circle | 2026-02-21 | `488ddb8` |
+| Fil de commentaires sur Moment : `CommentThread` (plat, chronologique) sur pages publique + dashboard Host/Player | 2026-02-21 | non commité |
 
 ---
 
@@ -66,9 +67,9 @@
   - Confirmation inscription, rappels 24h/1h, changements, annulations
   - Architecture multi-canal (email V1, SMS/push/WhatsApp futur)
 
-- [ ] **Fil de commentaires sur Moment**
+- [x] **Fil de commentaires sur Moment** ✅
   - CRUD commentaire sur chaque Moment
-  - Visible sur la page publique
+  - Visible sur la page publique et la vue dashboard
 
 - [ ] **Répertoire public de Circles**
   - Annuaire de Circles uniquement (pas de Moments — distribution via lien partagé par le Host)
@@ -88,7 +89,11 @@
 
 ### Infrastructure / Qualité
 
-- [ ] **Baseliner les migrations Prisma** (actuellement `db:push` sans historique)
+- [ ] **Stratégie migrations DB + rollback production** — voir `spec/db-migration-rollback-strategy.md`
+  - Baseline migrations Prisma (passer de `db:push` à `prisma migrate`)
+  - Scripts `db:migrate`, `db:migrate:prod`, `db:migrate:status`, `db:snapshot`
+  - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
+  - Validation titre Moment dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
 - [ ] **Tests E2E Playwright** (parcours critiques)
 - [ ] **Accessibilité axe-core** dans Playwright
@@ -127,3 +132,4 @@
 | 2026-02-21 | Moments passés accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |
 | 2026-02-21 | Page Circle = même layout 2 colonnes que Moment (cover gradient LEFT sticky, contenu RIGHT). Cohérence design inter-pages. |
 | 2026-02-21 | Carte "Événement terminé" (vue publique Moment passé) inclut un CTA "Voir les prochains Moments du Cercle" — rétention vers le Circle. |
+| 2026-02-21 | Fil de commentaires plat (pas de réponses imbriquées). Max 2000 chars. Tout utilisateur authentifié peut commenter, même sans être membre. Auteur et Host peuvent supprimer. Sur Moments PAST, le formulaire est masqué mais les commentaires restent visibles. |

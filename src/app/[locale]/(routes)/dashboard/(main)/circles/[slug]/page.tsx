@@ -94,7 +94,7 @@ export default async function CircleDetailPage({
 
   const totalMembers = hosts.length + players.length;
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
-  const pastMoments = allMoments.filter((m) => m.status === "PAST");
+  const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
   const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
 
   // Fetch registration counts + user registration status in parallel
