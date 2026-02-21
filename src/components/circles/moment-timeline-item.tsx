@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
-import { MapPin, Globe, Users, ArrowRight, Check, Clock, XCircle, Crown } from "lucide-react";
+import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -172,16 +172,6 @@ export async function MomentTimelineItem({
           </div>
         </Link>
 
-        {/* Manage button — Host only, outside the card link */}
-        {isHost && (
-          <Link
-            href={`/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
-            className="text-muted-foreground hover:text-foreground mt-2 inline-flex items-center gap-1 text-xs transition-colors"
-          >
-            {tCircle("detail.manageMoment")}
-            <ArrowRight className="size-3" />
-          </Link>
-        )}
       </div>
     </div>
   );
