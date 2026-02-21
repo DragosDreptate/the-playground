@@ -133,3 +133,4 @@
 | 2026-02-21 | Page Circle = même layout 2 colonnes que Moment (cover gradient LEFT sticky, contenu RIGHT). Cohérence design inter-pages. |
 | 2026-02-21 | Carte "Événement terminé" (vue publique Moment passé) inclut un CTA "Voir les prochains Moments du Cercle" — rétention vers le Circle. |
 | 2026-02-21 | Fil de commentaires plat (pas de réponses imbriquées). Max 2000 chars. Tout utilisateur authentifié peut commenter, même sans être membre. Auteur et Host peuvent supprimer. Sur Moments PAST, le formulaire est masqué mais les commentaires restent visibles. |
+| 2026-02-21 | Convention pérenne utilisateurs test : domaine `@test.playground` en dev ET en prod. Pas de champ DB supplémentaire. Suppression via `DELETE WHERE email LIKE '%@test.playground'`. |
