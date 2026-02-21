@@ -22,6 +22,18 @@
 | Page publique `/m/[slug]` : bouton inscription fonctionnel (`RegistrationButton`, `RegistrationsList`) | 2026-02-20 | non commité |
 | Dashboard Player-first : `GetUserCirclesWithRole`, `GetUserUpcomingMoments` | 2026-02-20 | non commité |
 | Dashboard Player-first : section "Mes prochains Moments" + "Mes Cercles" avec badge rôle | 2026-02-20 | non commité |
+| Dev tooling : seed 3 utilisateurs test (host/player1/player2) + route GET d'impersonation (dev-only) | 2026-02-20 | `c862293` |
+| Sécurité dashboard : pages Circle/Moment vérifient le rôle — Players voient la vue publique, contrôles Host masqués | 2026-02-20 | `c862293` |
+| Règle métier : blocage inscription si Moment déjà commencé (`MomentAlreadyStartedError`) + transition auto PUBLISHED→PAST | 2026-02-20 | `c862293` |
+| Bug fix : ré-inscription après annulation met à jour la ligne existante (pas de doublon) | 2026-02-20 | `c862293` |
+| Tests : 21 nouveaux tests couvrant le cycle de vie de l'inscription (re-register, capacité, flux croisés) | 2026-02-20 | `c862293` |
+| Monitoring : Sentry (error tracking client/server/edge) + Vercel Analytics + SpeedInsights | 2026-02-21 | `c862293` + `2dde4cc` |
+| Page Moment unifiée : composant `MomentDetailView` partagé entre vue publique et vue Host | 2026-02-21 | `e867ba0` |
+| Page Circle redesignée : layout 2 colonnes aligné sur Moment (cover gradient, hosts, stats) | 2026-02-21 | `0deec99` |
+| Timeline Moments sur page Circle : toggle "À venir / Passés" (URL param `?tab=past`) + fil d'ariane avec dates | 2026-02-21 | `0deec99` |
+| Statut inscription dans la timeline : dot coloré (rose/amber) + badge (Inscrit / Liste d'attente) | 2026-02-21 | `b9a9993` |
+| Formulaire Moment : auto-sync date de fin = date de début à la sélection | 2026-02-21 | `0deec99` |
+| Indicateurs Moment passé : cover grisée + badge "Passé" overlay + banner contextuel + carte "Événement terminé" avec CTA rétention Circle | 2026-02-21 | `488ddb8` |
 
 ---
 
@@ -112,3 +124,6 @@
 | 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) au Moment qu'il crée — règle métier dans `createMoment`. |
 | 2026-02-20 | Check-in retiré du MVP → Phase 2 (pas prioritaire pour le lancement) |
 | 2026-02-20 | Répertoire public = Circles uniquement (pas de Moments). Distribution des Moments via lien partagé par le Host. Annuaire de Moments → Phase 2 si besoin. |
+| 2026-02-21 | Moments passés accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |
+| 2026-02-21 | Page Circle = même layout 2 colonnes que Moment (cover gradient LEFT sticky, contenu RIGHT). Cohérence design inter-pages. |
+| 2026-02-21 | Carte "Événement terminé" (vue publique Moment passé) inclut un CTA "Voir les prochains Moments du Cercle" — rétention vers le Circle. |
