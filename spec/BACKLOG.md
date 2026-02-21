@@ -48,6 +48,7 @@
 | Renommage Répertoire → **La Carte** (FR) / **Explore** (EN). Route `/explorer` inchangée. | 2026-02-21 | — |
 | Homepage redesignée : hero split-screen (texte + mockup iPhone 3D tilt), section "Comment ça marche" (3 étapes), 3 piliers, CTA final, footer — i18n FR/EN complet | 2026-02-21 | — |
 | Scripts données démo : `db:seed-demo-data` (6 Circles, 20 users `@demo.playground`, 30 Moments 80%/20%, FR, idempotent) + `db:cleanup-demo-data` (dry-run par défaut) + variantes prod | 2026-02-21 | `0fa65f0` |
+| Admin plateforme : dashboard stats, listes paginées (Users/Circles/Moments) avec recherche, pages détail, suppression, forcer annulation Moment. Middleware guard `/admin/*`, `UserRole` (USER/ADMIN), lien Admin dans UserMenu, i18n FR/EN complet | 2026-02-21 | `dbe3dda` |
 
 ---
 
@@ -159,12 +160,11 @@
 
 ### Priorité haute (bloquant pour le lancement)
 
-- [ ] **Admin plateforme**
+- [x] **Admin plateforme** ✅
   - Pages `/admin/*` (même stack, shadcn)
-  - CRUD complet sur tous Circles / Users / Moments
-  - Dashboard stats basiques
+  - Dashboard stats + listes paginées + détail + suppression (Users, Circles, Moments)
+  - Forcer annulation Moment
   - Champ `role` (USER/ADMIN) sur User, middleware guard sur `/admin/*`
-  - Timing : avant Registration/Paiement
 
 - [ ] **Outils Host enrichis**
   - Co-Hosts (plusieurs HOST par Circle)
