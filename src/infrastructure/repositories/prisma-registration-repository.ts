@@ -161,7 +161,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             endsAt: true,
             locationType: true,
             locationName: true,
-            circle: { select: { name: true } },
+            circle: { select: { name: true, slug: true } },
           },
         },
       },
@@ -178,6 +178,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
         circleName: r.moment.circle.name,
+        circleSlug: r.moment.circle.slug,
       },
     }));
   },

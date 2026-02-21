@@ -79,7 +79,7 @@ export function UpcomingMomentCard({ registration, isLast }: UpcomingMomentCardP
 
       {/* Card */}
       <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
-        <Link href={`/m/${moment.slug}`} className="group block">
+        <Link href={`/dashboard/circles/${moment.circleSlug}/moments/${moment.slug}`} className="group block">
           <div className="border-border bg-card hover:border-primary/30 flex items-start gap-4 rounded-xl border p-4 transition-colors">
             {/* Content */}
             <div className="min-w-0 flex-1 space-y-1">

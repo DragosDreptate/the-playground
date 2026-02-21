@@ -40,5 +40,6 @@ export type RegistrationWithMoment = Registration & {
     locationType: LocationType;
     locationName: string | null;
     circleName: string;
+    circleSlug: string;
   };
 };

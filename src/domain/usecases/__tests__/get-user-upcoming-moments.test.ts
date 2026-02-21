@@ -21,6 +21,7 @@ describe("GetUserUpcomingMoments", () => {
             locationType: "IN_PERSON",
             locationName: "Studio Zen",
             circleName: "Yoga Circle",
+            circleSlug: "yoga-circle",
           },
         },
         {
@@ -34,6 +35,7 @@ describe("GetUserUpcomingMoments", () => {
             locationType: "ONLINE",
             locationName: null,
             circleName: "Dev Community",
+            circleSlug: "dev-community",
           },
         },
       ];
