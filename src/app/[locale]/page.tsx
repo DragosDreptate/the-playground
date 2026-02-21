@@ -61,7 +61,7 @@ export default async function HomePage() {
 
             {/* RIGHT — iPhone mockup (3D tilt, always dark) */}
             <div
-              className="flex flex-1 justify-center"
+              className="flex shrink-0 justify-center lg:w-[300px]"
               style={{ perspective: "1200px" }}
             >
               <div
