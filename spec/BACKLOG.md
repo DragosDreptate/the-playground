@@ -46,6 +46,112 @@
 
 ## MVP V1 — À faire
 
+> Référence UX complète : `spec/ux-parcours-jtbd.md` (8 personas, 25 JTBD, 7 parcours, matrice gaps).
+
+---
+
+### 🔴 Rétention & viralité — boucle critique (bloquant pour la croissance)
+
+> Ces éléments sont les **casseurs de loop** identifiés dans l'analyse UX.
+> Sans eux, le produit peut fonctionner mais ne peut pas croître ni fidéliser.
+> Référence : parcours A→G, gaps MVP-1 à MVP-4 + H-1 à H-8.
+
+#### Emails transactionnels (Resend + react-email)
+
+- [ ] **Email de confirmation d'inscription** (MVP-1 — parcours A)
+  - Déclenché immédiatement après `JoinMoment`
+  - Contenu : titre Moment, date, lieu, lien `/m/[slug]`, lien d'annulation
+  - Sans cet email, l'inscription est anxiogène et le taux d'absence explose
+
+- [ ] **Email de rappel pré-événement** (MVP-2 — parcours B)
+  - Rappel 24h avant + rappel 1h avant
+  - Contenu : infos pratiques condensées (lieu exact, heure, lien visio si Online/Hybrid)
+  - Job planifié (cron ou queue) déclenché à la publication du Moment
+  - Sans ces rappels, le taux de no-show est structurellement élevé
+
+- [ ] **Email de promotion liste d'attente** (MVP-3 — parcours C)
+  - Déclenché par `CancelRegistration` quand un inscrit se désiste et promeut un waitlisté
+  - Contenu : "Votre place est confirmée", détails du Moment, lien pour annuler si besoin
+  - Sans cet email, le Player promu ne le sait jamais → place perdue en pratique
+
+- [ ] **Email de notification Host : nouvelle inscription** (MVP-4 — parcours D)
+  - Déclenché par chaque `JoinMoment` sur un Moment dont l'utilisateur est Host
+  - Contenu : nom du nouvel inscrit, total inscrits / places restantes, lien vers gestion
+  - Sans cet email, le Host ne sait pas que ça "marche" → abandon early adopters
+
+- [ ] **Architecture email multi-canal** (infrastructure)
+  - `EmailService` port déjà défini dans le domaine → implémenter `ResendEmailService`
+  - Templates React (react-email) : cohérence visuelle avec la plateforme
+  - File d'attente ou jobs planifiés pour les rappels (Vercel Cron Jobs ou queue)
+  - Variables Vercel : `RESEND_API_KEY`, `EMAIL_FROM`
+
+#### UX post-inscription — "Et maintenant ?" (parcours A)
+
+- [ ] **CTA "Ajouter au calendrier" post-inscription** (gap M-1)
+  - Sur la page `/m/[slug]` après inscription confirmée
+  - Liens : Google Calendar, Apple Calendar, fichier `.ics` (ICS universel)
+  - Référence CLAUDE.md : déjà prévu dans le périmètre MVP Player
+
+- [ ] **Lien "Voir dans mon tableau de bord" post-inscription** (gap M-2)
+  - Sur la page `/m/[slug]` après inscription : lien visible vers `/dashboard`
+  - Objectif : faire découvrir l'espace personnel au nouveau membre
+
+- [ ] **Section "Prochains Moments du Cercle" sur page Moment publique** (gap M-3)
+  - Sur `/m/[slug]` pour les Moments PUBLISHED (pas PAST — déjà traité)
+  - Affiche jusqu'à 3 prochains Moments du même Circle (titre, date, CTA)
+  - Rétention Circle depuis la porte d'entrée virale
+
+#### Engagement post-événement — fenêtre d'or 24h (parcours F)
+
+- [ ] **Host peut commenter sur un Moment PAST** (gap H-1 — critique)
+  - Actuellement : formulaire masqué pour tous sur PAST, y compris le Host
+  - Décision à prendre : débloquer pour le Host uniquement, ou pour tous
+  - Impact : le Host ne peut pas remercier sa communauté, pic d'engagement manqué
+
+- [ ] **CTA "Créer le prochain Moment" depuis un Moment PAST** (gap H-2)
+  - Sur la page Moment PAST, vue Host : bouton "Programmer le prochain Moment"
+  - Pré-remplit le formulaire avec le même Circle
+  - Capitalise sur l'élan post-événement
+
+#### Clarté liste d'attente (parcours C)
+
+- [ ] **Position dans la liste d'attente visible** (gap H-3)
+  - Sur `/m/[slug]` et dashboard : "Vous êtes X° sur la liste d'attente"
+  - Réduit l'incertitude, évite l'abandon silencieux
+  - Nécessite un champ `waitlistPosition` ou calcul à la volée
+
+#### Découverte inter-Moments (parcours B)
+
+- [ ] **Autres Moments du Circle sur la page Moment dashboard Player** (gap H-4)
+  - Sur `/dashboard/circles/[slug]/moments/[slug]` vue Player : section "Dans ce Cercle"
+  - Liste les 3 prochains Moments À VENIR du même Circle
+  - Actuellement absent : une fois sur un Moment, le Player ne découvre pas les autres
+
+#### Onboarding Host — time-to-first-event (parcours G)
+
+- [ ] **Guide onboarding Host débutant** (gap H-7)
+  - Dashboard vide (nouveau user, aucun Circle) : remplacer le simple bouton "Créer un Cercle"
+  - Proposition : stepper 3 étapes — "Créez votre Cercle → Créez votre premier Moment → Partagez le lien"
+  - Objectif : réduire le time-to-first-event à < 5 minutes
+
+- [ ] **CTA "Devenir organisateur" pour Players** (gap H-5)
+  - Sur le dashboard d'un Player sans Circle : lien/bouton "Vous voulez organiser ? Créez votre Cercle"
+  - Actuellement invisible pour un Player qui découvre la plateforme via un Moment
+
+#### Gestion des inscriptions Host (parcours E)
+
+- [ ] **Export CSV des inscrits** (gap E-3 + déjà au backlog)
+  - Depuis la page Moment Host : bouton "Exporter la liste"
+  - Colonnes : nom, email, statut (REGISTERED/WAITLISTED), date d'inscription
+  - Besoin logistique réel (badges, listes d'émargement, suivi)
+
+- [ ] **Vue segmentée inscrits/liste d'attente sur page Moment Host** (gap H-8 + M-5)
+  - Compteur "X inscrits confirmés · Y en attente · Z places restantes" en haut de page
+  - Liste séparée en deux sections : Inscrits / Liste d'attente
+  - Actuellement : liste unique sans distinction claire
+
+---
+
 ### Priorité haute (bloquant pour le lancement)
 
 - [ ] **Admin plateforme**
@@ -60,18 +166,10 @@
   - Gestion membres (inviter, retirer)
   - Stats Circle basiques
 
-- [ ] **Registration — reste à faire**
-  - Export CSV des inscrits
-
 - [ ] **Paiement Stripe Connect**
   - Moments payants : prix en centimes, reversement aux Hosts
   - Stripe Connect onboarding pour les Hosts
   - 0% commission plateforme, seuls frais Stripe
-
-- [ ] **Notifications email**
-  - Resend + react-email templates
-  - Confirmation inscription, rappels 24h/1h, changements, annulations
-  - Architecture multi-canal (email V1, SMS/push/WhatsApp futur)
 
 - [x] **Fil de commentaires sur Moment** ✅
   - CRUD commentaire sur chaque Moment
@@ -85,9 +183,12 @@
 
 ### Priorité moyenne
 
-- [ ] **Export données**
-  - CSV export : membres, événements, historique
-  - Pour les Hosts
+- [ ] **Notification aux membres : nouveau Moment dans leur Circle** (gap M-4)
+  - Email ou notification in-app quand un Host crée un nouveau Moment dans un Circle dont l'utilisateur est membre
+  - Le Player revient seulement s'il se souvient de vérifier — ce push est nécessaire
+
+- [ ] **Export données Host**
+  - CSV export : membres Circle, historique Moments, inscrits cumulés
 
 - [ ] **Assistant IA basique**
   - Description Moment, email invitation, suggestions Circle
@@ -146,3 +247,4 @@
 | 2026-02-21 | Badges unifiés : fond plein (`default`) = engagement positif (Inscrit, Publié). Outline = tout le reste (Organisateur en `outline` + accent primary, Annulé en `outline` + accent destructive, Passé en `outline` neutre, Participant en `secondary`). |
 | 2026-02-21 | Couleur unique : `--destructive` = `--primary` (même rose). Le danger est communiqué par le contexte (mot, modale), pas par une couleur différente. Approche Luma : un seul accent. |
 | 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et Moment). Cohérence inter-pages. |
+| 2026-02-21 | Analyse UX JTBD complète (spec/ux-parcours-jtbd.md) : 8 personas, 25 JTBD, 7 parcours. 4 casseurs de loop identifiés (emails transactionnels), 8 gaps haute priorité, 7 moyens. Ajoutés au backlog sous "Rétention & viralité". |
