@@ -45,7 +45,7 @@
     "signOut": "Sign out"
   },
   "Dashboard": {
-    "title": "Dashboard",
+    "title": "My Playground",
     "myCircles": "My Circles",
     "createCircle": "Create a Circle",
     "createMoment": "Create a Moment",
@@ -62,14 +62,14 @@
     "pastMoments": "Past",
     "noUpcomingMoments": "No upcoming Moments.",
     "noMoments": "No Moments yet.",
-    "noMomentsHint": "Register for a Moment or create your community.",
+    "noMomentsHint": "Join a Moment or create your community.",
     "noCirclesMember": "You are not a member of any Circle yet.",
     "role": {
       "host": "Host",
-      "player": "Player"
+      "player": "Member"
     },
     "registrationStatus": {
-      "registered": "Registered",
+      "registered": "Joined",
       "waitlisted": "Waitlisted"
     },
     "online": "Online",
@@ -201,10 +201,10 @@
       "hostedBy": "Hosted by",
       "free": "Free",
       "spotsAvailable": "{count} spots",
-      "registerFree": "Register for free",
-      "registerPaid": "Register — {price} {currency}",
+      "registerFree": "Join for free",
+      "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
-      "registered": "You're registered!",
+      "registered": "You've joined!",
       "waitlisted": "You're on the waitlist",
       "joinWaitlist": "Join the waitlist",
       "cancelRegistration": "Cancel my registration",
@@ -212,24 +212,24 @@
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Moment?",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
-      "signInToRegister": "Sign in to register",
-      "attendeesCount": "{count} attendee(s)",
+      "signInToRegister": "Sign in to join",
+      "attendeesCount": "{count} member(s)",
       "about": "About",
       "viewOnMap": "View on Google Maps",
       "eventTookPlace": "This event took place on",
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
-      "attendedCount": "{count} people attended",
+      "attendedCount": "{count} members attended",
       "viewCircleMoments": "See upcoming Moments from this Circle"
     },
     "registrations": {
       "title": "Registrations",
-      "registered": "{count} registered",
+      "registered": "{count} joined",
       "waitlisted": "{count} waitlisted",
       "capacity": "{count} capacity",
-      "empty": "No registrations yet.",
+      "empty": "No one has joined yet.",
       "status": {
-        "registered": "Registered",
+        "registered": "Joined",
         "waitlisted": "Waitlisted"
       }
     },
@@ -275,14 +275,14 @@
     "navLink": "Explore",
     "tabs": {
       "circles": "Circles",
-      "moments": "Events"
+      "moments": "Moments"
     },
     "filters": {
       "allCategories": "All categories"
     },
     "empty": {
       "circles": "No public Circles for this category.",
-      "moments": "No upcoming events for this category."
+      "moments": "No upcoming Moments for this category."
     },
     "circleCard": {
       "members": "{count} members",
@@ -293,12 +293,12 @@
     "momentCard": {
       "free": "Free",
       "spotsRemaining": "{count} spots remaining",
-      "registeredCount": "{count} registered",
+      "registeredCount": "{count} joined",
       "online": "Online"
     }
   },
   "UserMenu": {
-    "dashboard": "Dashboard",
+    "dashboard": "My Playground",
     "profile": "Profile",
     "signOut": "Sign out"
   },
