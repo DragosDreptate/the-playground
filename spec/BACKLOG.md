@@ -50,6 +50,9 @@
 | Scripts données démo : `db:seed-demo-data` (6 Circles, 20 users `@demo.playground`, 30 Moments 80%/20%, FR, idempotent) + `db:cleanup-demo-data` (dry-run par défaut) + variantes prod | 2026-02-21 | `0fa65f0` |
 | Admin plateforme : dashboard stats, listes paginées (Users/Circles/Moments) avec recherche, pages détail, suppression, forcer annulation Moment. Middleware guard `/admin/*`, `UserRole` (USER/ADMIN), lien Admin dans UserMenu, i18n FR/EN complet | 2026-02-21 | `dbe3dda` |
 | Emails transactionnels (Resend + react-email) : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Host nouvelle inscription. Port `EmailService` + adapter `ResendEmailService`. Templates React avec calendar badge (gradient rose→violet). Fire-and-forget depuis server actions. i18n FR/EN complet. | 2026-02-21 | — |
+| Couverture tests complète : 14 nouveaux fichiers (get-user-registration, get-moment-comments, get-user-past-moments, 11 usecases admin). 5 specs E2E scaffoldées (auth, join-moment, host-flow, cancel-registration, comments). 202 tests, 100% verts. | 2026-02-21 | `3ee4865` |
+| Agents Claude Code : `test-coverage-guardian` (audit couverture + création tests manquants, run + correction en boucle) + `security-guardian` (audit RBAC/IDOR/accès admin, création tests sécurité, correction vulnérabilités). Définis dans `.claude/agents/`. | 2026-02-21 | — |
+| Sécurité : audit complet + correction vulnérabilité architecturale (defense-in-depth manquante sur 11 usecases admin). Ajout `callerRole: UserRole` + `AdminUnauthorizedError`. 59 nouveaux tests de sécurité (RBAC, IDOR cross-tenant, accès admin). 271 tests, 100% verts. | 2026-02-21 | `8b14aaf` |
 
 ---
 
@@ -212,7 +215,9 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre Moment dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [ ] **Tests E2E Playwright** (parcours critiques)
+- [x] **Tests unitaires complets** — 271 tests, tous usecases couverts (y compris admin) ✅
+- [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin (59 tests dédiés sécurité) ✅
+- [ ] **Tests E2E Playwright** — 5 specs scaffoldées (auth, join-moment, host-flow, cancel-registration, comments), à brancher sur environnement de test
 - [ ] **Accessibilité axe-core** dans Playwright
 
 ---
@@ -266,3 +271,6 @@
 | 2026-02-21 | Convention démo : domaine **`@demo.playground`** distinct de `@test.playground`. Démo = contenu réaliste pour présentation/validation produit. Test = données techniques pour QA/dev. Reset complet de base (dev + prod) via `prisma db push --force-reset` avant injection démo. |
 | 2026-02-21 | Données démo : 6 Circles publics (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 Moments (1 passé + 4 à venir par Circle), ratio 20%/80%, contenu entièrement en français. |
 | 2026-02-21 | Emails transactionnels : envoyés depuis les server actions (pas les usecases). Usecases restent purs (pas de side effects). Fire-and-forget (si email échoue, inscription réussit). Traductions i18n résolues dans le flux principal avant le fire-and-forget. Port `EmailService` avec 3 méthodes + adapter `ResendEmailService` (Resend + react-email). 4 emails MVP : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Host. |
+| 2026-02-21 | Agents Claude Code : définis dans `.claude/agents/` (gitignored). `test-coverage-guardian` — audit usecase vs test, création des manquants, run en boucle jusqu'à 100% vert. `security-guardian` — cartographie des points d'autorisation, tests RBAC/IDOR/admin, correction des vulnérabilités réelles dans le code source si détectées. Pattern : lancer en worktree isolé pour zéro risque sur main. |
+| 2026-02-21 | Sécurité — defense-in-depth : les usecases admin ne doivent PAS faire confiance à la couche action seule. Chaque usecase admin accepte `callerRole: UserRole` et lève `AdminUnauthorizedError` si `callerRole !== "ADMIN"`. Principe : la sécurité est dans le domaine, pas uniquement à la périphérie. |
+| 2026-02-21 | Observation architecturale : les pages admin (`/admin/*.tsx`) appellent `prismaAdminRepository` directement (sans passer par les usecases). Elles sont protégées par le layout guard mais ne bénéficient pas de la defense-in-depth des usecases. À adresser post-MVP. |
