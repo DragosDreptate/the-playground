@@ -34,5 +34,6 @@ export interface RegistrationRepository {
   ): Promise<number>;
   update(id: string, input: UpdateRegistrationInput): Promise<Registration>;
   findUpcomingByUserId(userId: string): Promise<RegistrationWithMoment[]>;
+  findPastByUserId(userId: string): Promise<RegistrationWithMoment[]>;
   findFirstWaitlisted(momentId: string): Promise<Registration | null>;
 }

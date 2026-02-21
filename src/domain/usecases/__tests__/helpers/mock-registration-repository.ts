@@ -14,6 +14,7 @@ export function createMockRegistrationRepository(
     countByMomentIdAndStatus: vi.fn<RegistrationRepository["countByMomentIdAndStatus"]>().mockResolvedValue(0),
     update: vi.fn<RegistrationRepository["update"]>().mockResolvedValue(makeRegistration()),
     findUpcomingByUserId: vi.fn<RegistrationRepository["findUpcomingByUserId"]>().mockResolvedValue([]),
+    findPastByUserId: vi.fn<RegistrationRepository["findPastByUserId"]>().mockResolvedValue([]),
     findFirstWaitlisted: vi.fn<RegistrationRepository["findFirstWaitlisted"]>().mockResolvedValue(null),
     ...overrides,
   };

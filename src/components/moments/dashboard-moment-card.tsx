@@ -5,12 +5,14 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
+import { CircleAvatar } from "@/components/circles/circle-avatar";
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 
-type UpcomingMomentCardProps = {
+type DashboardMomentCardProps = {
   registration: RegistrationWithMoment;
   isLast: boolean;
   isHost?: boolean;
+  isPast?: boolean;
 };
 
 function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isToday: boolean } {
@@ -23,7 +25,7 @@ function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isT
   return { weekday, dateStr, isToday };
 }
 
-export function UpcomingMomentCard({ registration, isLast, isHost = false }: UpcomingMomentCardProps) {
+export function DashboardMomentCard({ registration, isLast, isHost = false, isPast = false }: DashboardMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
   const { moment } = registration;
@@ -31,11 +33,13 @@ export function UpcomingMomentCard({ registration, isLast, isHost = false }: Upc
   const isRegistered = registration.status === "REGISTERED" || registration.status === "CHECKED_IN";
   const isWaitlisted = registration.status === "WAITLISTED";
 
-  const dotClass = isRegistered
-    ? "bg-primary"
-    : isWaitlisted
-      ? "bg-amber-400"
-      : "bg-border";
+  const dotClass = isPast
+    ? "bg-border"
+    : isRegistered
+      ? "bg-primary"
+      : isWaitlisted
+        ? "bg-amber-400"
+        : "bg-border";
 
   const gradient = getMomentGradient(moment.title);
   const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt);
@@ -58,14 +62,14 @@ export function UpcomingMomentCard({ registration, isLast, isHost = false }: Upc
     <div className="flex gap-0">
       {/* Date column */}
       <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
-        {isToday ? (
+        {!isPast && isToday ? (
           <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
             {tCircle("detail.today")}
           </span>
         ) : (
           <>
-            <p className="text-muted-foreground text-xs">{weekday}</p>
-            <p className="text-sm font-medium leading-snug">{dateStr}</p>
+            <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{weekday}</p>
+            <p className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}>{dateStr}</p>
           </>
         )}
       </div>
@@ -81,20 +85,20 @@ export function UpcomingMomentCard({ registration, isLast, isHost = false }: Upc
       {/* Card */}
       <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
         <Link href={`/dashboard/circles/${moment.circleSlug}/moments/${moment.slug}`} className="group block">
-          <div className="border-border bg-card hover:border-primary/30 flex items-start gap-4 rounded-xl border p-4 transition-colors">
+          <div className={`bg-card flex items-start gap-4 rounded-xl border p-4 transition-colors ${isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
             {/* Content */}
             <div className="min-w-0 flex-1 space-y-1">
               {/* Time */}
-              <p className="text-muted-foreground text-xs">{timeStr}</p>
+              <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
               {/* Title */}
-              <p className="truncate font-semibold leading-snug group-hover:underline">
+              <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
                 {moment.title}
               </p>
 
               {/* Location */}
               {locationLabel && (
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                   <LocationIcon className="size-3.5 shrink-0" />
                   <span className="truncate">{locationLabel}</span>
                 </div>
@@ -102,32 +106,35 @@ export function UpcomingMomentCard({ registration, isLast, isHost = false }: Upc
 
               {/* Circle name + status */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="text-muted-foreground text-xs">
+                <span className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                  <CircleAvatar name={moment.circleName} size="xs" />
                   {moment.circleName}
                 </span>
 
-                {isHost ? (
-                  <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
-                    <Crown className="size-3" />
-                    {t("role.host")}
-                  </Badge>
-                ) : isRegistered ? (
-                  <Badge variant="default" className="gap-1 text-xs">
-                    <Check className="size-3" />
-                    {t("registrationStatus.registered")}
-                  </Badge>
-                ) : isWaitlisted ? (
-                  <Badge variant="secondary" className="gap-1 text-xs">
-                    <Clock className="size-3" />
-                    {t("registrationStatus.waitlisted")}
-                  </Badge>
-                ) : null}
+                {!isPast && (
+                  isHost ? (
+                    <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                      <Crown className="size-3" />
+                      {t("role.host")}
+                    </Badge>
+                  ) : isRegistered ? (
+                    <Badge variant="default" className="gap-1 text-xs">
+                      <Check className="size-3" />
+                      {t("registrationStatus.registered")}
+                    </Badge>
+                  ) : isWaitlisted ? (
+                    <Badge variant="secondary" className="gap-1 text-xs">
+                      <Clock className="size-3" />
+                      {t("registrationStatus.waitlisted")}
+                    </Badge>
+                  ) : null
+                )}
               </div>
             </div>
 
             {/* Thumbnail */}
             <div
-              className="size-[60px] shrink-0 rounded-lg"
+              className={`size-[60px] shrink-0 rounded-lg ${isPast ? "grayscale opacity-40" : ""}`}
               style={{ background: gradient }}
             />
           </div>

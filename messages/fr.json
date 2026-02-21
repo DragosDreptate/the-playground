@@ -57,8 +57,12 @@
       "title": "Créez d'abord un Cercle",
       "description": "Vous devez créer un Cercle avant de créer un Moment."
     },
+    "myMoments": "Mes Moments",
     "upcomingMoments": "Mes prochains Moments",
+    "pastMoments": "Passés",
     "noUpcomingMoments": "Aucun Moment à venir.",
+    "noMoments": "Aucun Moment pour l'instant.",
+    "noMomentsHint": "Inscrivez-vous à un Moment ou créez votre communauté.",
     "noCirclesMember": "Vous n'êtes membre d'aucun Cercle.",
     "role": {
       "host": "Organisateur",

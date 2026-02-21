@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
 import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
+import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import {
@@ -357,6 +358,14 @@ export default async function CircleDetailPage({
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
+          {/* Membres */}
+          <div className="border-border rounded-2xl border p-6">
+            <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} />
           </div>
         </div>
       </div>

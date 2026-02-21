@@ -183,6 +183,47 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     }));
   },
 
+  async findPastByUserId(userId: string): Promise<RegistrationWithMoment[]> {
+    const records = await prisma.registration.findMany({
+      where: {
+        userId,
+        status: { in: ["REGISTERED", "CHECKED_IN"] },
+        moment: {
+          status: "PAST",
+        },
+      },
+      include: {
+        moment: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            startsAt: true,
+            endsAt: true,
+            locationType: true,
+            locationName: true,
+            circle: { select: { name: true, slug: true } },
+          },
+        },
+      },
+      orderBy: { moment: { startsAt: "desc" } },
+    });
+    return records.map((r) => ({
+      ...toDomainRegistration(r),
+      moment: {
+        id: r.moment.id,
+        slug: r.moment.slug,
+        title: r.moment.title,
+        startsAt: r.moment.startsAt,
+        endsAt: r.moment.endsAt,
+        locationType: r.moment.locationType,
+        locationName: r.moment.locationName,
+        circleName: r.moment.circle.name,
+        circleSlug: r.moment.circle.slug,
+      },
+    }));
+  },
+
   async findFirstWaitlisted(momentId: string): Promise<Registration | null> {
     const record = await prisma.registration.findFirst({
       where: { momentId, status: "WAITLISTED" },

@@ -57,8 +57,12 @@
       "title": "Create a Circle first",
       "description": "You need a Circle before creating a Moment."
     },
+    "myMoments": "My Moments",
     "upcomingMoments": "My upcoming Moments",
+    "pastMoments": "Past",
     "noUpcomingMoments": "No upcoming Moments.",
+    "noMoments": "No Moments yet.",
+    "noMomentsHint": "Register for a Moment or create your community.",
     "noCirclesMember": "You are not a member of any Circle yet.",
     "role": {
       "host": "Host",
