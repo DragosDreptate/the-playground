@@ -10,7 +10,7 @@ describe("AdminUpdateMomentStatus", () => {
         updateMomentStatus: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminUpdateMomentStatus("moment-1", "CANCELLED", { adminRepository });
+      await adminUpdateMomentStatus("ADMIN", "moment-1", "CANCELLED", { adminRepository });
 
       expect(adminRepository.updateMomentStatus).toHaveBeenCalledWith(
         "moment-1",
@@ -25,7 +25,7 @@ describe("AdminUpdateMomentStatus", () => {
       });
 
       await expect(
-        adminUpdateMomentStatus("moment-1", "PUBLISHED", { adminRepository })
+        adminUpdateMomentStatus("ADMIN", "moment-1", "PUBLISHED", { adminRepository })
       ).resolves.toBeUndefined();
     });
   });
@@ -41,7 +41,7 @@ describe("AdminUpdateMomentStatus", () => {
         updateMomentStatus: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminUpdateMomentStatus("moment-1", status, { adminRepository });
+      await adminUpdateMomentStatus("ADMIN", "moment-1", status, { adminRepository });
 
       expect(adminRepository.updateMomentStatus).toHaveBeenCalledWith("moment-1", status);
     });
@@ -53,7 +53,7 @@ describe("AdminUpdateMomentStatus", () => {
         updateMomentStatus: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminUpdateMomentStatus("moment-99", "DRAFT", { adminRepository });
+      await adminUpdateMomentStatus("ADMIN", "moment-99", "DRAFT", { adminRepository });
 
       expect(adminRepository.updateMomentStatus).toHaveBeenCalledWith("moment-99", "DRAFT");
     });

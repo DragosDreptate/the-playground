@@ -17,7 +17,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(2),
       });
 
-      const result = await getAdminMoments({}, { adminRepository });
+      const result = await getAdminMoments("ADMIN", {}, { adminRepository });
 
       expect(result.moments).toHaveLength(2);
       expect(result.total).toBe(2);
@@ -31,7 +31,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminMoments({ search: "meetup" }, { adminRepository });
+      await getAdminMoments("ADMIN", { search: "meetup" }, { adminRepository });
 
       expect(adminRepository.findAllMoments).toHaveBeenCalledWith({ search: "meetup" });
       expect(adminRepository.countMoments).toHaveBeenCalledWith({ search: "meetup" });
@@ -46,7 +46,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(1),
       });
 
-      const result = await getAdminMoments({ status: "DRAFT" }, { adminRepository });
+      const result = await getAdminMoments("ADMIN", { status: "DRAFT" }, { adminRepository });
 
       expect(result.moments[0].status).toBe("DRAFT");
       expect(adminRepository.findAllMoments).toHaveBeenCalledWith({ status: "DRAFT" });
@@ -60,7 +60,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(100),
       });
 
-      await getAdminMoments({ limit: 20, offset: 40 }, { adminRepository });
+      await getAdminMoments("ADMIN", { limit: 20, offset: 40 }, { adminRepository });
 
       expect(adminRepository.findAllMoments).toHaveBeenCalledWith({ limit: 20, offset: 40 });
       expect(adminRepository.countMoments).toHaveBeenCalledWith({ limit: 20, offset: 40 });
@@ -74,7 +74,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(0),
       });
 
-      const result = await getAdminMoments({ search: "nothing" }, { adminRepository });
+      const result = await getAdminMoments("ADMIN", { search: "nothing" }, { adminRepository });
 
       expect(result.moments).toEqual([]);
       expect(result.total).toBe(0);
@@ -88,7 +88,7 @@ describe("GetAdminMoments", () => {
         countMoments: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminMoments({}, { adminRepository });
+      await getAdminMoments("ADMIN", {}, { adminRepository });
 
       expect(adminRepository.findAllMoments).toHaveBeenCalledOnce();
       expect(adminRepository.countMoments).toHaveBeenCalledOnce();

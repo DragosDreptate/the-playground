@@ -9,7 +9,7 @@ describe("AdminDeleteUser", () => {
         deleteUser: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminDeleteUser("user-1", { adminRepository });
+      await adminDeleteUser("ADMIN", "user-1", { adminRepository });
 
       expect(adminRepository.deleteUser).toHaveBeenCalledWith("user-1");
       expect(adminRepository.deleteUser).toHaveBeenCalledOnce();
@@ -20,7 +20,7 @@ describe("AdminDeleteUser", () => {
         deleteUser: vi.fn().mockResolvedValue(undefined),
       });
 
-      await expect(adminDeleteUser("user-1", { adminRepository })).resolves.toBeUndefined();
+      await expect(adminDeleteUser("ADMIN", "user-1", { adminRepository })).resolves.toBeUndefined();
     });
   });
 
@@ -34,7 +34,7 @@ describe("AdminDeleteUser", () => {
         deleteUser: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminDeleteUser(userId, { adminRepository });
+      await adminDeleteUser("ADMIN", userId, { adminRepository });
 
       expect(adminRepository.deleteUser).toHaveBeenCalledWith(userId);
     });

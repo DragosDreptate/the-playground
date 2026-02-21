@@ -21,12 +21,12 @@ import type { MomentStatus } from "@/domain/models/moment";
 
 const deps = { adminRepository: prismaAdminRepository };
 
-async function requireAdmin(): Promise<ActionResult<{ userId: string }>> {
+async function requireAdmin(): Promise<ActionResult<{ userId: string; role: "ADMIN" }>> {
   const session = await auth();
   if (!session?.user?.id || session.user.role !== "ADMIN") {
     return { success: false, error: "Unauthorized", code: "ADMIN_UNAUTHORIZED" };
   }
-  return { success: true, data: { userId: session.user.id } };
+  return { success: true, data: { userId: session.user.id, role: "ADMIN" } };
 }
 
 // ─────────────────────────────────────────────
@@ -37,7 +37,7 @@ export async function getAdminStatsAction(): Promise<ActionResult<AdminStats>> {
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const stats = await getAdminStats(deps);
+  const stats = await getAdminStats(check.data.role, deps);
   return { success: true, data: stats };
 }
 
@@ -51,7 +51,7 @@ export async function getAdminUsersAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const result = await getAdminUsers(filters, deps);
+  const result = await getAdminUsers(check.data.role, filters, deps);
   return { success: true, data: result };
 }
 
@@ -61,7 +61,7 @@ export async function getAdminUserAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const user = await getAdminUser(userId, deps);
+  const user = await getAdminUser(check.data.role, userId, deps);
   return { success: true, data: user };
 }
 
@@ -72,7 +72,7 @@ export async function adminDeleteUserAction(
   if (!check.success) return check;
 
   try {
-    await adminDeleteUser(userId, deps);
+    await adminDeleteUser(check.data.role, userId, deps);
     revalidatePath("/admin/users");
     return { success: true, data: undefined };
   } catch (error) {
@@ -93,7 +93,7 @@ export async function getAdminCirclesAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const result = await getAdminCircles(filters, deps);
+  const result = await getAdminCircles(check.data.role, filters, deps);
   return { success: true, data: result };
 }
 
@@ -103,7 +103,7 @@ export async function getAdminCircleAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const circle = await getAdminCircle(circleId, deps);
+  const circle = await getAdminCircle(check.data.role, circleId, deps);
   return { success: true, data: circle };
 }
 
@@ -114,7 +114,7 @@ export async function adminDeleteCircleAction(
   if (!check.success) return check;
 
   try {
-    await adminDeleteCircle(circleId, deps);
+    await adminDeleteCircle(check.data.role, circleId, deps);
     revalidatePath("/admin/circles");
     return { success: true, data: undefined };
   } catch (error) {
@@ -135,7 +135,7 @@ export async function getAdminMomentsAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const result = await getAdminMoments(filters, deps);
+  const result = await getAdminMoments(check.data.role, filters, deps);
   return { success: true, data: result };
 }
 
@@ -145,7 +145,7 @@ export async function getAdminMomentAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  const moment = await getAdminMoment(momentId, deps);
+  const moment = await getAdminMoment(check.data.role, momentId, deps);
   return { success: true, data: moment };
 }
 
@@ -156,7 +156,7 @@ export async function adminDeleteMomentAction(
   if (!check.success) return check;
 
   try {
-    await adminDeleteMoment(momentId, deps);
+    await adminDeleteMoment(check.data.role, momentId, deps);
     revalidatePath("/admin/moments");
     return { success: true, data: undefined };
   } catch (error) {
@@ -174,7 +174,7 @@ export async function adminCancelMomentAction(
   if (!check.success) return check;
 
   try {
-    await adminUpdateMomentStatus(momentId, "CANCELLED" as MomentStatus, deps);
+    await adminUpdateMomentStatus(check.data.role, momentId, "CANCELLED" as MomentStatus, deps);
     revalidatePath("/admin/moments");
     return { success: true, data: undefined };
   } catch (error) {

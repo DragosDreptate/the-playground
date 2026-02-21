@@ -17,7 +17,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(2),
       });
 
-      const result = await getAdminCircles({}, { adminRepository });
+      const result = await getAdminCircles("ADMIN", {}, { adminRepository });
 
       expect(result.circles).toHaveLength(2);
       expect(result.total).toBe(2);
@@ -31,7 +31,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminCircles({ search: "tech" }, { adminRepository });
+      await getAdminCircles("ADMIN", { search: "tech" }, { adminRepository });
 
       expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ search: "tech" });
       expect(adminRepository.countCircles).toHaveBeenCalledWith({ search: "tech" });
@@ -46,7 +46,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(1),
       });
 
-      const result = await getAdminCircles({ visibility: "PRIVATE" }, { adminRepository });
+      const result = await getAdminCircles("ADMIN", { visibility: "PRIVATE" }, { adminRepository });
 
       expect(result.circles[0].visibility).toBe("PRIVATE");
       expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ visibility: "PRIVATE" });
@@ -60,7 +60,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminCircles({ category: "SPORT" }, { adminRepository });
+      await getAdminCircles("ADMIN", { category: "SPORT" }, { adminRepository });
 
       expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ category: "SPORT" });
       expect(adminRepository.countCircles).toHaveBeenCalledWith({ category: "SPORT" });
@@ -74,7 +74,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(50),
       });
 
-      await getAdminCircles({ limit: 10, offset: 20 }, { adminRepository });
+      await getAdminCircles("ADMIN", { limit: 10, offset: 20 }, { adminRepository });
 
       expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ limit: 10, offset: 20 });
       expect(adminRepository.countCircles).toHaveBeenCalledWith({ limit: 10, offset: 20 });
@@ -88,7 +88,7 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(0),
       });
 
-      const result = await getAdminCircles({ search: "nothing" }, { adminRepository });
+      const result = await getAdminCircles("ADMIN", { search: "nothing" }, { adminRepository });
 
       expect(result.circles).toEqual([]);
       expect(result.total).toBe(0);

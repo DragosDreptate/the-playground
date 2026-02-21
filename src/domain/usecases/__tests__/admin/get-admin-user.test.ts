@@ -20,7 +20,7 @@ describe("GetAdminUser", () => {
         findUserById: vi.fn().mockResolvedValue(userDetail),
       });
 
-      const result = await getAdminUser("user-1", { adminRepository });
+      const result = await getAdminUser("ADMIN", "user-1", { adminRepository });
 
       expect(result).toEqual(userDetail);
       expect(adminRepository.findUserById).toHaveBeenCalledWith("user-1");
@@ -38,7 +38,7 @@ describe("GetAdminUser", () => {
         findUserById: vi.fn().mockResolvedValue(adminUserDetail),
       });
 
-      const result = await getAdminUser("admin-1", { adminRepository });
+      const result = await getAdminUser("ADMIN", "admin-1", { adminRepository });
 
       expect(result?.role).toBe("ADMIN");
     });
@@ -50,7 +50,7 @@ describe("GetAdminUser", () => {
         findUserById: vi.fn().mockResolvedValue(null),
       });
 
-      const result = await getAdminUser("user-999", { adminRepository });
+      const result = await getAdminUser("ADMIN", "user-999", { adminRepository });
 
       expect(result).toBeNull();
     });
@@ -68,7 +68,7 @@ describe("GetAdminUser", () => {
         findUserById: vi.fn().mockResolvedValue(userDetail),
       });
 
-      const result = await getAdminUser("user-1", { adminRepository });
+      const result = await getAdminUser("ADMIN", "user-1", { adminRepository });
 
       expect(result?.circles).toHaveLength(2);
       expect(result?.circles[0].role).toBe("HOST");

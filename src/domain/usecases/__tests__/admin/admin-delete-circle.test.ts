@@ -9,7 +9,7 @@ describe("AdminDeleteCircle", () => {
         deleteCircle: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminDeleteCircle("circle-1", { adminRepository });
+      await adminDeleteCircle("ADMIN", "circle-1", { adminRepository });
 
       expect(adminRepository.deleteCircle).toHaveBeenCalledWith("circle-1");
       expect(adminRepository.deleteCircle).toHaveBeenCalledOnce();
@@ -20,7 +20,7 @@ describe("AdminDeleteCircle", () => {
         deleteCircle: vi.fn().mockResolvedValue(undefined),
       });
 
-      await expect(adminDeleteCircle("circle-1", { adminRepository })).resolves.toBeUndefined();
+      await expect(adminDeleteCircle("ADMIN", "circle-1", { adminRepository })).resolves.toBeUndefined();
     });
   });
 
@@ -34,7 +34,7 @@ describe("AdminDeleteCircle", () => {
         deleteCircle: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminDeleteCircle(circleId, { adminRepository });
+      await adminDeleteCircle("ADMIN", circleId, { adminRepository });
 
       expect(adminRepository.deleteCircle).toHaveBeenCalledWith(circleId);
     });

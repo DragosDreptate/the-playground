@@ -14,7 +14,7 @@ describe("GetAdminUsers", () => {
         countUsers: vi.fn().mockResolvedValue(2),
       });
 
-      const result = await getAdminUsers({}, { adminRepository });
+      const result = await getAdminUsers("ADMIN", {}, { adminRepository });
 
       expect(result.users).toHaveLength(2);
       expect(result.total).toBe(2);
@@ -28,7 +28,7 @@ describe("GetAdminUsers", () => {
         countUsers: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminUsers({ search: "alice" }, { adminRepository });
+      await getAdminUsers("ADMIN", { search: "alice" }, { adminRepository });
 
       expect(adminRepository.findAllUsers).toHaveBeenCalledWith({ search: "alice" });
       expect(adminRepository.countUsers).toHaveBeenCalledWith({ search: "alice" });
@@ -43,7 +43,7 @@ describe("GetAdminUsers", () => {
         countUsers: vi.fn().mockResolvedValue(1),
       });
 
-      const result = await getAdminUsers({ role: "ADMIN" }, { adminRepository });
+      const result = await getAdminUsers("ADMIN", { role: "ADMIN" }, { adminRepository });
 
       expect(result.users[0].role).toBe("ADMIN");
       expect(adminRepository.findAllUsers).toHaveBeenCalledWith({ role: "ADMIN" });
@@ -57,7 +57,7 @@ describe("GetAdminUsers", () => {
         countUsers: vi.fn().mockResolvedValue(100),
       });
 
-      await getAdminUsers({ limit: 10, offset: 20 }, { adminRepository });
+      await getAdminUsers("ADMIN", { limit: 10, offset: 20 }, { adminRepository });
 
       expect(adminRepository.findAllUsers).toHaveBeenCalledWith({ limit: 10, offset: 20 });
       expect(adminRepository.countUsers).toHaveBeenCalledWith({ limit: 10, offset: 20 });
@@ -78,7 +78,7 @@ describe("GetAdminUsers", () => {
         }),
       });
 
-      await getAdminUsers({}, { adminRepository });
+      await getAdminUsers("ADMIN", {}, { adminRepository });
 
       expect(callOrder).toContain("findAllUsers");
       expect(callOrder).toContain("countUsers");
@@ -94,7 +94,7 @@ describe("GetAdminUsers", () => {
         countUsers: vi.fn().mockResolvedValue(0),
       });
 
-      const result = await getAdminUsers({ search: "nobody" }, { adminRepository });
+      const result = await getAdminUsers("ADMIN", { search: "nobody" }, { adminRepository });
 
       expect(result.users).toEqual([]);
       expect(result.total).toBe(0);

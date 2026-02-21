@@ -21,7 +21,7 @@ describe("GetAdminStats", () => {
         getStats: vi.fn().mockResolvedValue(stats),
       });
 
-      const result = await getAdminStats({ adminRepository });
+      const result = await getAdminStats("ADMIN", { adminRepository });
 
       expect(result.totalUsers).toBe(100);
       expect(result.totalCircles).toBe(20);
@@ -48,7 +48,7 @@ describe("GetAdminStats", () => {
         getStats: vi.fn().mockResolvedValue(stats),
       });
 
-      const result = await getAdminStats({ adminRepository });
+      const result = await getAdminStats("ADMIN", { adminRepository });
 
       expect(result.totalUsers).toBe(0);
       expect(result.totalCircles).toBe(0);
@@ -60,7 +60,7 @@ describe("GetAdminStats", () => {
     it("should delegate to adminRepository.getStats", async () => {
       const adminRepository = createMockAdminRepository();
 
-      await getAdminStats({ adminRepository });
+      await getAdminStats("ADMIN", { adminRepository });
 
       expect(adminRepository.getStats).toHaveBeenCalledOnce();
     });

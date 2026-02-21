@@ -17,7 +17,7 @@ describe("GetAdminMoment", () => {
         findMomentById: vi.fn().mockResolvedValue(momentDetail),
       });
 
-      const result = await getAdminMoment("moment-1", { adminRepository });
+      const result = await getAdminMoment("ADMIN", "moment-1", { adminRepository });
 
       expect(result).toEqual(momentDetail);
       expect(adminRepository.findMomentById).toHaveBeenCalledWith("moment-1");
@@ -50,7 +50,7 @@ describe("GetAdminMoment", () => {
         findMomentById: vi.fn().mockResolvedValue(momentDetail),
       });
 
-      const result = await getAdminMoment("moment-1", { adminRepository });
+      const result = await getAdminMoment("ADMIN", "moment-1", { adminRepository });
 
       expect(result?.registrations).toHaveLength(2);
       expect(result?.registrations[0].status).toBe("REGISTERED");
@@ -69,7 +69,7 @@ describe("GetAdminMoment", () => {
         findMomentById: vi.fn().mockResolvedValue(momentDetail),
       });
 
-      const result = await getAdminMoment("moment-1", { adminRepository });
+      const result = await getAdminMoment("ADMIN", "moment-1", { adminRepository });
 
       expect(result?.circleId).toBe("circle-1");
       expect(result?.circleSlug).toBe("tech-paris");
@@ -83,7 +83,7 @@ describe("GetAdminMoment", () => {
         findMomentById: vi.fn().mockResolvedValue(null),
       });
 
-      const result = await getAdminMoment("moment-999", { adminRepository });
+      const result = await getAdminMoment("ADMIN", "moment-999", { adminRepository });
 
       expect(result).toBeNull();
     });

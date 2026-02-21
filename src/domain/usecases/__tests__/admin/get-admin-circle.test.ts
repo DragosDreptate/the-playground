@@ -19,7 +19,7 @@ describe("GetAdminCircle", () => {
         findCircleById: vi.fn().mockResolvedValue(circleDetail),
       });
 
-      const result = await getAdminCircle("circle-1", { adminRepository });
+      const result = await getAdminCircle("ADMIN", "circle-1", { adminRepository });
 
       expect(result).toEqual(circleDetail);
       expect(adminRepository.findCircleById).toHaveBeenCalledWith("circle-1");
@@ -38,7 +38,7 @@ describe("GetAdminCircle", () => {
         findCircleById: vi.fn().mockResolvedValue(circleDetail),
       });
 
-      const result = await getAdminCircle("circle-1", { adminRepository });
+      const result = await getAdminCircle("ADMIN", "circle-1", { adminRepository });
 
       expect(result?.hosts).toHaveLength(2);
       expect(result?.hosts[0].email).toBe("alice@example.com");
@@ -58,7 +58,7 @@ describe("GetAdminCircle", () => {
         findCircleById: vi.fn().mockResolvedValue(circleDetail),
       });
 
-      const result = await getAdminCircle("circle-1", { adminRepository });
+      const result = await getAdminCircle("ADMIN", "circle-1", { adminRepository });
 
       expect(result?.recentMoments).toHaveLength(2);
       expect(result?.recentMoments[0].status).toBe("PUBLISHED");
@@ -71,7 +71,7 @@ describe("GetAdminCircle", () => {
         findCircleById: vi.fn().mockResolvedValue(null),
       });
 
-      const result = await getAdminCircle("circle-999", { adminRepository });
+      const result = await getAdminCircle("ADMIN", "circle-999", { adminRepository });
 
       expect(result).toBeNull();
     });
