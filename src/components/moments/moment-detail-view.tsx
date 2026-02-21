@@ -109,6 +109,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
+  const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
 
   const gradient = getMomentGradient(moment.title);
@@ -240,6 +241,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </Button>
                 <DeleteMomentDialog momentId={moment.id} circleSlug={props.circleSlug} />
               </div>
+            )}
+            {!isHostView && props.isHost && (
+              <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
+                <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
+                  <ExternalLink className="size-3.5" />
+                  {tCircle("detail.manageMoment")}
+                </Link>
+              </Button>
             )}
           </div>
 
