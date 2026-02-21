@@ -23,11 +23,11 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
         {/* Logo — left */}
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
-          {/* Icône cercle + point */}
+          {/* Icône play */}
           <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
-            <div className="flex size-[15px] items-center justify-center rounded-full border-[2px] border-white">
-              <div className="size-[4px] rounded-full bg-white" />
-            </div>
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
+              <polygon points="0,0 0,12 10,6" fill="white" />
+            </svg>
           </div>
           <span className="text-lg font-semibold">The Playground</span>
         </Link>

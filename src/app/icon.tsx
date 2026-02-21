@@ -17,28 +17,16 @@ export default function Icon() {
           borderRadius: "7px",
         }}
       >
-        {/* Anneau (Circle) */}
-        <div
-          style={{
-            width: "20px",
-            height: "20px",
-            border: "2.5px solid white",
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+        {/* Triangle play — légèrement décalé à droite pour l'équilibre optique */}
+        <svg
+          width="13"
+          height="15"
+          viewBox="0 0 13 15"
+          fill="none"
+          style={{ marginLeft: "2px" }}
         >
-          {/* Point central (Moment) */}
-          <div
-            style={{
-              width: "6px",
-              height: "6px",
-              background: "white",
-              borderRadius: "50%",
-            }}
-          />
-        </div>
+          <polygon points="0,0 0,15 13,7.5" fill="white" />
+        </svg>
       </div>
     ),
     { ...size }
