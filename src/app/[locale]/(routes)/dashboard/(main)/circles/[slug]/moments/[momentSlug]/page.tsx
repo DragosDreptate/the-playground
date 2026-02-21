@@ -3,10 +3,12 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaCommentRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
+import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 
@@ -52,8 +54,13 @@ export default async function MomentDetailPage({
 
   const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
 
-  const allAttendees =
-    await prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id);
+  const [allAttendees, comments] = await Promise.all([
+    prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+    getMomentComments(
+      { momentId: moment.id },
+      { commentRepository: prismaCommentRepository }
+    ),
+  ]);
   const registeredCount = allAttendees.filter(
     (r) => r.status === "REGISTERED"
   ).length;
@@ -73,6 +80,8 @@ export default async function MomentDetailPage({
         registrations={allAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
+        comments={comments}
+        currentUserId={session.user.id}
         isAuthenticated={true}
         isHost={false}
         existingRegistration={
@@ -99,6 +108,8 @@ export default async function MomentDetailPage({
       registrations={allAttendees}
       registeredCount={registeredCount}
       waitlistedCount={waitlistedCount}
+      comments={comments}
+      currentUserId={session.user.id}
       circleSlug={slug}
       momentSlug={momentSlug}
       publicUrl={publicUrl}

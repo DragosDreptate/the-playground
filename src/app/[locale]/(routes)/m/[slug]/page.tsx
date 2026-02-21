@@ -3,10 +3,12 @@ import {
   prismaMomentRepository,
   prismaCircleRepository,
   prismaRegistrationRepository,
+  prismaCommentRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
+import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 
@@ -51,12 +53,16 @@ export default async function PublicMomentPage({
     );
   }
 
-  const [registeredCount, allAttendees] = await Promise.all([
+  const [registeredCount, allAttendees, comments] = await Promise.all([
     prismaRegistrationRepository.countByMomentIdAndStatus(
       moment.id,
       "REGISTERED"
     ),
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+    getMomentComments(
+      { momentId: moment.id },
+      { commentRepository: prismaCommentRepository }
+    ),
   ]);
 
   const isFull =
@@ -78,6 +84,8 @@ export default async function PublicMomentPage({
         registrations={allAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
+        comments={comments}
+        currentUserId={session?.user?.id ?? null}
         isAuthenticated={isAuthenticated}
         isHost={isHost}
         existingRegistration={existingRegistration}

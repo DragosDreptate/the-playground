@@ -11,6 +11,12 @@ export {
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {
+  CommentNotFoundError,
+  UnauthorizedCommentDeletionError,
+  CommentContentEmptyError,
+  CommentContentTooLongError,
+} from "./comment-errors";
+export {
   MomentNotOpenForRegistrationError,
   MomentAlreadyStartedError,
   PaidMomentNotSupportedError,

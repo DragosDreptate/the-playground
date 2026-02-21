@@ -6,10 +6,13 @@ import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
+import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
+import type { CommentWithUser } from "@/domain/models/comment";
+import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import {
   CalendarIcon,
   MapPin,
@@ -31,6 +34,8 @@ type CommonProps = {
   registrations: RegistrationWithUser[];
   registeredCount: number;
   waitlistedCount: number;
+  comments: CommentWithUser[];
+  currentUserId: string | null;
 };
 
 type HostViewProps = CommonProps & {
@@ -250,16 +255,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* À propos */}
+          {/* Séparateur avant À propos */}
+          {moment.description && <div className="border-border border-t" />}
+
+          {/* Description */}
           {moment.description && (
-            <div className="space-y-2">
-              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                {t("public.about")}
-              </p>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {moment.description}
-              </p>
-            </div>
+            <CollapsibleDescription text={moment.description} />
           )}
 
           {/* Séparateur */}
@@ -405,6 +406,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               />
             </div>
           )}
+
+          {/* Fil de commentaires */}
+          <CommentThread
+            momentId={moment.id}
+            comments={props.comments}
+            currentUserId={props.currentUserId}
+            isHost={isHostView || (!isHostView && (props as PublicViewProps).isHost)}
+            isPastMoment={moment.status === "PAST"}
+            signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
+          />
 
         </div>
       </div>
