@@ -41,6 +41,7 @@
 | Harmonisation badges : Annulé → outline destructive, Organisateur → outline primary partout, Participant → secondary partout | 2026-02-21 | `8d7b76b` |
 | Couleur destructive = primary (une seule couleur accent rose, danger communiqué par le contexte) | 2026-02-21 | `75fd383` |
 | Bouton Modifier unifié : default (rose plein) sur pages Circle et Moment | 2026-02-21 | `295575d` |
+| Le Répertoire : `/explorer` (tabs Cercles/Événements, filtre catégorie) + page Circle publique `/circles/[slug]` + champs `category`/`city` sur Circle | 2026-02-21 | `c3813e7` |
 
 ---
 
@@ -173,17 +174,16 @@
   - CRUD commentaire sur chaque Moment
   - Visible sur la page publique et la vue dashboard
 
-- [ ] **Le Répertoire** — `spec/feature-explorer-repertoire.md`
-  - Page `/explorer` : vitrine publique, "répertoire de tous les possibles"
+- [x] **Le Répertoire** ✅ — `spec/feature-explorer-repertoire.md`
+  - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
   - Tab **Cercles** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain Moment en teaser)
-  - Tab **Événements** : agenda chronologique des Moments PUBLISHED de Circles publics (card community-first : Circle en en-tête, Moment en corps)
-  - Filtres : catégorie + ville (URL params, SSR-friendly, partageable)
-  - **Pas de ranking, pas d'algorithme** — ordre chronologique uniquement
+  - Tab **Événements** : agenda chronologique des Moments PUBLISHED de Circles publics (card community-first)
+  - Filtre **catégorie** (MVP) — pas de filtre ville (densité insuffisante au lancement)
   - Page Circle publique `/circles/[slug]` accessible sans compte (SEO + cold traffic)
-  - Lien "Explorer" dans le header principal (visible non connecté)
-  - **Schema** : ajouter `category` (enum `CircleCategory`) + `city` (string libre) sur Circle
-  - **Formulaire Circle** : ajouter les champs category + city
-  - Séquençage complet en 12 étapes dans le spec
+  - Lien "Explorer" dans le header principal (visible auth et non-auth)
+  - Schema : `CircleCategory` enum (8 valeurs) + `category` + `city` sur Circle
+  - Formulaire Circle : Select catégorie + Input ville
+  - 10 nouveaux tests unitaires BDD (`getPublicCircles`, `getPublicUpcomingMoments`)
 
 ### Priorité moyenne
 
