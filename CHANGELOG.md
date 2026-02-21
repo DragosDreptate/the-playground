@@ -14,10 +14,10 @@ Le dernier bloc critique avant le lancement. Les emails transactionnels donnent 
 ### Ajouté
 
 - **Emails transactionnels** (Resend + react-email) — 4 emails MVP :
-  - Confirmation d'inscription (Player)
-  - Confirmation liste d'attente (Player)
-  - Promotion liste d'attente — "une place s'est libérée !" (Player)
-  - Notification nouvelle inscription (Host)
+  - Confirmation d'inscription (Participant)
+  - Confirmation liste d'attente (Participant)
+  - Promotion liste d'attente — "une place s'est libérée !" (Participant)
+  - Notification nouvelle inscription (Organisateur)
 - **Pièce jointe .ics** sur les emails de confirmation et de promotion — l'événement arrive directement dans l'agenda du Participant
 - **Générateur iCalendar** (`generateIcs`) — conforme RFC 5545, avec échappement des caractères spéciaux
 - **Templates email** — layout partagé, calendar badge gradient rose→violet (inspiré Luma), CTA visible
@@ -42,10 +42,10 @@ La plateforme a besoin d'yeux. L'admin permet de superviser l'activité, modére
 ### Ajouté
 
 - **Dashboard admin** — 4 cartes stats (Users, Circles, Moments, Inscriptions) + deltas hebdomadaires
-- **Listes paginées** (20/page) avec recherche pour Users, Circles et Moments
+- **Listes paginées** (20/page) avec recherche pour Utilisateurs, Cercles et Escales
 - **Pages de détail** pour chaque entité avec toutes les informations associées
-- **Actions de modération** — supprimer un utilisateur, un Circle ou un Moment, forcer l'annulation d'un Moment
-- **Cascading delete** — suppression d'un utilisateur supprime ses Circles orphelins (s'il est seul Host)
+- **Actions de modération** — supprimer un utilisateur, un Cercle ou une Escale, forcer l'annulation d'une Escale
+- **Cascading delete** — suppression d'un utilisateur supprime ses Cercles orphelins (s'il est seul Organisateur)
 - **Triple guard** — protection layout (redirect) + server action (`requireAdmin`) + usecase (`AdminUnauthorizedError`)
 
 ### Architecture
@@ -67,18 +67,20 @@ The Playground prend forme visuellement. La homepage raconte l'histoire du produ
 
 - **Homepage redesignée** — hero split-screen (texte animé + mockup iPhone 3D), section "Comment ça marche" en 3 étapes, 3 piliers (Communauté d'abord, Design premium, 100% gratuit), CTA final
 - **La Carte** (`/explorer`) — page publique de découverte des Cercles et Escales, filtrable par catégorie, tabs Cercles/Escales
-- **Pages Circle publiques** (`/circles/[slug]`) — accessibles sans compte, SEO-friendly
-- **Champs Circle enrichis** — `category` (enum 8 valeurs) + `city` (string libre)
+- **Pages Cercle publiques** (`/circles/[slug]`) — accessibles sans compte, SEO-friendly
+- **Champs Cercle enrichis** — catégorie (enum 8 valeurs) + ville (string libre)
 - **Toggle langue FR/EN** dans le header
 - **Favicon** — gradient rose→violet avec triangle play
 - **Icône brand** dans le header (triangle play)
-- **Données démo** — 6 Circles FR réalistes, 20 users, 30 Moments (`@demo.playground`)
+- **Données démo** — 6 Cercles FR réalistes, 20 utilisateurs, 30 Escales (`@demo.playground`)
 
 ### Terminologie i18n
 
 La plateforme adopte son vocabulaire propre :
 - **FR** : Moment → **Escale**, S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**, Explorer → **La Carte**
 - **EN** : Player → **Member**, Register → **Join**, Dashboard → **My Playground**, Explorer → **Explore**
+
+> À partir de cette version, tous les documents user-facing utilisent la terminologie propriétaire.
 
 ---
 
@@ -88,11 +90,11 @@ Le design passe du fonctionnel au premium. Chaque page est repensée pour attein
 
 ### Ajouté
 
-- **Dashboard redesigné** — pill tabs (Mes Moments / Mes Cercles), timeline unifiée (upcoming + past), `DashboardMomentCard` + `CircleAvatar`, empty states avec CTA
-- **Page Circle redesignée** — layout 2 colonnes (cover gradient + hosts + stats | titre + méta + timeline), toggle À venir/Passés via URL param
-- **Page Moment passé** — cover grisée, badge overlay "Passé", banner contextuel, carte "Événement terminé" avec CTA rétention vers le Circle
+- **Dashboard redesigné** — pill tabs (Mes Escales / Mes Cercles), timeline unifiée (à venir + passées), empty states avec CTA
+- **Page Cercle redesignée** — layout 2 colonnes (cover gradient + Organisateurs + stats | titre + méta + timeline), toggle À venir/Passées via URL param
+- **Escale passée** — cover grisée, badge overlay "Passée", banner contextuel, carte "Événement terminé" avec CTA rétention vers le Cercle
 - **Page profil redesignée** — single-column centré, avatar header, stats inline, meta rows
-- **Liste des membres** (`CircleMembersList`) — Hosts avec couronne + Players, emails visibles uniquement pour les Hosts
+- **Liste des membres** (`CircleMembersList`) — Organisateurs avec couronne + Participants, emails visibles uniquement pour les Organisateurs
 - **Fils d'ariane** sur toutes les pages dashboard
 - **Design system unifié** — une seule couleur accent (destructive = primary), badges harmonisés, hiérarchie boutons normative
 
@@ -110,10 +112,10 @@ Les premières briques de l'engagement communautaire : commentaires, contenu enr
 
 ### Ajouté
 
-- **Fil de commentaires** sur chaque Moment — plat, chronologique, auteur + Host peuvent supprimer, formulaire masqué sur les Moments passés
-- **Autocomplete adresse** — intégration API BAN (Base Adresse Nationale) dans le formulaire Moment
-- **Badge Organisateur** sur les cartes Moment (remplace "Inscrit" pour les Hosts)
-- **Moments annulés** visibles dans la timeline du Circle (avec badge dédié)
+- **Fil de commentaires** sur chaque Escale — plat, chronologique, auteur + Organisateur peuvent supprimer, formulaire masqué sur les Escales passées
+- **Autocomplete adresse** — intégration API BAN (Base Adresse Nationale) dans le formulaire Escale
+- **Badge Organisateur** sur les cartes Escale (remplace "Inscrit" pour les Organisateurs)
+- **Escales annulées** visibles dans la timeline du Cercle (avec badge dédié)
 - **Scripts données de test** — seed + cleanup pour `@test.playground`, idempotents
 - **Impersonation dev** — `/api/dev/impersonate?email=...` pour les tests manuels
 
@@ -121,26 +123,26 @@ Les premières briques de l'engagement communautaire : commentaires, contenu enr
 
 ## [0.2.0] — 2026-02-20 — Parcours utilisateur complet
 
-Le produit devient utilisable de bout en bout. Un Organisateur peut créer une communauté, publier un événement et recevoir des inscriptions. Un Participant peut s'inscrire, rejoindre la communauté et annuler.
+Le produit devient utilisable de bout en bout. Un Organisateur peut créer une communauté, publier une Escale et recevoir des inscriptions. Un Participant peut s'inscrire, rejoindre la communauté et annuler.
 
 ### Ajouté
 
-- **Système d'inscription** — JoinMoment, CancelRegistration, GetMomentRegistrations, GetUserRegistration
+- **Système d'inscription** — Rejoindre une Escale, annuler, consulter les inscriptions
 - **Liste d'attente** avec promotion automatique sur désistement
-- **Auto-inscription Circle** — s'inscrire à un Moment inscrit automatiquement au Circle (zéro friction)
-- **Auto-inscription Host** — créer un Moment inscrit automatiquement le Host
-- **Dashboard Player-first** — "Mes prochains Moments" en timeline, "Mes Cercles" avec badge rôle
-- **Sécurité dashboard** — Circle/Moment vérifient le rôle (Players redirigés vers la vue publique)
+- **Auto-inscription Cercle** — rejoindre une Escale inscrit automatiquement au Cercle (zéro friction)
+- **Auto-inscription Organisateur** — créer une Escale inscrit automatiquement l'Organisateur
+- **Dashboard Participant-first** — "Mes prochaines Escales" en timeline, "Mes Cercles" avec badge rôle
+- **Sécurité dashboard** — Cercle/Escale vérifient le rôle (Participants redirigés vers la vue publique)
 - **Profil utilisateur** + onboarding obligatoire au premier login (nom, prénom)
-- **MomentDetailView** — composant unique paramétré par `variant` (public/host), réutilisé sur les deux vues
-- **Formulaire Moment redesigné** — style Luma, minimaliste (titre, date, lieu, description), options avancées masquées
+- **Vue Escale unifiée** — composant unique paramétré par `variant` (publique/Organisateur), réutilisé sur les deux vues
+- **Formulaire Escale redesigné** — style Luma, minimaliste (titre, date, lieu, description), options avancées masquées
 - **Header Luma-style** — avatar dropdown, navigation
 - **Tests E2E mobiles** (Playwright) — dashboard + pages publiques
 - **Monitoring** — Sentry (prod only) + Vercel Analytics + SpeedInsights
 
 ### Architecture
 
-- Modèle de rôle refactoré : **Host = Player + droits de gestion** (single membership row, `@@unique([userId, circleId])`)
+- Modèle de rôle refactoré : **Organisateur = Participant + droits de gestion** (single membership row, `@@unique([userId, circleId])`)
 - Neon branching : branche `production` pour Vercel, branche `dev` pour local
 - Script `db:dev:reset` pour recréer la branche dev depuis un snapshot prod
 
@@ -148,15 +150,15 @@ Le produit devient utilisable de bout en bout. Un Organisateur peut créer une c
 
 ## [0.1.0] — 2026-02-19 — Fondations
 
-Le socle technique et les premières features domaine. Le projet démarre avec une architecture hexagonale stricte et les deux entités centrales : Circle et Moment.
+Le socle technique et les premières features domaine. Le projet démarre avec une architecture hexagonale stricte et les deux entités centrales : Cercle et Escale.
 
 ### Ajouté
 
 - **Stack technique** — Next.js 15 (App Router), TypeScript strict, Prisma 7, PostgreSQL (Neon), Auth.js v5, Tailwind CSS 4, shadcn/ui, next-intl
 - **Architecture hexagonale** — `domain/` (models, ports, usecases) → `infrastructure/` (repositories Prisma) → `app/` (routes Next.js)
 - **Auth** — magic link + OAuth (Google, GitHub) via Auth.js v5
-- **CRUD Circle** — première feature domaine complète (usecase + port + adapter + UI)
-- **CRUD Moment** — avec page publique partageable `/m/[slug]`
+- **CRUD Cercle** — première feature domaine complète (usecase + port + adapter + UI)
+- **CRUD Escale** — avec page publique partageable `/m/[slug]`
 - **i18n** — FR/EN natif avec next-intl
 - **Déploiement** — Vercel (EU) + Neon PostgreSQL serverless (EU)
 
