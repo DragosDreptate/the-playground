@@ -25,10 +25,10 @@ export function UserAvatar({ name, email, image, size = "default" }: UserAvatarP
   return (
     <Avatar
       className={cn(
-        size === "sm" && "h-7 w-7 text-xs",
-        size === "default" && "h-8 w-8 text-sm",
-        size === "lg" && "h-16 w-16 text-xl",
-        size === "xl" && "h-24 w-24 text-3xl",
+        size === "sm" && "size-7 text-xs",
+        size === "default" && "size-8 text-sm",
+        size === "lg" && "size-16 text-xl",
+        size === "xl" && "size-24 text-3xl",
       )}
     >
       {image && <AvatarImage src={image} alt={name ?? email} />}
