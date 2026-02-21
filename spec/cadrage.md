@@ -139,7 +139,7 @@ Contient :
 - Prix (gratuit ou payant)
 - Liste d'attente (promotion automatique en cas de désistement)
 - Players inscrits
-- Statut check-in
+- Fil de commentaires (Players inscrits)
 - Fil de commentaires (Players inscrits)
 - URL partageable dédiée
 
@@ -157,7 +157,6 @@ Contient :
 - Voir les Players inscrits
 - Gestion de la liste d'attente
 - Export données (CSV participants, données Circle)
-- Check-in le jour J
 - Communiquer avec les Players inscrits (email direct)
 - Assistant IA basique :
   - Génération description Moment
@@ -177,10 +176,10 @@ Contient :
 - Commenter sur le fil du Moment
 - **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention
 
-## Répertoire public
+## La Carte (découverte publique)
 
 - Annuaire simple de Circles publics
-- Filtrable par thème et localisation
+- Filtrable par thème (catégorie), ville en affichage uniquement (pas de filtre MVP)
 - Sans algorithme de ranking, sans promoted content
 
 ---
@@ -214,7 +213,7 @@ Contient :
 - Données exportables (export complet Circle : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
-- Pas de marketplace (mais un répertoire simple de Circles publics)
+- Pas de marketplace (mais La Carte : annuaire simple de Circles publics)
 - Ownership des données pour les Circles
 - Architecture notifications multi-canal dès la conception (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour support multi-langue futur
@@ -285,19 +284,21 @@ Chaque Moment est une page autonome, design premium (benchmark Luma), optimisée
 - Pages Moment autonomes et partageables
 - Inscriptions (avec inscription automatique au Circle)
 - Liste d'attente avec promotion automatique
-- Emails (confirmation, rappels, notifications de changement, communication Host→Players)
-- Stripe (événements payants)
-- Assistant IA basique (descriptions, emails)
-- Répertoire public de Circles
-- Export données (CSV)
-- Check-in
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host)
+- Stripe Connect (événements payants) — pas encore implémenté
+- Assistant IA basique (descriptions, emails) — pas encore implémenté
+- La Carte (répertoire public de Circles)
+- Export données (CSV) — pas encore implémenté
+- Admin plateforme (dashboard stats, listes paginées, modération)
 
 ## Phase 2 – Engagement
 
 - Tracks (séries d'événements récurrents)
+- Check-in le jour J
 - Dashboard analytics simple
 - Fil de commentaires enrichi
 - Notifications multi-canal (SMS, push)
+- Emails enrichis (rappels 24h/1h, notifications de changement, communication Host→Players)
 - Export avancé (JSON, données complètes)
 - Améliorations IA (agenda, FAQ, post LinkedIn)
 

@@ -1,21 +1,23 @@
-# Le Répertoire — Spec d'implémentation
+# La Carte — Spec d'implémentation
 
-> "Le répertoire de tous les possibles" — l'espace de découverte de The Playground.
+> "L'espace de jeu ouvert" — la page de découverte de The Playground.
 > Page `/explorer` : vitrine publique des Circles et Moments ouverts à tous.
 >
 > Référence produit : `spec/ux-parcours-jtbd.md` (parcours cold traffic, persona Host débutant)
-> Référence backlog : section "Répertoire public"
+> Référence backlog : section "La Carte"
+>
+> **Terminologie** : "La Carte" (FR) / "Explore" (EN). Route : `/explorer`. Clé i18n : `Explorer`.
 
 ---
 
 ## Vision produit
 
-Le **Répertoire** est la réponse à la question : *"Que voit un utilisateur qui arrive sur
+**La Carte** est la réponse à la question : *"Que voit un utilisateur qui arrive sur
 The Playground sans lien partagé ?"*
 
 Aujourd'hui : rien. Bounce immédiat.
 
-Le Répertoire est l'**espace de jeu ouvert** — l'incarnation du nom "Playground". On y trouve
+La Carte est l'**espace de jeu ouvert** — l'incarnation du nom "Playground". On y trouve
 tous les Circles et Moments publics, sans algorithme, sans ranking, sans mise en avant payante.
 Juste les communautés et leurs événements, dans l'ordre chronologique.
 
@@ -57,7 +59,7 @@ model Circle {
 ```
 
 **Décision** : nullable en DB, obligatoire dans le formulaire de création (validation côté usecase).
-Les Circles existants sans catégorie restent valides et apparaissent dans le Répertoire sans filtre.
+Les Circles existants sans catégorie restent valides et apparaissent sur La Carte sans filtre.
 
 ### Ajout : `city` (string libre) — affichage uniquement, pas de filtre MVP
 
@@ -280,7 +282,7 @@ export default async function ExplorerPage({ searchParams }) {
     <>
       <ExplorerHeader />          {/* titre + description */}
       <ExplorerFilterBar />       {/* filtre catégorie uniquement — Client Component */}
-      <ExplorerTabs              {/* Cercles / Événements */}
+      <ExplorerTabs              {/* Cercles / Escales */}
         tab={tab}
         circles={circles}
         moments={moments}
@@ -293,12 +295,12 @@ export default async function ExplorerPage({ searchParams }) {
 **Metadata SEO** :
 ```typescript
 export const metadata = {
-  title: "Le Répertoire — The Playground",
+  title: "La Carte — The Playground",
   description: "Découvrez des communautés ouvertes à tous. Tech, sport, art, business...",
 };
 ```
 
-### Composants à créer
+### Composants
 
 #### `ExplorerFilterBar` (Client Component)
 
@@ -344,7 +346,7 @@ Contenu (community-first) :
 ## Page Circle publique (hors dashboard)
 
 Actuellement, la page Circle n'existe qu'en version dashboard (authentifiée).
-Pour le Répertoire, il faut une **page Circle publique** accessible sans compte.
+Pour La Carte, il faut une **page Circle publique** accessible sans compte.
 
 ```
 src/app/[locale]/(routes)/circles/[slug]/page.tsx
@@ -372,16 +374,16 @@ src/components/circles/circle-form.tsx
 
 ---
 
-## i18n — Clés à ajouter
+## i18n — Clés
 
 ```json
 {
   "Explorer": {
-    "title": "Le Répertoire",
+    "title": "La Carte",
     "description": "Découvrez des communautés ouvertes à tous.",
     "tabs": {
       "circles": "Cercles",
-      "moments": "Événements"
+      "moments": "Escales"
     },
     "filters": {
       "category": "Thématique",
@@ -389,7 +391,7 @@ src/components/circles/circle-form.tsx
     },
     "empty": {
       "circles": "Aucun Cercle public pour cette thématique.",
-      "moments": "Aucun événement à venir pour cette thématique."
+      "moments": "Aucune Escale à venir pour cette thématique."
     }
   },
   "CircleCategory": {
@@ -409,12 +411,12 @@ src/components/circles/circle-form.tsx
 
 ## Navigation — Points d'accès
 
-Le Répertoire doit être accessible depuis :
+La Carte est accessible depuis :
 
-1. **Header principal** : lien "Explorer" dans la nav (visible même non connecté)
-2. **Dashboard** : lien "Explorer" pour les Players sans Moment à venir
-3. **Page \****`/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
-4. **URL directe \****`/explorer`** : accessible et indexable sans authentification
+1. **Header principal** : lien "La Carte" (FR) / "Explore" (EN) dans la nav (visible même non connecté)
+2. **Dashboard** : lien dans les empty states pour les Players sans Moment à venir
+3. **Page `/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
+4. **URL directe `/explorer`** : accessible et indexable sans authentification
 
 ---
 
@@ -441,7 +443,7 @@ Le Répertoire doit être accessible depuis :
 | 8 | Composants : `PublicCircleCard`, `PublicMomentCard`, `ExplorerFilterBar` | Étape 4 |
 | 9 | Page `/explorer` | Étapes 7, 8 |
 | 10 | Page Circle publique `/circles/[slug]` | Étape 7 |
-| 11 | Ajouter lien "Explorer" dans le header | Étape 9 |
+| 11 | Ajouter lien "La Carte" dans le header | Étape 9 |
 | 12 | i18n FR + EN | Toutes |
 
 ---
@@ -450,7 +452,7 @@ Le Répertoire doit être accessible depuis :
 
 | Décision | Raison |
 | --- | --- |
-| Tab par défaut : Cercles (pas Événements) | Community-first : on découvre d'abord une communauté, pas un événement |
+| Tab par défaut : Cercles (pas Escales) | Community-first : on découvre d'abord une communauté, pas un événement |
 | Ordre chronologique uniquement | Pas d'algorithme, pas de ranking — invariant positionnement |
 | **Filtre MVP : catégorie uniquement (pas de ville)** | La densité par ville sera insuffisante au lancement. La catégorie est utile dès le premier Circle. Un filtre ville vide est pire qu'absent. |
 | `city` = affichage uniquement en MVP | Enrichit les cards sans créer un filtre inutile. Filtre géographique post-MVP quand la densité le justifie. |
@@ -459,3 +461,4 @@ Le Répertoire doit être accessible depuis :
 | Page Circle publique séparée du dashboard | Accès sans auth, SEO, parcours cold traffic |
 | `revalidate: 60` sur `/explorer` | Fraîcheur acceptable sans rebuild, pas de full SSR dynamique |
 | Pas de pagination complexe en MVP | `limit: 20` suffit pour le lancement |
+| Renommage "Répertoire" → "La Carte" | Nom plus évocateur, cohérent avec la métaphore Playground |
