@@ -333,15 +333,6 @@ export default async function CircleDetailPage({
                     ? t("detail.noUpcomingMoments")
                     : t("detail.noPastMoments")}
                 </p>
-                {isHost && activeTab === "upcoming" && (
-                  <Button asChild className="mt-4" size="sm">
-                    <Link
-                      href={`/dashboard/circles/${circle.slug}/moments/new`}
-                    >
-                      {t("detail.manageMoment")}
-                    </Link>
-                  </Button>
-                )}
               </div>
             ) : (
               <div>
