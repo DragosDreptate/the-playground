@@ -42,6 +42,9 @@
 | Couleur destructive = primary (une seule couleur accent rose, danger communiqué par le contexte) | 2026-02-21 | `75fd383` |
 | Bouton Modifier unifié : default (rose plein) sur pages Circle et Moment | 2026-02-21 | `295575d` |
 | Le Répertoire : `/explorer` (tabs Cercles/Événements, filtre catégorie) + page Circle publique `/circles/[slug]` + champs `category`/`city` sur Circle | 2026-02-21 | `c3813e7` |
+| Dashboard redesigné : pill tabs (Mes Moments / Mes Cercles), timeline unifiée (upcoming + past), `DashboardMomentCard` avec `CircleAvatar`, empty states CTA | 2026-02-21 | — |
+| `CircleMembersList` : section membres sur page Circle (Hosts avec Crown, emails visibles Host-only via `variant`) | 2026-02-21 | — |
+| Terminologie i18n : FR Moment → **Escale**, S'inscrire → **Rejoindre**, Dashboard → **Mon Playground** / EN Player → **Member**, Register → **Join**, Dashboard → **My Playground** | 2026-02-21 | — |
 
 ---
 
@@ -254,3 +257,5 @@
 | 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et Moment). Cohérence inter-pages. |
 | 2026-02-21 | Analyse UX JTBD complète (spec/ux-parcours-jtbd.md) : 8 personas, 25 JTBD, 7 parcours. 4 casseurs de loop identifiés (emails transactionnels), 8 gaps haute priorité, 7 moyens. Ajoutés au backlog sous "Rétention & viralité". |
 | 2026-02-21 | Le Répertoire (spec/feature-explorer-repertoire.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : Répertoire = Circles + Moments à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
+| 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
+| 2026-02-21 | Terminologie i18n rebranding. FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée, cette/une Escale), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Code identifiers, clés JSON et noms de fichiers restent en anglais (Moment, Player). |

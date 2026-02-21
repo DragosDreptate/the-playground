@@ -56,11 +56,13 @@ The Playground: Moment → Inscription → Membre du Circle → Prochains Moment
 | **Playground** | — | La plateforme |
 | **Circle** | Cercle | Une communauté autonome (publique ou privée) |
 | **Track** | — | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
-| **Moment** | Moment | Événement individuel — unité virale de la plateforme, page autonome et partageable |
+| **Moment** | Escale (FR) / Moment (EN) | Événement individuel — unité virale de la plateforme, page autonome et partageable |
 | **Host** | Organisateur | Organisateur d'un Circle |
-| **Player** | Participant | Participant à un Moment / membre d'un Circle |
+| **Player** | Participant (FR) / Member (EN) | Participant à un Moment / membre d'un Circle |
 
-> **Règle i18n** : En code (types, variables, DB), on utilise toujours les termes anglais (Circle, Host, Player). Les termes français (Cercle, Organisateur, Participant) ne sont utilisés que dans les fichiers i18n (`messages/fr.json`) et le texte visible par l'utilisateur en français.
+> **Règle i18n** : En code (types, variables, DB, noms de fichiers, clés JSON), on utilise toujours les termes anglais (Circle, Moment, Host, Player). Les traductions user-facing sont :
+> - **FR** : Circle → Cercle, Moment → **Escale** (féminin : une Escale, cette Escale, Publiée, Annulée, Passée), Host → Organisateur, Player → Participant, Register → Rejoindre, Dashboard → Mon Playground
+> - **EN** : Circle, Moment, Host restent inchangés. Player → **Member**, Register → **Join**, Dashboard → **My Playground**
 
 ## Règles métier clés
 
@@ -557,3 +559,8 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Traductions FR : Circle → Cercle, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
 | 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience." |
 | 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, la page Circle est la couche de rétention absente chez Luma |
+| 2026-02-21 | Dashboard redesigné : pill tabs (Mes Moments / Mes Cercles), timeline unifiée (upcoming + past), empty states avec CTA. Pas de CTAs dans les tab headers. |
+| 2026-02-21 | CircleAvatar : composant réutilisable (gradient + initial), prêt pour future prop `image` (avatar Circle personnalisé) |
+| 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Hosts d'abord (Crown), emails visibles uniquement pour les Hosts (prop `variant`) |
+| 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
+| 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
