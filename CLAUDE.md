@@ -14,11 +14,11 @@ The Playground est **community-centric** (comme Meetup), pas event-centric (comm
 - **Meetup** : créer un groupe → des gens rejoignent → ils restent → les événements sont des rendez-vous dans la communauté. Bon modèle, mais UX datée et paywall organisateur.
 - **The Playground** : le modèle communautaire de Meetup + l'expérience premium de Luma + 100% gratuit.
 
-Le **Circle** (communauté) est l'entité centrale. Le **Moment** (événement) est un point d'entrée viral vers le Circle. L'inscription à un Moment rend le Player membre du Circle. Après le Moment, le Circle reste — avec ses membres, ses prochains Moments, son identité.
+Le **Circle** (communauté) est l'entité centrale. L'**Escale** (événement) est un point d'entrée viral vers le Circle. L'inscription à une Escale rend le Participant membre du Circle. Après l'Escale, le Circle reste — avec ses membres, ses prochaines Escales, son identité.
 
 ```
 Luma:           Event → Inscription → Event a lieu → Fin (pas de rétention)
-The Playground: Moment → Inscription → Membre du Circle → Prochains Moments → Rétention
+The Playground: Escale → Inscription → Membre du Circle → Prochaines Escales → Rétention
 ```
 
 ### Ce qu'on prend de chaque référence
@@ -30,24 +30,24 @@ The Playground: Moment → Inscription → Membre du Circle → Prochains Moment
 | Page événement premium | non (datée) | oui | **oui** |
 | Inscription sans friction | non (compte obligatoire) | oui | **oui** |
 | Dashboard organisateur | basique | bon | **bon** |
-| Découverte publique | oui (annuaire) | non | **oui** (répertoire) |
+| Découverte publique | oui (annuaire) | non | **oui** (La Carte) |
 | Gratuit | non (abo organisateur) | commission | **100% gratuit** |
 
 ### Parcours clés
 
 **Host (Organisateur)** :
 1. Créer son **Circle** (sa communauté) — c'est le cockpit
-2. Créer des **Moments** dans ce Circle
-3. Gérer ses **Players** de façon persistante (pas événement par événement)
-4. Communiquer avec sa communauté entre les Moments
+2. Créer des **Escales** dans ce Cercle
+3. Gérer ses **Participants** de façon persistante (pas événement par événement)
+4. Communiquer avec sa communauté entre les Escales
 
 **Player (Participant)** :
-1. Reçoit un lien vers un Moment (viralité, comme Luma)
+1. Reçoit un lien vers une Escale (viralité, comme Luma)
 2. S'inscrit → devient membre du Circle (transparent, zéro friction)
-3. Après le Moment : découvre la page Circle, les prochains Moments, les autres membres
-4. Revient naturellement pour les Moments suivants
+3. Après l'Escale : découvre la page Cercle, les prochaines Escales, les autres membres
+4. Revient naturellement pour les Escales suivantes
 
-> Le dashboard Host est **Circle-first**, pas event-first. Le Circle est le cockpit, les Moments sont des actions lancées depuis ce cockpit.
+> Le dashboard Organisateur est **Circle-first**, pas event-first. Le Circle est le cockpit, les Escales sont des actions lancées depuis ce cockpit.
 
 ## Architecture sémantique
 
@@ -67,26 +67,26 @@ The Playground: Moment → Inscription → Membre du Circle → Prochains Moment
 ## Règles métier clés
 
 - **Le Circle est l'entité centrale** — tout gravite autour de la communauté, pas de l'événement
-- S'inscrire à un Moment inscrit automatiquement le Player au Circle (transparent, pas de friction)
-- Le Moment est la **porte d'entrée virale**. Le Circle est la **couche de rétention**
-- Parcours : découvrir un Moment → s'inscrire → devenir membre du Circle → découvrir les prochains Moments → rester
-- **La page Circle est la page de rétention** : prochains Moments, Moments passés, membres, identité du Circle
+- Rejoindre une Escale inscrit automatiquement le Participant au Cercle (transparent, pas de friction)
+- L'Escale est la **porte d'entrée virale**. Le Cercle est la **couche de rétention**
+- Parcours : découvrir une Escale → rejoindre → devenir membre du Cercle → découvrir les prochaines Escales → rester
+- **La page Circle est la page de rétention** : prochaines Escales, Escales passées, membres, identité du Cercle
 - Liste d'attente avec promotion automatique sur désistement
-- Fil de commentaires (pas de forum) sur chaque Moment
+- Fil de commentaires (pas de forum) sur chaque Escale
 
 ## Principes structurants
 
 - Multi-tenant dès le départ
 - Architecture hexagonale obligatoire
-- **Design premium par défaut** — chaque page Moment doit être belle sans effort du Host
-- **Mobile-first** — le parcours Player est optimisé pour mobile (lien partagé via WhatsApp/Instagram/Slack → toujours sur mobile)
-- **Marque visible mais discrète** — "Powered by The Playground" en footer, couleur accent reconnaissable, mais le Host et son Circle restent au premier plan. On construit de la notoriété sans cannibaliser l'identité des communautés
+- **Design premium par défaut** — chaque page Escale doit être belle sans effort de l'Organisateur
+- **Mobile-first** — le parcours Participant est optimisé pour mobile (lien partagé via WhatsApp/Instagram/Slack → toujours sur mobile)
+- **Marque visible mais discrète** — "Powered by The Playground" en footer, couleur accent reconnaissable, mais l'Organisateur et son Cercle restent au premier plan. On construit de la notoriété sans cannibaliser l'identité des communautés
 - Données exportables (export complet : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
-- Pas de marketplace (mais répertoire simple de Circles publics, filtrable par thème/localisation)
+- Pas de marketplace (mais La Carte : annuaire simple de Cercles publics, filtrable par thème/localisation)
 - Ownership des données pour les Circles
-- **Distribution par les Hosts** — pas d'algo de distribution, la viralité vient des liens partageables + intégration calendrier + export. Le Host génère la distribution, pas la plateforme
+- **Distribution par les Organisateurs** — pas d'algo de distribution, la viralité vient des liens partageables + intégration calendrier + export. L'Organisateur génère la distribution, pas la plateforme
 - Architecture notifications **multi-canal dès la conception** (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour ajout de langues futur
 
@@ -94,35 +94,35 @@ The Playground: Moment → Inscription → Membre du Circle → Prochains Moment
 
 > L'UI/UX est calquée sur Luma (lu.ma) pour le design premium. Le modèle fonctionnel s'inspire de Meetup pour la couche communautaire. On systématiquement challenge le design Luma : si on peut faire mieux, on propose l'alternative.
 
-### La page Moment = porte d'entrée virale (benchmark Luma)
+### La page Escale = porte d'entrée virale (benchmark Luma)
 
-La page Moment est la première chose que voit un Player. Design premium, inspiration directe Luma :
+La page Escale est la première chose que voit un Participant. Design premium, inspiration directe Luma :
 - **Titre clair** — immédiatement lisible
 - **Date visible immédiatement** — pas cachée dans un détail
 - **Lieu explicite** — adresse ou "En ligne"
 - **CTA évident** — bouton d'inscription dominant, au-dessus de la ligne de flottaison
 - **Social proof** — liste des inscrits avec avatars/initiales, nombre de places restantes
-- **Lien vers le Circle** — visible sur la page Moment, invitation à explorer la communauté
+- **Lien vers le Circle** — visible sur la page Escale, invitation à explorer la communauté
 
 ### La page Circle = couche de rétention (ce que Luma n'a pas)
 
 C'est l'avantage structurel de The Playground. La page Circle montre :
-- Les **prochains Moments** du Circle
-- Les **Moments passés** (historique)
+- Les **prochaines Escales** du Cercle
+- Les **Escales passées** (historique)
 - Les **membres** du Circle
-- L'**identité** du Circle (description, Host)
+- L'**identité** du Cercle (description, Organisateur)
 
 > La page Circle n'existe pas chez Luma. C'est elle qui transforme des participants ponctuels en membres fidèles.
 
 ### Friction zéro à l'inscription (benchmark Luma)
 
 - Magic link / OAuth — pas de création de compte lourde avant inscription
-- Minimum d'étapes entre "je vois le Moment" et "je suis inscrit"
+- Minimum d'étapes entre "je vois l'Escale" et "j'ai rejoint"
 - L'inscription au Circle est transparente (pas de popup ni de validation supplémentaire)
 
 ### Minimalisme du formulaire de création (benchmark Luma)
 
-- Le Host ne remplit que l'essentiel : **titre, date, lieu, description**
+- L'Organisateur ne remplit que l'essentiel : **titre, date, lieu, description**
 - Tout le reste (capacité, prix, paramètres avancés) est masqué dans des options secondaires
 - Moins de réglages = meilleure adoption
 
@@ -147,8 +147,8 @@ C'est l'avantage structurel de The Playground. La page Circle montre :
 
 | Variant | Rôle | Quand l'utiliser |
 |---|---|---|
-| `default` (rose/primary) | **Action principale** de la page ou du contexte | CTA inscription, Créer un Moment, Modifier, Enregistrer |
-| `outline` | **Action secondaire** | Créer un Cercle (quand Créer un Moment est le primary), Annuler, actions de navigation secondaires |
+| `default` (rose/primary) | **Action principale** de la page ou du contexte | CTA Rejoindre, Créer une Escale, Modifier, Enregistrer |
+| `outline` | **Action secondaire** | Créer un Cercle (quand Créer une Escale est le primary), Annuler, actions de navigation secondaires |
 | `ghost` | **Action tertiaire / utilitaire** | Copier, Voir (dans une toolbar), Se déconnecter, toggles UI |
 | `destructive` | **Jamais utilisé comme trigger visible** | Réservé aux `AlertDialogAction` de confirmation (dans la modale) |
 
@@ -172,7 +172,7 @@ L'`AlertDialogAction` dans la modale de confirmation utilise `className="bg-dest
 
 - **Pages et headers** : `size="sm"` pour les boutons d'action en haut de page
 - **Formulaires** : `size` non spécifié (default) pour Submit et Cancel
-- **CTAs fullwidth** (page publique Moment, inscription) : `size="lg"` avec `w-full`
+- **CTAs fullwidth** (page publique Escale, Rejoindre) : `size="lg"` avec `w-full`
 - **Utilitaires inline** (toolbar, copy) : `size="sm"` ou taille custom via className
 
 ### Règle anti-doublon
@@ -182,28 +182,28 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 ## Monétisation
 
 - **100% gratuit** — aucune commission plateforme, aucun abonnement requis
-- Seuls les frais Stripe (~2.9% + 0.30$) sur les Moments payants
+- Seuls les frais Stripe (~2.9% + 0.30$) sur les Escales payantes
 - The Playground ne prend aucune marge sur les transactions
 - Évolution future : Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 
 ## MVP V1 — Périmètre
 
-### Host
+### Organisateur
 - CRUD Circle / Moment (Track en Phase 2)
 - Pages Moment autonomes et partageables (URL propre `/m/[slug]`)
 - Formulaire de création minimaliste (titre, date, lieu, description) — options avancées (capacité, prix) masquées par défaut
 - Liste d'attente
-- Check-in, export CSV, communication directe avec Players
-- Assistant IA basique (description Moment, email invitation, suggestions Circle)
+- Check-in, export CSV, communication directe avec les Participants
+- Assistant IA basique (description Escale, email invitation, suggestions Cercle)
 
-### Player
-- Découverte Moment via lien partagé
-- Inscription Moment = inscription Circle automatique
-- Social proof sur la page Moment : liste des inscrits (avatars/initiales), nombre de places restantes
+### Participant
+- Découverte d'Escale via lien partagé
+- Rejoindre une Escale = inscription au Cercle automatique
+- Social proof sur la page Escale : liste des inscrits (avatars/initiales), nombre de places restantes
 - Bouton "Ajouter à mon calendrier" après inscription (Google Calendar, Apple Calendar, ICS)
 - Paiement Stripe si nécessaire
 - Notifications email (confirmation, rappels 24h/1h, changements, annulations)
-- Fil de commentaires sur le Moment
+- Fil de commentaires sur l'Escale
 
 ### Plateforme
 - La Carte : répertoire public de Circles (filtrable thème/localisation, sans ranking)
@@ -217,7 +217,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - **ORM** : Prisma — schema déclaratif, migrations
 - **Base de données** : PostgreSQL — multi-tenant
 - **Auth** : Auth.js (NextAuth v5) — magic link + OAuth (Google, GitHub), self-hosted
-- **Paiements** : Stripe Connect — reversement aux Hosts
+- **Paiements** : Stripe Connect — reversement aux Organisateurs
 
 ### UI / Design
 - **Styling** : Tailwind CSS 4
@@ -466,7 +466,7 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 
 ##### Performance pages
 
-- **Lighthouse CI** sur les pages Moment (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
+- **Lighthouse CI** sur les pages Escale (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
 - **Détection N+1 queries** dans les tests d'intégration des repositories
 - **Load testing** (k6/Artillery) : uniquement en phase pré-lancement, pas dans le MVP
 
@@ -524,8 +524,8 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 
 | Date | Décision |
 | --- | --- |
-| 2026-02-19 | Le Moment est l'unité virale, page autonome partageable (inspiration Luma) |
-| 2026-02-19 | Inscription Moment = inscription automatique Circle (pas de friction) |
+| 2026-02-19 | L'Escale est l'unité virale, page autonome partageable (inspiration Luma) |
+| 2026-02-19 | Rejoindre une Escale = inscription automatique au Cercle (pas de friction) |
 | 2026-02-19 | Design-first comme principe structurant (Luma = benchmark UX) |
 | 2026-02-19 | 100% gratuit, 0% commission plateforme, seuls frais Stripe |
 | 2026-02-19 | IA basique dès le MVP (descriptions, emails, suggestions) |
@@ -533,35 +533,35 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Notifications multi-canal en architecture, email-only en V1 |
 | 2026-02-19 | La Carte : répertoire public de Circles (annuaire simple, pas de marketplace) |
 | 2026-02-19 | On garde le nom "Circle" malgré la collision avec Circle.so |
-| 2026-02-19 | Fil de commentaires sur Moment (pas de forum complet) |
-| 2026-02-19 | Mobile-first pour le parcours Player |
+| 2026-02-19 | Fil de commentaires sur Escale (pas de forum complet) |
+| 2026-02-19 | Mobile-first pour le parcours Participant |
 | 2026-02-19 | Export données ambitieux (CSV + JSON + API Pro) |
 | 2026-02-19 | UI bilingue FR/EN dès V1, architecture i18n native pour multi-langue futur |
 | 2026-02-19 | Lancement France d'abord, puis expansion européenne et internationale |
 | 2026-02-19 | Stack technique : TypeScript full-stack (Next.js 15, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon/Supabase) |
 | 2026-02-19 | Architecture hexagonale : domain/ (models, ports, usecases) + infrastructure/ (repositories, services) + app/ (routes Next.js) |
 | 2026-02-19 | Questions ouvertes résolues : découverte publique = oui, freemium = non, langue = bilingue FR/EN, géo = France d'abord |
-| 2026-02-19 | Track retiré du MVP V1 → Phase 2. MVP se concentre sur Circle + Moment |
+| 2026-02-19 | Track retiré du MVP V1 → Phase 2. MVP se concentre sur Circle + Escale |
 | 2026-02-19 | Auth : Magic link + OAuth (Google, GitHub) via Auth.js v5 |
 | 2026-02-19 | Data model V1 : User, Circle, CircleMembership, Moment, Registration, Comment |
 | 2026-02-19 | Modèle User unique (pas d'entités Host/Player séparées) — rôle via CircleMembership |
 | 2026-02-19 | Prix en centimes (int) — convention Stripe, pas de floating point |
 | 2026-02-19 | Tests : BDD lightweight (Given/When/Then natif Vitest) + Specification by Example (test.each), pas de Gherkin/Cucumber |
 | 2026-02-19 | Sécu MVP : tests d'autorisation multi-tenant dans Vitest + pnpm audit en CI. Pentest → pré-lancement |
-| 2026-02-19 | Perf MVP : Lighthouse CI sur pages Moment + détection N+1. Load testing → pré-lancement |
+| 2026-02-19 | Perf MVP : Lighthouse CI sur pages Escale + détection N+1. Load testing → pré-lancement |
 | 2026-02-19 | A11y : axe-core intégré dans tests Playwright E2E |
-| 2026-02-19 | Benchmark Luma intégré : page Moment = 80% de la valeur (titre, date, lieu, CTA, social proof) |
-| 2026-02-19 | Social proof MVP : liste inscrits avec avatars/initiales + places restantes sur page Moment |
+| 2026-02-19 | Benchmark Luma intégré : page Escale = 80% de la valeur (titre, date, lieu, CTA, social proof) |
+| 2026-02-19 | Social proof MVP : liste inscrits avec avatars/initiales + places restantes sur page Escale |
 | 2026-02-19 | Ajout calendrier natif post-inscription (Google Calendar, Apple Calendar, ICS) |
-| 2026-02-19 | Formulaire création Moment minimaliste : titre/date/lieu/description, options avancées masquées |
-| 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Host au premier plan |
-| 2026-02-19 | Distribution par les Hosts (liens partageables + calendrier), pas d'algo de distribution plateforme |
-| 2026-02-19 | Traductions FR : Circle → Cercle, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
+| 2026-02-19 | Formulaire création Escale minimaliste : titre/date/lieu/description, options avancées masquées |
+| 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Organisateur au premier plan |
+| 2026-02-19 | Distribution par les Organisateurs (liens partageables + calendrier), pas d'algo de distribution plateforme |
+| 2026-02-19 | Traductions FR : Circle → Cercle, Moment → Escale, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
 | 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience." |
-| 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Moment = porte d'entrée virale, la page Circle est la couche de rétention absente chez Luma |
-| 2026-02-21 | Dashboard redesigné : pill tabs (Mes Moments / Mes Cercles), timeline unifiée (upcoming + past), empty states avec CTA. Pas de CTAs dans les tab headers. |
+| 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Escale = porte d'entrée virale, la page Cercle est la couche de rétention absente chez Luma |
+| 2026-02-21 | Dashboard redesigné : pill tabs (Mes Escales / Mes Cercles), timeline unifiée (upcoming + past), empty states avec CTA. Pas de CTAs dans les tab headers. |
 | 2026-02-21 | CircleAvatar : composant réutilisable (gradient + initial), prêt pour future prop `image` (avatar Circle personnalisé) |
-| 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Hosts d'abord (Crown), emails visibles uniquement pour les Hosts (prop `variant`) |
+| 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Organisateurs d'abord (Crown), emails visibles uniquement pour les Organisateurs (prop `variant`) |
 | 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
 | 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
 | 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et clé i18n `Explorer` inchangées. La Boussole réservée pour l'assistant IA (futur). |
