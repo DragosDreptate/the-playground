@@ -173,11 +173,17 @@
   - CRUD commentaire sur chaque Moment
   - Visible sur la page publique et la vue dashboard
 
-- [ ] **Répertoire public de Circles**
-  - Annuaire de Circles uniquement (pas de Moments — distribution via lien partagé par le Host)
-  - Chaque card affiche le prochain Moment à venir du Circle (teaser)
-  - Filtrable par catégorie/thème et localisation
-  - Pas de ranking, pas de marketplace
+- [ ] **Le Répertoire** — `spec/feature-explorer-repertoire.md`
+  - Page `/explorer` : vitrine publique, "répertoire de tous les possibles"
+  - Tab **Cercles** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain Moment en teaser)
+  - Tab **Événements** : agenda chronologique des Moments PUBLISHED de Circles publics (card community-first : Circle en en-tête, Moment en corps)
+  - Filtres : catégorie + ville (URL params, SSR-friendly, partageable)
+  - **Pas de ranking, pas d'algorithme** — ordre chronologique uniquement
+  - Page Circle publique `/circles/[slug]` accessible sans compte (SEO + cold traffic)
+  - Lien "Explorer" dans le header principal (visible non connecté)
+  - **Schema** : ajouter `category` (enum `CircleCategory`) + `city` (string libre) sur Circle
+  - **Formulaire Circle** : ajouter les champs category + city
+  - Séquençage complet en 12 étapes dans le spec
 
 ### Priorité moyenne
 
@@ -247,3 +253,4 @@
 | 2026-02-21 | Couleur unique : `--destructive` = `--primary` (même rose). Le danger est communiqué par le contexte (mot, modale), pas par une couleur différente. Approche Luma : un seul accent. |
 | 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et Moment). Cohérence inter-pages. |
 | 2026-02-21 | Analyse UX JTBD complète (spec/ux-parcours-jtbd.md) : 8 personas, 25 JTBD, 7 parcours. 4 casseurs de loop identifiés (emails transactionnels), 8 gaps haute priorité, 7 moyens. Ajoutés au backlog sous "Rétention & viralité". |
+| 2026-02-21 | Le Répertoire (spec/feature-explorer-repertoire.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : Répertoire = Circles + Moments à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
