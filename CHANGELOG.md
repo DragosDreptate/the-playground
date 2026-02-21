@@ -1,4 +1,4 @@
-# Changelog
+# Journal des modifications
 
 Historique des livraisons de The Playground.
 Chaque étape correspond à un bloc fonctionnel significatif du produit.
@@ -18,19 +18,19 @@ Le dernier bloc critique avant le lancement. Les emails transactionnels donnent 
   - Confirmation liste d'attente (Participant)
   - Promotion liste d'attente — "une place s'est libérée !" (Participant)
   - Notification nouvelle inscription (Organisateur)
-- **Pièce jointe .ics** sur les emails de confirmation et de promotion — l'événement arrive directement dans l'agenda du Participant
-- **Générateur iCalendar** (`generateIcs`) — conforme RFC 5545, avec échappement des caractères spéciaux
-- **Templates email** — layout partagé, calendar badge gradient rose→violet (inspiré Luma), CTA visible
-- **Audit sécurité RBAC/IDOR** — defense-in-depth sur tous les usecases admin, tests d'autorisation
-- **Tests unitaires** — couverture complète des usecases + 10 tests generateIcs
+- **Pièce jointe .ics** sur les emails de confirmation et de promotion — l'Escale arrive directement dans l'agenda du Participant
+- **Générateur iCalendar** — conforme RFC 5545, avec échappement des caractères spéciaux
+- **Modèles email** — mise en page partagée, badge calendrier gradient rose→violet (inspiré Luma), bouton d'action visible
+- **Audit sécurité** — vérification des contrôles d'accès sur tous les cas d'usage admin, tests d'autorisation
+- **Tests unitaires** — couverture complète des cas d'usage + 10 tests sur le générateur iCalendar
 - **Documentation spec** — vision produit, admin plateforme, emails, cadrage mis à jour
 
 ### Architecture
 
-- Port `EmailService` (domaine) → Adapter `ResendEmailService` (infrastructure)
-- Pattern fire-and-forget : si l'email échoue, l'inscription réussit quand même
-- i18n résolu avant le fire-and-forget (contexte requête Next.js)
-- Templates locale-agnostiques (tous les textes arrivent pré-traduits dans `strings`)
+- Port `EmailService` (domaine) → Adapteur `ResendEmailService` (infrastructure)
+- Envoi asynchrone sans attente : si l'email échoue, l'inscription réussit quand même
+- Traductions résolues avant l'envoi asynchrone (contexte requête Next.js)
+- Modèles email indépendants de la langue (tous les textes arrivent pré-traduits)
 - DNS configuré sur OVH : DKIM, SPF, DMARC pour `the-playground.fr`
 
 ---
@@ -41,68 +41,68 @@ La plateforme a besoin d'yeux. L'admin permet de superviser l'activité, modére
 
 ### Ajouté
 
-- **Dashboard admin** — 4 cartes stats (Users, Circles, Moments, Inscriptions) + deltas hebdomadaires
+- **Tableau de bord admin** — 4 cartes stats (Utilisateurs, Cercles, Escales, Inscriptions) + deltas hebdomadaires
 - **Listes paginées** (20/page) avec recherche pour Utilisateurs, Cercles et Escales
 - **Pages de détail** pour chaque entité avec toutes les informations associées
 - **Actions de modération** — supprimer un utilisateur, un Cercle ou une Escale, forcer l'annulation d'une Escale
-- **Cascading delete** — suppression d'un utilisateur supprime ses Cercles orphelins (s'il est seul Organisateur)
-- **Triple guard** — protection layout (redirect) + server action (`requireAdmin`) + usecase (`AdminUnauthorizedError`)
+- **Suppression en cascade** — suppression d'un utilisateur supprime ses Cercles orphelins (s'il est seul Organisateur)
+- **Triple protection** — garde au niveau de la mise en page (redirection) + action serveur + cas d'usage
 
 ### Architecture
 
-- Port `AdminRepository` dédié (requêtes transversales cross-domain, 13 méthodes)
-- 11 usecases dans `domain/usecases/admin/`
-- 14 server actions dans `app/actions/admin.ts`
-- Layout sidebar dédié + middleware guard
-- Champ `role` (USER/ADMIN) sur l'entité User
-- i18n FR/EN complet (~70 clés)
+- Port `AdminRepository` dédié (requêtes transversales, 13 méthodes)
+- 11 cas d'usage dans `domain/usecases/admin/`
+- 14 actions serveur dans `app/actions/admin.ts`
+- Mise en page avec barre latérale dédiée + garde d'accès
+- Champ `role` (USER/ADMIN) sur l'entité Utilisateur
+- Traductions FR/EN complètes (~70 clés)
 
 ---
 
-## [0.5.0] — 2026-02-21 — Homepage, identité & découverte
+## [0.5.0] — 2026-02-21 — Page d'accueil, identité & découverte
 
-The Playground prend forme visuellement. La homepage raconte l'histoire du produit, La Carte ouvre la découverte publique, et la terminologie propriétaire s'installe.
+The Playground prend forme visuellement. La page d'accueil raconte l'histoire du produit, La Carte ouvre la découverte publique, et la terminologie propriétaire s'installe.
 
 ### Ajouté
 
-- **Homepage redesignée** — hero split-screen (texte animé + mockup iPhone 3D), section "Comment ça marche" en 3 étapes, 3 piliers (Communauté d'abord, Design premium, 100% gratuit), CTA final
-- **La Carte** (`/explorer`) — page publique de découverte des Cercles et Escales, filtrable par catégorie, tabs Cercles/Escales
-- **Pages Cercle publiques** (`/circles/[slug]`) — accessibles sans compte, SEO-friendly
+- **Page d'accueil redesignée** — héro en écran partagé (texte animé + maquette iPhone 3D), section "Comment ça marche" en 3 étapes, 3 piliers (Communauté d'abord, Design premium, 100% gratuit), appel à l'action final
+- **La Carte** (`/explorer`) — page publique de découverte des Cercles et Escales, filtrable par catégorie, onglets Cercles/Escales
+- **Pages Cercle publiques** (`/circles/[slug]`) — accessibles sans compte, optimisées pour le référencement
 - **Champs Cercle enrichis** — catégorie (enum 8 valeurs) + ville (string libre)
-- **Toggle langue FR/EN** dans le header
+- **Sélecteur de langue FR/EN** dans l'en-tête
 - **Favicon** — gradient rose→violet avec triangle play
-- **Icône brand** dans le header (triangle play)
+- **Icône de marque** dans l'en-tête (triangle play)
 - **Données démo** — 6 Cercles FR réalistes, 20 utilisateurs, 30 Escales (`@demo.playground`)
 
-### Terminologie i18n
+### Terminologie
 
 La plateforme adopte son vocabulaire propre :
 - **FR** : Moment → **Escale**, S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**, Explorer → **La Carte**
 - **EN** : Player → **Member**, Register → **Join**, Dashboard → **My Playground**, Explorer → **Explore**
 
-> À partir de cette version, tous les documents user-facing utilisent la terminologie propriétaire.
+> À partir de cette version, tous les documents destinés aux utilisateurs emploient la terminologie propriétaire.
 
 ---
 
-## [0.4.0] — 2026-02-21 — Design system & polish
+## [0.4.0] — 2026-02-21 — Système de design & polish
 
 Le design passe du fonctionnel au premium. Chaque page est repensée pour atteindre le niveau Luma.
 
 ### Ajouté
 
-- **Dashboard redesigné** — pill tabs (Mes Escales / Mes Cercles), timeline unifiée (à venir + passées), empty states avec CTA
-- **Page Cercle redesignée** — layout 2 colonnes (cover gradient + Organisateurs + stats | titre + méta + timeline), toggle À venir/Passées via URL param
-- **Escale passée** — cover grisée, badge overlay "Passée", banner contextuel, carte "Événement terminé" avec CTA rétention vers le Cercle
-- **Page profil redesignée** — single-column centré, avatar header, stats inline, meta rows
-- **Liste des membres** (`CircleMembersList`) — Organisateurs avec couronne + Participants, emails visibles uniquement pour les Organisateurs
-- **Fils d'ariane** sur toutes les pages dashboard
-- **Design system unifié** — une seule couleur accent (destructive = primary), badges harmonisés, hiérarchie boutons normative
+- **Tableau de bord redesigné** — onglets (Mes Escales / Mes Cercles), timeline unifiée (à venir + passées), états vides avec appel à l'action
+- **Page Cercle redesignée** — mise en page 2 colonnes (couverture gradient + Organisateurs + stats | titre + méta + timeline), bascule À venir/Passées via paramètre URL
+- **Escale passée** — couverture grisée, badge superposé "Passée", bannière contextuelle, carte "Événement terminé" avec appel à l'action de rétention vers le Cercle
+- **Page profil redesignée** — colonne unique centrée, avatar en en-tête, stats en ligne, lignes de métadonnées
+- **Liste des membres** — Organisateurs avec couronne + Participants, emails visibles uniquement pour les Organisateurs
+- **Fils d'ariane** sur toutes les pages du tableau de bord
+- **Système de design unifié** — une seule couleur accent, badges harmonisés, hiérarchie de boutons normative
 
 ### Modifié
 
-- Couleur destructive alignée sur la teinte rose (hue 341) — approche Luma : un seul accent, zéro confusion
-- Badges : fond plein = engagement positif, outline = tout le reste
-- Bouton Modifier toujours `default` + `size="sm"` sur les pages de détail
+- Couleur de danger alignée sur la teinte rose (hue 341) — approche Luma : un seul accent, zéro confusion
+- Badges : fond plein = engagement positif, contour = tout le reste
+- Bouton Modifier toujours en variante principale sur les pages de détail
 
 ---
 
@@ -113,17 +113,17 @@ Les premières briques de l'engagement communautaire : commentaires, contenu enr
 ### Ajouté
 
 - **Fil de commentaires** sur chaque Escale — plat, chronologique, auteur + Organisateur peuvent supprimer, formulaire masqué sur les Escales passées
-- **Autocomplete adresse** — intégration API BAN (Base Adresse Nationale) dans le formulaire Escale
+- **Autocomplétion d'adresse** — intégration API BAN (Base Adresse Nationale) dans le formulaire Escale
 - **Badge Organisateur** sur les cartes Escale (remplace "Inscrit" pour les Organisateurs)
 - **Escales annulées** visibles dans la timeline du Cercle (avec badge dédié)
-- **Scripts données de test** — seed + cleanup pour `@test.playground`, idempotents
-- **Impersonation dev** — `/api/dev/impersonate?email=...` pour les tests manuels
+- **Scripts données de test** — injection + nettoyage pour `@test.playground`, idempotents
+- **Impersonnation dev** — `/api/dev/impersonate?email=...` pour les tests manuels
 
 ---
 
 ## [0.2.0] — 2026-02-20 — Parcours utilisateur complet
 
-Le produit devient utilisable de bout en bout. Un Organisateur peut créer une communauté, publier une Escale et recevoir des inscriptions. Un Participant peut s'inscrire, rejoindre la communauté et annuler.
+Le produit devient utilisable de bout en bout. Un Organisateur peut créer une communauté, publier une Escale et recevoir des inscriptions. Un Participant peut rejoindre, intégrer la communauté et annuler.
 
 ### Ajouté
 
@@ -131,50 +131,50 @@ Le produit devient utilisable de bout en bout. Un Organisateur peut créer une c
 - **Liste d'attente** avec promotion automatique sur désistement
 - **Auto-inscription Cercle** — rejoindre une Escale inscrit automatiquement au Cercle (zéro friction)
 - **Auto-inscription Organisateur** — créer une Escale inscrit automatiquement l'Organisateur
-- **Dashboard Participant-first** — "Mes prochaines Escales" en timeline, "Mes Cercles" avec badge rôle
-- **Sécurité dashboard** — Cercle/Escale vérifient le rôle (Participants redirigés vers la vue publique)
+- **Tableau de bord orienté Participant** — "Mes prochaines Escales" en timeline, "Mes Cercles" avec badge rôle
+- **Sécurité du tableau de bord** — Cercle/Escale vérifient le rôle (Participants redirigés vers la vue publique)
 - **Profil utilisateur** + onboarding obligatoire au premier login (nom, prénom)
-- **Vue Escale unifiée** — composant unique paramétré par `variant` (publique/Organisateur), réutilisé sur les deux vues
+- **Vue Escale unifiée** — composant unique paramétré (publique/Organisateur), réutilisé sur les deux vues
 - **Formulaire Escale redesigné** — style Luma, minimaliste (titre, date, lieu, description), options avancées masquées
-- **Header Luma-style** — avatar dropdown, navigation
-- **Tests E2E mobiles** (Playwright) — dashboard + pages publiques
-- **Monitoring** — Sentry (prod only) + Vercel Analytics + SpeedInsights
+- **En-tête style Luma** — menu avatar, navigation
+- **Tests E2E mobiles** (Playwright) — tableau de bord + pages publiques
+- **Supervision** — Sentry (prod uniquement) + Vercel Analytics + SpeedInsights
 
 ### Architecture
 
-- Modèle de rôle refactoré : **Organisateur = Participant + droits de gestion** (single membership row, `@@unique([userId, circleId])`)
-- Neon branching : branche `production` pour Vercel, branche `dev` pour local
-- Script `db:dev:reset` pour recréer la branche dev depuis un snapshot prod
+- Modèle de rôle refactoré : **Organisateur = Participant + droits de gestion** (une seule ligne d'appartenance par utilisateur et Cercle)
+- Branches Neon : branche `production` pour Vercel, branche `dev` pour le développement local
+- Script `db:dev:reset` pour recréer la branche dev depuis un instantané de production
 
 ---
 
 ## [0.1.0] — 2026-02-19 — Fondations
 
-Le socle technique et les premières features domaine. Le projet démarre avec une architecture hexagonale stricte et les deux entités centrales : Cercle et Escale.
+Le socle technique et les premières fonctionnalités domaine. Le projet démarre avec une architecture hexagonale stricte et les deux entités centrales : Cercle et Escale.
 
 ### Ajouté
 
-- **Stack technique** — Next.js 15 (App Router), TypeScript strict, Prisma 7, PostgreSQL (Neon), Auth.js v5, Tailwind CSS 4, shadcn/ui, next-intl
-- **Architecture hexagonale** — `domain/` (models, ports, usecases) → `infrastructure/` (repositories Prisma) → `app/` (routes Next.js)
-- **Auth** — magic link + OAuth (Google, GitHub) via Auth.js v5
-- **CRUD Cercle** — première feature domaine complète (usecase + port + adapter + UI)
+- **Socle technique** — Next.js 15 (App Router), TypeScript strict, Prisma 7, PostgreSQL (Neon), Auth.js v5, Tailwind CSS 4, shadcn/ui, next-intl
+- **Architecture hexagonale** — `domain/` (modèles, ports, cas d'usage) → `infrastructure/` (dépôts Prisma) → `app/` (routes Next.js)
+- **Authentification** — lien magique + OAuth (Google, GitHub) via Auth.js v5
+- **CRUD Cercle** — première fonctionnalité domaine complète (cas d'usage + port + adapteur + interface)
 - **CRUD Escale** — avec page publique partageable `/m/[slug]`
-- **i18n** — FR/EN natif avec next-intl
+- **Traductions** — FR/EN natif avec next-intl
 - **Déploiement** — Vercel (EU) + Neon PostgreSQL serverless (EU)
 
 ### Architecture
 
 - Règle de dépendance unidirectionnelle : `app/ → domain/ ← infrastructure/`
 - Le domaine ne dépend de rien (ni Prisma, ni Next.js, ni aucune librairie externe)
-- Ports = interfaces TypeScript, Adapters = implémentations Prisma
-- Usecases reçoivent les dépendances par injection
-- Mapping Prisma ↔ domaine dans les repositories (pas dans le domaine)
+- Ports = interfaces TypeScript, Adapteurs = implémentations Prisma
+- Les cas d'usage reçoivent les dépendances par injection
+- La correspondance Prisma ↔ domaine se fait dans les dépôts (pas dans le domaine)
 
 ---
 
 ## Conventions
 
 - **Format** : [Keep a Changelog](https://keepachangelog.com/)
-- **Versioning** : SemVer-inspired (0.x.0 = pre-launch milestones)
+- **Versionnage** : inspiré SemVer (0.x.0 = jalons pré-lancement)
 - **Langue** : français (cohérent avec le marché cible initial)
 - **Mise à jour** : après chaque livraison significative (pas après chaque commit)
