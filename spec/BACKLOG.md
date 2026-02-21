@@ -63,11 +63,9 @@
   - Contenu : titre Moment, date, lieu, lien `/m/[slug]`, lien d'annulation
   - Sans cet email, l'inscription est anxiogène et le taux d'absence explose
 
-- [ ] **Email de rappel pré-événement** (MVP-2 — parcours B)
-  - Rappel 24h avant + rappel 1h avant
-  - Contenu : infos pratiques condensées (lieu exact, heure, lien visio si Online/Hybrid)
-  - Job planifié (cron ou queue) déclenché à la publication du Moment
-  - Sans ces rappels, le taux de no-show est structurellement élevé
+- [ ] ~~**Email de rappel pré-événement**~~ → **déprioritisé, post-MVP** (voir Phase 2)
+  - Rappel 24h avant + rappel 1h avant — nécessite une infrastructure de jobs planifiés (Vercel Cron / QStash)
+  - Complexité d'implémentation disproportionnée pour le MVP
 
 - [ ] **Email de promotion liste d'attente** (MVP-3 — parcours C)
   - Déclenché par `CancelRegistration` quand un inscrit se désiste et promeut un waitlisté
@@ -212,6 +210,7 @@
 - [ ] Track (série d'événements récurrents dans un Circle)
 - [ ] Check-in (marquer présent sur place)
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
+- [ ] **Emails de rappel pré-événement** (24h + 1h avant) — jobs planifiés Vercel Cron ou Upstash QStash, flags `reminder24hSentAt` / `reminder1hSentAt` sur `Moment`
 - [ ] Visual regression testing (Chromatic/Percy)
 - [ ] SAST/DAST (Snyk/SonarCloud)
 - [ ] Load testing (k6/Artillery)
