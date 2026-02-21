@@ -72,28 +72,33 @@ export default async function DashboardPage({
           : t("greetingAnonymous")}
       </h1>
 
-      {/* Tab selector */}
-      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
-        <Link
-          href="?tab=moments"
-          className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-            activeTab === "moments"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {t("myMoments")}
-        </Link>
-        <Link
-          href="?tab=circles"
-          className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-            activeTab === "circles"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {t("myCircles")}
-        </Link>
+      {/* Tab selector + create Circle */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+          <Link
+            href="?tab=moments"
+            className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+              activeTab === "moments"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t("myMoments")}
+          </Link>
+          <Link
+            href="?tab=circles"
+            className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+              activeTab === "circles"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t("myCircles")}
+          </Link>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+        </Button>
       </div>
 
       {/* Tab content */}
