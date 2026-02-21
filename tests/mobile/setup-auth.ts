@@ -19,14 +19,16 @@ async function main() {
   // Créer le dossier .auth si nécessaire
   fs.mkdirSync(path.dirname(AUTH_FILE), { recursive: true });
 
-  const browser = await chromium.launch({ headless: false });
+  // Utiliser le vrai Chrome installé (pas Chromium) pour permettre OAuth Google
+  const browser = await chromium.launch({ headless: false, channel: "chrome" });
   const context = await browser.newContext();
   const page = await context.newPage();
 
   console.log("\n📱 Setup Auth — Tests Mobile");
   console.log("════════════════════════════════");
   console.log(`Ouverture de ${BASE_URL}/auth/sign-in`);
-  console.log("Connecte-toi avec ton compte, puis appuie sur Entrée dans ce terminal.\n");
+  console.log("Connecte-toi avec ton compte (Google, GitHub ou magic link),");
+  console.log("puis appuie sur Entrée dans ce terminal.\n");
 
   await page.goto(`${BASE_URL}/auth/sign-in`);
 
