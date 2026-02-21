@@ -10,7 +10,7 @@ import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 
 type ProfileFormProps = {
-  user: Pick<User, "email" | "firstName" | "lastName">;
+  user: Pick<User, "firstName" | "lastName">;
   mode: "setup" | "edit";
   action: (formData: FormData) => Promise<ActionResult<User>>;
 };
@@ -36,6 +36,7 @@ export function ProfileForm({ user, mode, action }: ProfileFormProps) {
         router.push("/dashboard");
         return {};
       }
+      router.refresh();
       return { saved: true };
     }
 
@@ -57,19 +58,6 @@ export function ProfileForm({ user, mode, action }: ProfileFormProps) {
           {t("form.saved")}
         </div>
       )}
-
-      <div className="space-y-2">
-        <Label htmlFor="email">{t("form.email")}</Label>
-        <Input
-          id="email"
-          type="email"
-          value={user.email}
-          disabled
-        />
-        <p className="text-muted-foreground text-xs">
-          {t("form.emailHint")}
-        </p>
-      </div>
 
       <div className="space-y-2">
         <Label htmlFor="firstName">{t("form.firstName")}</Label>

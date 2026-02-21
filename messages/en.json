@@ -263,7 +263,12 @@
     },
     "edit": {
       "title": "My profile",
-      "description": "Manage your personal information"
+      "description": "Manage your personal information",
+      "personalInfo": "Personal information",
+      "memberSince": "Member since",
+      "account": "Account",
+      "circles": "Circles",
+      "moments": "Moments"
     },
     "form": {
       "email": "Email",

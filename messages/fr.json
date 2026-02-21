@@ -263,7 +263,12 @@
     },
     "edit": {
       "title": "Mon profil",
-      "description": "Gérez vos informations personnelles"
+      "description": "Gérez vos informations personnelles",
+      "personalInfo": "Informations personnelles",
+      "memberSince": "Membre depuis",
+      "account": "Compte",
+      "circles": "Cercles",
+      "moments": "Moments"
     },
     "form": {
       "email": "Email",

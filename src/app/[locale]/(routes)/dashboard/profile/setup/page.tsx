@@ -49,7 +49,7 @@ export default async function ProfileSetupPage() {
         </p>
       </div>
       <ProfileForm
-        user={{ email: user.email, firstName, lastName }}
+        user={{ firstName, lastName }}
         mode="setup"
         action={updateProfileAction}
       />
