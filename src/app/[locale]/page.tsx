@@ -27,7 +27,7 @@ export default async function HomePage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="flex min-h-[80vh] items-center px-4 py-24 md:py-32">
+        <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4">
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
             {/* LEFT — text */}
             <div className="flex-1 text-center lg:text-left">
