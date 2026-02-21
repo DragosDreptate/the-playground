@@ -277,9 +277,11 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-            <Button asChild variant="outline" size="lg" className="mt-12">
-              <Link href="/explorer">{t("ctaExplore")}</Link>
-            </Button>
+            <div className="mt-12 flex justify-center">
+              <Button asChild size="lg">
+                <Link href="/explorer">{t("ctaExplore")}</Link>
+              </Button>
+            </div>
           </div>
         </section>
 
