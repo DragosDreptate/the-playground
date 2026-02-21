@@ -35,19 +35,21 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
 
         {/* Nav — center */}
         <nav className="flex flex-1 items-center justify-center gap-6">
-          <Link
-            href="/explorer"
-            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-          >
-            {tExplorer("navLink")}
-          </Link>
           {user && (
-            <Link
-              href="/dashboard"
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-            >
-              {tDashboard("title")}
-            </Link>
+            <>
+              <Link
+                href="/explorer"
+                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              >
+                {tExplorer("navLink")}
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+              >
+                {tDashboard("title")}
+              </Link>
+            </>
           )}
         </nav>
 

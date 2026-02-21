@@ -326,6 +326,12 @@ export default async function HomePage() {
             <Button asChild size="lg" className="mt-8">
               <Link href="/auth/sign-in">{t("ctaFinal")}</Link>
             </Button>
+            <Link
+              href="/explorer"
+              className="text-muted-foreground hover:text-foreground mt-4 text-sm font-medium transition-colors"
+            >
+              {t("ctaExplore")}
+            </Link>
           </div>
         </section>
       </main>
