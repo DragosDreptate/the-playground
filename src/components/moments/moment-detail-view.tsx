@@ -17,7 +17,7 @@ import {
   CalendarIcon,
   MapPin,
   Globe,
-
+  ImageIcon,
   ExternalLink,
   Link as LinkIcon,
   ChevronRight,
@@ -184,9 +184,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="absolute inset-0 bg-black/20" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <svg width="18" height="22" viewBox="0 0 10 12" fill="none" className="ml-px">
-                    <polygon points="0,0 0,12 10,6" fill="white" />
-                  </svg>
+                  <ImageIcon className="size-6 text-white" />
                 </div>
               </div>
               {moment.status === "PAST" && (
