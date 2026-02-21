@@ -24,7 +24,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           from,
           to: identifier,
           subject: "Votre lien de connexion — The Playground",
-          react: MagicLinkEmail({ url }),
+          react: MagicLinkEmail({ url, baseUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://the-playground.fr" }),
         });
 
         if (error) {
