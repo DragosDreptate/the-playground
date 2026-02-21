@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LocaleToggle } from "@/components/locale-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { getTranslations } from "next-intl/server";
 
@@ -45,6 +46,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
 
         {/* Actions — right */}
         <div className="flex shrink-0 items-center gap-3">
+          <LocaleToggle />
           <ThemeToggle />
           {user ? (
             <UserMenu user={user} />
