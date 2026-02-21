@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 import {
   expectNoHorizontalScroll,
   expectTouchTargets,
+  expectStackedLayout,
+  expectNotOverflowing,
 } from "./helpers";
 
 /**
