@@ -45,24 +45,24 @@
     "signOut": "Se déconnecter"
   },
   "Dashboard": {
-    "title": "Tableau de bord",
+    "title": "Mon Playground",
     "myCircles": "Mes Cercles",
     "createCircle": "Créer un Cercle",
-    "createMoment": "Créer un Moment",
+    "createMoment": "Créer une Escale",
     "selectCircle": {
       "title": "Choisir un Cercle",
-      "description": "À quel Cercle rattacher ce Moment ?"
+      "description": "À quel Cercle rattacher cette Escale ?"
     },
     "noCircles": {
       "title": "Créez d'abord un Cercle",
-      "description": "Vous devez créer un Cercle avant de créer un Moment."
+      "description": "Vous devez créer un Cercle avant de créer une Escale."
     },
-    "myMoments": "Mes Moments",
-    "upcomingMoments": "Mes prochains Moments",
-    "pastMoments": "Passés",
-    "noUpcomingMoments": "Aucun Moment à venir.",
-    "noMoments": "Aucun Moment pour l'instant.",
-    "noMomentsHint": "Inscrivez-vous à un Moment ou créez votre communauté.",
+    "myMoments": "Mes Escales",
+    "upcomingMoments": "Mes prochaines Escales",
+    "pastMoments": "Passées",
+    "noUpcomingMoments": "Aucune Escale à venir.",
+    "noMoments": "Aucune Escale pour l'instant.",
+    "noMomentsHint": "Rejoignez une Escale ou créez votre communauté.",
     "noCirclesMember": "Vous n'êtes membre d'aucun Cercle.",
     "role": {
       "host": "Organisateur",
@@ -103,12 +103,12 @@
     },
     "delete": {
       "title": "Supprimer le Cercle",
-      "description": "Êtes-vous sûr de vouloir supprimer ce Cercle ? Cette action est irréversible. Tous les Moments et adhésions seront définitivement supprimés.",
+      "description": "Êtes-vous sûr de vouloir supprimer ce Cercle ? Cette action est irréversible. Toutes les Escales et adhésions seront définitivement supprimées.",
       "confirm": "Oui, supprimer ce Cercle"
     },
     "detail": {
       "members": "Membres",
-      "moments": "Moments",
+      "moments": "Escales",
       "settings": "Paramètres",
       "editCircle": "Modifier",
       "deleteCircle": "Supprimer",
@@ -120,12 +120,12 @@
       "publicCircle": "Cercle public",
       "privateCircle": "Cercle privé",
       "memberCount": "{count} membres",
-      "upcomingMoments": "Prochains Moments",
-      "pastMoments": "Moments passés",
-      "noUpcomingMoments": "Aucun Moment à venir.",
-      "noPastMoments": "Aucun Moment passé.",
+      "upcomingMoments": "Prochaines Escales",
+      "pastMoments": "Escales passées",
+      "noUpcomingMoments": "Aucune Escale à venir.",
+      "noPastMoments": "Aucune Escale passée.",
       "today": "Aujourd'hui",
-      "manageMoment": "Gérer ce Moment"
+      "manageMoment": "Gérer cette Escale"
     },
     "errors": {
       "notFound": "Cercle introuvable",
@@ -137,18 +137,18 @@
   },
   "Moment": {
     "create": {
-      "title": "Créer un Moment",
+      "title": "Créer une Escale",
       "description": "Configurez votre événement"
     },
     "edit": {
-      "title": "Modifier le Moment",
+      "title": "Modifier l'Escale",
       "description": "Mettez à jour les détails de votre événement"
     },
     "form": {
       "title": "Titre",
       "eventName": "Nom de l'événement",
       "description": "Description",
-      "descriptionPlaceholder": "Décrivez votre Moment en quelques mots...",
+      "descriptionPlaceholder": "Décrivez votre Escale en quelques mots...",
       "addLocation": "Ajouter un lieu",
       "addLocationHint": "Lieu physique ou lien virtuel",
       "addDescription": "Ajouter une description",
@@ -177,12 +177,12 @@
       "startLabel": "Début",
       "endLabel": "Fin",
       "pickDate": "Choisir une date",
-      "createMoment": "Créer un Moment"
+      "createMoment": "Créer une Escale"
     },
     "delete": {
-      "title": "Supprimer le Moment",
-      "description": "Êtes-vous sûr de vouloir supprimer ce Moment ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
-      "confirm": "Oui, supprimer ce Moment"
+      "title": "Supprimer l'Escale",
+      "description": "Êtes-vous sûr de vouloir supprimer cette Escale ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
+      "confirm": "Oui, supprimer cette Escale"
     },
     "detail": {
       "when": "Quand",
@@ -193,34 +193,34 @@
       "shareableLink": "Lien partageable"
     },
     "status": {
-      "published": "Publié",
-      "cancelled": "Annulé",
-      "past": "Passé"
+      "published": "Publiée",
+      "cancelled": "Annulée",
+      "past": "Passée"
     },
     "public": {
       "hostedBy": "Organisé par",
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
-      "registerFree": "S'inscrire gratuitement",
-      "registerPaid": "S'inscrire — {price} {currency}",
+      "registerFree": "Rejoindre gratuitement",
+      "registerPaid": "Rejoindre — {price} {currency}",
       "comingSoon": "Bientôt disponible",
-      "registered": "Vous êtes inscrit !",
+      "registered": "Vous avez rejoint cette Escale !",
       "waitlisted": "Vous êtes sur liste d'attente",
       "joinWaitlist": "Rejoindre la liste d'attente",
       "cancelRegistration": "Annuler mon inscription",
       "cancelConfirmTitle": "Annuler l'inscription",
-      "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à ce Moment ?",
+      "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cette Escale ?",
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",
-      "signInToRegister": "Se connecter pour s'inscrire",
+      "signInToRegister": "Se connecter pour rejoindre",
       "attendeesCount": "{count} participant(s)",
       "about": "À propos",
       "viewOnMap": "Voir sur Google Maps",
-      "eventTookPlace": "Cet événement a eu lieu le",
-      "eventEnded": "Événement terminé",
-      "eventCancelled": "Événement annulé",
+      "eventTookPlace": "Cette Escale a eu lieu le",
+      "eventEnded": "Escale terminée",
+      "eventCancelled": "Escale annulée",
       "attendedCount": "{count} personnes ont participé",
-      "viewCircleMoments": "Voir les prochains Moments du Cercle"
+      "viewCircleMoments": "Voir les prochaines Escales du Cercle"
     },
     "registrations": {
       "title": "Inscriptions",
@@ -249,14 +249,14 @@
       "daysAgo": "Il y a {count}j"
     },
     "empty": {
-      "description": "Aucun Moment pour le moment. Créez votre premier événement."
+      "description": "Aucune Escale pour le moment. Créez votre premier événement."
     },
     "errors": {
-      "notFound": "Moment introuvable",
-      "unauthorized": "Vous n'avez pas la permission de gérer ce Moment",
-      "createFailed": "Échec de la création du Moment",
-      "updateFailed": "Échec de la mise à jour du Moment",
-      "deleteFailed": "Échec de la suppression du Moment"
+      "notFound": "Escale introuvable",
+      "unauthorized": "Vous n'avez pas la permission de gérer cette Escale",
+      "createFailed": "Échec de la création de l'Escale",
+      "updateFailed": "Échec de la mise à jour de l'Escale",
+      "deleteFailed": "Échec de la suppression de l'Escale"
     }
   },
   "CircleCategory": {
@@ -275,20 +275,20 @@
     "navLink": "Explorer",
     "tabs": {
       "circles": "Cercles",
-      "moments": "Événements"
+      "moments": "Escales"
     },
     "filters": {
       "allCategories": "Toutes les thématiques"
     },
     "empty": {
       "circles": "Aucun Cercle public pour cette thématique.",
-      "moments": "Aucun événement à venir pour cette thématique."
+      "moments": "Aucune Escale à venir pour cette thématique."
     },
     "circleCard": {
       "members": "{count} membres",
-      "upcomingMoments": "{count} Moment(s) à venir",
-      "noUpcomingMoments": "Aucun Moment à venir",
-      "nextMoment": "Prochain Moment"
+      "upcomingMoments": "{count} Escale(s) à venir",
+      "noUpcomingMoments": "Aucune Escale à venir",
+      "nextMoment": "Prochaine Escale"
     },
     "momentCard": {
       "free": "Gratuit",
@@ -298,7 +298,7 @@
     }
   },
   "UserMenu": {
-    "dashboard": "Dashboard",
+    "dashboard": "Mon Playground",
     "profile": "Profil",
     "signOut": "Se déconnecter"
   },
@@ -314,7 +314,7 @@
       "memberSince": "Membre depuis",
       "account": "Compte",
       "circles": "Cercles",
-      "moments": "Moments"
+      "moments": "Escales"
     },
     "form": {
       "email": "Email",
