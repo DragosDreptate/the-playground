@@ -4,6 +4,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { getTranslations } from "next-intl/server";
+import { Compass, LayoutDashboard } from "lucide-react";
 
 type SiteHeaderProps = {
   user?: {
@@ -39,14 +40,16 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
             <>
               <Link
                 href="/explorer"
-                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
+                <Compass className="size-3.5" />
                 {tExplorer("navLink")}
               </Link>
               <Link
                 href="/dashboard"
-                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm font-medium transition-colors"
               >
+                <LayoutDashboard className="size-3.5" />
                 {tDashboard("title")}
               </Link>
             </>
