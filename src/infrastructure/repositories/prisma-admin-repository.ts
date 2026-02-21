@@ -164,7 +164,28 @@ export const prismaAdminRepository: AdminRepository = {
   },
 
   async deleteUser(id: string): Promise<void> {
-    await prisma.user.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+      // 1. Find Circles where this user is HOST
+      const hostMemberships = await tx.circleMembership.findMany({
+        where: { userId: id, role: "HOST" },
+        select: { circleId: true },
+      });
+
+      for (const { circleId } of hostMemberships) {
+        // Count other Hosts in this Circle
+        const otherHosts = await tx.circleMembership.count({
+          where: { circleId, role: "HOST", userId: { not: id } },
+        });
+
+        if (otherHosts === 0) {
+          // Sole Host → delete the entire Circle (cascades to Moments, Registrations, Comments, Memberships)
+          await tx.circle.delete({ where: { id: circleId } });
+        }
+      }
+
+      // 2. Delete the user (cascades to remaining memberships, registrations, comments, accounts, sessions)
+      await tx.user.delete({ where: { id } });
+    });
   },
 
   // ── Circles ──────────────────────────────

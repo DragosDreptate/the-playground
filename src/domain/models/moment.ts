@@ -6,7 +6,7 @@ export type Moment = {
   id: string;
   slug: string;
   circleId: string;
-  createdById: string;
+  createdById: string | null;
   title: string;
   description: string;
   startsAt: Date;
