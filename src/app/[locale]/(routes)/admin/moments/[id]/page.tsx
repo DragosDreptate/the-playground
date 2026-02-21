@@ -53,7 +53,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
             />
             <Row
               label={t("momentDetail.createdBy")}
-              value={moment.createdByName || moment.createdByEmail}
+              value={moment.createdByName || moment.createdByEmail || "—"}
             />
             <Row
               label={t("momentDetail.status")}

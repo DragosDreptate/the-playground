@@ -120,7 +120,7 @@ export type AdminMomentDetail = AdminMomentRow & {
   description: string;
   circleId: string;
   circleSlug: string;
-  createdByEmail: string;
+  createdByEmail: string | null;
   createdByName: string | null;
   registrations: Array<{
     id: string;

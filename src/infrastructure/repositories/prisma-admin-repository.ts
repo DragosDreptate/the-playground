@@ -331,10 +331,12 @@ export const prismaAdminRepository: AdminRepository = {
       capacity: record.capacity,
       startsAt: record.startsAt,
       createdAt: record.createdAt,
-      createdByEmail: record.createdBy.email,
-      createdByName: [record.createdBy.firstName, record.createdBy.lastName]
-        .filter(Boolean)
-        .join(" ") || null,
+      createdByEmail: record.createdBy?.email ?? null,
+      createdByName: record.createdBy
+        ? [record.createdBy.firstName, record.createdBy.lastName]
+            .filter(Boolean)
+            .join(" ") || null
+        : null,
       registrations: record.registrations.map((reg) => ({
         id: reg.id,
         userId: reg.user.id,
