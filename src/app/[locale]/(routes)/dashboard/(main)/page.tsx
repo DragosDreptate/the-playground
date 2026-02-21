@@ -44,6 +44,11 @@ export default async function DashboardPage() {
 
   const isHost = circles.some((c) => c.memberRole === "HOST");
 
+  // Set des slugs de Cercles dont l'utilisateur est Host (pour les cartes de Moments)
+  const hostCircleSlugs = new Set(
+    circles.filter((c) => c.memberRole === "HOST").map((c) => c.slug)
+  );
+
   // Extract first name for greeting
   const firstName = session.user.name?.split(" ")[0];
 
@@ -72,6 +77,7 @@ export default async function DashboardPage() {
                 key={reg.id}
                 registration={reg}
                 isLast={i === upcomingMoments.length - 1}
+                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
               />
             ))}
           </div>

@@ -3,13 +3,14 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Globe, Check, Clock } from "lucide-react";
+import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 
 type UpcomingMomentCardProps = {
   registration: RegistrationWithMoment;
   isLast: boolean;
+  isHost?: boolean;
 };
 
 function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isToday: boolean } {
@@ -22,7 +23,7 @@ function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isT
   return { weekday, dateStr, isToday };
 }
 
-export function UpcomingMomentCard({ registration, isLast }: UpcomingMomentCardProps) {
+export function UpcomingMomentCard({ registration, isLast, isHost = false }: UpcomingMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
   const { moment } = registration;
@@ -105,19 +106,22 @@ export function UpcomingMomentCard({ registration, isLast }: UpcomingMomentCardP
                   {moment.circleName}
                 </span>
 
-                {isRegistered && (
+                {isHost ? (
+                  <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                    <Crown className="size-3" />
+                    {t("role.host")}
+                  </Badge>
+                ) : isRegistered ? (
                   <Badge variant="default" className="gap-1 text-xs">
                     <Check className="size-3" />
                     {t("registrationStatus.registered")}
                   </Badge>
-                )}
-
-                {isWaitlisted && (
+                ) : isWaitlisted ? (
                   <Badge variant="secondary" className="gap-1 text-xs">
                     <Clock className="size-3" />
                     {t("registrationStatus.waitlisted")}
                   </Badge>
-                )}
+                ) : null}
               </div>
             </div>
 

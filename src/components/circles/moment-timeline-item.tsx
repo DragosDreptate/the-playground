@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
-import { MapPin, Globe, Users, ArrowRight, Check, Clock, XCircle } from "lucide-react";
+import { MapPin, Globe, Users, ArrowRight, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -142,19 +142,22 @@ export async function MomentTimelineItem({
                       </div>
                     )}
 
-                    {isRegistered && (
+                    {isHost ? (
+                      <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                        <Crown className="size-3" />
+                        {tDashboard("role.host")}
+                      </Badge>
+                    ) : isRegistered ? (
                       <Badge variant="default" className="gap-1 text-xs">
                         <Check className="size-3" />
                         {tDashboard("registrationStatus.registered")}
                       </Badge>
-                    )}
-
-                    {isWaitlisted && (
+                    ) : isWaitlisted ? (
                       <Badge variant="secondary" className="gap-1 text-xs">
                         <Clock className="size-3" />
                         {tDashboard("registrationStatus.waitlisted")}
                       </Badge>
-                    )}
+                    ) : null}
 
                     {moment.status === "PAST" && (
                       <Badge variant="outline" className="text-xs">
