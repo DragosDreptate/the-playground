@@ -33,9 +33,10 @@ recommandation, pas de classement. Un annuaire ouvert, community-first.
 
 ## Schema — Modifications nécessaires
 
-Deux champs manquent sur `Circle` pour permettre le filtrage.
+Un seul champ manque sur `Circle` pour le filtrage MVP.
+La ville est conservée comme champ d'affichage mais n'est pas un axe de filtre (voir Décisions).
 
-### Ajout : `category` (enum)
+### Ajout : `category` (enum) — axe de filtrage principal
 
 ```prisma
 enum CircleCategory {
@@ -56,20 +57,20 @@ model Circle {
 ```
 
 **Décision** : nullable en DB, obligatoire dans le formulaire de création (validation côté usecase).
-Les Circles existants sans catégorie restent valides.
+Les Circles existants sans catégorie restent valides et apparaissent dans le Répertoire sans filtre.
 
-### Ajout : `city` (string libre)
+### Ajout : `city` (string libre) — affichage uniquement, pas de filtre MVP
 
 ```prisma
 model Circle {
   // ... champs existants ...
-  city      String?   // ex: "Paris", "Lyon", "Remote"
+  city      String?   // ex: "Paris", "Lyon", "Remote" — affiché sur la card, non filtrable en MVP
 }
 ```
 
-**Décision** : string libre (pas de liste fermée), nullable. Le Host saisit librement.
-Valeur spéciale suggérée : `"Remote"` pour les Circles 100% en ligne.
-L'autocomplétion ou la normalisation de ville est post-MVP.
+**Décision** : champ optionnel, string libre, enrichit la card Circle ("Paris · Tech & Dev")
+sans être un axe de filtrage. Le filtrage géographique est post-MVP : la densité par ville
+ne sera pas suffisante au lancement pour que le filtre soit utile.
 
 ### Migration
 
@@ -94,8 +95,7 @@ Pas de données existantes à migrer — les deux champs sont nullable.
 findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]>;
 
 type PublicCircleFilters = {
-  category?: CircleCategory;
-  city?: string;
+  category?: CircleCategory;   // seul axe de filtre MVP
   limit?: number;
   offset?: number;
 };
@@ -106,7 +106,7 @@ type PublicCircle = {
   name: string;
   description: string;
   category: CircleCategory | null;
-  city: string | null;
+  city: string | null;           // affiché sur la card
   memberCount: number;
   upcomingMomentCount: number;
   nextMoment: {
@@ -124,8 +124,7 @@ type PublicCircle = {
 findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]>;
 
 type PublicMomentFilters = {
-  category?: CircleCategory;   // hérité du Circle
-  city?: string;               // hérité du Circle
+  category?: CircleCategory;   // hérité du Circle, seul axe de filtre MVP
   limit?: number;
   offset?: number;
 };
@@ -187,7 +186,6 @@ async findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]> {
     where: {
       visibility: "PUBLIC",
       ...(filters.category && { category: filters.category }),
-      ...(filters.city && { city: { contains: filters.city, mode: "insensitive" } }),
     },
     include: {
       _count: { select: { memberships: true } },
@@ -211,7 +209,7 @@ async findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]> {
     category: c.category,
     city: c.city,
     memberCount: c._count.memberships,
-    upcomingMomentCount: c.moments.length, // affiner avec un _count séparé si besoin
+    upcomingMomentCount: c.moments.length,
     nextMoment: c.moments[0] ?? null,
   }));
 }
@@ -228,7 +226,6 @@ async findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]> 
       circle: {
         visibility: "PUBLIC",
         ...(filters.category && { category: filters.category }),
-        ...(filters.city && { city: { contains: filters.city, mode: "insensitive" } }),
       },
     },
     include: {
@@ -266,24 +263,23 @@ src/app/[locale]/(routes)/explorer/page.tsx
 ```
 
 **Rendu** : Server Component, SSR avec revalidation (`revalidate: 60` secondes).
-**URL params** : `?tab=moments|circles`, `?category=TECH`, `?city=Paris`
+**URL params** : `?tab=moments|circles`, `?category=TECH`
 
 ```typescript
 // Structure de la page
 export default async function ExplorerPage({ searchParams }) {
   const tab = searchParams.tab ?? "circles";
-  const category = searchParams.category;
-  const city = searchParams.city;
+  const category = searchParams.category;  // seul filtre MVP
 
   const [circles, moments] = await Promise.all([
-    getPublicCircles({ category, city }, { circleRepository: prismaCircleRepository }),
-    getPublicUpcomingMoments({ category, city }, { momentRepository: prismaMomentRepository }),
+    getPublicCircles({ category }, { circleRepository: prismaCircleRepository }),
+    getPublicUpcomingMoments({ category }, { momentRepository: prismaMomentRepository }),
   ]);
 
   return (
     <>
       <ExplorerHeader />          {/* titre + description */}
-      <ExplorerFilterBar />       {/* filtres category + city — Client Component */}
+      <ExplorerFilterBar />       {/* filtre catégorie uniquement — Client Component */}
       <ExplorerTabs              {/* Cercles / Événements */}
         tab={tab}
         circles={circles}
@@ -297,8 +293,8 @@ export default async function ExplorerPage({ searchParams }) {
 **Metadata SEO** :
 ```typescript
 export const metadata = {
-  title: "Explorer — The Playground",
-  description: "Découvrez des communautés et des événements près de chez vous.",
+  title: "Le Répertoire — The Playground",
+  description: "Découvrez des communautés ouvertes à tous. Tech, sport, art, business...",
 };
 ```
 
@@ -310,9 +306,9 @@ export const metadata = {
 src/components/explorer/explorer-filter-bar.tsx
 ```
 
-- Sélecteur de catégorie (pills/chips, multi-select non prioritaire)
-- Input ville (texte libre)
-- Mise à jour de l'URL via `router.push` (SSR-friendly, partageable)
+- Pills/chips de catégorie (une seule sélection, "Toutes" = aucun filtre)
+- Mise à jour de l'URL via `router.push` (SSR-friendly, partageable, lien partageable avec le filtre)
+- Pas d'input ville en MVP
 
 #### `PublicCircleCard`
 
@@ -321,12 +317,12 @@ src/components/explorer/public-circle-card.tsx
 ```
 
 Contenu :
-- Gradient cover (petit, 16:9 ou carré)
-- Nom du Circle + badge catégorie
-- Ville (si renseignée) + icône
+- Gradient cover (petit)
+- Nom du Circle
+- Badge catégorie + ville en texte secondaire si renseignée ("Paris")
 - N membres · N Moments à venir
 - Teaser prochain Moment : titre + date
-- CTA : lien vers la page Circle publique (à créer — voir ci-dessous)
+- CTA : lien vers `/circles/[slug]` (page Circle publique)
 
 #### `PublicMomentCard`
 
@@ -335,11 +331,12 @@ src/components/explorer/public-moment-card.tsx
 ```
 
 Contenu (community-first) :
-- En-tête : nom du Circle (prominent) + catégorie badge
+- En-tête : nom du Circle (prominent) + badge catégorie
 - Thumbnail gradient Moment
 - Titre du Moment
-- Date + heure + lieu
+- Date + heure · lieu ou "En ligne"
 - N inscrits (+ places restantes si capacité définie)
+- Ville du Circle en texte secondaire si renseignée
 - CTA : lien vers `/m/[slug]`
 
 ---
@@ -366,17 +363,12 @@ src/app/[locale]/(routes)/circles/[slug]/page.tsx
 
 ## Formulaire Circle — Champs à ajouter
 
-Dans le formulaire de création/modification de Circle :
-
 ```
-src/components/circles/circle-form.tsx  (à vérifier nom exact)
+src/components/circles/circle-form.tsx
 ```
 
-Ajouter :
-- **Catégorie** : `Select` avec les valeurs de l'enum `CircleCategory` (obligatoire)
-- **Ville** : `Input` texte libre avec placeholder "Paris, Lyon, Remote..." (optionnel)
-
-Ces champs alimentent le filtrage sur le Répertoire.
+- **Catégorie** : `Select` avec les 8 valeurs de l'enum (obligatoire à la création)
+- **Ville** : `Input` texte libre, placeholder "Paris, Lyon, Remote..." (optionnel, affiché sur les cards)
 
 ---
 
@@ -386,22 +378,18 @@ Ces champs alimentent le filtrage sur le Répertoire.
 {
   "Explorer": {
     "title": "Le Répertoire",
-    "description": "Découvrez des communautés et des événements ouverts à tous.",
+    "description": "Découvrez des communautés ouvertes à tous.",
     "tabs": {
       "circles": "Cercles",
       "moments": "Événements"
     },
     "filters": {
-      "category": "Catégorie",
-      "city": "Ville",
-      "allCategories": "Toutes les catégories",
-      "placeholder": {
-        "city": "Paris, Lyon, Remote..."
-      }
+      "category": "Thématique",
+      "allCategories": "Toutes les thématiques"
     },
     "empty": {
-      "circles": "Aucun Cercle public pour ces critères.",
-      "moments": "Aucun événement à venir pour ces critères."
+      "circles": "Aucun Cercle public pour cette thématique.",
+      "moments": "Aucun événement à venir pour cette thématique."
     }
   },
   "CircleCategory": {
@@ -425,24 +413,24 @@ Le Répertoire doit être accessible depuis :
 
 1. **Header principal** : lien "Explorer" dans la nav (visible même non connecté)
 2. **Dashboard** : lien "Explorer" pour les Players sans Moment à venir
-3. **Page `/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
-4. **URL directe `/explorer`** : accessible et indexable sans authentification
+3. **Page ****`/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
+4. **URL directe ****`/explorer`** : accessible et indexable sans authentification
 
 ---
 
 ## SEO & indexation
 
-- Page `/explorer` : `sitemap.xml` + `robots.txt` permettent l'indexation
+- Page `/explorer` : indexable, `sitemap.xml`
 - Pages Circle publiques `/circles/[slug]` : indexables, metadata dynamiques
 - Pages Moment publiques `/m/[slug]` : déjà existantes et indexables
-- `revalidate: 60` sur toutes les pages statiques → fraîcheur des données sans rebuild complet
+- `revalidate: 60` sur toutes les pages → fraîcheur sans rebuild complet
 
 ---
 
 ## Plan d'implémentation — Séquençage
 
 | Étape | Tâche | Dépendances |
-|-------|-------|-------------|
+| --- | --- | --- |
 | 1 | Schema : ajouter `category` + `city` sur Circle | — |
 | 2 | `db:push` dev + prod | Étape 1 |
 | 3 | Formulaire Circle : ajouter champs category + city | Étape 1 |
@@ -461,11 +449,13 @@ Le Répertoire doit être accessible depuis :
 ## Décisions prises
 
 | Décision | Raison |
-|----------|--------|
+| --- | --- |
 | Tab par défaut : Cercles (pas Événements) | Community-first : on découvre d'abord une communauté, pas un événement |
 | Ordre chronologique uniquement | Pas d'algorithme, pas de ranking — invariant positionnement |
+| **Filtre MVP : catégorie uniquement (pas de ville)** | La densité par ville sera insuffisante au lancement. La catégorie est utile dès le premier Circle. Un filtre ville vide est pire qu'absent. |
+| `city` = affichage uniquement en MVP | Enrichit les cards sans créer un filtre inutile. Filtre géographique post-MVP quand la densité le justifie. |
 | `city` = string libre (pas enum) | Flexibilité MVP, normalisation post-MVP si besoin |
 | `category` = nullable en DB, obligatoire en UI | Rétrocompatibilité + meilleure expérience à la création |
 | Page Circle publique séparée du dashboard | Accès sans auth, SEO, parcours cold traffic |
 | `revalidate: 60` sur `/explorer` | Fraîcheur acceptable sans rebuild, pas de full SSR dynamique |
-| Pas de pagination complexe en MVP | `limit: 20` suffit pour le lancement, pagination à ajouter si besoin |
+| Pas de pagination complexe en MVP | `limit: 20` suffit pour le lancement |
