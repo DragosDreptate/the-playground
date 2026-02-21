@@ -31,12 +31,11 @@ describe("AdminUpdateMomentStatus", () => {
   });
 
   describe("given all possible target statuses", () => {
-    it.each<MomentStatus>([
-      "DRAFT",
+    it.each([
       "PUBLISHED",
       "CANCELLED",
       "PAST",
-    ])("should pass status %s to the repository", async (status) => {
+    ] as MomentStatus[])("should pass status %s to the repository", async (status) => {
       const adminRepository = createMockAdminRepository({
         updateMomentStatus: vi.fn().mockResolvedValue(undefined),
       });
@@ -53,9 +52,9 @@ describe("AdminUpdateMomentStatus", () => {
         updateMomentStatus: vi.fn().mockResolvedValue(undefined),
       });
 
-      await adminUpdateMomentStatus("ADMIN", "moment-99", "DRAFT", { adminRepository });
+      await adminUpdateMomentStatus("ADMIN", "moment-99", "CANCELLED", { adminRepository });
 
-      expect(adminRepository.updateMomentStatus).toHaveBeenCalledWith("moment-99", "DRAFT");
+      expect(adminRepository.updateMomentStatus).toHaveBeenCalledWith("moment-99", "CANCELLED");
     });
   });
 });

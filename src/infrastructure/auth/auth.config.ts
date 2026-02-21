@@ -1,9 +1,11 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import Resend from "next-auth/providers/resend";
+import ResendProvider from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/infrastructure/db/prisma";
+import { Resend } from "resend";
+import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -11,9 +13,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     GitHub,
     Google,
-    Resend({
+    ResendProvider({
       apiKey: process.env.AUTH_RESEND_KEY,
-      from: process.env.AUTH_EMAIL_FROM ?? "onboarding@resend.dev",
+      from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
+      async sendVerificationRequest({ identifier, url }) {
+        const resend = new Resend(process.env.AUTH_RESEND_KEY);
+        const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+
+        const { error } = await resend.emails.send({
+          from,
+          to: identifier,
+          subject: "Votre lien de connexion — The Playground",
+          react: MagicLinkEmail({ url }),
+        });
+
+        if (error) {
+          throw new Error(`[AUTH] Magic link email failed: ${error.message}`);
+        }
+      },
     }),
   ],
   pages: {

@@ -60,10 +60,10 @@ describe("GetAdminCircles", () => {
         countCircles: vi.fn().mockResolvedValue(0),
       });
 
-      await getAdminCircles("ADMIN", { category: "SPORT" }, { adminRepository });
+      await getAdminCircles("ADMIN", { category: "SPORT_WELLNESS" }, { adminRepository });
 
-      expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ category: "SPORT" });
-      expect(adminRepository.countCircles).toHaveBeenCalledWith({ category: "SPORT" });
+      expect(adminRepository.findAllCircles).toHaveBeenCalledWith({ category: "SPORT_WELLNESS" });
+      expect(adminRepository.countCircles).toHaveBeenCalledWith({ category: "SPORT_WELLNESS" });
     });
   });
 

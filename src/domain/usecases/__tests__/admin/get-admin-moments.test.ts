@@ -40,16 +40,16 @@ describe("GetAdminMoments", () => {
 
   describe("given a status filter", () => {
     it("should pass the status filter to the repository", async () => {
-      const draftMoments = [makeAdminMomentRow({ status: "DRAFT" })];
+      const draftMoments = [makeAdminMomentRow({ status: "PUBLISHED" })];
       const adminRepository = createMockAdminRepository({
         findAllMoments: vi.fn().mockResolvedValue(draftMoments),
         countMoments: vi.fn().mockResolvedValue(1),
       });
 
-      const result = await getAdminMoments("ADMIN", { status: "DRAFT" }, { adminRepository });
+      const result = await getAdminMoments("ADMIN", { status: "PUBLISHED" }, { adminRepository });
 
-      expect(result.moments[0].status).toBe("DRAFT");
-      expect(adminRepository.findAllMoments).toHaveBeenCalledWith({ status: "DRAFT" });
+      expect(result.moments[0].status).toBe("PUBLISHED");
+      expect(adminRepository.findAllMoments).toHaveBeenCalledWith({ status: "PUBLISHED" });
     });
   });
 
