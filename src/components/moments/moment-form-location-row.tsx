@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PlaceAutocompleteInput } from "@/components/ui/place-autocomplete-input";
 import {
   Select,
   SelectContent,
@@ -16,6 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { usePlaceAutocomplete } from "@/hooks/use-place-autocomplete";
 import type { LocationType } from "@/domain/models/moment";
 
 type MomentFormLocationRowProps = {
@@ -42,6 +45,10 @@ export function MomentFormLocationRow({
   const showPhysical = locationType === "IN_PERSON" || locationType === "HYBRID";
   const showVirtual = locationType === "ONLINE" || locationType === "HYBRID";
 
+  // Controlled state for address (autocomplete BAN)
+  const [locationAddress, setLocationAddress] = useState(defaultLocationAddress);
+  const addressAutocomplete = usePlaceAutocomplete();
+
   return (
     <Collapsible open={open} onOpenChange={onOpenChange}>
       {/* Hidden input always in DOM — guarantees locationType is submitted */}
@@ -50,9 +57,12 @@ export function MomentFormLocationRow({
       <CollapsibleTrigger asChild>
         <button
           type="button"
-          className="hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg px-1 py-2 text-left transition-colors"
+          className="hover:bg-muted/50 flex w-full items-center gap-3 rounded-lg py-2 text-left transition-colors"
         >
-          <MapPin className="text-muted-foreground size-5 shrink-0" />
+          {/* Icon box */}
+          <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+            <MapPin className="text-primary size-4" />
+          </div>
           <div className="flex-1">
             <p className="text-sm font-medium">{t("form.addLocation")}</p>
             <p className="text-muted-foreground text-xs">
@@ -66,7 +76,7 @@ export function MomentFormLocationRow({
       </CollapsibleTrigger>
 
       <CollapsibleContent forceMount className="data-[state=closed]:hidden">
-        <div className="space-y-3 pt-2 pl-8">
+        <div className="space-y-3 pt-2 pl-12">
           {/* Location type select */}
           <div className="space-y-1">
             <Label htmlFor="locationTypeSelect" className="text-xs">
@@ -95,7 +105,7 @@ export function MomentFormLocationRow({
 
           {/* Physical venue fields */}
           {showPhysical && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-3">
               <div className="space-y-1">
                 <Label htmlFor="locationName" className="text-xs">
                   {t("form.locationName")}
@@ -112,12 +122,20 @@ export function MomentFormLocationRow({
                 <Label htmlFor="locationAddress" className="text-xs">
                   {t("form.locationAddress")}
                 </Label>
-                <Input
+                <PlaceAutocompleteInput
                   id="locationAddress"
                   name="locationAddress"
                   placeholder={t("form.locationAddressPlaceholder")}
-                  defaultValue={defaultLocationAddress}
-                  className="h-9"
+                  value={locationAddress}
+                  onChange={setLocationAddress}
+                  suggestions={addressAutocomplete.suggestions}
+                  isLoading={addressAutocomplete.isLoading}
+                  onQueryChange={addressAutocomplete.suggest}
+                  onSelect={(s) => {
+                    setLocationAddress(s.fullAddress);
+                    addressAutocomplete.clear();
+                  }}
+                  onClear={addressAutocomplete.clear}
                 />
               </div>
             </div>
