@@ -17,17 +17,28 @@ export default function Icon() {
           borderRadius: "7px",
         }}
       >
-        <span
+        {/* Anneau (Circle) */}
+        <div
           style={{
-            color: "white",
-            fontSize: "18px",
-            fontWeight: 800,
-            letterSpacing: "-1px",
-            fontFamily: "sans-serif",
+            width: "20px",
+            height: "20px",
+            border: "2.5px solid white",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          P
-        </span>
+          {/* Point central (Moment) */}
+          <div
+            style={{
+              width: "6px",
+              height: "6px",
+              background: "white",
+              borderRadius: "50%",
+            }}
+          />
+        </div>
       </div>
     ),
     { ...size }
