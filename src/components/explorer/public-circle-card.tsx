@@ -33,7 +33,7 @@ export async function PublicCircleCard({ circle }: Props) {
           />
           <div
             className="relative w-full overflow-hidden rounded-xl"
-            style={{ background: gradient, aspectRatio: "3 / 1" }}
+            style={{ background: gradient, aspectRatio: "1 / 1" }}
           >
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 flex items-center justify-center">
