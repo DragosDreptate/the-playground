@@ -393,8 +393,8 @@ src/components/circles/circle-form.tsx
     }
   },
   "CircleCategory": {
-    "TECH": "Tech & Dev",
-    "DESIGN": "Design & Créatif",
+    "TECH": "Tech & IA",
+    "DESIGN": "Product & Design",
     "BUSINESS": "Business & Entrepreneuriat",
     "SPORT_WELLNESS": "Sport & Bien-être",
     "ART_CULTURE": "Art & Culture",
@@ -413,8 +413,8 @@ Le Répertoire doit être accessible depuis :
 
 1. **Header principal** : lien "Explorer" dans la nav (visible même non connecté)
 2. **Dashboard** : lien "Explorer" pour les Players sans Moment à venir
-3. **Page ****`/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
-4. **URL directe ****`/explorer`** : accessible et indexable sans authentification
+3. **Page \****`/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
+4. **URL directe \****`/explorer`** : accessible et indexable sans authentification
 
 ---
 

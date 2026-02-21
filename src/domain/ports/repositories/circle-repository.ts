@@ -1,16 +1,41 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory } from "@/domain/models/circle";
 
 export type CreateCircleInput = {
   name: string;
   slug: string;
   description: string;
   visibility: Circle["visibility"];
+  category?: CircleCategory;
+  city?: string;
 };
 
 export type UpdateCircleInput = {
   name?: string;
   description?: string;
   visibility?: Circle["visibility"];
+  category?: CircleCategory | null;
+  city?: string | null;
+};
+
+export type PublicCircleFilters = {
+  category?: CircleCategory;
+  limit?: number;
+  offset?: number;
+};
+
+export type PublicCircle = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: CircleCategory | null;
+  city: string | null;
+  memberCount: number;
+  upcomingMomentCount: number;
+  nextMoment: {
+    title: string;
+    startsAt: Date;
+  } | null;
 };
 
 export interface CircleRepository {
@@ -26,4 +51,5 @@ export interface CircleRepository {
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
   findMembersByRole(circleId: string, role: CircleMemberRole): Promise<CircleMemberWithUser[]>;
   countMembers(circleId: string): Promise<number>;
+  findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]>;
 }

@@ -20,6 +20,17 @@ enum CircleVisibility {
   PRIVATE
 }
 
+enum CircleCategory {
+  TECH
+  DESIGN
+  BUSINESS
+  SPORT_WELLNESS
+  ART_CULTURE
+  SCIENCE_EDUCATION
+  SOCIAL
+  OTHER
+}
+
 enum CircleMemberRole {
   HOST
   PLAYER
@@ -127,6 +138,8 @@ model Circle {
   description           String           @db.Text
   logo                  String?
   visibility            CircleVisibility @default(PUBLIC)
+  category              CircleCategory?
+  city                  String?
   stripeConnectAccountId String?
 
   createdAt DateTime @default(now())

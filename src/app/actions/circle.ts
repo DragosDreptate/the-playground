@@ -6,7 +6,7 @@ import { createCircle } from "@/domain/usecases/create-circle";
 import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
 import { DomainError } from "@/domain/errors";
-import type { CircleVisibility } from "@/domain/models/circle";
+import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 
@@ -21,6 +21,8 @@ export async function createCircleAction(
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const visibility = (formData.get("visibility") as CircleVisibility) ?? "PUBLIC";
+  const category = (formData.get("category") as CircleCategory) || undefined;
+  const city = (formData.get("city") as string)?.trim() || undefined;
 
   if (!name?.trim()) {
     return { success: false, error: "Name is required", code: "VALIDATION" };
@@ -39,6 +41,8 @@ export async function createCircleAction(
         name: name.trim(),
         description: description.trim(),
         visibility,
+        category,
+        city,
         userId: session.user.id,
       },
       { circleRepository: prismaCircleRepository }
@@ -64,6 +68,10 @@ export async function updateCircleAction(
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
   const visibility = formData.get("visibility") as CircleVisibility | null;
+  const categoryRaw = formData.get("category") as string | null;
+  const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
+  const cityRaw = formData.get("city") as string | null;
+  const city = cityRaw ? cityRaw.trim() : null;
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
@@ -77,6 +85,8 @@ export async function updateCircleAction(
         ...(name && { name: name.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...(visibility && { visibility }),
+        category,
+        city,
       },
       { circleRepository: prismaCircleRepository }
     );

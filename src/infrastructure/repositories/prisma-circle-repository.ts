@@ -3,6 +3,8 @@ import type {
   CircleRepository,
   CreateCircleInput,
   UpdateCircleInput,
+  PublicCircleFilters,
+  PublicCircle,
 } from "@/domain/ports/repositories/circle-repository";
 import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
@@ -15,6 +17,8 @@ function toDomainCircle(record: PrismaCircle): Circle {
     description: record.description,
     logo: record.logo,
     visibility: record.visibility,
+    category: record.category ?? null,
+    city: record.city ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
@@ -39,6 +43,8 @@ export const prismaCircleRepository: CircleRepository = {
         slug: input.slug,
         description: input.description,
         visibility: input.visibility,
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.city !== undefined && { city: input.city }),
       },
     });
     return toDomainCircle(record);
@@ -69,6 +75,8 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.name !== undefined && { name: input.name }),
         ...(input.description !== undefined && { description: input.description }),
         ...(input.visibility !== undefined && { visibility: input.visibility }),
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.city !== undefined && { city: input.city }),
       },
     });
     return toDomainCircle(record);
@@ -139,5 +147,38 @@ export const prismaCircleRepository: CircleRepository = {
 
   async countMembers(circleId: string): Promise<number> {
     return prisma.circleMembership.count({ where: { circleId } });
+  },
+
+  async findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]> {
+    const now = new Date();
+    const circles = await prisma.circle.findMany({
+      where: {
+        visibility: "PUBLIC",
+        ...(filters.category && { category: filters.category }),
+      },
+      include: {
+        _count: { select: { memberships: true } },
+        moments: {
+          where: { status: "PUBLISHED", startsAt: { gte: now } },
+          orderBy: { startsAt: "asc" },
+          select: { title: true, startsAt: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: filters.limit ?? 20,
+      skip: filters.offset ?? 0,
+    });
+
+    return circles.map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      description: c.description,
+      category: c.category ?? null,
+      city: c.city ?? null,
+      memberCount: c._count.memberships,
+      upcomingMomentCount: c.moments.length,
+      nextMoment: c.moments[0] ?? null,
+    }));
   },
 };

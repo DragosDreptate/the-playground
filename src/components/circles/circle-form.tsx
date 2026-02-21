@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Circle, CircleVisibility } from "@/domain/models/circle";
+import type { Circle, CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 
@@ -26,8 +26,20 @@ type FormState = {
   error?: string;
 };
 
+const CIRCLE_CATEGORIES: CircleCategory[] = [
+  "TECH",
+  "DESIGN",
+  "BUSINESS",
+  "SPORT_WELLNESS",
+  "ART_CULTURE",
+  "SCIENCE_EDUCATION",
+  "SOCIAL",
+  "OTHER",
+];
+
 export function CircleForm({ circle, action }: CircleFormProps) {
   const t = useTranslations("Circle");
+  const tCategory = useTranslations("CircleCategory");
   const tCommon = useTranslations("Common");
   const router = useRouter();
 
@@ -76,6 +88,36 @@ export function CircleForm({ circle, action }: CircleFormProps) {
           defaultValue={circle?.description ?? ""}
           required
           rows={4}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="category">{t("form.category")}</Label>
+        <Select
+          name="category"
+          defaultValue={circle?.category ?? ""}
+        >
+          <SelectTrigger id="category">
+            <SelectValue placeholder={t("form.categoryPlaceholder")} />
+          </SelectTrigger>
+          <SelectContent>
+            {CIRCLE_CATEGORIES.map((cat) => (
+              <SelectItem key={cat} value={cat}>
+                {tCategory(cat)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="city">{t("form.city")}</Label>
+        <Input
+          id="city"
+          name="city"
+          placeholder={t("form.cityPlaceholder")}
+          defaultValue={circle?.city ?? ""}
+          maxLength={100}
         />
       </div>
 

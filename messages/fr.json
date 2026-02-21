@@ -95,7 +95,11 @@
       "descriptionPlaceholder": "Décrivez votre Cercle en quelques mots...",
       "visibility": "Visibilité",
       "visibilityPublic": "Public — tout le monde peut découvrir ce Cercle",
-      "visibilityPrivate": "Privé — accessible uniquement sur invitation"
+      "visibilityPrivate": "Privé — accessible uniquement sur invitation",
+      "category": "Thématique",
+      "categoryPlaceholder": "Choisir une thématique",
+      "city": "Ville",
+      "cityPlaceholder": "Paris, Lyon, Remote..."
     },
     "delete": {
       "title": "Supprimer le Cercle",
@@ -253,6 +257,44 @@
       "createFailed": "Échec de la création du Moment",
       "updateFailed": "Échec de la mise à jour du Moment",
       "deleteFailed": "Échec de la suppression du Moment"
+    }
+  },
+  "CircleCategory": {
+    "TECH": "Tech & IA",
+    "DESIGN": "Product & Design",
+    "BUSINESS": "Business & Entrepreneuriat",
+    "SPORT_WELLNESS": "Sport & Bien-être",
+    "ART_CULTURE": "Art & Culture",
+    "SCIENCE_EDUCATION": "Sciences & Éducation",
+    "SOCIAL": "Social & Communauté",
+    "OTHER": "Autre"
+  },
+  "Explorer": {
+    "title": "Le Répertoire",
+    "description": "Découvrez des communautés ouvertes à tous.",
+    "navLink": "Explorer",
+    "tabs": {
+      "circles": "Cercles",
+      "moments": "Événements"
+    },
+    "filters": {
+      "allCategories": "Toutes les thématiques"
+    },
+    "empty": {
+      "circles": "Aucun Cercle public pour cette thématique.",
+      "moments": "Aucun événement à venir pour cette thématique."
+    },
+    "circleCard": {
+      "members": "{count} membres",
+      "upcomingMoments": "{count} Moment(s) à venir",
+      "noUpcomingMoments": "Aucun Moment à venir",
+      "nextMoment": "Prochain Moment"
+    },
+    "momentCard": {
+      "free": "Gratuit",
+      "spotsRemaining": "{count} places restantes",
+      "registeredCount": "{count} inscrit(s)",
+      "online": "En ligne"
     }
   },
   "UserMenu": {

@@ -1,6 +1,5 @@
-import type { Circle } from "@/domain/models/circle";
+import type { Circle, CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
-import type { CircleVisibility } from "@/domain/models/circle";
 import { SlugAlreadyExistsError } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
 
@@ -8,6 +7,8 @@ type CreateCircleInput = {
   name: string;
   description: string;
   visibility: CircleVisibility;
+  category?: CircleCategory;
+  city?: string;
   userId: string;
 };
 
@@ -41,6 +42,8 @@ export async function createCircle(
     slug,
     description: input.description,
     visibility: input.visibility,
+    ...(input.category !== undefined && { category: input.category }),
+    ...(input.city !== undefined && { city: input.city }),
   });
 
   await circleRepository.addMembership(circle.id, input.userId, "HOST");

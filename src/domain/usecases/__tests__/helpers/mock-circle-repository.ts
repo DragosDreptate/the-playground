@@ -18,6 +18,7 @@ export function createMockCircleRepository(
     findMembership: vi.fn<CircleRepository["findMembership"]>().mockResolvedValue(null),
     findMembersByRole: vi.fn<CircleRepository["findMembersByRole"]>().mockResolvedValue([]),
     countMembers: vi.fn<CircleRepository["countMembers"]>().mockResolvedValue(0),
+    findPublic: vi.fn<CircleRepository["findPublic"]>().mockResolvedValue([]),
     ...overrides,
   };
 }
@@ -30,6 +31,8 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     description: "A test circle",
     logo: null,
     visibility: "PUBLIC",
+    category: null,
+    city: null,
     stripeConnectAccountId: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),

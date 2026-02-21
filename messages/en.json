@@ -95,7 +95,11 @@
       "descriptionPlaceholder": "Tell people what your Circle is about...",
       "visibility": "Visibility",
       "visibilityPublic": "Public — anyone can discover this Circle",
-      "visibilityPrivate": "Private — only accessible via invitation"
+      "visibilityPrivate": "Private — only accessible via invitation",
+      "category": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "city": "City",
+      "cityPlaceholder": "Paris, London, Remote..."
     },
     "delete": {
       "title": "Delete Circle",
@@ -253,6 +257,44 @@
       "createFailed": "Failed to create Moment",
       "updateFailed": "Failed to update Moment",
       "deleteFailed": "Failed to delete Moment"
+    }
+  },
+  "CircleCategory": {
+    "TECH": "Tech & AI",
+    "DESIGN": "Product & Design",
+    "BUSINESS": "Business & Entrepreneurship",
+    "SPORT_WELLNESS": "Sport & Wellness",
+    "ART_CULTURE": "Art & Culture",
+    "SCIENCE_EDUCATION": "Science & Education",
+    "SOCIAL": "Social & Community",
+    "OTHER": "Other"
+  },
+  "Explorer": {
+    "title": "The Directory",
+    "description": "Discover open communities for everyone.",
+    "navLink": "Explore",
+    "tabs": {
+      "circles": "Circles",
+      "moments": "Events"
+    },
+    "filters": {
+      "allCategories": "All categories"
+    },
+    "empty": {
+      "circles": "No public Circles for this category.",
+      "moments": "No upcoming events for this category."
+    },
+    "circleCard": {
+      "members": "{count} members",
+      "upcomingMoments": "{count} upcoming Moment(s)",
+      "noUpcomingMoments": "No upcoming Moments",
+      "nextMoment": "Next Moment"
+    },
+    "momentCard": {
+      "free": "Free",
+      "spotsRemaining": "{count} spots remaining",
+      "registeredCount": "{count} registered",
+      "online": "Online"
     }
   },
   "UserMenu": {

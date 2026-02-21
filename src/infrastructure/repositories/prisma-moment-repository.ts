@@ -3,6 +3,8 @@ import type {
   MomentRepository,
   CreateMomentInput,
   UpdateMomentInput,
+  PublicMomentFilters,
+  PublicMoment,
 } from "@/domain/ports/repositories/moment-repository";
 import type { Moment } from "@/domain/models/moment";
 import type { Moment as PrismaMoment } from "@prisma/client";
@@ -115,5 +117,44 @@ export const prismaMomentRepository: MomentRepository = {
       data: { status: "PAST" },
     });
     return result.count;
+  },
+
+  async findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]> {
+    const now = new Date();
+    const moments = await prisma.moment.findMany({
+      where: {
+        status: "PUBLISHED",
+        startsAt: { gte: now },
+        circle: {
+          visibility: "PUBLIC",
+          ...(filters.category && { category: filters.category }),
+        },
+      },
+      include: {
+        circle: { select: { slug: true, name: true, category: true, city: true } },
+        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+      },
+      orderBy: { startsAt: "asc" },
+      take: filters.limit ?? 20,
+      skip: filters.offset ?? 0,
+    });
+
+    return moments.map((m) => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      startsAt: m.startsAt,
+      endsAt: m.endsAt,
+      locationType: m.locationType,
+      locationName: m.locationName,
+      registrationCount: m._count.registrations,
+      capacity: m.capacity,
+      circle: {
+        slug: m.circle.slug,
+        name: m.circle.name,
+        category: m.circle.category ?? null,
+        city: m.circle.city ?? null,
+      },
+    }));
   },
 };

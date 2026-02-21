@@ -2,6 +2,16 @@ export type CircleVisibility = "PUBLIC" | "PRIVATE";
 
 export type CircleMemberRole = "HOST" | "PLAYER";
 
+export type CircleCategory =
+  | "TECH"
+  | "DESIGN"
+  | "BUSINESS"
+  | "SPORT_WELLNESS"
+  | "ART_CULTURE"
+  | "SCIENCE_EDUCATION"
+  | "SOCIAL"
+  | "OTHER";
+
 export type Circle = {
   id: string;
   slug: string;
@@ -9,6 +19,8 @@ export type Circle = {
   description: string;
   logo: string | null;
   visibility: CircleVisibility;
+  category: CircleCategory | null;
+  city: string | null;
   stripeConnectAccountId: string | null;
   createdAt: Date;
   updatedAt: Date;
