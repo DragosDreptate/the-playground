@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getProfile } from "@/domain/usecases/get-profile";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { shouldRedirectFromSetup } from "@/lib/onboarding";
+import { safeCallbackUrl } from "@/lib/url";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { updateProfileAction } from "@/app/actions/profile";
@@ -25,9 +27,17 @@ export default async function ProfileSetupPage() {
     redirect("/auth/sign-in");
   }
 
+  const cookieStore = await cookies();
+  const rawCallbackUrl = cookieStore.get("auth-callback-url")?.value;
+  const callbackUrl = safeCallbackUrl(rawCallbackUrl);
+
   if (shouldRedirectFromSetup(session.user)) {
-    redirect("/dashboard");
+    if (callbackUrl) cookieStore.delete("auth-callback-url");
+    redirect(callbackUrl ?? "/dashboard");
   }
+
+  // Lire et supprimer immédiatement le cookie pour ne pas polluer les sessions futures
+  if (callbackUrl) cookieStore.delete("auth-callback-url");
 
   const user = await getProfile(
     { userId: session.user.id },
@@ -62,6 +72,7 @@ export default async function ProfileSetupPage() {
         user={{ firstName, lastName }}
         mode="setup"
         action={updateProfileAction}
+        callbackUrl={callbackUrl}
       />
     </div>
   );

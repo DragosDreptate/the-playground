@@ -6,17 +6,23 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { signInWithGitHub, signInWithGoogle, signInWithEmail } from "@/app/actions/auth";
 
-export function SignInForm() {
+type SignInFormProps = {
+  callbackUrl?: string;
+};
+
+export function SignInForm({ callbackUrl }: SignInFormProps) {
   const t = useTranslations("Auth");
 
   return (
     <div className="space-y-4">
       <form action={signInWithGoogle}>
+        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
         <Button variant="outline" className="w-full" type="submit">
           {t("signIn.google")}
         </Button>
       </form>
       <form action={signInWithGitHub}>
+        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
         <Button variant="outline" className="w-full" type="submit">
           {t("signIn.github")}
         </Button>
@@ -29,6 +35,7 @@ export function SignInForm() {
       </div>
 
       <form action={signInWithEmail} className="space-y-3">
+        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
         <Input
           name="email"
           type="email"

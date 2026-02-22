@@ -13,6 +13,7 @@ type ProfileFormProps = {
   user: Pick<User, "firstName" | "lastName">;
   mode: "setup" | "edit";
   action: (formData: FormData) => Promise<ActionResult<User>>;
+  callbackUrl?: string;
 };
 
 type FormState = {
@@ -20,7 +21,7 @@ type FormState = {
   saved?: boolean;
 };
 
-export function ProfileForm({ user, mode, action }: ProfileFormProps) {
+export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProps) {
   const t = useTranslations("Profile");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -33,7 +34,13 @@ export function ProfileForm({ user, mode, action }: ProfileFormProps) {
 
     if (result.success) {
       if (mode === "setup") {
-        router.push("/dashboard");
+        // callbackUrl est déjà une URL complète avec locale (/fr/m/slug)
+        // on utilise window.location pour éviter le double-préfixe locale de next-intl
+        if (callbackUrl) {
+          window.location.href = callbackUrl;
+        } else {
+          router.push("/dashboard");
+        }
         return {};
       }
       router.refresh();
