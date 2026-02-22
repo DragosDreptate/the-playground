@@ -9,7 +9,7 @@ import { prisma } from "@/infrastructure/db/prisma";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { updateProfileAction } from "@/app/actions/profile";
-import { UserAvatar } from "@/components/user-avatar";
+import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, Mail, CalendarIcon } from "lucide-react";
 
@@ -53,11 +53,10 @@ export default async function ProfilePage() {
 
       {/* Profile header */}
       <div className="flex flex-col items-center gap-3 text-center">
-        <UserAvatar
+        <AvatarUpload
           name={fullName || null}
           email={user.email}
           image={user.image}
-          size="xl"
         />
         {fullName && (
           <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>

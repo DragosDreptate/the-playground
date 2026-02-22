@@ -592,6 +592,14 @@
     }
   },
   "Profile": {
+    "avatar": {
+      "add": "Add a photo",
+      "change": "Change photo",
+      "uploading": "Uploading...",
+      "errorType": "Unsupported format. Use JPEG, PNG or WebP.",
+      "errorSize": "File too large (max 5 MB).",
+      "errorUpload": "Upload failed. Please try again."
+    },
     "setup": {
       "title": "Complete your profile",
       "description": "Tell us a bit about yourself to get started."

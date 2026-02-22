@@ -57,6 +57,42 @@ describe("UpdateProfile", () => {
         name: "Alice D.",
       });
     });
+
+    it("should pass optional image if provided", async () => {
+      const existing = makeUser({ id: "user-1" });
+      const avatarUrl =
+        "https://abc.public.blob.vercel-storage.com/avatars/user-1-123.webp";
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        updateProfile: vi.fn().mockResolvedValue(
+          makeUser({ firstName: "Alice", lastName: "Dupont", image: avatarUrl })
+        ),
+      });
+
+      await updateProfile(
+        { ...defaultInput, image: avatarUrl },
+        { userRepository: repo }
+      );
+
+      expect(repo.updateProfile).toHaveBeenCalledWith("user-1", {
+        firstName: "Alice",
+        lastName: "Dupont",
+        image: avatarUrl,
+      });
+    });
+
+    it("should not include image in updateProfile call when image is not provided", async () => {
+      const existing = makeUser({ id: "user-1" });
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        updateProfile: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+      });
+
+      await updateProfile(defaultInput, { userRepository: repo });
+
+      const [, profileInput] = (repo.updateProfile as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(profileInput).not.toHaveProperty("image");
+    });
   });
 
   describe("given a non-existing user", () => {

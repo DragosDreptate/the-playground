@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/infrastructure/db/prisma";
 import { Resend } from "resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
+import { isUploadedUrl } from "@/lib/blob";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -46,10 +47,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   events: {
     async linkAccount({ user, profile }) {
       if (profile.image && user.id) {
-        await prisma.user.update({
+        const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
-          data: { image: profile.image },
+          select: { image: true },
         });
+        // Ne pas écraser un avatar uploadé manuellement par l'utilisateur
+        if (!isUploadedUrl(dbUser?.image)) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { image: profile.image },
+          });
+        }
       }
     },
   },
@@ -60,7 +68,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { id: user.id },
           select: { image: true },
         });
-        if (!dbUser?.image || dbUser.image !== profile.image) {
+        // Ne pas écraser un avatar uploadé manuellement. Mettre à jour uniquement si
+        // l'utilisateur n'a pas encore d'avatar ou si son avatar OAuth a changé.
+        if (!isUploadedUrl(dbUser?.image) && dbUser?.image !== profile.image) {
           await prisma.user.update({
             where: { id: user.id },
             data: { image: profile.image },
