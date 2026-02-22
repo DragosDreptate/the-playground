@@ -234,11 +234,14 @@
   - Contenu : titre, date, lieu, description courte, CTA "S'inscrire" → `/m/[slug]`
   - Sans cette notification, les membres ne reviennent que s'ils pensent à vérifier — ce push est le principal levier de rétention
   - **❓ Décision ouverte : automatique ou manuel ?**
-    - **Automatique** (à la création) : zéro friction pour l'Organisateur, mais risque de spam si l'Escale est créée en brouillon ou modifiée plusieurs fois avant publication
-    - **Manuel** (bouton "Notifier les membres" sur la page Escale) : l'Organisateur contrôle le moment d'envoi, peut peaufiner l'Escale avant d'envoyer — mais une étape supplémentaire qu'il peut oublier
-    - **Hybride recommandé** : envoi automatique au passage en statut PUBLISHED (pas à la création si un statut "brouillon" existe), avec possibilité de re-notifier manuellement une fois
+    - **Contexte modèle actuel** : il n'existe pas de statut `DRAFT` — les statuts sont `PUBLISHED` / `CANCELLED` / `PAST`. Une Escale est créée directement en `PUBLISHED`. Création = publication, ce sont le même moment.
+    - **Automatique à la création** (= à la publication aujourd'hui) : zéro friction, mais l'Organisateur ne peut pas corriger une erreur avant que les membres soient notifiés
+    - **Manuel** (bouton "Notifier les membres" sur la page Escale) : l'Organisateur contrôle le moment d'envoi — mais étape supplémentaire qu'il peut oublier
+    - **Hybride** (envoi automatique à la publication, re-notification manuelle possible) : nécessite d'introduire un statut `DRAFT` — changement de modèle non négligeable, à peser par rapport au bénéfice
+    - **Recommandation court terme** : automatique à la création (simple, cohérent avec le modèle actuel), avec un délai de grâce de quelques minutes pour annulation ("Annuler l'envoi" façon Gmail)
   - Dépend de l'infrastructure email existante (`ResendEmailService`, `EmailService` port) — réutilisable directement
   - Option future : préférence par membre (opt-out des notifications Cercle)
+  - Prérequis si hybride retenu : ajouter `DRAFT` à `MomentStatus` (DB + domaine + UI)
 
 - [ ] **Export données Organisateur**
   - CSV export : membres Circle, historique Escales, inscrits cumulés
