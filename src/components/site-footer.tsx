@@ -20,9 +20,6 @@ export async function SiteFooter() {
 
         {/* Droite : liens */}
         <nav className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-          <Link href="/explorer" className="hover:text-foreground transition-colors">
-            {t("product.explore")}
-          </Link>
           <Link href="/legal/mentions-legales" className="hover:text-foreground transition-colors">
             {t("legal.legalNotice")}
           </Link>
