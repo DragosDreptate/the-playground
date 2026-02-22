@@ -44,37 +44,30 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       console.error("[AUTH ERROR]", error);
     },
   },
-  events: {
-    async linkAccount({ user, profile }) {
-      if (profile.image && user.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { image: true },
-        });
-        // Ne pas écraser un avatar uploadé manuellement par l'utilisateur
-        if (!isUploadedUrl(dbUser?.image)) {
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { image: profile.image },
-          });
-        }
-      }
-    },
-  },
   callbacks: {
     async signIn({ user, profile }) {
-      if (profile?.image && user.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: user.id },
-          select: { image: true },
-        });
-        // Ne pas écraser un avatar uploadé manuellement. Mettre à jour uniquement si
-        // l'utilisateur n'a pas encore d'avatar ou si son avatar OAuth a changé.
-        if (!isUploadedUrl(dbUser?.image) && dbUser?.image !== profile.image) {
-          await prisma.user.update({
+      if (user.id) {
+        // profile.image = profil normalisé Auth.js
+        // profile.picture = champ brut Google (OIDC)
+        // profile.avatar_url = champ brut GitHub
+        const rawProfile = profile as Record<string, unknown>;
+        const imageUrl =
+          (typeof rawProfile?.image === "string" ? rawProfile.image : null) ??
+          (typeof rawProfile?.picture === "string" ? rawProfile.picture : null) ??
+          (typeof rawProfile?.avatar_url === "string" ? rawProfile.avatar_url : null);
+
+        if (imageUrl) {
+          const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            data: { image: profile.image },
+            select: { image: true },
           });
+          // Ne pas écraser un avatar uploadé manuellement par l'utilisateur
+          if (!isUploadedUrl(dbUser?.image)) {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { image: imageUrl },
+            });
+          }
         }
       }
       return true;
