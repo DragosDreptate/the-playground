@@ -32,12 +32,8 @@ export default async function ProfileSetupPage() {
   const callbackUrl = safeCallbackUrl(rawCallbackUrl);
 
   if (shouldRedirectFromSetup(session.user)) {
-    if (callbackUrl) cookieStore.delete("auth-callback-url");
     redirect(callbackUrl ?? "/dashboard");
   }
-
-  // Lire et supprimer immédiatement le cookie pour ne pas polluer les sessions futures
-  if (callbackUrl) cookieStore.delete("auth-callback-url");
 
   const user = await getProfile(
     { userId: session.user.id },
