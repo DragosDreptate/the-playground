@@ -161,6 +161,34 @@
 
 ---
 
+### Personnalisation visuelle — avatars & covers
+
+> Directement lié au principe "design premium par défaut" et à l'identité des communautés.
+> Les gradients générés sont de bons fallbacks, mais les Organisateurs doivent pouvoir personnaliser leur Cercle.
+
+- [ ] **Avatar utilisateur** — upload photo de profil
+  - Champ `avatarUrl` sur `User` (DB + domaine)
+  - Upload dans la page profil (remplace/complète le composant `UserAvatar` actuel)
+  - `UserAvatar` affiche la photo si disponible, sinon fallback gradient + initiales (comportement actuel inchangé)
+
+- [ ] **Cover / avatar Circle** — image personnalisée du Cercle
+  - Champ `imageUrl` sur `Circle` (DB + domaine)
+  - Upload dans le formulaire d'édition du Cercle
+  - Affiché en cover sur la page Circle (remplace le gradient généré) et dans `CircleAvatar`
+  - Fallback : gradient actuel si pas d'image
+
+- [ ] **Cover Escale** — image de couverture de l'Escale
+  - Champ `coverImageUrl` sur `Moment` (DB + domaine)
+  - Upload dans le formulaire de création/édition d'une Escale
+  - Affiché en bannière sur la page publique `/m/[slug]` (remplace le gradient)
+  - Fallback : gradient actuel si pas d'image
+
+- [ ] **Infrastructure upload** (prérequis commun aux 3)
+  - Adapter `StorageService` (port déjà prévu dans CLAUDE.md) : Uploadthing ou S3-compatible
+  - Contraintes : taille max (ex. 5 Mo), formats acceptés (jpg, png, webp), redimensionnement côté service
+
+---
+
 ### Priorité haute (bloquant pour le lancement)
 
 - [x] **Admin plateforme** ✅

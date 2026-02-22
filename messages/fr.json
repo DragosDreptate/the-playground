@@ -116,6 +116,7 @@
     "hostTools": "Outils Organisateur",
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
+    "greetingSubtitle": "Vos Cercles et vos prochaines Escales, au même endroit.",
     "memberCount": "{count} membres"
   },
   "Circle": {
@@ -309,9 +310,9 @@
     "OTHER": "Autre"
   },
   "Explorer": {
-    "title": "La Carte",
+    "title": "Explorer",
     "description": "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
-    "navLink": "La Carte",
+    "navLink": "Explorer",
     "tabs": {
       "circles": "Cercles",
       "moments": "Escales"
@@ -461,7 +462,7 @@
     },
     "product": {
       "title": "Produit",
-      "explore": "La Carte",
+      "explore": "Explorer",
       "howItWorks": "Comment ça marche"
     },
     "legal": {

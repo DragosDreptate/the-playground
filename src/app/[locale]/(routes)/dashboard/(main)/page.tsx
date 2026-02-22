@@ -66,11 +66,14 @@ export default async function DashboardPage({
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       {/* Greeting */}
-      <h1 className="text-3xl font-bold tracking-tight">
-        {firstName
-          ? t("greeting", { name: firstName })
-          : t("greetingAnonymous")}
-      </h1>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {firstName
+            ? t("greeting", { name: firstName })
+            : t("greetingAnonymous")}
+        </h1>
+        <p className="text-muted-foreground mt-1">{t("greetingSubtitle")}</p>
+      </div>
 
       {/* Tab selector + create Circle */}
       <div className="flex items-center justify-between gap-4">

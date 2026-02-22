@@ -116,6 +116,7 @@
     "hostTools": "Host tools",
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
+    "greetingSubtitle": "Your Circles and upcoming Moments, all in one place.",
     "memberCount": "{count} members"
   },
   "Circle": {
