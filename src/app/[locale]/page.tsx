@@ -288,7 +288,7 @@ export default async function HomePage() {
               ))}
             </div>
             <div className="mt-16 flex justify-center">
-              <Button asChild size="lg" className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 text-white hover:opacity-90">
+              <Button asChild size="lg" className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
                 <Link href="/explorer">{t("ctaExplore")}</Link>
               </Button>
             </div>
@@ -345,7 +345,7 @@ export default async function HomePage() {
             <p className="text-muted-foreground mt-4 text-lg">
               {t("ctaFinalSubtitle")}
             </p>
-            <Button asChild size="lg" className="mt-8 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 text-white hover:opacity-90">
+            <Button asChild size="lg" className="mt-8 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
               <Link href="/auth/sign-in">{t("ctaFinal")}</Link>
             </Button>
           </div>
