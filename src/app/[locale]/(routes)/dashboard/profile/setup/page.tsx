@@ -47,7 +47,7 @@ export default async function ProfileSetupPage() {
         <AvatarUpload
           name={fullName}
           email={user.email}
-          image={user.image}
+          image={user.image ?? session.user.image ?? null}
         />
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
