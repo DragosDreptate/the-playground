@@ -262,7 +262,7 @@
       "viewCircleMoments": "See upcoming Moments from this Circle"
     },
     "registrations": {
-      "title": "Registrations",
+      "title": "Attendees",
       "registered": "{count} joined",
       "waitlisted": "{count} waitlisted",
       "capacity": "{count} capacity",

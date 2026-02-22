@@ -262,7 +262,7 @@
       "viewCircleMoments": "Voir les prochaines Escales du Cercle"
     },
     "registrations": {
-      "title": "Inscriptions",
+      "title": "Participants",
       "registered": "{count} inscrit(s)",
       "waitlisted": "{count} en liste d'attente",
       "capacity": "{count} places",
