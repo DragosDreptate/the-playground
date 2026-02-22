@@ -19,9 +19,19 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
+  const description = t("heroSubtitle");
   return {
     title: "The Playground",
-    description: t("heroSubtitle"),
+    description,
+    openGraph: {
+      title: "The Playground",
+      description,
+      siteName: "The Playground",
+    },
+    twitter: {
+      title: "The Playground",
+      description,
+    },
   };
 }
 

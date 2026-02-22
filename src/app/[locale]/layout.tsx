@@ -32,10 +32,12 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: "The Playground",
+      description: t("heroSubtitle"),
       locale: locale === "en" ? "en_US" : "fr_FR",
     },
     twitter: {
       card: "summary_large_image",
+      description: t("heroSubtitle"),
     },
   };
 }
