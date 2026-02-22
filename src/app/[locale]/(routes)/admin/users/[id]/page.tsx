@@ -13,6 +13,7 @@ type Props = {
 export default async function AdminUserDetailPage({ params }: Props) {
   const { id } = await params;
   const t = await getTranslations("Admin");
+  const tRole = await getTranslations("Dashboard.role");
   const user = await prismaAdminRepository.findUserById(id);
 
   if (!user) notFound();
@@ -81,7 +82,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                     {circle.name}
                   </Link>
                   <Badge variant="outline" className="text-xs">
-                    {circle.role}
+                    {tRole(circle.role.toLowerCase() as "host" | "player")}
                   </Badge>
                 </div>
               ))}
