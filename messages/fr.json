@@ -34,7 +34,13 @@
     "ctaFinalTitle": "Prêt à lancer votre communauté ?",
     "ctaFinalSubtitle": "Créez votre Cercle en 30 secondes. C'est gratuit, pour toujours.",
     "ctaFinal": "Commencer gratuitement",
-    "ctaExplore": "Commencez à explorer"
+    "ctaExplore": "Commencez à explorer",
+    "heroFamiliar1": "communauté",
+    "heroFamiliar2": "événements",
+    "heroBranded1": "Cercle",
+    "heroBranded2": "Escales",
+    "heroRestPrefix1": "votre",
+    "heroRestPrefix2": "vos"
   },
   "Common": {
     "loading": "Chargement...",
@@ -303,7 +309,7 @@
   },
   "Explorer": {
     "title": "La Carte",
-    "description": "Explorez les communautés et les Escales ouvertes à tous.",
+    "description": "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
     "navLink": "La Carte",
     "tabs": {
       "circles": "Cercles",

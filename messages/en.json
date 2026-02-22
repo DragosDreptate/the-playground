@@ -34,7 +34,13 @@
     "ctaFinalTitle": "Ready to launch your community?",
     "ctaFinalSubtitle": "Create your Circle in 30 seconds. Free, forever.",
     "ctaFinal": "Get started for free",
-    "ctaExplore": "Start exploring"
+    "ctaExplore": "Start exploring",
+    "heroFamiliar1": "community",
+    "heroFamiliar2": "events",
+    "heroBranded1": "Circle",
+    "heroBranded2": "Moments",
+    "heroRestPrefix1": "your",
+    "heroRestPrefix2": "your"
   },
   "Common": {
     "loading": "Loading...",
@@ -303,7 +309,7 @@
   },
   "Explorer": {
     "title": "Explore",
-    "description": "Discover open communities and upcoming Moments.",
+    "description": "Communities that share your values, events you don't want to miss.",
     "navLink": "Explore",
     "tabs": {
       "circles": "Circles",
