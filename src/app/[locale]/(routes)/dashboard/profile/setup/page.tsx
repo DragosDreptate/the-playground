@@ -6,6 +6,7 @@ import { shouldRedirectFromSetup } from "@/lib/onboarding";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { updateProfileAction } from "@/app/actions/profile";
+import { AvatarUpload } from "@/components/profile/avatar-upload";
 
 function parseName(name: string | null): { firstName: string; lastName: string } {
   if (!name?.trim()) return { firstName: "", lastName: "" };
@@ -38,15 +39,24 @@ export default async function ProfileSetupPage() {
 
   const t = await getTranslations("Profile");
 
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || null;
+
   return (
     <div className="mx-auto max-w-lg space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t("setup.title")}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t("setup.description")}
-        </p>
+      <div className="flex flex-col items-center gap-4 text-center">
+        <AvatarUpload
+          name={fullName}
+          email={user.email}
+          image={user.image}
+        />
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {t("setup.title")}
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t("setup.description")}
+          </p>
+        </div>
       </div>
       <ProfileForm
         user={{ firstName, lastName }}
