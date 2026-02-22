@@ -20,17 +20,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const resend = new Resend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
 
-        // Gmail web n'accepte que les images via URL externe accessible publiquement.
-        // NEXT_PUBLIC_APP_URL doit pointer vers un domaine public (ex : déploiement Vercel)
-        // pour que l'icône s'affiche. En local avec localhost, Gmail ne peut pas y accéder.
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-        const iconUrl = `${baseUrl}/icon.png`;
-
         const { error } = await resend.emails.send({
           from,
           to: identifier,
           subject: "Votre lien de connexion — The Playground",
-          react: MagicLinkEmail({ url, iconUrl }),
+          react: MagicLinkEmail({ url }),
         });
 
         if (error) {

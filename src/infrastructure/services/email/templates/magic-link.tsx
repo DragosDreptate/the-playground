@@ -1,26 +1,24 @@
-import { Button, Hr, Img, Section, Text } from "@react-email/components";
+import { Button, Hr, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
 type Props = {
   url: string;
-  iconUrl: string;
 };
 
-export function MagicLinkEmail({ url, iconUrl }: Props) {
+export function MagicLinkEmail({ url }: Props) {
   return (
     <EmailLayout
       preview="Votre lien de connexion à The Playground"
       footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     >
       <Section style={iconSection}>
-        <Img
-          src={iconUrl}
-          width={48}
-          height={48}
-          alt="The Playground"
-          style={iconImage}
-        />
+        {/* Icône CSS pure — même technique que le bouton gradient ci-dessous.
+            Aucune image, rendu lisse par le client email. */}
+        <div style={iconBox}>
+          {/* Triangle CSS border-trick : right-pointing, blanc */}
+          <div style={triangle} />
+        </div>
         <Text style={brandName}>The Playground</Text>
       </Section>
 
@@ -53,9 +51,26 @@ const iconSection: React.CSSProperties = {
   marginBottom: "24px",
 };
 
-const iconImage: React.CSSProperties = {
-  display: "block",
+// Carré gradient — même dégradé rose→violet que le bouton CTA
+const iconBox: React.CSSProperties = {
+  background: "linear-gradient(135deg, #ec4899, #a855f7)",
+  borderRadius: "12px",
+  width: "48px",
+  height: "48px",
   margin: "0 auto 8px auto",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+// Triangle CSS border-trick — right-pointing, 13×16px, décalé légèrement à droite
+const triangle: React.CSSProperties = {
+  width: 0,
+  height: 0,
+  borderTop: "8px solid transparent",
+  borderBottom: "8px solid transparent",
+  borderLeft: "13px solid #ffffff",
+  marginLeft: "3px",
 };
 
 const brandName: React.CSSProperties = {
