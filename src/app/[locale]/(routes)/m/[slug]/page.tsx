@@ -1,4 +1,6 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   prismaMomentRepository,
   prismaCircleRepository,
@@ -12,6 +14,63 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 
+// Deduplicate DB calls between generateMetadata and the page
+const getMoment = cache(async (slug: string) => {
+  try {
+    return await getMomentBySlug(slug, {
+      momentRepository: prismaMomentRepository,
+    });
+  } catch (error) {
+    if (error instanceof MomentNotFoundError) return null;
+    throw error;
+  }
+});
+
+const getCircle = cache(async (circleId: string) => {
+  return prismaCircleRepository.findById(circleId);
+});
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const moment = await getMoment(slug);
+  if (!moment || moment.status === "CANCELLED") return {};
+
+  const circle = await getCircle(moment.circleId);
+  const date = moment.startsAt.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const time = moment.startsAt.toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const location =
+    moment.locationType === "ONLINE"
+      ? "En ligne"
+      : moment.locationName ?? moment.locationAddress ?? "";
+
+  const description = `${date} à ${time} · ${location}${circle ? ` — ${circle.name}` : ""}`;
+
+  return {
+    title: moment.title,
+    description,
+    openGraph: {
+      title: moment.title,
+      description,
+      type: "article",
+    },
+    twitter: {
+      title: moment.title,
+      description,
+    },
+  };
+}
+
 export default async function PublicMomentPage({
   params,
 }: {
@@ -22,20 +81,13 @@ export default async function PublicMomentPage({
   // Transition PUBLISHED → PAST for ended Moments
   await prismaMomentRepository.transitionPastMoments();
 
-  let moment;
-  try {
-    moment = await getMomentBySlug(slug, {
-      momentRepository: prismaMomentRepository,
-    });
-  } catch (error) {
-    if (error instanceof MomentNotFoundError) notFound();
-    throw error;
-  }
+  const moment = await getMoment(slug);
+  if (!moment) notFound();
 
   if (moment.status === "CANCELLED") notFound();
 
   const [circle, hosts] = await Promise.all([
-    prismaCircleRepository.findById(moment.circleId),
+    getCircle(moment.circleId),
     prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
   ]);
 

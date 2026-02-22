@@ -12,8 +12,22 @@ import "../globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "The Playground",
-  description: "La plateforme ouverte pour vos communautés",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+  ),
+  title: {
+    default: "The Playground",
+    template: "%s — The Playground",
+  },
+  description: "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
+  openGraph: {
+    type: "website",
+    siteName: "The Playground",
+    locale: "fr_FR",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export function generateStaticParams() {

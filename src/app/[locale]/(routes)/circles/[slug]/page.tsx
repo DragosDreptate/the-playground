@@ -57,8 +57,17 @@ export async function generateMetadata({
       circleRepository: prismaCircleRepository,
     });
     return {
-      title: `${circle.name} — The Playground`,
+      title: circle.name,
       description: circle.description,
+      openGraph: {
+        title: circle.name,
+        description: circle.description ?? undefined,
+        type: "website",
+      },
+      twitter: {
+        title: circle.name,
+        description: circle.description ?? undefined,
+      },
     };
   } catch {
     return {};

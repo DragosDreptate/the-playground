@@ -18,8 +18,16 @@ export const revalidate = 60;
 export async function generateMetadata() {
   const t = await getTranslations("Explorer");
   return {
-    title: `${t("title")} — The Playground`,
+    title: t("title"),
     description: t("description"),
+    openGraph: {
+      title: t("title"),
+      description: t("description"),
+    },
+    twitter: {
+      title: t("title"),
+      description: t("description"),
+    },
   };
 }
 

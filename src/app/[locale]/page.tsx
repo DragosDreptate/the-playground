@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
 import { SiteHeader } from "@/components/site-header";
@@ -15,6 +16,14 @@ import {
   MapPin,
   Crown,
 } from "lucide-react";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("HomePage");
+  return {
+    title: "The Playground",
+    description: t("heroSubtitle"),
+  };
+}
 
 export default async function HomePage() {
   const session = await auth();
