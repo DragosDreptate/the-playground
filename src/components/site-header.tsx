@@ -13,9 +13,11 @@ type SiteHeaderProps = {
     image?: string | null;
     role?: "USER" | "ADMIN";
   } | null;
+  /** Masque navigation + UserMenu — utilisé pendant l'onboarding */
+  hideNav?: boolean;
 };
 
-export async function SiteHeader({ user }: SiteHeaderProps) {
+export async function SiteHeader({ user, hideNav = false }: SiteHeaderProps) {
   const t = await getTranslations("Auth");
   const tExplorer = await getTranslations("Explorer");
   const tDashboard = await getTranslations("Dashboard");
@@ -36,7 +38,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
 
         {/* Nav — center */}
         <nav className="flex flex-1 items-center justify-center gap-6">
-          {user && (
+          {user && !hideNav && (
             <>
               <Link
                 href="/explorer"
@@ -60,12 +62,16 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
         <div className="flex shrink-0 items-center gap-3">
           <LocaleToggle />
           <ThemeToggle />
-          {user ? (
-            <UserMenu user={user} />
-          ) : (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/auth/sign-in">{t("signIn.title")}</Link>
-            </Button>
+          {!hideNav && (
+            <>
+              {user ? (
+                <UserMenu user={user} />
+              ) : (
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/auth/sign-in">{t("signIn.title")}</Link>
+                </Button>
+              )}
+            </>
           )}
         </div>
       </div>
