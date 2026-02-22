@@ -60,8 +60,7 @@ export default async function OgImage() {
             flexDirection: "column",
             justifyContent: "center",
             flex: 1,
-            padding: "64px 0 64px 72px",
-            maxWidth: "680px",
+            padding: "64px 0 64px 64px",
           }}
         >
           {/* Logo row */}
@@ -199,8 +198,8 @@ export default async function OgImage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            width: "420px",
-            paddingRight: "40px",
+            width: "380px",
+            paddingRight: "64px",
           }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
