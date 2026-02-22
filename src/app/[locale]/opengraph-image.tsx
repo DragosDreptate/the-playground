@@ -127,7 +127,7 @@ export default async function OgImage() {
                 Lancez
               </span>
               <span style={{ color: "white", marginLeft: "14px" }}>
-                votre Communauté.
+                votre communauté.
               </span>
             </div>
 
