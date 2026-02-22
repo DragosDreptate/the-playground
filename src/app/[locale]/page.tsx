@@ -53,22 +53,22 @@ export default async function HomePage() {
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-3xl leading-[1.3] font-medium tracking-tighter md:text-4xl lg:text-[2.75rem]">
                 <span className="block md:whitespace-nowrap">
-                  <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
+                  <span className="block bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent md:inline">
                     {t("heroHighlight1")}
-                  </span>{" "}
-                  {t("heroRest1")}
+                  </span>
+                  <span className="md:ml-3">{t("heroRest1")}</span>
                 </span>
                 <span className="block md:whitespace-nowrap">
-                  <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
+                  <span className="block bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent md:inline">
                     {t("heroHighlight2")}
-                  </span>{" "}
-                  {t("heroRest2")}
+                  </span>
+                  <span className="md:ml-3">{t("heroRest2")}</span>
                 </span>
                 <span className="block md:whitespace-nowrap">
-                  <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
+                  <span className="block bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent md:inline">
                     {t("heroHighlight3")}
-                  </span>{" "}
-                  {t("heroRest3")}
+                  </span>
+                  <span className="md:ml-3">{t("heroRest3")}</span>
                 </span>
               </h1>
               <p className="text-muted-foreground mt-6 max-w-md text-lg font-light lg:max-w-none">

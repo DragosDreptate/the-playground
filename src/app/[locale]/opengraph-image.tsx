@@ -170,10 +170,10 @@ export default async function OgImage() {
                   color: "transparent",
                 }}
               >
-                Fédérez
+                Animez
               </span>
               <span style={{ color: "white", marginLeft: "14px" }}>
-                votre audience.
+                votre réseau.
               </span>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 ## Vision
 
-**Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.**
+**Lancez votre communauté. Organisez vos événements. Animez votre réseau.**
 
 Plateforme SaaS ouverte et 100% gratuite pour communautés. **Le modèle Meetup.com avec l'expérience Luma, 100% gratuit.**
 
@@ -557,7 +557,7 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Organisateur au premier plan |
 | 2026-02-19 | Distribution par les Organisateurs (liens partageables + calendrier), pas d'algo de distribution plateforme |
 | 2026-02-19 | Traductions FR : Circle → Cercle, Moment → Escale, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
-| 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience." |
+| 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Animez votre réseau." |
 | 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Escale = porte d'entrée virale, la page Cercle est la couche de rétention absente chez Luma |
 | 2026-02-21 | Dashboard redesigné : pill tabs (Mes Escales / Mes Cercles), timeline unifiée (upcoming + past), empty states avec CTA. Pas de CTAs dans les tab headers. |
 | 2026-02-21 | CircleAvatar : composant réutilisable (gradient + initial), prêt pour future prop `image` (avatar Circle personnalisé) |
