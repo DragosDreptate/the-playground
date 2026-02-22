@@ -10,7 +10,7 @@ export default async function ExplorerLayout({
   const session = await auth();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
       <SiteHeader user={session?.user} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         {children}

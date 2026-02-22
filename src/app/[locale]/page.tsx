@@ -42,12 +42,12 @@ export default async function HomePage() {
   const tDashboard = await getTranslations("Dashboard");
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
       <SiteHeader user={session?.user} />
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4 pt-16 pb-12 md:pt-0 md:pb-0">
+        <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4 pb-16 md:pb-0">
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
             {/* LEFT — text */}
             <div className="flex-1 text-center lg:text-left">

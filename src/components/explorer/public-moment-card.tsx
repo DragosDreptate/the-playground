@@ -38,8 +38,8 @@ export async function PublicMomentCard({ moment }: Props) {
       : null;
 
   return (
-    <Link href={`/m/${moment.slug}`} className="group block">
-      <div className="bg-card flex flex-col gap-3 rounded-2xl border p-5 transition-colors hover:border-primary/30">
+    <Link href={`/m/${moment.slug}`} className="group block min-w-0">
+      <div className="bg-card flex flex-col gap-3 overflow-hidden rounded-2xl border p-4 transition-colors hover:border-primary/30 sm:p-5">
         {/* Circle name (prominent) + category badge */}
         <div className="flex items-center justify-between gap-2">
           <p className="text-muted-foreground truncate text-sm font-medium">

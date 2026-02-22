@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { UserMenu } from "@/components/user-menu";
+import { MobileNav } from "@/components/mobile-nav";
 import { getTranslations } from "next-intl/server";
 import { Compass, LayoutDashboard } from "lucide-react";
 
@@ -33,8 +34,8 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
           <span className="text-lg font-semibold">The Playground</span>
         </Link>
 
-        {/* Nav — center */}
-        <nav className="flex flex-1 items-center justify-center gap-6">
+        {/* Nav — center (desktop only) */}
+        <nav className="hidden flex-1 items-center justify-center gap-6 md:flex">
           {user && (
             <>
               <Link
@@ -55,17 +56,21 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
           )}
         </nav>
 
+        {/* Spacer for mobile (pushes actions to the right) */}
+        <div className="flex-1 md:hidden" />
+
         {/* Actions — right */}
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           <LocaleToggle />
           <ThemeToggle />
           {user ? (
             <UserMenu user={user} />
           ) : (
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
               <Link href="/auth/sign-in">{t("signIn.title")}</Link>
             </Button>
           )}
+          <MobileNav isAuthenticated={!!user} />
         </div>
       </div>
     </header>
