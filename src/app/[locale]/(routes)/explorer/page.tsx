@@ -51,9 +51,9 @@ export default async function ExplorerPage({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1">
+        <div className="space-y-3">
           <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground">{t("description")}</p>
+          <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
         </div>
         {session?.user && (
           <Button asChild size="sm" className="shrink-0">
