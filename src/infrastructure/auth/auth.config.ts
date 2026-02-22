@@ -46,29 +46,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async signIn({ user, profile }) {
-      if (user.id) {
-        // profile.image = profil normalisé Auth.js
-        // profile.picture = champ brut Google (OIDC)
-        // profile.avatar_url = champ brut GitHub
-        const rawProfile = profile as Record<string, unknown>;
-        const imageUrl =
-          (typeof rawProfile?.image === "string" ? rawProfile.image : null) ??
-          (typeof rawProfile?.picture === "string" ? rawProfile.picture : null) ??
-          (typeof rawProfile?.avatar_url === "string" ? rawProfile.avatar_url : null);
+      // Synchro image OAuth — ne doit jamais bloquer le sign-in
+      try {
+        if (user.id && profile) {
+          // profile.image = profil normalisé Auth.js
+          // profile.picture = champ brut Google (OIDC)
+          // profile.avatar_url = champ brut GitHub
+          const rawProfile = profile as Record<string, unknown>;
+          const imageUrl =
+            (typeof rawProfile.image === "string" ? rawProfile.image : null) ??
+            (typeof rawProfile.picture === "string" ? rawProfile.picture : null) ??
+            (typeof rawProfile.avatar_url === "string" ? rawProfile.avatar_url : null);
 
-        if (imageUrl) {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { image: true },
-          });
-          // Ne pas écraser un avatar uploadé manuellement par l'utilisateur
-          if (!isUploadedUrl(dbUser?.image)) {
-            await prisma.user.update({
+          if (imageUrl) {
+            const dbUser = await prisma.user.findUnique({
               where: { id: user.id },
-              data: { image: imageUrl },
+              select: { image: true },
             });
+            // Ne pas écraser un avatar uploadé manuellement par l'utilisateur
+            if (!isUploadedUrl(dbUser?.image)) {
+              await prisma.user.update({
+                where: { id: user.id },
+                data: { image: imageUrl },
+              });
+            }
           }
         }
+      } catch (err) {
+        console.error("[AUTH] OAuth image sync failed (non-blocking):", err);
       }
       return true;
     },
