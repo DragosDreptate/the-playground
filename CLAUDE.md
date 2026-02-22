@@ -14,11 +14,11 @@ The Playground est **community-centric** (comme Meetup), pas event-centric (comm
 - **Meetup** : créer un groupe → des gens rejoignent → ils restent → les événements sont des rendez-vous dans la communauté. Bon modèle, mais UX datée et paywall organisateur.
 - **The Playground** : le modèle communautaire de Meetup + l'expérience premium de Luma + 100% gratuit.
 
-Le **Circle** (communauté) est l'entité centrale. L'**Escale** (événement) est un point d'entrée viral vers le Circle. L'inscription à une Escale rend le Participant membre du Circle. Après l'Escale, le Circle reste — avec ses membres, ses prochaines Escales, son identité.
+Le **Circle** (Communauté) est l'entité centrale. L'**événement** est un point d'entrée viral vers le Circle. L'inscription à un événement rend le Participant membre du Circle. Après l'événement, le Circle reste — avec ses membres, ses prochains événements, son identité.
 
 ```
 Luma:           Event → Inscription → Event a lieu → Fin (pas de rétention)
-The Playground: Escale → Inscription → Membre du Circle → Prochaines Escales → Rétention
+The Playground: Événement → Inscription → Membre du Circle → Prochains événements → Rétention
 ```
 
 ### Ce qu'on prend de chaque référence
@@ -30,61 +30,61 @@ The Playground: Escale → Inscription → Membre du Circle → Prochaines Escal
 | Page événement premium | non (datée) | oui | **oui** |
 | Inscription sans friction | non (compte obligatoire) | oui | **oui** |
 | Dashboard organisateur | basique | bon | **bon** |
-| Découverte publique | oui (annuaire) | non | **oui** (La Carte) |
+| Découverte publique | oui (annuaire) | non | **oui** (Découvrir) |
 | Gratuit | non (abo organisateur) | commission | **100% gratuit** |
 
 ### Parcours clés
 
 **Host (Organisateur)** :
-1. Créer son **Circle** (sa communauté) — c'est le cockpit
-2. Créer des **Escales** dans ce Cercle
+1. Créer son **Circle** (sa Communauté) — c'est le cockpit
+2. Créer des **événements** dans cette Communauté
 3. Gérer ses **Participants** de façon persistante (pas événement par événement)
-4. Communiquer avec sa communauté entre les Escales
+4. Communiquer avec sa communauté entre les événements
 
 **Player (Participant)** :
-1. Reçoit un lien vers une Escale (viralité, comme Luma)
+1. Reçoit un lien vers un événement (viralité, comme Luma)
 2. S'inscrit → devient membre du Circle (transparent, zéro friction)
-3. Après l'Escale : découvre la page Cercle, les prochaines Escales, les autres membres
-4. Revient naturellement pour les Escales suivantes
+3. Après l'événement : découvre la page Communauté, les prochains événements, les autres membres
+4. Revient naturellement pour les événements suivants
 
-> Le dashboard Organisateur est **Circle-first**, pas event-first. Le Circle est le cockpit, les Escales sont des actions lancées depuis ce cockpit.
+> Le dashboard Organisateur est **Circle-first**, pas event-first. Le Circle est le cockpit, les événements sont des actions lancées depuis ce cockpit.
 
 ## Architecture sémantique
 
 | Concept | FR (i18n) | Description |
 | --- | --- | --- |
 | **Playground** | — | La plateforme |
-| **Circle** | Cercle | Une communauté autonome (publique ou privée) |
+| **Circle** | Communauté | Une communauté autonome (publique ou privée) |
 | **Track** | — | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
-| **Moment** | Escale (FR) / Moment (EN) | Événement individuel — unité virale de la plateforme, page autonome et partageable |
+| **Moment** | événement (FR) / Moment (EN) | Événement individuel — unité virale de la plateforme, page autonome et partageable |
 | **Host** | Organisateur | Organisateur d'un Circle |
 | **Player** | Participant (FR) / Member (EN) | Participant à un Moment / membre d'un Circle |
 
 > **Règle i18n** : En code (types, variables, DB, noms de fichiers, clés JSON), on utilise toujours les termes anglais (Circle, Moment, Host, Player). Les traductions user-facing sont :
-> - **FR** : Circle → Cercle, Moment → **Escale** (féminin : une Escale, cette Escale, Publiée, Annulée, Passée), Host → Organisateur, Player → Participant, Register → Rejoindre, Dashboard → Mon Playground, Explorer → **La Carte**
+> - **FR** : Circle → **Communauté** (féminin : une Communauté, cette Communauté), Moment → **événement** (masculin : un événement, cet événement, Publié, Annulé, Passé), Host → Organisateur, Player → Participant, Register → **S'inscrire**, Dashboard → **Mon espace**, Explorer → **Découvrir**
 > - **EN** : Circle, Moment, Host restent inchangés. Player → **Member**, Register → **Join**, Dashboard → **My Playground**, Explorer → **Explore**
 
 ## Règles métier clés
 
 - **Le Circle est l'entité centrale** — tout gravite autour de la communauté, pas de l'événement
-- Rejoindre une Escale inscrit automatiquement le Participant au Cercle (transparent, pas de friction)
-- L'Escale est la **porte d'entrée virale**. Le Cercle est la **couche de rétention**
-- Parcours : découvrir une Escale → rejoindre → devenir membre du Cercle → découvrir les prochaines Escales → rester
-- **La page Circle est la page de rétention** : prochaines Escales, Escales passées, membres, identité du Cercle
+- S'inscrire à un événement inscrit automatiquement le Participant à la Communauté (transparent, pas de friction)
+- L'événement est la **porte d'entrée virale**. La Communauté est la **couche de rétention**
+- Parcours : découvrir un événement → s'inscrire → devenir membre de la Communauté → découvrir les prochains événements → rester
+- **La page Circle est la page de rétention** : prochains événements, événements passés, membres, identité de la Communauté
 - Liste d'attente avec promotion automatique sur désistement
-- Fil de commentaires (pas de forum) sur chaque Escale
+- Fil de commentaires (pas de forum) sur chaque événement
 
 ## Principes structurants
 
 - Multi-tenant dès le départ
 - Architecture hexagonale obligatoire
-- **Design premium par défaut** — chaque page Escale doit être belle sans effort de l'Organisateur
+- **Design premium par défaut** — chaque page événement doit être belle sans effort de l'Organisateur
 - **Mobile-first** — le parcours Participant est optimisé pour mobile (lien partagé via WhatsApp/Instagram/Slack → toujours sur mobile)
-- **Marque visible mais discrète** — "Powered by The Playground" en footer, couleur accent reconnaissable, mais l'Organisateur et son Cercle restent au premier plan. On construit de la notoriété sans cannibaliser l'identité des communautés
+- **Marque visible mais discrète** — "Powered by The Playground" en footer, couleur accent reconnaissable, mais l'Organisateur et sa Communauté restent au premier plan. On construit de la notoriété sans cannibaliser l'identité des communautés
 - Données exportables (export complet : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
-- Pas de marketplace (mais La Carte : annuaire simple de Cercles publics, filtrable par thème/localisation)
+- Pas de marketplace (mais Découvrir : annuaire simple de Communautés publiques, filtrable par thème/localisation)
 - Ownership des données pour les Circles
 - **Distribution par les Organisateurs** — pas d'algo de distribution, la viralité vient des liens partageables + intégration calendrier + export. L'Organisateur génère la distribution, pas la plateforme
 - Architecture notifications **multi-canal dès la conception** (V1 = email, puis SMS/push/WhatsApp)
@@ -94,30 +94,30 @@ The Playground: Escale → Inscription → Membre du Circle → Prochaines Escal
 
 > L'UI/UX est calquée sur Luma (lu.ma) pour le design premium. Le modèle fonctionnel s'inspire de Meetup pour la couche communautaire. On systématiquement challenge le design Luma : si on peut faire mieux, on propose l'alternative.
 
-### La page Escale = porte d'entrée virale (benchmark Luma)
+### La page événement = porte d'entrée virale (benchmark Luma)
 
-La page Escale est la première chose que voit un Participant. Design premium, inspiration directe Luma :
+La page événement est la première chose que voit un Participant. Design premium, inspiration directe Luma :
 - **Titre clair** — immédiatement lisible
 - **Date visible immédiatement** — pas cachée dans un détail
 - **Lieu explicite** — adresse ou "En ligne"
 - **CTA évident** — bouton d'inscription dominant, au-dessus de la ligne de flottaison
 - **Social proof** — liste des inscrits avec avatars/initiales, nombre de places restantes
-- **Lien vers le Circle** — visible sur la page Escale, invitation à explorer la communauté
+- **Lien vers le Circle** — visible sur la page événement, invitation à explorer la communauté
 
 ### La page Circle = couche de rétention (ce que Luma n'a pas)
 
 C'est l'avantage structurel de The Playground. La page Circle montre :
-- Les **prochaines Escales** du Cercle
-- Les **Escales passées** (historique)
+- Les **prochains événements** de la Communauté
+- Les **événements passés** (historique)
 - Les **membres** du Circle
-- L'**identité** du Cercle (description, Organisateur)
+- L'**identité** de la Communauté (description, Organisateur)
 
 > La page Circle n'existe pas chez Luma. C'est elle qui transforme des participants ponctuels en membres fidèles.
 
 ### Friction zéro à l'inscription (benchmark Luma)
 
 - Magic link / OAuth — pas de création de compte lourde avant inscription
-- Minimum d'étapes entre "je vois l'Escale" et "j'ai rejoint"
+- Minimum d'étapes entre "je vois l'événement" et "je suis inscrit"
 - L'inscription au Circle est transparente (pas de popup ni de validation supplémentaire)
 
 ### Minimalisme du formulaire de création (benchmark Luma)
@@ -147,8 +147,8 @@ C'est l'avantage structurel de The Playground. La page Circle montre :
 
 | Variant | Rôle | Quand l'utiliser |
 |---|---|---|
-| `default` (rose/primary) | **Action principale** de la page ou du contexte | CTA Rejoindre, Créer une Escale, Modifier, Enregistrer |
-| `outline` | **Action secondaire** | Créer un Cercle (quand Créer une Escale est le primary), Annuler, actions de navigation secondaires |
+| `default` (rose/primary) | **Action principale** de la page ou du contexte | CTA S'inscrire, Créer un événement, Modifier, Enregistrer |
+| `outline` | **Action secondaire** | Créer une Communauté (quand Créer un événement est le primary), Annuler, actions de navigation secondaires |
 | `ghost` | **Action tertiaire / utilitaire** | Copier, Voir (dans une toolbar), Se déconnecter, toggles UI |
 | `destructive` | **Jamais utilisé comme trigger visible** | Réservé aux `AlertDialogAction` de confirmation (dans la modale) |
 
@@ -172,7 +172,7 @@ L'`AlertDialogAction` dans la modale de confirmation utilise `className="bg-dest
 
 - **Pages et headers** : `size="sm"` pour les boutons d'action en haut de page
 - **Formulaires** : `size` non spécifié (default) pour Submit et Cancel
-- **CTAs fullwidth** (page publique Escale, Rejoindre) : `size="lg"` avec `w-full`
+- **CTAs fullwidth** (page publique événement, S'inscrire) : `size="lg"` avec `w-full`
 - **Utilitaires inline** (toolbar, copy) : `size="sm"` ou taille custom via className
 
 ### Règle anti-doublon
@@ -182,7 +182,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 ## Monétisation
 
 - **100% gratuit** — aucune commission plateforme, aucun abonnement requis
-- Seuls les frais Stripe (~2.9% + 0.30$) sur les Escales payantes
+- Seuls les frais Stripe (~2.9% + 0.30$) sur les événements payants
 - The Playground ne prend aucune marge sur les transactions
 - Évolution future : Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 
@@ -194,19 +194,19 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - Formulaire de création minimaliste (titre, date, lieu, description) — options avancées (capacité, prix) masquées par défaut
 - Liste d'attente
 - Check-in, export CSV, communication directe avec les Participants
-- Assistant IA basique (description Escale, email invitation, suggestions Cercle)
+- Assistant IA basique (description événement, email invitation, suggestions Communauté)
 
 ### Participant
-- Découverte d'Escale via lien partagé
-- Rejoindre une Escale = inscription au Cercle automatique
-- Social proof sur la page Escale : liste des inscrits (avatars/initiales), nombre de places restantes
+- Découverte d'événement via lien partagé
+- S'inscrire à un événement = inscription à la Communauté automatique
+- Social proof sur la page événement : liste des inscrits (avatars/initiales), nombre de places restantes
 - Bouton "Ajouter à mon calendrier" après inscription (Google Calendar, Apple Calendar, ICS)
 - Paiement Stripe si nécessaire
 - Notifications email (confirmation, rappels 24h/1h, changements, annulations)
-- Fil de commentaires sur l'Escale
+- Fil de commentaires sur l'événement
 
 ### Plateforme
-- La Carte : répertoire public de Circles (filtrable thème/localisation, sans ranking)
+- Découvrir : répertoire public de Communautés (filtrable thème/localisation, sans ranking)
 - Stripe Connect pour événements payants
 
 ## Stack technique
@@ -466,7 +466,7 @@ Tests Vitest dédiés vérifiant l'isolation multi-tenant et les contrôles d'ac
 
 ##### Performance pages
 
-- **Lighthouse CI** sur les pages Escale (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
+- **Lighthouse CI** sur les pages événement (unité virale, doit être rapide) — à intégrer en CI avec les tests E2E
 - **Détection N+1 queries** dans les tests d'intégration des repositories
 - **Load testing** (k6/Artillery) : uniquement en phase pré-lancement, pas dans le MVP
 
@@ -565,3 +565,4 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
 | 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
 | 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et clé i18n `Explorer` inchangées. La Boussole réservée pour l'assistant IA (futur). |
+| 2026-02-22 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin : Publié, Annulé, Passé), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. |

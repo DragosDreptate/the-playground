@@ -7,7 +7,7 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 
 export const runtime = "nodejs";
-export const alt = "Escale — The Playground";
+export const alt = "Événement — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -58,6 +58,9 @@
 | Audit sécurité (security-guardian) : 20 nouveaux tests de sécurité. `avatar-upload-isolation.test.ts` (5 tests IDOR/userId isolation) + `onboarding-guard.test.ts` (15 tests anti-boucle, transitions d'état, cas limites). Aucune vulnérabilité détectée dans le code source. 299 tests, 100% verts. | 2026-02-22 | — |
 | Footer global (`SiteFooter`) + pages légales : mentions légales `/legal/mentions-legales`, confidentialité `/legal/confidentialite`, CGU `/legal/cgu`. i18n FR/EN complet (namespaces `Footer` + `Legal`). | 2026-02-22 | `da1c2e8` |
 | Magic link email : template react-email avec icône PNG embarquée en base64 (gradient + triangle play). Zéro dépendance réseau pour le rendu. | 2026-02-22 | `f27fee9` |
+| OpenGraph + SEO : images OG dynamiques (homepage, événement, Communauté), `metadataBase`, `generateMetadata`, `robots.ts`, `sitemap.ts`. | 2026-02-22 | — |
+| Mobile responsive : hamburger menu (DropdownMenu), cards compactes Explorer, footer responsive, hero centrage, tabs responsive. | 2026-02-22 | — |
+| Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. | 2026-02-22 | — |
 
 ---
 
@@ -256,6 +259,13 @@
 
 - [ ] Track (série d'événements récurrents dans un Circle)
 - [ ] Check-in (marquer présent sur place)
+- [ ] **Galerie photos post-événement**
+  - Les Participants et l'Organisateur peuvent uploader des photos après une Escale PAST
+  - Galerie visible sur la page publique `/m/[slug]` et sur la page Circle (onglet dédié ou section en bas)
+  - Upload via `StorageService` existant (Vercel Blob) — infrastructure déjà en place
+  - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par Escale
+  - Option modération : l'Organisateur peut supprimer une photo
+  - Viralité : lien partageable vers la galerie, CTA "Voir les photos" dans l'email post-événement
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 - [ ] **Emails de rappel pré-événement** (24h + 1h avant) — jobs planifiés Vercel Cron ou Upstash QStash, flags `reminder24hSentAt` / `reminder1hSentAt` sur `Moment`
 - [ ] Visual regression testing (Chromatic/Percy)
@@ -304,3 +314,4 @@
 | 2026-02-21 | Agents Claude Code : définis dans `.claude/agents/` (gitignored). `test-coverage-guardian` — audit usecase vs test, création des manquants, run en boucle jusqu'à 100% vert. `security-guardian` — cartographie des points d'autorisation, tests RBAC/IDOR/admin, correction des vulnérabilités réelles dans le code source si détectées. Pattern : lancer en worktree isolé pour zéro risque sur main. |
 | 2026-02-21 | Sécurité — defense-in-depth : les usecases admin ne doivent PAS faire confiance à la couche action seule. Chaque usecase admin accepte `callerRole: UserRole` et lève `AdminUnauthorizedError` si `callerRole !== "ADMIN"`. Principe : la sécurité est dans le domaine, pas uniquement à la périphérie. |
 | 2026-02-21 | Observation architecturale : les pages admin (`/admin/*.tsx`) appellent `prismaAdminRepository` directement (sans passer par les usecases). Elles sont protégées par le layout guard mais ne bénéficient pas de la defense-in-depth des usecases. À adresser post-MVP. |
+| 2026-02-22 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté** (féminin), Escale → **événement** (masculin : Publié, Annulé, Passé), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code identifiers, clés JSON et noms de fichiers restent en anglais. EN inchangé. Motivation : termes plus accessibles pour les utilisateurs non familiers avec les concepts Meetup/Luma. |

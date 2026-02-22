@@ -61,8 +61,10 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
 
         {/* Actions — right */}
         <div className="flex shrink-0 items-center gap-2">
-          <LocaleToggle />
-          <ThemeToggle />
+          <div className="hidden md:flex md:items-center md:gap-2">
+            <LocaleToggle />
+            <ThemeToggle />
+          </div>
           {user ? (
             <UserMenu user={user} />
           ) : (

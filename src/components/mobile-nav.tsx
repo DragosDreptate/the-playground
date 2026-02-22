@@ -8,8 +8,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LocaleToggle } from "@/components/locale-toggle";
 
 type MobileNavProps = {
   isAuthenticated: boolean;
@@ -52,6 +55,11 @@ export function MobileNav({ isAuthenticated }: MobileNavProps) {
             </Link>
           </DropdownMenuItem>
         )}
+        <DropdownMenuSeparator />
+        <div className="flex items-center justify-between px-2 py-1.5">
+          <LocaleToggle />
+          <ThemeToggle />
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -75,7 +75,7 @@ export default async function DashboardPage({
         <p className="text-muted-foreground text-base leading-relaxed">{t("greetingSubtitle")}</p>
       </div>
 
-      {/* Tab selector + create Circle */}
+      {/* Tab selector + create Circle (desktop only, inline) */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
           <Link
@@ -99,7 +99,7 @@ export default async function DashboardPage({
             {t("myCircles")}
           </Link>
         </div>
-        <Button asChild size="sm">
+        <Button asChild size="sm" className="hidden md:inline-flex">
           <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
         </Button>
       </div>
@@ -167,6 +167,9 @@ export default async function DashboardPage({
               ))}
             </div>
           )}
+          <Button asChild className="mt-6 w-full md:hidden">
+            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+          </Button>
         </section>
       ) : (
         <section>
@@ -191,6 +194,9 @@ export default async function DashboardPage({
               ))}
             </div>
           )}
+          <Button asChild className="mt-6 w-full md:hidden">
+            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+          </Button>
         </section>
       )}
     </div>

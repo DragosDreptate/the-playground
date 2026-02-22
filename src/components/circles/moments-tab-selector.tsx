@@ -13,7 +13,7 @@ export async function MomentsTabSelector({ activeTab, isHost, circleSlug }: Prop
   const tMoment = await getTranslations("Moment");
 
   return (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
       <div className="flex items-center gap-1 rounded-full border p-1">
         <Link
           href="?tab=upcoming"
@@ -38,7 +38,7 @@ export async function MomentsTabSelector({ activeTab, isHost, circleSlug }: Prop
       </div>
 
       {isHost && activeTab === "upcoming" && (
-        <Button asChild size="sm">
+        <Button asChild size="sm" className="w-full md:w-auto">
           <Link href={`/dashboard/circles/${circleSlug}/moments/new`}>
             {tMoment("create.title")}
           </Link>

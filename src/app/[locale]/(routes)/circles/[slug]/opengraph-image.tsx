@@ -4,7 +4,7 @@ import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
 
 export const runtime = "nodejs";
-export const alt = "Cercle — The Playground";
+export const alt = "Communauté — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -109,7 +109,7 @@ export default async function OgImage({
               letterSpacing: "2px",
             }}
           >
-            Cercle
+            Communauté
           </span>
         </div>
 

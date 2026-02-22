@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 export const runtime = "nodejs";
-export const alt = "The Playground — Lancez votre communauté";
+export const alt = "The Playground — Lancez votre communauté, organisez vos événements";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -127,7 +127,7 @@ export default async function OgImage() {
                 Lancez
               </span>
               <span style={{ color: "white", marginLeft: "14px" }}>
-                votre Cercle.
+                votre Communauté.
               </span>
             </div>
 
@@ -150,7 +150,7 @@ export default async function OgImage() {
                 Organisez
               </span>
               <span style={{ color: "white", marginLeft: "14px" }}>
-                vos Escales.
+                vos événements.
               </span>
             </div>
 

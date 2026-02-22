@@ -2,9 +2,9 @@
   "HomePage": {
     "title": "The Playground",
     "heroHighlight1": "Lancez",
-    "heroRest1": "votre Cercle.",
+    "heroRest1": "votre Communauté.",
     "heroHighlight2": "Organisez",
-    "heroRest2": "vos Escales.",
+    "heroRest2": "vos événements.",
     "heroHighlight3": "Fédérez",
     "heroRest3": "votre audience.",
     "heroSubtitle": "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
@@ -19,27 +19,27 @@
     "mockupMomentLocation": "Le Comptoir",
     "mockupMomentAttendees": "8 inscrit(s)",
     "howItWorks": "Comment ça marche",
-    "step1Title": "Créez votre Cercle",
+    "step1Title": "Créez votre Communauté",
     "step1Description": "Votre espace communautaire en 30 secondes. Public ou privé, vous décidez.",
-    "step2Title": "Lancez des Escales",
+    "step2Title": "Lancez des événements",
     "step2Description": "Chaque événement a sa page premium partageable. Un lien, et c'est parti.",
     "step3Title": "Regardez votre Playground grandir",
-    "step3Description": "Les participants restent membres de votre Cercle et reviennent pour les prochaines Escales.",
+    "step3Description": "Les participants restent membres de votre Communauté et reviennent pour les prochains événements.",
     "pillarsHeading": "Ce qui rend The Playground différent",
     "pillar1Title": "Communauté d'abord",
-    "pillar1Description": "Vos membres restent entre les Escales. Fini les audiences éphémères.",
+    "pillar1Description": "Vos membres restent entre les événements. Fini les audiences éphémères.",
     "pillar2Title": "Design premium",
-    "pillar2Description": "Pages élégantes, sans effort. Votre Cercle impressionne dès le premier jour.",
+    "pillar2Description": "Pages élégantes, sans effort. Votre Communauté impressionne dès le premier jour.",
     "pillar3Title": "100% gratuit",
     "pillar3Description": "Zéro commission, zéro abonnement. Seuls les frais Stripe sur les événements payants.",
     "ctaFinalTitle": "Prêt à lancer votre communauté ?",
-    "ctaFinalSubtitle": "Créez votre Cercle en 30 secondes. C'est gratuit, pour toujours.",
+    "ctaFinalSubtitle": "Créez votre Communauté en 30 secondes. C'est gratuit, pour toujours.",
     "ctaFinal": "Commencer gratuitement",
     "ctaExplore": "Commencez à explorer",
     "heroFamiliar1": "communauté",
     "heroFamiliar2": "événements",
-    "heroBranded1": "Cercle",
-    "heroBranded2": "Escales",
+    "heroBranded1": "Communauté",
+    "heroBranded2": "événements",
     "heroRestPrefix1": "votre",
     "heroRestPrefix2": "vos"
   },
@@ -84,25 +84,25 @@
     "signOut": "Se déconnecter"
   },
   "Dashboard": {
-    "title": "Mon Playground",
-    "myCircles": "Mes Cercles",
-    "createCircle": "Créer un Cercle",
-    "createMoment": "Créer une Escale",
+    "title": "Mon espace",
+    "myCircles": "Mes Communautés",
+    "createCircle": "Créer une Communauté",
+    "createMoment": "Créer un événement",
     "selectCircle": {
-      "title": "Choisir un Cercle",
-      "description": "À quel Cercle rattacher cette Escale ?"
+      "title": "Choisir une Communauté",
+      "description": "À quelle Communauté rattacher cet événement ?"
     },
     "noCircles": {
-      "title": "Créez d'abord un Cercle",
-      "description": "Vous devez créer un Cercle avant de créer une Escale."
+      "title": "Créez d'abord une Communauté",
+      "description": "Vous devez créer une Communauté avant de créer un événement."
     },
-    "myMoments": "Mes Escales",
-    "upcomingMoments": "Mes prochaines Escales",
-    "pastMoments": "Passées",
-    "noUpcomingMoments": "Aucune Escale à venir.",
-    "noMoments": "Aucune Escale pour l'instant.",
-    "noMomentsHint": "Rejoignez une Escale ou créez votre communauté.",
-    "noCirclesMember": "Vous n'êtes membre d'aucun Cercle.",
+    "myMoments": "Mes événements",
+    "upcomingMoments": "Mes prochains événements",
+    "pastMoments": "Passés",
+    "noUpcomingMoments": "Aucun événement à venir.",
+    "noMoments": "Aucun événement pour l'instant.",
+    "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
+    "noCirclesMember": "Vous n'êtes membre d'aucune Communauté.",
     "role": {
       "host": "Organisateur",
       "player": "Participant"
@@ -116,39 +116,39 @@
     "hostTools": "Outils Organisateur",
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
-    "greetingSubtitle": "Vos Cercles et vos prochaines Escales, au même endroit.",
+    "greetingSubtitle": "Vos Communautés et vos prochains événements, au même endroit.",
     "memberCount": "{count} membres"
   },
   "Circle": {
     "create": {
-      "title": "Créer un Cercle",
+      "title": "Créer une Communauté",
       "description": "Configurez votre espace communautaire"
     },
     "edit": {
-      "title": "Modifier le Cercle",
-      "description": "Mettez à jour les paramètres de votre Cercle"
+      "title": "Modifier la Communauté",
+      "description": "Mettez à jour les paramètres de votre Communauté"
     },
     "form": {
       "name": "Nom",
       "namePlaceholder": "Ma super communauté",
       "description": "Description",
-      "descriptionPlaceholder": "Décrivez votre Cercle en quelques mots...",
+      "descriptionPlaceholder": "Décrivez votre Communauté en quelques mots...",
       "visibility": "Visibilité",
-      "visibilityPublic": "Public — tout le monde peut découvrir ce Cercle",
-      "visibilityPrivate": "Privé — accessible uniquement sur invitation",
+      "visibilityPublic": "Publique — tout le monde peut découvrir cette Communauté",
+      "visibilityPrivate": "Privée — accessible uniquement sur invitation",
       "category": "Thématique",
       "categoryPlaceholder": "Choisir une thématique",
       "city": "Ville",
       "cityPlaceholder": "Paris, Lyon, Remote..."
     },
     "delete": {
-      "title": "Supprimer le Cercle",
-      "description": "Êtes-vous sûr de vouloir supprimer ce Cercle ? Cette action est irréversible. Toutes les Escales et adhésions seront définitivement supprimées.",
-      "confirm": "Oui, supprimer ce Cercle"
+      "title": "Supprimer la Communauté",
+      "description": "Êtes-vous sûr de vouloir supprimer cette Communauté ? Cette action est irréversible. Tous les événements et adhésions seront définitivement supprimés.",
+      "confirm": "Oui, supprimer cette Communauté"
     },
     "detail": {
       "members": "Membres",
-      "moments": "Escales",
+      "moments": "Événements",
       "settings": "Paramètres",
       "editCircle": "Modifier",
       "deleteCircle": "Supprimer",
@@ -157,38 +157,38 @@
       "hostedBy": "Organisé par",
       "about": "À propos",
       "visibility": "Visibilité",
-      "publicCircle": "Cercle public",
-      "privateCircle": "Cercle privé",
+      "publicCircle": "Communauté publique",
+      "privateCircle": "Communauté privée",
       "memberCount": "{count} membres",
-      "upcomingMoments": "Prochaines Escales",
-      "pastMoments": "Escales passées",
-      "noUpcomingMoments": "Aucune Escale à venir.",
-      "noPastMoments": "Aucune Escale passée.",
+      "upcomingMoments": "Prochains événements",
+      "pastMoments": "Événements passés",
+      "noUpcomingMoments": "Aucun événement à venir.",
+      "noPastMoments": "Aucun événement passé.",
       "today": "Aujourd'hui",
-      "manageMoment": "Gérer cette Escale"
+      "manageMoment": "Gérer cet événement"
     },
     "errors": {
-      "notFound": "Cercle introuvable",
+      "notFound": "Communauté introuvable",
       "unauthorized": "Vous n'avez pas la permission d'effectuer cette action",
-      "createFailed": "Échec de la création du Cercle",
-      "updateFailed": "Échec de la mise à jour du Cercle",
-      "deleteFailed": "Échec de la suppression du Cercle"
+      "createFailed": "Échec de la création de la Communauté",
+      "updateFailed": "Échec de la mise à jour de la Communauté",
+      "deleteFailed": "Échec de la suppression de la Communauté"
     }
   },
   "Moment": {
     "create": {
-      "title": "Créer une Escale",
+      "title": "Créer un événement",
       "description": "Configurez votre événement"
     },
     "edit": {
-      "title": "Modifier l'Escale",
+      "title": "Modifier l'événement",
       "description": "Mettez à jour les détails de votre événement"
     },
     "form": {
       "title": "Titre",
       "eventName": "Nom de l'événement",
       "description": "Description",
-      "descriptionPlaceholder": "Décrivez votre Escale en quelques mots...",
+      "descriptionPlaceholder": "Décrivez votre événement en quelques mots...",
       "addLocation": "Ajouter un lieu",
       "addLocationHint": "Lieu physique ou lien virtuel",
       "addDescription": "Ajouter une description",
@@ -218,12 +218,12 @@
       "startLabel": "Début",
       "endLabel": "Fin",
       "pickDate": "Choisir une date",
-      "createMoment": "Créer une Escale"
+      "createMoment": "Créer un événement"
     },
     "delete": {
-      "title": "Supprimer l'Escale",
-      "description": "Êtes-vous sûr de vouloir supprimer cette Escale ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
-      "confirm": "Oui, supprimer cette Escale"
+      "title": "Supprimer l'événement",
+      "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
+      "confirm": "Oui, supprimer cet événement"
     },
     "detail": {
       "when": "Quand",
@@ -234,34 +234,34 @@
       "shareableLink": "Lien partageable"
     },
     "status": {
-      "published": "Publiée",
-      "cancelled": "Annulée",
-      "past": "Passée"
+      "published": "Publié",
+      "cancelled": "Annulé",
+      "past": "Passé"
     },
     "public": {
       "hostedBy": "Organisé par",
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
-      "registerFree": "Rejoindre gratuitement",
-      "registerPaid": "Rejoindre — {price} {currency}",
+      "registerFree": "S'inscrire gratuitement",
+      "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
-      "registered": "Vous avez rejoint cette Escale !",
+      "registered": "Vous êtes inscrit(e) à cet événement !",
       "waitlisted": "Vous êtes sur liste d'attente",
       "joinWaitlist": "Rejoindre la liste d'attente",
       "cancelRegistration": "Annuler mon inscription",
       "cancelConfirmTitle": "Annuler l'inscription",
-      "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cette Escale ?",
+      "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cet événement ?",
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",
-      "signInToRegister": "Se connecter pour rejoindre",
+      "signInToRegister": "Se connecter pour s'inscrire",
       "attendeesCount": "{count} participant(s)",
       "about": "À propos",
       "viewOnMap": "Voir sur Google Maps",
-      "eventTookPlace": "Cette Escale a eu lieu le",
-      "eventEnded": "Escale terminée",
-      "eventCancelled": "Escale annulée",
+      "eventTookPlace": "Cet événement a eu lieu le",
+      "eventEnded": "Événement terminé",
+      "eventCancelled": "Événement annulé",
       "attendedCount": "{count} personnes ont participé",
-      "viewCircleMoments": "Voir les prochaines Escales du Cercle"
+      "viewCircleMoments": "Voir les prochains événements de la Communauté"
     },
     "registrations": {
       "title": "Participants",
@@ -290,14 +290,14 @@
       "daysAgo": "Il y a {count}j"
     },
     "empty": {
-      "description": "Aucune Escale pour le moment. Créez votre premier événement."
+      "description": "Aucun événement pour le moment. Créez votre premier événement."
     },
     "errors": {
-      "notFound": "Escale introuvable",
-      "unauthorized": "Vous n'avez pas la permission de gérer cette Escale",
-      "createFailed": "Échec de la création de l'Escale",
-      "updateFailed": "Échec de la mise à jour de l'Escale",
-      "deleteFailed": "Échec de la suppression de l'Escale"
+      "notFound": "Événement introuvable",
+      "unauthorized": "Vous n'avez pas la permission de gérer cet événement",
+      "createFailed": "Échec de la création de l'événement",
+      "updateFailed": "Échec de la mise à jour de l'événement",
+      "deleteFailed": "Échec de la suppression de l'événement"
     }
   },
   "CircleCategory": {
@@ -311,25 +311,25 @@
     "OTHER": "Autre"
   },
   "Explorer": {
-    "title": "Explorer",
+    "title": "Découvrir",
     "description": "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
-    "navLink": "Explorer",
+    "navLink": "Découvrir",
     "tabs": {
-      "circles": "Cercles",
-      "moments": "Escales"
+      "circles": "Communautés",
+      "moments": "Événements"
     },
     "filters": {
       "allCategories": "Toutes les thématiques"
     },
     "empty": {
-      "circles": "Aucun Cercle public pour cette thématique.",
-      "moments": "Aucune Escale à venir pour cette thématique."
+      "circles": "Aucune Communauté publique pour cette thématique.",
+      "moments": "Aucun événement à venir pour cette thématique."
     },
     "circleCard": {
       "members": "{count} membres",
-      "upcomingMoments": "{count} Escale(s) à venir",
-      "noUpcomingMoments": "Aucune Escale à venir",
-      "nextMoment": "Prochaine Escale"
+      "upcomingMoments": "{count} événement(s) à venir",
+      "noUpcomingMoments": "Aucun événement à venir",
+      "nextMoment": "Prochain événement"
     },
     "momentCard": {
       "free": "Gratuit",
@@ -342,13 +342,13 @@
     "title": "Administration",
     "dashboard": "Tableau de bord",
     "users": "Utilisateurs",
-    "circles": "Cercles",
-    "moments": "Escales",
+    "circles": "Communautés",
+    "moments": "Événements",
     "backToSite": "Retour au site",
     "stats": {
       "totalUsers": "Utilisateurs",
-      "totalCircles": "Cercles",
-      "totalMoments": "Escales",
+      "totalCircles": "Communautés",
+      "totalMoments": "Événements",
       "totalRegistrations": "Inscriptions",
       "thisWeek": "cette semaine"
     },
@@ -363,7 +363,7 @@
       "delete": "Supprimer",
       "cancel": "Annuler",
       "confirmDelete": "Êtes-vous sûr ? Cette action est irréversible.",
-      "confirmCancel": "Êtes-vous sûr de vouloir annuler cette Escale ?",
+      "confirmCancel": "Êtes-vous sûr de vouloir annuler cet événement ?",
       "cancelMoment": "Forcer l'annulation",
       "view": "Voir"
     },
@@ -374,24 +374,24 @@
       "completed": "Complété",
       "pending": "En attente",
       "memberSince": "Membre depuis",
-      "circles": "Cercles",
-      "noCircles": "Aucun Cercle."
+      "circles": "Communautés",
+      "noCircles": "Aucune Communauté."
     },
     "circleDetail": {
-      "title": "Détail Cercle",
+      "title": "Détail Communauté",
       "host": "Organisateur",
       "members": "Membres",
-      "moments": "Escales",
+      "moments": "Événements",
       "visibility": "Visibilité",
       "category": "Thématique",
       "city": "Ville",
       "description": "Description",
-      "recentMoments": "Escales récentes",
-      "noMoments": "Aucune Escale."
+      "recentMoments": "Événements récents",
+      "noMoments": "Aucun événement."
     },
     "momentDetail": {
-      "title": "Détail Escale",
-      "circle": "Cercle",
+      "title": "Détail événement",
+      "circle": "Communauté",
       "createdBy": "Créé par",
       "status": "Statut",
       "date": "Date",
@@ -404,15 +404,15 @@
       "name": "Nom",
       "email": "Email",
       "role": "Rôle",
-      "circles": "Cercles",
-      "moments": "Escales",
+      "circles": "Communautés",
+      "moments": "Événements",
       "createdAt": "Inscrit le",
       "host": "Organisateur",
       "members": "Membres",
       "visibility": "Visibilité",
       "category": "Thématique",
       "title": "Titre",
-      "circle": "Cercle",
+      "circle": "Communauté",
       "date": "Date",
       "status": "Statut",
       "registrations": "Inscrits",
@@ -420,13 +420,13 @@
     }
   },
   "UserMenu": {
-    "dashboard": "Mon Playground",
+    "dashboard": "Mon espace",
     "profile": "Profil",
     "signOut": "Se déconnecter"
   },
   "Email": {
     "registration": {
-      "subject": "Vous avez rejoint {momentTitle}",
+      "subject": "Inscription confirmée : {momentTitle}",
       "heading": "Inscription confirmée !",
       "statusMessage": "Vous êtes inscrit(e) à {momentTitle}."
     },
@@ -441,9 +441,9 @@
       "statusMessage": "Une place s'est libérée ! Votre inscription à {momentTitle} est confirmée."
     },
     "hostNotification": {
-      "subject": "{playerName} a rejoint {momentTitle}",
+      "subject": "{playerName} s'est inscrit(e) à {momentTitle}",
       "heading": "Nouvelle inscription",
-      "message": "{playerName} a rejoint {momentTitle}",
+      "message": "{playerName} s'est inscrit(e) à {momentTitle}",
       "registrationInfo": "{count} inscrit(s) / {capacity} places",
       "registrationInfoUnlimited": "{count} inscrit(s)",
       "manageRegistrationsCta": "Gérer les inscriptions"
@@ -451,7 +451,7 @@
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",
-      "viewMomentCta": "Voir l'Escale",
+      "viewMomentCta": "Voir l'événement",
       "cancelLink": "Annuler mon inscription",
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     }
@@ -463,7 +463,7 @@
     },
     "product": {
       "title": "Produit",
-      "explore": "Explorer",
+      "explore": "Découvrir",
       "howItWorks": "Comment ça marche"
     },
     "legal": {
@@ -516,7 +516,7 @@
         "title": "Finalités du traitement",
         "items": {
           "auth": "Authentification et gestion de votre compte",
-          "service": "Fourniture du service (création de Cercles, inscription aux Escales)",
+          "service": "Fourniture du service (création de communautés, inscription aux événements)",
           "email": "Envoi d'emails transactionnels (confirmations d'inscription, notifications)",
           "analytics": "Amélioration du service via des statistiques anonymisées"
         }
@@ -556,7 +556,7 @@
       },
       "service": {
         "title": "Description du service",
-        "content": "The Playground est une plateforme gratuite permettant de créer des communautés (Cercles) et d'organiser des événements (Escales). Le service est accessible via le web et est fourni « en l'état »."
+        "content": "The Playground est une plateforme gratuite permettant de créer des communautés et d'organiser des événements. Le service est accessible via le web et est fourni « en l'état »."
       },
       "account": {
         "title": "Compte utilisateur",
@@ -564,19 +564,19 @@
       },
       "userContent": {
         "title": "Contenu utilisateur",
-        "content": "Vous êtes seul responsable du contenu que vous publiez sur The Playground (descriptions de Cercles, d'Escales, commentaires). Tout contenu illicite, diffamatoire, discriminatoire ou contraire aux bonnes mœurs est interdit et pourra être supprimé sans préavis."
+        "content": "Vous êtes seul responsable du contenu que vous publiez sur The Playground (descriptions de communautés, d'événements, commentaires). Tout contenu illicite, diffamatoire, discriminatoire ou contraire aux bonnes mœurs est interdit et pourra être supprimé sans préavis."
       },
       "hostResponsibilities": {
         "title": "Responsabilités de l'Organisateur",
-        "content": "En tant qu'Organisateur, vous êtes responsable de l'exactitude des informations relatives à vos Escales (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
+        "content": "En tant qu'Organisateur, vous êtes responsable de l'exactitude des informations relatives à vos événements (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
       },
       "playerResponsibilities": {
         "title": "Responsabilités du Participant",
-        "content": "En tant que Participant, vous vous engagez à respecter les règles de chaque Cercle et Escale auxquels vous participez. L'inscription à une Escale vaut engagement de présence."
+        "content": "En tant que Participant, vous vous engagez à respecter les règles de chaque Communauté et événement auxquels vous participez. L'inscription à un événement vaut engagement de présence."
       },
       "pricing": {
         "title": "Gratuité et tarification",
-        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les Escales payantes, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'Organisateur."
+        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'Organisateur."
       },
       "liability": {
         "title": "Limitation de responsabilité",
@@ -611,8 +611,8 @@
       "personalInfo": "Informations personnelles",
       "memberSince": "Membre depuis",
       "account": "Compte",
-      "circles": "Cercles",
-      "moments": "Escales"
+      "circles": "Communautés",
+      "moments": "Événements"
     },
     "form": {
       "email": "Email",
