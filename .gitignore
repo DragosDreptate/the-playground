@@ -61,6 +61,9 @@ nimbalyst-local/
 tsconfig.tsbuildinfo
 tests/mobile/.auth/
 tests/e2e/.auth/
+playwright-report/
+playwright-report-mobile/
+test-results/
 
 # sentry
 .sentryclirc
