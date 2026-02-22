@@ -47,24 +47,24 @@ export default async function HomePage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4">
-          <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16">
+        <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4 pt-16 pb-12 md:pt-0 md:pb-0">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-16">
             {/* LEFT — text */}
             <div className="flex-1 text-center lg:text-left">
               <h1 className="text-3xl leading-[1.3] font-medium tracking-tighter md:text-4xl lg:text-[2.75rem]">
-                <span className="block whitespace-nowrap">
+                <span className="block md:whitespace-nowrap">
                   <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
                     {t("heroHighlight1")}
                   </span>{" "}
                   {t("heroRest1")}
                 </span>
-                <span className="block whitespace-nowrap">
+                <span className="block md:whitespace-nowrap">
                   <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
                     {t("heroHighlight2")}
                   </span>{" "}
                   {t("heroRest2")}
                 </span>
-                <span className="block whitespace-nowrap">
+                <span className="block md:whitespace-nowrap">
                   <span className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent">
                     {t("heroHighlight3")}
                   </span>{" "}
@@ -79,9 +79,9 @@ export default async function HomePage() {
               </Button>
             </div>
 
-            {/* RIGHT — iPhone mockup (3D tilt, always dark) */}
+            {/* RIGHT — iPhone mockup (3D tilt, always dark, desktop only) */}
             <div
-              className="flex shrink-0 justify-center lg:w-[300px]"
+              className="hidden shrink-0 justify-center lg:flex lg:w-[300px]"
               style={{ perspective: "1200px" }}
             >
               <div
