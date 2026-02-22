@@ -138,7 +138,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
         </div>
 
         {/* Right column — Form fields */}
-        <div className="flex min-w-0 flex-1 flex-col gap-5">
+        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
           {/* Status select (edit mode only) */}
           {moment && (
             <div className="flex justify-end">
