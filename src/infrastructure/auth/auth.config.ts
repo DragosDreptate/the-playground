@@ -43,7 +43,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       console.error("[AUTH ERROR]", error);
     },
   },
+  events: {
+    async linkAccount({ user, profile }) {
+      if (profile.image && user.id) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { image: profile.image },
+        });
+      }
+    },
+  },
   callbacks: {
+    async signIn({ user, profile }) {
+      if (profile?.image && user.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { image: true },
+        });
+        if (!dbUser?.image || dbUser.image !== profile.image) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { image: profile.image },
+          });
+        }
+      }
+      return true;
+    },
     session({ session, user }) {
       session.user.id = user.id;
       const dbUser = user as unknown as { onboardingCompleted: boolean; role: "USER" | "ADMIN" };

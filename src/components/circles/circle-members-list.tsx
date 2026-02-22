@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Crown } from "lucide-react";
-import { getMomentGradient } from "@/lib/gradient";
+import { UserAvatar } from "@/components/user-avatar";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
 type CircleMembersListProps = {
@@ -12,17 +12,6 @@ type CircleMembersListProps = {
   players: CircleMemberWithUser[];
   variant?: "host" | "player";
 };
-
-function getInitials(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName)
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  if (firstName) return firstName[0].toUpperCase();
-  return email[0].toUpperCase();
-}
 
 function getDisplayName(
   firstName: string | null,
@@ -78,27 +67,18 @@ function MemberItem({
   showEmail?: boolean;
 }) {
   const { user } = member;
+  const displayName = getDisplayName(user.firstName, user.lastName, user.email);
 
   return (
     <div className="flex items-center gap-2">
-      {user.image ? (
-        <img
-          src={user.image}
-          alt=""
-          className="size-8 rounded-full object-cover"
-        />
-      ) : (
-        <div
-          className="flex size-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-          style={{ background: getMomentGradient(user.email) }}
-        >
-          {getInitials(user.firstName, user.lastName, user.email)}
-        </div>
-      )}
+      <UserAvatar
+        name={displayName}
+        email={user.email}
+        image={user.image}
+        size="sm"
+      />
       <div className="min-w-0">
-        <p className="text-sm">
-          {getDisplayName(user.firstName, user.lastName, user.email)}
-        </p>
+        <p className="text-sm">{displayName}</p>
         {showEmail && (
           <p className="text-muted-foreground truncate text-xs">
             {user.email}

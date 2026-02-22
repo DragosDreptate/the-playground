@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getMomentGradient } from "@/lib/gradient";
+import { UserAvatar } from "@/components/user-avatar";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
 type RegistrationsListProps = {
@@ -11,16 +11,6 @@ type RegistrationsListProps = {
   capacity: number | null;
   variant?: "host" | "public";
 };
-
-function getInitials(firstName: string | null, lastName: string | null, email: string): string {
-  if (firstName && lastName) {
-    return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  }
-  if (firstName) {
-    return firstName[0].toUpperCase();
-  }
-  return email[0].toUpperCase();
-}
 
 function getDisplayName(firstName: string | null, lastName: string | null, email: string): string {
   if (firstName && lastName) {
@@ -70,45 +60,34 @@ export function RegistrationsList({
         </p>
       ) : (
         <div className="flex flex-wrap gap-3">
-          {registrations.map((reg) => (
-            <div
-              key={reg.id}
-              className="flex items-center gap-2"
-            >
-              {reg.user.image ? (
-                <img
-                  src={reg.user.image}
-                  alt=""
-                  className="size-8 rounded-full object-cover"
+          {registrations.map((reg) => {
+            const displayName = getDisplayName(
+              reg.user.firstName,
+              reg.user.lastName,
+              reg.user.email
+            );
+            return (
+              <div
+                key={reg.id}
+                className="flex items-center gap-2"
+              >
+                <UserAvatar
+                  name={displayName}
+                  email={reg.user.email}
+                  image={reg.user.image}
+                  size="sm"
                 />
-              ) : (
-                <div
-                  className="flex size-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-                  style={{ background: getMomentGradient(reg.user.email) }}
-                >
-                  {getInitials(
-                    reg.user.firstName,
-                    reg.user.lastName,
-                    reg.user.email
+                <div className="min-w-0">
+                  <p className="text-sm">{displayName}</p>
+                  {variant === "host" && (
+                    <p className="text-muted-foreground truncate text-xs">
+                      {reg.user.email}
+                    </p>
                   )}
                 </div>
-              )}
-              <div className="min-w-0">
-                <p className="text-sm">
-                  {getDisplayName(
-                    reg.user.firstName,
-                    reg.user.lastName,
-                    reg.user.email
-                  )}
-                </p>
-                {variant === "host" && (
-                  <p className="text-muted-foreground truncate text-xs">
-                    {reg.user.email}
-                  </p>
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

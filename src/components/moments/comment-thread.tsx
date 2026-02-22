@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { getMomentGradient } from "@/lib/gradient";
+import { UserAvatar } from "@/components/user-avatar";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import type { CommentWithUser } from "@/domain/models/comment";
 
@@ -29,16 +29,6 @@ type CommentThreadProps = {
   isPastMoment: boolean;
   signInUrl: string;
 };
-
-function getInitials(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName) return `${firstName[0]}${lastName[0]}`.toUpperCase();
-  if (firstName) return firstName[0].toUpperCase();
-  return email[0].toUpperCase();
-}
 
 function getDisplayName(
   firstName: string | null,
@@ -180,26 +170,16 @@ export function CommentThread({
               return (
                 <div key={comment.id} className="flex gap-3">
                   {/* Avatar */}
-                  {comment.user.image ? (
-                    <img
-                      src={comment.user.image}
-                      alt=""
-                      className="size-8 shrink-0 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
-                      style={{
-                        background: getMomentGradient(comment.user.email),
-                      }}
-                    >
-                      {getInitials(
-                        comment.user.firstName,
-                        comment.user.lastName,
-                        comment.user.email
-                      )}
-                    </div>
-                  )}
+                  <UserAvatar
+                    name={getDisplayName(
+                      comment.user.firstName,
+                      comment.user.lastName,
+                      comment.user.email
+                    )}
+                    email={comment.user.email}
+                    image={comment.user.image}
+                    size="sm"
+                  />
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
