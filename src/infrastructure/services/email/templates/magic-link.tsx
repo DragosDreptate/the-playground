@@ -13,11 +13,10 @@ export function MagicLinkEmail({ url }: Props) {
       footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     >
       <Section style={iconSection}>
-        {/* Icône CSS pure — même technique que le bouton gradient ci-dessous.
-            Aucune image, rendu lisse par le client email. */}
+        {/* Icône CSS pure — gradient + triangle border-trick.
+            line-height + inline-block pour centrage email-compatible (pas de flex). */}
         <div style={iconBox}>
-          {/* Triangle CSS border-trick : right-pointing, blanc */}
-          <div style={triangle} />
+          <span style={triangle} />
         </div>
         <Text style={brandName}>The Playground</Text>
       </Section>
@@ -51,25 +50,31 @@ const iconSection: React.CSSProperties = {
   marginBottom: "24px",
 };
 
-// Carré gradient — même dégradé rose→violet que le bouton CTA
+// Carré gradient 48×48 — même dégradé que le bouton CTA.
+// line-height + text-align pour centrage email-compatible (flex non supporté).
+// font-size:0 évite l'espace fantôme autour du span inline.
 const iconBox: React.CSSProperties = {
   background: "linear-gradient(135deg, #ec4899, #a855f7)",
-  borderRadius: "12px",
+  borderRadius: "11px",
   width: "48px",
   height: "48px",
+  lineHeight: "48px",
+  textAlign: "center" as const,
+  fontSize: "0",
   margin: "0 auto 8px auto",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
 };
 
-// Triangle CSS border-trick — right-pointing, 13×16px, décalé légèrement à droite
+// Triangle border-trick proportionnel à icon.tsx (polygon 13×15 dans un carré 32×32).
+// À 48×48 : largeur ≈ 20px, hauteur ≈ 22px (= 2×11px).
+// marginLeft: 3px = décalage optique vers la droite (comme marginLeft:"2px" dans icon.tsx).
 const triangle: React.CSSProperties = {
+  display: "inline-block",
+  verticalAlign: "middle",
   width: 0,
   height: 0,
-  borderTop: "8px solid transparent",
-  borderBottom: "8px solid transparent",
-  borderLeft: "13px solid #ffffff",
+  borderTop: "11px solid transparent",
+  borderBottom: "11px solid transparent",
+  borderLeft: "20px solid #ffffff",
   marginLeft: "3px",
 };
 
