@@ -53,7 +53,9 @@
 | Couverture tests complète : 14 nouveaux fichiers (get-user-registration, get-moment-comments, get-user-past-moments, 11 usecases admin). 5 specs E2E scaffoldées (auth, join-moment, host-flow, cancel-registration, comments). 202 tests, 100% verts. | 2026-02-21 | `3ee4865` |
 | Agents Claude Code : `test-coverage-guardian` (audit couverture + création tests manquants, run + correction en boucle) + `security-guardian` (audit RBAC/IDOR/accès admin, création tests sécurité, correction vulnérabilités). Définis dans `.claude/agents/`. | 2026-02-21 | — |
 | Sécurité : audit complet + correction vulnérabilité architecturale (defense-in-depth manquante sur 11 usecases admin). Ajout `callerRole: UserRole` + `AdminUnauthorizedError`. 59 nouveaux tests de sécurité (RBAC, IDOR cross-tenant, accès admin). 271 tests, 100% verts. | 2026-02-21 | `8b14aaf` |
-| Upload d'avatar utilisateur : port `StorageService` (hexagonal), adapter `VercelBlobStorageService` (@vercel/blob), helper `isUploadedUrl`, helper `resizeImage` (Canvas API, crop carré centré, WebP 384×384 ~50 Ko), server action `uploadAvatarAction`, composant `AvatarUpload` (hover overlay + lien texte conditionnel, preview optimiste, spinner), protection OAuth (ne pas écraser avatar uploadé), i18n FR/EN `Profile.avatar.*`, tests `blob.test.ts` + cas image dans `update-profile.test.ts`. | 2026-02-22 | `aa84d5c` |
+| Upload d'avatar utilisateur : port `StorageService` (hexagonal), adapter `VercelBlobStorageService` (@vercel/blob), helper `isUploadedUrl`, helper `resizeImage` (Canvas API, crop carré centré, WebP 384×384 ~50 Ko), server action `uploadAvatarAction`, composant `AvatarUpload` (hover overlay + lien texte conditionnel, preview optimiste, spinner), protection OAuth (ne pas écraser avatar uploadé), i18n FR/EN `Profile.avatar.*`, tests `blob.test.ts` + cas image dans `update-profile.test.ts`. AvatarUpload intégré aussi sur la page d'onboarding `/dashboard/profile/setup`. | 2026-02-22 | `aa84d5c` |
+| Isolation onboarding via route groups Next.js : `(app)/layout.tsx` (layout complet : SiteHeader + SiteFooter) + `(onboarding)/layout.tsx` (layout minimal : logo statique non-cliquable, LocaleToggle + ThemeToggle uniquement, pas de footer). Suppression de la prop `hideNav` du SiteHeader. Tests E2E (`onboarding.spec.ts`, 6 tests) + `playwright.config.ts` + script `test:e2e:setup-onboarding`. TDD : tests écrits en RED, puis implémentation, puis GREEN. | 2026-02-22 | `7c57b8d` |
+| Audit sécurité (security-guardian) : 20 nouveaux tests de sécurité. `avatar-upload-isolation.test.ts` (5 tests IDOR/userId isolation) + `onboarding-guard.test.ts` (15 tests anti-boucle, transitions d'état, cas limites). Aucune vulnérabilité détectée dans le code source. 299 tests, 100% verts. | 2026-02-22 | — |
 
 ---
 
@@ -167,10 +169,7 @@
 > Directement lié au principe "design premium par défaut" et à l'identité des communautés.
 > Les gradients générés sont de bons fallbacks, mais les Organisateurs doivent pouvoir personnaliser leur Cercle.
 
-- [ ] **Avatar utilisateur** — upload photo de profil
-  - Champ `avatarUrl` sur `User` (DB + domaine)
-  - Upload dans la page profil (remplace/complète le composant `UserAvatar` actuel)
-  - `UserAvatar` affiche la photo si disponible, sinon fallback gradient + initiales (comportement actuel inchangé)
+- [x] **Avatar utilisateur** ✅ — upload photo de profil (Vercel Blob, resize Canvas WebP 384×384)
 
 - [ ] **Cover / avatar Circle** — image personnalisée du Cercle
   - Champ `imageUrl` sur `Circle` (DB + domaine)
@@ -244,9 +243,9 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre Escale dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [x] **Tests unitaires complets** — 271 tests, tous usecases couverts (y compris admin) ✅
-- [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin (59 tests dédiés sécurité) ✅
-- [ ] **Tests E2E Playwright** — 5 specs scaffoldées (auth, join-moment, host-flow, cancel-registration, comments), à brancher sur environnement de test
+- [x] **Tests unitaires complets** — 299 tests, tous usecases couverts (y compris admin) ✅
+- [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
+- [ ] **Tests E2E Playwright** — 6 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding). `onboarding.spec.ts` : 6/6 green. Les 5 autres à brancher sur environnement de test.
 - [ ] **Accessibilité axe-core** dans Playwright
 
 ---
