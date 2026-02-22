@@ -29,6 +29,8 @@
     "db:seed-demo-data:prod": "bash scripts/db-seed-demo-data-prod.sh",
     "db:cleanup-demo-data": "tsx scripts/db-cleanup-demo-data.ts",
     "db:cleanup-demo-data:prod": "bash scripts/db-cleanup-demo-data-prod.sh",
+    "test:e2e": "playwright test",
+    "test:e2e:setup-onboarding": "tsx tests/e2e/setup-onboarding-auth.ts",
     "test:mobile": "playwright test --config playwright.config.mobile.ts",
     "test:mobile:setup": "tsx tests/mobile/setup-auth.ts",
     "postinstall": "prisma generate"

@@ -3,7 +3,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 
-export default async function DashboardLayout({
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,11 +14,9 @@ export default async function DashboardLayout({
     redirect("/auth/sign-in");
   }
 
-  const isOnboarding = !session.user.onboardingCompleted;
-
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader user={session.user} hideNav={isOnboarding} />
+      <SiteHeader user={session.user} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">
         {children}
       </main>

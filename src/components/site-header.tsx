@@ -13,11 +13,9 @@ type SiteHeaderProps = {
     image?: string | null;
     role?: "USER" | "ADMIN";
   } | null;
-  /** Masque navigation + UserMenu — utilisé pendant l'onboarding */
-  hideNav?: boolean;
 };
 
-export async function SiteHeader({ user, hideNav = false }: SiteHeaderProps) {
+export async function SiteHeader({ user }: SiteHeaderProps) {
   const t = await getTranslations("Auth");
   const tExplorer = await getTranslations("Explorer");
   const tDashboard = await getTranslations("Dashboard");
@@ -26,29 +24,18 @@ export async function SiteHeader({ user, hideNav = false }: SiteHeaderProps) {
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
         {/* Logo — left */}
-        {hideNav ? (
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
-              <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
-                <polygon points="0,0 0,12 10,6" fill="white" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold">The Playground</span>
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
+              <polygon points="0,0 0,12 10,6" fill="white" />
+            </svg>
           </div>
-        ) : (
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
-              <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
-                <polygon points="0,0 0,12 10,6" fill="white" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold">The Playground</span>
-          </Link>
-        )}
+          <span className="text-lg font-semibold">The Playground</span>
+        </Link>
 
         {/* Nav — center */}
         <nav className="flex flex-1 items-center justify-center gap-6">
-          {user && !hideNav && (
+          {user && (
             <>
               <Link
                 href="/explorer"
@@ -72,16 +59,12 @@ export async function SiteHeader({ user, hideNav = false }: SiteHeaderProps) {
         <div className="flex shrink-0 items-center gap-3">
           <LocaleToggle />
           <ThemeToggle />
-          {!hideNav && (
-            <>
-              {user ? (
-                <UserMenu user={user} />
-              ) : (
-                <Button variant="ghost" size="sm" asChild>
-                  <Link href="/auth/sign-in">{t("signIn.title")}</Link>
-                </Button>
-              )}
-            </>
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/auth/sign-in">{t("signIn.title")}</Link>
+            </Button>
           )}
         </div>
       </div>
