@@ -57,5 +57,5 @@ Si vous organisez des événements et que vous en avez marre de perdre votre aud
 - **Structure** : hook personnel → problème → frustration → solution → angle IA → résultat → CTA
 - **Ton** : authentique, direct, pas corporate. Un fondateur qui raconte son histoire.
 - **Hashtags** : mix communauté/événements + tech/IA + build in public
-- **À personnaliser** : ajouter le lien réel, éventuellement une image/screenshot de la page Escale
-- **Image suggérée** : screenshot d'une page Escale (design premium) ou du dashboard avec des données démo
+- **À personnaliser** : ajouter le lien réel, éventuellement une image/screenshot de la page événement
+- **Image suggérée** : screenshot d'une page événement (design premium) ou du dashboard avec des données démo

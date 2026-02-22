@@ -207,7 +207,7 @@ src/app/[locale]/(routes)/admin/layout.tsx
 
 - Guard : `session.user.role !== "ADMIN"` → `redirect("/")`
 - Layout : sidebar fixe (gauche) + main content (droite, `max-w-6xl`)
-- `AdminSidebar` : navigation Dashboard / Utilisateurs / Cercles / Escales + lien "Retour au site"
+- `AdminSidebar` : navigation Dashboard / Utilisateurs / Communautés / Événements + lien "Retour au site"
 
 ### Pages (7 routes + layout)
 
@@ -277,7 +277,7 @@ Ne supprime pas les inscriptions existantes (elles restent visibles dans l'histo
 - Détails : `userDetail.*`, `circleDetail.*`, `momentDetail.*`
 - Colonnes : `columns.*` (name, email, role, circles, moments, etc.)
 
-Les termes domaine suivent la convention de nommage : Circle → Cercle (FR), Moment → Escale (FR).
+Les termes domaine suivent la convention de nommage : Circle → Communauté (FR), Moment → événement (FR).
 
 ---
 

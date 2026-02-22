@@ -15,12 +15,12 @@ Dans ce modèle :
 - Le nom de la plateforme, les couleurs, le logo sont ceux du client
 
 Ce qui disparaît de l'UI :
-- Sélection / création de Cercle
-- La Carte / Explorer (pas de découverte multi-communautés)
-- Notion de "rejoindre un Cercle" (on est membre de LA communauté)
+- Sélection / création de Communauté
+- Découvrir / Explorer (pas de découverte multi-communautés)
+- Notion de "s'inscrire à une Communauté" (on est membre de LA communauté)
 
 Ce qui change de sens :
-- "Membres" = membres de la communauté unique (pas d'un Cercle parmi d'autres)
+- "Membres" = membres de la communauté unique (pas d'une Communauté parmi d'autres)
 - Dashboard = liste des événements directement, sans couche Circle
 
 ---
@@ -94,13 +94,13 @@ apps/
 Chaque Circle peut avoir un domaine custom (`events.mycommunity.com`). Sur ce domaine, seul ce Circle est affiché. The Playground reste l'infrastructure invisible.
 
 ```
-the-playground.fr          → plateforme multi-communauté (La Carte, etc.)
+the-playground.fr          → plateforme multi-communauté (Découvrir, etc.)
 events.mycommunity.com     → Circle ID=xxx, branding custom, mono-communauté
 ```
 
 **Principe technique :**
 - Le middleware détecte le domaine entrant → résout le Circle associé
-- L'UI masque la couche Circle (plus de selector, plus de La Carte)
+- L'UI masque la couche Circle (plus de selector, plus de Découvrir)
 - Le header affiche le nom et le logo du client
 - Un objet `theme` en DB contient les variables CSS du client
 

@@ -6,7 +6,7 @@
 Build your community. Host your events. Own your audience.
 
 **FR**
-Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.
+Lancez votre communauté. Organisez vos événements. Animez votre réseau.
 
 ---
 
@@ -176,7 +176,7 @@ Contient :
 - Commenter sur le fil du Moment
 - **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention
 
-## La Carte (découverte publique)
+## Découvrir (découverte publique)
 
 - Annuaire simple de Circles publics
 - Filtrable par thème (catégorie), ville en affichage uniquement (pas de filtre MVP)
@@ -213,7 +213,7 @@ Contient :
 - Données exportables (export complet Circle : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
-- Pas de marketplace (mais La Carte : annuaire simple de Circles publics)
+- Pas de marketplace (mais Découvrir : annuaire simple de Circles publics)
 - Ownership des données pour les Circles
 - Architecture notifications multi-canal dès la conception (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour support multi-langue futur
@@ -287,7 +287,7 @@ Chaque Moment est une page autonome, design premium (benchmark Luma), optimisée
 - Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host)
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
-- La Carte (répertoire public de Circles)
+- Découvrir (répertoire public de Circles)
 - Export données (CSV) — pas encore implémenté
 - Admin plateforme (dashboard stats, listes paginées, modération)
 

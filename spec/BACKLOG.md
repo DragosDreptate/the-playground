@@ -80,7 +80,7 @@
 
 - [x] **Email de confirmation d'inscription** (MVP-1 — parcours A) ✅
   - Déclenché immédiatement après `JoinMoment`
-  - Contenu : titre Escale, date, lieu, lien `/m/[slug]`, lien d'annulation
+  - Contenu : titre événement, date, lieu, lien `/m/[slug]`, lien d'annulation
   - Gère aussi le cas WAITLISTED (textes différents, même template)
 
 - [ ] ~~**Email de rappel pré-événement**~~ → **déprioritisé, post-MVP** (voir Phase 2)
@@ -89,10 +89,10 @@
 
 - [x] **Email de promotion liste d'attente** (MVP-3 — parcours C) ✅
   - Déclenché par `CancelRegistration` quand un inscrit se désiste et promeut un waitlisté
-  - Contenu : "Votre place est confirmée", détails de l'Escale
+  - Contenu : "Votre place est confirmée", détails de l'événement
 
 - [x] **Email de notification Organisateur : nouvelle inscription** (MVP-4 — parcours D) ✅
-  - Déclenché par chaque `JoinMoment` sur une Escale dont l'utilisateur est Organisateur
+  - Déclenché par chaque `JoinMoment` sur un événement dont l'utilisateur est Organisateur
   - Contenu : nom du nouvel inscrit, total inscrits / places restantes, lien vers gestion
   - Skip quand l'Organisateur s'inscrit lui-même
 
@@ -113,20 +113,20 @@
   - Sur la page `/m/[slug]` après inscription : lien visible vers `/dashboard`
   - Objectif : faire découvrir l'espace personnel au nouveau membre
 
-- [ ] **Section "Prochaines Escales du Cercle" sur page Escale publique** (gap M-3)
-  - Sur `/m/[slug]` pour les Escales PUBLISHED (pas PAST — déjà traité)
-  - Affiche jusqu'à 3 prochaines Escales du même Cercle (titre, date, CTA)
+- [ ] **Section "Prochains événements de la Communauté" sur page événement publique** (gap M-3)
+  - Sur `/m/[slug]` pour les événements PUBLISHED (pas PAST — déjà traité)
+  - Affiche jusqu'à 3 prochains événements de la même Communauté (titre, date, CTA)
   - Rétention Circle depuis la porte d'entrée virale
 
 #### Engagement post-événement — fenêtre d'or 24h (parcours F)
 
-- [ ] **L'Organisateur peut commenter sur une Escale PAST** (gap H-1 — critique)
+- [ ] **L'Organisateur peut commenter sur un événement PAST** (gap H-1 — critique)
   - Actuellement : formulaire masqué pour tous sur PAST, y compris l'Organisateur
   - Décision à prendre : débloquer pour l'Organisateur uniquement, ou pour tous
   - Impact : l'Organisateur ne peut pas remercier sa communauté, pic d'engagement manqué
 
-- [ ] **CTA "Créer la prochaine Escale" depuis une Escale PAST** (gap H-2)
-  - Sur la page Escale PAST, vue Organisateur : bouton "Programmer la prochaine Escale"
+- [ ] **CTA "Créer le prochain événement" depuis un événement PAST** (gap H-2)
+  - Sur la page événement PAST, vue Organisateur : bouton "Programmer le prochain événement"
   - Pré-remplit le formulaire avec le même Circle
   - Capitalise sur l'élan post-événement
 
@@ -137,32 +137,32 @@
   - Réduit l'incertitude, évite l'abandon silencieux
   - Nécessite un champ `waitlistPosition` ou calcul à la volée
 
-#### Découverte inter-Escales (parcours B)
+#### Découverte inter-événements (parcours B)
 
-- [ ] **Autres Escales du Cercle sur la page Escale dashboard Participant** (gap H-4)
-  - Sur `/dashboard/circles/[slug]/moments/[slug]` vue Participant : section "Dans ce Cercle"
-  - Liste les 3 prochaines Escales À VENIR du même Cercle
-  - Actuellement absent : une fois sur une Escale, le Participant ne découvre pas les autres
+- [ ] **Autres événements de la Communauté sur la page événement dashboard Participant** (gap H-4)
+  - Sur `/dashboard/circles/[slug]/moments/[slug]` vue Participant : section "Dans cette Communauté"
+  - Liste les 3 prochains événements À VENIR de la même Communauté
+  - Actuellement absent : une fois sur un événement, le Participant ne découvre pas les autres
 
 #### Onboarding Organisateur — time-to-first-event (parcours G)
 
 - [ ] **Guide onboarding Organisateur débutant** (gap H-7)
-  - Dashboard vide (nouveau user, aucun Circle) : remplacer le simple bouton "Créer un Cercle"
-  - Proposition : stepper 3 étapes — "Créez votre Cercle → Créez votre première Escale → Partagez le lien"
+  - Dashboard vide (nouveau user, aucun Circle) : remplacer le simple bouton "Créer une Communauté"
+  - Proposition : stepper 3 étapes — "Créez votre Communauté → Créez votre premier événement → Partagez le lien"
   - Objectif : réduire le time-to-first-event à < 5 minutes
 
 - [ ] **CTA "Devenir organisateur" pour Participants** (gap H-5)
-  - Sur le dashboard d'un Participant sans Cercle : lien/bouton "Vous voulez organiser ? Créez votre Cercle"
-  - Actuellement invisible pour un Participant qui découvre la plateforme via une Escale
+  - Sur le dashboard d'un Participant sans Communauté : lien/bouton "Vous voulez organiser ? Créez votre Communauté"
+  - Actuellement invisible pour un Participant qui découvre la plateforme via un événement
 
 #### Gestion des inscriptions Organisateur (parcours E)
 
 - [ ] **Export CSV des inscrits** (gap E-3 + déjà au backlog)
-  - Depuis la page Escale Organisateur : bouton "Exporter la liste"
+  - Depuis la page événement Organisateur : bouton "Exporter la liste"
   - Colonnes : nom, email, statut (REGISTERED/WAITLISTED), date d'inscription
   - Besoin logistique réel (badges, listes d'émargement, suivi)
 
-- [ ] **Vue segmentée inscrits/liste d'attente sur page Escale Organisateur** (gap H-8 + M-5)
+- [ ] **Vue segmentée inscrits/liste d'attente sur page événement Organisateur** (gap H-8 + M-5)
   - Compteur "X inscrits confirmés · Y en attente · Z places restantes" en haut de page
   - Liste séparée en deux sections : Inscrits / Liste d'attente
   - Actuellement : liste unique sans distinction claire
@@ -172,23 +172,23 @@
 ### Personnalisation visuelle — avatars & covers
 
 > Directement lié au principe "design premium par défaut" et à l'identité des communautés.
-> Les gradients générés sont de bons fallbacks, mais les Organisateurs doivent pouvoir personnaliser leur Cercle.
+> Les gradients générés sont de bons fallbacks, mais les Organisateurs doivent pouvoir personnaliser leur Communauté.
 
 - [x] **Avatar utilisateur** ✅ — upload photo de profil (Vercel Blob, resize Canvas WebP 384×384)
 
-- [ ] **Cover / avatar Circle** — image personnalisée du Cercle
+- [ ] **Cover / avatar Circle** — image personnalisée de la Communauté
   - Champ `imageUrl` sur `Circle` (DB + domaine)
-  - Upload dans le formulaire d'édition du Cercle
+  - Upload dans le formulaire d'édition de la Communauté
   - Affiché en cover sur la page Circle (remplace le gradient généré) et dans `CircleAvatar`
   - Fallback : gradient actuel si pas d'image
 
-- [ ] **Cover Escale** — image de couverture de l'Escale
+- [ ] **Cover événement** — image de couverture de l'événement
   - Champ `coverImageUrl` sur `Moment` (DB + domaine)
-  - Upload dans le formulaire de création/édition d'une Escale
+  - Upload dans le formulaire de création/édition d'un événement
   - Affiché en bannière sur la page publique `/m/[slug]` (remplace le gradient)
   - Fallback : gradient actuel si pas d'image
 
-- [x] **Infrastructure upload** ✅ (prérequis commun aux covers Circle/Escale)
+- [x] **Infrastructure upload** ✅ (prérequis commun aux covers Circle/événement)
   - Port `StorageService` + adapter `VercelBlobStorageService` (@vercel/blob)
   - Contraintes : taille max 5 Mo, formats JPEG/PNG/WebP, redimensionnement Canvas côté client (WebP 384×384)
 
@@ -208,18 +208,18 @@
   - Stats Circle basiques
 
 - [ ] **Paiement Stripe Connect**
-  - Escales payantes : prix en centimes, reversement aux Organisateurs
+  - Événements payants : prix en centimes, reversement aux Organisateurs
   - Stripe Connect onboarding pour les Organisateurs
   - 0% commission plateforme, seuls frais Stripe
 
-- [x] **Fil de commentaires sur Escale** ✅
-  - CRUD commentaire sur chaque Escale
+- [x] **Fil de commentaires sur événement** ✅
+  - CRUD commentaire sur chaque événement
   - Visible sur la page publique et la vue dashboard
 
-- [x] **La Carte** (ex-Répertoire) ✅ — `spec/feature-explorer-la-carte.md`
+- [x] **Découvrir** (ex-Répertoire) ✅ — `spec/feature-explorer-la-carte.md`
   - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
-  - Tab **Cercles** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochaine Escale en teaser)
-  - Tab **Événements** : agenda chronologique des Escales PUBLISHED de Cercles publics (card community-first)
+  - Tab **Communautés** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain événement en teaser)
+  - Tab **Événements** : agenda chronologique des événements PUBLISHED de Communautés publiques (card community-first)
   - Filtre **catégorie** (MVP) — pas de filtre ville (densité insuffisante au lancement)
   - Page Circle publique `/circles/[slug]` accessible sans compte (SEO + cold traffic)
   - Lien "Explorer" dans le header principal (visible utilisateurs connectés)
@@ -229,25 +229,25 @@
 
 ### Priorité moyenne
 
-- [ ] **Email aux membres : nouvelle Escale dans leur Cercle** (gap M-4)
-  - Notifier tous les membres d'un Cercle quand l'Organisateur programme une nouvelle Escale
+- [ ] **Email aux membres : nouvel événement dans leur Communauté** (gap M-4)
+  - Notifier tous les membres d'une Communauté quand l'Organisateur programme un nouvel événement
   - Contenu : titre, date, lieu, description courte, CTA "S'inscrire" → `/m/[slug]`
   - Sans cette notification, les membres ne reviennent que s'ils pensent à vérifier — ce push est le principal levier de rétention
   - **❓ Décision ouverte : automatique ou manuel ?**
-    - **Contexte modèle actuel** : il n'existe pas de statut `DRAFT` — les statuts sont `PUBLISHED` / `CANCELLED` / `PAST`. Une Escale est créée directement en `PUBLISHED`. Création = publication, ce sont le même moment.
+    - **Contexte modèle actuel** : il n'existe pas de statut `DRAFT` — les statuts sont `PUBLISHED` / `CANCELLED` / `PAST`. Un événement est créé directement en `PUBLISHED`. Création = publication, ce sont le même moment.
     - **Automatique à la création** (= à la publication aujourd'hui) : zéro friction, mais l'Organisateur ne peut pas corriger une erreur avant que les membres soient notifiés
-    - **Manuel** (bouton "Notifier les membres" sur la page Escale) : l'Organisateur contrôle le moment d'envoi — mais étape supplémentaire qu'il peut oublier
+    - **Manuel** (bouton "Notifier les membres" sur la page événement) : l'Organisateur contrôle le moment d'envoi — mais étape supplémentaire qu'il peut oublier
     - **Hybride** (envoi automatique à la publication, re-notification manuelle possible) : nécessite d'introduire un statut `DRAFT` — changement de modèle non négligeable, à peser par rapport au bénéfice
     - **Recommandation court terme** : automatique à la création (simple, cohérent avec le modèle actuel), avec un délai de grâce de quelques minutes pour annulation ("Annuler l'envoi" façon Gmail)
   - Dépend de l'infrastructure email existante (`ResendEmailService`, `EmailService` port) — réutilisable directement
-  - Option future : préférence par membre (opt-out des notifications Cercle)
+  - Option future : préférence par membre (opt-out des notifications Communauté)
   - Prérequis si hybride retenu : ajouter `DRAFT` à `MomentStatus` (DB + domaine + UI)
 
 - [ ] **Export données Organisateur**
-  - CSV export : membres Circle, historique Escales, inscrits cumulés
+  - CSV export : membres Circle, historique événements, inscrits cumulés
 
 - [ ] **Assistant IA basique**
-  - Description Escale, email invitation, suggestions Circle
+  - Description événement, email invitation, suggestions Communauté
   - SDK Anthropic (Claude)
 
 ### Infrastructure / Qualité
@@ -256,7 +256,7 @@
   - Baseline migrations Prisma (passer de `db:push` à `prisma migrate`)
   - Scripts `db:migrate`, `db:migrate:prod`, `db:migrate:status`, `db:snapshot`
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
-  - Validation titre Escale dans les usecases (max 200 chars, actuellement front-only)
+  - Validation titre événement dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
 - [x] **Tests unitaires complets** — 299 tests, tous usecases couverts (y compris admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
@@ -270,10 +270,10 @@
 - [ ] Track (série d'événements récurrents dans un Circle)
 - [ ] Check-in (marquer présent sur place)
 - [ ] **Galerie photos post-événement**
-  - Les Participants et l'Organisateur peuvent uploader des photos après une Escale PAST
+  - Les Participants et l'Organisateur peuvent uploader des photos après un événement PAST
   - Galerie visible sur la page publique `/m/[slug]` et sur la page Circle (onglet dédié ou section en bas)
   - Upload via `StorageService` existant (Vercel Blob) — infrastructure déjà en place
-  - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par Escale
+  - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par événement
   - Option modération : l'Organisateur peut supprimer une photo
   - Viralité : lien partageable vers la galerie, CTA "Voir les photos" dans l'email post-événement
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)

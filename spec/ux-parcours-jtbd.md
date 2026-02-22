@@ -434,7 +434,7 @@
 
 **État actuel (implémenté) :**
 - Onboarding profil obligatoire ✓
-- Dashboard avec CTA "Créer un Cercle" si aucun Circle ✓
+- Dashboard avec CTA "Créer une Communauté" si aucun Circle ✓
 - Formulaire création Circle + Moment ✓
 
 **Gaps :**
@@ -442,7 +442,7 @@
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
 | G1 | L'onboarding profil ne détecte pas l'intention (Host vs Player). Un futur Host passe par le même écran qu'un Player | Onboarding non personnalisé | Moyenne |
-| G2 | Le dashboard vide d'un nouveau user est peu guidant : juste un bouton "Créer un Cercle" | Time-to-first-event trop long | Haute |
+| G2 | Le dashboard vide d'un nouveau user est peu guidant : juste un bouton "Créer une Communauté" | Time-to-first-event trop long | Haute |
 | G3 | Pas de page marketing/landing pour expliquer la proposition de valeur avant de créer un compte | Conversion cold traffic nulle | Post-MVP |
 | G4 | Pas de guide "3 étapes pour lancer votre première communauté" | Le Host débutant est perdu | Haute |
 
@@ -547,7 +547,7 @@
 │                                             │
 │  [📅 Ajouter au calendrier] [→ Mon tableau de bord] │
 │                                             │
-│  Voir les autres Moments de ce Cercle ↓     │
+│  Voir les autres Moments de cette Communauté ↓│
 └─────────────────────────────────────────────┘
 ```
 

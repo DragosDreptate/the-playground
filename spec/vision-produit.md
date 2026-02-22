@@ -18,7 +18,7 @@ Le nom évoque un terrain ouvert, un lieu de rencontre, un espace d'expression. 
 
 ### Tagline
 
-**FR** : Lancez votre communauté. Organisez vos événements. Maîtrisez votre audience.
+**FR** : Lancez votre communauté. Organisez vos événements. Animez votre réseau.
 
 **EN** : Build your community. Host your events. Own your audience.
 
@@ -88,7 +88,7 @@ Luma (event-centric) :
   Pas de rétention. Recommencer à zéro.
 
 The Playground (community-centric) :
-  Escale → Inscription → Membre du Cercle → Prochaines Escales → Rétention.
+  Événement → Inscription → Membre de la Communauté → Prochains événements → Rétention.
   La communauté persiste. L'audience grandit.
 ```
 
@@ -99,8 +99,8 @@ L'événement n'est pas le produit final — c'est la **porte d'entrée** vers u
 | Avant (event-centric) | Avec The Playground (community-centric) |
 |------------------------|----------------------------------------|
 | 50 inscrits à un événement → 50 inconnus après | 50 inscrits → 50 membres de votre communauté |
-| Pour le prochain événement : repartir de zéro | Pour la prochaine Escale : vos membres sont déjà là |
-| Audience dispersée entre les outils | Audience centralisée dans votre Cercle |
+| Pour le prochain événement : repartir de zéro | Pour le prochain événement : vos membres sont déjà là |
+| Audience dispersée entre les outils | Audience centralisée dans votre Communauté |
 | Pas de continuité entre deux événements | Timeline communautaire : passé, présent, futur |
 | Les participants oublient qui vous êtes | Les membres reviennent naturellement |
 
@@ -115,23 +115,17 @@ Le vocabulaire de The Playground est structurant. Il porte le positionnement et 
 | Concept | Ce que c'est | Métaphore |
 |---------|-------------|-----------|
 | **The Playground** | La plateforme | Le terrain de jeu — un espace ouvert où chaque communauté invente ses règles |
-| **Le Cercle** | Votre communauté | Un espace protégé, un groupe uni — vos membres, vos règles, votre identité |
-| **L'Escale** | Un événement | Un point de rendez-vous dans le voyage de la communauté — on s'arrête, on se retrouve, on repart ensemble |
-| **L'Organisateur** | Celui qui crée et anime | Le capitaine du navire — il trace la route, les membres le suivent |
-| **Le Participant** | Celui qui rejoint | Un membre de l'équipage — pas un passager anonyme, un membre qui reste |
-| **La Carte** | L'espace de découverte | L'annuaire ouvert — toutes les communautés publiques, sans algorithme, sans ranking |
+| **La Communauté** | Votre espace communautaire | Un espace protégé, un groupe uni — vos membres, vos règles, votre identité |
+| **L'événement** | Un rendez-vous | Un point de rencontre dans la vie de la communauté — on se retrouve, on partage, on revient |
+| **L'Organisateur** | Celui qui crée et anime | Le pilote — il lance les événements, les membres suivent |
+| **Le Participant** | Celui qui s'inscrit | Un membre actif — pas un passager anonyme, un membre qui reste |
+| **Découvrir** | L'espace de découverte | L'annuaire ouvert — toutes les communautés publiques, sans algorithme, sans ranking |
 
-### Pourquoi "Escale" (pas "événement")
-
-Le mot "événement" est terminal. Il commence et se termine. Il ne mène nulle part.
-
-Le mot **Escale** implique un voyage. On s'arrête quelque part, on vit un moment, puis on continue le voyage ensemble. L'Escale est un point sur une trajectoire — celle de la communauté.
-
-### Pourquoi "Cercle" (pas "groupe")
+### Pourquoi "Communauté" (pas "groupe")
 
 Le mot "groupe" est neutre et générique. Il évoque une liste de noms.
 
-Le mot **Cercle** évoque la proximité, le lien, l'appartenance. On est "dans le Cercle". C'est un espace de confiance, avec une identité propre.
+Le mot **Communauté** évoque la proximité, le lien, l'appartenance. On est "dans la Communauté". C'est un espace de confiance, avec une identité propre.
 
 ### Ton éditorial
 
@@ -139,7 +133,7 @@ Le mot **Cercle** évoque la proximité, le lien, l'appartenance. On est "dans l
 - **Enthousiaste** mais pas naïf
 - **Direct** — on va à l'essentiel, pas de jargon corporate
 - **Inclusif** — tout le monde peut créer une communauté, pas besoin d'être un "community builder professionnel"
-- Les concepts domaine sont toujours capitalisés : **Cercle**, **Escale**, **Organisateur**, **Participant**, **La Carte**
+- Les concepts domaine sont toujours capitalisés : **Communauté**, **Organisateur**, **Participant**, **Découvrir**
 
 ---
 
@@ -154,13 +148,13 @@ Le mot **Cercle** évoque la proximité, le lien, l'appartenance. On est "dans l
 #### Les 5 piliers
 
 **1. Communauté d'abord**
-Vos Participants restent membres de votre Cercle entre les Escales. Fini les audiences éphémères qui disparaissent après chaque événement. Chaque inscription est un membre de plus dans votre communauté.
+Vos Participants restent membres de votre Communauté entre les événements. Fini les audiences éphémères qui disparaissent après chaque événement. Chaque inscription est un membre de plus dans votre communauté.
 
 **2. Design premium, sans effort**
-Chaque Escale a sa page design, prête à partager. Votre Cercle impressionne dès le premier jour, sans maquette, sans designer, sans configuration. Un lien, et c'est parti.
+Chaque événement a sa page design, prête à partager. Votre Communauté impressionne dès le premier jour, sans maquette, sans designer, sans configuration. Un lien, et c'est parti.
 
 **3. 100% gratuit**
-Zéro commission. Zéro abonnement. Seuls les frais Stripe (~2.9%) s'appliquent si vous organisez des Escales payantes. The Playground ne prend aucune marge sur vos transactions.
+Zéro commission. Zéro abonnement. Seuls les frais Stripe (~2.9%) s'appliquent si vous organisez des événements payants. The Playground ne prend aucune marge sur vos transactions.
 
 **4. Vos données vous appartiennent**
 Export complet à tout moment : membres, inscriptions, historique. Vous partez quand vous voulez, avec tout. Aucun lock-in.
@@ -170,8 +164,8 @@ Un seul outil pour gérer votre communauté, organiser vos événements, communi
 
 #### Messages clés (copywriting)
 
-- "Créez votre Cercle en 30 secondes. C'est gratuit, pour toujours."
-- "Chaque Escale est une page premium. Un lien à partager, et c'est parti."
+- "Créez votre Communauté en 30 secondes. C'est gratuit, pour toujours."
+- "Chaque événement est une page premium. Un lien à partager, et c'est parti."
 - "Vos membres restent. Votre communauté grandit. Votre audience vous appartient."
 - "Le modèle Meetup avec l'expérience Luma, 100% gratuit."
 
@@ -179,7 +173,7 @@ Un seul outil pour gérer votre communauté, organiser vos événements, communi
 
 #### Promesse principale
 
-**Rejoignez des communautés qui durent — pas des événements qui s'oublient.**
+**Inscrivez-vous à des communautés qui durent — pas des événements qui s'oublient.**
 
 #### Les 3 piliers
 
@@ -187,14 +181,14 @@ Un seul outil pour gérer votre communauté, organiser vos événements, communi
 Un lien, un clic, c'est fait. Pas de formulaire interminable, pas de compte à créer avant de voir le contenu. Magic link ou connexion avec Google/GitHub.
 
 **2. Communauté, pas événement**
-En vous inscrivant à une Escale, vous rejoignez le Cercle. Vous découvrez les prochaines Escales, les autres membres, l'identité de la communauté. Vous n'êtes pas un participant ponctuel — vous êtes un membre.
+En vous inscrivant à un événement, vous rejoignez la Communauté. Vous découvrez les prochains événements, les autres membres, l'identité de la communauté. Vous n'êtes pas un participant ponctuel — vous êtes un membre.
 
 **3. Tout au même endroit**
-Vos prochaines Escales, vos Cercles, vos inscriptions — tout est dans votre Playground. Plus besoin de chercher dans vos emails pour retrouver le lieu d'un événement.
+Vos prochains événements, vos Communautés, vos inscriptions — tout est dans votre espace. Plus besoin de chercher dans vos emails pour retrouver le lieu d'un événement.
 
 #### Messages clés (copywriting)
 
-- "Rejoignez des communautés qui vous ressemblent."
+- "Inscrivez-vous à des communautés qui vous ressemblent."
 - "Un lien, un clic, vous y êtes."
 - "Pas un participant de plus. Un membre de la communauté."
 
@@ -225,25 +219,25 @@ Vos prochaines Escales, vos Cercles, vos inscriptions — tout est dans votre Pl
 
 | | Meetup | Luma | Eventbrite | The Playground |
 |---|---|---|---|---|
-| **Communauté persistante** | Oui (groupes) | Non | Non | **Oui (Cercles)** |
+| **Communauté persistante** | Oui (groupes) | Non | Non | **Oui (Communautés)** |
 | **Page événement premium** | Non (datée) | Oui | Basique | **Oui** |
 | **Inscription sans friction** | Non | Oui | Partiel | **Oui** |
 | **Coût organisateur** | 11-35$/mois | 0-69$/mois | 0$ | **0$** |
 | **Commission sur les ventes** | N/A | 5-8% | 10-14% | **0%** (Stripe only) |
 | **Export des données** | Bloqué | CSV | Limité | **Export complet** |
 | **Mobile-first** | Non | Partiel | Partiel | **Oui** |
-| **Rétention après l'événement** | Basique | Aucune | Aucune | **Cercle + timeline** |
+| **Rétention après l'événement** | Basique | Aucune | Aucune | **Communauté + timeline** |
 
-### L'avantage structurel : la page Cercle
+### L'avantage structurel : la page Communauté
 
-C'est ce qui nous différencie fondamentalement de Luma. La page Cercle montre :
+C'est ce qui nous différencie fondamentalement de Luma. La page Communauté montre :
 
-- Les prochaines Escales (timeline)
-- Les Escales passées (historique, continuité)
-- Les membres du Cercle (appartenance)
+- Les prochains événements (timeline)
+- Les événements passés (historique, continuité)
+- Les membres de la Communauté (appartenance)
 - L'identité de la communauté (description, Organisateurs)
 
-Luma n'a pas d'équivalent. Après un événement Luma, il ne reste rien. Après une Escale The Playground, le Cercle persiste — avec ses membres, son histoire, et ses prochains rendez-vous.
+Luma n'a pas d'équivalent. Après un événement Luma, il ne reste rien. Après un événement The Playground, la Communauté persiste — avec ses membres, son histoire, et ses prochains rendez-vous.
 
 ### Le timing : fenêtre d'opportunité
 
@@ -258,60 +252,60 @@ Meetup a triplé ses prix en 2024. Les organisateurs migrent. La fenêtre d'oppo
 ### Le parcours viral (acquisition)
 
 ```
-Un Organisateur partage le lien d'une Escale
+Un Organisateur partage le lien d'un événement
               ↓
 Le Participant reçoit le lien (WhatsApp, email, réseaux)
               ↓
-Il découvre la page Escale (design premium, infos claires)
+Il découvre la page événement (design premium, infos claires)
               ↓
 Il s'inscrit en 2 clics (magic link / OAuth)
               ↓
-Il est automatiquement membre du Cercle
+Il est automatiquement membre de la Communauté
               ↓
-Il découvre les prochaines Escales + les autres membres
+Il découvre les prochains événements + les autres membres
               ↓
-Il revient pour la prochaine Escale
+Il revient pour le prochain événement
 ```
 
-**Le Moment est la porte d'entrée virale.** Chaque Escale partagée est une publicité pour la plateforme. Mais contrairement à Luma, le parcours ne s'arrête pas à l'inscription — il mène au Cercle.
+**L'événement est la porte d'entrée virale.** Chaque événement partagé est une publicité pour la plateforme. Mais contrairement à Luma, le parcours ne s'arrête pas à l'inscription — il mène à la Communauté.
 
 ### Le parcours de rétention
 
 ```
-Le Participant assiste à une Escale
+Le Participant assiste à un événement
               ↓
 Il commente, remercie, interagit (fil de commentaires)
               ↓
-Il découvre la page Cercle (prochaines Escales, membres, identité)
+Il découvre la page Communauté (prochains événements, membres, identité)
               ↓
-Il reçoit une notification quand une nouvelle Escale est créée
+Il reçoit une notification quand un nouvel événement est créé
               ↓
-Il s'inscrit à la prochaine Escale
+Il s'inscrit au prochain événement
               ↓
-Le Cercle grandit organiquement
+La Communauté grandit organiquement
 ```
 
-**La rétention est invisible.** Le Participant ne "rejoint" pas activement le Cercle — il devient membre naturellement en s'inscrivant à une Escale. Zéro friction, zéro étape supplémentaire.
+**La rétention est invisible.** Le Participant ne "rejoint" pas activement la Communauté — il devient membre naturellement en s'inscrivant à un événement. Zéro friction, zéro étape supplémentaire.
 
 ### Le parcours Organisateur (adoption)
 
 ```
-L'Organisateur crée son Cercle (30 secondes)
+L'Organisateur crée sa Communauté (30 secondes)
               ↓
-Il crée sa première Escale (titre, date, lieu, description)
+Il crée son premier événement (titre, date, lieu, description)
               ↓
-Il partage le lien de l'Escale
+Il partage le lien de l'événement
               ↓
 Premiers inscrits → notifications → motivation
               ↓
-Escale terminée → commentaires → engagement post-événement
+Événement terminé → commentaires → engagement post-événement
               ↓
-Il crée la prochaine Escale → ses membres sont déjà là
+Il crée le prochain événement → ses membres sont déjà là
               ↓
-Sa communauté grandit à chaque Escale
+Sa communauté grandit à chaque événement
 ```
 
-**Le Cercle est le cockpit de l'Organisateur.** Il ne gère pas des événements individuels — il pilote sa communauté. Les Escales sont des actions lancées depuis ce cockpit.
+**La Communauté est le cockpit de l'Organisateur.** Il ne gère pas des événements individuels — il pilote sa communauté. Les événements sont des actions lancées depuis ce cockpit.
 
 ---
 
@@ -325,7 +319,7 @@ Sa communauté grandit à chaque Escale
 
 **Ce qu'il dit** : *"Je veux que mes événements aient l'air pro, sans y passer des heures."*
 
-**Pourquoi The Playground** : gratuit, page Escale premium sans effort, communauté persistante, export des données.
+**Pourquoi The Playground** : gratuit, page événement premium sans effort, communauté persistante, export des données.
 
 ### L'Organisateur actif — "Le Community Builder"
 
@@ -335,7 +329,7 @@ Sa communauté grandit à chaque Escale
 
 **Ce qu'il dit** : *"Avec Meetup, je payais 35$/mois et je ne pouvais même pas exporter mes membres. Avec Luma, les gens venaient à l'événement puis disparaissaient."*
 
-**Pourquoi The Playground** : Cercle comme outil de rétention, dashboard orienté communauté, ownership des données, zéro coût.
+**Pourquoi The Playground** : Communauté comme outil de rétention, dashboard orienté communauté, ownership des données, zéro coût.
 
 ### Le Participant — "Le Curieux"
 
@@ -343,9 +337,9 @@ Sa communauté grandit à chaque Escale
 
 **Ce qu'il cherche** : comprendre en 10 secondes de quoi il s'agit, s'inscrire sans friction, recevoir les infos pratiques.
 
-**Ce qu'il dit** : *"Un ami m'a envoyé un lien, j'ai cliqué, j'étais inscrit en 30 secondes. Et maintenant je suis dans le Cercle, je vois les prochains événements."*
+**Ce qu'il dit** : *"Un ami m'a envoyé un lien, j'ai cliqué, j'étais inscrit en 30 secondes. Et maintenant je suis dans la Communauté, je vois les prochains événements."*
 
-**Pourquoi The Playground** : inscription en 2 clics, page Escale claire et belle, continuité via le Cercle.
+**Pourquoi The Playground** : inscription en 2 clics, page événement claire et belle, continuité via la Communauté.
 
 ---
 
@@ -355,7 +349,7 @@ Sa communauté grandit à chaque Escale
 
 - Aucun abonnement
 - Aucune commission plateforme
-- Seuls les frais Stripe (~2.9% + 0.30$) sur les Escales payantes
+- Seuls les frais Stripe (~2.9% + 0.30$) sur les événements payants
 - The Playground ne prend aucune marge sur les transactions
 
 **C'est une différenciation radicale.** Aucune plateforme concurrente n'offre un service complet sans abonnement ni commission. C'est le levier principal d'adoption.
@@ -382,7 +376,7 @@ Chaque décision produit est prise à travers le prisme communautaire. L'événe
 
 ### 2. Design premium par défaut
 
-Chaque Escale doit être belle sans effort de l'Organisateur. Le design n'est pas une option — c'est le standard.
+Chaque événement doit être beau sans effort de l'Organisateur. Le design n'est pas une option — c'est le standard.
 
 ### 3. Friction zéro
 
@@ -394,7 +388,7 @@ Le parcours Participant est optimisé pour mobile. Le lien arrive par WhatsApp �
 
 ### 5. L'Organisateur au premier plan
 
-The Playground est une infrastructure, pas la vedette. "Powered by The Playground" en footer, branding discret. Le Cercle et l'Organisateur sont au premier plan.
+The Playground est une infrastructure, pas la vedette. "Powered by The Playground" en footer, branding discret. La Communauté et l'Organisateur sont au premier plan.
 
 ### 6. Ownership des données
 
@@ -402,7 +396,7 @@ Les données appartiennent à l'Organisateur, pas à la plateforme. Export compl
 
 ### 7. Pas d'algorithme
 
-Pas de ranking, pas de feed, pas de recommandation algorithmique. La Carte est un annuaire ouvert. La distribution vient des Organisateurs (liens partageables), pas de la plateforme.
+Pas de ranking, pas de feed, pas de recommandation algorithmique. Découvrir est un annuaire ouvert. La distribution vient des Organisateurs (liens partageables), pas de la plateforme.
 
 ---
 
@@ -435,8 +429,8 @@ Focus sur les marchés où Meetup est dominant et contesté.
 - "Vos membres restent. Votre communauté grandit."
 - "Fini les audiences éphémères."
 - "Le modèle Meetup + l'expérience Luma = 100% gratuit."
-- "Lancez votre Cercle en 30 secondes."
-- "Chaque Escale est une page premium. Un lien, et c'est parti."
+- "Lancez votre Communauté en 30 secondes."
+- "Chaque événement est une page premium. Un lien, et c'est parti."
 - "Construisez une audience qui vous appartient."
 - "Zéro commission. Zéro abonnement. Zéro lock-in."
 - "Après l'événement, la communauté reste."
@@ -450,19 +444,19 @@ Focus sur les marchés où Meetup est dominant et contesté.
 | "Pourquoi c'est gratuit, c'est louche" | Pas de commission, pas d'abonnement. On se rémunérera sur un Plan Pro optionnel (analytics, branding, IA avancée). La version gratuite est complète et le restera. |
 | "Et si vous fermez ?" | Vos données vous appartiennent. Export complet à tout moment (membres, événements, historique). Aucun lock-in. |
 | "Mon outil actuel me suffit" | Si vous jonglez entre Google Forms, WhatsApp, Mailchimp et un tableur — The Playground remplace tout ça en un seul outil, gratuit. |
-| "Le design c'est pas important" | Chaque lien d'Escale partagé est une vitrine pour votre communauté. Un design premium augmente le taux d'inscription. |
+| "Le design c'est pas important" | Chaque lien d'événement partagé est une vitrine pour votre communauté. Un design premium augmente le taux d'inscription. |
 
 ### Mots à utiliser / Mots à éviter
 
 | Utiliser | Éviter |
 |----------|--------|
-| Cercle, Escale | Groupe, événement (sauf contexte générique) |
-| Communauté | Réseau, plateforme sociale |
+| Communauté | Groupe, réseau, plateforme sociale |
+| Événement | Meetup, session (sauf contexte générique) |
 | Membres, Participants | Utilisateurs, clients |
 | Organisateur | Admin, manager |
-| Rejoindre | S'abonner, suivre |
+| S'inscrire | S'abonner, suivre |
 | Gratuit, pour toujours | Freemium, offre de base |
-| La Carte | Le répertoire, l'annuaire |
+| Découvrir | Le répertoire, l'annuaire |
 | Page premium | Landing page, formulaire |
 
 ---
@@ -477,13 +471,13 @@ Focus sur les marchés où Meetup est dominant et contesté.
 ### Slide 2 — La solution
 
 > The Playground est community-centric.
-> Chaque Escale est une porte d'entrée vers une communauté durable.
+> Chaque événement est une porte d'entrée vers une communauté durable.
 > Les participants deviennent des membres. L'audience grandit.
 
 ### Slide 3 — Comment ça marche
 
-> 1. Créez votre Cercle (30 secondes)
-> 2. Lancez des Escales (pages premium partageables)
+> 1. Créez votre Communauté (30 secondes)
+> 2. Lancez des événements (pages premium partageables)
 > 3. Regardez votre communauté grandir
 
 ### Slide 4 — Pourquoi nous

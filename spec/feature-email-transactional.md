@@ -172,7 +172,7 @@ Structure :
 2. Heading (ex: "Inscription confirmée !" / "Vous êtes sur la liste d'attente")
 3. Message de statut (ex: "Vous êtes inscrit(e) à {momentTitle}")
 4. Méta : date + lieu (avec icônes textuelles)
-5. CTA bouton rose : "Voir l'Escale" → `/m/[slug]`
+5. CTA bouton rose : "Voir l'événement" → `/m/[slug]`
 6. Lien d'annulation (petit, gris) → `/m/[slug]`
 7. Footer
 
@@ -256,7 +256,7 @@ Si `result.promotedRegistration` existe :
 | `hostNotification.manageRegistrationsCta` | Gérer les inscriptions | Manage registrations |
 | `common.dateLabel` | Date | Date |
 | `common.locationLabel` | Lieu | Location |
-| `common.viewMomentCta` | Voir l'Escale | View Moment |
+| `common.viewMomentCta` | Voir l'événement | View Moment |
 | `common.cancelLink` | Annuler mon inscription | Cancel my registration |
 | `common.footer` | Powered by The Playground — Lancez votre communauté, gratuitement. | Powered by The Playground — Launch your community, for free. |
 

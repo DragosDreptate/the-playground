@@ -8,7 +8,7 @@
 
 ## Resume executif
 
-L'application The Playground presente une bonne base responsive grace a l'utilisation coherente de Tailwind CSS avec des breakpoints `lg:` pour les layouts 2 colonnes et des `max-w-*` raisonnables. Cependant, plusieurs problemes critiques impactent l'experience mobile : le hero de la homepage deborde horizontalement a cause de `whitespace-nowrap` sur les titres, l'admin n'a aucune adaptation mobile (sidebar fixe de 224px), les timelines du dashboard ont une colonne de dates rigide qui ecrase le contenu sur petit ecran, et la navigation header masque les liens centraux sans alternative mobile. Les formulaires sont globalement bien concus (inputs a `text-base` sur mobile, bon espacement), mais le formulaire de creation d'Escale a des lignes date/heure qui debordent. Le design systeme (boutons, badges, cartes) est solide et adapte au tactile.
+L'application The Playground presente une bonne base responsive grace a l'utilisation coherente de Tailwind CSS avec des breakpoints `lg:` pour les layouts 2 colonnes et des `max-w-*` raisonnables. Cependant, plusieurs problemes critiques impactent l'experience mobile : le hero de la homepage deborde horizontalement a cause de `whitespace-nowrap` sur les titres, l'admin n'a aucune adaptation mobile (sidebar fixe de 224px), les timelines du dashboard ont une colonne de dates rigide qui ecrase le contenu sur petit ecran, et la navigation header masque les liens centraux sans alternative mobile. Les formulaires sont globalement bien concus (inputs a `text-base` sur mobile, bon espacement), mais le formulaire de creation d'événement a des lignes date/heure qui debordent. Le design systeme (boutons, badges, cartes) est solide et adapte au tactile.
 
 ---
 
@@ -16,7 +16,7 @@ L'application The Playground presente une bonne base responsive grace a l'utilis
 
 **6.5 / 10**
 
-**Justification** : La majorite des pages de contenu (Escale, Cercle, Profil, Explorer) s'adaptent correctement grace a `flex-col` / `lg:flex-row`. Les composants partages sont bien concus. Mais les problemes P0 (overflow homepage, admin inutilisable, navigation manquante) penalisent fortement le score. L'application n'est pas "cassee" sur mobile, mais elle n'est pas encore au niveau Luma attendu par le projet.
+**Justification** : La majorite des pages de contenu (événement, Communauté, Profil, Explorer) s'adaptent correctement grace a `flex-col` / `lg:flex-row`. Les composants partages sont bien concus. Mais les problemes P0 (overflow homepage, admin inutilisable, navigation manquante) penalisent fortement le score. L'application n'est pas "cassee" sur mobile, mais elle n'est pas encore au niveau Luma attendu par le projet.
 
 ---
 
@@ -35,7 +35,7 @@ L'application The Playground presente une bonne base responsive grace a l'utilis
 </span>
 ```
 
-Les 3 lignes du hero utilisent `whitespace-nowrap`. Sur un viewport de 320-375px, les textes comme "Lancez votre Cercle." ou "Organize your Moments." debordent du viewport et creent un scroll horizontal sur toute la page.
+Les 3 lignes du hero utilisent `whitespace-nowrap`. Sur un viewport de 320-375px, les textes comme "Lancez votre Communauté." ou "Organize your Moments." debordent du viewport et creent un scroll horizontal sur toute la page.
 
 **Impact** : Scroll horizontal parasite, premiere impression degradee, critere de qualite mobile basique non respecte.
 
@@ -116,14 +116,14 @@ La sidebar admin fait 224px (`w-56`) fixe. Sur un ecran de 375px, il reste 151px
 </nav>
 ```
 
-Les liens de navigation (La Carte, Mon Playground) sont dans un `flex-1 justify-center`. Sur mobile, ces liens sont visibles mais compriment l'espace. Pire : avec le logo a gauche, les toggles langue/theme et le menu utilisateur a droite, la zone centrale est tres etroite (~100-150px). Les textes des liens risquent de se superposer ou d'etre illisibles.
+Les liens de navigation (Découvrir, Mon espace) sont dans un `flex-1 justify-center`. Sur mobile, ces liens sont visibles mais compriment l'espace. Pire : avec le logo a gauche, les toggles langue/theme et le menu utilisateur a droite, la zone centrale est tres etroite (~100-150px). Les textes des liens risquent de se superposer ou d'etre illisibles.
 
-Il n'y a **aucun menu hamburger ni drawer mobile**. Les utilisateurs authentifies n'ont aucune alternative pour acceder a La Carte ou Mon Playground de maniere confortable sur petit ecran (ils sont accessibles via le UserMenu dropdown, mais ce n'est pas intuitif).
+Il n'y a **aucun menu hamburger ni drawer mobile**. Les utilisateurs authentifies n'ont aucune alternative pour acceder a Découvrir ou Mon espace de maniere confortable sur petit ecran (ils sont accessibles via le UserMenu dropdown, mais ce n'est pas intuitif).
 
 **Solution** :
 - Masquer les liens centraux sur mobile : `hidden md:flex` sur le `<nav>`
 - Ajouter un menu hamburger (Sheet/Drawer) sur mobile avec les liens
-- OU integrer "La Carte" et "Mon Playground" comme items supplementaires dans le `UserMenu` dropdown (ils y sont deja partiellement : Dashboard est dans le UserMenu, mais pas La Carte)
+- OU integrer "Découvrir" et "Mon espace" comme items supplementaires dans le `UserMenu` dropdown (ils y sont deja partiellement : Dashboard est dans le UserMenu, mais pas Découvrir)
 
 ---
 
@@ -149,7 +149,7 @@ Sur un viewport de 320px, la colonne date fixe (100px) + dot (8px) + padding car
 
 ---
 
-### P1-2. Formulaire Escale : lignes date/heure qui debordent
+### P1-2. Formulaire événement : lignes date/heure qui debordent
 
 **Fichier** : `/Users/dragos/AI Projects/the-playground/src/components/moments/moment-form-date-card.tsx`, lignes 70-91
 
@@ -172,7 +172,7 @@ ou separer date et heure sur deux lignes sur mobile.
 
 ---
 
-### P1-3. Page Escale publique : cover 1:1 trop grande sur mobile
+### P1-3. Page événement publique : cover 1:1 trop grande sur mobile
 
 **Fichier** : `/Users/dragos/AI Projects/the-playground/src/components/moments/moment-detail-view.tsx`, ligne 172
 
@@ -180,7 +180,7 @@ ou separer date et heure sur deux lignes sur mobile.
 <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] ...">
 ```
 
-Sur mobile (< lg), le layout est en colonne. La cover a `aspect-ratio: 1/1` et `w-full`. Sur un ecran de 375px avec `px-4`, la cover fait 343px x 343px. C'est un carre plein ecran qui pousse le contenu important (titre, date, inscription) sous la ligne de flottaison. Le meme probleme existe pour la page Cercle.
+Sur mobile (< lg), le layout est en colonne. La cover a `aspect-ratio: 1/1` et `w-full`. Sur un ecran de 375px avec `px-4`, la cover fait 343px x 343px. C'est un carre plein ecran qui pousse le contenu important (titre, date, inscription) sous la ligne de flottaison. Le meme probleme existe pour la page Communauté.
 
 **Note** : L'ordre CSS (`order-2` pour la cover, `order-1` pour le contenu) fait que sur mobile, le contenu (titre, date, CTA) apparait **en premier** et la cover en second. C'est le bon comportement. Ce point est donc bien gere.
 
@@ -190,7 +190,7 @@ Sur mobile (< lg), le layout est en colonne. La cover a `aspect-ratio: 1/1` et `
 
 ---
 
-### P1-4. Formulaire Escale : input titre sans taille minimum
+### P1-4. Formulaire événement : input titre sans taille minimum
 
 **Fichier** : `/Users/dragos/AI Projects/the-playground/src/components/moments/moment-form.tsx`, ligne 162
 
@@ -241,7 +241,7 @@ Ce texte n'est pas i18n. C'est un bug fonctionnel (pas specifiquement mobile), m
 
 ### P2-1. Touch targets des liens de breadcrumb
 
-**Fichiers multiples** : `moment-detail-view.tsx`, page Cercle dashboard, page profil, etc.
+**Fichiers multiples** : `moment-detail-view.tsx`, page Communauté dashboard, page profil, etc.
 
 ```tsx
 <div className="text-muted-foreground flex items-center gap-1 text-sm">
@@ -273,7 +273,7 @@ La hauteur est `py-1.5` (12px) + texte `text-sm` (~20px) = ~32px. Inferieur au m
 
 ### P2-3. Pill tabs : touch target trop petit
 
-**Fichiers** : Dashboard (`page.tsx` ligne 81), Explorer (`page.tsx` ligne 74), page Cercle (tab selector)
+**Fichiers** : Dashboard (`page.tsx` ligne 81), Explorer (`page.tsx` ligne 74), page Communauté (tab selector)
 
 ```tsx
 <Link className="rounded-full px-4 py-1 text-sm ...">
@@ -331,7 +331,7 @@ Meme probleme que P2-5 : `text-xs` sans padding, zone tactile trop petite.
 
 ---
 
-### P2-7. Page Escale publique : iframe Google Maps non lazy-loadee efficacement
+### P2-7. Page événement publique : iframe Google Maps non lazy-loadee efficacement
 
 **Fichier** : `/Users/dragos/AI Projects/the-playground/src/components/moments/moment-detail-view.tsx`, ligne 332
 
@@ -440,7 +440,7 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 
 ---
 
-### 2. Page Escale publique (`/m/[slug]`)
+### 2. Page événement publique (`/m/[slug]`)
 
 #### Ergonomie
 - L'ordre mobile est correct : contenu (order-1) avant cover (order-2)
@@ -464,10 +464,10 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 
 ---
 
-### 3. Page Cercle publique (`/circles/[slug]`)
+### 3. Page Communauté publique (`/circles/[slug]`)
 
 #### Ergonomie
-- Meme structure que la page Escale : bon comportement mobile
+- Meme structure que la page événement : bon comportement mobile
 - Les pill tabs pour A venir / Passes ont des touch targets trop petits (`py-1`)
 - La timeline des Escales utilise la meme colonne date de 100px (P1-1)
 
@@ -476,16 +476,16 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 - Le badge categorie est bien positionne
 
 #### Responsive
-- Identique a la page Cercle dashboard : meme layout 2 colonnes avec bon reflow
+- Identique a la page Communauté dashboard : meme layout 2 colonnes avec bon reflow
 
 ---
 
-### 4. Explorer / La Carte
+### 4. Explorer / Découvrir
 
 #### Ergonomie
 - **P1-5** : Les pills de filtre categorie occupent beaucoup d'espace vertical en `flex-wrap`
-- Les cartes Cercle et Escale ont une bonne taille tactile (zones entierement cliquables)
-- Le bouton "Creer un Cercle" est `shrink-0` : ne se comprime pas
+- Les cartes Communauté et événement ont une bonne taille tactile (zones entierement cliquables)
+- Le bouton "Créer une Communauté" est `shrink-0` : ne se comprime pas
 
 #### Esthetique
 - Grille `grid sm:grid-cols-2 lg:grid-cols-3` : 1 colonne sur mobile, correct
@@ -503,7 +503,7 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 #### Ergonomie
 - **P1-1** : Colonne date 100px rigide dans les `DashboardMomentCard`
 - Les pill tabs ont des touch targets trop petits (`py-1`)
-- Le bouton "Creer un Cercle" est bien positionne et accessible
+- Le bouton "Créer une Communauté" est bien positionne et accessible
 
 #### Esthetique
 - Le greeting avec prenom est un bon touche personnelle
@@ -683,8 +683,8 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 | 2 | P0 | **Ajouter un menu hamburger mobile** dans le SiteHeader (masquer nav centrale, ajouter Sheet/Drawer) | `src/components/site-header.tsx` | Rend la navigation accessible sur mobile |
 | 3 | P0 | **Rendre l'admin sidebar responsive** : `hidden md:flex` + drawer mobile, ou transformer en top tabs | `src/components/admin/admin-sidebar.tsx`, `src/app/[locale]/(routes)/admin/layout.tsx` | Rend l'admin utilisable sur mobile |
 | 4 | P0 | **Ajouter `overflow-x-auto`** sur les conteneurs de tables admin | Pages admin users/circles/moments | Empeche le debordement des tables |
-| 5 | P1 | **Reduire la colonne date timeline** a `w-[72px]` sur mobile (`w-[72px] md:w-[100px]`) | `dashboard-moment-card.tsx`, `moment-timeline-item.tsx`, page Cercle publique | Donne plus d'espace au contenu des cartes |
-| 6 | P1 | **Passer le formulaire date/heure en `flex-wrap`** ou layout empile sur mobile | `moment-form-date-card.tsx` | Empeche le debordement du formulaire Escale |
+| 5 | P1 | **Reduire la colonne date timeline** a `w-[72px]` sur mobile (`w-[72px] md:w-[100px]`) | `dashboard-moment-card.tsx`, `moment-timeline-item.tsx`, page Communauté publique | Donne plus d'espace au contenu des cartes |
+| 6 | P1 | **Passer le formulaire date/heure en `flex-wrap`** ou layout empile sur mobile | `moment-form-date-card.tsx` | Empeche le debordement du formulaire événement |
 | 7 | P2 | **Augmenter les touch targets** des pill tabs (`py-1` vers `py-2`), filtres categorie, liens breadcrumb, boutons delete commentaire | Multiples fichiers | Ameliore l'ergonomie tactile globale |
 | 8 | P2 | **Ajouter `text-base md:text-sm`** a la textarea des commentaires | `comment-thread.tsx` L225 | Empeche le zoom iOS sur saisie |
 | 9 | P2 | **i18n le CopyLinkButton** | `copy-link-button.tsx` L33 | Corrige le texte hard-code |
@@ -699,7 +699,7 @@ Ces elements sont bien faits et meritent d'etre mentionnes :
 1. **Input component** : `text-base md:text-sm` dans `input.tsx` previent le zoom iOS. Bonne pratique.
 2. **Ordre CSS des colonnes** : `order-1`/`order-2` bien utilise pour afficher le contenu avant la cover sur mobile.
 3. **AlertDialog responsive** : `max-w-[calc(100%-2rem)]` garantit des marges sur mobile.
-4. **Collapsible sections** dans le formulaire Escale (location, options) : reduit la complexite visible sur mobile.
+4. **Collapsible sections** dans le formulaire événement (location, options) : reduit la complexite visible sur mobile.
 5. **Font loading** : `Inter` avec `next/font/google` = font optimisee, pas de FOUT.
 6. **Gradients comme placeholders** : pas d'images a charger, excellent pour la performance mobile.
 7. **`px-4` systematique** sur les conteneurs principaux : 16px de marge minimale, le contenu respire.
