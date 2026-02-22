@@ -240,12 +240,15 @@ export default async function HomePage() {
         </section>
 
         {/* Comment ça marche */}
-        <section id="how-it-works" className="bg-muted/30 px-4 py-24 md:py-32">
-          <div className="mx-auto max-w-5xl">
+        <section id="how-it-works" className="bg-muted/60 px-4 pt-16 pb-24 md:pt-20 md:pb-32">
+          <div className="mx-auto max-w-3xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("howItWorks")}
             </h2>
-            <div className="grid gap-12 md:grid-cols-3 md:gap-8">
+            <div className="relative space-y-12">
+              {/* Ligne verticale */}
+              <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-pink-500 via-fuchsia-500 to-violet-500 opacity-20 md:left-8" />
+
               {[
                 {
                   step: 1,
@@ -266,19 +269,25 @@ export default async function HomePage() {
                   icon: TrendingUp,
                 },
               ].map(({ step, title, description, icon: Icon }) => (
-                <div key={step} className="flex flex-col items-center text-center">
-                  <div className="bg-primary/10 text-primary mb-4 flex size-12 items-center justify-center rounded-full text-lg font-bold">
-                    {step}
+                <div key={step} className="relative flex gap-6 md:gap-8">
+                  {/* Dot gradient */}
+                  <div className="relative z-10 flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-violet-500 shadow-lg shadow-pink-500/20 md:size-16">
+                    <Icon className="size-5 text-white md:size-6" />
                   </div>
-                  <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {description}
-                  </p>
-                  <Icon className="text-muted-foreground/50 mt-6 size-8" />
+                  {/* Contenu */}
+                  <div className="pt-1 md:pt-3">
+                    <p className="text-primary mb-1 text-xs font-semibold uppercase tracking-widest">
+                      Étape {step}
+                    </p>
+                    <h3 className="text-xl font-bold md:text-2xl">{title}</h3>
+                    <p className="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
+                      {description}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="mt-12 flex justify-center">
+            <div className="mt-16 flex justify-center">
               <Button asChild size="lg">
                 <Link href="/explorer">{t("ctaExplore")}</Link>
               </Button>
@@ -288,40 +297,47 @@ export default async function HomePage() {
 
         {/* 3 piliers */}
         <section className="px-4 py-24 md:py-32">
-          <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
-            {[
-              {
-                title: t("pillar1Title"),
-                description: t("pillar1Description"),
-                icon: LinkIcon,
-              },
-              {
-                title: t("pillar2Title"),
-                description: t("pillar2Description"),
-                icon: Sparkles,
-              },
-              {
-                title: t("pillar3Title"),
-                description: t("pillar3Description"),
-                icon: Gift,
-              },
-            ].map(({ title, description, icon: Icon }) => (
-              <div
-                key={title}
-                className="hover:border-primary/30 rounded-2xl border p-6 transition-colors"
-              >
-                <Icon className="text-primary mb-4 size-6" />
-                <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {description}
-                </p>
-              </div>
-            ))}
+          <div className="mx-auto max-w-5xl">
+            <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
+              {t("pillarsHeading")}
+            </h2>
+            <div className="grid gap-6 md:grid-cols-3 md:gap-8">
+              {[
+                {
+                  title: t("pillar1Title"),
+                  description: t("pillar1Description"),
+                  icon: LinkIcon,
+                },
+                {
+                  title: t("pillar2Title"),
+                  description: t("pillar2Description"),
+                  icon: Sparkles,
+                },
+                {
+                  title: t("pillar3Title"),
+                  description: t("pillar3Description"),
+                  icon: Gift,
+                },
+              ].map(({ title, description, icon: Icon }) => (
+                <div
+                  key={title}
+                  className="rounded-2xl border p-8 transition-colors hover:border-primary/30"
+                >
+                  <div className="mb-5 flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-violet-500 shadow-lg shadow-pink-500/20">
+                    <Icon className="size-5 text-white" />
+                  </div>
+                  <h3 className="mb-2 text-xl font-bold">{title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
+                    {description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         {/* CTA final */}
-        <section className="bg-muted/30 px-4 py-24 md:py-32">
+        <section className="bg-muted/60 px-4 py-24 md:py-32">
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               {t("ctaFinalTitle")}
