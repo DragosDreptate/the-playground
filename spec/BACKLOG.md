@@ -53,6 +53,7 @@
 | Couverture tests complète : 14 nouveaux fichiers (get-user-registration, get-moment-comments, get-user-past-moments, 11 usecases admin). 5 specs E2E scaffoldées (auth, join-moment, host-flow, cancel-registration, comments). 202 tests, 100% verts. | 2026-02-21 | `3ee4865` |
 | Agents Claude Code : `test-coverage-guardian` (audit couverture + création tests manquants, run + correction en boucle) + `security-guardian` (audit RBAC/IDOR/accès admin, création tests sécurité, correction vulnérabilités). Définis dans `.claude/agents/`. | 2026-02-21 | — |
 | Sécurité : audit complet + correction vulnérabilité architecturale (defense-in-depth manquante sur 11 usecases admin). Ajout `callerRole: UserRole` + `AdminUnauthorizedError`. 59 nouveaux tests de sécurité (RBAC, IDOR cross-tenant, accès admin). 271 tests, 100% verts. | 2026-02-21 | `8b14aaf` |
+| Upload d'avatar utilisateur : port `StorageService` (hexagonal), adapter `VercelBlobStorageService` (@vercel/blob), helper `isUploadedUrl`, helper `resizeImage` (Canvas API, crop carré centré, WebP 384×384 ~50 Ko), server action `uploadAvatarAction`, composant `AvatarUpload` (hover overlay + lien texte conditionnel, preview optimiste, spinner), protection OAuth (ne pas écraser avatar uploadé), i18n FR/EN `Profile.avatar.*`, tests `blob.test.ts` + cas image dans `update-profile.test.ts`. | 2026-02-22 | `aa84d5c` |
 
 ---
 
