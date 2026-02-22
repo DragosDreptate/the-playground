@@ -48,7 +48,7 @@ export default async function ProfileSetupPage() {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || null;
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="mx-auto max-w-sm space-y-6">
       <div className="flex flex-col items-center gap-4 text-center">
         <AvatarUpload
           name={fullName}

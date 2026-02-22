@@ -91,7 +91,11 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
       </div>
 
       <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
+        <Button
+          type="submit"
+          disabled={isPending}
+          className={mode === "setup" ? "w-full" : undefined}
+        >
           {isPending
             ? tCommon("loading")
             : mode === "setup"

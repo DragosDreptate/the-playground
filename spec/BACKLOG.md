@@ -155,6 +155,27 @@
   - Sur le dashboard d'un Participant sans Communauté : lien/bouton "Vous voulez organiser ? Créez votre Communauté"
   - Actuellement invisible pour un Participant qui découvre la plateforme via un événement
 
+#### Accueil utilisateur direct — sans lien d'entrée
+
+> Un utilisateur qui s'inscrit sans lien d'événement ni de Communauté ne sait pas où aller.
+> Le dashboard vide est silencieux — il faut l'orienter activement.
+
+- [ ] **Page de bienvenue `/dashboard/welcome`**
+  - **Trigger** : accès à `/dashboard` si l'utilisateur n'a aucune activité (aucun Circle créé, aucune Registration) ET aucun `callbackUrl` (pour ne pas interrompre un flux d'intent : s'inscrire à un événement, rejoindre une Communauté)
+  - **Persistance basée sur l'état** — pas de flag DB. La page s'affiche tant que l'état "sans activité" persiste. Dès qu'il crée un Circle ou s'inscrit à un événement, il ne la voit plus
+  - **Contenu** :
+    - Message d'accueil personnalisé ("Bonjour [prénom], bienvenue sur The Playground")
+    - 2 cartes CTA :
+      1. **Créer ma Communauté** (`default` / primary) → `/dashboard/circles/create`
+      2. **Découvrir des Communautés** (`outline`) → `/explorer`
+  - **Cas couverts** :
+    - Nouvel utilisateur post-onboarding (arrivée directe, pas via un lien)
+    - Revenant sans activité (retour sur `/dashboard` N jours plus tard, toujours sans Circle ni Registration)
+  - **Cas exclus** (flux intact, pas de welcome) :
+    - Arrivée via lien événement (`callbackUrl` présent → redirection après auth préservée)
+    - Utilisateur ayant au moins un Circle créé ou une Registration
+  - **Phase 2 — hors scope MVP** : email de re-engagement si N jours sans activité après le welcome
+
 #### Gestion des inscriptions Organisateur (parcours E)
 
 - [ ] **Export CSV des inscrits** (gap E-3 + déjà au backlog)
