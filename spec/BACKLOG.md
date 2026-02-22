@@ -229,9 +229,16 @@
 
 ### Priorité moyenne
 
-- [ ] **Notification aux membres : nouvelle Escale dans leur Cercle** (gap M-4)
-  - Email ou notification in-app quand un Organisateur crée une nouvelle Escale dans un Cercle dont l'utilisateur est membre
-  - Le Participant revient seulement s'il se souvient de vérifier — ce push est nécessaire
+- [ ] **Email aux membres : nouvelle Escale dans leur Cercle** (gap M-4)
+  - Notifier tous les membres d'un Cercle quand l'Organisateur programme une nouvelle Escale
+  - Contenu : titre, date, lieu, description courte, CTA "S'inscrire" → `/m/[slug]`
+  - Sans cette notification, les membres ne reviennent que s'ils pensent à vérifier — ce push est le principal levier de rétention
+  - **❓ Décision ouverte : automatique ou manuel ?**
+    - **Automatique** (à la création) : zéro friction pour l'Organisateur, mais risque de spam si l'Escale est créée en brouillon ou modifiée plusieurs fois avant publication
+    - **Manuel** (bouton "Notifier les membres" sur la page Escale) : l'Organisateur contrôle le moment d'envoi, peut peaufiner l'Escale avant d'envoyer — mais une étape supplémentaire qu'il peut oublier
+    - **Hybride recommandé** : envoi automatique au passage en statut PUBLISHED (pas à la création si un statut "brouillon" existe), avec possibilité de re-notifier manuellement une fois
+  - Dépend de l'infrastructure email existante (`ResendEmailService`, `EmailService` port) — réutilisable directement
+  - Option future : préférence par membre (opt-out des notifications Cercle)
 
 - [ ] **Export données Organisateur**
   - CSV export : membres Circle, historique Escales, inscrits cumulés
