@@ -14,8 +14,9 @@ import {
 } from "@/components/ui/select";
 import type { Moment, LocationType } from "@/domain/models/moment";
 import type { ActionResult } from "@/app/actions/types";
-import { useRouter } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
+import { getMomentGradient } from "@/lib/gradient";
 import { MomentFormCoverPlaceholder } from "./moment-form-cover-placeholder";
 import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
@@ -25,6 +26,7 @@ type MomentFormProps = {
   moment?: Moment;
   circleSlug: string;
   circleName: string;
+  circleDescription?: string;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -44,7 +46,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -91,6 +93,8 @@ export function MomentForm({ moment, circleSlug, circleName, action }: MomentFor
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
 
+  const circleGradient = getMomentGradient(circleName);
+
   // --- Computed hidden values ---
   const startsAtValue = startDate ? combineDateAndTime(startDate, startTime) : "";
   const endsAtValue = endDate ? combineDateAndTime(endDate, endTime) : "";
@@ -105,20 +109,36 @@ export function MomentForm({ moment, circleSlug, circleName, action }: MomentFor
       )}
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-        {/* Left column — Cover image placeholder */}
-        <div className="w-full shrink-0 lg:w-[40%]">
-          <div className="lg:sticky lg:top-6">
+        {/* Left column — Cover + Circle info */}
+        <div className="order-2 w-full shrink-0 lg:order-1 lg:w-[340px] lg:sticky lg:top-6">
+          <div className="flex flex-col gap-4">
             <MomentFormCoverPlaceholder seed={moment?.title ?? circleName} />
+
+            {/* Circle — identique à la vue Escale */}
+            <Link
+              href={`/dashboard/circles/${circleSlug}`}
+              className="group flex items-start gap-3 px-1"
+            >
+              <div
+                className="mt-0.5 size-9 shrink-0 rounded-lg"
+                style={{ background: circleGradient }}
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold leading-snug group-hover:underline">
+                  {circleName}
+                </p>
+                {circleDescription && (
+                  <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
+                    {circleDescription}
+                  </p>
+                )}
+              </div>
+            </Link>
           </div>
         </div>
 
         {/* Right column — Form fields */}
         <div className="flex min-w-0 flex-1 flex-col gap-5">
-          {/* Circle context */}
-          <p className="text-muted-foreground flex items-center gap-1.5 text-sm">
-            <span className="text-foreground font-medium">{circleName}</span>
-          </p>
-
           {/* Status select (edit mode only) */}
           {moment && (
             <div className="flex justify-end">

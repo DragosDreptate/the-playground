@@ -77,7 +77,7 @@ export default async function EditMomentPage({
           {tCommon("edit")}
         </span>
       </div>
-      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} action={boundAction} />
+      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} action={boundAction} />
     </div>
   );
 }
