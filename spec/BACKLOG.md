@@ -56,6 +56,8 @@
 | Upload d'avatar utilisateur : port `StorageService` (hexagonal), adapter `VercelBlobStorageService` (@vercel/blob), helper `isUploadedUrl`, helper `resizeImage` (Canvas API, crop carré centré, WebP 384×384 ~50 Ko), server action `uploadAvatarAction`, composant `AvatarUpload` (hover overlay + lien texte conditionnel, preview optimiste, spinner), protection OAuth (ne pas écraser avatar uploadé), i18n FR/EN `Profile.avatar.*`, tests `blob.test.ts` + cas image dans `update-profile.test.ts`. AvatarUpload intégré aussi sur la page d'onboarding `/dashboard/profile/setup`. | 2026-02-22 | `aa84d5c` |
 | Isolation onboarding via route groups Next.js : `(app)/layout.tsx` (layout complet : SiteHeader + SiteFooter) + `(onboarding)/layout.tsx` (layout minimal : logo statique non-cliquable, LocaleToggle + ThemeToggle uniquement, pas de footer). Suppression de la prop `hideNav` du SiteHeader. Tests E2E (`onboarding.spec.ts`, 6 tests) + `playwright.config.ts` + script `test:e2e:setup-onboarding`. TDD : tests écrits en RED, puis implémentation, puis GREEN. | 2026-02-22 | `7c57b8d` |
 | Audit sécurité (security-guardian) : 20 nouveaux tests de sécurité. `avatar-upload-isolation.test.ts` (5 tests IDOR/userId isolation) + `onboarding-guard.test.ts` (15 tests anti-boucle, transitions d'état, cas limites). Aucune vulnérabilité détectée dans le code source. 299 tests, 100% verts. | 2026-02-22 | — |
+| Footer global (`SiteFooter`) + pages légales : mentions légales `/legal/mentions-legales`, confidentialité `/legal/confidentialite`, CGU `/legal/cgu`. i18n FR/EN complet (namespaces `Footer` + `Legal`). | 2026-02-22 | `da1c2e8` |
+| Magic link email : template react-email avec icône PNG embarquée en base64 (gradient + triangle play). Zéro dépendance réseau pour le rendu. | 2026-02-22 | `f27fee9` |
 
 ---
 
@@ -183,9 +185,9 @@
   - Affiché en bannière sur la page publique `/m/[slug]` (remplace le gradient)
   - Fallback : gradient actuel si pas d'image
 
-- [ ] **Infrastructure upload** (prérequis commun aux 3)
-  - Adapter `StorageService` (port déjà prévu dans CLAUDE.md) : Uploadthing ou S3-compatible
-  - Contraintes : taille max (ex. 5 Mo), formats acceptés (jpg, png, webp), redimensionnement côté service
+- [x] **Infrastructure upload** ✅ (prérequis commun aux covers Circle/Escale)
+  - Port `StorageService` + adapter `VercelBlobStorageService` (@vercel/blob)
+  - Contraintes : taille max 5 Mo, formats JPEG/PNG/WebP, redimensionnement Canvas côté client (WebP 384×384)
 
 ---
 
@@ -211,13 +213,13 @@
   - CRUD commentaire sur chaque Escale
   - Visible sur la page publique et la vue dashboard
 
-- [x] **La Carte** (ex-Répertoire) ✅ — `spec/feature-explorer-repertoire.md`
+- [x] **La Carte** (ex-Répertoire) ✅ — `spec/feature-explorer-la-carte.md`
   - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
   - Tab **Cercles** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochaine Escale en teaser)
   - Tab **Événements** : agenda chronologique des Escales PUBLISHED de Cercles publics (card community-first)
   - Filtre **catégorie** (MVP) — pas de filtre ville (densité insuffisante au lancement)
   - Page Circle publique `/circles/[slug]` accessible sans compte (SEO + cold traffic)
-  - Lien "Explorer" dans le header principal (visible auth et non-auth)
+  - Lien "Explorer" dans le header principal (visible utilisateurs connectés)
   - Schema : `CircleCategory` enum (8 valeurs) + `category` + `city` sur Circle
   - Formulaire Circle : Select catégorie + Input ville
   - 10 nouveaux tests unitaires BDD (`getPublicCircles`, `getPublicUpcomingMoments`)
@@ -279,7 +281,7 @@
 | 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, Escale = porte d'entrée virale, page Cercle = couche de rétention (absente chez Luma). Dashboard Organisateur = Cercle-first. |
 | 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) à l'Escale qu'il crée — règle métier dans `createMoment`. |
 | 2026-02-20 | Check-in retiré du MVP → Phase 2 (pas prioritaire pour le lancement) |
-| 2026-02-20 | La Carte = Circles uniquement (pas d'Escales). Distribution des Escales via lien partagé par l'Organisateur. Annuaire d'Escales → Phase 2 si besoin. |
+| 2026-02-20 | ~~La Carte = Circles uniquement (pas d'Escales).~~ **Révisée le 2026-02-21** : La Carte = Circles + Escales à venir de Circles publics. |
 | 2026-02-21 | Escales passées accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |
 | 2026-02-21 | Page Circle = même layout 2 colonnes que Moment (cover gradient LEFT sticky, contenu RIGHT). Cohérence design inter-pages. |
 | 2026-02-21 | Carte "Événement terminé" (vue publique Escale passée) inclut un CTA "Voir les prochaines Escales du Cercle" — rétention vers le Circle. |
@@ -292,7 +294,7 @@
 | 2026-02-21 | Couleur unique : `--destructive` = `--primary` (même rose). Le danger est communiqué par le contexte (mot, modale), pas par une couleur différente. Approche Luma : un seul accent. |
 | 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et Escale). Cohérence inter-pages. |
 | 2026-02-21 | Analyse UX JTBD complète (spec/ux-parcours-jtbd.md) : 8 personas, 25 JTBD, 7 parcours. 4 casseurs de loop identifiés (emails transactionnels), 8 gaps haute priorité, 7 moyens. Ajoutés au backlog sous "Rétention & viralité". |
-| 2026-02-21 | La Carte (spec/feature-explorer-repertoire.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : La Carte = Circles + Escales à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
+| 2026-02-21 | La Carte (spec/feature-explorer-la-carte.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : La Carte = Circles + Escales à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
 | 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
 | 2026-02-21 | Terminologie i18n rebranding. FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée, cette/une Escale), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Code identifiers, clés JSON et noms de fichiers restent en anglais (Moment, Player). |
 | 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Métaphore voyage cohérente (Carte = destinations, Escale = étape). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). |

@@ -295,8 +295,8 @@ export default async function ExplorerPage({ searchParams }) {
 **Metadata SEO** :
 ```typescript
 export const metadata = {
-  title: "La Carte — The Playground",
-  description: "Découvrez des communautés ouvertes à tous. Tech, sport, art, business...",
+  title: "Explorer — The Playground",
+  description: "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
 };
 ```
 
@@ -379,8 +379,8 @@ src/components/circles/circle-form.tsx
 ```json
 {
   "Explorer": {
-    "title": "La Carte",
-    "description": "Découvrez des communautés ouvertes à tous.",
+    "title": "Explorer",
+    "description": "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
     "tabs": {
       "circles": "Cercles",
       "moments": "Escales"
@@ -413,7 +413,7 @@ src/components/circles/circle-form.tsx
 
 La Carte est accessible depuis :
 
-1. **Header principal** : lien "La Carte" (FR) / "Explore" (EN) dans la nav (visible même non connecté)
+1. **Header principal** : lien "Explorer" (FR) / "Explore" (EN) dans la nav (visible pour les utilisateurs connectés)
 2. **Dashboard** : lien dans les empty states pour les Players sans Moment à venir
 3. **Page `/m/[slug]`** : lien "Voir d'autres Cercles" (footer ou sidebar)
 4. **URL directe `/explorer`** : accessible et indexable sans authentification

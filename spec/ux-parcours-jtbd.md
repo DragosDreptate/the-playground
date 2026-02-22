@@ -215,6 +215,7 @@
 - Auth magic link + OAuth ✓
 - Onboarding profil obligatoire ✓
 - Retour sur la page après auth ✓
+- Email de confirmation d'inscription ✓ (avec pièce jointe .ics)
 
 **Gaps critiques :**
 
@@ -222,7 +223,7 @@
 |---|-----|--------|----------|
 | A1 | Post-inscription : aucun CTA "Ajouter au calendrier" | Le Player risque d'oublier l'événement | Haute |
 | A2 | Post-inscription : aucun lien visible vers le dashboard | Le Player ne sait pas qu'il a un espace personnel | Haute |
-| A3 | Pas d'email de confirmation d'inscription | Pas de réassurance, pas de rappel | Bloquante (MVP) |
+| A3 | ~~Pas d'email de confirmation d'inscription~~ ✅ **Résolu** — email de confirmation implémenté (Resend + react-email) | ~~Pas de réassurance, pas de rappel~~ | ~~Bloquante~~ ✅ |
 | A4 | La page `/m/[slug]` ne propose pas d'autres Moments du Circle (hors PAST) | Rétention Circle manquée pour les événements actifs | Moyenne |
 | A5 | L'onboarding ne distingue pas Host et Player | Un futur Host n'est pas guidé vers la création de Circle | Basse (post-MVP) |
 
@@ -259,7 +260,7 @@
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| B1 | Pas d'email de rappel 24h/1h avant l'événement | Taux d'absence élevé (oubli) | Bloquante (MVP) |
+| B1 | Pas d'email de rappel 24h/1h avant l'événement | Taux d'absence élevé (oubli) | ~~Bloquante~~ → **Déprioritisée Phase 2** (nécessite jobs planifiés Vercel Cron / QStash) |
 | B2 | Depuis la page Moment dashboard, aucune vue des autres Moments du même Circle | Découverte limitée, rétention faible | Haute |
 | B3 | Pas de notification quand un nouveau Moment est créé dans un Circle dont on est membre | Le Player revient seulement s'il pense à venir | Haute |
 | B4 | Pas d'infos pratiques en format "résumé rapide" au-dessus de la ligne de flottaison sur mobile | Sur mobile, doit scroller pour trouver l'adresse | Moyenne |
@@ -283,19 +284,20 @@
                                        ↓
                           [Promotion automatique ✓]
                                        ↓
-                          [Notification email → non implémentée]  ← GAP CRITIQUE
+                          [Notification email ✅ implémentée]
 ```
 
 **État actuel (implémenté) :**
 - Inscription en liste d'attente ✓
 - Badge "Liste d'attente" sur dashboard et timeline Circle ✓
 - Promotion automatique sur désistement ✓
+- Email de notification de promotion ✓
 
 **Gaps :**
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| C1 | Pas d'email de notification de promotion | Le Player ne sait pas qu'il a une place | Bloquante (MVP) |
+| C1 | ~~Pas d'email de notification de promotion~~ ✅ **Résolu** — email de promotion liste d'attente implémenté | ~~Le Player ne sait pas qu'il a une place~~ | ~~Bloquante~~ ✅ |
 | C2 | Position dans la liste d'attente non visible | Incertitude maximale | Haute |
 | C3 | Pas d'option "m'alerter si une place se libère" explicite | Le mécanisme est implicite, pas rassurant | Haute |
 
@@ -319,7 +321,7 @@
                         ↓
               [Copie + partage WhatsApp/email/réseaux]
                         ↓
-              [Premiers inscrits → (notification → non implémentée)]
+              [Premiers inscrits → notification email Host ✅]
 ```
 
 **État actuel (implémenté) :**
@@ -328,12 +330,13 @@
 - Génération de slug ✓
 - Lien partageable avec bouton Copier sur la page Moment dashboard ✓
 - Auto-inscription du Host au Moment ✓
+- Email de notification au Host quand un Player s'inscrit ✓
 
 **Gaps :**
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| D1 | Pas d'email de notification quand quelqu'un s'inscrit | Le Host ne sait pas que ça "marche" | Haute |
+| D1 | ~~Pas d'email de notification quand quelqu'un s'inscrit~~ ✅ **Résolu** — notification Host implémentée | ~~Le Host ne sait pas que ça "marche"~~ | ~~Haute~~ ✅ |
 | D2 | Le bouton "Créer un Moment" n'est visible que si l'utilisateur est déjà Host. Un Player qui veut organiser n'a pas de CTA évident pour devenir Host | Adoption Host bloquée | Haute |
 | D3 | Après création d'un Moment, pas de step "Partagez maintenant" avec le lien en grand | Le partage n'est pas assez encouragé | Moyenne |
 | D4 | Le Moment est automatiquement lié au Circle du Host, mais si le Host a plusieurs Circles, la sélection du Circle dans le formulaire n'est pas évidente | Confusion multi-Circle | Moyenne |
@@ -492,10 +495,10 @@
 
 | # | Gap | Persona(s) impactée(s) | Parcours |
 |---|-----|------------------------|----------|
-| MVP-1 | **Email de confirmation d'inscription** | Player fraîchement inscrit, Visiteur anonyme | A |
-| MVP-2 | **Email de rappel 24h/1h avant l'événement** | Player récurrent | B |
-| MVP-3 | **Email de notification de promotion liste d'attente** | Player waitlisté | C |
-| MVP-4 | **Email de notification au Host : nouvelle inscription** | Host actif | D |
+| MVP-1 | ~~**Email de confirmation d'inscription**~~ ✅ **Résolu** | Player fraîchement inscrit, Visiteur anonyme | A |
+| MVP-2 | ~~**Email de rappel 24h/1h avant l'événement**~~ → **Déprioritisé Phase 2** | Player récurrent | B |
+| MVP-3 | ~~**Email de notification de promotion liste d'attente**~~ ✅ **Résolu** | Player waitlisté | C |
+| MVP-4 | ~~**Email de notification au Host : nouvelle inscription**~~ ✅ **Résolu** | Host actif | D |
 
 ### 🟠 Haute priorité (impact fort sur les JTBD clés)
 
@@ -593,7 +596,7 @@
 - **Fil de commentaires** : engagement post-Moment, communauté vivante
 
 ### Talons d'Achille actuels
-- **Pas d'emails** : confirmation, rappels, notifications → le loop de rétention est cassé
+- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Host — 4 emails MVP implémentés. Rappels 24h/1h restent à faire (Phase 2).
 - **Formulaire de commentaire masqué sur PAST** : y compris pour le Host, alors que c'est le pic d'engagement
 - **L'après-inscription est vide** : aucune guidance "Et maintenant ?"
 - **L'onboarding Host n'existe pas** : le Host débutant est livré à lui-même
@@ -605,4 +608,4 @@
 | Page Circle = couche de rétention | Pas d'équivalent |
 | Inscription Moment = membre Circle automatique | Inscription one-shot, pas de lien |
 | Timeline communautaire (passé + futur) | Vue calendrier event-centric |
-| **Gap actuel** : emails et notifications | Emails soignés, notifications riches |
+| Emails transactionnels MVP ✅ (rappels restent à faire) | Emails soignés, notifications riches |

@@ -251,14 +251,14 @@ Si `result.promotedRegistration` existe :
 | `hostNotification.subject` | {playerName} a rejoint {momentTitle} | {playerName} joined {momentTitle} |
 | `hostNotification.heading` | Nouvelle inscription | New registration |
 | `hostNotification.message` | {playerName} a rejoint {momentTitle} | {playerName} joined {momentTitle} |
-| `hostNotification.registrationInfo` | {count} inscrit(s) / {capacity} places | {count} registered / {capacity} spots |
-| `hostNotification.registrationInfoUnlimited` | {count} inscrit(s) | {count} registered |
+| `hostNotification.registrationInfo` | {count} inscrit(s) / {capacity} places | {count} joined / {capacity} spots |
+| `hostNotification.registrationInfoUnlimited` | {count} inscrit(s) | {count} joined |
 | `hostNotification.manageRegistrationsCta` | Gérer les inscriptions | Manage registrations |
 | `common.dateLabel` | Date | Date |
 | `common.locationLabel` | Lieu | Location |
 | `common.viewMomentCta` | Voir l'Escale | View Moment |
 | `common.cancelLink` | Annuler mon inscription | Cancel my registration |
-| `common.footer` | Vous recevez cet email car vous utilisez The Playground. | You received this email because you use The Playground. |
+| `common.footer` | Powered by The Playground — Lancez votre communauté, gratuitement. | Powered by The Playground — Launch your community, for free. |
 
 ---
 

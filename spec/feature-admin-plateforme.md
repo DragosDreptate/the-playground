@@ -209,7 +209,7 @@ src/app/[locale]/(routes)/admin/layout.tsx
 - Layout : sidebar fixe (gauche) + main content (droite, `max-w-6xl`)
 - `AdminSidebar` : navigation Dashboard / Utilisateurs / Cercles / Escales + lien "Retour au site"
 
-### Pages (9 routes)
+### Pages (7 routes + layout)
 
 | Route | Contenu |
 |-------|---------|

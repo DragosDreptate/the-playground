@@ -516,7 +516,7 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 
 - **Prix en centimes** (int) — convention Stripe, pas de floating point. 1500 = 15,00€
 - **Slug global pour Moments** — URL courte `/m/[slug]`, pas scoped au Circle
-- **Contrainte unique (userId, circleId, role)** — un User peut être HOST et PLAYER du même Circle
+- **Contrainte unique (userId, circleId)** — une seule membership par User/Circle, le rôle HOST implique PLAYER
 - **Contrainte unique (momentId, userId)** — un User ne peut s'inscrire qu'une fois à un Moment
 - **Inscription auto au Circle** — logique dans le usecase, pas dans le schema
 

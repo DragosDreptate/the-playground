@@ -117,9 +117,10 @@ Contient :
 - Logo
 - Hosts
 - Players
-- Tracks
 - Moments
 - Visibilité (public / privé sur lien)
+- Catégorie (`CircleCategory`)
+- Ville (string libre)
 
 ## Track
 
@@ -139,7 +140,6 @@ Contient :
 - Prix (gratuit ou payant)
 - Liste d'attente (promotion automatique en cas de désistement)
 - Players inscrits
-- Fil de commentaires (Players inscrits)
 - Fil de commentaires (Players inscrits)
 - URL partageable dédiée
 
@@ -169,10 +169,10 @@ Contient :
 - S'inscrire à un Moment (= rejoindre le Circle automatiquement, zéro friction)
 - Payer si nécessaire (Stripe)
 - Recevoir les notifications email :
-  - Confirmation d'inscription
-  - Rappel 24h avant
-  - Rappel 1h avant
-  - Notification de changement (lieu, horaire, annulation)
+  - Confirmation d'inscription ✅
+  - ~~Rappel 24h avant~~ *(déprioritisé → Phase 2)*
+  - ~~Rappel 1h avant~~ *(déprioritisé → Phase 2)*
+  - Notification de changement (lieu, horaire, annulation) *(post-MVP)*
 - Commenter sur le fil du Moment
 - **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention
 
