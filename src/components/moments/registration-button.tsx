@@ -159,9 +159,9 @@ export function RegistrationButton({
         {!isHost && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <button className="text-muted-foreground hover:text-foreground text-xs transition-colors underline-offset-2 hover:underline">
+              <Button variant="default" size="lg" className="w-full">
                 {t("public.cancelRegistration")}
-              </button>
+              </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
