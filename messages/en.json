@@ -487,7 +487,9 @@
     "product": {
       "title": "Product",
       "explore": "Explore",
-      "howItWorks": "How it works"
+      "howItWorks": "How it works",
+      "about": "About",
+      "changelog": "Changelog"
     },
     "legal": {
       "title": "Legal",

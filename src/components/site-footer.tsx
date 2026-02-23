@@ -20,8 +20,14 @@ export async function SiteFooter() {
           <span className="text-muted-foreground text-xs">{t("brand.copyright")}</span>
         </div>
 
-        {/* Liens légaux */}
+        {/* Liens */}
         <nav className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+          <Link href="/about" className="hover:text-foreground transition-colors">
+            {t("product.about")}
+          </Link>
+          <Link href="/changelog" className="hover:text-foreground transition-colors">
+            {t("product.changelog")}
+          </Link>
           <Link href="/legal/mentions-legales" className="hover:text-foreground transition-colors">
             {t("legal.legalNotice")}
           </Link>
