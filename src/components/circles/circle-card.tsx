@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Globe, Lock, Users, ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Globe, Lock, Users, ImageIcon, Plus } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Circle, CircleMemberRole } from "@/domain/models/circle";
 
@@ -23,9 +24,11 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
   const gradient = getMomentGradient(circle.name);
 
   return (
-    <Link href={href ?? `/dashboard/circles/${circle.slug}`}>
-      <div className="border-border bg-card hover:border-primary/30 flex items-start gap-4 rounded-xl border p-4 transition-colors">
-        {/* Square avatar */}
+    <div className="border-border bg-card hover:border-primary/30 flex items-center gap-4 rounded-xl border p-4 transition-colors">
+
+      {/* Zone cliquable : avatar + contenu */}
+      <Link href={href ?? `/dashboard/circles/${circle.slug}`} className="flex min-w-0 flex-1 items-start gap-4">
+        {/* Avatar */}
         <div
           className="relative size-[72px] shrink-0 overflow-hidden rounded-xl"
           style={{ background: gradient }}
@@ -38,16 +41,13 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
           </div>
         </div>
 
-        {/* Content */}
+        {/* Contenu */}
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-start justify-between gap-2">
             <p className="truncate font-semibold leading-snug">{circle.name}</p>
-            {role && (
-              <Badge
-                variant={role === "HOST" ? "outline" : "secondary"}
-                className={role === "HOST" ? "shrink-0 border-primary/40 text-primary" : "shrink-0"}
-              >
-                {role === "HOST" ? tDashboard("role.host") : tDashboard("role.player")}
+            {role === "PLAYER" && (
+              <Badge variant="secondary" className="shrink-0">
+                {tDashboard("role.player")}
               </Badge>
             )}
           </div>
@@ -71,7 +71,22 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
             </p>
           )}
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      {/* Colonne droite : Organisateur uniquement */}
+      {role === "HOST" && (
+        <div className="flex shrink-0 flex-col items-center justify-center gap-2">
+          <Badge variant="outline" className="border-primary/40 text-primary">
+            {tDashboard("role.host")}
+          </Badge>
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
+              <Plus className="size-3.5" />
+              <span className="hidden sm:inline">{tDashboard("createMoment")}</span>
+            </Link>
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }
