@@ -102,7 +102,7 @@ export function RegistrationButton({
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
-        <Button className="rounded-full px-7" asChild>
+        <Button className="rounded-full md:px-7" asChild>
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
@@ -194,7 +194,7 @@ export function RegistrationButton({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <Button
-          className={`rounded-full${!isFull ? " px-7" : ""}`}
+          className={`rounded-full${!isFull ? " md:px-7" : ""}`}
           disabled={isPending}
           onClick={() => {
             startTransition(async () => {
