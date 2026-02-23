@@ -10,6 +10,16 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [0.10.0] — 2026-02-23 — À propos & Changelog
+
+### Ajouté
+
+- Page À propos — histoire du projet, le problème, la réponse, où on en est
+- Page Changelog — timeline des versions, mise à jour automatique à chaque release
+- Automatisation des releases (release-please)
+
+---
+
 ## [0.9.0] — 2026-02-23 — Polish & terminologie
 
 ### Ajouté
