@@ -144,6 +144,7 @@
       "description": "Update your Community settings"
     },
     "form": {
+      "coverImage": "Cover image",
       "name": "Name",
       "namePlaceholder": "My awesome community",
       "description": "Description",

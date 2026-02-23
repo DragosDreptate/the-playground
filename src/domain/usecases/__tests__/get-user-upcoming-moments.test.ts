@@ -22,6 +22,7 @@ describe("GetUserUpcomingMoments", () => {
             locationName: "Studio Zen",
             circleName: "Yoga Circle",
             circleSlug: "yoga-circle",
+            circleCoverImage: null,
           },
         },
         {
@@ -36,6 +37,7 @@ describe("GetUserUpcomingMoments", () => {
             locationName: null,
             circleName: "Dev Community",
             circleSlug: "dev-community",
+            circleCoverImage: null,
           },
         },
       ];

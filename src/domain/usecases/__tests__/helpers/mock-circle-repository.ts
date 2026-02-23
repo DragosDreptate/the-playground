@@ -31,6 +31,8 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     name: "My Circle",
     description: "A test circle",
     logo: null,
+    coverImage: null,
+    coverImageAttribution: null,
     visibility: "PUBLIC",
     category: null,
     city: null,

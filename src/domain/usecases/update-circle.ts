@@ -1,4 +1,4 @@
-import type { Circle, CircleVisibility, CircleCategory } from "@/domain/models/circle";
+import type { Circle, CircleVisibility, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
 
@@ -10,6 +10,8 @@ type UpdateCircleInput = {
   visibility?: CircleVisibility;
   category?: CircleCategory | null;
   city?: string | null;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
 };
 
 type UpdateCircleDeps = {
@@ -45,6 +47,10 @@ export async function updateCircle(
     visibility: input.visibility,
     category: input.category,
     city: input.city,
+    ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+    ...(input.coverImageAttribution !== undefined && {
+      coverImageAttribution: input.coverImageAttribution,
+    }),
   });
 
   return { circle: updated };

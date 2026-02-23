@@ -21,6 +21,7 @@ function makeRegistrationWithMoment(
       locationName: "Café Central",
       circleName: "Tech Paris",
       circleSlug: "tech-paris",
+      circleCoverImage: null,
     },
     ...overrides,
   };
@@ -43,6 +44,7 @@ describe("GetUserPastMoments", () => {
             locationName: "Studio Zen",
             circleName: "Yoga Circle",
             circleSlug: "yoga-circle",
+            circleCoverImage: null,
           },
         }),
         makeRegistrationWithMoment({
@@ -58,6 +60,7 @@ describe("GetUserPastMoments", () => {
             locationName: null,
             circleName: "Dev Community",
             circleSlug: "dev-community",
+            circleCoverImage: null,
           },
         }),
       ];
@@ -120,6 +123,7 @@ describe("GetUserPastMoments", () => {
           locationName: null,
           circleName: "Remote Circle",
           circleSlug: "remote-circle",
+          circleCoverImage: null,
         },
       });
       const registrationRepository = createMockRegistrationRepository({

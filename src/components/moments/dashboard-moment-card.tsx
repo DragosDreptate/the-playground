@@ -107,7 +107,7 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
               {/* Circle name + status */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                  <CircleAvatar name={moment.circleName} size="xs" />
+                  <CircleAvatar name={moment.circleName} image={moment.circleCoverImage} size="xs" />
                   {moment.circleName}
                 </span>
 

@@ -37,6 +37,59 @@ describe("UpdateCircle", () => {
       });
       expect(result.circle.name).toBe("Updated Name");
     });
+
+    it("should update coverImage and coverImageAttribution when provided", async () => {
+      const attribution = { name: "Jane Doe", url: "https://unsplash.com/@janedoe" };
+      const updated = makeCircle({
+        coverImage: "https://blob.example.com/cover.webp",
+        coverImageAttribution: attribution,
+      });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      const result = await updateCircle(
+        {
+          ...defaultInput,
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith(
+        "circle-1",
+        expect.objectContaining({
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        })
+      );
+      expect(result.circle.coverImage).toBe("https://blob.example.com/cover.webp");
+      expect(result.circle.coverImageAttribution).toEqual(attribution);
+    });
+
+    it("should remove coverImage when coverImage is null", async () => {
+      const existing = makeCircle({ coverImage: "https://blob.example.com/old.webp" });
+      const updated = makeCircle({ coverImage: null, coverImageAttribution: null });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      const result = await updateCircle(
+        { ...defaultInput, coverImage: null, coverImageAttribution: null },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith(
+        "circle-1",
+        expect.objectContaining({ coverImage: null, coverImageAttribution: null })
+      );
+      expect(result.circle.coverImage).toBeNull();
+    });
   });
 
   describe("given the circle does not exist", () => {

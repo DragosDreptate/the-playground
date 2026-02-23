@@ -151,16 +151,44 @@ export default async function PublicCirclePage({
             />
             <div
               className="relative w-full overflow-hidden rounded-2xl"
-              style={{ background: gradient, aspectRatio: "1 / 1" }}
+              style={{ aspectRatio: "1 / 1" }}
             >
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <Users className="size-6 text-white" />
-                </div>
-              </div>
+              {circle.coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={circle.coverImage}
+                  alt={circle.name}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <>
+                  <div className="size-full" style={{ background: gradient }} />
+                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                      <Users className="size-6 text-white" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
+
+          {/* Attribution photographe */}
+          {circle.coverImageAttribution && (
+            <p className="text-muted-foreground px-1 text-xs">
+              Photo par{" "}
+              <a
+                href={circle.coverImageAttribution.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground underline"
+              >
+                {circle.coverImageAttribution.name}
+              </a>{" "}
+              sur Unsplash
+            </p>
+          )}
 
           {/* Hosts */}
           {hosts.length > 0 && (

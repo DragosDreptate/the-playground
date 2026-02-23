@@ -11,6 +11,8 @@ function makePublicCircle(overrides: Partial<PublicCircle> = {}): PublicCircle {
     description: "Tech community in Paris",
     category: "TECH",
     city: "Paris",
+    coverImage: null,
+    coverImageAttribution: null,
     memberCount: 42,
     upcomingMomentCount: 3,
     nextMoment: { title: "Meetup React", startsAt: new Date("2026-03-15T18:00:00Z") },

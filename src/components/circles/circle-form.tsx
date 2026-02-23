@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Circle, CircleVisibility, CircleCategory } from "@/domain/models/circle";
+import type { Circle, CircleVisibility, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
+import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
 
 type CircleFormProps = {
   circle?: Circle;
@@ -43,10 +44,47 @@ export function CircleForm({ circle, action }: CircleFormProps) {
   const tCommon = useTranslations("Common");
   const router = useRouter();
 
+  const [coverSelection, setCoverSelection] = useState<CoverSelection | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CircleCategory | "">(
+    circle?.category ?? ""
+  );
+
+  // Ref pour avoir accès à la valeur du nom en temps réel (pour le picker)
+  const nameRef = useRef<HTMLInputElement>(null);
+  const [circleName, setCircleName] = useState(circle?.name ?? "");
+
+  // Image affichée : sélection en cours ou image existante
+  const previewImage =
+    coverSelection?.type === "upload"
+      ? coverSelection.previewUrl
+      : coverSelection?.type === "unsplash"
+        ? coverSelection.thumbUrl
+        : coverSelection?.type === "remove"
+          ? null
+          : circle?.coverImage ?? null;
+
+  const previewAttribution: CoverImageAttribution | null =
+    coverSelection?.type === "unsplash"
+      ? coverSelection.attribution
+      : coverSelection?.type === "remove"
+        ? null
+        : circle?.coverImageAttribution ?? null;
+
   async function handleSubmit(
     _prev: FormState,
     formData: FormData
   ): Promise<FormState> {
+    // Injecter les données cover dans le FormData
+    if (coverSelection?.type === "upload") {
+      formData.set("coverImageFile", coverSelection.file);
+    } else if (coverSelection?.type === "unsplash") {
+      formData.set("coverImageUrl", coverSelection.url);
+      formData.set("coverImageAuthorName", coverSelection.attribution.name);
+      formData.set("coverImageAuthorUrl", coverSelection.attribution.url);
+    } else if (coverSelection?.type === "remove") {
+      formData.set("removeCover", "true");
+    }
+
     const result = await action(formData);
 
     if (result.success) {
@@ -67,15 +105,43 @@ export function CircleForm({ circle, action }: CircleFormProps) {
         </div>
       )}
 
+      {/* Image de couverture — en premier */}
+      <div className="space-y-2">
+        <Label>{t("form.coverImage")}</Label>
+        <CoverImagePicker
+          circleName={circleName || undefined}
+          category={selectedCategory || undefined}
+          currentImage={previewImage}
+          currentAttribution={previewAttribution}
+          onSelect={setCoverSelection}
+        />
+        {previewAttribution && (
+          <p className="text-muted-foreground text-xs">
+            Photo par{" "}
+            <a
+              href={previewAttribution.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground underline"
+            >
+              {previewAttribution.name}
+            </a>{" "}
+            sur Unsplash
+          </p>
+        )}
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="name">{t("form.name")}</Label>
         <Input
           id="name"
           name="name"
+          ref={nameRef}
           placeholder={t("form.namePlaceholder")}
           defaultValue={circle?.name ?? ""}
           required
           maxLength={100}
+          onChange={(e) => setCircleName(e.target.value)}
         />
       </div>
 
@@ -96,6 +162,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
         <Select
           name="category"
           defaultValue={circle?.category ?? ""}
+          onValueChange={(value) => setSelectedCategory(value as CircleCategory | "")}
         >
           <SelectTrigger id="category">
             <SelectValue placeholder={t("form.categoryPlaceholder")} />

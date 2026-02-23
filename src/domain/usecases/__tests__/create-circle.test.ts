@@ -37,6 +37,27 @@ describe("CreateCircle", () => {
       expect(result.circle.name).toBe("My Circle");
     });
 
+    it("should pass coverImage and coverImageAttribution when provided", async () => {
+      const attribution = { name: "John Doe", url: "https://unsplash.com/@johndoe" };
+      const repo = createMockCircleRepository({
+        create: vi.fn().mockResolvedValue(
+          makeCircle({ coverImage: "https://blob.example.com/cover.webp", coverImageAttribution: attribution })
+        ),
+      });
+
+      await createCircle(
+        { ...defaultInput, coverImage: "https://blob.example.com/cover.webp", coverImageAttribution: attribution },
+        { circleRepository: repo }
+      );
+
+      expect(repo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        })
+      );
+    });
+
     it("should add the creator as HOST", async () => {
       const created = makeCircle({ id: "new-circle-id" });
       const repo = createMockCircleRepository({

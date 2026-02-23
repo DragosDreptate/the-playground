@@ -190,7 +190,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             endsAt: true,
             locationType: true,
             locationName: true,
-            circle: { select: { name: true, slug: true } },
+            circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
       },
@@ -208,6 +208,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         locationName: r.moment.locationName,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
+        circleCoverImage: r.moment.circle.coverImage ?? null,
       },
     }));
   },
@@ -231,7 +232,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             endsAt: true,
             locationType: true,
             locationName: true,
-            circle: { select: { name: true, slug: true } },
+            circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
       },
@@ -249,6 +250,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         locationName: r.moment.locationName,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
+        circleCoverImage: r.moment.circle.coverImage ?? null,
       },
     }));
   },

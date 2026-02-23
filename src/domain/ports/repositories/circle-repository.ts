@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
 
 export type CreateCircleInput = {
   name: string;
@@ -7,6 +7,8 @@ export type CreateCircleInput = {
   visibility: Circle["visibility"];
   category?: CircleCategory;
   city?: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
 };
 
 export type UpdateCircleInput = {
@@ -15,6 +17,8 @@ export type UpdateCircleInput = {
   visibility?: Circle["visibility"];
   category?: CircleCategory | null;
   city?: string | null;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
 };
 
 export type PublicCircleFilters = {
@@ -30,6 +34,8 @@ export type PublicCircle = {
   description: string;
   category: CircleCategory | null;
   city: string | null;
+  coverImage: string | null;
+  coverImageAttribution: CoverImageAttribution | null;
   memberCount: number;
   upcomingMomentCount: number;
   nextMoment: {

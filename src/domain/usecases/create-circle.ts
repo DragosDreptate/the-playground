@@ -1,4 +1,4 @@
-import type { Circle, CircleVisibility, CircleCategory } from "@/domain/models/circle";
+import type { Circle, CircleVisibility, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import { SlugAlreadyExistsError } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
@@ -9,6 +9,8 @@ type CreateCircleInput = {
   visibility: CircleVisibility;
   category?: CircleCategory;
   city?: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
   userId: string;
 };
 
@@ -44,6 +46,10 @@ export async function createCircle(
     visibility: input.visibility,
     ...(input.category !== undefined && { category: input.category }),
     ...(input.city !== undefined && { city: input.city }),
+    ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+    ...(input.coverImageAttribution !== undefined && {
+      coverImageAttribution: input.coverImageAttribution,
+    }),
   });
 
   await circleRepository.addMembership(circle.id, input.userId, "HOST");

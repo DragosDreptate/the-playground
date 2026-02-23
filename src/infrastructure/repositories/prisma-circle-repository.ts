@@ -1,4 +1,4 @@
-import { prisma } from "@/infrastructure/db/prisma";
+import { prisma, Prisma } from "@/infrastructure/db/prisma";
 import type {
   CircleRepository,
   CreateCircleInput,
@@ -6,7 +6,7 @@ import type {
   PublicCircleFilters,
   PublicCircle,
 } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -16,6 +16,10 @@ function toDomainCircle(record: PrismaCircle): Circle {
     name: record.name,
     description: record.description,
     logo: record.logo,
+    coverImage: record.coverImage ?? null,
+    coverImageAttribution: record.coverImageAttribution
+      ? (record.coverImageAttribution as CoverImageAttribution)
+      : null,
     visibility: record.visibility,
     category: record.category ?? null,
     city: record.city ?? null,
@@ -45,6 +49,13 @@ export const prismaCircleRepository: CircleRepository = {
         visibility: input.visibility,
         ...(input.category !== undefined && { category: input.category }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+        ...(input.coverImageAttribution !== undefined && {
+          coverImageAttribution:
+            input.coverImageAttribution === null
+              ? Prisma.DbNull
+              : input.coverImageAttribution,
+        }),
       },
     });
     return toDomainCircle(record);
@@ -77,6 +88,13 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.visibility !== undefined && { visibility: input.visibility }),
         ...(input.category !== undefined && { category: input.category }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+        ...(input.coverImageAttribution !== undefined && {
+          coverImageAttribution:
+            input.coverImageAttribution === null
+              ? Prisma.DbNull
+              : input.coverImageAttribution,
+        }),
       },
     });
     return toDomainCircle(record);
@@ -187,6 +205,10 @@ export const prismaCircleRepository: CircleRepository = {
       description: c.description,
       category: c.category ?? null,
       city: c.city ?? null,
+      coverImage: c.coverImage ?? null,
+      coverImageAttribution: c.coverImageAttribution
+        ? (c.coverImageAttribution as CoverImageAttribution)
+        : null,
       memberCount: c._count.memberships,
       upcomingMomentCount: c.moments.length,
       nextMoment: c.moments[0] ?? null,

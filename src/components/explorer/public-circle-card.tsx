@@ -65,11 +65,20 @@ export async function PublicCircleCard({ circle }: Props) {
         {/* ── Mobile: compact horizontal ── */}
         <div className="sm:hidden">
           <div className="flex items-start gap-3">
-            {/* Gradient thumbnail — même pattern que PublicMomentCard */}
+            {/* Thumbnail — cover image ou gradient */}
             <div
-              className="size-[72px] shrink-0 rounded-xl"
-              style={{ background: gradient }}
-            />
+              className="size-[72px] shrink-0 overflow-hidden rounded-xl"
+              style={circle.coverImage ? undefined : { background: gradient }}
+            >
+              {circle.coverImage && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={circle.coverImage}
+                  alt={circle.name}
+                  className="size-full object-cover"
+                />
+              )}
+            </div>
 
             {/* Info */}
             <div className="min-w-0 flex-1 space-y-1">
@@ -93,22 +102,31 @@ export async function PublicCircleCard({ circle }: Props) {
 
         {/* ── Desktop: vertical card ── */}
         <div className="hidden sm:block">
-          {/* Cover gradient */}
+          {/* Cover — image ou gradient */}
           <div className="relative mb-4">
             <div
               className="absolute inset-x-4 -bottom-2 h-6 opacity-50 blur-xl"
               style={{ background: gradient }}
             />
-            <div
-              className="relative aspect-square w-full overflow-hidden rounded-xl"
-              style={{ background: gradient }}
-            >
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <Users className="size-4 text-white" />
-                </div>
-              </div>
+            <div className="relative aspect-square w-full overflow-hidden rounded-xl">
+              {circle.coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={circle.coverImage}
+                  alt={circle.name}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <>
+                  <div className="size-full" style={{ background: gradient }} />
+                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                      <Users className="size-4 text-white" />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

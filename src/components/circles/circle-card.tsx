@@ -31,14 +31,25 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
         {/* Avatar */}
         <div
           className="relative size-[72px] shrink-0 overflow-hidden rounded-xl"
-          style={{ background: gradient }}
+          style={circle.coverImage ? undefined : { background: gradient }}
         >
-          <div className="absolute inset-0 bg-black/20" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <ImageIcon className="size-4 text-white" />
-            </div>
-          </div>
+          {circle.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={circle.coverImage}
+              alt={circle.name}
+              className="size-full object-cover"
+            />
+          ) : (
+            <>
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex size-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                  <ImageIcon className="size-4 text-white" />
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Contenu */}

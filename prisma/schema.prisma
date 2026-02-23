@@ -145,6 +145,8 @@ model Circle {
   name                  String
   description           String           @db.Text
   logo                  String?
+  coverImage            String?
+  coverImageAttribution Json?            @db.JsonB
   visibility            CircleVisibility @default(PUBLIC)
   category              CircleCategory?
   city                  String?

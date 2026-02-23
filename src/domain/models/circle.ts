@@ -1,5 +1,10 @@
 export type CircleVisibility = "PUBLIC" | "PRIVATE";
 
+export type CoverImageAttribution = {
+  name: string;
+  url: string;
+};
+
 export type CircleMemberRole = "HOST" | "PLAYER";
 
 export type CircleCategory =
@@ -18,6 +23,8 @@ export type Circle = {
   name: string;
   description: string;
   logo: string | null;
+  coverImage: string | null;
+  coverImageAttribution: CoverImageAttribution | null;
   visibility: CircleVisibility;
   category: CircleCategory | null;
   city: string | null;
