@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, Lock, Users, ImageIcon, Plus } from "lucide-react";
+import { Globe, Lock, Users, ImageIcon, Crown, User } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Circle, CircleMemberRole } from "@/domain/models/circle";
 
@@ -46,7 +46,8 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
           <div className="flex items-start justify-between gap-2">
             <p className="truncate font-semibold leading-snug">{circle.name}</p>
             {role === "PLAYER" && (
-              <Badge variant="secondary" className="shrink-0">
+              <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-primary">
+                <User className="size-3" />
                 {tDashboard("role.player")}
               </Badge>
             )}
@@ -75,14 +76,14 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
 
       {/* Colonne droite : Organisateur uniquement */}
       {role === "HOST" && (
-        <div className="flex shrink-0 flex-col items-center justify-center gap-2">
-          <Badge variant="outline" className="border-primary/40 text-primary">
+        <div className="flex shrink-0 flex-col items-end justify-center gap-2">
+          <Badge variant="outline" className="gap-1 border-primary/40 text-primary">
+            <Crown className="size-3" />
             {tDashboard("role.host")}
           </Badge>
-          <Button asChild variant="outline" size="sm">
+          <Button asChild size="sm" className="h-7 px-3 text-xs">
             <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
-              <Plus className="size-3.5" />
-              <span className="hidden sm:inline">{tDashboard("createMoment")}</span>
+              {tDashboard("createMoment")}
             </Link>
           </Button>
         </div>

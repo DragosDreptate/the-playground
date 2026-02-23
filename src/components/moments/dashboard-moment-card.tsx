@@ -118,7 +118,7 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
                       {t("role.host")}
                     </Badge>
                   ) : isRegistered ? (
-                    <Badge variant="default" className="gap-1 text-xs">
+                    <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
                       <Check className="size-3" />
                       {t("registrationStatus.registered")}
                     </Badge>
