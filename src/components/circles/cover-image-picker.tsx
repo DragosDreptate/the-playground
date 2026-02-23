@@ -208,12 +208,12 @@ export function CoverImagePicker({
     if (pending) {
       onSelect(pending);
     }
-    setOpen(false);
+    handleOpenChange(false);
   }
 
   function handleRemove() {
     onSelect({ type: "remove" });
-    setOpen(false);
+    handleOpenChange(false);
   }
 
   function handleOpenChange(value: boolean) {
