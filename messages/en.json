@@ -2,9 +2,9 @@
   "HomePage": {
     "title": "The Playground",
     "heroHighlight1": "Launch",
-    "heroRest1": "your Circle.",
+    "heroRest1": "your Community.",
     "heroHighlight2": "Organize",
-    "heroRest2": "your Moments.",
+    "heroRest2": "your Events.",
     "heroHighlight3": "Unite",
     "heroRest3": "your audience.",
     "heroSubtitle": "The free platform to build your community and host unforgettable events.",
@@ -19,27 +19,27 @@
     "mockupMomentLocation": "The Counter",
     "mockupMomentAttendees": "8 joined",
     "howItWorks": "How it works",
-    "step1Title": "Create your Circle",
+    "step1Title": "Create your Community",
     "step1Description": "Your community space in 30 seconds. Public or private, you decide.",
-    "step2Title": "Launch your Moments",
-    "step2Description": "Every Moment gets a premium, shareable page. One link, and you're live.",
+    "step2Title": "Launch your Events",
+    "step2Description": "Every Event gets a premium, shareable page. One link, and you're live.",
     "step3Title": "Watch your Playground grow",
-    "step3Description": "Members stay in your Circle and come back for the next Moments.",
+    "step3Description": "Members stay in your Community and come back for the next Events.",
     "pillarsHeading": "What makes The Playground different",
     "pillar1Title": "Community-first",
-    "pillar1Description": "Your members stay between Moments. No more one-time audiences.",
+    "pillar1Description": "Your members stay between Events. No more one-time audiences.",
     "pillar2Title": "Premium design",
-    "pillar2Description": "Elegant pages, effortlessly. Your Circle impresses from day one.",
+    "pillar2Description": "Elegant pages, effortlessly. Your Community impresses from day one.",
     "pillar3Title": "100% free",
     "pillar3Description": "Zero commission, zero subscription. Only Stripe fees on paid events.",
     "ctaFinalTitle": "Ready to launch your community?",
-    "ctaFinalSubtitle": "Create your Circle in 30 seconds. Free, forever.",
+    "ctaFinalSubtitle": "Create your Community in 30 seconds. Free, forever.",
     "ctaFinal": "Get started for free",
     "ctaExplore": "Start exploring",
     "heroFamiliar1": "community",
     "heroFamiliar2": "events",
-    "heroBranded1": "Circle",
-    "heroBranded2": "Moments",
+    "heroBranded1": "Community",
+    "heroBranded2": "Events",
     "heroRestPrefix1": "your",
     "heroRestPrefix2": "your"
   },
@@ -88,8 +88,8 @@
     "greetingAnonymous": "Welcome to The Playground 👋",
     "subtitle": "What would you like to do first?",
     "createCircle": {
-      "title": "Create my Circle",
-      "description": "Launch your space, invite your members and organize your events.",
+      "title": "Create my Community",
+      "description": "Launch your community, invite your members and organize your events.",
       "cta": "Get started"
     },
     "explore": {
@@ -99,25 +99,25 @@
     }
   },
   "Dashboard": {
-    "title": "My Playground",
-    "myCircles": "My Circles",
-    "createCircle": "Create a Circle",
-    "createMoment": "Create a Moment",
+    "title": "Dashboard",
+    "myCircles": "My Communities",
+    "createCircle": "Create a Community",
+    "createMoment": "Create an Event",
     "selectCircle": {
-      "title": "Choose a Circle",
-      "description": "Which Circle should this Moment belong to?"
+      "title": "Choose a Community",
+      "description": "Which Community should this Event belong to?"
     },
     "noCircles": {
-      "title": "Create a Circle first",
-      "description": "You need a Circle before creating a Moment."
+      "title": "Create a Community first",
+      "description": "You need a Community before creating an Event."
     },
-    "myMoments": "My Moments",
-    "upcomingMoments": "My upcoming Moments",
+    "myMoments": "My Events",
+    "upcomingMoments": "My upcoming Events",
     "pastMoments": "Past",
-    "noUpcomingMoments": "No upcoming Moments.",
-    "noMoments": "No Moments yet.",
-    "noMomentsHint": "Join a Moment or create your community.",
-    "noCirclesMember": "You are not a member of any Circle yet.",
+    "noUpcomingMoments": "No upcoming Events.",
+    "noMoments": "No Events yet.",
+    "noMomentsHint": "Join an Event or create your community.",
+    "noCirclesMember": "You are not a member of any Community yet.",
     "role": {
       "host": "Host",
       "player": "Member"
@@ -131,25 +131,25 @@
     "hostTools": "Host tools",
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
-    "greetingSubtitle": "Your Circles and upcoming Moments, all in one place.",
+    "greetingSubtitle": "Your Communities and upcoming Events, all in one place.",
     "memberCount": "{count} members"
   },
   "Circle": {
     "create": {
-      "title": "Create a Circle",
+      "title": "Create a Community",
       "description": "Set up your community space"
     },
     "edit": {
-      "title": "Edit Circle",
-      "description": "Update your Circle settings"
+      "title": "Edit Community",
+      "description": "Update your Community settings"
     },
     "form": {
       "name": "Name",
       "namePlaceholder": "My awesome community",
       "description": "Description",
-      "descriptionPlaceholder": "Tell people what your Circle is about...",
+      "descriptionPlaceholder": "Tell people what your Community is about...",
       "visibility": "Visibility",
-      "visibilityPublic": "Public — anyone can discover this Circle",
+      "visibilityPublic": "Public — anyone can discover this Community",
       "visibilityPrivate": "Private — only accessible via invitation",
       "category": "Category",
       "categoryPlaceholder": "Choose a category",
@@ -157,13 +157,13 @@
       "cityPlaceholder": "Paris, London, Remote..."
     },
     "delete": {
-      "title": "Delete Circle",
-      "description": "Are you sure you want to delete this Circle? This action cannot be undone. All Moments and memberships will be permanently removed.",
-      "confirm": "Yes, delete this Circle"
+      "title": "Delete Community",
+      "description": "Are you sure you want to delete this Community? This action cannot be undone. All Events and memberships will be permanently removed.",
+      "confirm": "Yes, delete this Community"
     },
     "detail": {
       "members": "Members",
-      "moments": "Moments",
+      "moments": "Events",
       "settings": "Settings",
       "editCircle": "Edit",
       "deleteCircle": "Delete",
@@ -172,38 +172,38 @@
       "hostedBy": "Hosted by",
       "about": "About",
       "visibility": "Visibility",
-      "publicCircle": "Public Circle",
-      "privateCircle": "Private Circle",
+      "publicCircle": "Public Community",
+      "privateCircle": "Private Community",
       "memberCount": "{count} members",
-      "upcomingMoments": "Upcoming Moments",
-      "pastMoments": "Past Moments",
-      "noUpcomingMoments": "No upcoming Moments.",
-      "noPastMoments": "No past Moments.",
+      "upcomingMoments": "Upcoming Events",
+      "pastMoments": "Past Events",
+      "noUpcomingMoments": "No upcoming Events.",
+      "noPastMoments": "No past Events.",
       "today": "Today",
-      "manageMoment": "Manage this Moment"
+      "manageMoment": "Manage this Event"
     },
     "errors": {
-      "notFound": "Circle not found",
+      "notFound": "Community not found",
       "unauthorized": "You don't have permission to perform this action",
-      "createFailed": "Failed to create Circle",
-      "updateFailed": "Failed to update Circle",
-      "deleteFailed": "Failed to delete Circle"
+      "createFailed": "Failed to create Community",
+      "updateFailed": "Failed to update Community",
+      "deleteFailed": "Failed to delete Community"
     }
   },
   "Moment": {
     "create": {
-      "title": "Create a Moment",
+      "title": "Create an Event",
       "description": "Set up your event"
     },
     "edit": {
-      "title": "Edit Moment",
+      "title": "Edit Event",
       "description": "Update your event details"
     },
     "form": {
       "title": "Title",
       "eventName": "Event name",
       "description": "Description",
-      "descriptionPlaceholder": "Tell people what this Moment is about...",
+      "descriptionPlaceholder": "Tell people what this Event is about...",
       "addLocation": "Add event location",
       "addLocationHint": "Physical venue or virtual link",
       "addDescription": "Add a description",
@@ -233,12 +233,12 @@
       "startLabel": "Start",
       "endLabel": "End",
       "pickDate": "Pick a date",
-      "createMoment": "Create a Moment"
+      "createMoment": "Create an Event"
     },
     "delete": {
-      "title": "Delete Moment",
-      "description": "Are you sure you want to delete this Moment? This action cannot be undone. All registrations will be permanently removed.",
-      "confirm": "Yes, delete this Moment"
+      "title": "Delete Event",
+      "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",
+      "confirm": "Yes, delete this Event"
     },
     "detail": {
       "when": "When",
@@ -265,7 +265,7 @@
       "joinWaitlist": "Join the waitlist",
       "cancelRegistration": "Cancel my registration",
       "cancelConfirmTitle": "Cancel registration",
-      "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Moment?",
+      "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
       "signInToRegister": "Sign in to join",
@@ -276,7 +276,7 @@
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
       "attendedCount": "{count} members attended",
-      "viewCircleMoments": "See upcoming Moments from this Circle"
+      "viewCircleMoments": "See upcoming Events from this Community"
     },
     "registrations": {
       "title": "Attendees",
@@ -305,14 +305,14 @@
       "daysAgo": "{count}d ago"
     },
     "empty": {
-      "description": "No Moments yet. Create your first event."
+      "description": "No Events yet. Create your first event."
     },
     "errors": {
-      "notFound": "Moment not found",
-      "unauthorized": "You don't have permission to manage this Moment",
-      "createFailed": "Failed to create Moment",
-      "updateFailed": "Failed to update Moment",
-      "deleteFailed": "Failed to delete Moment"
+      "notFound": "Event not found",
+      "unauthorized": "You don't have permission to manage this Event",
+      "createFailed": "Failed to create Event",
+      "updateFailed": "Failed to update Event",
+      "deleteFailed": "Failed to delete Event"
     }
   },
   "CircleCategory": {
@@ -330,21 +330,21 @@
     "description": "Communities that share your values, events you don't want to miss.",
     "navLink": "Explore",
     "tabs": {
-      "circles": "Circles",
-      "moments": "Moments"
+      "circles": "Communities",
+      "moments": "Events"
     },
     "filters": {
       "allCategories": "All categories"
     },
     "empty": {
-      "circles": "No public Circles for this category.",
-      "moments": "No upcoming Moments for this category."
+      "circles": "No public Communities for this category.",
+      "moments": "No upcoming Events for this category."
     },
     "circleCard": {
       "members": "{count} members",
-      "upcomingMoments": "{count} upcoming Moment(s)",
-      "noUpcomingMoments": "No upcoming Moments",
-      "nextMoment": "Next Moment"
+      "upcomingMoments": "{count} upcoming Event(s)",
+      "noUpcomingMoments": "No upcoming Events",
+      "nextMoment": "Next Event"
     },
     "momentCard": {
       "free": "Free",
@@ -357,13 +357,13 @@
     "title": "Administration",
     "dashboard": "Dashboard",
     "users": "Users",
-    "circles": "Circles",
-    "moments": "Moments",
+    "circles": "Communities",
+    "moments": "Events",
     "backToSite": "Back to site",
     "stats": {
       "totalUsers": "Users",
-      "totalCircles": "Circles",
-      "totalMoments": "Moments",
+      "totalCircles": "Communities",
+      "totalMoments": "Events",
       "totalRegistrations": "Registrations",
       "thisWeek": "this week"
     },
@@ -378,7 +378,7 @@
       "delete": "Delete",
       "cancel": "Cancel",
       "confirmDelete": "Are you sure? This action cannot be undone.",
-      "confirmCancel": "Are you sure you want to cancel this Moment?",
+      "confirmCancel": "Are you sure you want to cancel this Event?",
       "cancelMoment": "Force cancel",
       "view": "View"
     },
@@ -389,24 +389,24 @@
       "completed": "Completed",
       "pending": "Pending",
       "memberSince": "Member since",
-      "circles": "Circles",
-      "noCircles": "No Circles."
+      "circles": "Communities",
+      "noCircles": "No Communities."
     },
     "circleDetail": {
-      "title": "Circle detail",
+      "title": "Community detail",
       "host": "Host",
       "members": "Members",
-      "moments": "Moments",
+      "moments": "Events",
       "visibility": "Visibility",
       "category": "Category",
       "city": "City",
       "description": "Description",
-      "recentMoments": "Recent Moments",
-      "noMoments": "No Moments."
+      "recentMoments": "Recent Events",
+      "noMoments": "No Events."
     },
     "momentDetail": {
-      "title": "Moment detail",
-      "circle": "Circle",
+      "title": "Event detail",
+      "circle": "Community",
       "createdBy": "Created by",
       "status": "Status",
       "date": "Date",
@@ -419,15 +419,15 @@
       "name": "Name",
       "email": "Email",
       "role": "Role",
-      "circles": "Circles",
-      "moments": "Moments",
+      "circles": "Communities",
+      "moments": "Events",
       "createdAt": "Joined",
       "host": "Host",
       "members": "Members",
       "visibility": "Visibility",
       "category": "Category",
       "title": "Title",
-      "circle": "Circle",
+      "circle": "Community",
       "date": "Date",
       "status": "Status",
       "registrations": "Registrations",
@@ -435,7 +435,7 @@
     }
   },
   "UserMenu": {
-    "dashboard": "My Playground",
+    "dashboard": "Dashboard",
     "profile": "Profile",
     "signOut": "Sign out"
   },
@@ -443,7 +443,7 @@
     "registration": {
       "subject": "You've joined {momentTitle}",
       "heading": "Registration confirmed!",
-      "statusMessage": "You're registered for {momentTitle}."
+      "statusMessage": "You've joined {momentTitle}."
     },
     "waitlist": {
       "subject": "Waitlist: {momentTitle}",
@@ -466,7 +466,7 @@
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",
-      "viewMomentCta": "View Moment",
+      "viewMomentCta": "View Event",
       "cancelLink": "Cancel my registration",
       "footer": "Powered by The Playground — Launch your community, for free."
     }
@@ -531,7 +531,7 @@
         "title": "Purpose of data processing",
         "items": {
           "auth": "Authentication and account management",
-          "service": "Service delivery (creating Circles, joining Moments)",
+          "service": "Service delivery (creating Communities, joining Events)",
           "email": "Sending transactional emails (registration confirmations, notifications)",
           "analytics": "Service improvement through anonymized statistics"
         }
@@ -571,7 +571,7 @@
       },
       "service": {
         "title": "Service description",
-        "content": "The Playground is a free platform for creating communities (Circles) and organizing events (Moments). The service is accessible via the web and is provided \"as is\"."
+        "content": "The Playground is a free platform for creating Communities and organizing Events. The service is accessible via the web and is provided \"as is\"."
       },
       "account": {
         "title": "User account",
@@ -579,19 +579,19 @@
       },
       "userContent": {
         "title": "User content",
-        "content": "You are solely responsible for content you publish on The Playground (Circle descriptions, Moment descriptions, comments). Any unlawful, defamatory, discriminatory or otherwise inappropriate content is prohibited and may be removed without notice."
+        "content": "You are solely responsible for content you publish on The Playground (Community descriptions, Event descriptions, comments). Any unlawful, defamatory, discriminatory or otherwise inappropriate content is prohibited and may be removed without notice."
       },
       "hostResponsibilities": {
         "title": "Host responsibilities",
-        "content": "As a Host, you are responsible for the accuracy of information related to your Moments (location, date, description). You agree to comply with all applicable laws regarding event organization."
+        "content": "As a Host, you are responsible for the accuracy of information related to your Events (location, date, description). You agree to comply with all applicable laws regarding event organization."
       },
       "playerResponsibilities": {
         "title": "Member responsibilities",
-        "content": "As a Member, you agree to respect the rules of each Circle and Moment you participate in. Joining a Moment constitutes a commitment to attend."
+        "content": "As a Member, you agree to respect the rules of each Community and Event you participate in. Joining an Event constitutes a commitment to attend."
       },
       "pricing": {
         "title": "Pricing",
-        "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Moments, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
+        "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Events, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
       },
       "liability": {
         "title": "Limitation of liability",
@@ -626,8 +626,8 @@
       "personalInfo": "Personal information",
       "memberSince": "Member since",
       "account": "Account",
-      "circles": "Circles",
-      "moments": "Moments"
+      "circles": "Communities",
+      "moments": "Events"
     },
     "form": {
       "email": "Email",

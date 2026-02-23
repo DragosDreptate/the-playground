@@ -40,7 +40,7 @@ export default async function WelcomePage() {
 
   return (
     <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center">
-      <div className="mx-auto w-full max-w-lg space-y-8">
+      <div className="mx-auto w-full max-w-2xl space-y-8">
         {/* Greeting */}
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -52,9 +52,9 @@ export default async function WelcomePage() {
         {/* Cards */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Créer ma Communauté */}
-          <div className="flex flex-col gap-4 rounded-xl border bg-card p-6">
+          <div className="flex flex-col items-center gap-6 rounded-xl border bg-card px-8 py-10 text-center">
             <Users className="size-10 text-primary" />
-            <div className="space-y-1">
+            <div className="space-y-2">
               <h2 className="font-semibold">{t("createCircle.title")}</h2>
               <p className="text-muted-foreground text-sm">{t("createCircle.description")}</p>
             </div>
@@ -64,13 +64,13 @@ export default async function WelcomePage() {
           </div>
 
           {/* Découvrir des Communautés */}
-          <div className="flex flex-col gap-4 rounded-xl border bg-card p-6">
+          <div className="flex flex-col items-center gap-6 rounded-xl border bg-card px-8 py-10 text-center">
             <Compass className="size-10 text-primary" />
-            <div className="space-y-1">
+            <div className="space-y-2">
               <h2 className="font-semibold">{t("explore.title")}</h2>
               <p className="text-muted-foreground text-sm">{t("explore.description")}</p>
             </div>
-            <Button asChild variant="outline" className="mt-auto w-full">
+            <Button asChild className="mt-auto w-full">
               <Link href="/explorer">{t("explore.cta")}</Link>
             </Button>
           </div>

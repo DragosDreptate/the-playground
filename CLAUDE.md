@@ -56,13 +56,13 @@ The Playground: Événement → Inscription → Membre du Circle → Prochains �
 | **Playground** | — | La plateforme |
 | **Circle** | Communauté | Une communauté autonome (publique ou privée) |
 | **Track** | — | Série d'événements récurrents dans un Circle (**Phase 2** — retiré du MVP) |
-| **Moment** | événement (FR) / Moment (EN) | Événement individuel — unité virale de la plateforme, page autonome et partageable |
+| **Moment** | événement (FR) / Event (EN) | Événement individuel — unité virale de la plateforme, page autonome et partageable |
 | **Host** | Organisateur | Organisateur d'un Circle |
 | **Player** | Participant (FR) / Member (EN) | Participant à un Moment / membre d'un Circle |
 
 > **Règle i18n** : En code (types, variables, DB, noms de fichiers, clés JSON), on utilise toujours les termes anglais (Circle, Moment, Host, Player). Les traductions user-facing sont :
 > - **FR** : Circle → **Communauté** (féminin : une Communauté, cette Communauté), Moment → **événement** (masculin : un événement, cet événement, Publié, Annulé, Passé), Host → Organisateur, Player → Participant, Register → **S'inscrire**, Dashboard → **Mon espace**, Explorer → **Découvrir**
-> - **EN** : Circle, Moment, Host restent inchangés. Player → **Member**, Register → **Join**, Dashboard → **My Playground**, Explorer → **Explore**
+> - **EN** : Circle → **Community**, Moment → **Event**, Host reste inchangé. Player → **Member**, Register → **Join**, Dashboard → **Dashboard**, Explorer → **Explore**
 
 ## Règles métier clés
 
@@ -564,5 +564,6 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Organisateurs d'abord (Crown), emails visibles uniquement pour les Organisateurs (prop `variant`) |
 | 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
 | 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
+| 2026-02-23 | Terminologie EN alignée sur FR : Circle → **Community**, Moment → **Event**, My Playground → **Dashboard**. Code/clés JSON inchangés. FR inchangé. |
 | 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et clé i18n `Explorer` inchangées. La Boussole réservée pour l'assistant IA (futur). |
 | 2026-02-22 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin : Publié, Annulé, Passé), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. |
