@@ -134,6 +134,7 @@ async function sendRegistrationEmails(
   ]);
   if (!user || !moment) return;
 
+  // Note : circle dépend de moment.circleId → séquentiel volontaire
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
