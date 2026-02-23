@@ -198,9 +198,9 @@ export default async function AboutPage() {
                     Dragos Dreptate
                   </a>
                   . Dirigeant, entrepreneur et coach — 25 ans dans la tech,
-                  basé à Paris. Je co-dirige{" "}
-                  <strong className="text-foreground">The Spark</strong>, une
-                  structure centrée sur l'innovation et le leadership.
+                  basé à Paris. J'ai fondé{" "}
+                  <strong className="text-foreground">The Spark</strong>, un
+                  cabinet de conseil en IA, Produit et Innovation.
                 </>
               ) : (
                 <>
@@ -214,9 +214,9 @@ export default async function AboutPage() {
                     Dragos Dreptate
                   </a>
                   . Executive, entrepreneur and coach — 25 years in tech,
-                  based in Paris. I co-lead{" "}
-                  <strong className="text-foreground">The Spark</strong>, an
-                  organization focused on innovation and leadership.
+                  based in Paris. I founded{" "}
+                  <strong className="text-foreground">The Spark</strong>, a
+                  consulting firm specializing in AI, Product and Innovation.
                 </>
               )}
             </p>
