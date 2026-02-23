@@ -10,6 +10,7 @@ import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-mome
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { Button } from "@/components/ui/button";
 import { CircleCard } from "@/components/circles/circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 
@@ -79,8 +80,9 @@ export default async function DashboardPage({
         <p className="text-muted-foreground text-base leading-relaxed">{t("greetingSubtitle")}</p>
       </div>
 
-      {/* Tab selector */}
-      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+      {/* Tab selector + action */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1 rounded-full border p-1">
           <Link
             href="?tab=moments"
             className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
@@ -102,6 +104,12 @@ export default async function DashboardPage({
             {t("myCircles")}
           </Link>
         </div>
+        {activeTab === "circles" && (
+          <Button asChild size="sm">
+            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+          </Button>
+        )}
+      </div>
 
       {/* Tab content */}
       {activeTab === "moments" ? (
