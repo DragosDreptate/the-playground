@@ -208,7 +208,10 @@ export function CoverImagePicker({
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<UnsplashPhoto[] | null>(null);
   const [searchTotal, setSearchTotal] = useState(0);
+  const [searchTotalPages, setSearchTotalPages] = useState(0);
+  const [searchPage, setSearchPage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [selectedUnsplashId, setSelectedUnsplashId] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -236,12 +239,14 @@ export function CoverImagePicker({
 
     debounceRef.current = setTimeout(async () => {
       setIsSearching(true);
+      setSearchPage(1);
       try {
-        const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(value.trim())}`);
+        const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(value.trim())}&page=1`);
         if (res.ok) {
           const data = await res.json();
           setSearchResults(data.results);
           setSearchTotal(data.total);
+          setSearchTotalPages(data.totalPages);
         }
       } finally {
         setIsSearching(false);
@@ -254,6 +259,23 @@ export function CoverImagePicker({
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
+
+  async function handleLoadMore() {
+    if (!query || isLoadingMore) return;
+    const nextPage = searchPage + 1;
+    setIsLoadingMore(true);
+    try {
+      const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(query.trim())}&page=${nextPage}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSearchResults((prev) => [...(prev ?? []), ...data.results]);
+        setSearchPage(nextPage);
+        setSearchTotalPages(data.totalPages);
+      }
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
 
   function handleUnsplashSelect(photo: UnsplashPhoto) {
     setSelectedUnsplashId(photo.id);
@@ -315,6 +337,9 @@ export function CoverImagePicker({
       setPending(null);
       setQuery("");
       setSearchResults(null);
+      setSearchTotal(0);
+      setSearchTotalPages(0);
+      setSearchPage(1);
       setSelectedUnsplashId(null);
       setUploadFile(null);
       setUploadPreview(null);
@@ -416,6 +441,22 @@ export function CoverImagePicker({
                     <p className="text-muted-foreground text-xs">
                       Suggestions pour votre communauté — tapez pour chercher
                     </p>
+                  )}
+                  {searchResults !== null && searchPage < searchTotalPages && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleLoadMore}
+                      disabled={isLoadingMore}
+                      className="w-full"
+                    >
+                      {isLoadingMore ? (
+                        <><Loader2 className="mr-2 size-3.5 animate-spin" />Chargement…</>
+                      ) : (
+                        "Voir plus"
+                      )}
+                    </Button>
                   )}
                 </>
               )}

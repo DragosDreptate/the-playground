@@ -13,6 +13,7 @@ export type UnsplashPhoto = {
 type UnsplashSearchResponse = {
   results: UnsplashPhoto[];
   total: number;
+  totalPages: number;
 };
 
 export async function GET(request: NextRequest) {
@@ -34,10 +35,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+
   const url = new URL("https://api.unsplash.com/search/photos");
   url.searchParams.set("query", q.trim());
   url.searchParams.set("orientation", "squarish");
   url.searchParams.set("per_page", "12");
+  url.searchParams.set("page", String(page));
 
   const response = await fetch(url.toString(), {
     headers: {
@@ -74,6 +78,7 @@ export async function GET(request: NextRequest) {
   const result: UnsplashSearchResponse = {
     results,
     total: data.total ?? 0,
+    totalPages: data.total_pages ?? 0,
   };
 
   return NextResponse.json(result, {

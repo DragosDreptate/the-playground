@@ -146,72 +146,78 @@ export function CircleForm({ circle, action }: CircleFormProps) {
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Thématique */}
-          <div className="flex items-start gap-3">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <Tag className="text-primary size-4" />
-            </div>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-sm font-medium">{t("form.category")}</p>
-              <Select
-                name="category"
-                defaultValue={circle?.category ?? ""}
-                onValueChange={(value) => setSelectedCategory(value as CircleCategory | "")}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("form.categoryPlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {CIRCLE_CATEGORIES.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {tCategory(cat)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          {/* Thématique / Ville / Visibilité — compact inline */}
+          <div className="flex flex-col gap-3">
 
-          {/* Ville */}
-          <div className="flex items-start gap-3">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <MapPin className="text-primary size-4" />
+            {/* Thématique */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <Tag className="text-primary size-4" />
+              </div>
+              <span className="w-28 shrink-0 text-sm font-medium">{t("form.category")}</span>
+              <div className="min-w-0 flex-1">
+                <Select
+                  name="category"
+                  defaultValue={circle?.category ?? ""}
+                  onValueChange={(value) => setSelectedCategory(value as CircleCategory | "")}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder={t("form.categoryPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CIRCLE_CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {tCategory(cat)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-sm font-medium">{t("form.city")}</p>
-              <Input
-                name="city"
-                placeholder={t("form.cityPlaceholder")}
-                defaultValue={circle?.city ?? ""}
-                maxLength={100}
-              />
-            </div>
-          </div>
 
-          {/* Visibilité */}
-          <div className="flex items-start gap-3">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              {(circle?.visibility ?? "PUBLIC") === "PUBLIC" ? (
-                <Globe className="text-primary size-4" />
-              ) : (
-                <Lock className="text-primary size-4" />
-              )}
+            {/* Ville */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <MapPin className="text-primary size-4" />
+              </div>
+              <span className="w-28 shrink-0 text-sm font-medium">{t("form.city")}</span>
+              <div className="min-w-0 flex-1">
+                <Input
+                  name="city"
+                  placeholder={t("form.cityPlaceholder")}
+                  defaultValue={circle?.city ?? ""}
+                  maxLength={100}
+                  className="h-9"
+                />
+              </div>
             </div>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="text-sm font-medium">{t("form.visibility")}</p>
-              <Select
-                name="visibility"
-                defaultValue={circle?.visibility ?? "PUBLIC"}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PUBLIC">{t("form.visibilityPublic")}</SelectItem>
-                  <SelectItem value="PRIVATE">{t("form.visibilityPrivate")}</SelectItem>
-                </SelectContent>
-              </Select>
+
+            {/* Visibilité */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                {(circle?.visibility ?? "PUBLIC") === "PUBLIC" ? (
+                  <Globe className="text-primary size-4" />
+                ) : (
+                  <Lock className="text-primary size-4" />
+                )}
+              </div>
+              <span className="w-28 shrink-0 text-sm font-medium">{t("form.visibility")}</span>
+              <div className="min-w-0 flex-1">
+                <Select
+                  name="visibility"
+                  defaultValue={circle?.visibility ?? "PUBLIC"}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PUBLIC">{t("form.visibilityPublic")}</SelectItem>
+                    <SelectItem value="PRIVATE">{t("form.visibilityPrivate")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
           </div>
 
           {/* Séparateur */}
