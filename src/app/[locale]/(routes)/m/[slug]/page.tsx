@@ -108,7 +108,7 @@ export default async function PublicMomentPage({
     );
   }
 
-  const [registeredCount, allAttendees, comments] = await Promise.all([
+  const [registeredCount, allAttendees, comments, waitlistPosition] = await Promise.all([
     prismaRegistrationRepository.countByMomentIdAndStatus(
       moment.id,
       "REGISTERED"
@@ -118,6 +118,9 @@ export default async function PublicMomentPage({
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
+    existingRegistration?.status === "WAITLISTED" && session?.user?.id
+      ? prismaRegistrationRepository.countWaitlistPosition(moment.id, session.user.id)
+      : Promise.resolve(0),
   ]);
 
   const isFull =
@@ -128,6 +131,17 @@ export default async function PublicMomentPage({
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
   ).length;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const calendarData = {
+    title: moment.title,
+    startsAt: moment.startsAt,
+    endsAt: moment.endsAt,
+    locationType: moment.locationType,
+    locationName: moment.locationName,
+    locationAddress: moment.locationAddress,
+    circleName: circle.name,
+    slug: moment.slug,
+  };
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
@@ -147,6 +161,9 @@ export default async function PublicMomentPage({
         signInUrl={signInUrl}
         isFull={isFull}
         spotsRemaining={spotsRemaining}
+        calendarData={calendarData}
+        appUrl={appUrl}
+        waitlistPosition={waitlistPosition}
       />
     </main>
   );

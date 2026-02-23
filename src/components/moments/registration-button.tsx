@@ -21,6 +21,8 @@ import {
   cancelRegistrationAction,
 } from "@/app/actions/registration";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
+import type { CalendarEventData } from "@/lib/calendar";
+import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
 
 type RegistrationButtonProps = {
   momentId: string;
@@ -32,6 +34,9 @@ type RegistrationButtonProps = {
   spotsRemaining: number | null;
   registrationCount: number;
   isHost?: boolean;
+  calendarData?: CalendarEventData;
+  appUrl?: string;
+  waitlistPosition?: number;
 };
 
 function StatsColumn({
@@ -73,6 +78,9 @@ export function RegistrationButton({
   spotsRemaining,
   registrationCount,
   isHost = false,
+  calendarData,
+  appUrl,
+  waitlistPosition,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -135,6 +143,18 @@ export function RegistrationButton({
           )}
           <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
         </div>
+
+        {/* Position liste d'attente */}
+        {!isRegistered && waitlistPosition != null && waitlistPosition > 0 && (
+          <p className="text-muted-foreground text-xs">
+            {t("public.waitlistPosition", { position: waitlistPosition })}
+          </p>
+        )}
+
+        {/* Boutons calendrier (uniquement pour les inscrits confirmés) */}
+        {isRegistered && calendarData && appUrl && (
+          <AddToCalendarButtons data={calendarData} appUrl={appUrl} />
+        )}
 
         {!isHost && (
           <AlertDialog>

@@ -12,6 +12,7 @@ import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
+import type { CalendarEventData } from "@/lib/calendar";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import {
   CalendarIcon,
@@ -53,6 +54,9 @@ type PublicViewProps = CommonProps & {
   signInUrl: string;
   isFull: boolean;
   spotsRemaining: number | null;
+  calendarData: CalendarEventData;
+  appUrl: string;
+  waitlistPosition: number;
 };
 
 export type MomentDetailViewProps = HostViewProps | PublicViewProps;
@@ -423,6 +427,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   spotsRemaining={props.spotsRemaining}
                   registrationCount={registeredCount}
                   isHost={props.isHost}
+                  calendarData={props.calendarData}
+                  appUrl={props.appUrl}
+                  waitlistPosition={props.waitlistPosition}
                 />
               </div>
             )

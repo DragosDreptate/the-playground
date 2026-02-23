@@ -278,7 +278,13 @@
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
       "attendedCount": "{count} members attended",
-      "viewCircleMoments": "See upcoming Events from this Community"
+      "viewCircleMoments": "See upcoming Events from this Community",
+      "addToCalendar": {
+        "label": "Add to calendar",
+        "google": "Google Calendar",
+        "ics": ".ics file"
+      },
+      "waitlistPosition": "You're #{position} on the waitlist"
     },
     "registrations": {
       "title": "Attendees",

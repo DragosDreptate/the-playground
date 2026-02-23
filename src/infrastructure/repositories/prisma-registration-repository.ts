@@ -231,4 +231,24 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     });
     return record ? toDomainRegistration(record) : null;
   },
+
+  async countWaitlistPosition(momentId: string, userId: string): Promise<number> {
+    const registration = await prisma.registration.findUnique({
+      where: { momentId_userId: { momentId, userId } },
+      select: { registeredAt: true, status: true },
+    });
+
+    if (!registration || registration.status !== "WAITLISTED") return 0;
+
+    // Position = nombre d'inscrits en liste d'attente avant moi (par date) + 1
+    const before = await prisma.registration.count({
+      where: {
+        momentId,
+        status: "WAITLISTED",
+        registeredAt: { lt: registration.registeredAt },
+      },
+    });
+
+    return before + 1;
+  },
 };

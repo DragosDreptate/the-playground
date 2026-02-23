@@ -71,6 +71,20 @@ export default async function MomentDetailPage({
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/m/${moment.slug}`;
 
   if (!isHost) {
+    const existingRegistration =
+      await prismaRegistrationRepository.findByMomentAndUser(
+        moment.id,
+        session.user.id
+      );
+    const waitlistPosition =
+      existingRegistration?.status === "WAITLISTED"
+        ? await prismaRegistrationRepository.countWaitlistPosition(
+            moment.id,
+            session.user.id
+          )
+        : 0;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
     return (
       <MomentDetailView
         variant="public"
@@ -84,17 +98,24 @@ export default async function MomentDetailPage({
         currentUserId={session.user.id}
         isAuthenticated={true}
         isHost={false}
-        existingRegistration={
-          await prismaRegistrationRepository.findByMomentAndUser(
-            moment.id,
-            session.user.id
-          )
-        }
+        existingRegistration={existingRegistration}
         signInUrl=""
         isFull={moment.capacity !== null && registeredCount >= moment.capacity}
         spotsRemaining={
           moment.capacity !== null ? moment.capacity - registeredCount : null
         }
+        calendarData={{
+          title: moment.title,
+          startsAt: moment.startsAt,
+          endsAt: moment.endsAt,
+          locationType: moment.locationType,
+          locationName: moment.locationName,
+          locationAddress: moment.locationAddress,
+          circleName: circle.name,
+          slug: moment.slug,
+        }}
+        appUrl={appUrl}
+        waitlistPosition={waitlistPosition}
       />
     );
   }

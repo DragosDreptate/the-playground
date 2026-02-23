@@ -278,7 +278,13 @@
       "eventEnded": "Événement terminé",
       "eventCancelled": "Événement annulé",
       "attendedCount": "{count} personnes ont participé",
-      "viewCircleMoments": "Voir les prochains événements de la Communauté"
+      "viewCircleMoments": "Voir les prochains événements de la Communauté",
+      "addToCalendar": {
+        "label": "Ajouter à mon calendrier",
+        "google": "Google Calendar",
+        "ics": "Fichier .ics"
+      },
+      "waitlistPosition": "Vous êtes {position}° sur la liste d'attente"
     },
     "registrations": {
       "title": "Participants",

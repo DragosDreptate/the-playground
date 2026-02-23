@@ -16,6 +16,7 @@ export function createMockRegistrationRepository(
     findUpcomingByUserId: vi.fn<RegistrationRepository["findUpcomingByUserId"]>().mockResolvedValue([]),
     findPastByUserId: vi.fn<RegistrationRepository["findPastByUserId"]>().mockResolvedValue([]),
     findFirstWaitlisted: vi.fn<RegistrationRepository["findFirstWaitlisted"]>().mockResolvedValue(null),
+    countWaitlistPosition: vi.fn<RegistrationRepository["countWaitlistPosition"]>().mockResolvedValue(0),
     ...overrides,
   };
 }
