@@ -38,7 +38,7 @@ export default async function AboutPage() {
             <>
               Ce projet a commencé comme{" "}
               <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-                une excuse
+                un prétexte
               </span>
               .
             </>
@@ -46,7 +46,7 @@ export default async function AboutPage() {
             <>
               This project started as{" "}
               <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-                an excuse
+                a pretext
               </span>
               .
             </>
@@ -54,8 +54,8 @@ export default async function AboutPage() {
         </h1>
         <p className="text-lg leading-relaxed text-muted-foreground">
           {isFr
-            ? "Une excuse pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais une plateforme qui fonctionne et je me posais sérieusement la question de l'ouvrir au public."
-            : "An excuse to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working platform and was seriously wondering whether to open it to the public."}
+            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais une plateforme qui fonctionne et je me posais sérieusement la question de l'ouvrir au public."
+            : "A pretext to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working platform and was seriously wondering whether to open it to the public."}
         </p>
       </section>
 
