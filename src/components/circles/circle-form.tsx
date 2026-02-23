@@ -107,7 +107,6 @@ export function CircleForm({ circle, action }: CircleFormProps) {
           <div className="flex flex-col gap-3">
             <CoverImagePicker
               circleName={circleName || undefined}
-              category={selectedCategory || undefined}
               currentImage={previewImage}
               currentAttribution={previewAttribution}
               onSelect={setCoverSelection}

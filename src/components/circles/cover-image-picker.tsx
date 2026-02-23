@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getMomentGradient } from "@/lib/gradient";
-import type { CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
+import type { CoverImageAttribution } from "@/domain/models/circle";
 import type { UnsplashPhoto } from "@/app/api/unsplash/search/route";
 import { resizeImage } from "@/lib/image-resize";
 
@@ -26,126 +26,11 @@ export type CoverSelection =
 
 type Props = {
   circleName?: string;
-  category?: CircleCategory | null;
   currentImage?: string | null;
   currentAttribution?: CoverImageAttribution | null;
   onSelect: (data: CoverSelection) => void;
 };
 
-// ── Photos curées par catégorie ────────────────────────────────
-
-const CURATED_PHOTOS: Record<string, UnsplashPhoto[]> = {
-  SPORT_WELLNESS: [
-    {
-      id: "curated-1",
-      url: "https://images.unsplash.com/photo-1512412046876-f386342eddb3?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1512412046876-f386342eddb3?w=200&h=200&fit=crop",
-      author: { name: "Victor Freitas", profileUrl: "https://unsplash.com/@victorfreitas" },
-    },
-    {
-      id: "curated-2",
-      url: "https://images.unsplash.com/photo-1639843091936-bb5fca7b5684?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1639843091936-bb5fca7b5684?w=200&h=200&fit=crop",
-      author: { name: "Karsten Winegeart", profileUrl: "https://unsplash.com/@karsten116" },
-    },
-    {
-      id: "curated-3",
-      url: "https://images.unsplash.com/photo-1485727749690-d091e8284ef3?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1485727749690-d091e8284ef3?w=200&h=200&fit=crop",
-      author: { name: "Jozsef Hocza", profileUrl: "https://unsplash.com/@hocza" },
-    },
-    {
-      id: "curated-4",
-      url: "https://images.unsplash.com/photo-1552984418-e47d59632489?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1552984418-e47d59632489?w=200&h=200&fit=crop",
-      author: { name: "Nicolas Hoizey", profileUrl: "https://unsplash.com/@nhoizey" },
-    },
-  ],
-  TECH: [
-    {
-      id: "curated-tech-1",
-      url: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&h=200&fit=crop",
-      author: { name: "Alexandre Debiève", profileUrl: "https://unsplash.com/@alexandre_d" },
-    },
-    {
-      id: "curated-tech-2",
-      url: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=200&h=200&fit=crop",
-      author: { name: "Luca Bravo", profileUrl: "https://unsplash.com/@lucabravo" },
-    },
-    {
-      id: "curated-tech-3",
-      url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200&h=200&fit=crop",
-      author: { name: "Ilya Pavlov", profileUrl: "https://unsplash.com/@ilyapavlov" },
-    },
-    {
-      id: "curated-tech-4",
-      url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=200&h=200&fit=crop",
-      author: { name: "Markus Spiske", profileUrl: "https://unsplash.com/@markusspiske" },
-    },
-  ],
-  DESIGN: [
-    {
-      id: "curated-design-1",
-      url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=200&h=200&fit=crop",
-      author: { name: "Balázs Kétyi", profileUrl: "https://unsplash.com/@balazsketyi" },
-    },
-    {
-      id: "curated-design-2",
-      url: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=200&h=200&fit=crop",
-      author: { name: "Oleg Laptev", profileUrl: "https://unsplash.com/@snowshade" },
-    },
-    {
-      id: "curated-design-3",
-      url: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea?w=200&h=200&fit=crop",
-      author: { name: "Amélie Mourichon", profileUrl: "https://unsplash.com/@amayli" },
-    },
-    {
-      id: "curated-design-4",
-      url: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800&h=800&fit=crop",
-      thumbUrl: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=200&h=200&fit=crop",
-      author: { name: "Domenico Loia", profileUrl: "https://unsplash.com/@domenicoloia" },
-    },
-  ],
-};
-
-const DEFAULT_CURATED: UnsplashPhoto[] = [
-  {
-    id: "curated-default-1",
-    url: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=800&fit=crop",
-    thumbUrl: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=200&h=200&fit=crop",
-    author: { name: "Chang Duong", profileUrl: "https://unsplash.com/@chang612" },
-  },
-  {
-    id: "curated-default-2",
-    url: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=800&fit=crop",
-    thumbUrl: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=200&h=200&fit=crop",
-    author: { name: "Antenna", profileUrl: "https://unsplash.com/@antenna" },
-  },
-  {
-    id: "curated-default-3",
-    url: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=800&fit=crop",
-    thumbUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200&h=200&fit=crop",
-    author: { name: "Annie Spratt", profileUrl: "https://unsplash.com/@anniespratt" },
-  },
-  {
-    id: "curated-default-4",
-    url: "https://images.unsplash.com/photo-1543269664-76bc3997d9ea?w=800&h=800&fit=crop",
-    thumbUrl: "https://images.unsplash.com/photo-1543269664-76bc3997d9ea?w=200&h=200&fit=crop",
-    author: { name: "Priscilla Du Preez", profileUrl: "https://unsplash.com/@priscilladupreez" },
-  },
-];
-
-function getCuratedPhotos(category: CircleCategory | null | undefined): UnsplashPhoto[] {
-  if (category && CURATED_PHOTOS[category]) return CURATED_PHOTOS[category];
-  return DEFAULT_CURATED;
-}
 
 // ── Photo Grid ─────────────────────────────────────────────────
 
@@ -196,13 +81,16 @@ function PhotoGrid({
 
 export function CoverImagePicker({
   circleName,
-  category,
   currentImage,
   currentAttribution,
   onSelect,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<CoverSelection | null>(null);
+
+  // Default random photos (fetched once on first open, cached)
+  const [defaultPhotos, setDefaultPhotos] = useState<UnsplashPhoto[] | null>(null);
+  const [isLoadingDefaults, setIsLoadingDefaults] = useState(false);
 
   // Unsplash search state
   const [query, setQuery] = useState("");
@@ -222,9 +110,8 @@ export function CoverImagePicker({
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const gradient = getMomentGradient(circleName ?? "");
-  const curated = getCuratedPhotos(category);
 
-  const displayedPhotos = searchResults ?? curated;
+  const displayedPhotos = searchResults ?? defaultPhotos ?? [];
 
   // Debounced Unsplash search
   const handleQueryChange = useCallback((value: string) => {
@@ -331,8 +218,19 @@ export function CoverImagePicker({
 
   function handleOpenChange(value: boolean) {
     setOpen(value);
-    if (!value) {
-      // Reset state on close without applying
+    if (value) {
+      // Fetch random photos on first open
+      if (defaultPhotos === null && !isLoadingDefaults) {
+        setIsLoadingDefaults(true);
+        fetch("/api/unsplash/random")
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data?.results) setDefaultPhotos(data.results as UnsplashPhoto[]);
+          })
+          .finally(() => setIsLoadingDefaults(false));
+      }
+    } else {
+      // Reset search state on close (keep defaultPhotos cached)
       setPending(null);
       setQuery("");
       setSearchResults(null);
@@ -419,11 +317,20 @@ export function CoverImagePicker({
                 )}
               </div>
 
-              {/* Résultats ou photos curées */}
+              {/* Résultats, skeleton ou photos par défaut */}
               {searchResults !== null && searchResults.length === 0 ? (
                 <p className="text-muted-foreground py-8 text-center text-sm">
                   Aucun résultat pour « {query} »
                 </p>
+              ) : isLoadingDefaults && searchResults === null ? (
+                <div className="grid grid-cols-4 gap-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="bg-muted aspect-square animate-pulse rounded-lg"
+                    />
+                  ))}
+                </div>
               ) : (
                 <>
                   {searchResults !== null && (
@@ -438,7 +345,7 @@ export function CoverImagePicker({
                   />
                   {searchResults === null && (
                     <p className="text-muted-foreground text-xs">
-                      Suggestions pour votre communauté — tapez pour chercher
+                      Photos Unsplash · tapez pour chercher
                     </p>
                   )}
                   {searchResults !== null && searchTotalPages > 1 && (

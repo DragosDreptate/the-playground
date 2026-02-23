@@ -13,7 +13,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Moment, LocationType } from "@/domain/models/moment";
-import type { CircleCategory } from "@/domain/models/circle";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
@@ -29,7 +28,6 @@ type MomentFormProps = {
   circleSlug: string;
   circleName: string;
   circleDescription?: string;
-  circleCategory?: CircleCategory | null;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -49,7 +47,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCategory, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -146,7 +144,6 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           <div className="flex flex-col gap-3">
             <CoverImagePicker
               circleName={circleName}
-              category={circleCategory ?? undefined}
               currentImage={previewImage}
               currentAttribution={previewAttribution}
               onSelect={setCoverSelection}

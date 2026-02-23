@@ -50,7 +50,7 @@ export default async function NewMomentPage({
           {tMoment("create.title")}
         </span>
       </div>
-      <MomentForm circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCategory={circle.category ?? null} action={boundAction} />
+      <MomentForm circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} action={boundAction} />
     </div>
   );
 }
