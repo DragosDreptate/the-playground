@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import {
   prismaMomentRepository,
   prismaCircleRepository,
@@ -33,28 +34,30 @@ const getCircle = cache(async (circleId: string) => {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
   const moment = await getMoment(slug);
   if (!moment || moment.status === "CANCELLED") return {};
 
   const circle = await getCircle(moment.circleId);
-  const date = moment.startsAt.toLocaleDateString("fr-FR", {
+  const t = await getTranslations({ locale, namespace: "Moment" });
+  const dateLocale = locale === "fr" ? "fr-FR" : "en-US";
+  const date = moment.startsAt.toLocaleDateString(dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-  const time = moment.startsAt.toLocaleTimeString("fr-FR", {
+  const time = moment.startsAt.toLocaleTimeString(dateLocale, {
     hour: "2-digit",
     minute: "2-digit",
   });
   const location =
     moment.locationType === "ONLINE"
-      ? "En ligne"
+      ? t("form.locationOnline")
       : moment.locationName ?? moment.locationAddress ?? "";
-
-  const description = `${date} à ${time} · ${location}${circle ? ` — ${circle.name}` : ""}`;
+  const connector = locale === "fr" ? " à " : " at ";
+  const description = `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`;
 
   return {
     title: moment.title,

@@ -4,16 +4,16 @@ import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
 
 export const runtime = "nodejs";
-export const alt = "Communauté — The Playground";
+export const alt = "Community — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
   let circle;
   try {
@@ -109,7 +109,7 @@ export default async function OgImage({
               letterSpacing: "2px",
             }}
           >
-            Communauté
+            {locale === "fr" ? "Communauté" : "Community"}
           </span>
         </div>
 
@@ -184,7 +184,9 @@ export default async function OgImage({
                 <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
-              {memberCount} membre{memberCount !== 1 ? "s" : ""}
+              {locale === "fr"
+                ? `${memberCount} membre${memberCount !== 1 ? "s" : ""}`
+                : `${memberCount} member${memberCount !== 1 ? "s" : ""}`}
             </div>
             {circle.city && (
               <div

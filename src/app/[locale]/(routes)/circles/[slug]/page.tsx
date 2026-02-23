@@ -90,6 +90,8 @@ export default async function PublicCirclePage({
   const t = await getTranslations("Circle");
   const tExplorer = await getTranslations("Explorer");
   const tCategory = await getTranslations("CircleCategory");
+  const tDashboard = await getTranslations("Dashboard");
+  const tMoment = await getTranslations("Moment");
 
   let circle;
   try {
@@ -381,7 +383,7 @@ export default async function PublicCirclePage({
 
                   const locationLabel =
                     moment.locationType === "ONLINE" || moment.locationType === "HYBRID"
-                      ? moment.locationType === "ONLINE" ? "En ligne" : "Hybride"
+                      ? moment.locationType === "ONLINE" ? tDashboard("online") : tDashboard("hybrid")
                       : moment.locationName ?? moment.locationAddress ?? null;
                   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
@@ -416,7 +418,7 @@ export default async function PublicCirclePage({
                             {isCancelled && (
                               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
                                 <XCircle className="size-3.5 shrink-0 text-destructive" />
-                                <span className="text-destructive text-xs font-medium">Événement annulé</span>
+                                <span className="text-destructive text-xs font-medium">{tMoment("public.eventCancelled")}</span>
                               </div>
                             )}
                             <div className="flex items-start gap-4 p-4">

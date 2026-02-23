@@ -7,16 +7,16 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 
 export const runtime = "nodejs";
-export const alt = "Événement — The Playground";
+export const alt = "Event — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 }) {
-  const { slug } = await params;
+  const { slug, locale } = await params;
 
   let moment;
   try {
@@ -36,21 +36,24 @@ export default async function OgImage({
 
   const circle = await prismaCircleRepository.findById(moment.circleId);
 
-  const date = moment.startsAt.toLocaleDateString("fr-FR", {
+  const dateLocale = locale === "fr" ? "fr-FR" : "en-US";
+  const date = moment.startsAt.toLocaleDateString(dateLocale, {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
   });
-  const time = moment.startsAt.toLocaleTimeString("fr-FR", {
+  const time = moment.startsAt.toLocaleTimeString(dateLocale, {
     hour: "2-digit",
     minute: "2-digit",
   });
+  const onlineLabel = locale === "fr" ? "En ligne" : "Online";
+  const hybridLabel = locale === "fr" ? "Hybride" : "Hybrid";
   const location =
     moment.locationType === "ONLINE"
-      ? "En ligne"
+      ? onlineLabel
       : moment.locationType === "HYBRID"
-        ? "Hybride"
+        ? hybridLabel
         : moment.locationName ?? moment.locationAddress ?? "";
 
   return new ImageResponse(
