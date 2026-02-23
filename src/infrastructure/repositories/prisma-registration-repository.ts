@@ -122,6 +122,35 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     });
   },
 
+  async findRegisteredCountsByMomentIds(momentIds: string[]): Promise<Map<string, number>> {
+    if (momentIds.length === 0) return new Map();
+    // Requête GROUP BY : une seule requête pour N Moments (évite le N+1)
+    const counts = await prisma.registration.groupBy({
+      by: ["momentId"],
+      where: { momentId: { in: momentIds }, status: "REGISTERED" },
+      _count: { _all: true },
+    });
+    // Les Moments sans inscriptions n'apparaissent pas dans le résultat → valeur 0 par défaut
+    const result = new Map(momentIds.map((id) => [id, 0]));
+    for (const row of counts) {
+      result.set(row.momentId, row._count._all);
+    }
+    return result;
+  },
+
+  async findByMomentIdsAndUser(momentIds: string[], userId: string): Promise<Map<string, Registration | null>> {
+    if (momentIds.length === 0) return new Map();
+    // Une seule requête pour toutes les inscriptions de l'utilisateur sur ces Moments
+    const records = await prisma.registration.findMany({
+      where: { momentId: { in: momentIds }, userId },
+    });
+    const result = new Map<string, Registration | null>(momentIds.map((id) => [id, null]));
+    for (const record of records) {
+      result.set(record.momentId, toDomainRegistration(record));
+    }
+    return result;
+  },
+
   async update(
     id: string,
     input: UpdateRegistrationInput

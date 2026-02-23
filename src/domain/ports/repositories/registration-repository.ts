@@ -32,6 +32,16 @@ export interface RegistrationRepository {
     momentId: string,
     status: RegistrationStatus
   ): Promise<number>;
+  /**
+   * Renvoie une Map momentId → nombre d'inscrits REGISTERED pour une liste de Moments.
+   * Une seule requête GROUP BY (évite le N+1 de la page Circle dashboard).
+   */
+  findRegisteredCountsByMomentIds(momentIds: string[]): Promise<Map<string, number>>;
+  /**
+   * Renvoie une Map momentId → Registration (ou null) pour un User sur une liste de Moments.
+   * Une seule requête (évite le N+1 de la page Circle dashboard).
+   */
+  findByMomentIdsAndUser(momentIds: string[], userId: string): Promise<Map<string, Registration | null>>;
   update(id: string, input: UpdateRegistrationInput): Promise<Registration>;
   findUpcomingByUserId(userId: string): Promise<RegistrationWithMoment[]>;
   findPastByUserId(userId: string): Promise<RegistrationWithMoment[]>;

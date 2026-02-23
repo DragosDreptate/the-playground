@@ -98,24 +98,14 @@ export default async function CircleDetailPage({
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
   const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
 
-  // Fetch registration counts + user registration status in parallel
-  const [registrationCounts, userRegistrations] = await Promise.all([
-    Promise.all(
-      displayedMoments.map((m) =>
-        prismaRegistrationRepository.countByMomentIdAndStatus(m.id, "REGISTERED")
-      )
-    ),
-    Promise.all(
-      displayedMoments.map((m) =>
-        prismaRegistrationRepository.findByMomentAndUser(m.id, session.user.id!)
-      )
-    ),
+  // Récupère compteurs + inscriptions utilisateur en deux requêtes GROUP BY (évite le N+1)
+  const momentIds = displayedMoments.map((m) => m.id);
+  const [countByMomentId, userRegistrationsByMomentId] = await Promise.all([
+    prismaRegistrationRepository.findRegisteredCountsByMomentIds(momentIds),
+    prismaRegistrationRepository.findByMomentIdsAndUser(momentIds, session.user.id!),
   ]);
-  const countByMomentId = new Map(
-    displayedMoments.map((m, i) => [m.id, registrationCounts[i]])
-  );
   const userStatusByMomentId = new Map(
-    displayedMoments.map((m, i) => [m.id, userRegistrations[i]?.status ?? null])
+    [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
   );
 
   const gradient = getMomentGradient(circle.name);
