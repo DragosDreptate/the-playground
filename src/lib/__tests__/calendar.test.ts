@@ -28,7 +28,8 @@ describe("buildGoogleCalendarUrl", () => {
 
     it("should include the event title", () => {
       const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
-      expect(url).toContain(encodeURIComponent("Apéro JS #12"));
+      // URLSearchParams encode les espaces en "+" (pas %20)
+      expect(url).toContain("text=Ap%C3%A9ro+JS+%2312");
     });
 
     it("should include formatted dates", () => {
