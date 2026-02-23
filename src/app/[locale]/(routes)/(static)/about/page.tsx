@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { CheckIcon } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "À propos · The Playground",
     description:
-      "L'histoire de The Playground — pourquoi, comment, et où on en est.",
+      "L'histoire de The Playground — pourquoi, comment, et ce qui vient.",
     openGraph: {
       title: "À propos · The Playground",
       description:
-        "L'histoire de The Playground — pourquoi, comment, et où on en est.",
+        "L'histoire de The Playground — pourquoi, comment, et ce qui vient.",
     },
   };
 }
@@ -226,6 +225,29 @@ export default async function AboutPage() {
                 ? "Depuis des années, j'organise des événements — conférences tech, masterclasses leadership, communautés agiles. C'est ce vécu d'organisateur, confronté aux mêmes outils bancals en boucle, qui est à l'origine de The Playground."
                 : "For years, I've been running events — tech conferences, leadership masterclasses, agile communities. That experience as an organizer, running into the same broken tools over and over, is what sparked The Playground."}
             </p>
+            <p>
+              {isFr ? (
+                <>
+                  Une question, une idée, envie d'essayer ?{" "}
+                  <a
+                    href="mailto:dragos@thespark.fr"
+                    className="text-primary font-semibold hover:underline"
+                  >
+                    dragos@thespark.fr
+                  </a>
+                </>
+              ) : (
+                <>
+                  A question, an idea, want to try it?{" "}
+                  <a
+                    href="mailto:dragos@thespark.fr"
+                    className="text-primary font-semibold hover:underline"
+                  >
+                    dragos@thespark.fr
+                  </a>
+                </>
+              )}
+            </p>
           </div>
         </div>
       </section>
@@ -306,66 +328,6 @@ export default async function AboutPage() {
         </ul>
       </section>
 
-      <hr className="border-border" />
-
-      {/* ── Section 7 — Où on en est ── */}
-      <section className="space-y-5">
-        <h2 className="text-2xl font-bold tracking-tight">
-          {isFr ? "Où on en est" : "Where we are"}
-        </h2>
-
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-6 space-y-4">
-          <p className="text-[17px] leading-relaxed text-muted-foreground">
-            {isFr
-              ? "La V0 tourne : multi-communautés, création d'événements, inscriptions, liste d'attente, gestion des participants, emails de confirmation. Bilingue FR/EN."
-              : "V0 is live: multi-communities, event creation, registrations, waitlist, participant management, confirmation emails. Bilingual FR/EN."}
-          </p>
-          <p className="text-[17px] leading-relaxed text-muted-foreground">
-            {isFr ? (
-              <>
-                Je réfléchis à ouvrir ça à un cercle restreint pour avoir des
-                retours réels. Si tu organises des événements et que ça
-                t'intéresse,{" "}
-                <a
-                  href="mailto:dragos@thespark.fr"
-                  className="text-primary font-semibold hover:underline"
-                >
-                  dis-le moi
-                </a>
-                .
-              </>
-            ) : (
-              <>
-                I'm thinking about opening this to a small group for real
-                feedback. If you organize events and this interests you,{" "}
-                <a
-                  href="mailto:dragos@thespark.fr"
-                  className="text-primary font-semibold hover:underline"
-                >
-                  let me know
-                </a>
-                .
-              </>
-            )}
-          </p>
-        </div>
-
-        <div className="flex justify-end">
-          <Link
-            href="/changelog"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
-          >
-            {isFr ? "Voir le changelog" : "View changelog"}
-            <span aria-hidden>→</span>
-          </Link>
-        </div>
-
-        <p className="text-sm italic text-muted-foreground">
-          {isFr
-            ? "The Playground est développé en solo, propulsé par la curiosité et trop de café."
-            : "The Playground is built solo, powered by curiosity and too much coffee."}
-        </p>
-      </section>
 
     </div>
   );
