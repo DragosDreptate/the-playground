@@ -7,6 +7,79 @@ Chaque étape correspond à un bloc fonctionnel significatif du produit.
 
 ---
 
+## [0.9.0] — 2026-02-23 — Terminologie & UX inscription
+
+Terminologie définitive, section d'inscription repensée, et polish général avant les premiers utilisateurs réels.
+
+### Terminologie FR définitive
+
+Le vocabulaire propriétaire laisse place à des mots du quotidien, plus accessibles :
+
+| Avant | Après |
+|---|---|
+| Cercle | **Communauté** |
+| Escale | **événement** |
+| Mon Playground | **Mon espace** |
+| La Carte | **Découvrir** |
+| Rejoindre | **S'inscrire** |
+
+> Le code (types, variables, clés i18n) reste inchangé. Seul le texte utilisateur évolue.
+
+### Section d'inscription repensée
+
+- **Nouveau layout** — bouton "S'inscrire" à gauche, compteur d'inscrits + places restantes à droite, sur une même ligne
+- **Libellé unifié** — "S'inscrire" pour tous les états non-inscrits (y compris non connecté, anciennement "Se connecter pour s'inscrire")
+- **Bouton pill** (`rounded-full`) — forme arrondie cohérente avec le design system
+- **Padding responsive** — bouton élargi sur desktop (`md:px-7`), compact sur mobile
+- Variante inscrit : bouton outline rose avec icône ✓
+- Variante liste d'attente : bouton outline amber avec icône horloge
+
+### Dashboard & UX
+
+- **Page de bienvenue** `/dashboard/welcome` pour les nouveaux utilisateurs après onboarding
+- **Badges harmonisés** — rôle (Organisateur/Participant) et statut (Inscrit/Liste d'attente) unifiés sur toutes les vues
+- **CircleCard** — bouton "Créer un événement" visible directement pour les Organisateurs
+- Suppression des CTAs "Créer une Communauté" redondants dans le tableau de bord
+
+### i18n EN
+
+- Tagline : "Unite your audience" → "Engage your network" (cohérence des 3 lignes, suppression de la répétition "community")
+- Terminologie alignée sur le français : Circle → Community, Moment → Event, Dashboard
+
+---
+
+## [0.8.0] — 2026-02-21 — Finition produit & prêt au lancement
+
+Le dernier sprint avant d'accueillir les premiers utilisateurs. Avatar, suppression de compte, légal, SEO, mobile — tout ce qui transforme un prototype en produit.
+
+### Ajouté
+
+- **Upload d'avatar** — Vercel Blob, redimensionnement côté client (Canvas API, WebP 384×384, ~50 Ko), aperçu optimiste, protection OAuth (l'avatar uploadé n'est jamais écrasé par un reconnexion Google/GitHub). Disponible sur le profil et sur la page d'onboarding.
+- **Suppression de compte** — cas d'usage `deleteAccount`, action serveur, section "Zone de danger" sur la page profil avec modale de confirmation
+- **Ajouter au calendrier** — après inscription, boutons Google Calendar, Apple Calendar et téléchargement ICS ; position dans la liste d'attente visible
+- **Magic link email** — modèle react-email premium avec icône CSS pure (gradient rose→violet + triangle border-trick), rendu lisse sur tous les clients email sans image externe
+- **Footer global** (`SiteFooter`) + **pages légales** — mentions légales, politique de confidentialité, CGU ; i18n FR/EN complet
+- **SEO & OpenGraph** — images OG dynamiques (homepage, événement, Communauté) avec polices Inter, `metadataBase`, `generateMetadata`, `sitemap.ts`, `robots.ts`
+- **Responsive mobile** — menu hamburger (DropdownMenu), cartes Découvrir compactes, footer responsive, hero recentré, mockup iPhone masqué sur mobile
+- **Isolation onboarding** — route groups `(app)` (layout complet) et `(onboarding)` (layout minimal, logo non-cliquable, sans navigation) ; fin du patchwork `hideNav`
+- **Préservation du callback URL** à travers tout le flux d'authentification
+- **Sync image OAuth** — `signIn` callback tente `profile.picture` (Google) puis `profile.avatar_url` (GitHub), ne remplace jamais un avatar uploadé, non-bloquant
+
+### Architecture
+
+- Port `StorageService` (domaine) → Adapteur `VercelBlobStorageService` (infrastructure)
+- Helper `isUploadedUrl` pour distinguer avatars Blob vs images OAuth
+- Helper `resizeImage` (Canvas API, côté client, avant upload)
+- Route groups Next.js App Router pour isoler les layouts d'onboarding
+
+### Tests
+
+- Tests de sécurité enrichis : isolation upload avatar, guards onboarding (79 tests dédiés au total)
+- 2 nouvelles specs E2E Playwright : `waitlist.spec.ts`, `explore.spec.ts`
+- 303 tests au total, 46 fichiers, 100 % verts
+
+---
+
 ## [0.7.0] — 2026-02-21 — Emails transactionnels & sécurité
 
 Le dernier bloc critique avant le lancement. Les emails transactionnels donnent vie au produit : chaque inscription, chaque promotion de liste d'attente, chaque nouvelle inscription notifie les bonnes personnes au bon moment.
