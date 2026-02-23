@@ -199,8 +199,15 @@ export default async function AboutPage() {
                   </a>
                   . Dirigeant, entrepreneur et coach — 25 ans dans la tech,
                   basé à Paris. J'ai fondé{" "}
-                  <strong className="text-foreground">The Spark</strong>, un
-                  cabinet de conseil en IA, Produit et Innovation.
+                  <a
+                    href="https://thespark.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground font-semibold hover:underline"
+                  >
+                    The Spark
+                  </a>
+                  , un cabinet de conseil en IA, Produit et Innovation.
                 </>
               ) : (
                 <>
@@ -215,8 +222,15 @@ export default async function AboutPage() {
                   </a>
                   . Executive, entrepreneur and coach — 25 years in tech,
                   based in Paris. I founded{" "}
-                  <strong className="text-foreground">The Spark</strong>, a
-                  consulting firm specializing in AI, Product and Innovation.
+                  <a
+                    href="https://thespark.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground font-semibold hover:underline"
+                  >
+                    The Spark
+                  </a>
+                  , a consulting firm specializing in AI, Product and Innovation.
                 </>
               )}
             </p>
