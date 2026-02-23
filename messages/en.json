@@ -642,6 +642,20 @@
     "errors": {
       "notFound": "User not found",
       "updateFailed": "Failed to update profile"
+    },
+    "deleteAccount": {
+      "dangerZone": "Danger zone",
+      "description": "Deleting your account is permanent and cannot be undone.",
+      "trigger": "Delete my account",
+      "title": "Delete your account?",
+      "warning": "This action is permanent and will delete:",
+      "items": {
+        "registrations": "Your event registrations",
+        "comments": "Your comments",
+        "circles": "Communities where you are the sole Organizer (and their events)"
+      },
+      "confirm": "Delete permanently",
+      "error": "Something went wrong. Please try again."
     }
   }
 }

@@ -10,4 +10,5 @@ export type UpdateProfileInput = {
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
   updateProfile(id: string, input: UpdateProfileInput): Promise<User>;
+  delete(id: string): Promise<void>;
 }

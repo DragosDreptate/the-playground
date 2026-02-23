@@ -23,6 +23,30 @@ function toDomainUser(record: PrismaUser): User {
 }
 
 export const prismaUserRepository: UserRepository = {
+  async delete(id: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      // Trouver les Circles dont cet user est le seul HOST
+      const hostMemberships = await tx.circleMembership.findMany({
+        where: { userId: id, role: "HOST" },
+        select: { circleId: true },
+      });
+
+      for (const { circleId } of hostMemberships) {
+        const otherHostsCount = await tx.circleMembership.count({
+          where: { circleId, role: "HOST", userId: { not: id } },
+        });
+
+        if (otherHostsCount === 0) {
+          // Seul Organisateur → supprimer la Communauté entière (cascade : Moments, inscriptions, commentaires, membres)
+          await tx.circle.delete({ where: { id: circleId } });
+        }
+      }
+
+      // Supprimer l'utilisateur (cascade : memberships restantes, inscriptions, commentaires, sessions, accounts)
+      await tx.user.delete({ where: { id } });
+    });
+  },
+
   async findById(id: string): Promise<User | null> {
     const record = await prisma.user.findUnique({ where: { id } });
     return record ? toDomainUser(record) : null;

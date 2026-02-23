@@ -642,6 +642,20 @@
     "errors": {
       "notFound": "Utilisateur introuvable",
       "updateFailed": "Échec de la mise à jour du profil"
+    },
+    "deleteAccount": {
+      "dangerZone": "Zone de danger",
+      "description": "La suppression de votre compte est définitive et irréversible.",
+      "trigger": "Supprimer mon compte",
+      "title": "Supprimer votre compte ?",
+      "warning": "Cette action est permanente et supprimera :",
+      "items": {
+        "registrations": "Vos inscriptions aux événements",
+        "comments": "Vos commentaires",
+        "circles": "Les Communautés dont vous êtes le seul Organisateur (avec leurs événements)"
+      },
+      "confirm": "Supprimer définitivement",
+      "error": "Une erreur est survenue. Veuillez réessayer."
     }
   }
 }

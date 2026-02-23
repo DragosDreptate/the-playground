@@ -10,6 +10,7 @@ export function createMockUserRepository(
     updateProfile: vi
       .fn<UserRepository["updateProfile"]>()
       .mockResolvedValue(makeUser()),
+    delete: vi.fn<UserRepository["delete"]>().mockResolvedValue(undefined),
     ...overrides,
   };
 }

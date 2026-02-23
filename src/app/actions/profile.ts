@@ -3,7 +3,9 @@
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { updateProfile } from "@/domain/usecases/update-profile";
+import { deleteAccount } from "@/domain/usecases/delete-account";
 import { DomainError } from "@/domain/errors";
+import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
 import type { User } from "@/domain/models/user";
@@ -46,6 +48,29 @@ export async function updateProfileAction(
     }
     throw error;
   }
+}
+
+export async function deleteAccountAction(): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await deleteAccount(
+      { userId: session.user.id },
+      { userRepository: prismaUserRepository }
+    );
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    throw error;
+  }
+
+  // Compte supprimé — déconnexion (signOut lance un redirect en interne, ne retourne jamais)
+  await signOut({ redirectTo: "/" });
+  return { success: true, data: undefined };
 }
 
 export async function uploadAvatarAction(

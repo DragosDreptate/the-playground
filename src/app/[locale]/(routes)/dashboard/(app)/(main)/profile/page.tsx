@@ -10,6 +10,7 @@ import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { updateProfileAction } from "@/app/actions/profile";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
+import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, Mail, CalendarIcon } from "lucide-react";
 
@@ -116,6 +117,20 @@ export default async function ProfilePage() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Separator */}
+      <div className="border-border border-t" />
+
+      {/* Zone de danger */}
+      <div className="space-y-3">
+        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          {t("deleteAccount.dangerZone")}
+        </p>
+        <p className="text-muted-foreground text-sm">
+          {t("deleteAccount.description")}
+        </p>
+        <DeleteAccountDialog />
       </div>
     </div>
   );
