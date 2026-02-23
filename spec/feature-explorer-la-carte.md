@@ -379,14 +379,14 @@ src/components/circles/circle-form.tsx
 ```json
 {
   "Explorer": {
-    "title": "Explorer",
-    "description": "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
+    "title": "Découvrir",
+    "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
+    "navLink": "Découvrir",
     "tabs": {
       "circles": "Communautés",
       "moments": "Événements"
     },
     "filters": {
-      "category": "Thématique",
       "allCategories": "Toutes les thématiques"
     },
     "empty": {

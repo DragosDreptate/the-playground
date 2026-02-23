@@ -239,24 +239,24 @@ Si `result.promotedRegistration` existe :
 
 | Clé | FR | EN |
 |-----|----|----|
-| `registration.subject` | Vous avez rejoint {momentTitle} | You joined {momentTitle} |
+| `registration.subject` | Inscription confirmée : {momentTitle} | You've joined {momentTitle} |
 | `registration.heading` | Inscription confirmée ! | Registration confirmed! |
-| `registration.statusMessage` | Vous êtes inscrit(e) à {momentTitle}. | You are registered for {momentTitle}. |
+| `registration.statusMessage` | Vous êtes inscrit(e) à {momentTitle}. | You've joined {momentTitle}. |
 | `waitlist.subject` | Liste d'attente : {momentTitle} | Waitlist: {momentTitle} |
 | `waitlist.heading` | Vous êtes sur la liste d'attente | You're on the waitlist |
 | `waitlist.statusMessage` | Vous êtes en liste d'attente pour {momentTitle}. Nous vous informerons si une place se libère. | You're on the waitlist for {momentTitle}. We'll let you know if a spot opens up. |
 | `promotion.subject` | Votre place est confirmée : {momentTitle} | Your spot is confirmed: {momentTitle} |
 | `promotion.heading` | Bonne nouvelle ! | Great news! |
 | `promotion.statusMessage` | Une place s'est libérée ! Votre inscription à {momentTitle} est confirmée. | A spot opened up! Your registration for {momentTitle} is confirmed. |
-| `hostNotification.subject` | {playerName} a rejoint {momentTitle} | {playerName} joined {momentTitle} |
+| `hostNotification.subject` | {playerName} s'est inscrit(e) à {momentTitle} | {playerName} joined {momentTitle} |
 | `hostNotification.heading` | Nouvelle inscription | New registration |
-| `hostNotification.message` | {playerName} a rejoint {momentTitle} | {playerName} joined {momentTitle} |
+| `hostNotification.message` | {playerName} s'est inscrit(e) à {momentTitle} | {playerName} joined {momentTitle} |
 | `hostNotification.registrationInfo` | {count} inscrit(s) / {capacity} places | {count} joined / {capacity} spots |
 | `hostNotification.registrationInfoUnlimited` | {count} inscrit(s) | {count} joined |
 | `hostNotification.manageRegistrationsCta` | Gérer les inscriptions | Manage registrations |
 | `common.dateLabel` | Date | Date |
 | `common.locationLabel` | Lieu | Location |
-| `common.viewMomentCta` | Voir l'événement | View Moment |
+| `common.viewMomentCta` | Voir l'événement | View Event |
 | `common.cancelLink` | Annuler mon inscription | Cancel my registration |
 | `common.footer` | Powered by The Playground — Lancez votre communauté, gratuitement. | Powered by The Playground — Launch your community, for free. |
 
