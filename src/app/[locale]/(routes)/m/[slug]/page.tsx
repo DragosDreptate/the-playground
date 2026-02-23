@@ -100,15 +100,14 @@ export default async function PublicMomentPage({
   const isAuthenticated = !!session?.user?.id;
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
-  let existingRegistration = null;
-  if (isAuthenticated) {
-    existingRegistration = await getUserRegistration(
-      { momentId: moment.id, userId: session!.user!.id! },
-      { registrationRepository: prismaRegistrationRepository }
-    );
-  }
-
-  const [registeredCount, allAttendees, comments, waitlistPosition] = await Promise.all([
+  // Parallélise : inscription existante + données publiques en une seule vague
+  const [existingRegistration, registeredCount, allAttendees, comments] = await Promise.all([
+    isAuthenticated
+      ? getUserRegistration(
+          { momentId: moment.id, userId: session!.user!.id! },
+          { registrationRepository: prismaRegistrationRepository }
+        )
+      : Promise.resolve(null),
     prismaRegistrationRepository.countByMomentIdAndStatus(
       moment.id,
       "REGISTERED"
@@ -118,10 +117,13 @@ export default async function PublicMomentPage({
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
-    existingRegistration?.status === "WAITLISTED" && session?.user?.id
-      ? prismaRegistrationRepository.countWaitlistPosition(moment.id, session.user.id)
-      : Promise.resolve(0),
   ]);
+
+  // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
+  const waitlistPosition =
+    existingRegistration?.status === "WAITLISTED" && session?.user?.id
+      ? await prismaRegistrationRepository.countWaitlistPosition(moment.id, session.user.id)
+      : 0;
 
   const isFull =
     moment.capacity !== null && registeredCount >= moment.capacity;

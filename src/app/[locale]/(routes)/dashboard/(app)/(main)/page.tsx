@@ -45,12 +45,9 @@ export default async function DashboardPage({
     }),
   ]);
 
-  // Fetch member counts for all circles
-  const memberCounts = await Promise.all(
-    circles.map((c) => prismaCircleRepository.countMembers(c.id))
-  );
-  const memberCountById = new Map(
-    circles.map((c, i) => [c.id, memberCounts[i]])
+  // Récupère les compteurs de membres en une seule requête GROUP BY (évite le N+1)
+  const memberCountById = await prismaCircleRepository.findMemberCountsByCircleIds(
+    circles.map((c) => c.id)
   );
 
   // Redirect vers la page de bienvenue si l'utilisateur n'a aucune activité

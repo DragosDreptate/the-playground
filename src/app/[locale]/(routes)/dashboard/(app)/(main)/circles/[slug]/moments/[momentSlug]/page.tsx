@@ -22,37 +22,30 @@ export default async function MomentDetailPage({
   const session = await auth();
   if (!session?.user?.id) notFound();
 
+  // Parallélise Circle + Moment (les deux dépendent uniquement du slug)
   let circle;
-  try {
-    circle = await getCircleBySlug(slug, {
-      circleRepository: prismaCircleRepository,
-    });
-  } catch (error) {
-    if (error instanceof CircleNotFoundError) notFound();
-    throw error;
-  }
-
-  const membership = await prismaCircleRepository.findMembership(
-    circle.id,
-    session.user.id
-  );
-  if (!membership) notFound();
-
-  const isHost = membership.role === "HOST";
-
   let moment;
   try {
-    moment = await getMomentBySlug(momentSlug, {
-      momentRepository: prismaMomentRepository,
-    });
+    [circle, moment] = await Promise.all([
+      getCircleBySlug(slug, { circleRepository: prismaCircleRepository }),
+      getMomentBySlug(momentSlug, { momentRepository: prismaMomentRepository }),
+    ]);
   } catch (error) {
-    if (error instanceof MomentNotFoundError) notFound();
+    if (error instanceof CircleNotFoundError || error instanceof MomentNotFoundError) notFound();
     throw error;
   }
 
   if (moment.circleId !== circle.id) notFound();
 
-  const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
+  // Parallélise membership + hosts (dépendent tous deux de circle.id)
+  const [membership, hosts] = await Promise.all([
+    prismaCircleRepository.findMembership(circle.id, session.user.id),
+    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+  ]);
+
+  if (!membership) notFound();
+
+  const isHost = membership.role === "HOST";
 
   const [allAttendees, comments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),

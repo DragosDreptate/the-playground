@@ -87,6 +87,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
   @@map("accounts")
 }
 
@@ -98,6 +99,7 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("sessions")
 }
 
@@ -168,6 +170,10 @@ model CircleMembership {
   circle Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, circleId])
+  // Index sur circleId+role : utilisé dans findMembersByRole, countMembers, findAllCircles (admin)
+  @@index([circleId, role])
+  // Index sur userId : utilisé dans findByUserId, findAllByUserId, delete (user)
+  @@index([userId])
   @@map("circle_memberships")
 }
 
@@ -198,6 +204,12 @@ model Moment {
   registrations Registration[]
   comments      Comment[]
 
+  // Index sur circleId : utilisé dans findByCircleId, getCircleMoments
+  @@index([circleId])
+  // Index composite (status, startsAt) : utilisé dans findPublicUpcoming, transitionPastMoments, explorer
+  @@index([status, startsAt])
+  // Index sur (circleId, status) : utilisé dans findPublic (circles avec moments à venir)
+  @@index([circleId, status])
   @@map("moments")
 }
 
@@ -216,6 +228,10 @@ model Registration {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([momentId, userId])
+  // Index composite (momentId, status) : utilisé dans findActiveByMomentId, countByMomentIdAndStatus, findFirstWaitlisted
+  @@index([momentId, status])
+  // Index sur userId : utilisé dans findUpcomingByUserId, findPastByUserId
+  @@index([userId])
   @@map("registrations")
 }
 
@@ -231,5 +247,7 @@ model Comment {
   moment Moment @relation(fields: [momentId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // Index sur momentId : utilisé dans findByMomentIdWithUser, countByMomentId
+  @@index([momentId])
   @@map("comments")
 }

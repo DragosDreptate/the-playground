@@ -106,15 +106,15 @@ export default async function PublicCirclePage({
   // Only PUBLIC circles are accessible without auth
   if (circle.visibility !== "PUBLIC") notFound();
 
-  const [hosts, allMoments] = await Promise.all([
+  // Parallélise les 3 requêtes indépendantes : hosts, moments, compteur membres
+  const [hosts, allMoments, memberCount] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     getCircleMoments(circle.id, {
       momentRepository: prismaMomentRepository,
       circleRepository: prismaCircleRepository,
     }),
+    prismaCircleRepository.countMembers(circle.id),
   ]);
-
-  const memberCount = await prismaCircleRepository.countMembers(circle.id);
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
   const pastMoments = allMoments.filter(

@@ -149,6 +149,17 @@ export const prismaCircleRepository: CircleRepository = {
     return prisma.circleMembership.count({ where: { circleId } });
   },
 
+  async findMemberCountsByCircleIds(circleIds: string[]): Promise<Map<string, number>> {
+    if (circleIds.length === 0) return new Map();
+    // Requête GROUP BY : une seule requête pour N Circles (évite le N+1 du dashboard)
+    const counts = await prisma.circleMembership.groupBy({
+      by: ["circleId"],
+      where: { circleId: { in: circleIds } },
+      _count: { _all: true },
+    });
+    return new Map(counts.map((c) => [c.circleId, c._count._all]));
+  },
+
   async findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]> {
     const now = new Date();
     const circles = await prisma.circle.findMany({

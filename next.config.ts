@@ -4,7 +4,31 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
-const nextConfig: NextConfig = {};
+const securityHeaders = [
+  // Empêche le navigateur de détecter (sniffer) le Content-Type
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // Empêche l'intégration dans des iframes (clickjacking)
+  { key: "X-Frame-Options", value: "DENY" },
+  // Politique de référent : transmet l'origine uniquement en cross-origin HTTPS
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // Désactive les fonctionnalités navigateur non utilisées (privacy + sécurité)
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+  },
+];
+
+const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        // Applique les headers de sécurité sur toutes les routes
+        source: "/(.*)",
+        headers: securityHeaders,
+      },
+    ];
+  },
+};
 
 export default withSentryConfig(withNextIntl(nextConfig), {
   org: process.env.SENTRY_ORG,
