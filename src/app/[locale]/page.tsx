@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -16,6 +15,8 @@ import {
   MapPin,
   Crown,
 } from "lucide-react";
+
+export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
@@ -36,14 +37,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const session = await auth();
   const t = await getTranslations("HomePage");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
-      <SiteHeader user={session?.user} />
+      <SiteHeader />
 
       <main className="flex-1">
         {/* Hero */}

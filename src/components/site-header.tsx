@@ -1,25 +1,22 @@
+"use client";
+
+import { useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { MobileNav } from "@/components/mobile-nav";
-import { getTranslations } from "next-intl/server";
 import { Compass, LayoutDashboard } from "lucide-react";
 
-type SiteHeaderProps = {
-  user?: {
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    role?: "USER" | "ADMIN";
-  } | null;
-};
+export function SiteHeader() {
+  const { data: session } = useSession();
+  const t = useTranslations("Auth");
+  const tExplorer = useTranslations("Explorer");
+  const tDashboard = useTranslations("Dashboard");
 
-export async function SiteHeader({ user }: SiteHeaderProps) {
-  const t = await getTranslations("Auth");
-  const tExplorer = await getTranslations("Explorer");
-  const tDashboard = await getTranslations("Dashboard");
+  const user = session?.user;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">

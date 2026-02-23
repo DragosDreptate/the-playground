@@ -19,6 +19,7 @@ export function createMockCircleRepository(
     findMembersByRole: vi.fn<CircleRepository["findMembersByRole"]>().mockResolvedValue([]),
     countMembers: vi.fn<CircleRepository["countMembers"]>().mockResolvedValue(0),
     findPublic: vi.fn<CircleRepository["findPublic"]>().mockResolvedValue([]),
+    findMemberCountsByCircleIds: vi.fn<CircleRepository["findMemberCountsByCircleIds"]>().mockResolvedValue(new Map()),
     ...overrides,
   };
 }
