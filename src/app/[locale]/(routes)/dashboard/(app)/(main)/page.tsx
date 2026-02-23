@@ -10,7 +10,6 @@ import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-mome
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
 import { CircleCard } from "@/components/circles/circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 
@@ -83,9 +82,8 @@ export default async function DashboardPage({
         <p className="text-muted-foreground text-base leading-relaxed">{t("greetingSubtitle")}</p>
       </div>
 
-      {/* Tab selector + create Circle (desktop only, inline) */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+      {/* Tab selector */}
+      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
           <Link
             href="?tab=moments"
             className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
@@ -107,10 +105,6 @@ export default async function DashboardPage({
             {t("myCircles")}
           </Link>
         </div>
-        <Button asChild size="sm" className="hidden md:inline-flex">
-          <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-        </Button>
-      </div>
 
       {/* Tab content */}
       {activeTab === "moments" ? (
@@ -123,9 +117,6 @@ export default async function DashboardPage({
               <p className="text-muted-foreground mt-1 text-xs">
                 {t("noMomentsHint")}
               </p>
-              <Button asChild className="mt-4">
-                <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-              </Button>
             </div>
           ) : (
             <div>
@@ -175,36 +166,19 @@ export default async function DashboardPage({
               ))}
             </div>
           )}
-          <Button asChild className="mt-6 w-full md:hidden">
-            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-          </Button>
         </section>
       ) : (
         <section>
-          {circles.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-              <p className="text-muted-foreground text-sm">
-                {t("noCirclesMember")}
-              </p>
-              <Button asChild className="mt-4">
-                <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {circles.map((circle) => (
-                <CircleCard
-                  key={circle.id}
-                  circle={circle}
-                  role={circle.memberRole}
-                  memberCount={memberCountById.get(circle.id)}
-                />
-              ))}
-            </div>
-          )}
-          <Button asChild className="mt-6 w-full md:hidden">
-            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-          </Button>
+          <div className="flex flex-col gap-4">
+            {circles.map((circle) => (
+              <CircleCard
+                key={circle.id}
+                circle={circle}
+                role={circle.memberRole}
+                memberCount={memberCountById.get(circle.id)}
+              />
+            ))}
+          </div>
         </section>
       )}
     </div>
