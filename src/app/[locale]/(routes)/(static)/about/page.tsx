@@ -176,7 +176,139 @@ export default async function AboutPage() {
 
       <hr className="border-border" />
 
-      {/* ── Section 4 — Où on en est ── */}
+      {/* ── Section 4 — Qui je suis ── */}
+      <section className="space-y-5">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {isFr ? "Qui je suis" : "About me"}
+        </h2>
+        <div className="flex items-start gap-4">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-violet-500 text-white font-bold text-lg select-none">
+            D
+          </div>
+          <div className="space-y-3 text-[17px] leading-relaxed text-muted-foreground">
+            <p>
+              {isFr ? (
+                <>
+                  Je m'appelle{" "}
+                  <a
+                    href="https://www.linkedin.com/in/dragosdreptate/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground font-semibold hover:underline"
+                  >
+                    Dragos Dreptate
+                  </a>
+                  . Dirigeant, entrepreneur et coach — 25 ans dans la tech,
+                  basé à Paris. Je co-dirige{" "}
+                  <strong className="text-foreground">The Spark</strong>, une
+                  structure centrée sur l'innovation et le leadership.
+                </>
+              ) : (
+                <>
+                  I'm{" "}
+                  <a
+                    href="https://www.linkedin.com/in/dragosdreptate/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-foreground font-semibold hover:underline"
+                  >
+                    Dragos Dreptate
+                  </a>
+                  . Executive, entrepreneur and coach — 25 years in tech,
+                  based in Paris. I co-lead{" "}
+                  <strong className="text-foreground">The Spark</strong>, an
+                  organization focused on innovation and leadership.
+                </>
+              )}
+            </p>
+            <p>
+              {isFr
+                ? "Depuis des années, j'organise des événements — conférences tech, masterclasses leadership, communautés agiles. C'est ce vécu d'organisateur, confronté aux mêmes outils bancals en boucle, qui est à l'origine de The Playground."
+                : "For years, I've been running events — tech conferences, leadership masterclasses, agile communities. That experience as an organizer, running into the same broken tools over and over, is what sparked The Playground."}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <hr className="border-border" />
+
+      {/* ── Section 5 — La stack ── */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {isFr ? "La stack" : "The stack"}
+        </h2>
+        <p className="text-[17px] leading-relaxed text-muted-foreground">
+          {isFr
+            ? "Construit en moins d'une semaine avec Claude Code (Anthropic). Architecture hexagonale, TypeScript strict, tout déployé en Europe."
+            : "Built in under a week with Claude Code (Anthropic). Hexagonal architecture, strict TypeScript, everything deployed in Europe."}
+        </p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {[
+            { name: "Next.js 15", desc: isFr ? "App Router, SSR/ISR" : "App Router, SSR/ISR" },
+            { name: "TypeScript", desc: isFr ? "Strict, full-stack" : "Strict, full-stack" },
+            { name: "PostgreSQL", desc: isFr ? "Neon serverless (EU)" : "Neon serverless (EU)" },
+            { name: "Prisma", desc: isFr ? "ORM + migrations" : "ORM + migrations" },
+            { name: "Auth.js v5", desc: isFr ? "Magic link + OAuth" : "Magic link + OAuth" },
+            { name: "Tailwind + shadcn", desc: isFr ? "Design system" : "Design system" },
+            { name: "Resend", desc: isFr ? "Emails transactionnels" : "Transactional emails" },
+            { name: "Vercel", desc: isFr ? "Déploiement EU" : "Edge deployment (EU)" },
+            { name: "Claude Code", desc: isFr ? "Propulsé par l'IA" : "AI-powered dev" },
+          ].map(({ name, desc }) => (
+            <div
+              key={name}
+              className="rounded-lg border border-border bg-muted/30 px-3 py-2.5"
+            >
+              <p className="text-sm font-semibold text-foreground">{name}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <hr className="border-border" />
+
+      {/* ── Section 6 — Ce qui vient ── */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {isFr ? "Ce qui vient" : "What's next"}
+        </h2>
+        <p className="text-[17px] leading-relaxed text-muted-foreground">
+          {isFr
+            ? "Le cœur est là. Les prochaines priorités :"
+            : "The core is there. Next priorities:"}
+        </p>
+        <ul className="space-y-3">
+          {(isFr
+            ? [
+                ["Images de couverture", " — personnalisation visuelle des Communautés et des événements."],
+                ["Export CSV", " — liste des inscrits pour la logistique (badges, émargement)."],
+                ["Événements payants", " — Stripe Connect pour ceux qui en ont besoin."],
+                ["Assistant IA", " — aide à la rédaction des descriptions et emails d'invitation."],
+              ]
+            : [
+                ["Cover images", " — visual customization for Communities and events."],
+                ["CSV export", " — attendee list for logistics (badges, sign-in sheets)."],
+                ["Paid events", " — Stripe Connect for those who need it."],
+                ["AI assistant", " — help drafting event descriptions and invitation emails."],
+              ]
+          ).map(([bold, rest]) => (
+            <li
+              key={bold}
+              className="flex items-start gap-3 text-[17px] leading-relaxed text-muted-foreground"
+            >
+              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gradient-to-br from-pink-500 to-violet-500" />
+              <span>
+                <strong className="text-foreground">{bold}</strong>
+                {rest}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <hr className="border-border" />
+
+      {/* ── Section 7 — Où on en est ── */}
       <section className="space-y-5">
         <h2 className="text-2xl font-bold tracking-tight">
           {isFr ? "Où on en est" : "Where we are"}
