@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
@@ -52,6 +53,13 @@ export default async function DashboardPage({
   const memberCountById = new Map(
     circles.map((c, i) => [c.id, memberCounts[i]])
   );
+
+  // Redirect vers la page de bienvenue si l'utilisateur n'a aucune activité
+  const hasActivity =
+    circles.length > 0 || upcomingMoments.length > 0 || pastMoments.length > 0;
+  if (!hasActivity) {
+    redirect("/dashboard/welcome");
+  }
 
   // Set des slugs de Cercles dont l'utilisateur est Host (pour les cartes de Moments)
   const hostCircleSlugs = new Set(

@@ -83,6 +83,21 @@
     },
     "signOut": "Se déconnecter"
   },
+  "Welcome": {
+    "greeting": "Bonjour {name} 👋",
+    "greetingAnonymous": "Bienvenue sur The Playground 👋",
+    "subtitle": "Par où voulez-vous commencer ?",
+    "createCircle": {
+      "title": "Créer ma Communauté",
+      "description": "Lancez votre espace, invitez vos membres et organisez vos événements.",
+      "cta": "Commencer"
+    },
+    "explore": {
+      "title": "Découvrir des Communautés",
+      "description": "Explorez les communautés publiques et rejoignez celles qui vous correspondent.",
+      "cta": "Explorer"
+    }
+  },
   "Dashboard": {
     "title": "Mon espace",
     "myCircles": "Mes Communautés",

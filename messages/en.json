@@ -83,6 +83,21 @@
     },
     "signOut": "Sign out"
   },
+  "Welcome": {
+    "greeting": "Hey {name} 👋",
+    "greetingAnonymous": "Welcome to The Playground 👋",
+    "subtitle": "What would you like to do first?",
+    "createCircle": {
+      "title": "Create my Circle",
+      "description": "Launch your space, invite your members and organize your events.",
+      "cta": "Get started"
+    },
+    "explore": {
+      "title": "Discover Communities",
+      "description": "Explore public communities and join the ones that match your interests.",
+      "cta": "Explore"
+    }
+  },
   "Dashboard": {
     "title": "My Playground",
     "myCircles": "My Circles",
