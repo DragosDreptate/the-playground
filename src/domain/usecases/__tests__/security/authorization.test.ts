@@ -18,6 +18,8 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { getMomentRegistrations } from "@/domain/usecases/get-moment-registrations";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { deleteComment } from "@/domain/usecases/delete-comment";
+import { addComment } from "@/domain/usecases/add-comment";
+import { joinMoment } from "@/domain/usecases/join-moment";
 
 // Erreurs domaine
 import {
@@ -26,6 +28,7 @@ import {
   UnauthorizedRegistrationActionError,
   HostCannotCancelRegistrationError,
   UnauthorizedCommentDeletionError,
+  MomentNotFoundError,
 } from "@/domain/errors";
 
 // Helpers mock
@@ -529,6 +532,206 @@ describe("Security — RBAC", () => {
         )
       ).resolves.toBeUndefined();
       expect(commentRepo.delete).toHaveBeenCalledWith("comment-1");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // addComment — Modèle de sécurité (documentation)
+  //
+  // addComment n'a pas de garde RBAC au niveau usecase.
+  // La sécurité repose sur la couche action (addCommentAction)
+  // qui vérifie session?.user?.id avant d'appeler le usecase.
+  // Tout utilisateur authentifié peut commenter sur n'importe
+  // quel Moment — c'est le comportement intentionnel (commentaires publics).
+  //
+  // Ces tests documentent et vérifient ce comportement.
+  // ─────────────────────────────────────────────────────────────
+
+  describe("addComment — modèle de sécurité (pas de garde RBAC au niveau usecase)", () => {
+    const baseInput = {
+      momentId: "moment-1",
+      userId: "any-authenticated-user",
+      content: "Super événement !",
+    };
+
+    it("should allow any authenticated user to add a comment to a published Moment", async () => {
+      const comment = makeComment({ userId: "any-authenticated-user" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1" })),
+      });
+      const commentRepo = createMockCommentRepository({
+        create: vi.fn().mockResolvedValue(comment),
+      });
+
+      const result = await addComment(baseInput, {
+        commentRepository: commentRepo,
+        momentRepository: momentRepo,
+      });
+
+      expect(result.comment.userId).toBe("any-authenticated-user");
+      expect(commentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: "any-authenticated-user" })
+      );
+    });
+
+    it("should throw MomentNotFoundError when the Moment does not exist (hard isolation boundary)", async () => {
+      // Le usecase rejette les commentaires sur des Moments inexistants —
+      // c'est la seule barrière au niveau usecase pour addComment.
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(null),
+      });
+      const commentRepo = createMockCommentRepository();
+
+      await expect(
+        addComment(baseInput, {
+          commentRepository: commentRepo,
+          momentRepository: momentRepo,
+        })
+      ).rejects.toThrow(MomentNotFoundError);
+
+      expect(commentRepo.create).not.toHaveBeenCalled();
+    });
+
+    it("should allow a PLAYER (circle member) to add a comment — HOST restriction does not apply to comments", async () => {
+      // Les commentaires ne sont pas restreints aux HOSTs.
+      // Les PLAYERs (membres) et même les non-membres authentifiés peuvent commenter.
+      const comment = makeComment({ userId: "player-user" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1" })),
+      });
+      const commentRepo = createMockCommentRepository({
+        create: vi.fn().mockResolvedValue(comment),
+      });
+
+      const result = await addComment(
+        { momentId: "moment-1", userId: "player-user", content: "Excellent !" },
+        { commentRepository: commentRepo, momentRepository: momentRepo }
+      );
+
+      expect(result.comment.userId).toBe("player-user");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // joinMoment — Préservation du rôle HOST lors de l'inscription
+  //
+  // Règle : HOST = PLAYER + droits de gestion.
+  // Quand un HOST rejoint son propre Moment, son membership HOST
+  // ne doit PAS être écrasé par un membership PLAYER.
+  // Le usecase ne crée un nouveau membership que si aucun n'existe.
+  // ─────────────────────────────────────────────────────────────
+
+  describe("joinMoment — préservation du rôle HOST lors de l'inscription", () => {
+    const baseJoinInput = {
+      momentId: "moment-1",
+      userId: "host-user",
+    };
+
+    it("should NOT downgrade a HOST membership to PLAYER when the HOST joins their own Moment", async () => {
+      // Le HOST a déjà un membership HOST — le usecase ne doit pas le modifier
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({
+            id: "moment-1",
+            circleId: "circle-1",
+            status: "PUBLISHED",
+            startsAt: new Date("2099-01-01T18:00:00Z"),
+            price: 0,
+          })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(null),
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+        create: vi.fn().mockResolvedValue({ id: "reg-1", momentId: "moment-1", userId: "host-user", status: "REGISTERED", paymentStatus: "NONE", stripePaymentIntentId: null, registeredAt: new Date(), cancelledAt: null, checkedInAt: null }),
+      });
+      const circleRepo = createMockCircleRepository({
+        // Le HOST a déjà un membership HOST — findMembership retourne HOST
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ userId: "host-user", circleId: "circle-1", role: "HOST" })
+        ),
+        addMembership: vi.fn(),
+      });
+
+      await joinMoment(baseJoinInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      // addMembership NE DOIT PAS être appelé car le membership HOST existe déjà
+      expect(circleRepo.addMembership).not.toHaveBeenCalled();
+    });
+
+    it("should create a PLAYER membership when a new user (non-member) joins a Moment", async () => {
+      // Utilisateur sans membership — doit être inscrit en tant que PLAYER
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({
+            id: "moment-1",
+            circleId: "circle-1",
+            status: "PUBLISHED",
+            startsAt: new Date("2099-01-01T18:00:00Z"),
+            price: 0,
+          })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(null),
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+        create: vi.fn().mockResolvedValue({ id: "reg-2", momentId: "moment-1", userId: "new-user", status: "REGISTERED", paymentStatus: "NONE", stripePaymentIntentId: null, registeredAt: new Date(), cancelledAt: null, checkedInAt: null }),
+      });
+      const circleRepo = createMockCircleRepository({
+        // Pas de membership existant
+        findMembership: vi.fn().mockResolvedValue(null),
+        addMembership: vi.fn().mockResolvedValue(makeMembership({ userId: "new-user", role: "PLAYER" })),
+      });
+
+      await joinMoment(
+        { momentId: "moment-1", userId: "new-user" },
+        {
+          momentRepository: momentRepo,
+          registrationRepository: registrationRepo,
+          circleRepository: circleRepo,
+        }
+      );
+
+      // addMembership DOIT être appelé avec le rôle PLAYER
+      expect(circleRepo.addMembership).toHaveBeenCalledWith("circle-1", "new-user", "PLAYER");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // getMomentRegistrations — vérification que le lookup membership
+  // porte sur le Circle du Moment (pas un paramètre externe)
+  // ─────────────────────────────────────────────────────────────
+
+  describe("getMomentRegistrations — lookup membership sur le Circle du Moment", () => {
+    it("should check membership on the circleId from the Moment, not from external input", async () => {
+      const targetCircleId = "circle-from-moment";
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: targetCircleId })),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ circleId: targetCircleId, role: "HOST" })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findActiveWithUserByMomentId: vi.fn().mockResolvedValue([]),
+      });
+
+      await getMomentRegistrations(
+        { momentId: "moment-1", userId: "legitimate-host" },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      // Le circleId utilisé pour le lookup membership doit provenir du Moment
+      expect(circleRepo.findMembership).toHaveBeenCalledWith(targetCircleId, "legitimate-host");
     });
   });
 });

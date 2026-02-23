@@ -56,12 +56,17 @@
 | Sécurité : audit complet + correction vulnérabilité architecturale (defense-in-depth manquante sur 11 usecases admin). Ajout `callerRole: UserRole` + `AdminUnauthorizedError`. 59 nouveaux tests de sécurité (RBAC, IDOR cross-tenant, accès admin). 271 tests au total à ce stade, 100% verts. | 2026-02-21 | `8b14aaf` |
 | Upload d'avatar utilisateur : port `StorageService` (hexagonal), adapter `VercelBlobStorageService` (@vercel/blob), helper `isUploadedUrl`, helper `resizeImage` (Canvas API, crop carré centré, WebP 384×384 ~50 Ko), server action `uploadAvatarAction`, composant `AvatarUpload` (hover overlay + lien texte conditionnel, preview optimiste, spinner), protection OAuth (ne pas écraser avatar uploadé), i18n FR/EN `Profile.avatar.*`, tests `blob.test.ts` + cas image dans `update-profile.test.ts`. AvatarUpload intégré aussi sur la page d'onboarding `/dashboard/profile/setup`. | 2026-02-22 | `aa84d5c` |
 | Isolation onboarding via route groups Next.js : `(app)/layout.tsx` (layout complet : SiteHeader + SiteFooter) + `(onboarding)/layout.tsx` (layout minimal : logo statique non-cliquable, LocaleToggle + ThemeToggle uniquement, pas de footer). Suppression de la prop `hideNav` du SiteHeader. Tests E2E (`onboarding.spec.ts`, 6 tests) + `playwright.config.ts` + script `test:e2e:setup-onboarding`. TDD : tests écrits en RED, puis implémentation, puis GREEN. | 2026-02-22 | `7c57b8d` |
-| Audit sécurité (security-guardian) : 20 nouveaux tests de sécurité. `avatar-upload-isolation.test.ts` (5 tests IDOR/userId isolation) + `onboarding-guard.test.ts` (15 tests anti-boucle, transitions d'état, cas limites). Aucune vulnérabilité détectée dans le code source. 303 tests, 46 fichiers, 100% verts. | 2026-02-22 | — |
+| Audit sécurité (security-guardian) : 20 nouveaux tests de sécurité. `avatar-upload-isolation.test.ts` (5 tests IDOR/userId isolation) + `onboarding-guard.test.ts` (15 tests anti-boucle, transitions d'état, cas limites). Aucune vulnérabilité détectée dans le code source. À ce stade : 303 tests, 46 fichiers, 100% verts. | 2026-02-22 | — |
 | Footer global (`SiteFooter`) + pages légales : mentions légales `/legal/mentions-legales`, confidentialité `/legal/confidentialite`, CGU `/legal/cgu`. i18n FR/EN complet (namespaces `Footer` + `Legal`). | 2026-02-22 | `da1c2e8` |
 | Magic link email : template react-email avec icône PNG embarquée en base64 (gradient + triangle play). Zéro dépendance réseau pour le rendu. | 2026-02-22 | `f27fee9` |
 | OpenGraph + SEO : images OG dynamiques (homepage, événement, Communauté), `metadataBase`, `generateMetadata`, `robots.ts`, `sitemap.ts`. | 2026-02-22 | — |
 | Mobile responsive : hamburger menu (DropdownMenu), cards compactes Explorer, footer responsive, hero centrage, tabs responsive. | 2026-02-22 | — |
 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. | 2026-02-22 | — |
+| Cover Circle : `CoverImagePicker` (tabs Photos Unsplash + Importer), server action `processCoverImage` dans `cover-image.ts`, champs `coverImage`/`coverImageAttribution` sur Circle (DB + domaine), API proxy Unsplash `/api/unsplash/search`, affichage sur 5 emplacements, attribution "Photo par [Nom] sur Unsplash". | 2026-02-23 | — |
+| Cover Moment : mêmes champs `coverImage`/`coverImageAttribution` sur Moment (DB + domaine), même composant `CoverImagePicker`, même server action `processCoverImage`, affichage sur pages publique et Organisateur. | 2026-02-23 | — |
+| CoverImagePicker — photos aléatoires Unsplash à l'ouverture : suppression des photos curées statiques, nouvelle route `/api/unsplash/random` (8 appels parallèles `/photos/random`, 1 par thématique, cache `s-maxage=300`), skeleton 8 cases pendant le chargement, `defaultPhotos` mis en cache entre les ouvertures. | 2026-02-23 | `dcd2c6c` |
+| CoverImagePicker — pagination recherche : remplacement du bouton "Voir plus" (qui agrandissait la modale) par une navigation prev/next qui remplace les photos sans changer la taille de la modale. | 2026-02-23 | — |
+| CoverImagePicker — fix state reset : `handleApply` et `handleRemove` appelaient `setOpen(false)` directement (bypasse `onOpenChange` en mode contrôlé Radix), laissant `pending` stale. Corrigé en appelant `handleOpenChange(false)` pour garantir le reset complet. Fix parallèle : le bouton déclencheur appelait `setOpen(true)` au lieu de `handleOpenChange(true)`, empêchant le fetch des photos aléatoires. | 2026-02-23 | `e1131ef`, `9d5cfde` |
 
 ---
 
@@ -105,10 +110,11 @@
 
 #### UX post-inscription — "Et maintenant ?" (parcours A)
 
-- [ ] **CTA "Ajouter au calendrier" post-inscription** (gap M-1)
+- [x] **CTA "Ajouter au calendrier" post-inscription** (gap M-1) ✅
   - Sur la page `/m/[slug]` après inscription confirmée
-  - Liens : Google Calendar, Apple Calendar, fichier `.ics` (ICS universel)
-  - Référence CLAUDE.md : déjà prévu dans le périmètre MVP Participant
+  - Liens : Google Calendar (via `buildGoogleCalendarUrl`) + fichier `.ics` (via `/api/moments/[slug]/calendar`)
+  - Composant `AddToCalendarButtons` (`src/components/moments/add-to-calendar-buttons.tsx`)
+  - Intégré dans `RegistrationButton` côté client
 
 - [ ] **Lien "Voir dans mon tableau de bord" post-inscription** (gap M-2)
   - Sur la page `/m/[slug]` après inscription : lien visible vers `/dashboard`
@@ -133,10 +139,10 @@
 
 #### Clarté liste d'attente (parcours C)
 
-- [ ] **Position dans la liste d'attente visible** (gap H-3)
+- [x] **Position dans la liste d'attente visible** (gap H-3) ✅
   - Sur `/m/[slug]` et dashboard : "Vous êtes X° sur la liste d'attente"
-  - Réduit l'incertitude, évite l'abandon silencieux
-  - Nécessite un champ `waitlistPosition` ou calcul à la volée
+  - Calcul à la volée via `prismaRegistrationRepository.countWaitlistPosition`
+  - Affiché dans `RegistrationButton` via prop `waitlistPosition`
 
 #### Découverte inter-événements (parcours B)
 
@@ -161,20 +167,12 @@
 > Un utilisateur qui s'inscrit sans lien d'événement ni de Communauté ne sait pas où aller.
 > Le dashboard vide est silencieux — il faut l'orienter activement.
 
-- [ ] **Page de bienvenue `/dashboard/welcome`**
-  - **Trigger** : accès à `/dashboard` si l'utilisateur n'a aucune activité (aucun Circle créé, aucune Registration) ET aucun `callbackUrl` (pour ne pas interrompre un flux d'intent : s'inscrire à un événement, rejoindre une Communauté)
-  - **Persistance basée sur l'état** — pas de flag DB. La page s'affiche tant que l'état "sans activité" persiste. Dès qu'il crée un Circle ou s'inscrit à un événement, il ne la voit plus
-  - **Contenu** :
-    - Message d'accueil personnalisé ("Bonjour [prénom], bienvenue sur The Playground")
-    - 2 cartes CTA :
-      1. **Créer ma Communauté** (`default` / primary) → `/dashboard/circles/create`
-      2. **Découvrir des Communautés** (`outline`) → `/explorer`
-  - **Cas couverts** :
-    - Nouvel utilisateur post-onboarding (arrivée directe, pas via un lien)
-    - Revenant sans activité (retour sur `/dashboard` N jours plus tard, toujours sans Circle ni Registration)
-  - **Cas exclus** (flux intact, pas de welcome) :
-    - Arrivée via lien événement (`callbackUrl` présent → redirection après auth préservée)
-    - Utilisateur ayant au moins un Circle créé ou une Registration
+- [x] **Page de bienvenue `/dashboard/welcome`** ✅
+  - **Trigger** : accès à `/dashboard/welcome` si l'utilisateur n'a aucune activité (aucun Circle créé, aucune Registration). Redirect vers `/dashboard` si activité détectée.
+  - **Persistance basée sur l'état** — pas de flag DB. La page redirige vers `/dashboard` dès qu'il a un Circle ou une Registration.
+  - **Contenu** : message d'accueil personnalisé (prénom) + 2 cartes CTA :
+    1. **Créer ma Communauté** (`default` / primary) → `/dashboard/circles/new`
+    2. **Découvrir des Communautés** (`outline`) → `/explorer`
   - **Phase 2 — hors scope MVP** : email de re-engagement si N jours sans activité après le welcome
 
 #### Gestion des inscriptions Organisateur (parcours E)
@@ -198,16 +196,21 @@
 
 - [x] **Avatar utilisateur** ✅ — upload photo de profil (Vercel Blob, resize Canvas WebP 384×384)
 
-- [ ] **Cover / avatar Circle** — image personnalisée de la Communauté
-  - Champ `imageUrl` sur `Circle` (DB + domaine)
-  - Upload dans le formulaire d'édition de la Communauté
-  - Affiché en cover sur la page Circle (remplace le gradient généré) et dans `CircleAvatar`
+- [x] **Cover Circle** ✅ — image personnalisée de la Communauté (Vercel Blob, Unsplash via proxy + upload local)
+  - Champs `coverImage: String?` + `coverImageAttribution: Json?` sur `Circle` (DB + domaine)
+  - Composant `CoverImagePicker` : dialog tabs "Photos Unsplash" + "Importer" (drag-and-drop, resize client-side)
+    - Onglet Photos : 8 photos aléatoires Unsplash à l'ouverture (1/thématique, via `/api/unsplash/random`, chargées en parallèle, mises en cache) + recherche paginée prev/next
+    - Onglet Importer : drag-and-drop ou sélection fichier, validation client (5 Mo, JPG/PNG/WebP), resize Canvas → WebP
+  - Server action `processCoverImage` dans `src/app/actions/cover-image.ts` (partagée Circle + Moment)
+  - Affiché sur page Circle publique, page Circle dashboard, `CircleCard`, `PublicCircleCard`, `CircleAvatar`
+  - Attribution Unsplash : "Photo par [Nom] sur Unsplash"
   - Fallback : gradient actuel si pas d'image
+  - Cleanup Vercel Blob de l'ancienne image lors du remplacement ou de la suppression
 
-- [ ] **Cover événement** — image de couverture de l'événement
-  - Champ `coverImageUrl` sur `Moment` (DB + domaine)
-  - Upload dans le formulaire de création/édition d'un événement
-  - Affiché en bannière sur la page publique `/m/[slug]` (remplace le gradient)
+- [x] **Cover événement** ✅ — image de couverture de l'événement (Vercel Blob, Unsplash via proxy + upload local)
+  - Champs `coverImage: String?` + `coverImageAttribution: Json?` sur `Moment` (DB + domaine)
+  - Même composant `CoverImagePicker` que pour le Circle (même server action `processCoverImage`)
+  - Affiché en bannière sur la page publique `/m/[slug]` et la vue Organisateur
   - Fallback : gradient actuel si pas d'image
 
 - [x] **Infrastructure upload** ✅ (prérequis commun aux covers Circle/événement)
@@ -280,7 +283,7 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre événement dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [x] **Tests unitaires complets** — 303 tests, 46 fichiers, tous usecases couverts (25 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 313 tests, 47 fichiers, tous usecases couverts (25 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
 - [ ] **Tests E2E Playwright** — 8 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore). `onboarding.spec.ts` : 6/6 green. Les 7 autres à brancher sur environnement de test.
 - [ ] **Accessibilité axe-core** dans Playwright
@@ -314,36 +317,39 @@
 | 2026-02-19 | Usecases = fonctions (pas de classes) |
 | 2026-02-19 | ActionResult pattern pour les server actions |
 | 2026-02-19 | Slug généré dans le usecase (règle métier) |
-| 2026-02-19 | Circle = Cercle en français, Host/Player en anglais dans le code |
+| 2026-02-19 | Circle = Cercle en français (renommé en **Communauté** le 2026-02-22), Host/Player en anglais dans le code |
 | 2026-02-20 | Host = Player + droits de gestion (rôle hiérarchique, une seule membership par user/circle) |
 | 2026-02-20 | Neon branching dev/prod (`pnpm db:dev:reset` pour snapshot frais) |
 | 2026-02-20 | Onboarding profil obligatoire au premier login |
 | 2026-02-20 | Email non éditable dans le profil (clé unique Auth.js, pivot de liaison entre providers) |
 | 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |
-| 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, Escale = porte d'entrée virale, page Cercle = couche de rétention (absente chez Luma). Dashboard Organisateur = Cercle-first. |
-| 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) à l'Escale qu'il crée — règle métier dans `createMoment`. |
+| 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. Circle = entité centrale, événement = porte d'entrée virale, page Communauté = couche de rétention (absente chez Luma). Dashboard Organisateur = Communauté-first. *(Terminologie FR mise à jour le 2026-02-22 : Cercle → Communauté, Escale → événement)* |
+| 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) à l'événement qu'il crée — règle métier dans `createMoment`. |
 | 2026-02-20 | Check-in retiré du MVP → Phase 2 (pas prioritaire pour le lancement) |
-| 2026-02-20 | ~~La Carte = Circles uniquement (pas d'Escales).~~ **Révisée le 2026-02-21** : La Carte = Circles + Escales à venir de Circles publics. |
-| 2026-02-21 | Escales passées accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |
+| 2026-02-20 | ~~La Carte = Circles uniquement (pas d'événements).~~ **Révisée le 2026-02-21** : La Carte = Circles + événements à venir de Circles publics. *(Renommé "Découvrir" le 2026-02-22)* |
+| 2026-02-21 | Événements passés accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |
 | 2026-02-21 | Page Circle = même layout 2 colonnes que Moment (cover gradient LEFT sticky, contenu RIGHT). Cohérence design inter-pages. |
-| 2026-02-21 | Carte "Événement terminé" (vue publique Escale passée) inclut un CTA "Voir les prochaines Escales du Cercle" — rétention vers le Circle. |
-| 2026-02-21 | Fil de commentaires plat (pas de réponses imbriquées). Max 2000 chars. Tout utilisateur authentifié peut commenter, même sans être membre. Auteur et Organisateur peuvent supprimer. Sur Escales PAST, le formulaire est masqué mais les commentaires restent visibles. |
+| 2026-02-21 | Carte "Événement terminé" (vue publique événement passé) inclut un CTA "Voir les prochains événements de la Communauté" — rétention vers le Circle. |
+| 2026-02-21 | Fil de commentaires plat (pas de réponses imbriquées). Max 2000 chars. Tout utilisateur authentifié peut commenter, même sans être membre. Auteur et Organisateur peuvent supprimer. Sur événements PAST, le formulaire est masqué mais les commentaires restent visibles. |
 | 2026-02-21 | Convention pérenne utilisateurs test : domaine `@test.playground` en dev ET en prod. Pas de champ DB supplémentaire. Suppression via `DELETE WHERE email LIKE '%@test.playground'`. |
 | 2026-02-21 | Scripts données test : seed idempotent (`upsert` partout), cleanup avec flag `--execute` (dry-run par défaut). Variantes prod via scripts shell Neon (même pattern que `db-push-prod.sh`). Données FR uniquement (noms, lieux). |
 | 2026-02-21 | Page profil : layout single-column centré (pas 2 colonnes), avatar + nom + email + stats en header, formulaire prénom/nom, meta rows read-only (email, membre depuis). Email retiré du formulaire (lecture seule dans meta row). |
 | 2026-02-21 | Fils d'ariane : obligatoires sur toutes les pages dashboard sauf racine `/dashboard` et onboarding `profile/setup`. Pattern CSS unifié. |
 | 2026-02-21 | Badges unifiés : fond plein (`default`) = engagement positif (Inscrit, Publié). Outline = tout le reste (Organisateur en `outline` + accent primary, Annulé en `outline` + accent destructive, Passé en `outline` neutre, Participant en `secondary`). |
 | 2026-02-21 | Couleur unique : `--destructive` = `--primary` (même rose). Le danger est communiqué par le contexte (mot, modale), pas par une couleur différente. Approche Luma : un seul accent. |
-| 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et Escale). Cohérence inter-pages. |
+| 2026-02-21 | Bouton Modifier : toujours `default` (rose plein) + `size="sm"` sur les pages de détail (Circle et événement). Cohérence inter-pages. |
 | 2026-02-21 | Analyse UX JTBD complète (spec/ux-parcours-jtbd.md) : 8 personas, 25 JTBD, 7 parcours. 4 casseurs de loop identifiés (emails transactionnels), 8 gaps haute priorité, 7 moyens. Ajoutés au backlog sous "Rétention & viralité". |
-| 2026-02-21 | La Carte (spec/feature-explorer-la-carte.md) : `/explorer` avec tabs Cercles + Événements, community-first, pas d'algorithme. Décision révisée : La Carte = Circles + Escales à venir de Circles publics (pas Circles uniquement). Nouvelle métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
+| 2026-02-21 | Découvrir (spec/feature-explorer-la-carte.md) : `/explorer` avec tabs Communautés + Événements, community-first, pas d'algorithme. Décision révisée : Découvrir = Circles + événements à venir de Circles publics (pas Circles uniquement). Métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
 | 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
-| 2026-02-21 | Terminologie i18n rebranding. FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée, cette/une Escale), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Code identifiers, clés JSON et noms de fichiers restent en anglais (Moment, Player). |
-| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Métaphore voyage cohérente (Carte = destinations, Escale = étape). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). |
+| 2026-02-21 | Terminologie i18n rebranding (intermédiaire). FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. *(Terminologie FR finalisée le 2026-02-22 : Escale → événement, Mon Playground → Mon espace, Rejoindre → S'inscrire)* |
+| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). *(La Carte renommée **Découvrir** en FR le 2026-02-22)* |
 | 2026-02-21 | Convention démo : domaine **`@demo.playground`** distinct de `@test.playground`. Démo = contenu réaliste pour présentation/validation produit. Test = données techniques pour QA/dev. Reset complet de base (dev + prod) via `prisma db push --force-reset` avant injection démo. |
-| 2026-02-21 | Données démo : 6 Circles publics (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 Escales (1 passée + 4 à venir par Circle), ratio 20%/80%, contenu entièrement en français. |
+| 2026-02-21 | Données démo : 6 Circles publics (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 événements (1 passé + 4 à venir par Circle), ratio 20%/80%, contenu entièrement en français. |
 | 2026-02-21 | Emails transactionnels : envoyés depuis les server actions (pas les usecases). Usecases restent purs (pas de side effects). Fire-and-forget (si email échoue, inscription réussit). Traductions i18n résolues dans le flux principal avant le fire-and-forget. Port `EmailService` avec 3 méthodes + adapter `ResendEmailService` (Resend + react-email). 4 emails MVP : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Organisateur. |
 | 2026-02-21 | Agents Claude Code : définis dans `.claude/agents/` (gitignored). `test-coverage-guardian` — audit usecase vs test, création des manquants, run en boucle jusqu'à 100% vert. `security-guardian` — cartographie des points d'autorisation, tests RBAC/IDOR/admin, correction des vulnérabilités réelles dans le code source si détectées. Pattern : lancer en worktree isolé pour zéro risque sur main. |
 | 2026-02-21 | Sécurité — defense-in-depth : les usecases admin ne doivent PAS faire confiance à la couche action seule. Chaque usecase admin accepte `callerRole: UserRole` et lève `AdminUnauthorizedError` si `callerRole !== "ADMIN"`. Principe : la sécurité est dans le domaine, pas uniquement à la périphérie. |
 | 2026-02-21 | Observation architecturale : les pages admin (`/admin/*.tsx`) appellent `prismaAdminRepository` directement (sans passer par les usecases). Elles sont protégées par le layout guard mais ne bénéficient pas de la defense-in-depth des usecases. À adresser post-MVP. |
 | 2026-02-22 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté** (féminin), Escale → **événement** (masculin : Publié, Annulé, Passé), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code identifiers, clés JSON et noms de fichiers restent en anglais. EN inchangé. Motivation : termes plus accessibles pour les utilisateurs non familiers avec les concepts Meetup/Luma. |
+| 2026-02-23 | CoverImagePicker — photos d'ouverture = **random Unsplash** (8 thématiques fixes : technology, design studio, business meeting, fitness sport, art painting, science laboratory, community people, nature landscape). Route `/api/unsplash/random` : 8 appels `/photos/random` en parallèle. Résultat mis en cache côté composant (pas de re-fetch aux réouvertures). Abandonne les photos curées statiques par catégorie (fragiles, non représentatives). |
+| 2026-02-23 | CoverImagePicker — **Radix UI mode contrôlé** : en mode `open` contrôlé, changer l'état `open` programmatiquement via `setOpen(false)` ne déclenche PAS le callback `onOpenChange`. Pour garantir le reset de l'état interne, toujours passer par la fonction `handleOpenChange`. Règle : `handleApply` et `handleRemove` appellent `handleOpenChange(false)`, jamais `setOpen(false)` directement. |
+| 2026-02-23 | CoverImagePicker — **pagination search** : navigation prev/next (remplace les photos en place) plutôt qu'un "Voir plus" (qui agrandissait la modale). Le param `page` est propagé à la route `/api/unsplash/search`. |

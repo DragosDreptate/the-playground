@@ -131,4 +131,50 @@ describe("UpdateCircle", () => {
       ).rejects.toThrow(UnauthorizedCircleActionError);
     });
   });
+
+  describe("given optional fields (category and city)", () => {
+    it("should pass category and city to the repository when provided", async () => {
+      const updated = makeCircle({ name: "Updated Name", category: "TECH", city: "Paris" });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      await updateCircle(
+        { ...defaultInput, category: "TECH", city: "Paris" },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith("circle-1", {
+        name: "Updated Name",
+        description: undefined,
+        visibility: undefined,
+        category: "TECH",
+        city: "Paris",
+      });
+    });
+
+    it("should pass null category and city when explicitly cleared", async () => {
+      const updated = makeCircle({ name: "Updated Name", category: null, city: null });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      await updateCircle(
+        { ...defaultInput, category: null, city: null },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith("circle-1", {
+        name: "Updated Name",
+        description: undefined,
+        visibility: undefined,
+        category: null,
+        city: null,
+      });
+    });
+  });
 });

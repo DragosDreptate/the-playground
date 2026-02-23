@@ -74,6 +74,40 @@ describe("CreateCircle", () => {
     });
   });
 
+  describe("given a valid input with category and city", () => {
+    it("should pass category and city to the repository", async () => {
+      const repo = createMockCircleRepository({
+        create: vi.fn().mockImplementation((input) =>
+          Promise.resolve(makeCircle({ ...input }))
+        ),
+      });
+
+      await createCircle(
+        { ...defaultInput, category: "TECH", city: "Paris" },
+        { circleRepository: repo }
+      );
+
+      expect(repo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: "TECH",
+          city: "Paris",
+        })
+      );
+    });
+
+    it("should not include category or city when not provided", async () => {
+      const repo = createMockCircleRepository({
+        create: vi.fn().mockResolvedValue(makeCircle()),
+      });
+
+      await createCircle(defaultInput, { circleRepository: repo });
+
+      const [callArg] = (repo.create as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(callArg).not.toHaveProperty("category");
+      expect(callArg).not.toHaveProperty("city");
+    });
+  });
+
   describe("given a name whose slug already exists", () => {
     it("should append a suffix to make the slug unique", async () => {
       const repo = createMockCircleRepository({

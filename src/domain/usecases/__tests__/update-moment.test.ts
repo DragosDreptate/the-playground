@@ -66,6 +66,76 @@ describe("UpdateMoment", () => {
     });
   });
 
+  describe("given a HOST updating the Moment to ONLINE type", () => {
+    it("should pass locationType ONLINE and null locationAddress to the repository", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
+      const updated = makeMoment({
+        id: "moment-1",
+        locationType: "ONLINE",
+        locationName: null,
+        locationAddress: null,
+        videoLink: "https://meet.example.com/room",
+      });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      const result = await updateMoment(
+        {
+          momentId: "moment-1",
+          userId: "user-1",
+          locationType: "ONLINE",
+          locationName: null,
+          locationAddress: null,
+          videoLink: "https://meet.example.com/room",
+        },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({
+          locationType: "ONLINE",
+          locationName: null,
+          locationAddress: null,
+          videoLink: "https://meet.example.com/room",
+        })
+      );
+      expect(result.moment.locationType).toBe("ONLINE");
+    });
+  });
+
+  describe("given a HOST cancelling a Moment via status update", () => {
+    it("should update the Moment status to CANCELLED", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED" });
+      const cancelled = makeMoment({ id: "moment-1", status: "CANCELLED" });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(cancelled),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", status: "CANCELLED" },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({ status: "CANCELLED" })
+      );
+      expect(result.moment.status).toBe("CANCELLED");
+    });
+  });
+
   describe("given a non-existing Moment", () => {
     it("should throw MomentNotFoundError", async () => {
       const momentRepo = createMockMomentRepository();

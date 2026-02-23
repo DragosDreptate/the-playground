@@ -22,6 +22,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { getMomentRegistrations } from "@/domain/usecases/get-moment-registrations";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { deleteComment } from "@/domain/usecases/delete-comment";
+import { joinMoment } from "@/domain/usecases/join-moment";
 
 // Erreurs domaine
 import {
@@ -29,6 +30,7 @@ import {
   UnauthorizedMomentActionError,
   UnauthorizedRegistrationActionError,
   UnauthorizedCommentDeletionError,
+  MomentNotOpenForRegistrationError,
 } from "@/domain/errors";
 
 // Helpers mock
@@ -405,6 +407,187 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
 
       // Doit vérifier membership sur le circleId provenant du Moment (pas d'une entrée externe)
       expect(circleRepo.findMembership).toHaveBeenCalledWith(targetCircleId, "legitimate-host");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // IDOR — deleteMoment : vérification que le lookup membership
+  // porte sur le Circle du Moment (isolation circleId)
+  // ─────────────────────────────────────────────────────────────
+
+  describe("deleteMoment — vérification que le lookup membership porte sur le Circle du Moment", () => {
+    it("should check membership on the Moment's circleId, not on any user-supplied value", async () => {
+      const targetCircleId = "circle-from-moment";
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: targetCircleId })),
+        delete: vi.fn().mockResolvedValue(undefined),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ circleId: targetCircleId, role: "HOST" })
+        ),
+      });
+
+      await deleteMoment(
+        { momentId: "moment-1", userId: "legitimate-host" },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(circleRepo.findMembership).toHaveBeenCalledWith(targetCircleId, "legitimate-host");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // IDOR — getMomentRegistrations : vérification que le lookup
+  // membership porte sur le Circle du Moment (isolation circleId)
+  // ─────────────────────────────────────────────────────────────
+
+  describe("getMomentRegistrations — vérification que le lookup membership porte sur le Circle du Moment", () => {
+    it("should check membership on the Moment's circleId, not on any user-supplied value", async () => {
+      const targetCircleId = "circle-from-moment";
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: targetCircleId })),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(
+          makeMembership({ circleId: targetCircleId, role: "HOST" })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findActiveWithUserByMomentId: vi.fn().mockResolvedValue([]),
+      });
+
+      await getMomentRegistrations(
+        { momentId: "moment-1", userId: "legitimate-host" },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(circleRepo.findMembership).toHaveBeenCalledWith(targetCircleId, "legitimate-host");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // IDOR — joinMoment : isolation Circle via le Moment
+  //
+  // Scénario : user-attacker essaie de rejoindre un Moment
+  // dont le statut est CANCELLED (non éligible à l'inscription).
+  // L'accès au Moment lui-même est public (page partageable),
+  // mais la logique de joinMoment protège l'intégrité.
+  // ─────────────────────────────────────────────────────────────
+
+  describe("joinMoment — protection contre l'inscription sur un Moment non ouvert", () => {
+    it.each([
+      ["CANCELLED", "CANCELLED" as const],
+      ["PAST", "PAST" as const],
+    ])(
+      "should throw MomentNotOpenForRegistrationError when Moment status is %s",
+      async (_label, status) => {
+        const momentRepo = createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(
+            makeMoment({
+              id: "moment-1",
+              status,
+              startsAt: new Date("2099-01-01T18:00:00Z"),
+              price: 0,
+            })
+          ),
+        });
+        const registrationRepo = createMockRegistrationRepository();
+        const circleRepo = createMockCircleRepository();
+
+        await expect(
+          joinMoment(
+            { momentId: "moment-1", userId: "user-attacker" },
+            {
+              momentRepository: momentRepo,
+              registrationRepository: registrationRepo,
+              circleRepository: circleRepo,
+            }
+          )
+        ).rejects.toThrow(MomentNotOpenForRegistrationError);
+
+        // Aucune inscription ne doit être créée
+        expect(registrationRepo.create).not.toHaveBeenCalled();
+        // Aucun membership ne doit être ajouté
+        expect(circleRepo.addMembership).not.toHaveBeenCalled();
+      }
+    );
+
+    it("should NOT add Circle membership when registration is rejected", async () => {
+      // Si l'inscription échoue (Moment fermé), pas de membership parasite créé
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ id: "moment-1", status: "CANCELLED", price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+      const circleRepo = createMockCircleRepository({
+        addMembership: vi.fn(),
+      });
+
+      await expect(
+        joinMoment(
+          { momentId: "moment-1", userId: "user-a" },
+          {
+            momentRepository: momentRepo,
+            registrationRepository: registrationRepo,
+            circleRepository: circleRepo,
+          }
+        )
+      ).rejects.toThrow(MomentNotOpenForRegistrationError);
+
+      expect(circleRepo.addMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Vérification de la combinaison d'attaques : un attaquant
+  // HOST de circle-b tente de lire les inscriptions d'un Moment
+  // appartenant à circle-a en fournissant un momentId valide.
+  // L'isolation repose sur le fait que findMembership est appelé
+  // avec le circleId du Moment (circle-a), pas celui de l'attaquant.
+  // ─────────────────────────────────────────────────────────────
+
+  describe("getMomentRegistrations — combinaison IDOR : HOST circle-b cible Moment circle-a", () => {
+    it("should throw UnauthorizedMomentActionError and never expose registrations data", async () => {
+      // L'attaquant connait le momentId public (URL /m/slug) mais n'est pas HOST de circle-a
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-a" })),
+      });
+      // findMembership("circle-a", "host-of-circle-b") → null (pas membre de circle-a)
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockImplementation((circleId: string) => {
+          if (circleId === "circle-b") {
+            return Promise.resolve(
+              makeMembership({ userId: "host-of-circle-b", circleId: "circle-b", role: "HOST" })
+            );
+          }
+          return Promise.resolve(null); // pas membre de circle-a
+        }),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findActiveWithUserByMomentId: vi.fn().mockResolvedValue([]),
+      });
+
+      await expect(
+        getMomentRegistrations(
+          { momentId: "moment-in-circle-a", userId: "host-of-circle-b" },
+          {
+            momentRepository: momentRepo,
+            circleRepository: circleRepo,
+            registrationRepository: registrationRepo,
+          }
+        )
+      ).rejects.toThrow(UnauthorizedMomentActionError);
+
+      // Les données d'inscription ne doivent jamais être lues
+      expect(registrationRepo.findActiveWithUserByMomentId).not.toHaveBeenCalled();
+      // Vérifie que le check a bien été fait sur circle-a (le Circle du Moment)
+      expect(circleRepo.findMembership).toHaveBeenCalledWith("circle-a", "host-of-circle-b");
     });
   });
 });

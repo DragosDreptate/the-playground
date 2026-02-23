@@ -277,6 +277,15 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:cleanup-test-data` | Dry-run : affiche ce qui serait supprimé (@test.playground) |
 | `pnpm db:cleanup-test-data --execute` | Supprime les données test (dev) — utilisateurs @test.playground + leur data |
 | `pnpm db:cleanup-test-data:prod` | Supprime les données test en production (avec double confirmation) |
+| `pnpm db:dev:wipe-user` | Supprime un utilisateur spécifique en dev (par email) |
+| `pnpm db:dev:seed-test-users` | Injecte les 3 utilisateurs test minimaux (host, player1, player2 @test.playground) |
+| `pnpm db:seed-demo-data` | Injecte les données de démo (6 Circles, 20 users @demo.playground, 30 événements) — idempotent |
+| `pnpm db:seed-demo-data:prod` | Injecte les données de démo en production (avec confirmation) |
+| `pnpm db:cleanup-demo-data` | Dry-run : affiche ce qui serait supprimé (@demo.playground) |
+| `pnpm db:cleanup-demo-data:prod` | Supprime les données démo en production (avec double confirmation) |
+| `pnpm test:e2e` | Lance les tests E2E Playwright |
+| `pnpm test:e2e:setup-onboarding` | Génère le storage state d'auth pour l'onboarding E2E |
+| `pnpm test:mobile` | Lance les tests mobile Playwright (config dédiée) |
 
 > **Note Claude** : ne pas lancer les tests automatiquement. Lancer uniquement quand l'utilisateur le demande explicitement.
 

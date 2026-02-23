@@ -102,7 +102,7 @@ Un événement individuel d'une communauté (présentiel ou visio). Il peut fair
 ## 🧑 The Host
 Organisateur d'un Circle. Son dashboard est **Circle-first** : le Circle est le cockpit, les Moments sont des actions lancées depuis ce cockpit.
 
-## 🎟️ The Player
+## 🎟️ The Player (Member en EN, Participant en FR)
 Participant à un Moment et membre persistant d'un Circle. S'inscrire à un Moment inscrit automatiquement le Player au Circle organisateur (de façon transparente). Le Circle se constitue organiquement via les inscriptions aux Moments. Après le Moment, le Player reste membre du Circle et découvre les prochains Moments.
 
 ---
@@ -149,38 +149,38 @@ Contient :
 
 ## Côté Host
 
-- Créer un Circle
-- Créer un Moment (page autonome et partageable)
+- Créer un Circle ✅
+- Créer un Moment (page autonome et partageable) ✅
 - Paramétrer :
-  - Capacité
-  - Gratuit / Payant
-- Voir les Players inscrits
-- Gestion de la liste d'attente
-- Export données (CSV participants, données Circle)
-- Communiquer avec les Players inscrits (email direct)
-- Assistant IA basique :
-  - Génération description Moment
-  - Génération email d'invitation
-  - Suggestions titre/description Circle
+  - Capacité ✅
+  - Gratuit / Payant *(Stripe Connect — pas encore implémenté)*
+- Voir les Players inscrits ✅
+- Gestion de la liste d'attente ✅
+- Export données (CSV participants, données Circle) *(pas encore implémenté)*
+- Communiquer avec les Players inscrits (email direct) *(pas encore implémenté)*
+- Assistant IA basique *(pas encore implémenté)*
 
 ## Côté Player
 
-- Découvrir un Moment via un lien partagé (page autonome, design premium)
-- S'inscrire à un Moment (= rejoindre le Circle automatiquement, zéro friction)
-- Payer si nécessaire (Stripe)
+- Découvrir un Moment via un lien partagé (page autonome, design premium) ✅
+- S'inscrire à un Moment (= rejoindre le Circle automatiquement, zéro friction) ✅
+- Payer si nécessaire (Stripe) *(Stripe Connect — pas encore implémenté)*
 - Recevoir les notifications email :
   - Confirmation d'inscription ✅
+  - Confirmation liste d'attente ✅
+  - Promotion liste d'attente ✅
   - ~~Rappel 24h avant~~ *(déprioritisé → Phase 2)*
   - ~~Rappel 1h avant~~ *(déprioritisé → Phase 2)*
   - Notification de changement (lieu, horaire, annulation) *(post-MVP)*
-- Commenter sur le fil du Moment
-- **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention
+- Commenter sur le fil du Moment ✅
+- **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention ✅
 
-## Découvrir (découverte publique)
+## Découvrir (découverte publique) ✅
 
-- Annuaire simple de Circles publics
-- Filtrable par thème (catégorie), ville en affichage uniquement (pas de filtre MVP)
-- Sans algorithme de ranking, sans promoted content
+- Annuaire simple de Circles publics ✅
+- Filtrable par thème (catégorie), ville en affichage uniquement (pas de filtre MVP) ✅
+- Tab Événements : agenda chronologique des événements à venir de Circles publics ✅
+- Sans algorithme de ranking, sans promoted content ✅
 
 ---
 
@@ -279,17 +279,17 @@ Chaque Moment est une page autonome, design premium (benchmark Luma), optimisée
 
 ## Phase 1 – Fondation
 
-- Multi-communautés (Circles)
-- CRUD Circle / Moment
-- Pages Moment autonomes et partageables
-- Inscriptions (avec inscription automatique au Circle)
-- Liste d'attente avec promotion automatique
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host)
+- Multi-communautés (Circles) ✅
+- CRUD Circle / Moment ✅
+- Pages Moment autonomes et partageables ✅
+- Inscriptions (avec inscription automatique au Circle) ✅
+- Liste d'attente avec promotion automatique ✅
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host) ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
-- Découvrir (répertoire public de Circles)
+- Découvrir (répertoire public de Circles + événements) ✅
 - Export données (CSV) — pas encore implémenté
-- Admin plateforme (dashboard stats, listes paginées, modération)
+- Admin plateforme (dashboard stats, listes paginées, modération) ✅
 
 ## Phase 2 – Engagement
 

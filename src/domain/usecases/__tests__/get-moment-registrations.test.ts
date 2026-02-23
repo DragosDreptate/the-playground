@@ -70,7 +70,7 @@ describe("GetMomentRegistrations", () => {
     });
   });
 
-  describe("given a non-HOST user", () => {
+  describe("given a PLAYER user (not HOST)", () => {
     it("should throw UnauthorizedMomentActionError", async () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment()),
@@ -87,6 +87,54 @@ describe("GetMomentRegistrations", () => {
           registrationRepository: registrationRepo,
         })
       ).rejects.toThrow(UnauthorizedMomentActionError);
+    });
+  });
+
+  describe("given a non-member (no Circle membership)", () => {
+    it("should throw UnauthorizedMomentActionError", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment()),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(null),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await expect(
+        getMomentRegistrations(defaultInput, {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        })
+      ).rejects.toThrow(UnauthorizedMomentActionError);
+    });
+  });
+
+  describe("given a HOST with only CHECKED_IN registrations", () => {
+    it("should return registrations with registeredCount=0 and waitlistedCount=0", async () => {
+      const registrations: RegistrationWithUser[] = [
+        makeRegistrationWithUser({ id: "r1", status: "CHECKED_IN" }),
+      ];
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment()),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findActiveWithUserByMomentId: vi.fn().mockResolvedValue(registrations),
+      });
+
+      const result = await getMomentRegistrations(defaultInput, {
+        momentRepository: momentRepo,
+        circleRepository: circleRepo,
+        registrationRepository: registrationRepo,
+      });
+
+      expect(result.registrations).toHaveLength(1);
+      expect(result.registeredCount).toBe(0);
+      expect(result.waitlistedCount).toBe(0);
     });
   });
 
