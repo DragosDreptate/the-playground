@@ -260,16 +260,15 @@ export function CoverImagePicker({
     };
   }, []);
 
-  async function handleLoadMore() {
+  async function handleGoToPage(page: number) {
     if (!query || isLoadingMore) return;
-    const nextPage = searchPage + 1;
     setIsLoadingMore(true);
     try {
-      const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(query.trim())}&page=${nextPage}`);
+      const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(query.trim())}&page=${page}`);
       if (res.ok) {
         const data = await res.json();
-        setSearchResults((prev) => [...(prev ?? []), ...data.results]);
-        setSearchPage(nextPage);
+        setSearchResults(data.results);
+        setSearchPage(page);
         setSearchTotalPages(data.totalPages);
       }
     } finally {
@@ -442,21 +441,34 @@ export function CoverImagePicker({
                       Suggestions pour votre communauté — tapez pour chercher
                     </p>
                   )}
-                  {searchResults !== null && searchPage < searchTotalPages && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleLoadMore}
-                      disabled={isLoadingMore}
-                      className="w-full"
-                    >
-                      {isLoadingMore ? (
-                        <><Loader2 className="mr-2 size-3.5 animate-spin" />Chargement…</>
-                      ) : (
-                        "Voir plus"
-                      )}
-                    </Button>
+                  {searchResults !== null && searchTotalPages > 1 && (
+                    <div className="flex items-center justify-between">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleGoToPage(searchPage - 1)}
+                        disabled={searchPage <= 1 || isLoadingMore}
+                      >
+                        ← Précédent
+                      </Button>
+                      <span className="text-muted-foreground text-xs">
+                        {isLoadingMore ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          `${searchPage} / ${searchTotalPages}`
+                        )}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleGoToPage(searchPage + 1)}
+                        disabled={searchPage >= searchTotalPages || isLoadingMore}
+                      >
+                        Suivant →
+                      </Button>
+                    </div>
                   )}
                 </>
               )}
