@@ -195,7 +195,7 @@ export default async function AboutPage() {
                 retours réels. Si tu organises des événements et que ça
                 t'intéresse,{" "}
                 <a
-                  href="mailto:hello@theplayground.community"
+                  href="mailto:dragos@thespark.fr"
                   className="text-primary font-semibold hover:underline"
                 >
                   dis-le moi
@@ -207,7 +207,7 @@ export default async function AboutPage() {
                 I'm thinking about opening this to a small group for real
                 feedback. If you organize events and this interests you,{" "}
                 <a
-                  href="mailto:hello@theplayground.community"
+                  href="mailto:dragos@thespark.fr"
                   className="text-primary font-semibold hover:underline"
                 >
                   let me know
