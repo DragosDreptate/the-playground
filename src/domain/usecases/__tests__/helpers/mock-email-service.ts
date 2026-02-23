@@ -8,6 +8,7 @@ export function createMockEmailService(
     sendRegistrationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendWaitlistPromotion: vi.fn().mockResolvedValue(undefined),
     sendHostNewRegistration: vi.fn().mockResolvedValue(undefined),
+    sendHostNewComment: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

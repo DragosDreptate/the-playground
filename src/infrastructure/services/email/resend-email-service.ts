@@ -4,10 +4,12 @@ import type {
   RegistrationConfirmationEmailData,
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
+  HostNewCommentEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "./templates/host-new-registration";
+import { HostNewCommentEmail } from "./templates/host-new-comment";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -75,6 +77,15 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: HostNewRegistrationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendHostNewComment(data: HostNewCommentEmailData): Promise<void> {
+      await resend.emails.send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: HostNewCommentEmail({ ...data, baseUrl }),
       });
     },
   };

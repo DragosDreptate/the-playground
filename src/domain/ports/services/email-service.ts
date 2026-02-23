@@ -67,6 +67,24 @@ export type HostNewRegistrationEmailData = {
   };
 };
 
+export type HostNewCommentEmailData = {
+  to: string;
+  hostName: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  circleSlug: string;
+  commentPreview: string; // Comment content truncated to 200 chars
+  strings: {
+    subject: string;
+    heading: string;
+    message: string; // Pre-formatted: "{playerName} commented on {momentTitle}"
+    commentPreviewLabel: string;
+    viewCommentCta: string;
+    footer: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -75,4 +93,5 @@ export interface EmailService {
   ): Promise<void>;
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
+  sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
 }

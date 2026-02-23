@@ -471,6 +471,13 @@
       "registrationInfoUnlimited": "{count} inscrit(s)",
       "manageRegistrationsCta": "Gérer les inscriptions"
     },
+    "commentNotification": {
+      "subject": "{playerName} a commenté {momentTitle}",
+      "heading": "Nouveau commentaire",
+      "message": "{playerName} a commenté votre événement {momentTitle}",
+      "commentPreviewLabel": "Commentaire",
+      "viewCommentCta": "Voir le commentaire"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",
