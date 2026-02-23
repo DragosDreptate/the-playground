@@ -6,6 +6,7 @@ import {
   prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
+import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
@@ -13,6 +14,7 @@ import { DomainError } from "@/domain/errors";
 import type { LocationType } from "@/domain/models/moment";
 import type { Moment } from "@/domain/models/moment";
 import type { ActionResult } from "./types";
+import { processCoverImage } from "./cover-image";
 
 export async function createMomentAction(
   circleId: string,
@@ -51,12 +53,15 @@ export async function createMomentAction(
   const price = priceRaw ? parseInt(priceRaw, 10) || 0 : 0;
 
   try {
+    const coverData = await processCoverImage(formData);
+
     const result = await createMoment(
       {
         circleId,
         userId: session.user.id,
         title: title.trim(),
         description: description.trim(),
+        ...coverData,
         startsAt,
         endsAt,
         locationType,
@@ -112,12 +117,19 @@ export async function updateMomentAction(
   const price = priceRaw !== null ? parseInt(priceRaw, 10) || 0 : undefined;
 
   try {
+    // Récupère l'ancienne cover pour cleanup si besoin
+    const existingMoment = await prismaMomentRepository.findById(momentId);
+    const oldCoverImage = existingMoment?.coverImage ?? null;
+
+    const coverData = await processCoverImage(formData);
+
     const result = await updateMoment(
       {
         momentId,
         userId: session.user.id,
         ...(title && { title: title.trim() }),
         ...(description !== null && { description: description.trim() }),
+        ...coverData,
         ...(startsAtRaw && { startsAt: new Date(startsAtRaw) }),
         ...(endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
         ...(locationType && { locationType }),
@@ -134,6 +146,16 @@ export async function updateMomentAction(
         circleRepository: prismaCircleRepository,
       }
     );
+
+    // Cleanup ancien blob si une nouvelle image a été uploadée
+    if (
+      coverData.coverImage !== undefined &&
+      coverData.coverImage !== oldCoverImage &&
+      oldCoverImage
+    ) {
+      await vercelBlobStorageService.delete(oldCoverImage);
+    }
+
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {

@@ -13,11 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Moment, LocationType } from "@/domain/models/moment";
+import type { CircleCategory } from "@/domain/models/circle";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
 import { getMomentGradient } from "@/lib/gradient";
-import { MomentFormCoverPlaceholder } from "./moment-form-cover-placeholder";
+import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
+import type { CoverImageAttribution } from "@/domain/models/moment";
 import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
 import { MomentFormOptionsSection } from "./moment-form-options-section";
@@ -27,6 +29,7 @@ type MomentFormProps = {
   circleSlug: string;
   circleName: string;
   circleDescription?: string;
+  circleCategory?: CircleCategory | null;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -46,7 +49,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCategory, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -64,6 +67,25 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     moment?.endsAt ? snapToSlot(extractTime(moment.endsAt)) : snapToSlot(extractTime(defaultEnd))
   );
 
+  // --- Cover state ---
+  const [coverSelection, setCoverSelection] = useState<CoverSelection | null>(null);
+
+  const previewImage =
+    coverSelection?.type === "upload"
+      ? coverSelection.previewUrl
+      : coverSelection?.type === "unsplash"
+        ? coverSelection.thumbUrl
+        : coverSelection?.type === "remove"
+          ? null
+          : moment?.coverImage ?? null;
+
+  const previewAttribution: CoverImageAttribution | null =
+    coverSelection?.type === "unsplash"
+      ? coverSelection.attribution
+      : coverSelection?.type === "remove"
+        ? null
+        : moment?.coverImageAttribution ?? null;
+
   // --- Section state ---
   const [locationOpen, setLocationOpen] = useState(
     !!(moment?.locationName || moment?.locationAddress || moment?.videoLink)
@@ -79,6 +101,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     _prev: FormState,
     formData: FormData
   ): Promise<FormState> {
+    if (coverSelection?.type === "upload") {
+      formData.set("coverImageFile", coverSelection.file);
+    } else if (coverSelection?.type === "unsplash") {
+      formData.set("coverImageUrl", coverSelection.url);
+      formData.set("coverImageAuthorName", coverSelection.attribution.name);
+      formData.set("coverImageAuthorUrl", coverSelection.attribution.url);
+    } else if (coverSelection?.type === "remove") {
+      formData.set("removeCover", "true");
+    }
+
     const result = await action(formData);
 
     if (result.success) {
@@ -111,8 +143,28 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         {/* Left column — Cover + Circle info */}
         <div className="order-2 w-full shrink-0 lg:order-1 lg:w-[340px] lg:sticky lg:top-6">
-          <div className="flex flex-col gap-4">
-            <MomentFormCoverPlaceholder seed={moment?.title ?? circleName} />
+          <div className="flex flex-col gap-3">
+            <CoverImagePicker
+              circleName={circleName}
+              category={circleCategory ?? undefined}
+              currentImage={previewImage}
+              currentAttribution={previewAttribution}
+              onSelect={setCoverSelection}
+            />
+            {previewAttribution && (
+              <p className="text-muted-foreground px-1 text-xs">
+                Photo par{" "}
+                <a
+                  href={previewAttribution.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground underline"
+                >
+                  {previewAttribution.name}
+                </a>{" "}
+                sur Unsplash
+              </p>
+            )}
 
             {/* Circle — identique à la vue Escale */}
             <Link

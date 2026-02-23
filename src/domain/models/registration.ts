@@ -35,6 +35,7 @@ export type RegistrationWithMoment = Registration & {
     id: string;
     slug: string;
     title: string;
+    coverImage: string | null;
     startsAt: Date;
     endsAt: Date | null;
     locationType: LocationType;

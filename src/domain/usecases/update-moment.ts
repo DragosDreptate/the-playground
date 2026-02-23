@@ -1,4 +1,4 @@
-import type { Moment, LocationType, MomentStatus } from "@/domain/models/moment";
+import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import {
@@ -11,6 +11,8 @@ type UpdateMomentInput = {
   userId: string;
   title?: string;
   description?: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
   locationType?: LocationType;

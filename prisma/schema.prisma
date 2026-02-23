@@ -180,22 +180,24 @@ model CircleMembership {
 }
 
 model Moment {
-  id              String       @id @default(cuid())
-  slug            String       @unique
-  circleId        String
-  createdById     String?
-  title           String
-  description     String       @db.Text
-  startsAt        DateTime
-  endsAt          DateTime?
-  locationType    LocationType
-  locationName    String?
-  locationAddress String?
-  videoLink       String?
-  capacity        Int?
-  price           Int          @default(0)
-  currency        String       @default("EUR")
-  status          MomentStatus @default(PUBLISHED)
+  id                    String       @id @default(cuid())
+  slug                  String       @unique
+  circleId              String
+  createdById           String?
+  title                 String
+  description           String       @db.Text
+  coverImage            String?
+  coverImageAttribution Json?        @db.JsonB
+  startsAt              DateTime
+  endsAt                DateTime?
+  locationType          LocationType
+  locationName          String?
+  locationAddress       String?
+  videoLink             String?
+  capacity              Int?
+  price                 Int          @default(0)
+  currency              String       @default("EUR")
+  status                MomentStatus @default(PUBLISHED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

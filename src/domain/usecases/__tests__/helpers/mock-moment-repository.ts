@@ -27,6 +27,8 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     createdById: "user-1",
     title: "Weekly Meetup",
     description: "A weekly community meetup",
+    coverImage: null,
+    coverImageAttribution: null,
     startsAt: new Date("2026-03-01T18:00:00Z"),
     endsAt: new Date("2026-03-01T20:00:00Z"),
     locationType: "IN_PERSON",

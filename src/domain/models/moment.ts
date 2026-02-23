@@ -1,3 +1,7 @@
+import type { CoverImageAttribution } from "@/domain/models/circle";
+
+export type { CoverImageAttribution };
+
 export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
 export type MomentStatus = "PUBLISHED" | "CANCELLED" | "PAST";
@@ -9,6 +13,8 @@ export type Moment = {
   createdById: string | null;
   title: string;
   description: string;
+  coverImage: string | null;
+  coverImageAttribution: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
   locationType: LocationType;

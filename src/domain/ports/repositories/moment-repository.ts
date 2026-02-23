@@ -1,4 +1,4 @@
-import type { Moment, LocationType, MomentStatus } from "@/domain/models/moment";
+import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
 import type { CircleCategory } from "@/domain/models/circle";
 
 export type CreateMomentInput = {
@@ -7,6 +7,8 @@ export type CreateMomentInput = {
   createdById: string;
   title: string;
   description: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
   locationType: LocationType;
@@ -22,6 +24,8 @@ export type CreateMomentInput = {
 export type UpdateMomentInput = {
   title?: string;
   description?: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
   locationType?: LocationType;
@@ -44,6 +48,7 @@ export type PublicMoment = {
   id: string;
   slug: string;
   title: string;
+  coverImage: string | null;
   startsAt: Date;
   endsAt: Date | null;
   locationType: LocationType;

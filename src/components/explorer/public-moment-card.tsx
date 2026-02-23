@@ -57,11 +57,20 @@ export async function PublicMomentCard({ moment }: Props) {
 
         {/* Thumbnail + content */}
         <div className="flex items-start gap-4">
-          {/* Thumbnail gradient */}
-          <div
-            className="size-[72px] shrink-0 rounded-xl"
-            style={{ background: gradient }}
-          />
+          {/* Thumbnail */}
+          {moment.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={moment.coverImage}
+              alt={moment.title}
+              className="size-[72px] shrink-0 rounded-xl object-cover"
+            />
+          ) : (
+            <div
+              className="size-[72px] shrink-0 rounded-xl"
+              style={{ background: gradient }}
+            />
+          )}
 
           {/* Details */}
           <div className="min-w-0 flex-1 space-y-1">

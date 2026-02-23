@@ -1,4 +1,4 @@
-import { prisma } from "@/infrastructure/db/prisma";
+import { prisma, Prisma } from "@/infrastructure/db/prisma";
 import type {
   MomentRepository,
   CreateMomentInput,
@@ -6,7 +6,7 @@ import type {
   PublicMomentFilters,
   PublicMoment,
 } from "@/domain/ports/repositories/moment-repository";
-import type { Moment } from "@/domain/models/moment";
+import type { Moment, CoverImageAttribution } from "@/domain/models/moment";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -17,6 +17,10 @@ function toDomainMoment(record: PrismaMoment): Moment {
     createdById: record.createdById,
     title: record.title,
     description: record.description,
+    coverImage: record.coverImage ?? null,
+    coverImageAttribution: record.coverImageAttribution
+      ? (record.coverImageAttribution as CoverImageAttribution)
+      : null,
     startsAt: record.startsAt,
     endsAt: record.endsAt,
     locationType: record.locationType,
@@ -41,6 +45,8 @@ export const prismaMomentRepository: MomentRepository = {
         createdById: input.createdById,
         title: input.title,
         description: input.description,
+        coverImage: input.coverImage ?? null,
+        coverImageAttribution: input.coverImageAttribution ?? Prisma.DbNull,
         startsAt: input.startsAt,
         endsAt: input.endsAt,
         locationType: input.locationType,
@@ -80,6 +86,11 @@ export const prismaMomentRepository: MomentRepository = {
       data: {
         ...(input.title !== undefined && { title: input.title }),
         ...(input.description !== undefined && { description: input.description }),
+        ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+        ...(input.coverImageAttribution !== undefined && {
+          coverImageAttribution:
+            input.coverImageAttribution === null ? Prisma.DbNull : input.coverImageAttribution,
+        }),
         ...(input.startsAt !== undefined && { startsAt: input.startsAt }),
         ...(input.endsAt !== undefined && { endsAt: input.endsAt }),
         ...(input.locationType !== undefined && { locationType: input.locationType }),
@@ -143,6 +154,7 @@ export const prismaMomentRepository: MomentRepository = {
       id: m.id,
       slug: m.slug,
       title: m.title,
+      coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
       endsAt: m.endsAt,
       locationType: m.locationType,

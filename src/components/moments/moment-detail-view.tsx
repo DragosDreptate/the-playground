@@ -176,29 +176,57 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
         <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
 
           {/* Cover — carré, glow blur */}
-          <div className="relative">
-            <div
-              className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
-              style={{ background: gradient }}
-            />
-            <div
-              className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
-              style={{ background: gradient, aspectRatio: "1 / 1" }}
-            >
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <ImageIcon className="size-6 text-white" />
-                </div>
+          <div className="flex flex-col gap-2">
+            <div className="relative">
+              <div
+                className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
+                style={{ background: gradient }}
+              />
+              <div
+                className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                {moment.coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={moment.coverImage}
+                    alt={moment.title}
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <>
+                    <div className="size-full" style={{ background: gradient }} />
+                    <div className="absolute inset-0 bg-black/20" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                        <ImageIcon className="size-6 text-white" />
+                      </div>
+                    </div>
+                  </>
+                )}
+                {moment.status === "PAST" && (
+                  <div className="absolute bottom-3 left-3">
+                    <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      {t(`status.past`)}
+                    </span>
+                  </div>
+                )}
               </div>
-              {moment.status === "PAST" && (
-                <div className="absolute bottom-3 left-3">
-                  <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                    {t(`status.past`)}
-                  </span>
-                </div>
-              )}
             </div>
+            {moment.coverImageAttribution && (
+              <p className="text-muted-foreground px-1 text-xs">
+                Photo par{" "}
+                <a
+                  href={moment.coverImageAttribution.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground underline"
+                >
+                  {moment.coverImageAttribution.name}
+                </a>{" "}
+                sur Unsplash
+              </p>
+            )}
           </div>
 
           {/* Circle — cliquable */}

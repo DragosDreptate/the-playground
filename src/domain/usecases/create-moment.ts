@@ -1,4 +1,4 @@
-import type { Moment, LocationType } from "@/domain/models/moment";
+import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
@@ -13,6 +13,8 @@ type CreateMomentInput = {
   userId: string;
   title: string;
   description: string;
+  coverImage?: string | null;
+  coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
   locationType: LocationType;
@@ -66,6 +68,8 @@ export async function createMoment(
     createdById: input.userId,
     title: input.title,
     description: input.description,
+    coverImage: input.coverImage,
+    coverImageAttribution: input.coverImageAttribution,
     startsAt: input.startsAt,
     endsAt: input.endsAt,
     locationType: input.locationType,

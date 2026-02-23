@@ -133,10 +133,19 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
             </div>
 
             {/* Thumbnail */}
-            <div
-              className={`size-[60px] shrink-0 rounded-lg ${isPast ? "grayscale opacity-40" : ""}`}
-              style={{ background: gradient }}
-            />
+            {moment.coverImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={moment.coverImage}
+                alt={moment.title}
+                className={`size-[60px] shrink-0 rounded-lg object-cover ${isPast ? "grayscale opacity-40" : ""}`}
+              />
+            ) : (
+              <div
+                className={`size-[60px] shrink-0 rounded-lg ${isPast ? "grayscale opacity-40" : ""}`}
+                style={{ background: gradient }}
+              />
+            )}
           </div>
         </Link>
       </div>
