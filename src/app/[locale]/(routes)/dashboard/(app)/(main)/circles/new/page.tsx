@@ -9,7 +9,7 @@ export default async function NewCirclePage() {
   const tDashboard = await getTranslations("Dashboard");
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="space-y-6">
       <div className="text-muted-foreground flex items-center gap-1 text-sm">
         <Link href="/dashboard" className="hover:text-foreground transition-colors">
           {tDashboard("title")}
@@ -18,14 +18,6 @@ export default async function NewCirclePage() {
         <span className="text-foreground truncate font-medium">
           {t("create.title")}
         </span>
-      </div>
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t("create.title")}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t("create.description")}
-        </p>
       </div>
       <CircleForm action={createCircleAction} />
     </div>

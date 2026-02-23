@@ -339,7 +339,7 @@ export function CoverImagePicker({
         type="button"
         onClick={() => setOpen(true)}
         className="group relative w-full overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        style={{ aspectRatio: "16 / 7" }}
+        style={{ aspectRatio: "1 / 1" }}
         aria-label="Modifier l'image de couverture"
       >
         {previewImage ? (

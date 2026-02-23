@@ -14,7 +14,6 @@ export default async function EditCirclePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const t = await getTranslations("Circle");
 
   let circle;
   try {
@@ -34,7 +33,7 @@ export default async function EditCirclePage({
   const tCommon = await getTranslations("Common");
 
   return (
-    <div className="mx-auto max-w-lg space-y-6">
+    <div className="space-y-6">
       <div className="text-muted-foreground flex items-center gap-1 text-sm">
         <Link href="/dashboard" className="hover:text-foreground transition-colors">
           {tDashboard("title")}
@@ -50,14 +49,6 @@ export default async function EditCirclePage({
         <span className="text-foreground truncate font-medium">
           {tCommon("edit")}
         </span>
-      </div>
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t("edit.title")}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t("edit.description")}
-        </p>
       </div>
       <CircleForm circle={circle} action={boundAction} />
     </div>
