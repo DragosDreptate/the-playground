@@ -259,7 +259,7 @@ export function CoverImagePicker({
       {/* Zone de couverture cliquable */}
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => handleOpenChange(true)}
         className="group relative w-full overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         style={{ aspectRatio: "1 / 1" }}
         aria-label="Modifier l'image de couverture"
