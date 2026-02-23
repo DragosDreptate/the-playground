@@ -421,6 +421,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   signInUrl={props.signInUrl}
                   isFull={props.isFull}
                   spotsRemaining={props.spotsRemaining}
+                  registrationCount={registeredCount}
                   isHost={props.isHost}
                 />
               </div>

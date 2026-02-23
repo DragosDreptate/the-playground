@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Clock } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,8 +30,38 @@ type RegistrationButtonProps = {
   signInUrl: string;
   isFull: boolean;
   spotsRemaining: number | null;
+  registrationCount: number;
   isHost?: boolean;
 };
+
+function StatsColumn({
+  count,
+  spotsRemaining,
+  isFull,
+}: {
+  count: number;
+  spotsRemaining: number | null;
+  isFull: boolean;
+}) {
+  const t = useTranslations("Moment");
+  return (
+    <div className="flex flex-col items-end gap-0.5 shrink-0">
+      <span className="text-sm font-semibold">
+        {t("public.registrantsCount", { count })}
+      </span>
+      {!isFull && spotsRemaining !== null && (
+        <span className="text-muted-foreground text-xs">
+          {t("public.spotsRemaining", { count: spotsRemaining })}
+        </span>
+      )}
+      {isFull && (
+        <span className="text-xs text-amber-400">
+          {t("public.eventFull")}
+        </span>
+      )}
+    </div>
+  );
+}
 
 export function RegistrationButton({
   momentId,
@@ -41,6 +71,7 @@ export function RegistrationButton({
   signInUrl,
   isFull,
   spotsRemaining,
+  registrationCount,
   isHost = false,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
@@ -58,96 +89,102 @@ export function RegistrationButton({
   // Paid Moments: disabled "Coming soon"
   if (price > 0) {
     return (
-      <Button size="lg" className="w-full" disabled>
-        {t("public.comingSoon")}
-      </Button>
+      <div className="flex items-center justify-between gap-3">
+        <Button className="rounded-full" disabled>
+          {t("public.comingSoon")}
+        </Button>
+        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
     );
   }
 
   // Not authenticated: link to sign-in
   if (!isAuthenticated) {
     return (
-      <Button size="lg" className="w-full" asChild>
-        <a href={signInUrl}>{t("public.signInToRegister")}</a>
-      </Button>
+      <div className="flex items-center justify-between gap-3">
+        <Button className="rounded-full" asChild>
+          <a href={signInUrl}>{t("public.signInToRegister")}</a>
+        </Button>
+        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
     );
   }
 
-  // Already registered or waitlisted — compact Luma-style row
+  // Already registered or waitlisted
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
     const isRegistered = localStatus === "REGISTERED";
     return (
-      <div className="space-y-3">
-        <div
-          className={`flex items-center justify-between rounded-lg border px-3 py-2.5 ${
-            isRegistered
-              ? "border-primary/20 bg-primary/5"
-              : "border-border bg-muted/50"
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            {isRegistered ? (
-              <CheckCircle2 className="text-primary size-4 shrink-0" />
-            ) : (
-              <Clock className="text-muted-foreground size-4 shrink-0" />
-            )}
-            <span className="text-sm font-medium">
-              {isRegistered
-                ? t("public.registered")
-                : t("public.waitlisted")}
-            </span>
-          </div>
-
-          {!isHost && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <button className="text-muted-foreground hover:text-foreground text-xs transition-colors underline-offset-2 hover:underline">
-                  {t("public.cancelRegistration")}
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {t("public.cancelConfirmTitle")}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("public.cancelConfirmDescription")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                {error && (
-                  <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                    {error}
-                  </div>
-                )}
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-                  <AlertDialogAction
-                    variant="destructive"
-                    disabled={isPending}
-                    onClick={() => {
-                      if (!localRegistrationId) return;
-                      startTransition(async () => {
-                        setError(null);
-                        const result = await cancelRegistrationAction(
-                          localRegistrationId
-                        );
-                        if (result.success) {
-                          setLocalStatus(null);
-                          setLocalRegistrationId(null);
-                          router.refresh();
-                        } else {
-                          setError(result.error);
-                        }
-                      });
-                    }}
-                  >
-                    {isPending ? tCommon("loading") : t("public.confirmCancel")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          {isRegistered ? (
+            <Button
+              variant="outline"
+              className="rounded-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
+            >
+              <Check className="size-3.5" />
+              {t("public.registered")}
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              className="rounded-full border-amber-500/30 bg-amber-500/5 text-amber-400 hover:bg-amber-500/10 hover:text-amber-400"
+            >
+              <Clock className="size-3.5" />
+              {t("public.waitlisted")}
+            </Button>
           )}
+          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
         </div>
+
+        {!isHost && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-muted-foreground hover:text-foreground text-xs transition-colors underline-offset-2 hover:underline">
+                {t("public.cancelRegistration")}
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {t("public.cancelConfirmTitle")}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("public.cancelConfirmDescription")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              {error && (
+                <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+                  {error}
+                </div>
+              )}
+              <AlertDialogFooter>
+                <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  disabled={isPending}
+                  onClick={() => {
+                    if (!localRegistrationId) return;
+                    startTransition(async () => {
+                      setError(null);
+                      const result = await cancelRegistrationAction(
+                        localRegistrationId
+                      );
+                      if (result.success) {
+                        setLocalStatus(null);
+                        setLocalRegistrationId(null);
+                        router.refresh();
+                      } else {
+                        setError(result.error);
+                      }
+                    });
+                  }}
+                >
+                  {isPending ? tCommon("loading") : t("public.confirmCancel")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     );
   }
@@ -155,35 +192,32 @@ export function RegistrationButton({
   // Default: register or join waitlist
   return (
     <div className="space-y-2">
-      <Button
-        size="lg"
-        className="w-full"
-        disabled={isPending}
-        onClick={() => {
-          startTransition(async () => {
-            setError(null);
-            const result = await joinMomentAction(momentId);
-            if (result.success) {
-              setLocalStatus(result.data.status);
-              setLocalRegistrationId(result.data.id);
-              router.refresh();
-            } else {
-              setError(result.error);
-            }
-          });
-        }}
-      >
-        {isPending
-          ? tCommon("loading")
-          : isFull
-            ? t("public.joinWaitlist")
-            : t("public.registerFree")}
-      </Button>
-      {spotsRemaining !== null && spotsRemaining > 0 && !isFull && (
-        <p className="text-muted-foreground text-center text-sm">
-          {t("public.spotsRemaining", { count: spotsRemaining })}
-        </p>
-      )}
+      <div className="flex items-center justify-between gap-3">
+        <Button
+          className="rounded-full"
+          disabled={isPending}
+          onClick={() => {
+            startTransition(async () => {
+              setError(null);
+              const result = await joinMomentAction(momentId);
+              if (result.success) {
+                setLocalStatus(result.data.status);
+                setLocalRegistrationId(result.data.id);
+                router.refresh();
+              } else {
+                setError(result.error);
+              }
+            });
+          }}
+        >
+          {isPending
+            ? tCommon("loading")
+            : isFull
+              ? t("public.joinWaitlist")
+              : t("public.registerFree")}
+        </Button>
+        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {error}
