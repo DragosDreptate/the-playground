@@ -292,6 +292,15 @@
 
 ## Phase 2 (post-MVP)
 
+- [ ] **Suivre une Communauté (Follow)** — non-membre notifié lors d'un nouvel événement
+  - Un utilisateur peut "suivre" une Communauté dont il n'est pas encore membre
+  - **Effet** : reçoit un email à chaque nouvel événement PUBLISHED dans cette Communauté (même template que "Email aux membres : nouvel événement")
+  - **UI** : icône cloche 🔔 sur la page Circle publique (`/circles/[slug]`) et page Découvrir — toggle actif/inactif, comme le bouton "Follow" LinkedIn
+  - **Distinct du membership** : follow = abonnement notifications uniquement, pas membre du Circle. L'inscription à un événement reste le seul chemin vers le membership (règle inchangée)
+  - **Data model** : nouvelle table `CircleFollow` (`userId`, `circleId`, `createdAt`) — contrainte unique, index sur `circleId` pour les lookups batch au moment de l'envoi
+  - **Désabonnement** : même cloche (toggle off) + lien "Se désabonner" dans le footer de l'email
+  - **Option future** : préférences granulaires (ex: seulement événements en présentiel, seulement certaines catégories)
+
 - [ ] Track (série d'événements récurrents dans un Circle)
 - [ ] Check-in (marquer présent sur place)
 - [ ] **Galerie photos post-événement**
