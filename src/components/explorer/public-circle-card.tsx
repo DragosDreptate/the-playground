@@ -1,6 +1,5 @@
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
-import { Badge } from "@/components/ui/badge";
 import { getMomentGradient } from "@/lib/gradient";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
@@ -23,9 +22,9 @@ export async function PublicCircleCard({ circle }: Props) {
     : null;
 
   const categoryBadge = circle.category && (
-    <Badge variant="secondary" className="text-xs">
+    <span className="text-foreground text-xs font-semibold">
       {tCategory(circle.category)}
-    </Badge>
+    </span>
   );
 
   const cityLabel = circle.city && (
