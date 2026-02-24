@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
@@ -15,12 +15,12 @@ type DashboardMomentCardProps = {
   isPast?: boolean;
 };
 
-function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isToday: boolean } {
+function formatTimelineDate(date: Date, locale: string): { weekday: string; dateStr: string; isToday: boolean } {
   const now = new Date();
   const isToday = date.toDateString() === now.toDateString();
 
-  const weekday = date.toLocaleDateString(undefined, { weekday: "short" });
-  const dateStr = date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  const weekday = date.toLocaleDateString(locale, { weekday: "short" });
+  const dateStr = date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
 
   return { weekday, dateStr, isToday };
 }
@@ -28,6 +28,7 @@ function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isT
 export function DashboardMomentCard({ registration, isLast, isHost = false, isPast = false }: DashboardMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
+  const locale = useLocale();
   const { moment } = registration;
 
   const isRegistered = registration.status === "REGISTERED" || registration.status === "CHECKED_IN";
@@ -42,9 +43,9 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
         : "bg-border";
 
   const gradient = getMomentGradient(moment.title);
-  const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt);
+  const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt, locale);
 
-  const timeStr = moment.startsAt.toLocaleTimeString(undefined, {
+  const timeStr = moment.startsAt.toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit",
   });
