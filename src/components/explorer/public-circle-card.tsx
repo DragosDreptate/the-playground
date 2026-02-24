@@ -1,5 +1,7 @@
+"use client";
+
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
@@ -10,14 +12,14 @@ type Props = {
   membershipRole?: CircleMemberRole | null;
 };
 
-export async function PublicCircleCard({ circle, membershipRole }: Props) {
-  const t = await getTranslations("Explorer");
-  const tCategory = await getTranslations("CircleCategory");
+export function PublicCircleCard({ circle, membershipRole }: Props) {
+  const t = useTranslations("Explorer");
+  const tCategory = useTranslations("CircleCategory");
 
   const gradient = getMomentGradient(circle.name);
 
   const nextMomentDate = circle.nextMoment
-    ? circle.nextMoment.startsAt.toLocaleDateString(undefined, {
+    ? new Date(circle.nextMoment.startsAt).toLocaleDateString(undefined, {
         day: "numeric",
         month: "short",
       })

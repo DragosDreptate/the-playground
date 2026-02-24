@@ -7,13 +7,15 @@ import {
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
-import { PublicCircleCard } from "@/components/explorer/public-circle-card";
-import { PublicMomentCard } from "@/components/explorer/public-moment-card";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerCreateButton } from "@/components/explorer/explorer-create-button";
+import { ExplorerGrid } from "@/components/explorer/explorer-grid";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
-import type { Registration } from "@/domain/models/registration";
+import type { RegistrationStatus } from "@/domain/models/registration";
+
+const PAGE_SIZE = 12;
+const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function generateMetadata() {
   const t = await getTranslations("Explorer");
@@ -43,36 +45,51 @@ export default async function ExplorerPage({
   const t = await getTranslations("Explorer");
   const session = await auth();
 
-  const [circles, moments, userCircles] = await Promise.all([
-    getPublicCircles(
-      { category },
-      { circleRepository: prismaCircleRepository }
-    ),
-    getPublicUpcomingMoments(
-      { category },
-      { momentRepository: prismaMomentRepository }
-    ),
+  // Fetch only the active tab to avoid over-fetching
+  const [circlesRaw, momentsRaw, userCircles] = await Promise.all([
+    activeTab === "circles"
+      ? getPublicCircles(
+          { category, limit: FETCH_SIZE },
+          { circleRepository: prismaCircleRepository }
+        )
+      : Promise.resolve([]),
+    activeTab === "moments"
+      ? getPublicUpcomingMoments(
+          { category, limit: FETCH_SIZE },
+          { momentRepository: prismaMomentRepository }
+        )
+      : Promise.resolve([]),
     session?.user?.id
       ? prismaCircleRepository.findAllByUserId(session.user.id)
       : Promise.resolve([]),
   ]);
 
-  const membershipMap = new Map<string, CircleMemberRole>(
-    userCircles.map((c) => [c.id, c.memberRole])
-  );
+  // Over-fetch pattern: fetch FETCH_SIZE, display PAGE_SIZE
+  const circlesHasMore = circlesRaw.length > PAGE_SIZE;
+  const circles = circlesHasMore ? circlesRaw.slice(0, PAGE_SIZE) : circlesRaw;
 
-  // Membership par slug pour les cartes événement (PublicMoment expose circle.slug, pas circle.id)
-  const membershipBySlug = new Map<string, CircleMemberRole>(
-    userCircles.map((c) => [c.slug, c.memberRole])
-  );
+  const momentsHasMore = momentsRaw.length > PAGE_SIZE;
+  const moments = momentsHasMore ? momentsRaw.slice(0, PAGE_SIZE) : momentsRaw;
 
-  // Inscriptions de l'utilisateur sur les événements affichés (une seule requête)
-  const registrationMap = session?.user?.id && moments.length > 0
-    ? await prismaRegistrationRepository.findByMomentIdsAndUser(
-        moments.map((m) => m.id),
-        session.user.id
-      )
-    : new Map<string, Registration | null>();
+  // Membership maps
+  const membershipRoleMap: Record<string, CircleMemberRole> = {};
+  const membershipBySlug: Record<string, CircleMemberRole> = {};
+  for (const c of userCircles) {
+    membershipRoleMap[c.id] = c.memberRole;
+    membershipBySlug[c.slug] = c.memberRole;
+  }
+
+  // Registration statuses for moment cards
+  const registrationStatusMap: Record<string, RegistrationStatus | null> = {};
+  if (session?.user?.id && moments.length > 0) {
+    const regMap = await prismaRegistrationRepository.findByMomentIdsAndUser(
+      moments.map((m) => m.id),
+      session.user.id
+    );
+    for (const [momentId, reg] of regMap) {
+      registrationStatusMap[momentId] = reg?.status ?? null;
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -119,31 +136,29 @@ export default async function ExplorerPage({
             <p className="text-muted-foreground text-sm">{t("empty.circles")}</p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {circles.map((circle) => (
-              <PublicCircleCard
-                key={circle.id}
-                circle={circle}
-                membershipRole={membershipMap.get(circle.id) ?? null}
-              />
-            ))}
-          </div>
+          <ExplorerGrid
+            key={`circles-${category ?? "all"}`}
+            tab="circles"
+            initialItems={circles}
+            initialHasMore={circlesHasMore}
+            membershipRoleMap={membershipRoleMap}
+            category={category}
+          />
         )
       ) : moments.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16">
           <p className="text-muted-foreground text-sm">{t("empty.moments")}</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {moments.map((moment) => (
-            <PublicMomentCard
-              key={moment.id}
-              moment={moment}
-              registrationStatus={registrationMap.get(moment.id)?.status ?? null}
-              isOrganizer={membershipBySlug.get(moment.circle.slug) === "HOST"}
-            />
-          ))}
-        </div>
+        <ExplorerGrid
+          key={`moments-${category ?? "all"}`}
+          tab="moments"
+          initialItems={moments}
+          initialHasMore={momentsHasMore}
+          registrationStatusMap={registrationStatusMap}
+          membershipBySlug={membershipBySlug}
+          category={category}
+        />
       )}
     </div>
   );
