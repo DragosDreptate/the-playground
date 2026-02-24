@@ -57,7 +57,7 @@ export async function PublicCircleCard({ circle, membershipRole }: Props) {
   );
 
   const nextMomentTeaser = circle.nextMoment && nextMomentDate && (
-    <div className="rounded-lg border border-border bg-muted/40 px-3 py-2">
+    <div className="rounded-lg border border-border bg-muted/40 px-2 py-2">
       <p className="text-muted-foreground text-xs font-medium">
         {t("circleCard.nextMoment")}
       </p>
