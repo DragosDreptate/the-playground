@@ -209,7 +209,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                   <SelectTrigger className="h-9 w-full">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent position="popper">
+                  <SelectContent>
                     <SelectItem value="PUBLIC">{t("form.visibilityPublic")}</SelectItem>
                     <SelectItem value="PRIVATE">{t("form.visibilityPrivate")}</SelectItem>
                   </SelectContent>
