@@ -186,6 +186,7 @@
       "unfollow": "Unfollow",
       "following": "Following",
       "isMember": "You are a member",
+      "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community"
     },
     "errors": {

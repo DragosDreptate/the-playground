@@ -186,6 +186,7 @@
       "unfollow": "Se désabonner",
       "following": "Abonné·e",
       "isMember": "Vous êtes membre",
+      "isHost": "Vous êtes Organisateur",
       "manageCircle": "Gérer cette Communauté"
     },
     "errors": {

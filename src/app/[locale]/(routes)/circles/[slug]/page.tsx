@@ -24,6 +24,7 @@ import {
   MapPin,
   XCircle,
   ExternalLink,
+  Crown,
 } from "lucide-react";
 
 export const revalidate = 60;
@@ -258,6 +259,14 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs">{t("detail.moments")}</p>
             </div>
           </div>
+
+          {/* Badge Organisateur — visible pour les Organisateurs */}
+          {isHost && (
+            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
+              <Crown className="size-4 shrink-0" aria-hidden="true" />
+              {t("detail.isHost")}
+            </div>
+          )}
 
           {/* Badge Membre — visible pour les membres non-Organisateurs */}
           {showMemberBadge && (
