@@ -134,7 +134,7 @@ export default async function ExplorerPage({
           <p className="text-muted-foreground text-sm">{t("empty.moments")}</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {moments.map((moment) => (
             <PublicMomentCard
               key={moment.id}
