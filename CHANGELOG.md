@@ -10,6 +10,25 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [1.0.0] — 2026-02-24 — Release majeure
+
+### Ajouté
+
+- Dashboard "Mes Communautés" : cartes style Explorer — cover 1:1, catégorie, badge rôle, stats membres/événements, prochain événement, bouton "Créer un événement" pour les Organisateurs
+- Type domaine `DashboardCircle` + usecase `getUserDashboardCircles` + requête repository unique (sans N+1)
+
+### Modifié
+
+- Dashboard "Mes événements" : couverture déplacée à gauche (64px), titre sur 2 lignes, badge aligné à droite
+- Explorer : refonte cartes événement — cover 1:1, alignement sur les cartes Communauté, badges Organisateur / Inscrit / Liste d'attente, grille 3 colonnes
+- Sélecteur d'image de couverture : corrections mobiles iOS Safari (plein écran, grille 2 colonnes)
+
+### Corrigé
+
+- Optimisations SQL : count côté base + `take: 1` sur les moments à venir (suppression du sur-fetching)
+
+---
+
 ## [0.10.0] — 2026-02-23 — À propos & Changelog
 
 ### Ajouté

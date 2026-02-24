@@ -316,16 +316,16 @@ export default async function AboutPage() {
         <ul className="space-y-3">
           {(isFr
             ? [
-                ["Images de couverture", " — personnalisation visuelle des Communautés et des événements."],
                 ["Export CSV", " — liste des inscrits pour la logistique (badges, émargement)."],
                 ["Événements payants", " — Stripe Connect pour ceux qui en ont besoin."],
                 ["Assistant IA", " — aide à la rédaction des descriptions et emails d'invitation."],
+                ["Co-organisateurs", " — déléguer la gestion d'une Communauté à plusieurs Organisateurs."],
               ]
             : [
-                ["Cover images", " — visual customization for Communities and events."],
                 ["CSV export", " — attendee list for logistics (badges, sign-in sheets)."],
                 ["Paid events", " — Stripe Connect for those who need it."],
                 ["AI assistant", " — help drafting event descriptions and invitation emails."],
+                ["Co-organizers", " — delegate community management to multiple organizers."],
               ]
           ).map(([bold, rest]) => (
             <li
