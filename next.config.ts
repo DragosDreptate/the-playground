@@ -19,6 +19,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Inclure CHANGELOG.md dans le bundle serverless Vercel
+    // (utilisé par la page /changelog via readFileSync)
+    outputFileTracingIncludes: {
+      "/:locale/changelog": ["./CHANGELOG.md"],
+    },
+  },
   async headers() {
     return [
       {

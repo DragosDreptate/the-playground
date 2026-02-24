@@ -14,8 +14,12 @@ export type ChangelogEntry = {
 };
 
 export function getChangelog(): ChangelogEntry[] {
-  const content = readFileSync(join(process.cwd(), "CHANGELOG.md"), "utf-8");
-  return parseChangelog(content);
+  try {
+    const content = readFileSync(join(process.cwd(), "CHANGELOG.md"), "utf-8");
+    return parseChangelog(content);
+  } catch {
+    return [];
+  }
 }
 
 export function parseChangelog(content: string): ChangelogEntry[] {
