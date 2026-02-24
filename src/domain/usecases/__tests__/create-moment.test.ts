@@ -137,6 +137,69 @@ describe("CreateMoment", () => {
     });
   });
 
+  describe("given coverImage and coverImageAttribution provided", () => {
+    it("should pass coverImage and coverImageAttribution to the repository", async () => {
+      const attribution = { name: "Photographer", url: "https://unsplash.com/@photographer" };
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository({
+        create: vi.fn().mockResolvedValue(
+          makeMoment({
+            coverImage: "https://blob.example.com/cover.webp",
+            coverImageAttribution: attribution,
+          })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      const result = await createMoment(
+        {
+          ...defaultInput,
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        })
+      );
+      expect(result.moment.coverImage).toBe("https://blob.example.com/cover.webp");
+      expect(result.moment.coverImageAttribution).toEqual(attribution);
+    });
+
+    it("should pass null coverImage when not provided", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository({
+        create: vi.fn().mockResolvedValue(makeMoment({ coverImage: null })),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await createMoment(defaultInput, {
+        momentRepository: momentRepo,
+        circleRepository: circleRepo,
+        registrationRepository: registrationRepo,
+      });
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          coverImage: undefined,
+          coverImageAttribution: undefined,
+        })
+      );
+    });
+  });
+
   describe("given a title whose slug already exists", () => {
     it("should append a suffix to make the slug unique", async () => {
       const circleRepo = createMockCircleRepository({

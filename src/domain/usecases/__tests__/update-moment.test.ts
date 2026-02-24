@@ -110,6 +110,83 @@ describe("UpdateMoment", () => {
     });
   });
 
+  describe("given a HOST updating the coverImage of a Moment", () => {
+    it("should pass coverImage and coverImageAttribution to the repository", async () => {
+      const attribution = { name: "John Photo", url: "https://unsplash.com/@johnphoto" };
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
+      const updated = makeMoment({
+        id: "moment-1",
+        coverImage: "https://blob.example.com/cover.webp",
+        coverImageAttribution: attribution,
+      });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      const result = await updateMoment(
+        {
+          momentId: "moment-1",
+          userId: "user-1",
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({
+          coverImage: "https://blob.example.com/cover.webp",
+          coverImageAttribution: attribution,
+        })
+      );
+      expect(result.moment.coverImage).toBe("https://blob.example.com/cover.webp");
+      expect(result.moment.coverImageAttribution).toEqual(attribution);
+    });
+
+    it("should remove the coverImage when null is passed", async () => {
+      const existing = makeMoment({
+        id: "moment-1",
+        circleId: "circle-1",
+        coverImage: "https://blob.example.com/old-cover.webp",
+      });
+      const updated = makeMoment({
+        id: "moment-1",
+        coverImage: null,
+        coverImageAttribution: null,
+      });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      const result = await updateMoment(
+        {
+          momentId: "moment-1",
+          userId: "user-1",
+          coverImage: null,
+          coverImageAttribution: null,
+        },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({ coverImage: null, coverImageAttribution: null })
+      );
+      expect(result.moment.coverImage).toBeNull();
+    });
+  });
+
   describe("given a HOST cancelling a Moment via status update", () => {
     it("should update the Moment status to CANCELLED", async () => {
       const existing = makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED" });
