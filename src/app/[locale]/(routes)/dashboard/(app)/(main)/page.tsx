@@ -81,11 +81,11 @@ export default async function DashboardPage({
       </div>
 
       {/* Tab selector + action */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2.5">
         <div className="flex items-center gap-1 rounded-full border p-1">
           <Link
             href="?tab=moments"
-            className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors ${
               activeTab === "moments"
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
@@ -95,7 +95,7 @@ export default async function DashboardPage({
           </Link>
           <Link
             href="?tab=circles"
-            className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors ${
               activeTab === "circles"
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
@@ -105,9 +105,11 @@ export default async function DashboardPage({
           </Link>
         </div>
         {activeTab === "circles" && (
-          <Button asChild size="sm">
-            <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-          </Button>
+          <div className="flex justify-end">
+            <Button asChild size="sm">
+              <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
+            </Button>
+          </div>
         )}
       </div>
 
