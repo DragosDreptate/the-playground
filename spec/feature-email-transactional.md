@@ -354,8 +354,8 @@ Quand un Host crée un Moment, il est automatiquement inscrit (REGISTERED) dans 
 | `src/app/actions/registration.ts` | Ajout envoi emails (fire-and-forget) après joinMoment et cancelRegistration |
 | `src/app/actions/comment.ts` | Ajout notification Host (fire-and-forget) après addComment |
 | `src/infrastructure/services/index.ts` | Export `createResendEmailService` |
-| `messages/fr.json` | Ajout namespace `"Email"` (22 clés, dont `commentNotification.*`) |
-| `messages/en.json` | Ajout namespace `"Email"` (22 clés, dont `commentNotification.*`) |
+| `messages/fr.json` | Ajout namespace `"Email"` (25 clés, dont `commentNotification.*`) |
+| `messages/en.json` | Ajout namespace `"Email"` (25 clés, dont `commentNotification.*`) |
 
 ---
 

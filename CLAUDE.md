@@ -285,6 +285,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:cleanup-demo-data:prod` | Supprime les données démo en production (avec double confirmation) |
 | `pnpm db:seed-covers` | Dry-run : affiche les images de couverture à injecter |
 | `pnpm db:seed-covers:execute` | Injecte les images de couverture en base |
+| `pnpm db:seed-covers:prod` | Injecte les images de couverture en production (avec confirmation) |
 | `pnpm test:e2e` | Lance les tests E2E Playwright |
 | `pnpm test:e2e:setup-onboarding` | Génère le storage state d'auth pour l'onboarding E2E |
 | `pnpm test:mobile` | Lance les tests mobile Playwright (config dédiée) |
