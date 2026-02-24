@@ -311,6 +311,16 @@
   - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par événement
   - Option modération : l'Organisateur peut supprimer une photo
   - Viralité : lien partageable vers la galerie, CTA "Voir les photos" dans l'email post-événement
+- [ ] **Radar concurrentiel à la création d'événement**
+  - Lors de la création d'un Moment (step date/lieu), afficher les événements publiés sur les plateformes concurrentes (Meetup, Luma, Eventbrite…) dans la même ville, au même créneau
+  - **Objectif** : permettre à l'Organisateur d'identifier les conflits potentiels avec des événements qui ciblent la même audience, avant de publier
+  - **Affichage** : section "Événements le même jour dans ta ville" dans le formulaire — liste compacte (titre, plateforme source, heure, nombre d'inscrits si disponible)
+  - **Sources** : APIs publiques Meetup (`/find/events`), Eventbrite (`/events/search`), Luma (scraping ou API si disponible) — requêtes filtrées par `location` + `date range`
+  - **Périmètre** : rayon configurable (ex: 20 km), même catégorie en priorité
+  - **IA** : scoring de "risque de conflit" basé sur similarité de catégorie, audience cible, créneau horaire — suggestion de créneaux alternatifs moins concurrentiels
+  - **Privacy** : données affichées en lecture seule, pas stockées — requêtes live à la saisie (debounce)
+  - **Contraintes** : rate limits APIs tierces, certaines nécessitent une clé (Eventbrite), Luma sans API officielle
+
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 - [ ] **Emails de rappel pré-événement** (24h + 1h avant) — jobs planifiés Vercel Cron ou Upstash QStash, flags `reminder24hSentAt` / `reminder1hSentAt` sur `Moment`
 - [ ] Visual regression testing (Chromatic/Percy)
