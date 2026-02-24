@@ -8,7 +8,6 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
-import { ExplorerCreateButton } from "@/components/explorer/explorer-create-button";
 import { ExplorerGrid } from "@/components/explorer/explorer-grid";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
@@ -94,12 +93,9 @@ export default async function ExplorerPage({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-3">
-          <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
-        </div>
-        <ExplorerCreateButton />
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
       </div>
 
       {/* Tabs */}
