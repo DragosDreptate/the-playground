@@ -1,0 +1,2993 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Playground — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS VARIABLES — LIGHT MODE (default)
+   ============================================================ */
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --destructive: #e8457a;
+  --destructive-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --secondary: #f0eff7;
+  --secondary-foreground: #1a1b2e;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --accent: #6ee7d0;
+  --ring: #e8457a;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26, 27, 46, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26, 27, 46, 0.08), 0 2px 4px -2px rgba(26, 27, 46, 0.05);
+  --sidebar-width: 260px;
+}
+
+/* DARK MODE */
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --secondary: #222336;
+  --secondary-foreground: #f0f0f5;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre { font-family: 'JetBrains Mono', monospace; }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+#sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 1rem;
+  z-index: 100;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+#sidebar .logo {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+#sidebar .logo-sub {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+#sidebar nav ul { list-style: none; }
+#sidebar nav li { margin: 0; }
+#sidebar nav a {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+#sidebar nav a:hover {
+  color: var(--foreground);
+  background: var(--muted);
+  text-decoration: none;
+}
+#sidebar nav .section-link {
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: var(--foreground);
+  margin-top: 1rem;
+  margin-bottom: 0.1rem;
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+#sidebar nav .sub-link {
+  padding-left: 1rem;
+}
+
+#main {
+  margin-left: var(--sidebar-width);
+  padding: 2rem 3rem;
+  max-width: 1100px;
+}
+
+#topbar {
+  position: fixed;
+  top: 0; right: 0;
+  padding: 0.75rem 1.5rem;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+h2.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-top: 3rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+h3.sub-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+p { margin-bottom: 0.75rem; color: var(--foreground); }
+
+pre {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin: 0.75rem 0;
+}
+code {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1em 0.4em;
+  font-size: 0.82em;
+}
+pre code { background: none; border: none; padding: 0; font-size: inherit; }
+
+/* ============================================================
+   DEMO BOX
+   ============================================================ */
+.demo-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 0.75rem 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+.demo-label {
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* ============================================================
+   BADGE — RÈGLE ABSOLUE
+   ============================================================ */
+.badge-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--primary);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   DARK MODE TOGGLE
+   ============================================================ */
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.theme-toggle:hover { background: var(--muted); }
+
+/* ============================================================
+   SECTION 2 — TOKENS
+   ============================================================ */
+.color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 0.75rem 0;
+}
+.color-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 90px;
+}
+.color-square {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-sm);
+}
+.color-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-align: center;
+}
+.color-value {
+  font-size: 0.6rem;
+  color: var(--muted-foreground);
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  word-break: break-all;
+}
+
+.typo-h1 { font-size: 2.5rem; font-weight: 700; line-height: 1.2; }
+.typo-h2 { font-size: 1.75rem; font-weight: 700; line-height: 1.3; }
+.typo-h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; }
+.typo-body { font-size: 0.9375rem; font-weight: 400; }
+.typo-small { font-size: 0.8125rem; font-weight: 400; color: var(--muted-foreground); }
+.typo-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.typo-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+
+.spacing-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.4rem 0;
+}
+.spacing-bar {
+  background: var(--primary);
+  height: 16px;
+  border-radius: 3px;
+  opacity: 0.8;
+}
+.spacing-label { font-size: 0.75rem; color: var(--muted-foreground); font-family: 'JetBrains Mono', monospace; min-width: 60px; }
+
+.radius-demo {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.radius-box {
+  background: var(--muted);
+  border: 2px solid var(--primary);
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  color: var(--primary);
+  font-weight: 600;
+}
+.shadow-demo {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.shadow-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+/* ============================================================
+   SECTION 3 — COMPOSANTS DE BASE
+   ============================================================ */
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.btn-default {
+  background: var(--primary);
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-default:hover { background: #d63d6e; }
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--foreground);
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-ghost:hover { background: var(--muted); }
+.btn-secondary {
+  background: var(--secondary);
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-secondary:hover { background: var(--border); }
+.btn-destructive-outline {
+  background: transparent;
+  border-color: rgba(232, 69, 122, 0.4);
+  color: var(--destructive);
+  font-size: 0.875rem;
+  padding: 0.4rem 0.875rem;
+}
+.btn-destructive-outline:hover {
+  border-color: var(--destructive);
+  background: rgba(232,69,122,0.1);
+}
+.btn-link {
+  background: transparent;
+  border-color: transparent;
+  color: var(--primary);
+  font-size: 0.875rem;
+  padding: 0.5rem;
+  text-decoration: underline;
+}
+.btn-sm { font-size: 0.8125rem; padding: 0.35rem 0.75rem; }
+.btn-lg { font-size: 1rem; padding: 0.75rem 1.5rem; }
+.btn-xs { font-size: 0.75rem; padding: 0.2rem 0.5rem; }
+.btn-fullwidth { width: 100%; font-size: 1rem; padding: 0.75rem 1.5rem; }
+.btn-disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2em 0.65em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.badge-filled-primary { background: var(--primary); color: white; }
+.badge-outline-primary { border-color: rgba(232,69,122,0.4); color: var(--primary); background: transparent; }
+.badge-outline-destructive { border-color: rgba(232,69,122,0.4); color: var(--destructive); background: transparent; }
+.badge-outline-neutral { border-color: var(--border); color: var(--muted-foreground); background: transparent; }
+.badge-secondary { background: var(--secondary); color: var(--secondary-foreground); border-color: var(--border); }
+.badge-amber { background: rgba(245,158,11,0.12); color: #d97706; border-color: rgba(245,158,11,0.3); }
+
+/* Avatar */
+.avatar {
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  background: rgba(232,69,122,0.1);
+  color: var(--primary);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.avatar-xs  { width: 24px;  height: 24px;  font-size: 0.6rem; }
+.avatar-sm  { width: 32px;  height: 32px;  font-size: 0.7rem; }
+.avatar-md  { width: 40px;  height: 40px;  font-size: 0.875rem; }
+.avatar-lg  { width: 56px;  height: 56px;  font-size: 1.1rem; }
+.avatar-xl  { width: 80px;  height: 80px;  font-size: 1.5rem; }
+
+.avatar-gradient { border-radius: var(--radius); }
+
+.avatar-group { display: flex; }
+.avatar-group .avatar { margin-left: -8px; border: 2px solid var(--card); }
+.avatar-group .avatar:first-child { margin-left: 0; }
+
+/* Card */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.card-header {
+  padding: 1.25rem 1.25rem 0;
+  font-weight: 600;
+  font-size: 1rem;
+}
+.card-content { padding: 0.75rem 1.25rem; font-size: 0.875rem; color: var(--muted-foreground); }
+.card-footer {
+  padding: 0.75rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Input */
+.input {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+.input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.15); }
+.input::placeholder { color: var(--muted-foreground); }
+.input-with-icon { position: relative; }
+.input-with-icon .input { padding-left: 2.25rem; }
+.input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  width: 16px;
+  height: 16px;
+}
+
+.textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.15); }
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--foreground);
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.label-required::after { content: ' *'; color: var(--primary); }
+
+/* Select simulé */
+.select-sim {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b6f87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  outline: none;
+}
+.select-sim:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.15); }
+
+/* Tabs */
+.tabs-pill {
+  display: inline-flex;
+  background: var(--muted);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+.tabs-pill .tab {
+  padding: 0.3rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  transition: all 0.15s;
+  border: none;
+  background: none;
+  font-family: 'Inter', sans-serif;
+}
+.tabs-pill .tab.active {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
+}
+
+.tabs-line {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  gap: 0;
+}
+.tabs-line .tab {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'Inter', sans-serif;
+}
+.tabs-line .tab.active {
+  color: var(--foreground);
+  border-bottom-color: var(--primary);
+}
+
+/* Separator */
+.sep { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+.sep-v { border: none; border-left: 1px solid var(--border); height: 24px; display: inline-block; margin: 0 0.5rem; vertical-align: middle; }
+
+/* Table */
+.table-wrapper { overflow-x: auto; }
+.ds-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.ds-table th {
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+}
+.ds-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
+}
+.ds-table tr:last-child td { border-bottom: none; }
+.ds-table tr:hover td { background: var(--muted); }
+
+/* Tooltip sim */
+.tooltip-wrap { position: relative; display: inline-block; }
+.tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.tooltip-content::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--foreground);
+}
+
+/* Dropdown sim */
+.dropdown-sim {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  width: 200px;
+  padding: 0.35rem 0;
+}
+.dropdown-item {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.85rem;
+  color: var(--foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.1s;
+}
+.dropdown-item:hover { background: var(--muted); }
+.dropdown-item.destructive { color: var(--destructive); }
+.dropdown-sep { border: none; border-top: 1px solid var(--border); margin: 0.25rem 0; }
+
+/* Alert Dialog sim */
+.alert-dialog-sim {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.5);
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  max-width: 440px;
+}
+.alert-dialog-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.alert-dialog-desc { font-size: 0.875rem; color: var(--muted-foreground); margin-bottom: 1.25rem; }
+.alert-dialog-footer { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.btn-alert-destructive {
+  background: var(--destructive);
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+/* ============================================================
+   SECTION 4 — COMPOSANTS MÉTIER
+   ============================================================ */
+
+/* CircleCard */
+.circle-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 1.5);
+  overflow: hidden;
+  transition: box-shadow 0.15s, transform 0.15s;
+  cursor: pointer;
+}
+.circle-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.circle-card-cover {
+  width: 100%;
+  aspect-ratio: 1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circle-card-body { padding: 1rem; }
+.circle-card-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
+.circle-card-meta { font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.circle-card-desc { font-size: 0.8rem; color: var(--muted-foreground); line-height: 1.5; }
+
+/* MomentCard */
+.moment-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  gap: 0;
+  transition: box-shadow 0.15s;
+}
+.moment-card:hover { box-shadow: var(--shadow-md); }
+.moment-card-thumb {
+  width: 96px;
+  min-width: 96px;
+  aspect-ratio: 1/1;
+  flex-shrink: 0;
+}
+.moment-card-body { padding: 0.875rem; flex: 1; }
+.moment-card-date { font-size: 0.72rem; font-weight: 600; color: var(--primary); text-transform: uppercase; margin-bottom: 0.2rem; }
+.moment-card-title { font-weight: 600; font-size: 0.9375rem; margin-bottom: 0.25rem; }
+.moment-card-location { font-size: 0.78rem; color: var(--muted-foreground); display: flex; align-items: center; gap: 0.3rem; }
+
+/* Meta row */
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+.meta-row:last-child { border-bottom: none; }
+.meta-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius);
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+.meta-row-content { flex: 1; }
+.meta-row-label { font-size: 0.72rem; color: var(--muted-foreground); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.meta-row-value { font-weight: 500; color: var(--foreground); }
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--muted-foreground); }
+.breadcrumb a:hover { color: var(--foreground); text-decoration: none; }
+.breadcrumb-current { color: var(--foreground); font-weight: 500; }
+.breadcrumb-sep { font-size: 0.8rem; color: var(--border); }
+
+/* Comment thread */
+.comment { display: flex; gap: 0.75rem; padding: 0.875rem 0; border-bottom: 1px solid var(--border); }
+.comment:last-of-type { border-bottom: none; }
+.comment-body { flex: 1; }
+.comment-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.comment-name { font-weight: 600; font-size: 0.875rem; }
+.comment-time { font-size: 0.72rem; color: var(--muted-foreground); }
+.comment-text { font-size: 0.875rem; color: var(--foreground); line-height: 1.5; }
+
+/* RegistrationButton states */
+.reg-btn-joined {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(110,231,208,0.15);
+  border: 1px solid rgba(110,231,208,0.4);
+  border-radius: var(--radius);
+  font-weight: 600;
+  color: #0f766e;
+  font-size: 0.9375rem;
+  width: 100%;
+  justify-content: center;
+}
+.reg-btn-waitlist {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius);
+  font-weight: 600;
+  color: #d97706;
+  font-size: 0.9375rem;
+  width: 100%;
+  justify-content: center;
+}
+.reg-btn-full {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 600;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  width: 100%;
+  justify-content: center;
+  cursor: not-allowed;
+}
+
+/* SiteHeader */
+.site-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius);
+}
+.site-header-logo { font-weight: 700; font-size: 1rem; color: var(--primary); }
+.site-header-nav { display: flex; align-items: center; gap: 0.25rem; }
+.site-header-link {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  border-radius: var(--radius);
+  transition: all 0.15s;
+  cursor: pointer;
+  font-weight: 500;
+}
+.site-header-link:hover { color: var(--foreground); background: var(--muted); }
+.site-header-link.active { color: var(--foreground); font-weight: 600; }
+.site-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+/* SiteFooter */
+.site-footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.site-footer-brand { color: var(--primary); font-weight: 600; }
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--muted-foreground);
+}
+.empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.5; }
+.empty-title { font-weight: 600; font-size: 1rem; color: var(--foreground); margin-bottom: 0.35rem; }
+.empty-desc { font-size: 0.875rem; margin-bottom: 1.25rem; }
+
+/* Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, var(--muted) 25%, var(--border) 50%, var(--muted) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+@keyframes skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Admin Stats */
+.stats-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.stats-number { font-size: 2rem; font-weight: 700; color: var(--foreground); line-height: 1; }
+.stats-label { font-size: 0.8rem; color: var(--muted-foreground); margin-top: 0.25rem; }
+.stats-delta { font-size: 0.75rem; color: #10b981; font-weight: 600; margin-top: 0.5rem; }
+
+/* Cover glow */
+.cover-glow-wrap { position: relative; display: inline-block; }
+.cover-glow-blur {
+  position: absolute;
+  bottom: -12px;
+  left: 10%;
+  right: 10%;
+  height: 40px;
+  filter: blur(16px);
+  opacity: 0.5;
+  border-radius: 999px;
+}
+
+/* Focus demo */
+.focus-demo:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Warning box for dette technique */
+.warning-box {
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 0.5rem 0;
+}
+.warning-title { font-weight: 600; color: #d97706; font-size: 0.875rem; margin-bottom: 0.25rem; }
+.warning-body { font-size: 0.8rem; color: var(--foreground); }
+
+/* Gradient squares */
+.gradient-sq {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  display: inline-block;
+  box-shadow: var(--shadow-md);
+}
+
+/* Animation demos */
+.hover-scale { transition: transform 0.2s ease; cursor: pointer; display: inline-block; }
+.hover-scale:hover { transform: scale(1.03); }
+.hover-lift { transition: box-shadow 0.2s ease, transform 0.2s ease; cursor: pointer; }
+.hover-lift:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+/* Chart colors demo */
+.chart-bar-row { display: flex; align-items: center; gap: 0.5rem; margin: 0.3rem 0; }
+.chart-bar { height: 18px; border-radius: 4px; transition: width 0.3s; }
+.chart-bar-label { font-size: 0.75rem; color: var(--muted-foreground); min-width: 80px; }
+
+/* Divider with content */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+.section-divider::before, .section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-divider-text { font-size: 0.75rem; color: var(--muted-foreground); font-weight: 500; white-space: nowrap; }
+
+/* Chips/tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2em 0.6em;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+/* Scrollbar */
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-track { background: transparent; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Responsive note */
+@media (max-width: 900px) {
+  #sidebar { display: none; }
+  #main { margin-left: 0; padding: 1rem 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOPBAR
+     ============================================================ -->
+<div id="topbar">
+  <button class="theme-toggle" onclick="toggleDark()" id="themeBtn">
+    <span id="themeIcon">🌙</span>
+    <span id="themeText">Mode sombre</span>
+  </button>
+</div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside id="sidebar">
+  <div class="logo">The Playground</div>
+  <div class="logo-sub">Design System v1</div>
+  <nav>
+    <ul>
+      <li><a class="section-link" href="#s1">1. Philosophie</a></li>
+      <li><a class="section-link" href="#s2">2. Tokens</a></li>
+      <li><a class="sub-link" href="#s2-colors">2.1 Couleurs</a></li>
+      <li><a class="sub-link" href="#s2-typo">2.2 Typographie</a></li>
+      <li><a class="sub-link" href="#s2-spacing">2.3 Espacement</a></li>
+      <li><a class="sub-link" href="#s2-radius">2.4 Border radius</a></li>
+      <li><a class="sub-link" href="#s2-shadows">2.5 Ombres</a></li>
+      <li><a class="section-link" href="#s3">3. Composants base</a></li>
+      <li><a class="sub-link" href="#s3-btn">3.1 Button</a></li>
+      <li><a class="sub-link" href="#s3-badge">3.2 Badge</a></li>
+      <li><a class="sub-link" href="#s3-avatar">3.3 Avatar</a></li>
+      <li><a class="sub-link" href="#s3-card">3.4 Card</a></li>
+      <li><a class="sub-link" href="#s3-input">3.5–3.8 Form inputs</a></li>
+      <li><a class="sub-link" href="#s3-tabs">3.9 Tabs</a></li>
+      <li><a class="sub-link" href="#s3-dialog">3.10–3.11 Dialogs</a></li>
+      <li><a class="sub-link" href="#s3-misc">3.12–3.15 Misc</a></li>
+      <li><a class="section-link" href="#s4">4. Composants métier</a></li>
+      <li><a class="sub-link" href="#s4-circle">4.1 CircleCard</a></li>
+      <li><a class="sub-link" href="#s4-moment">4.2 MomentCard</a></li>
+      <li><a class="sub-link" href="#s4-detail">4.3 MomentDetailView</a></li>
+      <li><a class="sub-link" href="#s4-reg">4.4 RegistrationButton</a></li>
+      <li><a class="sub-link" href="#s4-list">4.5–4.7 Listes</a></li>
+      <li><a class="sub-link" href="#s4-cover">4.8 CoverImagePicker</a></li>
+      <li><a class="sub-link" href="#s4-public">4.9 PublicCircleCard</a></li>
+      <li><a class="sub-link" href="#s4-admin">4.10 Admin Stats</a></li>
+      <li><a class="section-link" href="#s5">5. Layouts</a></li>
+      <li><a class="sub-link" href="#s5-header">5.1 SiteHeader</a></li>
+      <li><a class="sub-link" href="#s5-footer">5.2 SiteFooter</a></li>
+      <li><a class="sub-link" href="#s5-2col">5.3 Layout 2 colonnes</a></li>
+      <li><a class="sub-link" href="#s5-dash">5.4 Dashboard</a></li>
+      <li><a class="sub-link" href="#s5-onboarding">5.5 Onboarding</a></li>
+      <li><a class="section-link" href="#s6">6. Patterns UX</a></li>
+      <li><a class="sub-link" href="#s6-breadcrumb">6.1 Breadcrumb</a></li>
+      <li><a class="sub-link" href="#s6-meta">6.2 Meta row</a></li>
+      <li><a class="sub-link" href="#s6-empty">6.3 Empty state</a></li>
+      <li><a class="sub-link" href="#s6-cover">6.4 Cover 1:1</a></li>
+      <li><a class="sub-link" href="#s6-gradients">6.5 Gradients</a></li>
+      <li><a class="sub-link" href="#s6-glow">6.6 Glow blur</a></li>
+      <li><a class="sub-link" href="#s6-pilltabs">6.7 Pill tabs</a></li>
+      <li><a class="sub-link" href="#s6-forms">6.8 Formulaires</a></li>
+      <li><a class="sub-link" href="#s6-loading">6.9 États chargement</a></li>
+      <li><a class="section-link" href="#s7">7. Responsive</a></li>
+      <li><a class="section-link" href="#s8">8. Animations</a></li>
+      <li><a class="section-link" href="#s9">9. Accessibilité</a></li>
+      <li><a class="section-link" href="#s10">10. i18n</a></li>
+      <li><a class="section-link" href="#s11">11. Dette technique</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main id="main">
+
+<!-- Page header -->
+<div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border);">
+  <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem;">
+    <span style="font-size:2rem;">🛝</span>
+    <h1 class="page-title" style="margin-bottom:0;">Design System</h1>
+  </div>
+  <p style="color:var(--muted-foreground); font-size:0.9375rem; margin:0;">
+    Référence visuelle complète pour The Playground — tokens, composants, patterns UX et règles normatives.
+    <br><strong>Dernière mise à jour :</strong> 2026-02-24 · <span class="badge badge-filled-primary">v1.0</span>
+  </p>
+</div>
+
+<!-- ============================================================
+     SECTION 1 — PHILOSOPHIE
+     ============================================================ -->
+<section id="s1">
+  <h2 class="section-title">1. Philosophie</h2>
+  <p>Le design system de The Playground repose sur trois piliers : <strong>premium par défaut</strong>, <strong>mobile-first</strong>, et <strong>marque discrète</strong>. Inspiré de Luma (lu.ma) pour le design, enrichi par le modèle communautaire de Meetup, entièrement gratuit.</p>
+
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top:1rem;">
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">✨</div>
+      <strong>Premium par défaut</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">Chaque page est belle sans effort de l'Organisateur. Design Luma-grade d'emblée.</p>
+    </div>
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">📱</div>
+      <strong>Mobile-first</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">Le parcours Participant arrive via WhatsApp/Instagram. Toujours sur mobile.</p>
+    </div>
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">🎯</div>
+      <strong>Marque discrète</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">"Powered by The Playground" en footer. L'Organisateur au premier plan.</p>
+    </div>
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">⚡</div>
+      <strong>Friction zéro</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">Minimum d'étapes entre "je vois l'événement" et "je suis inscrit".</p>
+    </div>
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">🔵</div>
+      <strong>Une couleur accent</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">Rose <code>#e8457a</code> = primary ET destructive. Le danger est dit par le contexte, pas la couleur.</p>
+    </div>
+    <div class="demo-box" style="border-left: 3px solid var(--primary);">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">🌐</div>
+      <strong>Bilingue FR/EN</strong>
+      <p style="font-size:0.82rem; color:var(--muted-foreground); margin:0.4rem 0 0;">i18n natif dès la V1. Keys en anglais, valeurs traduites. Pas de fallback visible.</p>
+    </div>
+  </div>
+
+  <h3 class="sub-title">Benchmark de référence</h3>
+  <div class="table-wrapper">
+    <table class="ds-table" style="margin-top:0.5rem;">
+      <thead>
+        <tr>
+          <th>Critère</th>
+          <th>Meetup.com</th>
+          <th>Luma</th>
+          <th>The Playground</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Communauté persistante</td><td>✅ oui</td><td>❌ non</td><td><strong>✅ oui</strong></td></tr>
+        <tr><td>Page événement premium</td><td>❌ datée</td><td>✅ oui</td><td><strong>✅ oui</strong></td></tr>
+        <tr><td>Inscription sans friction</td><td>❌ compte obligatoire</td><td>✅ oui</td><td><strong>✅ oui</strong></td></tr>
+        <tr><td>Découverte publique</td><td>✅ annuaire</td><td>❌ non</td><td><strong>✅ Découvrir</strong></td></tr>
+        <tr><td>100% gratuit</td><td>❌ abo organisateur</td><td>❌ commission</td><td><strong>✅ oui</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 2 — TOKENS
+     ============================================================ -->
+<section id="s2">
+  <h2 class="section-title">2. Tokens Design</h2>
+
+  <!-- 2.1 Couleurs -->
+  <h3 class="sub-title" id="s2-colors">2.1 Couleurs</h3>
+
+  <div class="section-divider"><span class="section-divider-text">Light mode</span></div>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-square" style="background:#e8457a;"></div>
+      <div class="color-name">--primary</div>
+      <div class="color-value">oklch(0.6726 0.2904 341.4084)<br>#e8457a</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#f5f5fa; border:1px solid #e3e3ec;"></div>
+      <div class="color-name">--background</div>
+      <div class="color-value">#f5f5fa</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#1a1b2e;"></div>
+      <div class="color-name">--foreground</div>
+      <div class="color-value">#1a1b2e</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#ffffff; border:1px solid #e3e3ec;"></div>
+      <div class="color-name">--card</div>
+      <div class="color-value">#ffffff</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#f0eff7; border:1px solid #e3e3ec;"></div>
+      <div class="color-name">--muted / --secondary</div>
+      <div class="color-value">#f0eff7</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#6b6f87;"></div>
+      <div class="color-name">--muted-foreground</div>
+      <div class="color-value">#6b6f87</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#e3e3ec;"></div>
+      <div class="color-name">--border / --input</div>
+      <div class="color-value">#e3e3ec</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#6ee7d0;"></div>
+      <div class="color-name">--accent</div>
+      <div class="color-value">#6ee7d0 (teal)</div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span class="section-divider-text">Dark mode</span></div>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-square" style="background:#1a1b2e;"></div>
+      <div class="color-name">--background</div>
+      <div class="color-value">#1a1b2e</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#f0f0f5;"></div>
+      <div class="color-name">--foreground</div>
+      <div class="color-value">#f0f0f5</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#252638;"></div>
+      <div class="color-name">--card</div>
+      <div class="color-value">#252638</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#383a55;"></div>
+      <div class="color-name">--border</div>
+      <div class="color-value">#383a55</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#222336;"></div>
+      <div class="color-name">--muted</div>
+      <div class="color-value">#222336</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#8385a0;"></div>
+      <div class="color-name">--muted-foreground</div>
+      <div class="color-value">#8385a0</div>
+    </div>
+  </div>
+
+  <div class="section-divider"><span class="section-divider-text">Charts</span></div>
+  <div class="color-grid">
+    <div class="color-swatch">
+      <div class="color-square" style="background:#e8457a;"></div>
+      <div class="color-name">chart-1</div>
+      <div class="color-value">rose #e8457a</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#8b33c8;"></div>
+      <div class="color-name">chart-2</div>
+      <div class="color-value">violet oklch(0.5488 0.2944 299)</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#76d0f0;"></div>
+      <div class="color-name">chart-3</div>
+      <div class="color-value">bleu clair oklch(0.8442 0.1457 209)</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#6ee7d0;"></div>
+      <div class="color-name">chart-4</div>
+      <div class="color-value">teal #6ee7d0</div>
+    </div>
+    <div class="color-swatch">
+      <div class="color-square" style="background:#d4f540;"></div>
+      <div class="color-name">chart-5</div>
+      <div class="color-value">jaune-vert oklch(0.9168 0.1915 101)</div>
+    </div>
+  </div>
+
+  <div class="demo-box" style="margin-top:1rem;">
+    <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.75rem;">Exemple d'utilisation — Barres de chart</p>
+    <div class="chart-bar-row"><div class="chart-bar-label">Inscriptions</div><div class="chart-bar" style="width:80%; background:#e8457a;"></div><span style="font-size:0.75rem; color:var(--muted-foreground);">142</span></div>
+    <div class="chart-bar-row"><div class="chart-bar-label">Communautés</div><div class="chart-bar" style="width:55%; background:#8b33c8;"></div><span style="font-size:0.75rem; color:var(--muted-foreground);">98</span></div>
+    <div class="chart-bar-row"><div class="chart-bar-label">Événements</div><div class="chart-bar" style="width:65%; background:#76d0f0;"></div><span style="font-size:0.75rem; color:var(--muted-foreground);">116</span></div>
+    <div class="chart-bar-row"><div class="chart-bar-label">Liste attente</div><div class="chart-bar" style="width:30%; background:#6ee7d0;"></div><span style="font-size:0.75rem; color:var(--muted-foreground);">54</span></div>
+    <div class="chart-bar-row"><div class="chart-bar-label">Check-ins</div><div class="chart-bar" style="width:70%; background:#d4f540;"></div><span style="font-size:0.75rem; color:var(--muted-foreground);">125</span></div>
+  </div>
+
+  <!-- 2.2 Typographie -->
+  <h3 class="sub-title" id="s2-typo">2.2 Typographie</h3>
+  <p style="font-size:0.82rem; color:var(--muted-foreground);">Police : <strong>Inter</strong> (UI) + <strong>JetBrains Mono</strong> (code). Pas de font-size custom hors de la scale Tailwind.</p>
+  <div class="demo-box">
+    <div style="margin-bottom:1.25rem;">
+      <div class="typo-h1">H1 — Lancez votre communauté</div>
+      <div class="demo-label">2.5rem / 700 / line-height 1.2</div>
+    </div>
+    <div style="margin-bottom:1.25rem;">
+      <div class="typo-h2">H2 — Organisez vos événements</div>
+      <div class="demo-label">1.75rem / 700 / line-height 1.3</div>
+    </div>
+    <div style="margin-bottom:1.25rem;">
+      <div class="typo-h3">H3 — Animez votre réseau</div>
+      <div class="demo-label">1.25rem / 600 / line-height 1.4</div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div class="typo-body">Body — The Playground est une plateforme SaaS ouverte et 100% gratuite pour communautés. Le Circle est l'entité centrale, l'événement est la porte d'entrée virale.</div>
+      <div class="demo-label">0.9375rem / 400 / line-height 1.6</div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div class="typo-small">Small — 24 membres · 6 événements à venir</div>
+      <div class="demo-label">0.8125rem / 400 / muted-foreground</div>
+    </div>
+    <div style="margin-bottom:1rem;">
+      <div class="typo-label">Label uppercase — Statut de l'inscription</div>
+      <div class="demo-label">0.75rem / 600 / uppercase / letter-spacing 0.08em</div>
+    </div>
+    <div>
+      <div class="typo-mono">const circle = await createCircle({ name: "Tech Paris" });</div>
+      <div class="demo-label">JetBrains Mono 0.875rem / code</div>
+    </div>
+  </div>
+
+  <!-- 2.3 Espacement -->
+  <h3 class="sub-title" id="s2-spacing">2.3 Espacement (Tailwind scale)</h3>
+  <div class="demo-box">
+    <div class="spacing-bar-row"><div class="spacing-label">0.25rem (1)</div><div class="spacing-bar" style="width:4px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">0.5rem (2)</div><div class="spacing-bar" style="width:8px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">0.75rem (3)</div><div class="spacing-bar" style="width:12px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">1rem (4)</div><div class="spacing-bar" style="width:16px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">1.25rem (5)</div><div class="spacing-bar" style="width:20px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">1.5rem (6)</div><div class="spacing-bar" style="width:24px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">2rem (8)</div><div class="spacing-bar" style="width:32px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">3rem (12)</div><div class="spacing-bar" style="width:48px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">4rem (16)</div><div class="spacing-bar" style="width:64px;"></div></div>
+    <div class="spacing-bar-row"><div class="spacing-label">6rem (24)</div><div class="spacing-bar" style="width:96px;"></div></div>
+  </div>
+
+  <!-- 2.4 Border Radius -->
+  <h3 class="sub-title" id="s2-radius">2.4 Border radius</h3>
+  <div class="demo-box">
+    <div class="radius-demo">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:0px;">0px</div>
+        <div class="demo-label">none</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:2px;">2px</div>
+        <div class="demo-label">xs</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:4px;">4px</div>
+        <div class="demo-label">sm</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:8px;">8px</div>
+        <div class="demo-label">--radius (0.5rem)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:12px;">12px</div>
+        <div class="demo-label">md (×1.5)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:16px;">16px</div>
+        <div class="demo-label">lg (×2)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="radius-box" style="border-radius:999px; width:60px;">∞</div>
+        <div class="demo-label">full (pill)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2.5 Ombres -->
+  <h3 class="sub-title" id="s2-shadows">2.5 Ombres</h3>
+  <div class="demo-box">
+    <div class="shadow-demo">
+      <div class="shadow-box" style="box-shadow: none; border-color: var(--border);">
+        <div class="demo-label" style="margin-top:0;">Aucune ombre</div>
+        <div style="font-size:0.8rem; margin-top:0.25rem; color:var(--foreground);">Cartes, inputs</div>
+      </div>
+      <div class="shadow-box" style="box-shadow: var(--shadow-sm);">
+        <div class="demo-label" style="margin-top:0;">shadow-sm</div>
+        <div style="font-size:0.8rem; margin-top:0.25rem; color:var(--foreground);">Avatars, badges, toggles</div>
+      </div>
+      <div class="shadow-box" style="box-shadow: var(--shadow-md);">
+        <div class="demo-label" style="margin-top:0;">shadow-md</div>
+        <div style="font-size:0.8rem; margin-top:0.25rem; color:var(--foreground);">Hover state, dropdowns, dialogs</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3 — COMPOSANTS DE BASE
+     ============================================================ -->
+<section id="s3">
+  <h2 class="section-title">3. Composants de base</h2>
+
+  <!-- 3.1 Button -->
+  <h3 class="sub-title" id="s3-btn">3.1 Button <span class="badge-rule">RÈGLE ABSOLUE</span></h3>
+  <p style="font-size:0.875rem; color:var(--muted-foreground);">Un seul bouton <code>default</code> (rose) par page/section. Le danger est communiqué par le <strong>contexte</strong>, pas la couleur. <code>--destructive = --primary</code>.</p>
+
+  <h4 style="font-size:0.85rem; font-weight:600; margin-top:1rem; margin-bottom:0.5rem; color:var(--muted-foreground);">Variants</h4>
+  <div class="demo-box">
+    <div class="demo-row">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default">Action principale</button>
+        <div class="demo-label">default (primary)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-outline">Action secondaire</button>
+        <div class="demo-label">outline</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-ghost">Action tertiaire</button>
+        <div class="demo-label">ghost</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-secondary">Secondaire</button>
+        <div class="demo-label">secondary</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-link">Lien</button>
+        <div class="demo-label">link</div>
+      </div>
+    </div>
+  </div>
+
+  <h4 style="font-size:0.85rem; font-weight:600; margin-top:1rem; margin-bottom:0.5rem; color:var(--muted-foreground);">Tailles</h4>
+  <div class="demo-box">
+    <div class="demo-row" style="align-items:flex-end;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default btn-lg">Large</button>
+        <div class="demo-label">size="lg"</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default">Default</button>
+        <div class="demo-label">default</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default btn-sm">Small</button>
+        <div class="demo-label">size="sm"</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default btn-xs">XS</button>
+        <div class="demo-label">size="xs"</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+        <button class="btn btn-default btn-default btn-disabled">Désactivé</button>
+        <div class="demo-label">disabled</div>
+      </div>
+    </div>
+  </div>
+
+  <h4 style="font-size:0.85rem; font-weight:600; margin-top:1rem; margin-bottom:0.5rem; color:var(--muted-foreground);">Pattern "Supprimer" <span class="badge-rule">RÈGLE ABSOLUE</span></h4>
+  <div class="demo-box">
+    <p style="font-size:0.8rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Le trigger utilise <code>variant="outline"</code> + classes destructive. L'<code>AlertDialogAction</code> dans la modale utilise fond destructive.</p>
+    <div class="demo-row">
+      <button class="btn btn-destructive-outline btn-sm">Supprimer</button>
+      <span style="font-size:0.78rem; color:var(--muted-foreground);">← trigger visible (outline, pas fond rouge)</span>
+    </div>
+    <pre><code>// Trigger
+&lt;Button
+  variant="outline"
+  size="sm"
+  className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+&gt;
+  Supprimer
+&lt;/Button&gt;
+
+// AlertDialogAction (dans la modale de confirmation)
+&lt;AlertDialogAction className="bg-destructive text-white hover:bg-destructive/90"&gt;
+  Supprimer définitivement
+&lt;/AlertDialogAction&gt;</code></pre>
+  </div>
+
+  <h4 style="font-size:0.85rem; font-weight:600; margin-top:1rem; margin-bottom:0.5rem; color:var(--muted-foreground);">CTA fullwidth (page publique)</h4>
+  <div class="demo-box" style="max-width:400px;">
+    <button class="btn btn-default btn-fullwidth">S'inscrire à l'événement</button>
+    <pre style="margin-top:0.75rem;"><code>size="lg" className="w-full"</code></pre>
+  </div>
+
+  <h4 style="font-size:0.85rem; font-weight:600; margin-top:1rem; margin-bottom:0.5rem; color:var(--muted-foreground);">Hiérarchie dans un contexte</h4>
+  <div class="demo-box">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0;">
+      <span style="font-size:0.9rem; font-weight:600;">Ma Communauté Tech</span>
+      <div class="demo-row" style="margin:0;">
+        <button class="btn btn-outline btn-sm">Créer une Communauté</button>
+        <button class="btn btn-default btn-sm">Créer un événement</button>
+      </div>
+    </div>
+    <p style="font-size:0.78rem; color:var(--muted-foreground); margin:0.5rem 0 0;">→ "Créer un événement" est l'action principale (default). "Créer une Communauté" est secondaire (outline).</p>
+  </div>
+
+  <!-- 3.2 Badge -->
+  <h3 class="sub-title" id="s3-badge">3.2 Badge</h3>
+  <div class="demo-box">
+    <div class="demo-row" style="flex-wrap:wrap;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-filled-primary">Inscrit</span>
+        <div class="demo-label">filled primary</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-filled-primary">Publié</span>
+        <div class="demo-label">filled primary</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-outline-primary">Organisateur</span>
+        <div class="demo-label">outline primary</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-outline-destructive">Annulé</span>
+        <div class="demo-label">outline destructive</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-outline-neutral">Passé</span>
+        <div class="demo-label">outline neutre</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-secondary">Participant</span>
+        <div class="demo-label">secondary</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <span class="badge badge-amber">Liste d'attente</span>
+        <div class="demo-label">amber</div>
+      </div>
+    </div>
+  </div>
+  <pre><code>// Règle : fond plein = engagement positif, outline = tout le reste
+badge-filled-primary  → Inscrit, Publié
+badge-outline-primary → Organisateur (border-primary/40 text-primary)
+badge-outline-destructive → Annulé (border-destructive/40 text-destructive)
+badge-outline-neutral → Passé
+badge-secondary       → Participant, défaut
+badge-amber           → Liste d'attente</code></pre>
+
+  <!-- 3.3 Avatar -->
+  <h3 class="sub-title" id="s3-avatar">3.3 Avatar</h3>
+  <div class="demo-box">
+    <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.75rem;">UserAvatar — toutes les tailles (initiales "JD")</p>
+    <div class="demo-row" style="align-items:flex-end;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-xs">JD</div>
+        <div class="demo-label">xs (24px)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-sm">JD</div>
+        <div class="demo-label">sm (32px)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-md">JD</div>
+        <div class="demo-label">md (40px)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-lg">JD</div>
+        <div class="demo-label">lg (56px)</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-xl">JD</div>
+        <div class="demo-label">xl (80px)</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem; font-weight:600; margin:1.25rem 0 0.75rem;">CircleAvatar — gradient par initiale</p>
+    <div class="demo-row">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-xs avatar-gradient" style="background: linear-gradient(135deg,#e8457a,#9333ea); color:white;">T</div>
+        <div class="demo-label">xs</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-sm avatar-gradient" style="background: linear-gradient(135deg,#3b82f6,#06b6d4); color:white;">B</div>
+        <div class="demo-label">sm</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-md avatar-gradient" style="background: linear-gradient(135deg,#10b981,#3b82f6); color:white;">C</div>
+        <div class="demo-label">default</div>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+        <div class="avatar avatar-lg avatar-gradient" style="background: linear-gradient(135deg,#8b5cf6,#ec4899); color:white;">D</div>
+        <div class="demo-label">lg</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem; font-weight:600; margin:1.25rem 0 0.75rem;">AvatarGroup — empilé</p>
+    <div class="avatar-group">
+      <div class="avatar avatar-md" style="background:rgba(232,69,122,0.12); color:var(--primary);">JD</div>
+      <div class="avatar avatar-md" style="background:rgba(59,130,246,0.12); color:#3b82f6;">AM</div>
+      <div class="avatar avatar-md" style="background:rgba(16,185,129,0.12); color:#10b981;">SC</div>
+      <div class="avatar avatar-md" style="background:rgba(139,92,246,0.12); color:#8b5cf6;">LB</div>
+      <div class="avatar avatar-md" style="background:var(--muted); color:var(--muted-foreground); font-size:0.72rem;">+12</div>
+    </div>
+  </div>
+
+  <!-- 3.4 Card -->
+  <h3 class="sub-title" id="s3-card">3.4 Card</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <div class="card hover-lift">
+      <div class="card-header">Titre de la carte</div>
+      <div class="card-content">
+        <p style="margin:0;">Contenu de la carte avec une description ou des informations pertinentes.</p>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-outline btn-sm">Annuler</button>
+        <button class="btn btn-default btn-sm">Confirmer</button>
+      </div>
+    </div>
+    <div class="card hover-lift">
+      <div class="card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <span>Statistiques</span>
+        <span class="badge badge-filled-primary">Publié</span>
+      </div>
+      <div class="card-content">
+        <div style="display:flex; gap:1.5rem; margin-top:0.5rem;">
+          <div><div style="font-size:1.5rem; font-weight:700; color:var(--foreground);">24</div><div class="demo-label">inscrits</div></div>
+          <div><div style="font-size:1.5rem; font-weight:700; color:var(--foreground);">6</div><div class="demo-label">restants</div></div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-ghost btn-sm">Voir les inscrits</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.5-3.8 Form inputs -->
+  <h3 class="sub-title" id="s3-input">3.5 Input / 3.6 Textarea / 3.7 Label / 3.8 Select</h3>
+  <div class="demo-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="demo-box">
+      <label class="label label-required">Titre de l'événement</label>
+      <input class="input" type="text" placeholder="Ex : Meetup React Paris #12">
+
+      <label class="label" style="margin-top:1rem;">Recherche</label>
+      <div class="input-with-icon">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="input" type="text" placeholder="Rechercher une communauté...">
+      </div>
+
+      <label class="label" style="margin-top:1rem;">Statut</label>
+      <select class="select-sim">
+        <option>Publié</option>
+        <option>Brouillon</option>
+        <option>Annulé</option>
+      </select>
+    </div>
+    <div class="demo-box">
+      <label class="label label-required">Description</label>
+      <textarea class="textarea" placeholder="Décrivez votre événement...">Rejoignez-nous pour cette rencontre mensuelle de la communauté React Paris.</textarea>
+      <div style="text-align:right; font-size:0.72rem; color:var(--muted-foreground); margin-top:0.35rem;">112 / 500</div>
+
+      <label class="label" style="margin-top:1rem;">Input erreur</label>
+      <input class="input" type="text" value="date-invalide" style="border-color:var(--destructive); box-shadow: 0 0 0 3px rgba(232,69,122,0.15);">
+      <div style="font-size:0.75rem; color:var(--destructive); margin-top:0.25rem;">Date invalide. Format attendu : JJ/MM/AAAA</div>
+    </div>
+  </div>
+
+  <!-- 3.9 Tabs -->
+  <h3 class="sub-title" id="s3-tabs">3.9 Tabs</h3>
+  <div class="demo-box">
+    <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.75rem;">Pill tabs (dashboard, timeline)</p>
+    <div class="tabs-pill">
+      <button class="tab active" onclick="switchPillTab(this, 'pill-upcoming')">À venir</button>
+      <button class="tab" onclick="switchPillTab(this, 'pill-past')">Passés</button>
+    </div>
+
+    <p style="font-size:0.8rem; font-weight:600; margin:1.25rem 0 0.75rem;">Line tabs (navigation)</p>
+    <div class="tabs-line">
+      <button class="tab active">Mes événements</button>
+      <button class="tab">Mes Communautés</button>
+      <button class="tab">Profil</button>
+    </div>
+    <div style="padding:0.75rem 0; font-size:0.82rem; color:var(--muted-foreground);">Contenu de l'onglet sélectionné…</div>
+  </div>
+
+  <!-- 3.10-3.11 Dialog -->
+  <h3 class="sub-title" id="s3-dialog">3.10 Dialog / 3.11 Alert Dialog (pattern Supprimer)</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Dialog — aperçu structure</p>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:calc(var(--radius)*1.5); padding:1.5rem; max-width:440px; box-shadow:var(--shadow-md);">
+        <div style="font-size:1.1rem; font-weight:600; margin-bottom:0.35rem;">Modifier les informations</div>
+        <div style="font-size:0.8rem; color:var(--muted-foreground); margin-bottom:1rem;">Mettez à jour les détails de votre événement.</div>
+        <label class="label label-required">Titre</label>
+        <input class="input" type="text" value="Meetup React Paris #12" style="margin-bottom:0.75rem;">
+        <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border);">
+          <button class="btn btn-outline">Annuler</button>
+          <button class="btn btn-default">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Alert Dialog — pattern Supprimer complet</p>
+      <div class="alert-dialog-sim">
+        <div class="alert-dialog-title">Supprimer cet événement ?</div>
+        <div class="alert-dialog-desc">Cette action est irréversible. L'événement "Meetup React Paris #12" et toutes ses inscriptions seront supprimés définitivement.</div>
+        <div class="alert-dialog-footer">
+          <button class="btn btn-outline">Annuler</button>
+          <button class="btn-alert-destructive">Supprimer définitivement</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.12-3.15 Misc -->
+  <h3 class="sub-title" id="s3-misc">3.12 Separator / 3.13 Table / 3.14 Tooltip / 3.15 Dropdown</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Separator</p>
+      <div class="demo-box">
+        <div>Texte avant</div>
+        <hr class="sep">
+        <div>Texte après</div>
+        <div style="display:flex; align-items:center; margin-top:0.5rem;">
+          <span>Élément A</span>
+          <span class="sep-v"></span>
+          <span>Élément B</span>
+          <span class="sep-v"></span>
+          <span>Élément C</span>
+        </div>
+      </div>
+
+      <p style="font-size:0.8rem; font-weight:600; margin:1rem 0 0.5rem;">Tooltip</p>
+      <div class="demo-box" style="padding-top:2.5rem;">
+        <div class="tooltip-wrap" style="display:inline-block;">
+          <button class="btn btn-ghost btn-sm">Copier le lien</button>
+          <div class="tooltip-content">Copier dans le presse-papier</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Dropdown Menu (ouvert)</p>
+      <div class="demo-box">
+        <div class="dropdown-sim">
+          <div class="dropdown-item">✏️ Modifier</div>
+          <div class="dropdown-item">📋 Dupliquer</div>
+          <div class="dropdown-item">🔗 Copier le lien</div>
+          <div class="dropdown-sep"></div>
+          <div class="dropdown-item destructive">🗑️ Supprimer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:0.8rem; font-weight:600; margin:1rem 0 0.5rem;">Table — exemple complet</p>
+  <div class="demo-box">
+    <div class="table-wrapper">
+      <table class="ds-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Check-in</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar avatar-sm" style="font-size:0.65rem;">JD</div>Jean Dupont</div></td>
+            <td style="color:var(--muted-foreground);">jean@example.com</td>
+            <td><span class="badge badge-filled-primary">Inscrit</span></td>
+            <td><span style="color:#10b981; font-weight:600;">✓</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar avatar-sm" style="background:rgba(59,130,246,0.12); color:#3b82f6; font-size:0.65rem;">AM</div>Alice Martin</div></td>
+            <td style="color:var(--muted-foreground);">alice@example.com</td>
+            <td><span class="badge badge-amber">Liste d'attente</span></td>
+            <td><span style="color:var(--muted-foreground);">—</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex; align-items:center; gap:0.5rem;"><div class="avatar avatar-sm" style="background:rgba(16,185,129,0.12); color:#10b981; font-size:0.65rem;">SC</div>Sophie Chen</div></td>
+            <td style="color:var(--muted-foreground);">sophie@example.com</td>
+            <td><span class="badge badge-filled-primary">Inscrit</span></td>
+            <td><span style="color:var(--muted-foreground);">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 4 — COMPOSANTS MÉTIER
+     ============================================================ -->
+<section id="s4">
+  <h2 class="section-title">4. Composants métier</h2>
+
+  <!-- 4.1 CircleCard -->
+  <h3 class="sub-title" id="s4-circle">4.1 CircleCard</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); max-width:700px;">
+    <div class="circle-card">
+      <div class="circle-card-cover" style="background: linear-gradient(135deg,#e8457a,#9333ea);">
+        <div style="font-size:2rem; opacity:0.3; color:white;">👥</div>
+      </div>
+      <div class="circle-card-body">
+        <div class="circle-card-name">Tech Paris</div>
+        <div class="circle-card-meta">
+          <span>👥 142 membres</span>
+          <span>·</span>
+          <span>🗓 8 événements</span>
+        </div>
+        <div class="circle-card-desc">La communauté des développeurs parisiens passionnés par le web moderne.</div>
+      </div>
+    </div>
+    <div class="circle-card">
+      <div class="circle-card-cover" style="background: linear-gradient(135deg,#3b82f6,#06b6d4);">
+        <div style="font-size:2rem; opacity:0.3; color:white;">🎨</div>
+      </div>
+      <div class="circle-card-body">
+        <div class="circle-card-name">Design System Club</div>
+        <div class="circle-card-meta">
+          <span>👥 67 membres</span>
+          <span>·</span>
+          <span>🗓 3 événements</span>
+        </div>
+        <div class="circle-card-desc">Pour les designers et développeurs qui construisent des systèmes visuels cohérents.</div>
+      </div>
+    </div>
+    <div class="circle-card">
+      <div class="circle-card-cover" style="background: linear-gradient(135deg,#10b981,#3b82f6);">
+        <div style="font-size:2rem; opacity:0.3; color:white;">🚀</div>
+      </div>
+      <div class="circle-card-body">
+        <div class="circle-card-name">Startup Founders</div>
+        <div class="circle-card-meta">
+          <span>👥 234 membres</span>
+          <span>·</span>
+          <span>🗓 12 événements</span>
+        </div>
+        <div class="circle-card-desc">Réseau d'entrepreneurs et fondateurs de startups tech en France.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.2 MomentCard -->
+  <h3 class="sub-title" id="s4-moment">4.2 MomentCard</h3>
+  <div style="max-width:540px; display:flex; flex-direction:column; gap:0.75rem;">
+    <div class="moment-card">
+      <div class="moment-card-thumb" style="background: linear-gradient(135deg,#e8457a,#9333ea);"></div>
+      <div class="moment-card-body">
+        <div class="moment-card-date">MAR 15, 2026 · 19:00</div>
+        <div class="moment-card-title">Meetup React Paris #12</div>
+        <div class="moment-card-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Station F, Paris 13e
+        </div>
+        <div style="margin-top:0.5rem;"><span class="badge badge-filled-primary">Inscrit</span></div>
+      </div>
+    </div>
+    <div class="moment-card">
+      <div class="moment-card-thumb" style="background: linear-gradient(135deg,#3b82f6,#06b6d4);"></div>
+      <div class="moment-card-body">
+        <div class="moment-card-date">AVR 02, 2026 · 18:30</div>
+        <div class="moment-card-title">Workshop TypeScript Avancé</div>
+        <div class="moment-card-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          En ligne · Zoom
+        </div>
+        <div style="margin-top:0.5rem;"><span class="badge badge-amber">Liste d'attente</span></div>
+      </div>
+    </div>
+    <div class="moment-card">
+      <div class="moment-card-thumb" style="background: linear-gradient(135deg,#8b5cf6,#ec4899);"></div>
+      <div class="moment-card-body">
+        <div class="moment-card-date" style="color:var(--muted-foreground);">JAN 20, 2026 · 19:00</div>
+        <div class="moment-card-title" style="color:var(--muted-foreground);">Soirée Networking Dev</div>
+        <div class="moment-card-location">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Le Marais, Paris 4e
+        </div>
+        <div style="margin-top:0.5rem;"><span class="badge badge-outline-neutral">Passé</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.3 MomentDetailView -->
+  <h3 class="sub-title" id="s4-detail">4.3 MomentDetailView — Layout 2 colonnes</h3>
+  <div class="demo-box" style="padding:1.5rem;">
+    <div style="display:grid; grid-template-columns: 300px 1fr; gap:2rem; align-items:start;">
+      <!-- LEFT -->
+      <div>
+        <div class="cover-glow-wrap" style="width:100%;">
+          <div style="width:100%; aspect-ratio:1/1; background:linear-gradient(135deg,#e8457a,#9333ea); border-radius:calc(var(--radius)*1.5); display:flex; align-items:center; justify-content:center; font-size:3rem; opacity:0.7; color:white;">🎉</div>
+          <div class="cover-glow-blur" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+        </div>
+        <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border);">
+          <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted-foreground); margin-bottom:0.75rem;">Organisé par</div>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#e8457a,#9333ea); color:white; font-size:0.7rem;">JD</div>
+            <span style="font-size:0.875rem; font-weight:500;">Jean Dupont</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#3b82f6,#06b6d4); color:white; font-size:0.7rem;">AM</div>
+            <span style="font-size:0.875rem; font-weight:500;">Alice Martin</span>
+          </div>
+          <div style="margin-top:1rem; padding-top:0.75rem; border-top:1px solid var(--border);">
+            <a href="#" style="font-size:0.8rem; font-weight:600; color:var(--primary); display:flex; align-items:center; gap:0.35rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Communauté Tech Paris
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT -->
+      <div>
+        <div class="breadcrumb" style="margin-bottom:0.75rem;">
+          <a href="#">Mon espace</a>
+          <span class="breadcrumb-sep">›</span>
+          <a href="#">Tech Paris</a>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-current">Meetup React #12</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.75rem;">
+          <span class="badge badge-filled-primary">Publié</span>
+          <span class="badge badge-outline-primary">Organisateur</span>
+        </div>
+        <h1 style="font-size:1.75rem; font-weight:700; line-height:1.2; margin-bottom:1rem;">Meetup React Paris #12</h1>
+
+        <div class="meta-row">
+          <div class="meta-icon">📅</div>
+          <div class="meta-row-content">
+            <div class="meta-row-label">Quand</div>
+            <div class="meta-row-value">Mercredi 15 mars 2026, 19h00</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">📍</div>
+          <div class="meta-row-content">
+            <div class="meta-row-label">Où</div>
+            <div class="meta-row-value">Station F — 5 Parvis Alan Turing, Paris 13e</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">👥</div>
+          <div class="meta-row-content">
+            <div class="meta-row-label">Inscrits</div>
+            <div class="meta-row-value" style="display:flex; align-items:center; gap:0.5rem;">
+              <div class="avatar-group" style="display:flex;">
+                <div class="avatar avatar-xs" style="background:rgba(232,69,122,0.1); color:var(--primary); border:2px solid var(--card); font-size:0.55rem;">JD</div>
+                <div class="avatar avatar-xs" style="background:rgba(59,130,246,0.1); color:#3b82f6; margin-left:-6px; border:2px solid var(--card); font-size:0.55rem;">AM</div>
+                <div class="avatar avatar-xs" style="background:rgba(16,185,129,0.1); color:#10b981; margin-left:-6px; border:2px solid var(--card); font-size:0.55rem;">SC</div>
+              </div>
+              24 inscrits · 6 places restantes
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <button class="btn btn-default btn-sm">✏️ Modifier</button>
+          <button class="btn btn-destructive-outline btn-sm" style="margin-left:0.5rem;">Supprimer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.4 RegistrationButton -->
+  <h3 class="sub-title" id="s4-reg">4.4 RegistrationButton — tous les états</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); max-width:700px;">
+    <div class="demo-box" style="display:flex; flex-direction:column; gap:0.4rem;">
+      <button class="btn btn-default btn-fullwidth">S'inscrire à l'événement</button>
+      <div class="demo-label" style="text-align:center;">CTA default</div>
+    </div>
+    <div class="demo-box" style="display:flex; flex-direction:column; gap:0.4rem;">
+      <div class="reg-btn-joined">✓ Inscrit</div>
+      <div class="demo-label" style="text-align:center;">Déjà inscrit</div>
+    </div>
+    <div class="demo-box" style="display:flex; flex-direction:column; gap:0.4rem;">
+      <div class="reg-btn-waitlist">⏳ En liste d'attente</div>
+      <div class="demo-label" style="text-align:center;">Liste d'attente</div>
+    </div>
+    <div class="demo-box" style="display:flex; flex-direction:column; gap:0.4rem;">
+      <div class="reg-btn-full">Complet</div>
+      <div class="demo-label" style="text-align:center;">Plus de places</div>
+    </div>
+  </div>
+
+  <!-- 4.5 RegistrationsList + 4.6 CommentThread + 4.7 CircleMembersList -->
+  <h3 class="sub-title" id="s4-list">4.5 RegistrationsList / 4.6 CommentThread / 4.7 CircleMembersList</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">RegistrationsList</p>
+      <div class="demo-box" style="padding:0; overflow:hidden;">
+        <div class="table-wrapper">
+          <table class="ds-table">
+            <thead><tr><th>Participant</th><th>Statut</th><th>Check-in</th></tr></thead>
+            <tbody>
+              <tr><td><div style="display:flex; align-items:center; gap:0.4rem;"><div class="avatar avatar-xs" style="font-size:0.55rem;">JD</div>Jean D.</div></td><td><span class="badge badge-filled-primary">Inscrit</span></td><td>✓</td></tr>
+              <tr><td><div style="display:flex; align-items:center; gap:0.4rem;"><div class="avatar avatar-xs" style="background:rgba(59,130,246,0.1); color:#3b82f6; font-size:0.55rem;">AM</div>Alice M.</div></td><td><span class="badge badge-amber">Attente</span></td><td>—</td></tr>
+              <tr><td><div style="display:flex; align-items:center; gap:0.4rem;"><div class="avatar avatar-xs" style="background:rgba(16,185,129,0.1); color:#10b981; font-size:0.55rem;">SC</div>Sophie C.</div></td><td><span class="badge badge-filled-primary">Inscrit</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">CircleMembersList</p>
+      <div class="demo-box">
+        <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted-foreground); margin-bottom:0.5rem;">Organisateurs</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <div class="avatar avatar-sm" style="background:linear-gradient(135deg,#e8457a,#9333ea); color:white; font-size:0.65rem;">JD</div>
+              <div>
+                <div style="font-size:0.875rem; font-weight:600;">Jean Dupont</div>
+                <div style="font-size:0.72rem; color:var(--muted-foreground);">jean@example.com</div>
+              </div>
+            </div>
+            <span style="font-size:0.8rem;">👑</span>
+          </div>
+        </div>
+        <div style="font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted-foreground); margin-bottom:0.5rem;">Membres</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <div class="avatar avatar-sm" style="background:rgba(59,130,246,0.1); color:#3b82f6; font-size:0.65rem;">AM</div>
+              <div style="font-size:0.875rem;">Alice Martin</div>
+            </div>
+            <span class="badge badge-secondary">Participant</span>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <div class="avatar avatar-sm" style="background:rgba(16,185,129,0.1); color:#10b981; font-size:0.65rem;">SC</div>
+              <div style="font-size:0.875rem;">Sophie Chen</div>
+            </div>
+            <span class="badge badge-secondary">Participant</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:0.8rem; font-weight:600; margin:1rem 0 0.5rem;">CommentThread</p>
+  <div class="demo-box" style="max-width:540px;">
+    <div class="comment">
+      <div class="avatar avatar-sm" style="background:rgba(232,69,122,0.1); color:var(--primary); font-size:0.65rem;">JD</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-name">Jean Dupont</span>
+          <span class="comment-time">Il y a 2 heures</span>
+        </div>
+        <div class="comment-text">Super événement comme d'habitude ! Le talk sur les React Server Components était excellent. Vivement le prochain 🚀</div>
+      </div>
+    </div>
+    <div class="comment">
+      <div class="avatar avatar-sm" style="background:rgba(59,130,246,0.1); color:#3b82f6; font-size:0.65rem;">AM</div>
+      <div class="comment-body">
+        <div class="comment-header">
+          <span class="comment-name">Alice Martin</span>
+          <span class="comment-time">Il y a 1 heure</span>
+        </div>
+        <div class="comment-text">Entièrement d'accord ! La démo live de Next.js 15 m'a convaincue de migrer mon projet. Merci aux organisateurs.</div>
+      </div>
+    </div>
+    <div style="padding-top:1rem; border-top:1px solid var(--border); margin-top:0.5rem;">
+      <label class="label">Ajouter un commentaire</label>
+      <textarea class="textarea" placeholder="Votre commentaire..." style="min-height:72px;"></textarea>
+      <div style="display:flex; justify-content:flex-end; margin-top:0.5rem;">
+        <button class="btn btn-default btn-sm">Publier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.8 CoverImagePicker -->
+  <h3 class="sub-title" id="s4-cover">4.8 CoverImagePicker</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Trigger — zone de cover avec hover</p>
+      <div class="demo-box" style="padding:0; overflow:hidden; max-width:240px;">
+        <div style="position:relative; width:100%; aspect-ratio:1/1; background:linear-gradient(135deg,#e8457a,#9333ea); cursor:pointer; overflow:hidden; group" onmouseenter="this.querySelector('.cover-overlay').style.opacity='1'" onmouseleave="this.querySelector('.cover-overlay').style.opacity='0'">
+          <div class="cover-overlay" style="position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s;">
+            <button class="btn btn-outline" style="border-color:rgba(255,255,255,0.5); color:white; background:rgba(0,0,0,0.3);">📷 Changer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Dialog — aperçu onglets</p>
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:calc(var(--radius)*1.5); padding:1.25rem; box-shadow:var(--shadow-md);">
+        <div style="font-size:1rem; font-weight:600; margin-bottom:0.75rem;">Photo de couverture</div>
+        <div class="tabs-line" style="margin-bottom:1rem;">
+          <button class="tab active">📷 Photos</button>
+          <button class="tab">⬆️ Importer</button>
+        </div>
+        <input class="input" type="text" placeholder="Rechercher une photo..." style="margin-bottom:0.75rem;">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.35rem;">
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#e8457a,#9333ea); border-radius:4px; cursor:pointer;"></div>
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#3b82f6,#06b6d4); border-radius:4px; cursor:pointer;"></div>
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#10b981,#3b82f6); border-radius:4px; cursor:pointer;"></div>
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#f59e0b,#ef4444); border-radius:4px; cursor:pointer;"></div>
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#8b5cf6,#ec4899); border-radius:4px; cursor:pointer; border:2px solid var(--primary);"></div>
+          <div style="aspect-ratio:1/1; background:linear-gradient(135deg,#6b7280,#374151); border-radius:4px; cursor:pointer;"></div>
+        </div>
+        <div style="font-size:0.72rem; color:var(--muted-foreground); margin-top:0.5rem;">Photos via Unsplash · Attribution auto</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.9 PublicCircleCard -->
+  <h3 class="sub-title" id="s4-public">4.9 PublicCircleCard — variant card + compact</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Variant card (Découvrir)</p>
+      <div class="circle-card">
+        <div class="circle-card-cover" style="background: linear-gradient(135deg,#8b5cf6,#ec4899);">
+          <div style="font-size:2.5rem; opacity:0.25; color:white;">🎭</div>
+        </div>
+        <div class="circle-card-body">
+          <div class="circle-card-name">Arts & Culture Paris</div>
+          <div class="circle-card-meta">
+            <span>👥 89 membres</span>
+            <span>·</span>
+            <span style="display:flex; align-items:center; gap:0.2rem;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/></svg>Paris</span>
+          </div>
+          <div class="circle-card-desc">Expositions, performances, rencontres autour de l'art contemporain.</div>
+          <div style="margin-top:0.75rem; display:flex; flex-wrap:wrap; gap:0.3rem;">
+            <span class="tag">Culture</span>
+            <span class="tag">Art</span>
+            <span class="tag">Paris</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Variant compact (liste)</p>
+      <div class="demo-box" style="padding:0; overflow:hidden;">
+        <div style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border-bottom:1px solid var(--border);">
+          <div style="width:48px; height:48px; min-width:48px; border-radius:var(--radius); background:linear-gradient(135deg,#e8457a,#9333ea); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1rem;">T</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.875rem;">Tech Paris</div>
+            <div style="font-size:0.72rem; color:var(--muted-foreground);">142 membres · Paris</div>
+          </div>
+          <button class="btn btn-outline btn-sm">Voir</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; border-bottom:1px solid var(--border);">
+          <div style="width:48px; height:48px; min-width:48px; border-radius:var(--radius); background:linear-gradient(135deg,#3b82f6,#06b6d4); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1rem;">D</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.875rem;">Design Club</div>
+            <div style="font-size:0.72rem; color:var(--muted-foreground);">67 membres · Lyon</div>
+          </div>
+          <button class="btn btn-outline btn-sm">Voir</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem;">
+          <div style="width:48px; height:48px; min-width:48px; border-radius:var(--radius); background:linear-gradient(135deg,#10b981,#3b82f6); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1rem;">S</div>
+          <div style="flex:1;">
+            <div style="font-weight:600; font-size:0.875rem;">Startup Founders</div>
+            <div style="font-size:0.72rem; color:var(--muted-foreground);">234 membres · France</div>
+          </div>
+          <button class="btn btn-outline btn-sm">Voir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.10 Admin StatsCard -->
+  <h3 class="sub-title" id="s4-admin">4.10 Admin StatsCard</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); max-width:600px;">
+    <div class="stats-card">
+      <div style="font-size:1.5rem; margin-bottom:0.25rem;">👥</div>
+      <div class="stats-number">1,284</div>
+      <div class="stats-label">Utilisateurs total</div>
+      <div class="stats-delta">+12 cette semaine</div>
+    </div>
+    <div class="stats-card">
+      <div style="font-size:1.5rem; margin-bottom:0.25rem;">🔵</div>
+      <div class="stats-number">89</div>
+      <div class="stats-label">Communautés actives</div>
+      <div class="stats-delta">+3 cette semaine</div>
+    </div>
+    <div class="stats-card">
+      <div style="font-size:1.5rem; margin-bottom:0.25rem;">🗓</div>
+      <div class="stats-number">342</div>
+      <div class="stats-label">Événements total</div>
+      <div class="stats-delta">+28 ce mois</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5 — LAYOUTS
+     ============================================================ -->
+<section id="s5">
+  <h2 class="section-title">5. Patterns de layout</h2>
+
+  <!-- 5.1 SiteHeader -->
+  <h3 class="sub-title" id="s5-header">5.1 SiteHeader</h3>
+  <div class="demo-box" style="padding:0; overflow:hidden;">
+    <div class="site-header">
+      <div class="site-header-logo">🛝 The Playground</div>
+      <div class="site-header-nav">
+        <div class="site-header-link active">Mon espace</div>
+        <div class="site-header-link">Découvrir</div>
+      </div>
+      <div class="site-header-actions">
+        <div class="avatar avatar-sm" style="cursor:pointer;">JD</div>
+        <button class="btn btn-ghost btn-sm">Se déconnecter</button>
+      </div>
+    </div>
+  </div>
+  <pre><code>// SiteHeader : height 56px, sticky top-0, z-50
+// - Logo (lien vers /dashboard)
+// - Nav links : Mon espace + Découvrir
+// - Actions : Avatar (vers /dashboard/profile) + Se déconnecter (ghost btn)
+// Pas de prop hideNav — le layout fait tout le travail</code></pre>
+
+  <!-- 5.2 SiteFooter -->
+  <h3 class="sub-title" id="s5-footer">5.2 SiteFooter</h3>
+  <div class="demo-box" style="padding:0; overflow:hidden;">
+    <div class="site-footer">
+      <div>© 2026 <span class="site-footer-brand">The Playground</span></div>
+      <div style="display:flex; align-items:center; gap:1rem;">
+        <a href="#" style="color:var(--muted-foreground); font-size:0.8rem;">Confidentialité</a>
+        <a href="#" style="color:var(--muted-foreground); font-size:0.8rem;">CGU</a>
+        <a href="#" style="color:var(--muted-foreground); font-size:0.8rem;">Contact</a>
+      </div>
+      <div style="font-size:0.75rem; color:var(--muted-foreground);">Propulsé par <span style="color:var(--primary); font-weight:500;">The Playground</span></div>
+    </div>
+  </div>
+
+  <!-- 5.3 Layout 2 colonnes -->
+  <h3 class="sub-title" id="s5-2col">5.3 Layout 2 colonnes (pages Circle et Moment)</h3>
+  <div class="demo-box">
+    <p style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Utilisé sur la page événement publique <code>/m/[slug]</code>, la vue Organisateur, et la page Circle.</p>
+    <pre style="font-family:'JetBrains Mono', monospace; font-size:0.75rem; line-height:1.6; margin:0;">
+┌─────────────────────────────────────────────────────────┐
+│  SiteHeader (sticky, h-14)                              │
+├───────────────────┬─────────────────────────────────────┤
+│  LEFT (sticky)    │  RIGHT (scrollable)                 │
+│  max-w: 300px     │  flex: 1                            │
+│                   │                                     │
+│  ┌─────────────┐  │  Breadcrumb                         │
+│  │ Cover 1:1   │  │  Badge(s)                           │
+│  │ (gradient   │  │  H1 Titre                           │
+│  │  ou image)  │  │                                     │
+│  └─────────────┘  │  Meta rows:                         │
+│  + glow blur      │    📅 Date                          │
+│                   │    📍 Lieu                          │
+│  Organisateurs    │    👥 Inscrits                      │
+│  (avatars + noms) │                                     │
+│                   │  Description / À propos             │
+│  Stats circle     │                                     │
+│  (N membres /     │  CTA / Actions                      │
+│   N événements)   │                                     │
+└───────────────────┴─────────────────────────────────────┘
+│  SiteFooter                                             │
+└─────────────────────────────────────────────────────────┘</pre>
+    <pre style="margin-top:0.75rem;"><code>// Tailwind classes
+&lt;div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start"&gt;
+  &lt;div className="lg:sticky lg:top-20"&gt; {/* LEFT */} &lt;/div&gt;
+  &lt;div&gt; {/* RIGHT */} &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+  </div>
+
+  <!-- 5.4 Dashboard layout -->
+  <h3 class="sub-title" id="s5-dash">5.4 Dashboard layout</h3>
+  <div class="demo-box">
+    <p style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Route group <code>dashboard/(app)/layout.tsx</code> — layout complet avec SiteHeader + SiteFooter.</p>
+    <pre style="font-family:'JetBrains Mono', monospace; font-size:0.75rem; line-height:1.6; margin:0;">
+Route: /dashboard/**
+Layout: (app)/layout.tsx
+  ↳ SiteHeader (sticky, navigation complète)
+  ↳ &lt;main&gt; {children} &lt;/main&gt;
+  ↳ SiteFooter
+
+Pages:
+  /dashboard                    → Vue principale (pill tabs: Mes événements / Mes Communautés)
+  /dashboard/circles/[slug]     → Page Circle organisateur
+  /dashboard/circles/[slug]/moments/[slug] → Détail événement
+  /dashboard/profile            → Profil utilisateur</pre>
+  </div>
+
+  <!-- 5.5 Onboarding layout -->
+  <h3 class="sub-title" id="s5-onboarding">5.5 Onboarding layout</h3>
+  <div class="demo-box">
+    <p style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Route group <code>dashboard/(onboarding)/layout.tsx</code> — layout minimal. Le logo est statique (non-lien), seuls les toggles langue/thème sont présents.</p>
+    <div style="background:var(--muted); border-radius:var(--radius); padding:1rem;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem;">
+        <span style="font-weight:700; color:var(--primary);">🛝 The Playground</span>
+        <span style="font-size:0.75rem; color:var(--muted-foreground);">FR / EN</span>
+      </div>
+      <div style="max-width:420px; margin:0 auto;">
+        <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:0.5rem;">Bienvenue ! 👋</h2>
+        <p style="font-size:0.875rem; color:var(--muted-foreground); margin-bottom:1.5rem;">Complétez votre profil pour commencer.</p>
+        <label class="label label-required">Prénom</label>
+        <input class="input" type="text" placeholder="Jean" style="margin-bottom:0.75rem;">
+        <label class="label label-required">Nom</label>
+        <input class="input" type="text" placeholder="Dupont" style="margin-bottom:1.25rem;">
+        <button class="btn btn-default btn-fullwidth">Continuer →</button>
+      </div>
+    </div>
+    <pre style="margin-top:0.75rem;"><code>// Guard logic (src/lib/onboarding.ts)
+shouldRedirectToSetup() → /dashboard → /dashboard/profile/setup
+shouldRedirectFromSetup() → setup → /dashboard (si profil complet)
+// La guard couvre UNIQUEMENT /dashboard/** — PAS les pages publiques</code></pre>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 6 — PATTERNS UX
+     ============================================================ -->
+<section id="s6">
+  <h2 class="section-title">6. Patterns UX</h2>
+
+  <!-- 6.1 Breadcrumb -->
+  <h3 class="sub-title" id="s6-breadcrumb">6.1 Breadcrumb <span class="badge-rule">RÈGLE ABSOLUE</span></h3>
+  <p style="font-size:0.875rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Toutes les pages dashboard ont un breadcrumb, sauf <code>/dashboard</code> (racine) et <code>profile/setup</code> (onboarding).</p>
+  <div class="demo-box">
+    <div class="breadcrumb">
+      <a href="#">Mon espace</a>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep"><polyline points="9 18 15 12 9 6"/></svg>
+      <a href="#">Tech Paris</a>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="breadcrumb-sep"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="breadcrumb-current">Meetup React Paris #12</span>
+    </div>
+    <pre style="margin-top:0.75rem;"><code>// Pattern CSS unifié
+className="text-muted-foreground flex items-center gap-1 text-sm"
+// Séparateur : ChevronRight size-3.5
+// Pages publiques (/m/[slug]) : PAS de breadcrumb</code></pre>
+  </div>
+
+  <!-- 6.2 Meta row -->
+  <h3 class="sub-title" id="s6-meta">6.2 Meta row</h3>
+  <div class="demo-box">
+    <div class="meta-row">
+      <div class="meta-icon">📅</div>
+      <div class="meta-row-content">
+        <div class="meta-row-label">Quand</div>
+        <div class="meta-row-value">Mercredi 15 mars 2026</div>
+        <div style="font-size:0.82rem; color:var(--muted-foreground);">19:00 – 21:30 (heure de Paris)</div>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-icon">📍</div>
+      <div class="meta-row-content">
+        <div class="meta-row-label">Où</div>
+        <div class="meta-row-value">Station F</div>
+        <div style="font-size:0.82rem; color:var(--muted-foreground);">5 Parvis Alan Turing, 75013 Paris</div>
+      </div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-icon">👥</div>
+      <div class="meta-row-content">
+        <div class="meta-row-label">Capacité</div>
+        <div class="meta-row-value">30 places · <span style="color:#10b981; font-weight:600;">6 restantes</span></div>
+      </div>
+    </div>
+    <pre style="margin-top:0.5rem;"><code>// Pattern : icône 36px (bg muted) + label (uppercase 0.72rem) + valeur</code></pre>
+  </div>
+
+  <!-- 6.3 Empty state -->
+  <h3 class="sub-title" id="s6-empty">6.3 Empty state</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+    <div class="demo-box">
+      <div class="empty-state">
+        <div class="empty-icon">🗓</div>
+        <div class="empty-title">Aucun événement à venir</div>
+        <div class="empty-desc">Vous n'avez pas encore d'événements planifiés.</div>
+        <button class="btn btn-default">Créer un événement</button>
+      </div>
+    </div>
+    <div class="demo-box">
+      <div class="empty-state">
+        <div class="empty-icon">🔵</div>
+        <div class="empty-title">Aucune communauté</div>
+        <div class="empty-desc">Rejoignez ou créez votre première communauté.</div>
+        <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
+          <button class="btn btn-outline">Découvrir</button>
+          <button class="btn btn-default">Créer</button>
+        </div>
+      </div>
+    </div>
+    <div class="demo-box">
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">Aucun résultat</div>
+        <div class="empty-desc">Essayez avec d'autres termes de recherche.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.4 Cover image 1:1 -->
+  <h3 class="sub-title" id="s6-cover">6.4 Cover image 1:1 <span class="badge-rule">RÈGLE ABSOLUE</span></h3>
+  <p style="font-size:0.875rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Toutes les images de couverture sont en format carré 1:1, partout. Aucune exception : ni 16:9, ni 4:3.</p>
+  <div class="demo-row">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div style="width:120px; aspect-ratio:1/1; background:linear-gradient(135deg,#e8457a,#9333ea); border-radius:var(--radius);"></div>
+      <div class="demo-label">✅ 1:1 (correct)</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div style="width:120px; height:68px; background:linear-gradient(135deg,#6b7280,#374151); border-radius:var(--radius); position:relative; overflow:hidden;">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:red; font-size:1.5rem;">🚫</div>
+      </div>
+      <div class="demo-label" style="color:var(--destructive);">❌ 16:9 (interdit)</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div style="width:120px; height:90px; background:linear-gradient(135deg,#6b7280,#374151); border-radius:var(--radius); position:relative; overflow:hidden;">
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:red; font-size:1.5rem;">🚫</div>
+      </div>
+      <div class="demo-label" style="color:var(--destructive);">❌ 4:3 (interdit)</div>
+    </div>
+  </div>
+  <pre style="margin-top:0.5rem;"><code>aspect-ratio: 1/1 — obligatoire sur tout élément cover (cartes, pages, OG images)</code></pre>
+
+  <!-- 6.5 Gradients -->
+  <h3 class="sub-title" id="s6-gradients">6.5 Gradients (5 rotatifs)</h3>
+  <div class="demo-row">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div class="gradient-sq" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+      <div class="demo-label">G1 Rose → Violet</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div class="gradient-sq" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);"></div>
+      <div class="demo-label">G2 Bleu → Cyan</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div class="gradient-sq" style="background:linear-gradient(135deg,#f59e0b,#ef4444);"></div>
+      <div class="demo-label">G3 Ambre → Rouge</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div class="gradient-sq" style="background:linear-gradient(135deg,#10b981,#3b82f6);"></div>
+      <div class="demo-label">G4 Vert → Bleu</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.4rem;">
+      <div class="gradient-sq" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);"></div>
+      <div class="demo-label">G5 Violet → Rose</div>
+    </div>
+  </div>
+  <pre><code>// Attribution automatique selon l'initiale du nom du Circle
+const gradients = [
+  'linear-gradient(135deg, #e8457a, #9333ea)',
+  'linear-gradient(135deg, #3b82f6, #06b6d4)',
+  'linear-gradient(135deg, #f59e0b, #ef4444)',
+  'linear-gradient(135deg, #10b981, #3b82f6)',
+  'linear-gradient(135deg, #8b5cf6, #ec4899)',
+]
+const index = name.charCodeAt(0) % gradients.length</code></pre>
+
+  <!-- 6.6 Glow blur -->
+  <h3 class="sub-title" id="s6-glow">6.6 Glow blur — effet cover</h3>
+  <div class="demo-box" style="display:flex; justify-content:center; padding:2rem;">
+    <div style="position:relative; display:inline-block;">
+      <div style="width:160px; height:160px; background:linear-gradient(135deg,#e8457a,#9333ea); border-radius:calc(var(--radius)*1.5);"></div>
+      <div style="position:absolute; bottom:-16px; left:10%; right:10%; height:48px; background:linear-gradient(135deg,#e8457a,#9333ea); filter:blur(20px); opacity:0.45; border-radius:999px;"></div>
+    </div>
+  </div>
+  <pre><code>// Implémentation
+&lt;div className="relative"&gt;
+  &lt;div className="cover-image" /&gt;
+  &lt;div
+    className="absolute -bottom-4 left-[10%] right-[10%] h-12 blur-xl opacity-45 rounded-full"
+    style={{ background: gradient }}
+  /&gt;
+&lt;/div&gt;</code></pre>
+
+  <!-- 6.7 Pill tabs -->
+  <h3 class="sub-title" id="s6-pilltabs">6.7 Pill tabs — timeline événements</h3>
+  <div class="demo-box">
+    <p style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:0.75rem;">État géré via URL param <code>?tab=past</code> (SSR, partageable). Pas de state local.</p>
+    <div class="tabs-pill">
+      <button class="tab active">À venir</button>
+      <button class="tab">Passés</button>
+    </div>
+    <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+      <div style="display:flex; gap:1rem; align-items:flex-start; padding-bottom:0.75rem; border-bottom:1px dashed var(--border);">
+        <div style="min-width:52px; text-align:center;">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; color:var(--muted-foreground);">MAR</div>
+          <div style="font-size:1.25rem; font-weight:700; line-height:1; color:var(--foreground);">15</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:center; padding-top:0.25rem;">
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--primary);"></div>
+          <div style="width:1px; flex:1; border-left:1px dashed var(--border); margin-top:4px;"></div>
+        </div>
+        <div class="card" style="flex:1; padding:0.875rem; display:flex; gap:0.75rem;">
+          <div style="width:48px; height:48px; min-width:48px; border-radius:var(--radius); background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+          <div>
+            <div style="font-weight:600; font-size:0.875rem;">Meetup React Paris #12</div>
+            <div style="font-size:0.75rem; color:var(--muted-foreground);">19:00 · Station F</div>
+            <div style="margin-top:0.35rem; display:flex; gap:0.35rem;"><span class="badge badge-filled-primary" style="font-size:0.62rem;">Inscrit</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.8 Formulaires -->
+  <h3 class="sub-title" id="s6-forms">6.8 Formulaires — états erreur + succès</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.75rem;">Formulaire avec erreurs inline</p>
+      <label class="label label-required">Titre</label>
+      <input class="input" type="text" value="" placeholder="Requis" style="border-color:var(--destructive); box-shadow:0 0 0 2px rgba(232,69,122,0.15);">
+      <div style="font-size:0.72rem; color:var(--destructive); margin-top:0.2rem; display:flex; align-items:center; gap:0.2rem;">⚠ Ce champ est requis</div>
+
+      <label class="label label-required" style="margin-top:0.75rem;">Email</label>
+      <input class="input" type="email" value="invalid-email" style="border-color:var(--destructive); box-shadow:0 0 0 2px rgba(232,69,122,0.15);">
+      <div style="font-size:0.72rem; color:var(--destructive); margin-top:0.2rem; display:flex; align-items:center; gap:0.2rem;">⚠ Format email invalide</div>
+
+      <label class="label" style="margin-top:0.75rem;">Description</label>
+      <textarea class="textarea" style="min-height:72px;" placeholder="Optionnel"></textarea>
+
+      <div style="display:flex; gap:0.5rem; margin-top:1rem; justify-content:flex-end;">
+        <button class="btn btn-outline">Annuler</button>
+        <button class="btn btn-default">Enregistrer</button>
+      </div>
+    </div>
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.75rem;">Formulaire — état succès</p>
+      <div style="text-align:center; padding:1.5rem 0;">
+        <div style="font-size:2.5rem; margin-bottom:0.5rem;">✅</div>
+        <div style="font-weight:700; font-size:1rem; margin-bottom:0.3rem;">Inscrit avec succès !</div>
+        <div style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:1rem;">Vous recevrez une confirmation par email.</div>
+        <button class="btn btn-default btn-fullwidth">Ajouter à mon calendrier</button>
+        <button class="btn btn-outline btn-fullwidth" style="margin-top:0.5rem;">Voir la communauté →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.9 États chargement -->
+  <h3 class="sub-title" id="s6-loading">6.9 États chargement / erreur</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Skeleton (pulse)</p>
+      <div class="demo-box" style="display:flex; gap:0.75rem;">
+        <div class="skeleton" style="width:48px; height:48px; min-width:48px; border-radius:var(--radius);"></div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:0.4rem;">
+          <div class="skeleton" style="height:14px; width:70%;"></div>
+          <div class="skeleton" style="height:12px; width:50%;"></div>
+          <div class="skeleton" style="height:12px; width:85%;"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Erreur inline</p>
+      <div class="demo-box" style="background:rgba(232,69,122,0.05); border-color:rgba(232,69,122,0.3);">
+        <div style="display:flex; align-items:flex-start; gap:0.5rem;">
+          <span style="font-size:1rem; flex-shrink:0;">⚠️</span>
+          <div>
+            <div style="font-weight:600; font-size:0.875rem; color:var(--destructive);">Erreur de chargement</div>
+            <div style="font-size:0.8rem; color:var(--muted-foreground); margin-top:0.2rem;">Impossible de charger les événements. Vérifiez votre connexion.</div>
+            <button class="btn btn-outline btn-sm" style="margin-top:0.5rem; border-color:rgba(232,69,122,0.3); color:var(--destructive);">Réessayer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Erreur globale (toast)</p>
+      <div class="demo-box" style="padding:0.75rem 1rem; display:flex; align-items:center; gap:0.75rem; box-shadow:var(--shadow-md);">
+        <span style="font-size:1rem;">❌</span>
+        <div style="flex:1; font-size:0.82rem;">Action impossible. Veuillez réessayer.</div>
+        <button class="btn btn-ghost btn-sm" style="padding:0.2rem 0.5rem; font-size:0.72rem;">×</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 7 — RESPONSIVE
+     ============================================================ -->
+<section id="s7">
+  <h2 class="section-title">7. Responsive</h2>
+  <div class="table-wrapper">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Breakpoint</th>
+          <th>Prefix</th>
+          <th>Largeur</th>
+          <th>Usage principal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Mobile (base)</td><td>—</td><td>&lt; 640px</td><td>Parcours Participant (WhatsApp/Instagram)</td></tr>
+        <tr><td>Small</td><td><code>sm:</code></td><td>≥ 640px</td><td>Petites tablettes, mise en page 2 colonnes légère</td></tr>
+        <tr><td>Medium</td><td><code>md:</code></td><td>≥ 768px</td><td>Tablettes, grille événements 2 colonnes</td></tr>
+        <tr><td>Large</td><td><code>lg:</code></td><td>≥ 1024px</td><td>Desktop, layout 2 colonnes Circle/Moment, sidebar dashboard</td></tr>
+        <tr><td>Extra large</td><td><code>xl:</code></td><td>≥ 1280px</td><td>Grand écran, grille 3-4 colonnes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">Exemples de classes fréquentes</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Layout 2 colonnes (Circle/Moment)</p>
+      <pre style="margin:0; font-size:0.72rem;"><code>grid-cols-1 lg:grid-cols-[300px_1fr]
+gap-6 lg:gap-8</code></pre>
+    </div>
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Grille de cartes</p>
+      <pre style="margin:0; font-size:0.72rem;"><code>grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
+gap-4</code></pre>
+    </div>
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Padding container</p>
+      <pre style="margin:0; font-size:0.72rem;"><code>px-4 sm:px-6 lg:px-8
+max-w-5xl mx-auto</code></pre>
+    </div>
+    <div class="demo-box">
+      <p style="font-size:0.8rem; font-weight:600; margin-bottom:0.5rem;">Sticky LEFT column</p>
+      <pre style="margin:0; font-size:0.72rem;"><code>lg:sticky lg:top-20
+self-start</code></pre>
+    </div>
+  </div>
+  <div class="demo-box" style="background:rgba(232,69,122,0.05); border-color:rgba(232,69,122,0.2);">
+    <strong style="color:var(--primary);">Mobile-first</strong> : toujours coder pour mobile d'abord, ajouter les breakpoints <code>md:</code> et <code>lg:</code> ensuite. Le parcours Participant (lien partagé) arrive toujours sur mobile.
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 8 — ANIMATIONS
+     ============================================================ -->
+<section id="s8">
+  <h2 class="section-title">8. Animations</h2>
+  <div class="table-wrapper" style="margin-bottom:1rem;">
+    <table class="ds-table">
+      <thead>
+        <tr><th>Élément</th><th>Animation</th><th>Valeur CSS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Cartes (hover)</td><td>Lift + shadow</td><td><code>transform: translateY(-2px); box-shadow: var(--shadow-md)</code></td></tr>
+        <tr><td>Boutons (hover)</td><td>Couleur de fond</td><td><code>transition: all 150ms ease</code></td></tr>
+        <tr><td>Focus ring</td><td>Outline ring</td><td><code>outline: 2px solid var(--ring); outline-offset: 2px</code></td></tr>
+        <tr><td>Input focus</td><td>Border + glow</td><td><code>border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.15)</code></td></tr>
+        <tr><td>Skeleton</td><td>Pulse shimmer</td><td><code>animation: skeleton-pulse 1.5s ease-in-out infinite</code></td></tr>
+        <tr><td>Toast / Overlay</td><td>Fade + slide</td><td><code>transition: opacity 200ms, transform 200ms</code></td></tr>
+        <tr><td>Theme toggle</td><td>Couleur variables</td><td><code>transition: background 200ms, color 200ms</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">Hover effects — démo interactive</h3>
+  <div class="demo-row" style="flex-wrap:wrap;">
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <div class="card hover-lift" style="padding:1rem 1.5rem; text-align:center;">
+        <div style="font-size:1.25rem;">🎉</div>
+        <div style="font-size:0.8rem; font-weight:600; margin-top:0.3rem;">Hover lift</div>
+      </div>
+      <div class="demo-label">translateY(-2px) + shadow</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <div class="hover-scale" style="background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.5rem; text-align:center;">
+        <div style="font-size:1.25rem;">✨</div>
+        <div style="font-size:0.8rem; font-weight:600; margin-top:0.3rem;">Hover scale</div>
+      </div>
+      <div class="demo-label">scale(1.03)</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <button class="btn btn-default">Hover color</button>
+      <div class="demo-label">background change</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; gap:0.5rem;">
+      <button class="btn btn-outline">Hover outline</button>
+      <div class="demo-label">background muted</div>
+    </div>
+  </div>
+
+  <p style="font-size:0.82rem; color:var(--muted-foreground); margin-top:0.75rem;">
+    Toutes les transitions utilisent <code>ease</code> (pas <code>linear</code>) avec une durée de 150–200ms. Pas d'animations complexes dans le MVP.
+  </p>
+</section>
+
+<!-- ============================================================
+     SECTION 9 — ACCESSIBILITÉ
+     ============================================================ -->
+<section id="s9">
+  <h2 class="section-title">9. Accessibilité</h2>
+  <p style="font-size:0.875rem; color:var(--muted-foreground);">axe-core intégré dans les tests Playwright E2E. Détecte les erreurs de contraste, labels manquants, navigation clavier.</p>
+
+  <h3 class="sub-title">Focus ring <span class="badge-rule">RÈGLE ABSOLUE</span></h3>
+  <div class="demo-box">
+    <p style="font-size:0.82rem; color:var(--muted-foreground); margin-bottom:0.75rem;">Chaque élément interactif a un focus ring visible. Utilisez Tab pour naviguer entre les éléments ci-dessous.</p>
+    <div class="demo-row">
+      <button class="btn btn-default focus-demo">Bouton primaire</button>
+      <button class="btn btn-outline focus-demo">Bouton outline</button>
+      <input class="input focus-demo" type="text" placeholder="Input text" style="max-width:200px;">
+      <a href="#s9" class="focus-demo" style="padding:0.25rem;">Lien texte</a>
+    </div>
+    <pre style="margin-top:0.75rem;"><code>// Focus ring uniform — outline:2px solid var(--ring); outline-offset:2px
+// shadcn/ui : focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+// NE PAS utiliser outline:none sans alternative visible</code></pre>
+  </div>
+
+  <h3 class="sub-title">États ARIA</h3>
+  <div class="table-wrapper">
+    <table class="ds-table">
+      <thead>
+        <tr><th>Composant</th><th>Attribut ARIA</th><th>Valeur</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Bouton désactivé</td><td><code>aria-disabled</code></td><td><code>"true"</code></td></tr>
+        <tr><td>Dialog ouvert</td><td><code>aria-modal</code></td><td><code>"true"</code></td></tr>
+        <tr><td>Tab actif</td><td><code>aria-selected</code></td><td><code>"true"</code></td></tr>
+        <tr><td>Champ requis</td><td><code>aria-required</code></td><td><code>"true"</code></td></tr>
+        <tr><td>Champ erreur</td><td><code>aria-invalid</code></td><td><code>"true"</code> + <code>aria-describedby</code></td></tr>
+        <tr><td>Loader</td><td><code>aria-busy</code> / <code>role="status"</code></td><td><code>"true"</code></td></tr>
+        <tr><td>Avatar initiales</td><td><code>aria-label</code></td><td><code>"Jean Dupont"</code></td></tr>
+        <tr><td>Icône décorative</td><td><code>aria-hidden</code></td><td><code>"true"</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">Contraste couleur</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+    <div class="demo-box">
+      <div style="background:var(--primary); color:white; padding:0.5rem 0.75rem; border-radius:4px; font-weight:500; font-size:0.875rem; margin-bottom:0.5rem;">Texte sur primary</div>
+      <div class="demo-label">✅ Ratio ≥ 4.5:1 (AA)</div>
+    </div>
+    <div class="demo-box">
+      <div style="background:var(--foreground); color:var(--background); padding:0.5rem 0.75rem; border-radius:4px; font-weight:500; font-size:0.875rem; margin-bottom:0.5rem;">Texte foreground/bg</div>
+      <div class="demo-label">✅ Ratio ≥ 7:1 (AAA)</div>
+    </div>
+    <div class="demo-box">
+      <div style="color:var(--muted-foreground); padding:0.5rem 0.75rem; border: 1px solid var(--border); border-radius:4px; font-size:0.875rem; margin-bottom:0.5rem;">Muted sur card</div>
+      <div class="demo-label">✅ Ratio ≥ 4.5:1 (AA)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 10 — i18n
+     ============================================================ -->
+<section id="s10">
+  <h2 class="section-title">10. i18n — Internationalisation</h2>
+  <p style="font-size:0.875rem; color:var(--muted-foreground);">Architecture next-intl. FR/EN dès la V1. Les clés JSON sont toujours en anglais — seules les valeurs sont traduites.</p>
+
+  <h3 class="sub-title">Mapping conceptuel → traductions</h3>
+  <div class="table-wrapper">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Concept code</th>
+          <th>Clé i18n</th>
+          <th>FR (valeur)</th>
+          <th>EN (valeur)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Circle</code></td><td><code>Circle</code></td><td><strong>Communauté</strong> (fém.)</td><td><strong>Community</strong></td></tr>
+        <tr><td><code>Moment</code></td><td><code>Moment</code></td><td><strong>événement</strong> (masc.)</td><td><strong>Event</strong></td></tr>
+        <tr><td><code>Host</code></td><td><code>Host</code></td><td><strong>Organisateur</strong></td><td><strong>Host</strong></td></tr>
+        <tr><td><code>Player</code></td><td><code>Player</code></td><td><strong>Participant</strong></td><td><strong>Member</strong></td></tr>
+        <tr><td><code>Register</code></td><td><code>Register</code></td><td><strong>S'inscrire</strong></td><td><strong>Join</strong></td></tr>
+        <tr><td><code>Dashboard</code></td><td><code>Dashboard</code></td><td><strong>Mon espace</strong></td><td><strong>Dashboard</strong></td></tr>
+        <tr><td><code>Explorer</code></td><td><code>Explorer</code></td><td><strong>Découvrir</strong></td><td><strong>Explore</strong></td></tr>
+        <tr><td><code>Registered</code></td><td><code>Registered</code></td><td><strong>Inscrit</strong></td><td><strong>Joined</strong></td></tr>
+        <tr><td><code>Attendees</code></td><td><code>Attendees</code></td><td><strong>Participants</strong></td><td><strong>Members</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">Statuts traduits</h3>
+  <div class="table-wrapper">
+    <table class="ds-table">
+      <thead>
+        <tr>
+          <th>Statut code</th>
+          <th>FR</th>
+          <th>EN</th>
+          <th>Badge</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>PUBLISHED</code></td>
+          <td>Publié</td>
+          <td>Published</td>
+          <td><span class="badge badge-filled-primary">Publié</span></td>
+        </tr>
+        <tr>
+          <td><code>DRAFT</code></td>
+          <td>Brouillon</td>
+          <td>Draft</td>
+          <td><span class="badge badge-outline-neutral">Brouillon</span></td>
+        </tr>
+        <tr>
+          <td><code>CANCELLED</code></td>
+          <td>Annulé</td>
+          <td>Cancelled</td>
+          <td><span class="badge badge-outline-destructive">Annulé</span></td>
+        </tr>
+        <tr>
+          <td><code>PAST</code></td>
+          <td>Passé</td>
+          <td>Past</td>
+          <td><span class="badge badge-outline-neutral">Passé</span></td>
+        </tr>
+        <tr>
+          <td><code>REGISTERED</code></td>
+          <td>Inscrit</td>
+          <td>Joined</td>
+          <td><span class="badge badge-filled-primary">Inscrit</span></td>
+        </tr>
+        <tr>
+          <td><code>WAITLISTED</code></td>
+          <td>Liste d'attente</td>
+          <td>Waitlisted</td>
+          <td><span class="badge badge-amber">Liste d'attente</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sub-title">Règles i18n</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+    <div class="demo-box" style="border-left:3px solid #10b981;">
+      <strong style="color:#10b981;">✅ Correct</strong>
+      <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// en.json
+{
+  "Circle": "Community",
+  "myCircles": "My Communities"
+}
+// fr.json
+{
+  "Circle": "Communauté",
+  "myCircles": "Mes Communautés"
+}</code></pre>
+    </div>
+    <div class="demo-box" style="border-left:3px solid var(--destructive);">
+      <strong style="color:var(--destructive);">❌ Interdit</strong>
+      <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// JAMAIS de clé française
+{
+  "Communauté": "Community",  // ❌
+  "cercle": "Circle"           // ❌
+}
+// JAMAIS de fallback visible
+t("Circle") → "Circle"  // ❌</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 11 — DETTE TECHNIQUE
+     ============================================================ -->
+<section id="s11">
+  <h2 class="section-title">11. Dette technique & bugs connus</h2>
+
+  <div class="warning-box">
+    <div class="warning-title">⚠️ Note</div>
+    <div class="warning-body">Cette section documente les compromis connus et la dette à adresser. Elle est mise à jour à chaque sprint.</div>
+  </div>
+
+  <h3 class="sub-title">Bugs CSS connus</h3>
+
+  <div class="warning-box" style="margin-top:0.75rem;">
+    <div class="warning-title">Skeleton flicker en dark mode</div>
+    <div class="warning-body">Le gradient du skeleton pulse utilise des couleurs light hardcodées. Doit être remplacé par des variables CSS.</div>
+    <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// Bug actuel
+background: linear-gradient(90deg, #f0eff7 25%, #e3e3ec 50%, #f0eff7 75%);
+
+// Fix à appliquer
+background: linear-gradient(90deg, var(--muted) 25%, var(--border) 50%, var(--muted) 75%);</code></pre>
+  </div>
+
+  <div class="warning-box" style="margin-top:0.75rem;">
+    <div class="warning-title">Cover image — flash blanc au chargement</div>
+    <div class="warning-body">Les images Unsplash n'ont pas de placeholder. L'espace est vide pendant le chargement. Solution : background-color du gradient par défaut pendant le chargement.</div>
+    <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// À ajouter sur l'img tag
+style={{ backgroundColor: gradientForCircle(circle.name) }}
+className="... bg-cover"</code></pre>
+  </div>
+
+  <div class="warning-box" style="margin-top:0.75rem;">
+    <div class="warning-title">AvatarGroup — overflow sur mobile</div>
+    <div class="warning-body">Les groupes de 5+ avatars débordent sur petit écran. À wrapper dans un container avec <code>overflow: hidden</code> et limiter à 3 avatars sur mobile.</div>
+    <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// Fix
+&lt;div className="flex overflow-hidden"&gt;
+  {members.slice(0, isMobile ? 3 : 5).map(...)}
+  {members.length &gt; limit && &lt;OverflowBadge /&gt;}
+&lt;/div&gt;</code></pre>
+  </div>
+
+  <div class="warning-box" style="margin-top:0.75rem;">
+    <div class="warning-title">Tabs pill — border-radius incohérent sur Firefox</div>
+    <div class="warning-body">Le border-radius du tab actif est légèrement différent sous Firefox. Lié à un bug de rendu du box-shadow interne. Pas critique — à adresser avant lancement.</div>
+    <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// Workaround si nécessaire
+.tab.active { outline: 1px solid transparent; } /* force GPU compositing */</code></pre>
+  </div>
+
+  <div class="warning-box" style="margin-top:0.75rem;">
+    <div class="warning-title">Focus trap manquant dans les Dialog custom</div>
+    <div class="warning-body">Les dialogs shadcn/ui gèrent correctement le focus trap. Si un dialog custom est créé sans shadcn, il doit implémenter un focus trap manuel. À vérifier avec axe-core.</div>
+    <pre style="margin-top:0.5rem; font-size:0.72rem;"><code>// Utiliser toujours le composant Dialog de shadcn/ui
+// Ne JAMAIS créer un modal sans focus trap
+import { Dialog, DialogContent } from "@/components/ui/dialog"</code></pre>
+  </div>
+
+  <h3 class="sub-title">Dette i18n</h3>
+  <div class="warning-box">
+    <div class="warning-title">Quelques strings hardcodées en FR</div>
+    <div class="warning-body">Certains messages d'erreur et textes de placeholder sont encore hardcodés en français dans les composants. À extraire dans les fichiers i18n avant la V1 EN.</div>
+  </div>
+
+  <h3 class="sub-title">Améliorations design futures (post-MVP)</h3>
+  <div class="demo-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+    <div class="demo-box">
+      <strong style="font-size:0.875rem;">Visual regression testing</strong>
+      <p style="font-size:0.8rem; color:var(--muted-foreground); margin:0.3rem 0 0;">Chromatic ou Percy pour détecter les régressions visuelles. Prévu post-MVP.</p>
+    </div>
+    <div class="demo-box">
+      <strong style="font-size:0.875rem;">Micro-animations</strong>
+      <p style="font-size:0.8rem; color:var(--muted-foreground); margin:0.3rem 0 0;">Framer Motion pour les transitions de page, accordéons, et feedback d'inscription.</p>
+    </div>
+    <div class="demo-box">
+      <strong style="font-size:0.875rem;">Thème Organisateur</strong>
+      <p style="font-size:0.8rem; color:var(--muted-foreground); margin:0.3rem 0 0;">Couleur accent personnalisable par Circle (Plan Pro). Architecture CSS vars déjà prête.</p>
+    </div>
+    <div class="demo-box">
+      <strong style="font-size:0.875rem;">OG Images dynamiques</strong>
+      <p style="font-size:0.8rem; color:var(--muted-foreground); margin:0.3rem 0 0;">Vercel OG pour générer des images de partage belles pour chaque événement.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Footer du design system -->
+<div style="margin-top:4rem; padding-top:2rem; border-top:2px solid var(--border); text-align:center; color:var(--muted-foreground); font-size:0.8rem;">
+  <div style="font-size:1.5rem; margin-bottom:0.5rem;">🛝</div>
+  <strong>The Playground Design System v1.0</strong>
+  <br>
+  Généré le 2026-02-24 · 11 sections · Autonome (aucune dépendance externe sauf Inter)
+  <br><br>
+  <span style="color:var(--primary);">Powered by The Playground</span>
+</div>
+
+</main>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// Dark mode toggle
+function toggleDark() {
+  const html = document.documentElement;
+  const isDark = html.classList.toggle('dark');
+  document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('themeText').textContent = isDark ? 'Mode clair' : 'Mode sombre';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+}
+
+// Restore theme preference
+(function() {
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && prefersDark)) {
+    document.documentElement.classList.add('dark');
+    document.getElementById('themeIcon').textContent = '☀️';
+    document.getElementById('themeText').textContent = 'Mode clair';
+  }
+})();
+
+// Pill tab switcher (demo only)
+function switchPillTab(btn, targetId) {
+  const container = btn.closest('.tabs-pill');
+  container.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Highlight active sidebar link on scroll
+(function() {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('#sidebar nav a');
+  
+  function updateActive() {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop - 100;
+      if (window.scrollY >= sectionTop) {
+        current = section.id;
+      }
+    });
+    links.forEach(link => {
+      link.style.fontWeight = '';
+      link.style.color = '';
+      if (link.getAttribute('href') === '#' + current) {
+        link.style.fontWeight = '600';
+        link.style.color = 'var(--foreground)';
+      }
+    });
+  }
+  
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+})();
+</script>
+
+</body>
+</html>
