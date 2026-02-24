@@ -87,16 +87,28 @@ export default async function OgImage() {
                 <polygon points="0,0 0,15 13,7.5" fill="white" />
               </svg>
             </div>
-            <span
-              style={{
-                fontSize: "20px",
-                fontWeight: 400,
-                color: "rgba(255, 255, 255, 0.55)",
-                letterSpacing: "-0.3px",
-              }}
-            >
-              The Playground
-            </span>
+            <div style={{ display: "flex", alignItems: "baseline" }}>
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "rgba(255, 255, 255, 0.55)",
+                  letterSpacing: "-0.4px",
+                }}
+              >
+                {"the\u2009"}
+              </span>
+              <span
+                style={{
+                  fontSize: "20px",
+                  fontWeight: 700,
+                  color: "#e8457a",
+                  letterSpacing: "-0.4px",
+                }}
+              >
+                playground
+              </span>
+            </div>
           </div>
 
           {/* H1 — 3 lines */}
