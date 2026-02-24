@@ -3,7 +3,7 @@
 import { LayoutDashboard, LogOut, User, Shield } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { signOutAction } from "@/app/actions/auth";
+import { signOut } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,7 +68,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuItem
           className="cursor-pointer"
           onSelect={() => {
-            signOutAction();
+            signOut({ callbackUrl: "/" });
           }}
         >
           <LogOut className="mr-2 h-4 w-4" />
