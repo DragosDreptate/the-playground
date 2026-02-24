@@ -42,7 +42,7 @@ export default async function HomePage() {
   const tDashboard = await getTranslations("Dashboard");
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
+    <div className="flex min-h-screen flex-col overflow-x-clip">
       <SiteHeader />
 
       <main className="flex-1">
