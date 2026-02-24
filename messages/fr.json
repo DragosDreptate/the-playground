@@ -184,7 +184,8 @@
       "manageMoment": "Gérer cet événement",
       "follow": "Suivre",
       "unfollow": "Se désabonner",
-      "following": "Abonné·e"
+      "following": "Abonné·e",
+      "isMember": "Vous êtes membre"
     },
     "errors": {
       "notFound": "Communauté introuvable",

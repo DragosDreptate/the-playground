@@ -184,7 +184,8 @@
       "manageMoment": "Manage this Event",
       "follow": "Follow",
       "unfollow": "Unfollow",
-      "following": "Following"
+      "following": "Following",
+      "isMember": "You are a member"
     },
     "errors": {
       "notFound": "Community not found",

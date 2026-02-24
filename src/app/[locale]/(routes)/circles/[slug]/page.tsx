@@ -138,7 +138,11 @@ export default async function PublicCirclePage({
 
   const isMember = isMemberResult === true;
   const isFollowing = isFollowingResult === true;
+  const isHost = session?.user?.id
+    ? hosts.some((h) => h.user.id === session.user!.id)
+    : false;
   const showFollowButton = !!session?.user?.id && !isMember;
+  const showMemberBadge = isMember && !isHost;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
   const pastMoments = allMoments.filter(
@@ -252,6 +256,26 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs">{t("detail.moments")}</p>
             </div>
           </div>
+
+          {/* Badge Membre — visible pour les membres non-Organisateurs */}
+          {showMemberBadge && (
+            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-green-500/25 bg-green-500/10 px-4 py-2.5 text-sm font-medium text-green-400">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              {t("detail.isMember")}
+            </div>
+          )}
 
           {/* Bouton Suivre — visible uniquement pour les utilisateurs connectés non-membres */}
           {showFollowButton && (
