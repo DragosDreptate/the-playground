@@ -5,8 +5,9 @@ import type {
   UpdateCircleInput,
   PublicCircleFilters,
   PublicCircle,
+  CircleFollowerInfo,
 } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -212,6 +213,68 @@ export const prismaCircleRepository: CircleRepository = {
       memberCount: c._count.memberships,
       upcomingMomentCount: c.moments.length,
       nextMoment: c.moments[0] ?? null,
+    }));
+  },
+
+  async followCircle(userId: string, circleId: string): Promise<CircleFollow> {
+    const row = await prisma.circleFollow.create({
+      data: { userId, circleId },
+    });
+    return {
+      id: row.id,
+      userId: row.userId,
+      circleId: row.circleId,
+      createdAt: row.createdAt,
+    };
+  },
+
+  async unfollowCircle(userId: string, circleId: string): Promise<void> {
+    await prisma.circleFollow.delete({
+      where: { userId_circleId: { userId, circleId } },
+    });
+  },
+
+  async getFollowStatus(userId: string, circleId: string): Promise<boolean> {
+    const row = await prisma.circleFollow.findUnique({
+      where: { userId_circleId: { userId, circleId } },
+    });
+    return row !== null;
+  },
+
+  async findFollowers(circleId: string): Promise<CircleFollowerInfo[]> {
+    const rows = await prisma.circleFollow.findMany({
+      where: { circleId },
+      include: {
+        user: {
+          select: { email: true, firstName: true, lastName: true },
+        },
+      },
+    });
+    return rows.map((r) => ({
+      userId: r.userId,
+      email: r.user.email,
+      firstName: r.user.firstName,
+      lastName: r.user.lastName,
+    }));
+  },
+
+  async findPlayersForNewMomentNotification(
+    circleId: string,
+    excludeUserId: string
+  ): Promise<CircleFollowerInfo[]> {
+    const rows = await prisma.circleMembership.findMany({
+      where: { circleId, userId: { not: excludeUserId } },
+      include: {
+        user: {
+          select: { email: true, firstName: true, lastName: true },
+        },
+      },
+    });
+    return rows.map((r) => ({
+      userId: r.userId,
+      email: r.user.email,
+      firstName: r.user.firstName,
+      lastName: r.user.lastName,
     }));
   },
 };

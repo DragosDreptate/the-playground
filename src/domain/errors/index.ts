@@ -3,6 +3,8 @@ export {
   CircleNotFoundError,
   SlugAlreadyExistsError,
   UnauthorizedCircleActionError,
+  AlreadyFollowingCircleError,
+  NotFollowingCircleError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,

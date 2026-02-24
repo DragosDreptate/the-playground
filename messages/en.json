@@ -181,7 +181,10 @@
       "noUpcomingMoments": "No upcoming Events.",
       "noPastMoments": "No past Events.",
       "today": "Today",
-      "manageMoment": "Manage this Event"
+      "manageMoment": "Manage this Event",
+      "follow": "Follow",
+      "unfollow": "Unfollow",
+      "following": "Following"
     },
     "errors": {
       "notFound": "Community not found",

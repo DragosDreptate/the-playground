@@ -181,7 +181,10 @@
       "noUpcomingMoments": "Aucun événement à venir.",
       "noPastMoments": "Aucun événement passé.",
       "today": "Aujourd'hui",
-      "manageMoment": "Gérer cet événement"
+      "manageMoment": "Gérer cet événement",
+      "follow": "Suivre",
+      "unfollow": "Se désabonner",
+      "following": "Abonné·e"
     },
     "errors": {
       "notFound": "Communauté introuvable",

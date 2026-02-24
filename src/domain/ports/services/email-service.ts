@@ -85,6 +85,30 @@ export type HostNewCommentEmailData = {
   };
 };
 
+export type NewMomentNotificationStrings = {
+  subject: string;
+  preheader: string;
+  heading: string;
+  intro: string;
+  ctaLabel: string;
+  unsubscribeText: string;
+  unsubscribeLabel: string;
+};
+
+export type NewMomentFollowerEmailData = {
+  to: string;
+  recipientName: string;
+  circleName: string;
+  circleSlug: string;
+  momentTitle: string;
+  momentSlug: string;
+  momentDate: string;
+  momentLocation: string;
+  strings: NewMomentNotificationStrings;
+};
+
+export type NewMomentMemberEmailData = NewMomentFollowerEmailData;
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -94,4 +118,6 @@ export interface EmailService {
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
   sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
+  sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
+  sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
 }

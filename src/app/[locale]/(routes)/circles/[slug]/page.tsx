@@ -5,12 +5,14 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
 } from "@/infrastructure/repositories";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleNotFoundError } from "@/domain/errors";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getMomentGradient } from "@/lib/gradient";
+import { FollowButton } from "@/components/circles/follow-button";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import {
   Globe,
@@ -93,6 +95,9 @@ export default async function PublicCirclePage({
   const tDashboard = await getTranslations("Dashboard");
   const tMoment = await getTranslations("Moment");
 
+  // Session optionnelle — les pages publiques sont accessibles sans auth
+  const session = await auth();
+
   let circle;
   try {
     circle = await getCircleBySlug(slug, {
@@ -106,15 +111,34 @@ export default async function PublicCirclePage({
   // Only PUBLIC circles are accessible without auth
   if (circle.visibility !== "PUBLIC") notFound();
 
-  // Parallélise les 3 requêtes indépendantes : hosts, moments, compteur membres
-  const [hosts, allMoments, memberCount] = await Promise.all([
+  // Parallélise les requêtes indépendantes
+  const parallelQueries: [
+    ReturnType<typeof prismaCircleRepository.findMembersByRole>,
+    ReturnType<typeof getCircleMoments>,
+    ReturnType<typeof prismaCircleRepository.countMembers>,
+    Promise<boolean | null>,
+    Promise<boolean | null>,
+  ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     getCircleMoments(circle.id, {
       momentRepository: prismaMomentRepository,
       circleRepository: prismaCircleRepository,
     }),
     prismaCircleRepository.countMembers(circle.id),
-  ]);
+    session?.user?.id
+      ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m !== null)
+      : Promise.resolve(null),
+    session?.user?.id
+      ? prismaCircleRepository.getFollowStatus(session.user.id, circle.id)
+      : Promise.resolve(null),
+  ];
+
+  const [hosts, allMoments, memberCount, isMemberResult, isFollowingResult] =
+    await Promise.all(parallelQueries);
+
+  const isMember = isMemberResult === true;
+  const isFollowing = isFollowingResult === true;
+  const showFollowButton = !!session?.user?.id && !isMember;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
   const pastMoments = allMoments.filter(
@@ -228,6 +252,11 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs">{t("detail.moments")}</p>
             </div>
           </div>
+
+          {/* Bouton Suivre — visible uniquement pour les utilisateurs connectés non-membres */}
+          {showFollowButton && (
+            <FollowButton circleId={circle.id} initialFollowing={isFollowing} />
+          )}
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}

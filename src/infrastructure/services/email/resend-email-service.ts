@@ -5,11 +5,14 @@ import type {
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
   HostNewCommentEmailData,
+  NewMomentFollowerEmailData,
+  NewMomentMemberEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "./templates/host-new-registration";
 import { HostNewCommentEmail } from "./templates/host-new-comment";
+import { NewMomentNotificationEmail } from "./templates/new-moment-notification";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -86,6 +89,28 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: HostNewCommentEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendNewMomentToFollower(
+      data: NewMomentFollowerEmailData
+    ): Promise<void> {
+      await resend.emails.send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: NewMomentNotificationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendNewMomentToMember(
+      data: NewMomentMemberEmailData
+    ): Promise<void> {
+      await resend.emails.send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: NewMomentNotificationEmail({ ...data, baseUrl }),
       });
     },
   };

@@ -735,3 +735,84 @@ describe("Security — RBAC", () => {
     });
   });
 });
+
+// ─────────────────────────────────────────────────────────────
+// followCircle / unfollowCircle — Isolation userId
+// ─────────────────────────────────────────────────────────────
+
+import { followCircle } from "@/domain/usecases/follow-circle";
+import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
+import {
+  AlreadyFollowingCircleError,
+  NotFollowingCircleError,
+} from "@/domain/errors";
+import { makeCircleFollow } from "../helpers/mock-circle-repository";
+
+describe("Security — followCircle / unfollowCircle — isolation userId", () => {
+  describe("followCircle", () => {
+    it("should only follow for the provided userId — cannot impersonate another user", async () => {
+      const circle = makeCircle({ id: "circle-1" });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(circle),
+        getFollowStatus: vi.fn().mockResolvedValue(false),
+        followCircle: vi.fn().mockResolvedValue(
+          makeCircleFollow({ userId: "user-alice", circleId: "circle-1" })
+        ),
+      });
+
+      await followCircle(
+        { circleId: "circle-1", userId: "user-alice" },
+        { circleRepository: repo }
+      );
+
+      // Le repo est appelé avec le userId fourni — jamais un autre
+      expect(repo.followCircle).toHaveBeenCalledWith("user-alice", "circle-1");
+      expect(repo.followCircle).not.toHaveBeenCalledWith("user-bob", expect.any(String));
+    });
+
+    it("should prevent double-follow — throws AlreadyFollowingCircleError", async () => {
+      const circle = makeCircle();
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(circle),
+        getFollowStatus: vi.fn().mockResolvedValue(true),
+      });
+
+      await expect(
+        followCircle(
+          { circleId: "circle-1", userId: "user-alice" },
+          { circleRepository: repo }
+        )
+      ).rejects.toThrow(AlreadyFollowingCircleError);
+    });
+  });
+
+  describe("unfollowCircle", () => {
+    it("should only unfollow for the provided userId — cannot impersonate another user", async () => {
+      const repo = createMockCircleRepository({
+        getFollowStatus: vi.fn().mockResolvedValue(true),
+        unfollowCircle: vi.fn().mockResolvedValue(undefined),
+      });
+
+      await unfollowCircle(
+        { circleId: "circle-1", userId: "user-alice" },
+        { circleRepository: repo }
+      );
+
+      expect(repo.unfollowCircle).toHaveBeenCalledWith("user-alice", "circle-1");
+      expect(repo.unfollowCircle).not.toHaveBeenCalledWith("user-bob", expect.any(String));
+    });
+
+    it("should prevent unfollowing when not following — throws NotFollowingCircleError", async () => {
+      const repo = createMockCircleRepository({
+        getFollowStatus: vi.fn().mockResolvedValue(false),
+      });
+
+      await expect(
+        unfollowCircle(
+          { circleId: "circle-1", userId: "user-alice" },
+          { circleRepository: repo }
+        )
+      ).rejects.toThrow(NotFollowingCircleError);
+    });
+  });
+});

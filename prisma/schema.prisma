@@ -129,12 +129,13 @@ model User {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 
-  accounts    Account[]
-  sessions    Session[]
-  memberships CircleMembership[]
-  moments     Moment[]           @relation("CreatedMoments")
+  accounts      Account[]
+  sessions      Session[]
+  memberships   CircleMembership[]
+  moments       Moment[]           @relation("CreatedMoments")
   registrations Registration[]
-  comments    Comment[]
+  comments      Comment[]
+  circleFollows CircleFollow[]
 
   @@map("users")
 }
@@ -155,8 +156,9 @@ model Circle {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  memberships CircleMembership[]
-  moments     Moment[]
+  memberships   CircleMembership[]
+  moments       Moment[]
+  circleFollows CircleFollow[]
 
   @@map("circles")
 }
@@ -254,4 +256,18 @@ model Comment {
   // Index sur momentId : utilisé dans findByMomentIdWithUser, countByMomentId
   @@index([momentId])
   @@map("comments")
+}
+
+model CircleFollow {
+  id        String   @id @default(cuid())
+  userId    String
+  circleId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  circle Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, circleId])
+  @@index([circleId])
+  @@map("circle_follows")
 }

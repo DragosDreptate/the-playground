@@ -6,6 +6,8 @@ import { vercelBlobStorageService } from "@/infrastructure/services/storage/verc
 import { createCircle } from "@/domain/usecases/create-circle";
 import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
+import { followCircle } from "@/domain/usecases/follow-circle";
+import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
 import { DomainError } from "@/domain/errors";
 import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
@@ -135,6 +137,72 @@ export async function deleteCircleAction(
       { circleRepository: prismaCircleRepository }
     );
     return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    throw error;
+  }
+}
+
+export async function followCircleAction(
+  circleId: string
+): Promise<ActionResult<{ following: boolean }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await followCircle(
+      { circleId, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    return { success: true, data: { following: true } };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    throw error;
+  }
+}
+
+export async function unfollowCircleAction(
+  circleId: string
+): Promise<ActionResult<void>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await unfollowCircle(
+      { circleId, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    throw error;
+  }
+}
+
+export async function getFollowStatusAction(
+  circleId: string
+): Promise<ActionResult<{ following: boolean }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const following = await prismaCircleRepository.getFollowStatus(
+      session.user.id,
+      circleId
+    );
+    return { success: true, data: { following } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };

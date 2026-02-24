@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, CircleFollow } from "@/domain/models/circle";
 
 export type CreateCircleInput = {
   name: string;
@@ -44,6 +44,13 @@ export type PublicCircle = {
   } | null;
 };
 
+export type CircleFollowerInfo = {
+  userId: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+};
+
 export interface CircleRepository {
   create(input: CreateCircleInput): Promise<Circle>;
   findById(id: string): Promise<Circle | null>;
@@ -60,4 +67,11 @@ export interface CircleRepository {
   /** Renvoie une Map circleId → nombre de membres pour une liste de Circles (une seule requête GROUP BY). */
   findMemberCountsByCircleIds(circleIds: string[]): Promise<Map<string, number>>;
   findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]>;
+  // Follow
+  followCircle(userId: string, circleId: string): Promise<CircleFollow>;
+  unfollowCircle(userId: string, circleId: string): Promise<void>;
+  getFollowStatus(userId: string, circleId: string): Promise<boolean>;
+  findFollowers(circleId: string): Promise<CircleFollowerInfo[]>;
+  /** Membres du Circle (PLAYER ou HOST) à notifier pour un nouvel événement, en excluant le créateur */
+  findPlayersForNewMomentNotification(circleId: string, excludeUserId: string): Promise<CircleFollowerInfo[]>;
 }

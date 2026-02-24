@@ -15,6 +15,7 @@ import type { LocationType } from "@/domain/models/moment";
 import type { Moment } from "@/domain/models/moment";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
+import { notifyNewMoment } from "./notify-new-moment";
 
 export async function createMomentAction(
   circleId: string,
@@ -78,6 +79,16 @@ export async function createMomentAction(
         registrationRepository: prismaRegistrationRepository,
       }
     );
+
+    // Fire-and-forget : notifier les followers et membres du Circle
+    prismaCircleRepository.findById(circleId).then((circle) => {
+      if (circle) {
+        notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
+          console.error
+        );
+      }
+    }).catch(console.error);
+
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {

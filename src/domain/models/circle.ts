@@ -54,3 +54,10 @@ export type CircleMemberWithUser = CircleMembership & {
     image: string | null;
   };
 };
+
+export type CircleFollow = {
+  id: string;
+  userId: string;
+  circleId: string;
+  createdAt: Date;
+};
