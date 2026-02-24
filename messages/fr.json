@@ -117,6 +117,8 @@
     "noUpcomingMoments": "Aucun événement à venir.",
     "noMoments": "Aucun événement pour l'instant.",
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
+    "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
+    "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
     "noCirclesMember": "Vous n'êtes membre d'aucune Communauté.",
     "role": {
       "host": "Organisateur",
