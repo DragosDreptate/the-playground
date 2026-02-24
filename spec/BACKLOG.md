@@ -8,7 +8,7 @@
 ## Fait
 
 | Feature | Date | Commit |
-|---------|------|--------|
+| --- | --- | --- |
 | Auth (magic link + OAuth Google/GitHub) | 2026-02-19 | — |
 | CRUD Circle (domain, tests, UI, i18n) | 2026-02-19 | `dd41709` |
 | Design system Cyberpunk + dark/light toggle | 2026-02-19 | `2250774` |
@@ -93,7 +93,7 @@
   - Contenu : titre événement, date, lieu, lien `/m/[slug]`, lien d'annulation
   - Gère aussi le cas WAITLISTED (textes différents, même template)
 
-- [ ] ~~**Email de rappel pré-événement**~~ → **déprioritisé, post-MVP** (voir Phase 2)
+- [ ] **~~Email de rappel pré-événement~~** → **déprioritisé, post-MVP** (voir Phase 2)
   - Rappel 24h avant + rappel 1h avant — nécessite une infrastructure de jobs planifiés (Vercel Cron / QStash)
   - Complexité d'implémentation disproportionnée pour le MVP
 
@@ -171,7 +171,7 @@
 > Un utilisateur qui s'inscrit sans lien d'événement ni de Communauté ne sait pas où aller.
 > Le dashboard vide est silencieux — il faut l'orienter activement.
 
-- [x] **Page de bienvenue `/dashboard/welcome`** ✅
+- [x] **Page de bienvenue ****`/dashboard/welcome`** ✅
   - **Trigger** : accès à `/dashboard/welcome` si l'utilisateur n'a aucune activité (aucun Circle créé, aucune Registration). Redirect vers `/dashboard` si activité détectée.
   - **Persistance basée sur l'état** — pas de flag DB. La page redirige vers `/dashboard` dès qu'il a un Circle ou une Registration.
   - **Contenu** : message d'accueil personnalisé (prénom) + 2 cartes CTA :
@@ -324,7 +324,7 @@
 ## Bugs connus
 
 | # | Description | Statut | Détail |
-|---|-------------|--------|--------|
+| --- | --- | --- | --- |
 | B-01 | OAuth Google bloquée depuis les navigateurs in-app (Instagram, WhatsApp, Facebook…) | ⚠️ Workaround utilisateur | Google refuse les WebViews (`Error 403: disallowed_useragent`). Fix possible : détecter le user-agent et afficher un message explicatif sur `/auth/error` à la place de l'erreur Google. |
 | B-02 | Page `/changelog` — RangeError stack overflow en prod | ✅ Corrigé `3fd5a2b` | `readFileSync(CHANGELOG.md)` pouvait crasher si le fichier absent du bundle serverless Vercel → boucle error boundary React. Fix : `outputFileTracingIncludes` + try/catch. |
 | B-03 | OAuth Google `redirect_uri_mismatch` pour certains users | ✅ Corrigé (config Vercel) | `AUTH_URL` absent → Auth.js utilisait `VERCEL_URL` ou le header `x-forwarded-host` de façon non déterministe. Fix : ajouter `AUTH_URL=https://the-playground.fr` dans les variables Vercel. |
@@ -334,7 +334,7 @@
 ## Décisions clés
 
 | Date | Décision |
-|------|----------|
+| --- | --- |
 | 2026-02-19 | Usecases = fonctions (pas de classes) |
 | 2026-02-19 | ActionResult pattern pour les server actions |
 | 2026-02-19 | Slug généré dans le usecase (règle métier) |
@@ -363,7 +363,7 @@
 | 2026-02-21 | Découvrir (spec/feature-explorer-la-carte.md) : `/explorer` avec tabs Communautés + Événements, community-first, pas d'algorithme. Décision révisée : Découvrir = Circles + événements à venir de Circles publics (pas Circles uniquement). Métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Circle. Page Circle publique `/circles/[slug]` pour le cold traffic et le SEO. |
 | 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
 | 2026-02-21 | Terminologie i18n rebranding (intermédiaire). FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. *(Terminologie FR finalisée le 2026-02-22 : Escale → événement, Mon Playground → Mon espace, Rejoindre → S'inscrire)* |
-| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). *(La Carte renommée **Découvrir** en FR le 2026-02-22)* |
+| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). *(La Carte renommée ****Découvrir**** en FR le 2026-02-22)* |
 | 2026-02-21 | Convention démo : domaine **`@demo.playground`** distinct de `@test.playground`. Démo = contenu réaliste pour présentation/validation produit. Test = données techniques pour QA/dev. Reset complet de base (dev + prod) via `prisma db push --force-reset` avant injection démo. |
 | 2026-02-21 | Données démo : 6 Circles publics (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 événements (1 passé + 4 à venir par Circle), ratio 20%/80%, contenu entièrement en français. |
 | 2026-02-21 | Emails transactionnels : envoyés depuis les server actions (pas les usecases). Usecases restent purs (pas de side effects). Fire-and-forget (si email échoue, inscription réussit). Traductions i18n résolues dans le flux principal avant le fire-and-forget. Port `EmailService` avec 3 méthodes + adapter `ResendEmailService` (Resend + react-email). 4 emails MVP : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Organisateur. |
