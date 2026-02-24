@@ -369,7 +369,12 @@
       "free": "Gratuit",
       "spotsRemaining": "{count} places restantes",
       "registeredCount": "{count} inscrit(s)",
-      "online": "En ligne"
+      "online": "En ligne",
+      "roleBadge": {
+        "host": "Organisateur",
+        "registered": "Inscrit",
+        "waitlisted": "Liste d'attente"
+      }
     }
   },
   "Admin": {

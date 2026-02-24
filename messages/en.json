@@ -369,7 +369,12 @@
       "free": "Free",
       "spotsRemaining": "{count} spots remaining",
       "registeredCount": "{count} joined",
-      "online": "Online"
+      "online": "Online",
+      "roleBadge": {
+        "host": "Organizer",
+        "registered": "Joined",
+        "waitlisted": "Waitlisted"
+      }
     }
   },
   "Admin": {

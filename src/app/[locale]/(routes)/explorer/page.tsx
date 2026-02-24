@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
@@ -12,6 +13,7 @@ import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerCreateButton } from "@/components/explorer/explorer-create-button";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
+import type { Registration } from "@/domain/models/registration";
 
 export async function generateMetadata() {
   const t = await getTranslations("Explorer");
@@ -58,6 +60,19 @@ export default async function ExplorerPage({
   const membershipMap = new Map<string, CircleMemberRole>(
     userCircles.map((c) => [c.id, c.memberRole])
   );
+
+  // Membership par slug pour les cartes événement (PublicMoment expose circle.slug, pas circle.id)
+  const membershipBySlug = new Map<string, CircleMemberRole>(
+    userCircles.map((c) => [c.slug, c.memberRole])
+  );
+
+  // Inscriptions de l'utilisateur sur les événements affichés (une seule requête)
+  const registrationMap = session?.user?.id && moments.length > 0
+    ? await prismaRegistrationRepository.findByMomentIdsAndUser(
+        moments.map((m) => m.id),
+        session.user.id
+      )
+    : new Map<string, Registration | null>();
 
   return (
     <div className="space-y-8">
@@ -121,7 +136,12 @@ export default async function ExplorerPage({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {moments.map((moment) => (
-            <PublicMomentCard key={moment.id} moment={moment} />
+            <PublicMomentCard
+              key={moment.id}
+              moment={moment}
+              registrationStatus={registrationMap.get(moment.id)?.status ?? null}
+              isOrganizer={membershipBySlug.get(moment.circle.slug) === "HOST"}
+            />
           ))}
         </div>
       )}
