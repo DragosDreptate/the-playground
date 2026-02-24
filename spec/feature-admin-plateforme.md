@@ -62,7 +62,7 @@ src/domain/ports/repositories/admin-repository.ts
 
 Port dédié aux requêtes transversales admin. Séparé des ports domaine existants (CircleRepository, MomentRepository, etc.) car les requêtes admin sont cross-domain et ne suivent pas les mêmes patterns d'accès.
 
-#### Interface (13 méthodes)
+#### Interface (14 méthodes)
 
 ```typescript
 interface AdminRepository {
@@ -173,7 +173,7 @@ export async function adminXxx(
 src/app/actions/admin.ts
 ```
 
-14 fonctions exportées, toutes suivent le même pattern :
+11 fonctions exportées, toutes suivent le même pattern :
 
 ```typescript
 export async function xxxAction(...): Promise<ActionResult<T>> {
@@ -287,7 +287,7 @@ Les termes domaine suivent la convention de nommage : Circle → Communauté (FR
 
 | Fichier | Rôle |
 |---------|------|
-| `src/domain/ports/repositories/admin-repository.ts` | Port AdminRepository (interface + 15 types) |
+| `src/domain/ports/repositories/admin-repository.ts` | Port AdminRepository (interface + 10 types) |
 | `src/infrastructure/repositories/prisma-admin-repository.ts` | Adapter Prisma |
 | `src/domain/usecases/admin/*.ts` | 11 usecases admin |
 | `src/app/actions/admin.ts` | 14 server actions |

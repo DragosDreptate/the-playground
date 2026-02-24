@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Explorer header mobile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #0e0f1c;
+      --foreground: #f1f1f8;
+      --card: #161726;
+      --card-foreground: #f1f1f8;
+      --muted: #1e1f30;
+      --muted-foreground: #8b8ea8;
+      --border: #2a2b3d;
+      --radius: 0.5rem;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0b15;
+      color: var(--foreground);
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 48px;
+    }
+
+    h2 {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+
+    /* ── Phone frame ── */
+    .phone {
+      width: 375px;
+      background: var(--background);
+      border-radius: 40px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+    }
+
+    /* ── SiteHeader ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--background);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 28px; height: 28px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 14px; height: 14px; fill: white; }
+    .logo-text { font-size: 14px; font-weight: 700; }
+    .logo-text span { color: var(--primary); }
+    .header-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+    }
+    .hamburger {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 18px; height: 2px;
+      background: var(--foreground); border-radius: 2px;
+    }
+
+    /* ── Page content ── */
+    .page-content {
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── CURRENT header (problème) ── */
+    .header-current {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .header-current .text-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+    }
+    .header-current h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+      line-height: 1.1;
+    }
+    .header-current .subtitle {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
+    }
+    .btn-primary-large {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      background: var(--primary);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    /* ── OPTION A — Stack vertical ── */
+    .header-option-a {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .header-option-a h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+      line-height: 1.1;
+    }
+    .header-option-a .subtitle {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.55;
+      max-width: 100%;
+    }
+    .btn-primary-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--primary);
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: none;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .btn-primary-sm svg { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+
+    /* ── OPTION B — Title row + subtitle full-width ── */
+    .header-option-b {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .header-option-b .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .header-option-b h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+      line-height: 1.1;
+    }
+    .header-option-b .subtitle {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.55;
+    }
+    .btn-outline-sm {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--foreground);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-outline-sm svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; flex-shrink: 0; }
+
+    /* ── Shared elements (tabs, chips, cards) ── */
+    .pill-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      width: fit-content;
+    }
+    .pill-tab {
+      padding: 5px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill-tab.active {
+      background: var(--foreground);
+      color: var(--background);
+    }
+    .pill-tab.inactive {
+      color: var(--muted-foreground);
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      color: var(--muted-foreground);
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--foreground);
+      color: var(--background);
+      border-color: var(--foreground);
+    }
+
+    .circle-card {
+      background: var(--card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .circle-card-inner {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      align-items: flex-start;
+    }
+    .circle-cover {
+      width: 64px; height: 64px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800; color: white;
+    }
+    .circle-card-content { flex: 1; min-width: 0; }
+    .circle-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 4px;
+    }
+    .circle-category {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+    .badge-organizer {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+    .badge-city {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .circle-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 3px;
+    }
+    .circle-desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .circle-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .circle-next-event {
+      border-top: 1px solid var(--border);
+      padding: 10px 12px;
+    }
+    .next-event-label { font-size: 10px; color: var(--muted-foreground); font-weight: 500; margin-bottom: 3px; }
+    .next-event-title { font-size: 13px; font-weight: 600; color: var(--foreground); }
+    .next-event-date { font-size: 11px; color: var(--muted-foreground); }
+    .card-footer {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .avatar-sm {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+    .footer-name { font-size: 11px; color: var(--muted-foreground); }
+
+    /* Labels */
+    .label-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .label-current { background: #3b1a1a; color: #f87171; }
+    .label-option-a { background: #1a2e1a; color: #4ade80; }
+    .label-option-b { background: #1a1a2e; color: #818cf8; }
+    .label-recommended {
+      background: var(--primary);
+      color: white;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      width: 100%;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      padding: 0 20px 0;
+      text-align: center;
+    }
+
+    /* annotation */
+    .annotation {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      text-align: center;
+      line-height: 1.5;
+      max-width: 340px;
+    }
+    .annotation strong { color: var(--foreground); }
+
+    .diff-block {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      max-width: 340px;
+      line-height: 1.7;
+    }
+    .diff-block .minus { color: #f87171; }
+    .diff-block .plus  { color: #4ade80; }
+  </style>
+</head>
+<body>
+
+  <!-- ─────────── BEFORE ─────────── -->
+  <h2>Avant — problème mobile</h2>
+
+  <div class="phone">
+    <!-- Header -->
+    <div class="site-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg>
+        </div>
+        <div class="logo-text">the <span>playground</span></div>
+      </div>
+      <div class="header-right">
+        <div class="avatar">D</div>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Header actuel — PROBLÈME -->
+      <div class="header-current">
+        <div class="text-block">
+          <h1>Découvrir</h1>
+          <p class="subtitle">Des communautés qui partagent vos passions, des événements à ne pas manquer.</p>
+        </div>
+        <div class="btn-primary-large">Créer une<br>Communauté</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Tabs -->
+      <div class="pill-tabs">
+        <div class="pill-tab active">Communautés</div>
+        <div class="pill-tab inactive">Événements</div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <div class="chip active">Toutes les thématiques</div>
+        <div class="chip">Tech & IA</div>
+        <div class="chip">Product & Design</div>
+        <div class="chip">Business & Entrepreneuriat</div>
+        <div class="chip">Sport & Bien-être</div>
+      </div>
+
+      <!-- Card -->
+      <div class="circle-card">
+        <div class="circle-card-inner">
+          <div class="circle-cover">W</div>
+          <div class="circle-card-content">
+            <div class="circle-meta">
+              <span class="circle-category">Product & Design</span>
+              <span class="badge-organizer">Organisateur</span>
+              <span class="badge-city">Paris</span>
+            </div>
+            <div class="circle-name">Communauté WOLD</div>
+            <div class="circle-desc">La communauté des consultants Wold</div>
+            <div class="circle-stats">
+              <span>👥 1 membre</span>
+              <span>📅 1 événement à venir</span>
+            </div>
+          </div>
+        </div>
+        <div class="circle-next-event">
+          <div class="next-event-label">Prochain événement</div>
+          <div class="next-event-title">AI from the trenches</div>
+          <div class="next-event-date">28 févr.</div>
+        </div>
+        <div class="card-footer">
+          <div class="avatar-sm">N</div>
+          <span class="footer-name">organisé par Nicolas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diff-block">
+    <span class="minus">✕ Bouton CTA force le texte titre dans une colonne étroite</span><br>
+    <span class="minus">✕ Le sous-titre wrap mot par mot (3 mots max par ligne)</span><br>
+    <span class="minus">✕ Déséquilibre visuel fort entre titre et bouton</span>
+  </div>
+
+
+  <!-- ─────────── OPTION A ─────────── -->
+  <h2>Option A — Stack vertical <span class="label-recommended">Recommandé</span></h2>
+
+  <div class="phone">
+    <div class="site-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg>
+        </div>
+        <div class="logo-text">the <span>playground</span></div>
+      </div>
+      <div class="header-right">
+        <div class="avatar">D</div>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Option A — Stack vertical -->
+      <div class="header-option-a">
+        <h1>Découvrir</h1>
+        <p class="subtitle">Des communautés qui partagent vos passions, des événements à ne pas manquer.</p>
+        <div class="btn-primary-sm">
+          <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+          Créer une Communauté
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="pill-tabs">
+        <div class="pill-tab active">Communautés</div>
+        <div class="pill-tab inactive">Événements</div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="chip active">Toutes les thématiques</div>
+        <div class="chip">Tech & IA</div>
+        <div class="chip">Product & Design</div>
+        <div class="chip">Business & Entrepreneuriat</div>
+        <div class="chip">Sport & Bien-être</div>
+      </div>
+
+      <div class="circle-card">
+        <div class="circle-card-inner">
+          <div class="circle-cover">W</div>
+          <div class="circle-card-content">
+            <div class="circle-meta">
+              <span class="circle-category">Product & Design</span>
+              <span class="badge-organizer">Organisateur</span>
+              <span class="badge-city">Paris</span>
+            </div>
+            <div class="circle-name">Communauté WOLD</div>
+            <div class="circle-desc">La communauté des consultants Wold</div>
+            <div class="circle-stats">
+              <span>👥 1 membre</span>
+              <span>📅 1 événement à venir</span>
+            </div>
+          </div>
+        </div>
+        <div class="circle-next-event">
+          <div class="next-event-label">Prochain événement</div>
+          <div class="next-event-title">AI from the trenches</div>
+          <div class="next-event-date">28 févr.</div>
+        </div>
+        <div class="card-footer">
+          <div class="avatar-sm">N</div>
+          <span class="footer-name">organisé par Nicolas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diff-block">
+    <span class="plus">✓ Titre full-width — respire</span><br>
+    <span class="plus">✓ Sous-titre lisible sur toute la largeur</span><br>
+    <span class="plus">✓ CTA aligné à gauche, taille cohérente (size="sm")</span><br>
+    <span class="plus">✓ Changement minimal : flex-col sur mobile, flex-row sur sm:</span><br>
+    <br>
+    Code : <strong>flex-col sm:flex-row sm:items-start sm:justify-between</strong>
+  </div>
+
+
+  <!-- ─────────── OPTION B ─────────── -->
+  <h2>Option B — Titre + bouton inline, sous-titre full-width</h2>
+
+  <div class="phone">
+    <div class="site-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg>
+        </div>
+        <div class="logo-text">the <span>playground</span></div>
+      </div>
+      <div class="header-right">
+        <div class="avatar">D</div>
+        <div class="hamburger"><span></span><span></span><span></span></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Option B — Title row + subtitle -->
+      <div class="header-option-b">
+        <div class="title-row">
+          <h1>Découvrir</h1>
+          <div class="btn-outline-sm">
+            <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14"/><line x1="2" y1="8" x2="14" y2="8"/></svg>
+            Créer
+          </div>
+        </div>
+        <p class="subtitle">Des communautés qui partagent vos passions, des événements à ne pas manquer.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="pill-tabs">
+        <div class="pill-tab active">Communautés</div>
+        <div class="pill-tab inactive">Événements</div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="chip active">Toutes les thématiques</div>
+        <div class="chip">Tech & IA</div>
+        <div class="chip">Product & Design</div>
+        <div class="chip">Business & Entrepreneuriat</div>
+        <div class="chip">Sport & Bien-être</div>
+      </div>
+
+      <div class="circle-card">
+        <div class="circle-card-inner">
+          <div class="circle-cover">W</div>
+          <div class="circle-card-content">
+            <div class="circle-meta">
+              <span class="circle-category">Product & Design</span>
+              <span class="badge-organizer">Organisateur</span>
+              <span class="badge-city">Paris</span>
+            </div>
+            <div class="circle-name">Communauté WOLD</div>
+            <div class="circle-desc">La communauté des consultants Wold</div>
+            <div class="circle-stats">
+              <span>👥 1 membre</span>
+              <span>📅 1 événement à venir</span>
+            </div>
+          </div>
+        </div>
+        <div class="circle-next-event">
+          <div class="next-event-label">Prochain événement</div>
+          <div class="next-event-title">AI from the trenches</div>
+          <div class="next-event-date">28 févr.</div>
+        </div>
+        <div class="card-footer">
+          <div class="avatar-sm">N</div>
+          <span class="footer-name">organisé par Nicolas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="diff-block">
+    <span class="plus">✓ Titre pleine largeur, sous-titre lisible</span><br>
+    <span class="plus">✓ Bouton en outline discret — ne dispute pas l'attention au titre</span><br>
+    <span class="minus">△ Bouton tronqué à "Créer" — perd le contexte "Communauté"</span><br>
+    <span class="minus">△ Outline moins visible = CTA moins incitatif</span>
+  </div>
+
+  <p class="annotation">
+    <strong>Recommandation : Option A</strong><br>
+    Un seul changement CSS — le composant existant est intact.<br>
+    Le CTA reste rose et visible, le sous-titre respire.
+  </p>
+
+</body>
+</html>

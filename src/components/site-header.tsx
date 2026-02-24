@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
@@ -17,6 +17,7 @@ export function SiteHeader() {
   const tDashboard = useTranslations("Dashboard");
 
   const user = session?.user;
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
@@ -37,14 +38,14 @@ export function SiteHeader() {
             <>
               <Link
                 href="/explorer"
-                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm font-medium transition-colors"
+                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/explorer") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 <Compass className="size-3.5" />
                 {tExplorer("navLink")}
               </Link>
               <Link
                 href="/dashboard"
-                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm font-medium transition-colors"
+                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 <LayoutDashboard className="size-3.5" />
                 {tDashboard("title")}
