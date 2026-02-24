@@ -140,10 +140,20 @@ export const prismaCircleRepository: CircleRepository = {
       include: {
         circle: {
           include: {
-            _count: { select: { memberships: true } },
+            // Compte SQL précis — ne charge aucun enregistrement Moment en mémoire
+            _count: {
+              select: {
+                memberships: true,
+                moments: {
+                  where: { status: "PUBLISHED", startsAt: { gte: now } },
+                },
+              },
+            },
+            // Un seul Moment chargé — uniquement les 2 champs nécessaires pour nextMoment
             moments: {
               where: { status: "PUBLISHED", startsAt: { gte: now } },
               orderBy: { startsAt: "asc" },
+              take: 1,
               select: { title: true, startsAt: true },
             },
           },
@@ -155,7 +165,8 @@ export const prismaCircleRepository: CircleRepository = {
       ...toDomainCircle(m.circle),
       memberRole: m.role,
       memberCount: m.circle._count.memberships,
-      upcomingMomentCount: m.circle.moments.length,
+      // upcomingMomentCount issu du _count SQL, pas de moments.length
+      upcomingMomentCount: m.circle._count.moments,
       nextMoment: m.circle.moments[0] ?? null,
     }));
   },
@@ -214,10 +225,20 @@ export const prismaCircleRepository: CircleRepository = {
         ...(filters.category && { category: filters.category }),
       },
       include: {
-        _count: { select: { memberships: true } },
+        // Comptes SQL précis — aucun enregistrement Moment chargé en mémoire pour le count
+        _count: {
+          select: {
+            memberships: true,
+            moments: {
+              where: { status: "PUBLISHED", startsAt: { gte: now } },
+            },
+          },
+        },
+        // Un seul Moment chargé — uniquement les 2 champs nécessaires pour nextMoment
         moments: {
           where: { status: "PUBLISHED", startsAt: { gte: now } },
           orderBy: { startsAt: "asc" },
+          take: 1,
           select: { title: true, startsAt: true },
         },
       },
@@ -238,7 +259,8 @@ export const prismaCircleRepository: CircleRepository = {
         ? (c.coverImageAttribution as CoverImageAttribution)
         : null,
       memberCount: c._count.memberships,
-      upcomingMomentCount: c.moments.length,
+      // upcomingMomentCount issu du _count SQL, pas de moments.length
+      upcomingMomentCount: c._count.moments,
       nextMoment: c.moments[0] ?? null,
     }));
   },

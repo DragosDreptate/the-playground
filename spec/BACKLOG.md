@@ -70,6 +70,7 @@
 | CoverImagePicker — photos aléatoires Unsplash à l'ouverture : suppression des photos curées statiques, nouvelle route `/api/unsplash/random` (8 appels parallèles `/photos/random`, 1 par thématique, cache `s-maxage=300`), skeleton 8 cases pendant le chargement, `defaultPhotos` mis en cache entre les ouvertures. | 2026-02-23 | `dcd2c6c` |
 | CoverImagePicker — pagination recherche : remplacement du bouton "Voir plus" (qui agrandissait la modale) par une navigation prev/next qui remplace les photos sans changer la taille de la modale. | 2026-02-23 | — |
 | CoverImagePicker — fix state reset : `handleApply` et `handleRemove` appelaient `setOpen(false)` directement (bypasse `onOpenChange` en mode contrôlé Radix), laissant `pending` stale. Corrigé en appelant `handleOpenChange(false)` pour garantir le reset complet. Fix parallèle : le bouton déclencheur appelait `setOpen(true)` au lieu de `handleOpenChange(true)`, empêchant le fetch des photos aléatoires. | 2026-02-23 | `e1131ef`, `9d5cfde` |
+| **Refonte dashboard "Mon espace"** : tab Événements (`DashboardMomentCard` redesigné — cover 64 px à gauche, titre line-clamp-2, badge aligné à droite) + tab Communautés (nouveau `DashboardCircleCard` style Explorer — cover 1:1, stats membres/événements, prochain événement, bouton "Créer un événement" HOST-only). Nouveau type domaine `DashboardCircle` (`CircleWithRole` + `memberCount` + `upcomingMomentCount` + `nextMoment`). Nouveau usecase `getUserDashboardCircles`. Nouvelle méthode repository `findAllByUserIdWithStats` (requête unique, pas de N+1). Grille Communautés `sm:grid-cols-2`. 9 nouveaux tests unitaires (`get-user-dashboard-circles.test.ts`). | 2026-02-24 | `6a912a2` |
 
 ---
 
@@ -277,7 +278,7 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre événement dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [x] **Tests unitaires complets** — 337 tests, 49 fichiers, tous usecases couverts (27 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 359 tests, 50 fichiers, tous usecases couverts (28 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
 - [ ] **Tests E2E Playwright** — 8 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore). `onboarding.spec.ts` : 6/6 green. Les 7 autres à brancher sur environnement de test.
 - [ ] **Accessibilité axe-core** dans Playwright

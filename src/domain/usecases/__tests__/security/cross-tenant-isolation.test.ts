@@ -23,6 +23,7 @@ import { getMomentRegistrations } from "@/domain/usecases/get-moment-registratio
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { deleteComment } from "@/domain/usecases/delete-comment";
 import { joinMoment } from "@/domain/usecases/join-moment";
+import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
 
 // Erreurs domaine
 import {
@@ -32,6 +33,9 @@ import {
   UnauthorizedCommentDeletionError,
   MomentNotOpenForRegistrationError,
 } from "@/domain/errors";
+
+// Types domaine
+import type { DashboardCircle } from "@/domain/models/circle";
 
 // Helpers mock
 import {
@@ -588,6 +592,145 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       expect(registrationRepo.findActiveWithUserByMomentId).not.toHaveBeenCalled();
       // Vérifie que le check a bien été fait sur circle-a (le Circle du Moment)
       expect(circleRepo.findMembership).toHaveBeenCalledWith("circle-a", "host-of-circle-b");
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// IDOR — getUserDashboardCircles
+//
+// Ce usecase n'a pas de garde d'autorisation interne.
+// La défense repose sur deux couches :
+//   1. Le caller (page Next.js) injecte `session.user.id`
+//   2. Le repository scope toutes les requêtes WHERE userId = ?
+//
+// Le risque d'IDOR est différent ici : un attaquant ne peut pas
+// substituer un userId via une action directe (le userId vient
+// de la session côté serveur). Mais il faut vérifier que le
+// usecase transmet le userId exactement tel quel, sans
+// modification ni contamination croisée entre utilisateurs.
+// ─────────────────────────────────────────────────────────────
+
+function makeDashboardCircleForSecurity(
+  overrides: Partial<DashboardCircle> = {}
+): DashboardCircle {
+  return {
+    ...makeCircle(),
+    memberRole: "HOST",
+    memberCount: 1,
+    upcomingMomentCount: 0,
+    nextMoment: null,
+    ...overrides,
+  };
+}
+
+describe("Security — Cross-Tenant Isolation (IDOR) — getUserDashboardCircles", () => {
+  describe("getUserDashboardCircles — isolation userId : pas de fuite de données cross-tenant", () => {
+    it("should scope the repository query to the exact userId provided — user A cannot see user B's circles", async () => {
+      // user-alice a 2 circles, user-bob a 0 circles
+      // Appeler le usecase avec user-alice ne doit JAMAIS retourner les circles de user-bob
+      const aliceCircles: DashboardCircle[] = [
+        makeDashboardCircleForSecurity({ id: "alice-circle-1", name: "Alice Circle" }),
+        makeDashboardCircleForSecurity({ id: "alice-circle-2", name: "Alice Circle 2" }),
+      ];
+
+      const circleRepo = createMockCircleRepository({
+        findAllByUserIdWithStats: vi.fn().mockImplementation((uid: string) => {
+          if (uid === "user-alice") return Promise.resolve(aliceCircles);
+          return Promise.resolve([]);
+        }),
+      });
+
+      // user-alice obtient ses 2 circles
+      const aliceResult = await getUserDashboardCircles("user-alice", {
+        circleRepository: circleRepo,
+      });
+      // user-bob n'obtient aucun circle
+      const bobResult = await getUserDashboardCircles("user-bob", {
+        circleRepository: circleRepo,
+      });
+
+      expect(aliceResult).toHaveLength(2);
+      expect(aliceResult.map((c) => c.id)).toContain("alice-circle-1");
+      expect(bobResult).toHaveLength(0);
+
+      // Le repository a bien été appelé avec chaque userId séparément
+      expect(circleRepo.findAllByUserIdWithStats).toHaveBeenCalledWith("user-alice");
+      expect(circleRepo.findAllByUserIdWithStats).toHaveBeenCalledWith("user-bob");
+    });
+
+    it("should call findAllByUserIdWithStats with the exact userId — no substitution", async () => {
+      // Vérifie que le usecase ne modifie pas le userId avant de le passer au repo
+      const circleRepo = createMockCircleRepository({
+        findAllByUserIdWithStats: vi.fn().mockResolvedValue([]),
+      });
+
+      await getUserDashboardCircles("user-victim", { circleRepository: circleRepo });
+
+      // Le repo est bien appelé avec user-victim, pas un autre userId
+      expect(circleRepo.findAllByUserIdWithStats).toHaveBeenCalledWith("user-victim");
+      expect(circleRepo.findAllByUserIdWithStats).toHaveBeenCalledTimes(1);
+    });
+
+    it("should not mix data between concurrent calls for different users", async () => {
+      // Simule des appels concurrents pour 3 users différents
+      // Chaque userId doit être transmis exactement une fois sans contamination
+      const callLog: string[] = [];
+
+      const circleRepo = createMockCircleRepository({
+        findAllByUserIdWithStats: vi.fn().mockImplementation((uid: string) => {
+          callLog.push(uid);
+          return Promise.resolve(
+            uid === "user-host"
+              ? [makeDashboardCircleForSecurity({ id: "host-circle", memberRole: "HOST" })]
+              : []
+          );
+        }),
+      });
+
+      const [hostResult, playerResult, strangerResult] = await Promise.all([
+        getUserDashboardCircles("user-host", { circleRepository: circleRepo }),
+        getUserDashboardCircles("user-player", { circleRepository: circleRepo }),
+        getUserDashboardCircles("user-stranger", { circleRepository: circleRepo }),
+      ]);
+
+      // user-host voit son circle, les autres voient rien
+      expect(hostResult).toHaveLength(1);
+      expect(hostResult[0].id).toBe("host-circle");
+      expect(playerResult).toHaveLength(0);
+      expect(strangerResult).toHaveLength(0);
+
+      // Chaque userId est transmis exactement une fois
+      expect(callLog.filter((id) => id === "user-host")).toHaveLength(1);
+      expect(callLog.filter((id) => id === "user-player")).toHaveLength(1);
+      expect(callLog.filter((id) => id === "user-stranger")).toHaveLength(1);
+    });
+
+    it("should allow a legitimate user to retrieve their own circles (positive case)", async () => {
+      // Cas positif : un utilisateur normal accède à ses propres circles
+      const myCircles: DashboardCircle[] = [
+        makeDashboardCircleForSecurity({
+          id: "my-circle",
+          name: "My Community",
+          memberRole: "PLAYER",
+          memberCount: 10,
+          upcomingMomentCount: 1,
+          nextMoment: { title: "Prochain événement", startsAt: new Date("2026-04-01T18:00:00Z") },
+        }),
+      ];
+
+      const circleRepo = createMockCircleRepository({
+        findAllByUserIdWithStats: vi.fn().mockResolvedValue(myCircles),
+      });
+
+      const result = await getUserDashboardCircles("user-legitimate", {
+        circleRepository: circleRepo,
+      });
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe("My Community");
+      expect(result[0].memberRole).toBe("PLAYER");
+      expect(result[0].nextMoment?.title).toBe("Prochain événement");
     });
   });
 });
