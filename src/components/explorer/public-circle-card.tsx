@@ -42,7 +42,7 @@ export async function PublicCircleCard({ circle, membershipRole }: Props) {
   );
 
   const stats = (
-    <div className="text-muted-foreground flex items-center gap-3 text-xs">
+    <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
       <div className="flex items-center gap-1">
         <Users className="size-3.5 shrink-0" />
         <span>{t("circleCard.members", { count: circle.memberCount })}</span>
