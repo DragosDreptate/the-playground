@@ -259,7 +259,7 @@ export default async function PublicCirclePage({
 
           {/* Badge Membre — visible pour les membres non-Organisateurs */}
           {showMemberBadge && (
-            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-green-500/25 bg-green-500/10 px-4 py-2.5 text-sm font-medium text-green-400">
+            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
               <svg
                 width="16"
                 height="16"
