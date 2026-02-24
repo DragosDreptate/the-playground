@@ -321,6 +321,16 @@
 
 ---
 
+## Bugs connus
+
+| # | Description | Statut | Détail |
+|---|-------------|--------|--------|
+| B-01 | OAuth Google bloquée depuis les navigateurs in-app (Instagram, WhatsApp, Facebook…) | ⚠️ Workaround utilisateur | Google refuse les WebViews (`Error 403: disallowed_useragent`). Fix possible : détecter le user-agent et afficher un message explicatif sur `/auth/error` à la place de l'erreur Google. |
+| B-02 | Page `/changelog` — RangeError stack overflow en prod | ✅ Corrigé `3fd5a2b` | `readFileSync(CHANGELOG.md)` pouvait crasher si le fichier absent du bundle serverless Vercel → boucle error boundary React. Fix : `outputFileTracingIncludes` + try/catch. |
+| B-03 | OAuth Google `redirect_uri_mismatch` pour certains users | ✅ Corrigé (config Vercel) | `AUTH_URL` absent → Auth.js utilisait `VERCEL_URL` ou le header `x-forwarded-host` de façon non déterministe. Fix : ajouter `AUTH_URL=https://the-playground.fr` dans les variables Vercel. |
+
+---
+
 ## Décisions clés
 
 | Date | Décision |
