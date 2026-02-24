@@ -357,7 +357,11 @@
       "members": "{count} membres",
       "upcomingMoments": "{count} événement(s) à venir",
       "noUpcomingMoments": "Aucun événement à venir",
-      "nextMoment": "Prochain événement"
+      "nextMoment": "Prochain événement",
+      "roleBadge": {
+        "host": "Organisateur",
+        "member": "Membre"
+      }
     },
     "momentCard": {
       "free": "Gratuit",

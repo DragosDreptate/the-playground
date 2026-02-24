@@ -357,7 +357,11 @@
       "members": "{count} members",
       "upcomingMoments": "{count} upcoming Event(s)",
       "noUpcomingMoments": "No upcoming Events",
-      "nextMoment": "Next Event"
+      "nextMoment": "Next Event",
+      "roleBadge": {
+        "host": "Organizer",
+        "member": "Member"
+      }
     },
     "momentCard": {
       "free": "Free",

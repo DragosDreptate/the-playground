@@ -3,12 +3,14 @@ import { getTranslations } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
+import type { CircleMemberRole } from "@/domain/models/circle";
 
 type Props = {
   circle: PublicCircle;
+  membershipRole?: CircleMemberRole | null;
 };
 
-export async function PublicCircleCard({ circle }: Props) {
+export async function PublicCircleCard({ circle, membershipRole }: Props) {
   const t = await getTranslations("Explorer");
   const tCategory = await getTranslations("CircleCategory");
 
@@ -24,6 +26,14 @@ export async function PublicCircleCard({ circle }: Props) {
   const categoryBadge = circle.category && (
     <span className="text-foreground text-xs font-semibold">
       {tCategory(circle.category)}
+    </span>
+  );
+
+  const roleBadge = membershipRole && (
+    <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
+      {membershipRole === "HOST"
+        ? t("circleCard.roleBadge.host")
+        : t("circleCard.roleBadge.member")}
     </span>
   );
 
@@ -83,6 +93,7 @@ export async function PublicCircleCard({ circle }: Props) {
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex flex-wrap items-center gap-1.5">
                 {categoryBadge}
+                {roleBadge}
                 {cityLabel}
               </div>
               <h3 className="truncate text-sm font-semibold group-hover:underline">
@@ -133,6 +144,7 @@ export async function PublicCircleCard({ circle }: Props) {
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryBadge}
+              {roleBadge}
               {cityLabel}
             </div>
             <h3 className="font-semibold leading-snug group-hover:underline">

@@ -3,6 +3,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
 } from "@/infrastructure/repositories";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import { PublicCircleCard } from "@/components/explorer/public-circle-card";
@@ -10,9 +11,7 @@ import { PublicMomentCard } from "@/components/explorer/public-moment-card";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerCreateButton } from "@/components/explorer/explorer-create-button";
 import { Link } from "@/i18n/navigation";
-import type { CircleCategory } from "@/domain/models/circle";
-
-export const revalidate = 60;
+import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
 
 export async function generateMetadata() {
   const t = await getTranslations("Explorer");
@@ -40,8 +39,9 @@ export default async function ExplorerPage({
   const category = categoryParam as CircleCategory | undefined;
 
   const t = await getTranslations("Explorer");
+  const session = await auth();
 
-  const [circles, moments] = await Promise.all([
+  const [circles, moments, userCircles] = await Promise.all([
     getPublicCircles(
       { category },
       { circleRepository: prismaCircleRepository }
@@ -50,7 +50,14 @@ export default async function ExplorerPage({
       { category },
       { momentRepository: prismaMomentRepository }
     ),
+    session?.user?.id
+      ? prismaCircleRepository.findAllByUserId(session.user.id)
+      : Promise.resolve([]),
   ]);
+
+  const membershipMap = new Map<string, CircleMemberRole>(
+    userCircles.map((c) => [c.id, c.memberRole])
+  );
 
   return (
     <div className="space-y-8">
@@ -99,7 +106,11 @@ export default async function ExplorerPage({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {circles.map((circle) => (
-              <PublicCircleCard key={circle.id} circle={circle} />
+              <PublicCircleCard
+                key={circle.id}
+                circle={circle}
+                membershipRole={membershipMap.get(circle.id) ?? null}
+              />
             ))}
           </div>
         )
