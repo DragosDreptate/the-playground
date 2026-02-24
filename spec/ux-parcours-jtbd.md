@@ -221,7 +221,7 @@
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| A1 | Post-inscription : aucun CTA "Ajouter au calendrier" | Le Player risque d'oublier l'événement | Haute |
+| A1 | ~~Post-inscription : aucun CTA "Ajouter au calendrier"~~ ✅ **Résolu** — composant `AddToCalendarButtons` (Google Calendar + fichier .ics via `/api/moments/[slug]/calendar`) affiché après inscription confirmée | ~~Le Player risque d'oublier l'événement~~ | ~~Haute~~ ✅ |
 | A2 | Post-inscription : aucun lien visible vers le dashboard | Le Player ne sait pas qu'il a un espace personnel | Haute |
 | A3 | ~~Pas d'email de confirmation d'inscription~~ ✅ **Résolu** — email de confirmation implémenté (Resend + react-email) | ~~Pas de réassurance, pas de rappel~~ | ~~Bloquante~~ ✅ |
 | A4 | La page `/m/[slug]` ne propose pas d'autres Moments du Circle (hors PAST) | Rétention Circle manquée pour les événements actifs | Moyenne |
@@ -298,7 +298,7 @@
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
 | C1 | ~~Pas d'email de notification de promotion~~ ✅ **Résolu** — email de promotion liste d'attente implémenté | ~~Le Player ne sait pas qu'il a une place~~ | ~~Bloquante~~ ✅ |
-| C2 | Position dans la liste d'attente non visible | Incertitude maximale | Haute |
+| C2 | ~~Position dans la liste d'attente non visible~~ ✅ **Résolu** — calcul à la volée via `countWaitlistPosition`, affiché dans `RegistrationButton` sur `/m/[slug]` et dashboard | ~~Incertitude maximale~~ | ~~Haute~~ ✅ |
 | C3 | Pas d'option "m'alerter si une place se libère" explicite | Le mécanisme est implicite, pas rassurant | Haute |
 
 ---
@@ -456,8 +456,8 @@
 
 | Persona | Voit | Peut faire | Manque |
 |---------|------|------------|--------|
-| Visiteur anonyme | Tout le contenu + inscrits + commentaires | S'inscrire (→ auth), Voir le Circle | CTA "Ajouter au calendrier" post-inscription, Lien dashboard après auth |
-| Player inscrit | Tout + statut inscrit | Commenter, Annuler inscription | CTA "Ajouter au calendrier", "Voir dans le dashboard" |
+| Visiteur anonyme | Tout le contenu + inscrits + commentaires | S'inscrire (→ auth), Voir le Circle | Lien dashboard après auth |
+| Player inscrit | Tout + statut inscrit + CTA "Ajouter au calendrier" ✅ | Commenter, Annuler inscription, Ajouter au calendrier | "Voir dans le dashboard" |
 | Player waitlisté | Tout + badge "Liste d'attente" | Annuler l'attente | Position dans la file, ETA estimation |
 | Player non-inscrit (Moment futur) | Tout le contenu | S'inscrire | Indication "X places restantes" plus visible |
 | Player non-inscrit (Moment PAST) | Tout + banner "Terminé" | Voir commentaires (lecture), Voir le Circle | — |
@@ -482,7 +482,7 @@
 
 | Persona | Voit | Peut faire | Manque |
 |---------|------|------------|--------|
-| Player (Moment futur) | Détails + inscrits + commentaires | Commenter, Annuler inscription | CTA "Ajouter au calendrier", Autres Moments du Circle |
+| Player (Moment futur) | Détails + inscrits + commentaires + CTA "Ajouter au calendrier" ✅ | Commenter, Annuler inscription, Ajouter au calendrier | Autres Moments du Circle |
 | Player (Moment PAST) | Détails + commentaires | Voir commentaires (lecture) | — |
 | Host (Moment futur) | Tout + lien partageable + liste inscrits | Modifier, Supprimer, Copier lien, Commenter | Envoyer rappel, Export CSV, Filtrer inscriptions |
 | Host (Moment PAST) | Tout + stats basiques | Voir commentaires | Commenter sur PAST, CTA "Créer le prochain", Stats présence |
@@ -506,7 +506,7 @@
 |---|-----|------------------------|----------|
 | H-1 | **Host peut commenter sur Moment PAST** | Host post-événement | F |
 | H-2 | **CTA "Créer le prochain Moment" depuis Moment PAST** | Host post-événement | F |
-| H-3 | **Position dans la liste d'attente visible** | Player waitlisté | C |
+| ~~H-3~~ | ~~**Position dans la liste d'attente visible**~~ ✅ **Résolu** | ~~Player waitlisté~~ | ~~C~~ |
 | H-4 | **Autres Moments du Circle visible sur page Moment dashboard** | Player récurrent | B |
 | H-5 | **CTA "Devenir organisateur" pour Players sans Circle** | Host débutant | G |
 | H-6 | **Export CSV des inscrits** | Host pré-événement | E |
@@ -517,7 +517,7 @@
 
 | # | Gap | Persona(s) impactée(s) | Parcours |
 |---|-----|------------------------|----------|
-| M-1 | CTA "Ajouter au calendrier" post-inscription (Google, Apple, ICS) | Player fraîchement inscrit | A |
+| ~~M-1~~ | ~~CTA "Ajouter au calendrier" post-inscription (Google, Apple, ICS)~~ ✅ **Résolu** | ~~Player fraîchement inscrit~~ | ~~A~~ |
 | M-2 | Lien vers dashboard visible depuis `/m/[slug]` après auth | Player fraîchement inscrit | A |
 | M-3 | Autres Moments du Circle en section "Vous aimerez aussi" sur page Moment publique (hors PAST) | Visiteur anonyme, Player non-inscrit | A |
 | M-4 | Notification aux membres quand un nouveau Moment est créé dans leur Circle | Player récurrent | B |
@@ -596,9 +596,9 @@
 - **Fil de commentaires** : engagement post-Moment, communauté vivante
 
 ### Talons d'Achille actuels
-- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Host — 4 emails MVP implémentés. Rappels 24h/1h restent à faire (Phase 2).
+- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Host nouvelle inscription, notification Host nouveau commentaire — 5 emails MVP implémentés. Rappels 24h/1h restent à faire (Phase 2).
 - **Formulaire de commentaire masqué sur PAST** : y compris pour le Host, alors que c'est le pic d'engagement
-- **L'après-inscription est vide** : aucune guidance "Et maintenant ?"
+- **L'après-inscription est partiellement guidée** : CTA "Ajouter au calendrier" ✅ résolu, mais lien vers le dashboard encore absent (gap A2)
 - **L'onboarding Host n'existe pas** : le Host débutant est livré à lui-même
 
 ### Ce qui nous différencie structurellement de Luma

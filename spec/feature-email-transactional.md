@@ -14,7 +14,8 @@ Les emails transactionnels sont le premier canal de communication entre la plate
 1. **Confirmation d'inscription** — rassure le Player, lui donne les infos pratiques
 2. **Confirmation liste d'attente** — informe le Player de sa position
 3. **Promotion liste d'attente** — notifie le Player qu'une place s'est libérée
-4. **Notification Host** — informe le Host de chaque nouvelle inscription
+4. **Notification Host : nouvelle inscription** — informe le Host de chaque nouvelle inscription
+5. **Notification Host : nouveau commentaire** — informe le Host quand un Player commente son événement
 
 **Inspiration Luma** : calendar badge (mois + jour), layout clean, CTA visible, footer discret. Adapté au branding The Playground (gradient rose → violet).
 
@@ -41,7 +42,7 @@ Server Action (joinMomentAction)
 
 ---
 
-## 4 emails MVP
+## 5 emails MVP
 
 | Email | Template | Déclencheur | Destinataire | Pièce jointe .ics |
 |-------|----------|-------------|--------------|---------------------|
@@ -49,6 +50,7 @@ Server Action (joinMomentAction)
 | Confirmation liste d'attente | `registration-confirmation` | `joinMomentAction` (status = WAITLISTED) | Player | Non |
 | Promotion liste d'attente | `waitlist-promotion` | `cancelRegistrationAction` (promotedRegistration) | Player promu | Oui |
 | Notification nouvelle inscription | `host-new-registration` | `joinMomentAction` | Chaque Host du Circle (sauf self) | Non |
+| Notification nouveau commentaire | `host-new-comment` | `addCommentAction` | Chaque Host du Circle (sauf commentateur) | Non |
 
 **Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n.
 
@@ -67,6 +69,7 @@ export interface EmailService {
   sendRegistrationConfirmation(data: RegistrationConfirmationEmailData): Promise<void>;
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
+  sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
 }
 ```
 
@@ -75,6 +78,7 @@ export interface EmailService {
 - `RegistrationConfirmationEmailData` : `to`, `playerName`, `momentTitle`, `momentSlug`, `momentDate` (formaté), `momentDateMonth`/`momentDateDay` (calendar badge), `locationText`, `circleName`, `circleSlug`, `status` (REGISTERED/WAITLISTED), `icsContent?` (attachement .ics, REGISTERED uniquement), `strings`
 - `WaitlistPromotionEmailData` : même structure sans `status`, avec `icsContent?` (promu = confirmé)
 - `HostNewRegistrationEmailData` : `to`, `hostName`, `playerName`, `momentTitle`, `momentSlug`, `circleSlug`, `registrationInfo` (pré-formaté), `strings`
+- `HostNewCommentEmailData` : `to`, `hostName`, `playerName`, `momentTitle`, `momentSlug`, `circleSlug`, `commentPreview` (max 200 chars, tronqué avec ellipse), `strings`
 
 Tous les payloads contiennent un objet `strings` avec les textes UI pré-traduits → templates locale-agnostiques.
 
@@ -185,7 +189,7 @@ src/infrastructure/services/email/templates/waitlist-promotion.tsx
 Même structure que la confirmation, textes spécifiques : "Bonne nouvelle ! Une place s'est libérée."
 Pas de lien d'annulation.
 
-### Template : Notification Host
+### Template : Notification Host — nouvelle inscription
 
 ```
 src/infrastructure/services/email/templates/host-new-registration.tsx
@@ -196,6 +200,18 @@ Plus simple :
 2. Message : "{playerName} a rejoint {momentTitle}" (via `strings.message`, locale-agnostique)
 3. Badge stats : "{count} inscrits / {capacity} places" ou "{count} inscrits"
 4. CTA : "Gérer les inscriptions" → `/dashboard/circles/[circleSlug]/moments/[momentSlug]`
+5. Footer
+
+### Template : Notification Host — nouveau commentaire
+
+```
+src/infrastructure/services/email/templates/host-new-comment.tsx
+```
+
+1. Heading : "Nouveau commentaire"
+2. Message : "{playerName} a commenté votre événement {momentTitle}" (via `strings.message`)
+3. Aperçu du commentaire (max 200 chars, tronqué)
+4. CTA : "Voir le commentaire" → `/dashboard/circles/[circleSlug]/moments/[momentSlug]`
 5. Footer
 
 ---
@@ -231,6 +247,19 @@ Si `result.promotedRegistration` existe :
 3. Générer `.ics` (promu = confirmé)
 4. Envoyer email de promotion
 
+### `addCommentAction` (`src/app/actions/comment.ts`)
+
+Après `addComment(...)` réussi :
+1. Résoudre `getTranslations("Email")` + `getLocale()` dans le flux principal
+2. Fire-and-forget : `sendHostCommentNotification(momentId, userId, content, t, locale).catch(console.error)`
+
+`sendHostCommentNotification(...)` :
+1. Fetch commenter (userRepository) + moment (momentRepository) en parallèle
+2. Fetch circle séquentiellement (dépend de `moment.circleId`)
+3. Tronquer le commentaire à 200 chars si nécessaire
+4. Fetch Hosts du Circle (`findMembersByRole(circleId, "HOST")`)
+5. Envoyer notification à chaque Host (skip si Host = commentateur)
+
 ---
 
 ## i18n
@@ -254,6 +283,11 @@ Si `result.promotedRegistration` existe :
 | `hostNotification.registrationInfo` | {count} inscrit(s) / {capacity} places | {count} joined / {capacity} spots |
 | `hostNotification.registrationInfoUnlimited` | {count} inscrit(s) | {count} joined |
 | `hostNotification.manageRegistrationsCta` | Gérer les inscriptions | Manage registrations |
+| `commentNotification.subject` | {playerName} a commenté {momentTitle} | {playerName} commented on {momentTitle} |
+| `commentNotification.heading` | Nouveau commentaire | New comment |
+| `commentNotification.message` | {playerName} a commenté votre événement {momentTitle} | {playerName} commented on your Event {momentTitle} |
+| `commentNotification.commentPreviewLabel` | Commentaire | Comment |
+| `commentNotification.viewCommentCta` | Voir le commentaire | View comment |
 | `common.dateLabel` | Date | Date |
 | `common.locationLabel` | Lieu | Location |
 | `common.viewMomentCta` | Voir l'événement | View Event |
@@ -297,7 +331,7 @@ Quand un Host crée un Moment, il est automatiquement inscrit (REGISTERED) dans 
 
 ## Fichiers
 
-### Nouveaux (10)
+### Nouveaux (11)
 
 | Fichier | Rôle |
 |---------|------|
@@ -308,18 +342,20 @@ Quand un Host crée un Moment, il est automatiquement inscrit (REGISTERED) dans 
 | `src/infrastructure/services/email/templates/components/calendar-badge.tsx` | Badge date (gradient) |
 | `src/infrastructure/services/email/templates/registration-confirmation.tsx` | Confirmation inscription/liste d'attente |
 | `src/infrastructure/services/email/templates/waitlist-promotion.tsx` | Promotion liste d'attente |
-| `src/infrastructure/services/email/templates/host-new-registration.tsx` | Notification Host |
+| `src/infrastructure/services/email/templates/host-new-registration.tsx` | Notification Host — nouvelle inscription |
+| `src/infrastructure/services/email/templates/host-new-comment.tsx` | Notification Host — nouveau commentaire |
 | `src/infrastructure/services/email/__tests__/generate-ics.test.ts` | Tests unitaires generateIcs (10 tests) |
 | `src/domain/usecases/__tests__/helpers/mock-email-service.ts` | Mock pour tests |
 
-### Modifiés (4)
+### Modifiés (5)
 
 | Fichier | Changement |
 |---------|-----------|
 | `src/app/actions/registration.ts` | Ajout envoi emails (fire-and-forget) après joinMoment et cancelRegistration |
+| `src/app/actions/comment.ts` | Ajout notification Host (fire-and-forget) après addComment |
 | `src/infrastructure/services/index.ts` | Export `createResendEmailService` |
-| `messages/fr.json` | Ajout namespace `"Email"` (17 clés) |
-| `messages/en.json` | Ajout namespace `"Email"` (17 clés) |
+| `messages/fr.json` | Ajout namespace `"Email"` (22 clés, dont `commentNotification.*`) |
+| `messages/en.json` | Ajout namespace `"Email"` (22 clés, dont `commentNotification.*`) |
 
 ---
 

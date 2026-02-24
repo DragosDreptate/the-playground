@@ -173,6 +173,7 @@ Contient :
   - ~~Rappel 1h avant~~ *(déprioritisé → Phase 2)*
   - Notification de changement (lieu, horaire, annulation) *(post-MVP)*
 - Commenter sur le fil du Moment ✅
+- Notification Host lors d'un nouveau commentaire ✅
 - **Après le Moment** : découvrir la page Circle, les prochains Moments, les autres membres → rétention ✅
 
 ## Découvrir (découverte publique) ✅
@@ -284,7 +285,7 @@ Chaque Moment est une page autonome, design premium (benchmark Luma), optimisée
 - Pages Moment autonomes et partageables ✅
 - Inscriptions (avec inscription automatique au Circle) ✅
 - Liste d'attente avec promotion automatique ✅
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host) ✅
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Host nouvelle inscription, notification Host nouveau commentaire) ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Découvrir (répertoire public de Circles + événements) ✅

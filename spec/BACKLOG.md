@@ -50,6 +50,7 @@
 | Scripts données démo : `db:seed-demo-data` (6 Circles, 20 users `@demo.playground`, 30 Escales 80%/20%, FR, idempotent) + `db:cleanup-demo-data` (dry-run par défaut) + variantes prod | 2026-02-21 | `0fa65f0` |
 | Admin plateforme : dashboard stats, listes paginées (Users/Circles/Moments) avec recherche, pages détail, suppression, forcer annulation Moment. Middleware guard `/admin/*`, `UserRole` (USER/ADMIN), lien Admin dans UserMenu, i18n FR/EN complet | 2026-02-21 | `dbe3dda` |
 | Emails transactionnels (Resend + react-email) : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Organisateur nouvelle inscription. Port `EmailService` + adapter `ResendEmailService`. Templates React avec calendar badge (gradient rose→violet). Fire-and-forget depuis server actions. i18n FR/EN complet. | 2026-02-21 | — |
+| Email notification Organisateur : nouveau commentaire sur un événement (`host-new-comment` template, `sendHostNewComment` sur `EmailService`, déclenché depuis `addCommentAction`, fire-and-forget, i18n FR/EN `Email.commentNotification.*`). | 2026-02-24 | `f29287b` |
 | Couverture tests complète : 14 nouveaux fichiers (get-user-registration, get-moment-comments, get-user-past-moments, 11 usecases admin). 5 specs E2E scaffoldées (auth, join-moment, host-flow, cancel-registration, comments). 202 tests, 100% verts. | 2026-02-21 | `3ee4865` |
 | Suppression de compte utilisateur : usecase `deleteAccount` (cascade Circle si seul Organisateur), server action `deleteAccountAction`, section "Zone de danger" sur la page profil avec confirmation modale. i18n FR/EN `Profile.deleteAccount.*`. | 2026-02-22 | — |
 | Agents Claude Code : `test-coverage-guardian` (audit couverture + création tests manquants, run + correction en boucle) + `security-guardian` (audit RBAC/IDOR/accès admin, création tests sécurité, correction vulnérabilités). Définis dans `.claude/agents/`. | 2026-02-21 | — |
@@ -283,7 +284,7 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre événement dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [x] **Tests unitaires complets** — 313 tests, 47 fichiers, tous usecases couverts (25 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 333 tests, 47 fichiers, tous usecases couverts (25 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
 - [ ] **Tests E2E Playwright** — 8 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore). `onboarding.spec.ts` : 6/6 green. Les 7 autres à brancher sur environnement de test.
 - [ ] **Accessibilité axe-core** dans Playwright
