@@ -289,7 +289,7 @@ export function CoverImagePicker({
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent>
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-lg overflow-x-hidden">
           <DialogHeader>
             <DialogTitle>Image de couverture</DialogTitle>
           </DialogHeader>
