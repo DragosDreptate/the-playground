@@ -185,7 +185,8 @@
       "follow": "Suivre",
       "unfollow": "Se désabonner",
       "following": "Abonné·e",
-      "isMember": "Vous êtes membre"
+      "isMember": "Vous êtes membre",
+      "manageCircle": "Gérer cette Communauté"
     },
     "errors": {
       "notFound": "Communauté introuvable",

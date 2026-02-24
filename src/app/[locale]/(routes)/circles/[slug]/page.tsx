@@ -11,6 +11,7 @@ import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleNotFoundError } from "@/domain/errors";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { FollowButton } from "@/components/circles/follow-button";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
@@ -22,6 +23,7 @@ import {
   ChevronRight,
   MapPin,
   XCircle,
+  ExternalLink,
 } from "lucide-react";
 
 export const revalidate = 60;
@@ -286,13 +288,23 @@ export default async function PublicCirclePage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" */}
-          {hosts.length > 0 && (
-            <p className="text-muted-foreground text-sm">
-              {t("detail.hostedBy")}{" "}
-              <span className="text-foreground font-medium">{hostNames}</span>
-            </p>
-          )}
+          {/* "Organisé par" + raccourci Organisateur */}
+          <div className="flex items-center justify-between gap-4">
+            {hosts.length > 0 && (
+              <p className="text-muted-foreground text-sm">
+                {t("detail.hostedBy")}{" "}
+                <span className="text-foreground font-medium">{hostNames}</span>
+              </p>
+            )}
+            {isHost && (
+              <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
+                <Link href={`/dashboard/circles/${circle.slug}`}>
+                  <ExternalLink className="size-3.5" />
+                  {t("detail.manageCircle")}
+                </Link>
+              </Button>
+            )}
+          </div>
 
           {/* Titre */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">

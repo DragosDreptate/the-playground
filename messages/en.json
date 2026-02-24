@@ -185,7 +185,8 @@
       "follow": "Follow",
       "unfollow": "Unfollow",
       "following": "Following",
-      "isMember": "You are a member"
+      "isMember": "You are a member",
+      "manageCircle": "Manage this Community"
     },
     "errors": {
       "notFound": "Community not found",
