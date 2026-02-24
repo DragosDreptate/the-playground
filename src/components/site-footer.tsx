@@ -15,7 +15,7 @@ export async function SiteFooter() {
                 <polygon points="0,0 0,12 10,6" fill="white" />
               </svg>
             </div>
-            <span className="text-sm font-medium">The Playground</span>
+            <span className="text-[13px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
           </Link>
           <span className="text-muted-foreground text-xs">{t("brand.copyright")}</span>
         </div>

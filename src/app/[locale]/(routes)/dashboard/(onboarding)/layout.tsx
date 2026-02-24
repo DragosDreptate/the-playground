@@ -25,7 +25,7 @@ export default async function OnboardingLayout({
                 <polygon points="0,0 0,12 10,6" fill="white" />
               </svg>
             </div>
-            <span className="text-lg font-semibold">The Playground</span>
+            <span className="text-[15px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-3">
