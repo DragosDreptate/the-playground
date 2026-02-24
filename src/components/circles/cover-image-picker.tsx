@@ -44,7 +44,7 @@ function PhotoGrid({
   onSelect: (photo: UnsplashPhoto) => void;
 }) {
   return (
-    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {photos.map((photo) => {
         const isSelected = selectedId === photo.id;
         return (
@@ -290,10 +290,10 @@ export function CoverImagePicker({
       {/* Dialog */}
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className={[
-          // Mobile : plein écran — évite le bug iOS Safari (fixed → absolute dans overflow:hidden)
-          "top-0 left-0 right-0 bottom-0 h-dvh max-w-none translate-x-0 translate-y-0 rounded-none overflow-y-auto",
-          // Desktop sm+ : comportement dialog centré normal
-          "sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
+          // Mobile : w-screen = 100vw (toujours viewport, même avec le bug iOS Safari fixed→absolute)
+          "top-0 left-0 w-screen h-dvh max-w-none translate-x-0 translate-y-0 rounded-none overflow-x-hidden overflow-y-auto",
+          // Desktop sm+ : dialog centré normal
+          "sm:top-[50%] sm:left-[50%] sm:w-auto sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
         ].join(" ")}>
           <DialogHeader>
             <DialogTitle>Image de couverture</DialogTitle>
@@ -331,7 +331,7 @@ export function CoverImagePicker({
                   Aucun résultat pour « {query} »
                 </p>
               ) : isLoadingDefaults && searchResults === null ? (
-                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div
                       key={i}
