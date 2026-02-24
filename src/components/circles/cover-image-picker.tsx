@@ -44,7 +44,7 @@ function PhotoGrid({
   onSelect: (photo: UnsplashPhoto) => void;
 }) {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
       {photos.map((photo) => {
         const isSelected = selectedId === photo.id;
         return (
@@ -289,7 +289,7 @@ export function CoverImagePicker({
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="max-w-lg">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Image de couverture</DialogTitle>
           </DialogHeader>
@@ -326,7 +326,7 @@ export function CoverImagePicker({
                   Aucun résultat pour « {query} »
                 </p>
               ) : isLoadingDefaults && searchResults === null ? (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div
                       key={i}
