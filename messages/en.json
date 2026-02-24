@@ -117,6 +117,8 @@
     "noUpcomingMoments": "No upcoming Events.",
     "noMoments": "No Events yet.",
     "noMomentsHint": "Join an Event or create your community.",
+    "emptyCircles": "You're not a member of any Community.",
+    "emptyCirclesHint": "Create a Community or join an Event to become a member of one.",
     "noCirclesMember": "You are not a member of any Community yet.",
     "role": {
       "host": "Host",
