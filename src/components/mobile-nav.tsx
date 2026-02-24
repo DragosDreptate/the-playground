@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Menu, Compass, LayoutDashboard, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +22,7 @@ export function MobileNav({ isAuthenticated }: MobileNavProps) {
   const tExplorer = useTranslations("Explorer");
   const tDashboard = useTranslations("Dashboard");
   const tAuth = useTranslations("Auth");
+  const pathname = usePathname();
 
   return (
     <DropdownMenu>
@@ -35,13 +36,13 @@ export function MobileNav({ isAuthenticated }: MobileNavProps) {
         {isAuthenticated ? (
           <>
             <DropdownMenuItem asChild>
-              <Link href="/explorer" className="cursor-pointer">
+              <Link href="/explorer" className={`cursor-pointer ${pathname.startsWith("/explorer") ? "text-foreground font-medium" : ""}`}>
                 <Compass className="mr-2 size-4" />
                 {tExplorer("navLink")}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard" className="cursor-pointer">
+              <Link href="/dashboard" className={`cursor-pointer ${pathname.startsWith("/dashboard") ? "text-foreground font-medium" : ""}`}>
                 <LayoutDashboard className="mr-2 size-4" />
                 {tDashboard("title")}
               </Link>
