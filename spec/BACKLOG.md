@@ -65,6 +65,8 @@
 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. | 2026-02-22 | — |
 | Cover Circle : `CoverImagePicker` (tabs Photos Unsplash + Importer), server action `processCoverImage` dans `cover-image.ts`, champs `coverImage`/`coverImageAttribution` sur Circle (DB + domaine), API proxy Unsplash `/api/unsplash/search`, affichage sur 5 emplacements, attribution "Photo par [Nom] sur Unsplash". | 2026-02-23 | — |
 | Cover Moment : mêmes champs `coverImage`/`coverImageAttribution` sur Moment (DB + domaine), même composant `CoverImagePicker`, même server action `processCoverImage`, affichage sur pages publique et Organisateur. | 2026-02-23 | — |
+| **Suivre une Communauté (Follow)** : table `CircleFollow` (DB + domaine), usecases `followCircle`/`unfollowCircle`, composant `FollowButton` (cloche, 3 états), intégré sur page Circle publique (visible uniquement pour les utilisateurs connectés non-membres). Notification email aux followers à la création d'un événement (fire-and-forget). Déduplique followers+membres (un follower-membre ne reçoit qu'un seul email). | 2026-02-24 | `80a1390` |
+| **Email aux membres : nouvel événement dans leur Communauté** : `notifyNewMoment` envoie automatiquement un email à tous les membres (PLAYERs) à la création d'un événement, sauf au créateur. Intégré dans `createMomentAction`. Fire-and-forget. Template distinct du template follower (intro "votre Communauté" vs "une Communauté que vous suivez"). | 2026-02-24 | `80a1390` |
 | CoverImagePicker — photos aléatoires Unsplash à l'ouverture : suppression des photos curées statiques, nouvelle route `/api/unsplash/random` (8 appels parallèles `/photos/random`, 1 par thématique, cache `s-maxage=300`), skeleton 8 cases pendant le chargement, `defaultPhotos` mis en cache entre les ouvertures. | 2026-02-23 | `dcd2c6c` |
 | CoverImagePicker — pagination recherche : remplacement du bouton "Voir plus" (qui agrandissait la modale) par une navigation prev/next qui remplace les photos sans changer la taille de la modale. | 2026-02-23 | — |
 | CoverImagePicker — fix state reset : `handleApply` et `handleRemove` appelaient `setOpen(false)` directement (bypasse `onOpenChange` en mode contrôlé Radix), laissant `pending` stale. Corrigé en appelant `handleOpenChange(false)` pour garantir le reset complet. Fix parallèle : le bouton déclencheur appelait `setOpen(true)` au lieu de `handleOpenChange(true)`, empêchant le fetch des photos aléatoires. | 2026-02-23 | `e1131ef`, `9d5cfde` |
@@ -255,19 +257,10 @@
 
 ### Priorité moyenne
 
-- [ ] **Email aux membres : nouvel événement dans leur Communauté** (gap M-4)
-  - Notifier tous les membres d'une Communauté quand l'Organisateur programme un nouvel événement
-  - Contenu : titre, date, lieu, description courte, CTA "S'inscrire" → `/m/[slug]`
-  - Sans cette notification, les membres ne reviennent que s'ils pensent à vérifier — ce push est le principal levier de rétention
-  - **❓ Décision ouverte : automatique ou manuel ?**
-    - **Contexte modèle actuel** : il n'existe pas de statut `DRAFT` — les statuts sont `PUBLISHED` / `CANCELLED` / `PAST`. Un événement est créé directement en `PUBLISHED`. Création = publication, ce sont le même moment.
-    - **Automatique à la création** (= à la publication aujourd'hui) : zéro friction, mais l'Organisateur ne peut pas corriger une erreur avant que les membres soient notifiés
-    - **Manuel** (bouton "Notifier les membres" sur la page événement) : l'Organisateur contrôle le moment d'envoi — mais étape supplémentaire qu'il peut oublier
-    - **Hybride** (envoi automatique à la publication, re-notification manuelle possible) : nécessite d'introduire un statut `DRAFT` — changement de modèle non négligeable, à peser par rapport au bénéfice
-    - **Recommandation court terme** : automatique à la création (simple, cohérent avec le modèle actuel), avec un délai de grâce de quelques minutes pour annulation ("Annuler l'envoi" façon Gmail)
-  - Dépend de l'infrastructure email existante (`ResendEmailService`, `EmailService` port) — réutilisable directement
-  - Option future : préférence par membre (opt-out des notifications Communauté)
-  - Prérequis si hybride retenu : ajouter `DRAFT` à `MomentStatus` (DB + domaine + UI)
+- [x] **Email aux membres : nouvel événement dans leur Communauté** (gap M-4) ✅
+  - Automatique à la création (cohérent avec modèle actuel : création = publication)
+  - Déduplication : si un utilisateur est à la fois follower et membre, il reçoit uniquement l'email membre
+  - Créateur exclu de la notification (via `findPlayersForNewMomentNotification`)
 
 - [ ] **Export données Organisateur**
   - CSV export : membres Circle, historique événements, inscrits cumulés
@@ -284,7 +277,7 @@
   - Workflow pré-déploiement : snapshot Neon + Point-in-Time Restore comme filet
   - Validation titre événement dans les usecases (max 200 chars, actuellement front-only)
 - [ ] **CI/CD GitHub Actions** (typecheck, tests, pnpm audit, Lighthouse CI)
-- [x] **Tests unitaires complets** — 333 tests, 47 fichiers, tous usecases couverts (25 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 337 tests, 49 fichiers, tous usecases couverts (27 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (79 tests dédiés sécurité) ✅
 - [ ] **Tests E2E Playwright** — 8 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore). `onboarding.spec.ts` : 6/6 green. Les 7 autres à brancher sur environnement de test.
 - [ ] **Accessibilité axe-core** dans Playwright
@@ -293,14 +286,11 @@
 
 ## Phase 2 (post-MVP)
 
-- [ ] **Suivre une Communauté (Follow)** — non-membre notifié lors d'un nouvel événement
-  - Un utilisateur peut "suivre" une Communauté dont il n'est pas encore membre
-  - **Effet** : reçoit un email à chaque nouvel événement PUBLISHED dans cette Communauté (même template que "Email aux membres : nouvel événement")
-  - **UI** : icône cloche 🔔 sur la page Circle publique (`/circles/[slug]`) et page Découvrir — toggle actif/inactif, comme le bouton "Follow" LinkedIn
-  - **Distinct du membership** : follow = abonnement notifications uniquement, pas membre du Circle. L'inscription à un événement reste le seul chemin vers le membership (règle inchangée)
-  - **Data model** : nouvelle table `CircleFollow` (`userId`, `circleId`, `createdAt`) — contrainte unique, index sur `circleId` pour les lookups batch au moment de l'envoi
-  - **Désabonnement** : même cloche (toggle off) + lien "Se désabonner" dans le footer de l'email
-  - **Option future** : préférences granulaires (ex: seulement événements en présentiel, seulement certaines catégories)
+- [x] **Suivre une Communauté (Follow)** ✅ — implémenté en 2026-02-24 (commit `80a1390`)
+  - Table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` avec 3 états (cloche/abonné·e/hover se désabonner)
+  - Visible uniquement pour les utilisateurs connectés non-membres sur `/circles/[slug]`
+  - Email aux followers à chaque nouvel événement, déduplication avec membres
+  - **Option future** : préférences granulaires (opt-out), affichage sur page Découvrir
 
 - [ ] Track (série d'événements récurrents dans un Circle)
 - [ ] Check-in (marquer présent sur place)
