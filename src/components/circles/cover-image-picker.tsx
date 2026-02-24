@@ -289,7 +289,12 @@ export function CoverImagePicker({
 
       {/* Dialog */}
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] sm:max-w-lg overflow-x-hidden">
+        <DialogContent className={[
+          // Mobile : plein écran — évite le bug iOS Safari (fixed → absolute dans overflow:hidden)
+          "top-0 left-0 right-0 bottom-0 h-dvh max-w-none translate-x-0 translate-y-0 rounded-none overflow-y-auto",
+          // Desktop sm+ : comportement dialog centré normal
+          "sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
+        ].join(" ")}>
           <DialogHeader>
             <DialogTitle>Image de couverture</DialogTitle>
           </DialogHeader>
