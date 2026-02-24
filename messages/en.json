@@ -65,7 +65,8 @@
       "github": "Continue with GitHub",
       "emailPlaceholder": "your@email.com",
       "magicLink": "Send a magic link",
-      "or": "or"
+      "or": "or",
+      "linkedin": "Continue with LinkedIn"
     },
     "verifyRequest": {
       "title": "Check your email",
@@ -377,7 +378,8 @@
         "registered": "Joined",
         "waitlisted": "Waitlisted"
       }
-    }
+    },
+    "loadMore": "Show more"
   },
   "Admin": {
     "title": "Administration",

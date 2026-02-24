@@ -1,5 +1,7 @@
+"use client";
+
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { MapPin, Globe, Users, Crown, Clock, CalendarIcon } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
@@ -11,18 +13,19 @@ type Props = {
   isOrganizer?: boolean;
 };
 
-export async function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Props) {
-  const t = await getTranslations("Explorer");
-  const tCategory = await getTranslations("CircleCategory");
+export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Props) {
+  const t = useTranslations("Explorer");
+  const tCategory = useTranslations("CircleCategory");
 
   const gradient = getMomentGradient(moment.title);
 
-  const dateStr = moment.startsAt.toLocaleDateString(undefined, {
+  const startsAt = new Date(moment.startsAt);
+  const dateStr = startsAt.toLocaleDateString(undefined, {
     weekday: "short",
     day: "numeric",
     month: "short",
   });
-  const timeStr = moment.startsAt.toLocaleTimeString(undefined, {
+  const timeStr = startsAt.toLocaleTimeString(undefined, {
     hour: "2-digit",
     minute: "2-digit",
   });
