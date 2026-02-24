@@ -414,7 +414,7 @@ export default async function PublicCirclePage({
             <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
               <Link
                 href="?tab=upcoming"
-                className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
                   activeTab === "upcoming"
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
@@ -424,7 +424,7 @@ export default async function PublicCirclePage({
               </Link>
               <Link
                 href="?tab=past"
-                className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+                className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
                   activeTab === "past"
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
