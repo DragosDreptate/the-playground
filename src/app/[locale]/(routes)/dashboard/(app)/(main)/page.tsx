@@ -100,8 +100,8 @@ export default async function DashboardPage({
           </Link>
         </div>
         {activeTab === "circles" && (
-          <div className="flex justify-end sm:contents">
-            <Button asChild size="sm">
+          <div className="sm:contents">
+            <Button asChild size="sm" className="w-full sm:w-auto">
               <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
             </Button>
           </div>
