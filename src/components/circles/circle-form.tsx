@@ -206,10 +206,10 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                   name="visibility"
                   defaultValue={circle?.visibility ?? "PUBLIC"}
                 >
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-9 w-full">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper">
                     <SelectItem value="PUBLIC">{t("form.visibilityPublic")}</SelectItem>
                     <SelectItem value="PRIVATE">{t("form.visibilityPrivate")}</SelectItem>
                   </SelectContent>

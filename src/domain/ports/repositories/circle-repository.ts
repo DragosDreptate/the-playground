@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, CircleFollow } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
 
 export type CreateCircleInput = {
   name: string;
@@ -61,6 +61,7 @@ export interface CircleRepository {
   slugExists(slug: string): Promise<boolean>;
   addMembership(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
   findAllByUserId(userId: string): Promise<CircleWithRole[]>;
+  findAllByUserIdWithStats(userId: string): Promise<DashboardCircle[]>;
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
   findMembersByRole(circleId: string, role: CircleMemberRole): Promise<CircleMemberWithUser[]>;
   countMembers(circleId: string): Promise<number>;

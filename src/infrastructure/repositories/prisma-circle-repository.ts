@@ -7,7 +7,7 @@ import type {
   PublicCircle,
   CircleFollowerInfo,
 } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -130,6 +130,33 @@ export const prismaCircleRepository: CircleRepository = {
     return memberships.map((m) => ({
       ...toDomainCircle(m.circle),
       memberRole: m.role,
+    }));
+  },
+
+  async findAllByUserIdWithStats(userId: string): Promise<DashboardCircle[]> {
+    const now = new Date();
+    const memberships = await prisma.circleMembership.findMany({
+      where: { userId },
+      include: {
+        circle: {
+          include: {
+            _count: { select: { memberships: true } },
+            moments: {
+              where: { status: "PUBLISHED", startsAt: { gte: now } },
+              orderBy: { startsAt: "asc" },
+              select: { title: true, startsAt: true },
+            },
+          },
+        },
+      },
+      orderBy: { joinedAt: "desc" },
+    });
+    return memberships.map((m) => ({
+      ...toDomainCircle(m.circle),
+      memberRole: m.role,
+      memberCount: m.circle._count.memberships,
+      upcomingMomentCount: m.circle.moments.length,
+      nextMoment: m.circle.moments[0] ?? null,
     }));
   },
 

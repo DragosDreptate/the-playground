@@ -83,47 +83,63 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
       </div>
 
       {/* Card */}
-      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
+      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
         <Link href={`/dashboard/circles/${moment.circleSlug}/moments/${moment.slug}`} className="group block">
-          <div className={`bg-card flex items-start gap-4 rounded-xl border p-4 transition-colors ${isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
-            {/* Content */}
+          <div className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors ${isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
+
+            {/* Cover — LEFT, 64×64px */}
+            {moment.coverImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={moment.coverImage}
+                alt={moment.title}
+                className={`size-16 shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+              />
+            ) : (
+              <div
+                className={`size-16 shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                style={{ background: gradient }}
+              />
+            )}
+
+            {/* Content — RIGHT */}
             <div className="min-w-0 flex-1 space-y-1">
               {/* Time */}
               <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
-              {/* Title */}
-              <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+              {/* Title — 2 lignes max */}
+              <p className={`line-clamp-2 font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
                 {moment.title}
               </p>
 
               {/* Location */}
               {locationLabel && (
                 <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                  <LocationIcon className="size-3.5 shrink-0" />
+                  <LocationIcon className="size-3 shrink-0" />
                   <span className="truncate">{locationLabel}</span>
                 </div>
               )}
 
-              {/* Circle name + status */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+              {/* Community + badge */}
+              <div className="flex items-center justify-between gap-2 pt-0.5">
+                <span className={`flex min-w-0 shrink items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                   <CircleAvatar name={moment.circleName} image={moment.circleCoverImage} size="xs" />
-                  {moment.circleName}
+                  <span className="truncate">{moment.circleName}</span>
                 </span>
 
                 {!isPast && (
                   isHost ? (
-                    <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Crown className="size-3" />
                       {t("role.host")}
                     </Badge>
                   ) : isRegistered ? (
-                    <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Check className="size-3" />
                       {t("registrationStatus.registered")}
                     </Badge>
                   ) : isWaitlisted ? (
-                    <Badge variant="secondary" className="gap-1 text-xs">
+                    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
                       <Clock className="size-3" />
                       {t("registrationStatus.waitlisted")}
                     </Badge>
@@ -132,20 +148,6 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
               </div>
             </div>
 
-            {/* Thumbnail */}
-            {moment.coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={moment.coverImage}
-                alt={moment.title}
-                className={`size-[60px] shrink-0 rounded-lg object-cover ${isPast ? "grayscale opacity-40" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-[60px] shrink-0 rounded-lg ${isPast ? "grayscale opacity-40" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
           </div>
         </Link>
       </div>

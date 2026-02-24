@@ -61,3 +61,9 @@ export type CircleFollow = {
   circleId: string;
   createdAt: Date;
 };
+
+export type DashboardCircle = CircleWithRole & {
+  memberCount: number;
+  upcomingMomentCount: number;
+  nextMoment: { title: string; startsAt: Date } | null;
+};
