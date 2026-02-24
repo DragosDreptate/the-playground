@@ -227,6 +227,9 @@ export function CoverImagePicker({
           .then((data) => {
             if (data?.results) setDefaultPhotos(data.results as UnsplashPhoto[]);
           })
+          .catch(() => {
+            // Échec silencieux — la recherche reste disponible
+          })
           .finally(() => setIsLoadingDefaults(false));
       }
     } else {
