@@ -31,7 +31,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' js.stripe.com",
       "style-src 'self' 'unsafe-inline'",
       // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
-      "img-src 'self' data: blob: *.unsplash.com public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
+      "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
       // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
       "connect-src 'self' *.sentry.io api.stripe.com",
       "font-src 'self'",
