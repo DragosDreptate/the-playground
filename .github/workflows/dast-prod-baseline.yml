@@ -1,0 +1,47 @@
+name: DAST — Baseline Scan (Production)
+
+on:
+  # Déclenchement manuel depuis GitHub Actions UI
+  workflow_dispatch:
+  # Scan hebdomadaire automatique — dimanche à 4h UTC
+  schedule:
+    - cron: "0 4 * * 0"
+
+jobs:
+  zap-baseline:
+    name: ZAP Baseline Scan — Production
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write  # ZAP peut ouvrir des issues GitHub sur les alertes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          # URL de production Vercel
+          target: "https://the-playground-eight.vercel.app/"
+          # Règles personnalisées (faux positifs Next.js filtrés)
+          rules_file_name: ".zap/rules.tsv"
+          # Ne pas faire échouer le CI — alertes en avertissement uniquement
+          fail_action: false
+          # Ouvrir une issue GitHub si de nouvelles alertes sont détectées
+          allow_issue_writing: true
+
+      - name: Upload rapport HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-baseline-report-${{ github.run_number }}
+          path: report_html.html
+          retention-days: 30
+
+      - name: Upload rapport JSON
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-baseline-report-json-${{ github.run_number }}
+          path: report_json.json
+          retention-days: 30

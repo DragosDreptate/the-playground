@@ -1,0 +1,51 @@
+name: DAST — Full Scan (Preview)
+
+on:
+  # Se déclenche quand Vercel crée ou met à jour un déploiement
+  deployment_status:
+
+jobs:
+  zap-full:
+    name: ZAP Full Scan — Preview
+    runs-on: ubuntu-latest
+    # Ne s'exécute que sur les déploiements Vercel Preview (pas Production) qui ont réussi
+    if: |
+      github.event.deployment_status.state == 'success' &&
+      contains(github.event.deployment.environment, 'Preview')
+    permissions:
+      issues: write
+      pull-requests: write  # Pour commenter la PR avec le résumé du scan
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.11.0
+        with:
+          # URL du déploiement Vercel Preview (fournie automatiquement par GitHub)
+          target: "${{ github.event.deployment_status.target_url }}"
+          # Règles personnalisées (faux positifs Next.js filtrés)
+          rules_file_name: ".zap/rules.tsv"
+          # Ne pas faire échouer le CI — alertes en avertissement uniquement
+          fail_action: false
+          # Ouvrir une issue GitHub si de nouvelles alertes critiques sont détectées
+          allow_issue_writing: true
+          # Durée max du spider (en minutes)
+          cmd_options: "-m 5"
+
+      - name: Upload rapport HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-full-report-${{ github.run_number }}
+          path: report_html.html
+          retention-days: 14
+
+      - name: Upload rapport JSON
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-full-report-json-${{ github.run_number }}
+          path: report_json.json
+          retention-days: 14
