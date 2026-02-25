@@ -23,13 +23,20 @@ export function generateTimeOptions(): TimeOption[] {
 }
 
 /**
- * Combine a Date (day) and a time string ("HH:mm") into a
- * datetime-local formatted string "YYYY-MM-DDTHH:mm".
- * This is the format expected by the server action.
+ * Combine a Date (day) and a time string ("HH:mm") into an ISO UTC string.
+ *
+ * The Date is interpreted in the **browser's local timezone** (getHours, etc.
+ * are local), so the resulting ISO string correctly represents the UTC instant
+ * matching the user's local time selection.
+ *
+ * Example (Paris UTC+1): date=Feb 25, time="23:00"
+ *   → new Date set to Feb 25 23:00 Paris → toISOString() → "2026-02-25T22:00:00.000Z"
  */
 export function combineDateAndTime(date: Date, time: string): string {
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${time}`;
+  const [h, m] = time.split(":").map(Number);
+  const d = new Date(date);
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
 }
 
 /**
