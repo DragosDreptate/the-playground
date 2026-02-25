@@ -53,7 +53,7 @@ export default async function AboutPage() {
         </h1>
         <p className="text-lg leading-relaxed text-muted-foreground">
           {isFr
-            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais une plateforme qui fonctionne et je me posais sérieusement la question de l'ouvrir au public."
+            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais une plateforme qui fonctionne et je me pose la question de l'ouvrir au public et de lui donner une chance de trouver sa place."
             : "A pretext to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working platform and was seriously wondering whether to open it to the public."}
         </p>
       </section>
