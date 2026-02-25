@@ -244,7 +244,7 @@
       "startLabel": "Start",
       "endLabel": "End",
       "pickDate": "Pick a date",
-      "createMoment": "Create an Event"
+      "createMoment": "Publish"
     },
     "delete": {
       "title": "Delete Event",
