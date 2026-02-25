@@ -1,6 +1,6 @@
 {
   "name": "The Playground",
-  "short_name": "Playground",
+  "short_name": "The Playground",
   "description": "Lancez votre communauté. Organisez vos événements. Animez votre réseau.",
   "start_url": "/",
   "display": "standalone",
@@ -10,13 +10,13 @@
   "categories": ["social", "events"],
   "icons": [
     {
-      "src": "/icon.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

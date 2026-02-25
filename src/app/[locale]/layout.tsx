@@ -34,6 +34,10 @@ export async function generateMetadata({
       capable: true,
       statusBarStyle: "default",
       title: "The Playground",
+      startupImage: "/apple-touch-icon.png",
+    },
+    icons: {
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
     },
     openGraph: {
       type: "website",
