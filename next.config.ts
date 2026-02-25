@@ -16,6 +16,33 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
   },
+  // Force HTTPS pendant 2 ans, sous-domaines inclus (HSTS)
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
+  // Content Security Policy — restreint les sources de scripts, styles et images
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      // Next.js requiert 'unsafe-inline' pour les styles injectés et 'unsafe-eval' pour le HMR dev
+      // Stripe.js doit être chargé depuis js.stripe.com (exigence PCI-DSS)
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' js.stripe.com",
+      "style-src 'self' 'unsafe-inline'",
+      // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
+      "img-src 'self' data: blob: *.unsplash.com public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
+      // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
+      "connect-src 'self' *.sentry.io api.stripe.com",
+      "font-src 'self'",
+      // Stripe Elements et Stripe Checkout utilisent des iframes hébergées sur js.stripe.com
+      "frame-src js.stripe.com",
+      // Interdire l'intégration de NOTRE page dans des iframes tierces (anti-clickjacking)
+      "frame-ancestors 'none'",
+      // Formulaires : uniquement vers le domaine propre
+      "form-action 'self'",
+    ].join("; "),
+  },
 ];
 
 const nextConfig: NextConfig = {
