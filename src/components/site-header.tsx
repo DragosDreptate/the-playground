@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -18,12 +19,20 @@ export function SiteHeader() {
 
   const user = session?.user;
   const pathname = usePathname();
+  const [isPWA, setIsPWA] = useState(false);
+
+  useEffect(() => {
+    setIsPWA(
+      window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as { standalone?: boolean }).standalone === true
+    );
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
         {/* Logo — left */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
+        <Link href={isPWA && user ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
           <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
               <polygon points="0,0 0,12 10,6" fill="white" />
