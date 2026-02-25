@@ -1,0 +1,90 @@
+import { Button, Section, Text } from "@react-email/components";
+import * as React from "react";
+import { EmailLayout } from "./components/email-layout";
+import type { HostNewFollowerEmailData } from "@/domain/ports/services/email-service";
+
+type Props = HostNewFollowerEmailData & {
+  baseUrl: string;
+};
+
+export function HostNewFollowerEmail({
+  followerName,
+  circleName,
+  circleSlug,
+  baseUrl,
+  strings,
+}: Props) {
+  const membersUrl = `${baseUrl}/dashboard/circles/${circleSlug}`;
+
+  return (
+    <EmailLayout preview={strings.subject} footer={strings.footer}>
+      <Text style={heading}>{strings.heading}</Text>
+
+      <Text style={message}>{strings.message}</Text>
+
+      <Section style={followerSection}>
+        <Text style={followerName_}>{followerName}</Text>
+        <Text style={communityLabel}>{circleName}</Text>
+      </Section>
+
+      <Section style={ctaSection}>
+        <Button style={ctaButton} href={membersUrl}>
+          {strings.viewMembersCta}
+        </Button>
+      </Section>
+    </EmailLayout>
+  );
+}
+
+const heading: React.CSSProperties = {
+  fontSize: "16px",
+  fontWeight: 600,
+  color: "#18181b",
+  margin: "0 0 16px 0",
+  lineHeight: "24px",
+};
+
+const message: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#52525b",
+  margin: "0 0 20px 0",
+  lineHeight: "22px",
+};
+
+const followerSection: React.CSSProperties = {
+  backgroundColor: "#f4f4f5",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "24px",
+};
+
+const followerName_: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#18181b",
+  fontWeight: 500,
+  margin: "0 0 4px 0",
+  textAlign: "center" as const,
+};
+
+const communityLabel: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#a855f7",
+  fontWeight: 500,
+  margin: "0",
+  textAlign: "center" as const,
+};
+
+const ctaSection: React.CSSProperties = {
+  textAlign: "center" as const,
+};
+
+const ctaButton: React.CSSProperties = {
+  background: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+  color: "#ffffff",
+  fontSize: "14px",
+  fontWeight: 600,
+  borderRadius: "8px",
+  padding: "12px 32px",
+  textDecoration: "none",
+  display: "inline-block",
+};
