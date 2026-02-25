@@ -1,10 +1,12 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 import { CircleAvatar } from "@/components/circles/circle-avatar";
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 
@@ -15,21 +17,18 @@ type DashboardMomentCardProps = {
   isPast?: boolean;
 };
 
-function formatTimelineDate(date: Date, locale: string): { weekday: string; dateStr: string; isToday: boolean } {
-  const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-
-  const weekday = date.toLocaleDateString(locale, { weekday: "short" });
-  const dateStr = date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" });
-
-  return { weekday, dateStr, isToday };
-}
-
 export function DashboardMomentCard({ registration, isLast, isHost = false, isPast = false }: DashboardMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
   const locale = useLocale();
   const { moment } = registration;
+
+  // Déféré au client pour éviter le mismatch structurel SSR/client (UTC vs timezone locale)
+  const [isToday, setIsToday] = useState(false);
+  useEffect(() => {
+    const now = new Date();
+    setIsToday(moment.startsAt.toDateString() === now.toDateString());
+  }, [moment.startsAt]);
 
   const isRegistered = registration.status === "REGISTERED" || registration.status === "CHECKED_IN";
   const isWaitlisted = registration.status === "WAITLISTED";
@@ -43,12 +42,8 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
         : "bg-border";
 
   const gradient = getMomentGradient(moment.title);
-  const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt, locale);
-
-  const timeStr = moment.startsAt.toLocaleTimeString(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
+  const timeStr = formatTime(moment.startsAt);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -69,8 +64,8 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
           </span>
         ) : (
           <>
-            <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{weekday}</p>
-            <p className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}>{dateStr}</p>
+            <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`} suppressHydrationWarning>{weekday}</p>
+            <p className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`} suppressHydrationWarning>{dateStr}</p>
           </>
         )}
       </div>
@@ -106,7 +101,7 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
             {/* Content — RIGHT */}
             <div className="min-w-0 flex-1 space-y-1">
               {/* Time */}
-              <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
+              <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`} suppressHydrationWarning>{timeStr}</p>
 
               {/* Title — 2 lignes max */}
               <p className={`line-clamp-2 font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>

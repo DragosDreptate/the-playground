@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
 import type { CalendarEventData } from "@/lib/calendar";
+import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import {
   CalendarIcon,
@@ -75,24 +76,6 @@ const statusClassName = {
   PAST: "",
 } as const;
 
-function formatDateRange(startsAt: Date, endsAt: Date | null): string {
-  const dateStr = startsAt.toLocaleDateString(undefined, {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-  const startTime = startsAt.toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  if (!endsAt) return `${dateStr} · ${startTime}`;
-  const endTime = endsAt.toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  return `${dateStr} · ${startTime} – ${endTime}`;
-}
-
 function formatHostNames(hosts: CircleMemberWithUser[]): string {
   return hosts
     .map((h) => {
@@ -115,6 +98,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const tCommon = await getTranslations("Common");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
+  const locale = await getLocale();
 
   const gradient = getMomentGradient(moment.title);
   const circleGradient = getMomentGradient(circle.name);
@@ -296,7 +280,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <p className="text-sm">
                 {t("public.eventTookPlace")}{" "}
                 <span className="font-medium">
-                  {formatDateRange(moment.startsAt, moment.endsAt)}
+                  {formatDateRange(moment.startsAt, moment.endsAt, locale)}
                 </span>
                 {registeredCount > 0 && (
                   <>
@@ -331,7 +315,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div>
                 <p className="text-muted-foreground text-xs">{t("detail.when")}</p>
                 <p className="text-sm font-medium">
-                  {formatDateRange(moment.startsAt, moment.endsAt)}
+                  {formatDateRange(moment.startsAt, moment.endsAt, locale)}
                 </p>
               </div>
             </div>

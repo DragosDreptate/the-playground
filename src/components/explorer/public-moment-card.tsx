@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatShortDate, formatTime } from "@/lib/format-date";
 import { MapPin, Globe, Users, Crown, Clock, CalendarIcon } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -21,15 +22,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   const gradient = getMomentGradient(moment.title);
 
   const startsAt = new Date(moment.startsAt);
-  const dateStr = startsAt.toLocaleDateString(locale, {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
-  const timeStr = startsAt.toLocaleTimeString(locale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const dateStr = formatShortDate(startsAt, locale);
+  const timeStr = formatTime(startsAt);
 
   const isOnline = moment.locationType === "ONLINE" || moment.locationType === "HYBRID";
   const locationLabel = isOnline
@@ -128,7 +122,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
               <h3 className="truncate text-sm font-semibold group-hover:underline">
                 {moment.title}
               </h3>
-              <p className="text-muted-foreground text-xs">{dateStr} · {timeStr}</p>
+              <p className="text-muted-foreground text-xs" suppressHydrationWarning>{dateStr} · {timeStr}</p>
               {locationLabel && (
                 <div className="text-muted-foreground flex items-center gap-1 text-xs">
                   <LocationIcon className="size-3.5 shrink-0" />
@@ -168,7 +162,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
               )}
               {/* Date en overlay bas-gauche */}
               <div className="absolute bottom-2.5 left-2.5 rounded-lg border border-white/10 bg-black/55 px-2.5 py-1 backdrop-blur-md">
-                <span className="text-xs font-semibold text-white">{dateStr} · {timeStr}</span>
+                <span className="text-xs font-semibold text-white" suppressHydrationWarning>{dateStr} · {timeStr}</span>
               </div>
             </div>
           </div>
