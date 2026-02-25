@@ -1,17 +1,18 @@
 name: DAST — Full Scan (Preview)
 
 on:
-  # Se déclenche quand Vercel crée ou met à jour un déploiement
-  deployment_status:
+  # Déclenchement manuel depuis GitHub Actions UI — fournir l'URL du déploiement Preview
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: "URL du déploiement Vercel Preview à scanner"
+        required: true
+        type: string
 
 jobs:
   zap-full:
     name: ZAP Full Scan — Preview
     runs-on: ubuntu-latest
-    # Ne s'exécute que sur les déploiements Vercel Preview (pas Production) qui ont réussi
-    if: |
-      github.event.deployment_status.state == 'success' &&
-      contains(github.event.deployment.environment, 'Preview')
     permissions:
       issues: write
       pull-requests: write  # Pour commenter la PR avec le résumé du scan
@@ -23,8 +24,8 @@ jobs:
       - name: ZAP Full Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          # URL du déploiement Vercel Preview (fournie automatiquement par GitHub)
-          target: "${{ github.event.deployment_status.target_url }}"
+          # URL du déploiement Vercel Preview (saisie manuellement au lancement)
+          target: "${{ github.event.inputs.target_url }}"
           # Règles personnalisées (faux positifs Next.js filtrés)
           rules_file_name: ".zap/rules.tsv"
           # Ne pas faire échouer le CI — alertes en avertissement uniquement
