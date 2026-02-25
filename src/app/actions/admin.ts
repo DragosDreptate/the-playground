@@ -79,7 +79,8 @@ export async function adminDeleteUserAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[adminDeleteUserAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -121,7 +122,8 @@ export async function adminDeleteCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[adminDeleteCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -163,7 +165,8 @@ export async function adminDeleteMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[adminDeleteMomentAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -181,6 +184,7 @@ export async function adminCancelMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[adminCancelMomentAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }

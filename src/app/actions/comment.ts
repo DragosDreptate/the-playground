@@ -53,7 +53,8 @@ export async function addCommentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[addCommentAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -79,7 +80,8 @@ export async function deleteCommentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[deleteCommentAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 

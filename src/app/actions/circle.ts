@@ -59,7 +59,8 @@ export async function createCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[createCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -119,7 +120,8 @@ export async function updateCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[updateCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -141,7 +143,8 @@ export async function deleteCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[deleteCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -163,7 +166,8 @@ export async function followCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[followCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -185,7 +189,8 @@ export async function unfollowCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[unfollowCircleAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -207,6 +212,7 @@ export async function getFollowStatusAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[getFollowStatusAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }

@@ -47,7 +47,8 @@ export async function updateProfileAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[updateProfileAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -66,7 +67,8 @@ export async function deleteAccountAction(): Promise<ActionResult> {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[deleteAccountAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 
   // Compte supprimé — déconnexion (signOut lance un redirect en interne, ne retourne jamais)
@@ -99,7 +101,8 @@ export async function updateNotificationPreferencesAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[updateNotificationPreferencesAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -160,6 +163,7 @@ export async function uploadAvatarAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[uploadAvatarAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }

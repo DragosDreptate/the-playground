@@ -76,7 +76,8 @@ export async function joinMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[joinMomentAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
@@ -113,7 +114,8 @@ export async function cancelRegistrationAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    throw error;
+    console.error("[cancelRegistrationAction] unexpected error:", error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
 
