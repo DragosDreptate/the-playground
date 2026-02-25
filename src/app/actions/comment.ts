@@ -119,7 +119,10 @@ async function sendHostCommentNotification(
   await Promise.all(
     hosts
       .filter((host) => host.userId !== commenterId)
-      .map((host) => {
+      .map(async (host) => {
+        const prefs = await prismaUserRepository.getNotificationPreferences(host.userId);
+        if (!prefs.notifyNewComment) return;
+
         const hostName =
           [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
           host.user.email;

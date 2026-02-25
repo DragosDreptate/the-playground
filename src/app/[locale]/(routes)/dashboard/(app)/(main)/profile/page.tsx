@@ -8,18 +8,26 @@ import {
 import { prisma } from "@/infrastructure/db/prisma";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
-import { updateProfileAction } from "@/app/actions/profile";
+import { NotificationPreferencesForm } from "@/components/profile/notification-preferences-form";
+import { updateProfileAction, updateNotificationPreferencesAction } from "@/app/actions/profile";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, Mail, CalendarIcon } from "lucide-react";
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string }>;
+}) {
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");
   }
+
+  const { tab } = await searchParams;
+  const activeTab = tab === "notifications" ? "notifications" : "profile";
 
   const userId = session.user.id;
 
@@ -71,67 +79,107 @@ export default async function ProfilePage() {
       {/* Separator */}
       <div className="border-border border-t" />
 
-      {/* Form */}
-      <ProfileForm
-        user={{
-          firstName: user.firstName ?? "",
-          lastName: user.lastName ?? "",
-        }}
-        mode="edit"
-        action={updateProfileAction}
-      />
-
-      {/* Separator */}
-      <div className="border-border border-t" />
-
-      {/* Meta rows */}
-      <div className="flex flex-col gap-3">
-        {/* Email */}
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-            <Mail className="text-primary size-4" />
-          </div>
-          <div>
-            <p className="text-muted-foreground text-xs">
-              {t("form.email")}
-            </p>
-            <p className="text-sm font-medium">{user.email}</p>
-          </div>
-        </div>
-
-        {/* Member since */}
-        <div className="flex items-center gap-3">
-          <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-            <CalendarIcon className="text-primary size-4" />
-          </div>
-          <div>
-            <p className="text-muted-foreground text-xs">
-              {t("edit.memberSince")}
-            </p>
-            <p className="text-sm font-medium">
-              {user.createdAt.toLocaleDateString(undefined, {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-          </div>
-        </div>
+      {/* Pill tabs */}
+      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+        <Link
+          href="?tab=profile"
+          className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            activeTab === "profile"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t("edit.title")}
+        </Link>
+        <Link
+          href="?tab=notifications"
+          className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            activeTab === "notifications"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t("notifications.title")}
+        </Link>
       </div>
 
-      {/* Separator */}
-      <div className="border-border border-t" />
+      {/* Tab content */}
+      {activeTab === "profile" ? (
+        <>
+          {/* Form */}
+          <ProfileForm
+            user={{
+              firstName: user.firstName ?? "",
+              lastName: user.lastName ?? "",
+            }}
+            mode="edit"
+            action={updateProfileAction}
+          />
 
-      {/* Zone de danger */}
-      <div className="space-y-3">
-        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-          {t("deleteAccount.dangerZone")}
-        </p>
-        <p className="text-muted-foreground text-sm">
-          {t("deleteAccount.description")}
-        </p>
-        <DeleteAccountDialog />
-      </div>
+          {/* Separator */}
+          <div className="border-border border-t" />
+
+          {/* Meta rows */}
+          <div className="flex flex-col gap-3">
+            {/* Email */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <Mail className="text-primary size-4" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  {t("form.email")}
+                </p>
+                <p className="text-sm font-medium">{user.email}</p>
+              </div>
+            </div>
+
+            {/* Member since */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-4" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  {t("edit.memberSince")}
+                </p>
+                <p className="text-sm font-medium">
+                  {user.createdAt.toLocaleDateString(undefined, {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Separator */}
+          <div className="border-border border-t" />
+
+          {/* Zone de danger */}
+          <div className="space-y-3">
+            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t("deleteAccount.dangerZone")}
+            </p>
+            <p className="text-muted-foreground text-sm">
+              {t("deleteAccount.description")}
+            </p>
+            <DeleteAccountDialog />
+          </div>
+        </>
+      ) : (
+        <NotificationPreferencesForm
+          preferences={{
+            notifyNewRegistration: user.notifyNewRegistration,
+            notifyNewComment: user.notifyNewComment,
+            notifyNewFollower: user.notifyNewFollower,
+            notifyNewMomentInCircle: user.notifyNewMomentInCircle,
+          }}
+          email={user.email}
+          action={updateNotificationPreferencesAction}
+        />
+      )}
     </div>
   );
 }

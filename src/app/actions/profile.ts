@@ -4,11 +4,12 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { updateProfile } from "@/domain/usecases/update-profile";
 import { deleteAccount } from "@/domain/usecases/delete-account";
+import { updateNotificationPreferences } from "@/domain/usecases/update-notification-preferences";
 import { DomainError } from "@/domain/errors";
 import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
-import type { User } from "@/domain/models/user";
+import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
@@ -71,6 +72,35 @@ export async function deleteAccountAction(): Promise<ActionResult> {
   // Compte supprimé — déconnexion (signOut lance un redirect en interne, ne retourne jamais)
   await signOut({ redirectTo: "/" });
   return { success: true, data: undefined };
+}
+
+export async function updateNotificationPreferencesAction(
+  formData: FormData
+): Promise<ActionResult<NotificationPreferences>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const prefs: NotificationPreferences = {
+    notifyNewRegistration: formData.get("notifyNewRegistration") === "true",
+    notifyNewComment: formData.get("notifyNewComment") === "true",
+    notifyNewFollower: formData.get("notifyNewFollower") === "true",
+    notifyNewMomentInCircle: formData.get("notifyNewMomentInCircle") === "true",
+  };
+
+  try {
+    const result = await updateNotificationPreferences(
+      { userId: session.user.id, ...prefs },
+      { userRepository: prismaUserRepository }
+    );
+    return { success: true, data: result };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    throw error;
+  }
 }
 
 export async function uploadAvatarAction(

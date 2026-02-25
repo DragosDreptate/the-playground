@@ -124,10 +124,14 @@ model User {
   lastName      String?
   image                String?
   emailVerified        DateTime?
-  onboardingCompleted  Boolean   @default(false)
-  role                 UserRole  @default(USER)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  onboardingCompleted       Boolean   @default(false)
+  role                      UserRole  @default(USER)
+  notifyNewRegistration     Boolean   @default(true)
+  notifyNewComment          Boolean   @default(true)
+  notifyNewFollower         Boolean   @default(true)
+  notifyNewMomentInCircle   Boolean   @default(true)
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 
   accounts      Account[]
   sessions      Session[]
