@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
@@ -79,7 +80,7 @@ export async function adminDeleteUserAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[adminDeleteUserAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -122,7 +123,7 @@ export async function adminDeleteCircleAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[adminDeleteCircleAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -165,7 +166,7 @@ export async function adminDeleteMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[adminDeleteMomentAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -184,7 +185,7 @@ export async function adminCancelMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[adminCancelMomentAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }

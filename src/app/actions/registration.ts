@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import { enUS } from "date-fns/locale/en-US";
@@ -76,7 +77,7 @@ export async function joinMomentAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[joinMomentAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -114,7 +115,7 @@ export async function cancelRegistrationAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[cancelRegistrationAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }

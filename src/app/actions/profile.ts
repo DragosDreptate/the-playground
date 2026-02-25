@@ -1,5 +1,6 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { updateProfile } from "@/domain/usecases/update-profile";
@@ -47,7 +48,7 @@ export async function updateProfileAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[updateProfileAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -67,7 +68,7 @@ export async function deleteAccountAction(): Promise<ActionResult> {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[deleteAccountAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 
@@ -101,7 +102,7 @@ export async function updateNotificationPreferencesAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[updateNotificationPreferencesAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
@@ -163,7 +164,7 @@ export async function uploadAvatarAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
-    console.error("[uploadAvatarAction] unexpected error:", error);
+    Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
 }
