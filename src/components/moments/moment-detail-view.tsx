@@ -357,11 +357,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
             </div>
 
-            {/* Carte — seulement si adresse physique */}
-            {moment.locationAddress && (
+            {/* Carte — seulement si adresse physique et clé API configurée */}
+            {moment.locationAddress && process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
               <div className="border-border overflow-hidden rounded-xl border">
                 <iframe
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(moment.locationAddress)}&output=embed&z=15`}
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(moment.locationAddress)}&zoom=15`}
                   className="h-44 w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -399,27 +399,22 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Host : lien partageable */}
           {isHostView && (
-            <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-              {/* Label */}
-              <div className="flex items-center gap-2">
+            <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
+              <div className="flex items-center gap-2 lg:col-span-2">
                 <LinkIcon className="text-muted-foreground size-4 shrink-0" />
                 <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
               </div>
-              {/* URL affichée sans le protocole */}
-              <div className="border-border bg-muted/50 rounded-lg border px-3 py-2">
+              <Link
+                href={`/m/${moment.slug}`}
+                target="_blank"
+                className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 rounded-lg border px-3 py-2 transition-colors min-w-0"
+              >
                 <span className="text-muted-foreground block truncate font-mono text-sm">
                   {props.publicUrl.replace(/^https?:\/\//, "")}
                 </span>
-              </div>
-              {/* Actions */}
-              <div className="flex items-center justify-between gap-2">
+              </Link>
+              <div className="flex items-center gap-2">
                 <CopyLinkButton value={props.publicUrl} />
-                <Button asChild variant="ghost" size="sm" className="h-8 shrink-0 gap-1.5 px-3">
-                  <Link href={`/m/${moment.slug}`} target="_blank">
-                    <ExternalLink className="size-3.5" />
-                    Voir
-                  </Link>
-                </Button>
               </div>
             </div>
           )}
@@ -472,6 +467,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 waitlistedCount={waitlistedCount}
                 capacity={moment.capacity}
                 variant={isHostView ? "host" : "public"}
+                hostUserIds={new Set(hosts.map((h) => h.user.id))}
               />
             </div>
           )}

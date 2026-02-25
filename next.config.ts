@@ -35,8 +35,8 @@ const securityHeaders = [
       // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
       "connect-src 'self' *.sentry.io api.stripe.com",
       "font-src 'self'",
-      // Stripe Elements et Stripe Checkout utilisent des iframes hébergées sur js.stripe.com
-      "frame-src js.stripe.com",
+      // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
+      "frame-src js.stripe.com www.google.com",
       // Interdire l'intégration de NOTRE page dans des iframes tierces (anti-clickjacking)
       "frame-ancestors 'none'",
       // Formulaires : uniquement vers le domaine propre
