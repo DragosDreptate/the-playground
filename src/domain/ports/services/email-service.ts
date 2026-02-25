@@ -109,6 +109,33 @@ export type NewMomentFollowerEmailData = {
 
 export type NewMomentMemberEmailData = NewMomentFollowerEmailData;
 
+export type MomentUpdateEmailData = {
+  to: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
+  locationText: string;
+  circleName: string;
+  circleSlug: string;
+  dateChanged: boolean;
+  locationChanged: boolean;
+  icsContent?: string;
+  strings: {
+    subject: string;
+    heading: string;
+    intro: string;
+    dateChangedLabel: string;
+    locationChangedLabel: string;
+    dateLabel: string;
+    locationLabel: string;
+    viewMomentCta: string;
+    footer: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -120,4 +147,5 @@ export interface EmailService {
   sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
   sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
+  sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
 }

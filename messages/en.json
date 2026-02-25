@@ -499,6 +499,13 @@
       "commentPreviewLabel": "Comment",
       "viewCommentCta": "View comment"
     },
+    "momentUpdate": {
+      "subject": "Update: {momentTitle}",
+      "heading": "An event has been updated",
+      "intro": "The organizer has made changes to an event you are registered for.",
+      "dateChangedLabel": "New date",
+      "locationChangedLabel": "New location"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",

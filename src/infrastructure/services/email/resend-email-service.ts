@@ -7,12 +7,14 @@ import type {
   HostNewCommentEmailData,
   NewMomentFollowerEmailData,
   NewMomentMemberEmailData,
+  MomentUpdateEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "./templates/host-new-registration";
 import { HostNewCommentEmail } from "./templates/host-new-comment";
 import { NewMomentNotificationEmail } from "./templates/new-moment-notification";
+import { MomentUpdateEmail } from "./templates/moment-update";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -111,6 +113,24 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: NewMomentNotificationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendMomentUpdate(data: MomentUpdateEmailData): Promise<void> {
+      await resend.emails.send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: MomentUpdateEmail({ ...data, baseUrl }),
+        ...(data.icsContent && {
+          attachments: [
+            {
+              filename: "event.ics",
+              content: Buffer.from(data.icsContent).toString("base64"),
+              contentType: "text/calendar; method=PUBLISH",
+            },
+          ],
+        }),
       });
     },
   };
