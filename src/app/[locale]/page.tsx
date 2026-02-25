@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { PwaRedirect } from "@/components/pwa-redirect";
 import {
   Users,
   CalendarDays,
@@ -37,12 +39,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  const session = await auth();
   const t = await getTranslations("HomePage");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
+      <PwaRedirect isLoggedIn={!!session?.user?.id} />
       <SiteHeader />
 
       <main className="flex-1">

@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { getTranslations } from "next-intl/server";
+import { version } from "../../package.json";
 
 export async function SiteFooter() {
   const t = await getTranslations("Footer");
@@ -17,7 +18,7 @@ export async function SiteFooter() {
             </div>
             <span className="text-[13px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
           </Link>
-          <span className="text-muted-foreground text-xs">{t("brand.copyright")}</span>
+          <span className="text-muted-foreground text-xs">{t("brand.copyright")} · v{version}</span>
         </div>
 
         {/* Liens */}
