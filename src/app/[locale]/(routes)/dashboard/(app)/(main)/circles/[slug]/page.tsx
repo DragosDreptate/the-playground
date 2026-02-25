@@ -16,6 +16,7 @@ import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
 import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
+import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import {
@@ -24,6 +25,8 @@ import {
   Users,
   CalendarIcon,
   ChevronRight,
+  Link as LinkIcon,
+  ExternalLink,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -107,6 +110,8 @@ export default async function CircleDetailPage({
   const userStatusByMomentId = new Map(
     [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
   );
+
+  const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/circles/${circle.slug}`;
 
   const gradient = getMomentGradient(circle.name);
   const hostNames = formatHostNames(hosts);
@@ -332,6 +337,33 @@ export default async function CircleDetailPage({
               </div>
             </div>
           </div>
+
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
+          {/* Lien partageable — visible Organisateurs uniquement */}
+          {isHost && (
+            <div className="border-border bg-card space-y-3 rounded-xl border p-4">
+              <div className="flex items-center gap-2">
+                <LinkIcon className="text-muted-foreground size-4 shrink-0" />
+                <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
+              </div>
+              <div className="border-border bg-muted/50 rounded-lg border px-3 py-2">
+                <span className="text-muted-foreground block truncate font-mono text-sm">
+                  {publicUrl.replace(/^https?:\/\//, "")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <CopyLinkButton value={publicUrl} />
+                <Button asChild variant="ghost" size="sm" className="h-8 shrink-0 gap-1.5 px-3">
+                  <Link href={`/circles/${circle.slug}`} target="_blank">
+                    <ExternalLink className="size-3.5" />
+                    Voir
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Séparateur */}
           <div className="border-border border-t" />

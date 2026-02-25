@@ -190,7 +190,8 @@
       "following": "Following",
       "isMember": "You are a member",
       "isHost": "You are an Organizer",
-      "manageCircle": "Manage this Community"
+      "manageCircle": "Manage this Community",
+      "shareableLink": "Shareable link"
     },
     "errors": {
       "notFound": "Community not found",
