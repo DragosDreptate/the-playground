@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1128 191" width="1128" height="191">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1128" y2="191" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#0d0e1a"/>
+      <stop offset="55%"  stop-color="#1a1b2e"/>
+      <stop offset="100%" stop-color="#1e1030"/>
+    </linearGradient>
+
+    <!-- Icon gradient -->
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="36"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1128" height="191" fill="url(#bgGrad)"/>
+
+  <!-- Glow blobs -->
+  <ellipse cx="560" cy="40"  rx="160" ry="100" fill="#e8457a" opacity="0.10" filter="url(#glow)"/>
+  <ellipse cx="820" cy="150" rx="130" ry="80"  fill="#8b5cf6" opacity="0.13" filter="url(#glow)"/>
+  <ellipse cx="1060" cy="155" rx="90" ry="65"  fill="#ec4899" opacity="0.09" filter="url(#glow)"/>
+
+  <!-- ── Logo — centré dans la zone utile (x=248 à x=1128) ── -->
+  <!-- Zone utile : 248 → 1128 = 880px. Centre = 248 + 440 = 688 -->
+  <!-- Logo block (icon 42px + gap 11px + text ~210px) ≈ 263px → x_start = 688 - 263/2 ≈ 557 -->
+  <!-- Mais on veut logo + séparateur + taglines groupés, on les centre ensemble -->
+  <!-- Groupe total : icon(42) + gap(11) + text(210) + sep_gap(28) + sep(1) + sep_gap(28) + taglines(~300) ≈ 620px -->
+  <!-- x_start = 248 + (880 - 620) / 2 = 248 + 130 = 378 -->
+
+  <!-- Icon: x=378, y=(191-42)/2=74.5 -->
+  <rect x="378" y="75" width="42" height="42" rx="9" fill="url(#iconGrad)"/>
+  <!-- Triangle play centré dans l'icône (centre=399,96) -->
+  <polygon points="389,82 389,109 411,96" fill="white"/>
+
+  <!-- Wordmark "the playground" -->
+  <text x="431" y="103"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="26" font-weight="800" letter-spacing="-0.7"
+    fill="#f0f0f5">the&#x2009;<tspan fill="#e8457a">playground</tspan></text>
+
+  <!-- Séparateur vertical : x=378+42+11+210+24=665 -->
+  <line x1="665" y1="55" x2="665" y2="136" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1"/>
+
+  <!-- ── Taglines — x=693, baselines: 72, 101, 130 ── -->
+  <!-- 3 lignes × 29px = 87px, centré: (191-87)/2 + 18 = 70 -->
+
+  <text x="693" y="70"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="24" font-weight="700" letter-spacing="-0.4"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Lancez</tspan><tspan> votre communauté.</tspan>
+  </text>
+
+  <text x="693" y="103"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="24" font-weight="700" letter-spacing="-0.4"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Organisez</tspan><tspan> vos événements.</tspan>
+  </text>
+
+  <text x="693" y="136"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="24" font-weight="700" letter-spacing="-0.4"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Animez</tspan><tspan> votre réseau.</tspan>
+  </text>
+
+</svg>

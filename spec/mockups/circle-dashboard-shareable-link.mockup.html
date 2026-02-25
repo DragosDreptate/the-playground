@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Lien partageable Communauté (dashboard)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --destructive: #e8457a;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* ── SiteHeader ── */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+}
+.site-header .logo {
+  font-weight: 700; font-size: 1rem; color: var(--foreground); text-decoration: none;
+}
+.site-header .logo span { color: var(--primary); }
+.site-header nav { display: flex; gap: 1.5rem; margin-left: auto; align-items: center; }
+.site-header nav a { font-size: 0.875rem; color: var(--muted-foreground); text-decoration: none; }
+.site-header nav a:hover { color: var(--foreground); }
+.site-header .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex; align-items: center; justify-center: center;
+  font-size: 0.75rem; font-weight: 600; color: white;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Layout ── */
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ── Breadcrumb ── */
+.breadcrumb { display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--muted-foreground); }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+.chevron { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem; font-weight: 500;
+  border: 1px solid transparent;
+}
+.badge-host { border-color: rgba(232,69,122,0.4); color: var(--primary); background: transparent; }
+.badge-secondary { background: var(--muted); color: var(--muted-foreground); }
+.badge-published { background: var(--primary); color: white; }
+
+/* ── Two-column layout ── */
+.two-col { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+@media (min-width: 1024px) {
+  .two-col { flex-direction: row; align-items: flex-start; }
+  .col-left { width: 340px; flex-shrink: 0; position: sticky; top: 72px; }
+  .col-right { flex: 1; min-width: 0; }
+}
+
+/* ── Cover ── */
+.cover-wrap { position: relative; }
+.cover-glow {
+  position: absolute; bottom: -12px; left: 16px; right: 16px;
+  height: 40px; opacity: 0.6;
+  filter: blur(16px);
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 0 0 1rem 1rem;
+}
+.cover-img {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+.cover-img .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.2); }
+.cover-img .icon-center {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-icon-bg {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Hosts bloc ── */
+.hosts-section { padding: 0 4px; }
+.section-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin-bottom: 0.5rem; }
+.avatars-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.375rem; }
+.host-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 600; color: white;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  flex-shrink: 0;
+}
+.host-name { font-size: 0.875rem; font-weight: 500; }
+
+/* ── Stats ── */
+.stats-row { display: flex; gap: 1.5rem; padding: 0 4px; }
+.stat-num { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.75rem; color: var(--muted-foreground); }
+.stat-divider { border-left: 1px solid var(--border); padding-left: 1.5rem; }
+
+/* ── Right column content ── */
+.hosted-by { font-size: 0.875rem; color: var(--muted-foreground); }
+.hosted-by strong { color: var(--foreground); }
+.actions-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+h1 { font-size: 1.875rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+@media (min-width: 1024px) { h1 { font-size: 2.25rem; } }
+
+.about-section { display: flex; flex-direction: column; gap: 0.5rem; }
+.about-text { font-size: 0.875rem; line-height: 1.7; color: var(--muted-foreground); }
+
+.separator { border: none; border-top: 1px solid var(--border); }
+
+/* ── Meta rows ── */
+.meta-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.meta-row { display: flex; align-items: center; gap: 0.75rem; }
+.meta-icon {
+  width: 36px; height: 36px; flex-shrink: 0;
+  border-radius: 0.5rem;
+  background: rgba(232,69,122,0.1);
+  display: flex; align-items: center; justify-content: center;
+}
+.meta-label { font-size: 0.75rem; color: var(--muted-foreground); margin-bottom: 0.1rem; }
+.meta-value { font-size: 0.875rem; font-weight: 500; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0.5rem 1rem; border-radius: var(--radius);
+  font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; border: none; text-decoration: none;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; }
+.btn-default { background: var(--primary); color: white; }
+.btn-outline {
+  background: transparent; color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.btn-outline-destructive {
+  background: transparent;
+  color: var(--destructive);
+  border: 1px solid rgba(232,69,122,0.4);
+}
+.btn-outline-destructive:hover { border-color: var(--destructive); background: rgba(232,69,122,0.05); }
+.btn-ghost { background: transparent; color: var(--muted-foreground); padding: 0.5rem 0.75rem; }
+.btn-ghost:hover { color: var(--foreground); background: var(--muted); }
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; height: 32px; }
+
+/* ── ✨ NOUVEAU : Lien partageable ── */
+.shareable-link-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.shareable-link-card .card-label {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.875rem; font-weight: 500;
+}
+.shareable-link-card .url-box {
+  background: rgba(240,239,247,0.6);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.shareable-link-card .url-box:hover {
+  border-color: var(--primary);
+  background: rgba(232,69,122,0.04);
+}
+.shareable-link-card .url-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: block;
+}
+.shareable-link-card .card-actions {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+}
+
+/* Desktop : 2 lignes (label / url+boutons inline) */
+@media (min-width: 1024px) {
+  .shareable-link-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0.5rem 0.75rem;
+    align-items: center;
+  }
+  .shareable-link-card .card-label {
+    grid-column: 1 / -1;
+  }
+  .shareable-link-card .url-box {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+  }
+  .shareable-link-card .card-actions {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+}
+
+/* NEW badge annotation */
+.new-badge {
+  display: inline-flex; align-items: center;
+  padding: 0.1rem 0.5rem;
+  background: rgba(110,231,208,0.2);
+  border: 1px solid rgba(110,231,208,0.5);
+  border-radius: 9999px;
+  font-size: 0.65rem; font-weight: 600; color: #0d9488;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-left: auto;
+}
+
+/* ── Timeline Moments ── */
+.timeline-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.tab-pills {
+  display: flex; align-items: center; gap: 2px;
+  border: 1px solid var(--border); border-radius: 9999px; padding: 3px;
+}
+.tab-pill {
+  padding: 0.25rem 1rem; border-radius: 9999px;
+  font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; text-decoration: none;
+  color: var(--muted-foreground);
+  transition: all 0.15s;
+}
+.tab-pill.active { background: var(--foreground); color: var(--card); }
+
+.timeline-item { display: flex; gap: 0; }
+.timeline-date { width: 100px; flex-shrink: 0; padding-right: 1rem; padding-top: 4px; text-align: right; }
+.timeline-date .weekday { font-size: 0.75rem; color: var(--muted-foreground); }
+.timeline-date .date-str { font-size: 0.875rem; font-weight: 500; line-height: 1.3; }
+.timeline-spine { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); margin-top: 8px; flex-shrink: 0; }
+.timeline-dot.active { background: var(--primary); }
+.timeline-line { flex: 1; border-left: 1px dashed var(--border); margin-top: 8px; }
+.timeline-card-wrap { flex: 1; min-width: 0; padding-left: 1rem; padding-bottom: 2rem; }
+.timeline-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0.75rem; overflow: hidden;
+  text-decoration: none; color: inherit; display: block;
+  transition: border-color 0.15s;
+}
+.timeline-card:hover { border-color: rgba(232,69,122,0.3); }
+.timeline-card-inner { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; }
+.timeline-card-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.timeline-card-time { font-size: 0.75rem; color: var(--muted-foreground); }
+.timeline-card-title { font-weight: 600; font-size: 0.9375rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.timeline-card-meta { font-size: 0.75rem; color: var(--muted-foreground); display: flex; align-items: center; gap: 4px; }
+.timeline-thumb {
+  width: 60px; height: 60px; border-radius: 0.5rem; flex-shrink: 0;
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+}
+.timeline-thumb-2 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.timeline-thumb-3 { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+
+/* ── Members card ── */
+.members-card { border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+.member-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+.member-row:last-child { border-bottom: none; }
+.member-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 600; color: white; flex-shrink: 0;
+}
+.member-name { font-size: 0.875rem; font-weight: 500; }
+.member-email { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* ── Icon SVG utils ── */
+svg { display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<!-- SiteHeader -->
+<header class="site-header">
+  <a href="#" class="logo">The <span>Playground</span></a>
+  <nav>
+    <a href="#">Découvrir</a>
+    <a href="#">Mon espace</a>
+    <div class="avatar">AD</div>
+  </nav>
+</header>
+
+<!-- Page -->
+<main class="page-wrapper">
+
+  <!-- Breadcrumb + badge -->
+  <div style="margin-bottom: 2rem;">
+    <div class="breadcrumb" style="margin-bottom: 0.25rem;">
+      <a href="#">Mon espace</a>
+      <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="current">Le Club de Mont-Saint-Léger</span>
+    </div>
+    <span class="badge badge-host">Organisateur</span>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="two-col">
+
+    <!-- ── LEFT column ── -->
+    <div class="col-left" style="display: flex; flex-direction: column; gap: 1rem;">
+
+      <!-- Cover -->
+      <div class="cover-wrap">
+        <div class="cover-glow"></div>
+        <div class="cover-img">
+          <div class="overlay"></div>
+          <div class="icon-center">
+            <div class="cover-icon-bg">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hosts -->
+      <div class="hosts-section">
+        <p class="section-label">Organisateurs</p>
+        <div class="avatars-row">
+          <div class="host-avatar">AD</div>
+        </div>
+        <p class="host-name">Alice Dupont</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" style="padding: 0 4px;">
+        <div>
+          <p class="stat-num">47</p>
+          <p class="stat-label">membres</p>
+        </div>
+        <div class="stat-divider">
+          <p class="stat-num">12</p>
+          <p class="stat-label">événements</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT column ── -->
+    <div class="col-right" style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+      <!-- Organisé par + actions -->
+      <div class="actions-row">
+        <p class="hosted-by">Organisé par <strong>Alice Dupont</strong></p>
+        <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+          <a href="#" class="btn btn-default btn-sm">Modifier</a>
+          <button class="btn btn-outline btn-sm" style="border-color: rgba(232,69,122,0.4); color: var(--destructive);">Supprimer</button>
+        </div>
+      </div>
+
+      <!-- Titre -->
+      <h1>Le Club de Mont-Saint-Léger</h1>
+
+      <!-- À propos -->
+      <div class="about-section">
+        <p class="section-label">À propos</p>
+        <p class="about-text">Communauté dédiée aux passionnés de randonnée et de nature dans la région de Mont-Saint-Léger. Retrouvez-nous chaque mois pour des sorties organisées, des ateliers et des moments de partage.</p>
+      </div>
+
+      <hr class="separator">
+
+      <!-- Meta rows -->
+      <div class="meta-list">
+
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div>
+            <p class="meta-label">Visibilité</p>
+            <p class="meta-value">Communauté publique</p>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <p class="meta-label">Membres</p>
+            <p class="meta-value">47 membres</p>
+          </div>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <p class="meta-label">Créée le</p>
+            <p class="meta-value">12 janvier 2026</p>
+          </div>
+        </div>
+
+      </div>
+
+      <hr class="separator">
+
+      <!-- ✨ NOUVEAU : Lien partageable (visible Organisateurs uniquement) -->
+      <div class="shareable-link-card">
+        <div class="card-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted-foreground)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Lien partageable</span>
+          <span class="new-badge">Nouveau</span>
+        </div>
+        <a href="#" target="_blank" class="url-box" style="text-decoration: none; cursor: pointer; display: block;" title="Ouvrir la page publique">
+          <span class="url-text">the-playground.fr/circles/le-club-de-mont-saint-leger</span>
+        </a>
+        <div class="card-actions">
+          <button class="btn btn-outline btn-sm" style="height: 32px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier le lien
+          </button>
+        </div>
+      </div>
+
+      <hr class="separator">
+
+      <!-- Timeline événements -->
+      <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+
+        <div class="timeline-header">
+          <div class="tab-pills">
+            <a href="#" class="tab-pill active">À venir</a>
+            <a href="#" class="tab-pill">Passés</a>
+          </div>
+          <a href="#" class="btn btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Créer un événement
+          </a>
+        </div>
+
+        <!-- Timeline -->
+        <div>
+
+          <!-- Item 1 -->
+          <div class="timeline-item">
+            <div class="timeline-date">
+              <p class="weekday">sam.</p>
+              <p class="date-str">8 mars 2026</p>
+            </div>
+            <div class="timeline-spine">
+              <div class="timeline-dot active"></div>
+              <div class="timeline-line"></div>
+            </div>
+            <div class="timeline-card-wrap">
+              <a href="#" class="timeline-card">
+                <div class="timeline-card-inner">
+                  <div class="timeline-card-content">
+                    <p class="timeline-card-time">09:00</p>
+                    <p class="timeline-card-title">Randonnée du Printemps — Sentier des Crêtes</p>
+                    <p class="timeline-card-meta">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      Mont-Saint-Léger
+                    </p>
+                  </div>
+                  <div class="timeline-thumb"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="timeline-item">
+            <div class="timeline-date">
+              <p class="weekday">sam.</p>
+              <p class="date-str">5 avr. 2026</p>
+            </div>
+            <div class="timeline-spine">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+            </div>
+            <div class="timeline-card-wrap">
+              <a href="#" class="timeline-card">
+                <div class="timeline-card-inner">
+                  <div class="timeline-card-content">
+                    <p class="timeline-card-time">14:00</p>
+                    <p class="timeline-card-title">Atelier Cartographie & Orientation</p>
+                    <p class="timeline-card-meta">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      Salle des fêtes, place du Village
+                    </p>
+                  </div>
+                  <div class="timeline-thumb timeline-thumb-2"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- Item 3 (last) -->
+          <div class="timeline-item">
+            <div class="timeline-date">
+              <p class="weekday">dim.</p>
+              <p class="date-str">3 mai 2026</p>
+            </div>
+            <div class="timeline-spine">
+              <div class="timeline-dot"></div>
+            </div>
+            <div class="timeline-card-wrap" style="padding-bottom: 0;">
+              <a href="#" class="timeline-card">
+                <div class="timeline-card-inner">
+                  <div class="timeline-card-content">
+                    <p class="timeline-card-time">10:00</p>
+                    <p class="timeline-card-title">Grande Sortie Annuelle — Sommet du Puy Griou</p>
+                    <p class="timeline-card-meta">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      Parking du Puy Griou
+                    </p>
+                  </div>
+                  <div class="timeline-thumb timeline-thumb-3"></div>
+                </div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <hr class="separator">
+
+      <!-- Membres -->
+      <div class="members-card">
+        <p class="section-label" style="margin-bottom: 1rem;">Membres · 47</p>
+        <div>
+          <div class="member-row">
+            <div class="member-avatar" style="background: linear-gradient(135deg, #e8457a, #9333ea);">AD</div>
+            <div>
+              <p class="member-name">Alice Dupont <span class="badge badge-host" style="margin-left: 4px; font-size: 0.65rem; padding: 0.05rem 0.4rem;">Organisateur</span></p>
+              <p class="member-email">alice@dupont.fr</p>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">BM</div>
+            <div>
+              <p class="member-name">Baptiste Martin</p>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">CL</div>
+            <div>
+              <p class="member-name">Claire Leroy</p>
+            </div>
+          </div>
+          <div class="member-row" style="border-bottom: none;">
+            <div style="font-size: 0.8125rem; color: var(--muted-foreground); padding: 0.25rem 0;">+ 44 membres</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
