@@ -10,6 +10,18 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [1.2.0] — 2026-02-25 — Préférences de notifications
+
+### Ajouté
+
+- Page Profil : tab **Notifications** avec 4 toggles opt-out (tout activé par défaut)
+  - En tant qu'Organisateur : nouvelle inscription, nouveau commentaire, nouveau follower
+  - En tant que Participant : nouvel événement dans une Communauté suivie
+- Guards email : les notifications respectent les préférences de chaque destinataire
+- Script `pnpm db:backfill-notification-prefs` — correction des valeurs pour les users existants
+
+---
+
 ## [1.1.0] — 2026-02-25 — Polish & sécurité
 
 ### Ajouté
