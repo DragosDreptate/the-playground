@@ -29,6 +29,12 @@ export async function generateMetadata({
       template: "%s — The Playground",
     },
     description: t("heroSubtitle"),
+    manifest: "/manifest.json",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "The Playground",
+    },
     openGraph: {
       type: "website",
       siteName: "The Playground",
