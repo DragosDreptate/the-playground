@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
@@ -15,11 +15,12 @@ type Props = {
 export function PublicCircleCard({ circle, membershipRole }: Props) {
   const t = useTranslations("Explorer");
   const tCategory = useTranslations("CircleCategory");
+  const locale = useLocale();
 
   const gradient = getMomentGradient(circle.name);
 
   const nextMomentDate = circle.nextMoment
-    ? new Date(circle.nextMoment.startsAt).toLocaleDateString(undefined, {
+    ? new Date(circle.nextMoment.startsAt).toLocaleDateString(locale, {
         day: "numeric",
         month: "short",
       })
