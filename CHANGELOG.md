@@ -10,6 +10,33 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [1.1.0] — 2026-02-25 — Polish & sécurité
+
+### Ajouté
+
+- Explorer : pagination "Voir plus" — chargement par batch de 12 Communautés ou événements
+- Page Communauté dashboard : section lien partageable pour les Organisateurs (avec copie en un clic)
+- Liste des membres et des inscrits : vue verticale 1 par ligne, badge Organisateur avec couronne, "Voir plus" à partir de 10
+- Navigation : mise en évidence de la page active dans le header et le menu mobile
+- Authentification : icônes Google et GitHub sur les boutons OAuth
+- Page À propos : section "Le code" avec lien vers le dépôt GitHub
+
+### Corrigé
+
+- Covers des événements absentes de la timeline publique d'une Communauté
+- Hydration error sur les dates du dashboard
+- NotFoundError iOS Safari sur les menus déroulants (Select)
+- Layout mobile Explorer et Dashboard
+- Google Maps : migration vers Embed API v1
+
+### Sécurité
+
+- Corrections SAST : SSRF, auth guard, CSP, HSTS
+- CSP : autorisation des sous-domaines Vercel Blob et Google Maps
+- DAST OWASP ZAP : scan baseline prod + scan full sur les previews PRs
+
+---
+
 ## [1.0.0] — 2026-02-24 — Release majeure
 
 ### Ajouté

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Github, Star } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -303,44 +303,38 @@ export default async function AboutPage() {
 
       <hr className="border-border" />
 
-      {/* ── Section 6 — Ce qui vient ── */}
+      {/* ── Section 6 — Code source ── */}
       <section className="space-y-6">
         <h2 className="text-2xl font-bold tracking-tight">
-          {isFr ? "Ce qui vient" : "What's next"}
+          {isFr ? "Le code" : "The code"}
         </h2>
         <p className="text-[17px] leading-relaxed text-muted-foreground">
           {isFr
-            ? "Le cœur est là. Les prochaines priorités :"
-            : "The core is there. Next priorities:"}
+            ? "Curieux de voir comment c'est construit ? Le code source est sur GitHub."
+            : "Curious about how it's built? The source code is on GitHub."}
         </p>
-        <ul className="space-y-3">
-          {(isFr
-            ? [
-                ["Export CSV", " — liste des inscrits pour la logistique (badges, émargement)."],
-                ["Événements payants", " — Stripe Connect pour ceux qui en ont besoin."],
-                ["Assistant IA", " — aide à la rédaction des descriptions et emails d'invitation."],
-                ["Co-organisateurs", " — déléguer la gestion d'une Communauté à plusieurs Organisateurs."],
-              ]
-            : [
-                ["CSV export", " — attendee list for logistics (badges, sign-in sheets)."],
-                ["Paid events", " — Stripe Connect for those who need it."],
-                ["AI assistant", " — help drafting event descriptions and invitation emails."],
-                ["Co-organizers", " — delegate community management to multiple organizers."],
-              ]
-          ).map(([bold, rest]) => (
-            <li
-              key={bold}
-              className="flex items-start gap-3 text-[17px] leading-relaxed text-muted-foreground"
-            >
-              <span className="mt-2 size-1.5 shrink-0 rounded-full bg-gradient-to-br from-pink-500 to-violet-500" />
-              <span>
-                <strong className="text-foreground">{bold}</strong>
-                {rest}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <a
+          href="https://github.com/DragosDreptate/the-playground"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4 transition-colors hover:border-primary/40 hover:bg-primary/5 group"
+        >
+          <Github className="size-8 shrink-0 text-foreground" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+              DragosDreptate / the-playground
+            </p>
+            <p className="text-sm text-muted-foreground truncate">
+              github.com/DragosDreptate/the-playground
+            </p>
+          </div>
+          <span className="flex items-center gap-1.5 shrink-0 text-sm text-muted-foreground">
+            <Star className="size-4" />
+            Star
+          </span>
+        </a>
       </section>
+
 
 
     </div>
