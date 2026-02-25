@@ -514,6 +514,28 @@
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     }
   },
+  "PwaInstall": {
+    "heading": "Disponible sur iOS et Android",
+    "subtitle": "Installez l'app gratuitement sur votre téléphone",
+    "note": "Application web progressive (PWA) — aucun téléchargement requis",
+    "ios": {
+      "badgeLine1": "Télécharger sur",
+      "badgeLine2": "App Store"
+    },
+    "android": {
+      "badgeLine1": "Disponible sur",
+      "badgeLine2": "Google Play"
+    },
+    "modal": {
+      "title": "Installer sur iPhone",
+      "step1Label": "Appuie sur Partage",
+      "step1Hint": "Bouton en bas de Safari",
+      "step2Label": "Sélectionne « Sur l'écran d'accueil »",
+      "step2Hint": "Fais défiler la liste des options vers le bas",
+      "step3Label": "Appuie sur « Ajouter »",
+      "step3Hint": "L'app apparaît sur ton écran d'accueil"
+    }
+  },
   "Footer": {
     "brand": {
       "tagline": "Lancez votre communauté, gratuitement.",

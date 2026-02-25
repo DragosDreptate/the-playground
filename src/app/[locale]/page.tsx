@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { PwaRedirect } from "@/components/pwa-redirect";
+import { PwaInstallSection } from "@/components/pwa-install-section";
 import {
   Users,
   CalendarDays,
@@ -373,6 +374,9 @@ export default async function HomePage() {
             </Button>
           </div>
         </section>
+
+        {/* PWA — télécharger l'app (iOS + Android) */}
+        <PwaInstallSection />
       </main>
 
       <SiteFooter />
