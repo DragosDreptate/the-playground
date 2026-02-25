@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { prismaCircleRepository } from "@/infrastructure/repositories";
+import { prismaCircleRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { Moment } from "@/domain/models/moment";
 import type { NewMomentNotificationStrings } from "@/domain/ports/services/email-service";
@@ -71,10 +71,13 @@ export async function notifyNewMoment(
 
   const followersToNotify = followers.filter((f) => !memberUserIds.has(f.userId));
 
-  // Notifier les followers (non-membres)
+  // Notifier les followers (non-membres) qui ont activé les notifications
   await Promise.allSettled(
-    followersToNotify.map((f) =>
-      emailService.sendNewMomentToFollower({
+    followersToNotify.map(async (f) => {
+      const prefs = await prismaUserRepository.getNotificationPreferences(f.userId);
+      if (!prefs.notifyNewMomentInCircle) return;
+
+      return emailService.sendNewMomentToFollower({
         to: f.email,
         recipientName: f.firstName ?? f.email,
         circleName,
@@ -84,14 +87,17 @@ export async function notifyNewMoment(
         momentDate,
         momentLocation,
         strings: followerStrings,
-      })
-    )
+      });
+    })
   );
 
-  // Notifier les membres (excluant déjà le créateur via findPlayersForNewMomentNotification)
+  // Notifier les membres (excluant déjà le créateur via findPlayersForNewMomentNotification) qui ont activé les notifications
   await Promise.allSettled(
-    members.map((m) =>
-      emailService.sendNewMomentToMember({
+    members.map(async (m) => {
+      const prefs = await prismaUserRepository.getNotificationPreferences(m.userId);
+      if (!prefs.notifyNewMomentInCircle) return;
+
+      return emailService.sendNewMomentToMember({
         to: m.email,
         recipientName: m.firstName ?? m.email,
         circleName,
@@ -101,7 +107,7 @@ export async function notifyNewMoment(
         momentDate,
         momentLocation,
         strings: memberStrings,
-      })
-    )
+      });
+    })
   );
 }

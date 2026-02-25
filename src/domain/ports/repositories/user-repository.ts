@@ -1,4 +1,4 @@
-import type { User } from "@/domain/models/user";
+import type { User, NotificationPreferences } from "@/domain/models/user";
 
 export type UpdateProfileInput = {
   firstName: string;
@@ -7,8 +7,15 @@ export type UpdateProfileInput = {
   image?: string | null;
 };
 
+export type UpdateNotificationPreferencesInput = NotificationPreferences;
+
 export interface UserRepository {
   findById(id: string): Promise<User | null>;
   updateProfile(id: string, input: UpdateProfileInput): Promise<User>;
   delete(id: string): Promise<void>;
+  getNotificationPreferences(userId: string): Promise<NotificationPreferences>;
+  updateNotificationPreferences(
+    userId: string,
+    input: UpdateNotificationPreferencesInput
+  ): Promise<NotificationPreferences>;
 }

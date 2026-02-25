@@ -694,6 +694,21 @@
       },
       "confirm": "Supprimer définitivement",
       "error": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emailBanner": "Ces préférences contrôlent les emails envoyés à {email}.",
+      "organizer": "En tant qu'Organisateur",
+      "participant": "En tant que Participant",
+      "newRegistration": "Nouvelle inscription",
+      "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements",
+      "newComment": "Nouveau commentaire",
+      "newCommentDesc": "Quand quelqu'un commente sur un de vos événements",
+      "newFollower": "Nouveau follower",
+      "newFollowerDesc": "Quand quelqu'un suit une de vos Communautés",
+      "newMomentInCircle": "Nouvel événement",
+      "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté que vous suivez",
+      "saved": "Préférences enregistrées"
     }
   }
 }

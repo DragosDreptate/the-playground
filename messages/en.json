@@ -694,6 +694,21 @@
       },
       "confirm": "Delete permanently",
       "error": "Something went wrong. Please try again."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "emailBanner": "These preferences control the emails sent to {email}.",
+      "organizer": "As an Organizer",
+      "participant": "As a Member",
+      "newRegistration": "New registration",
+      "newRegistrationDesc": "When someone registers for one of your events",
+      "newComment": "New comment",
+      "newCommentDesc": "When someone comments on one of your events",
+      "newFollower": "New follower",
+      "newFollowerDesc": "When someone follows one of your Communities",
+      "newMomentInCircle": "New event",
+      "newMomentInCircleDesc": "When an event is created in a Community you follow",
+      "saved": "Preferences saved"
     }
   }
 }
