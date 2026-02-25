@@ -26,7 +26,6 @@ import {
   CalendarIcon,
   ChevronRight,
   Link as LinkIcon,
-  ExternalLink,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -343,24 +342,22 @@ export default async function CircleDetailPage({
 
           {/* Lien partageable — visible Organisateurs uniquement */}
           {isHost && (
-            <div className="border-border bg-card space-y-3 rounded-xl border p-4">
-              <div className="flex items-center gap-2">
+            <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
+              <div className="flex items-center gap-2 lg:col-span-2">
                 <LinkIcon className="text-muted-foreground size-4 shrink-0" />
                 <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
               </div>
-              <div className="border-border bg-muted/50 rounded-lg border px-3 py-2">
+              <Link
+                href={`/circles/${circle.slug}`}
+                target="_blank"
+                className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 rounded-lg border px-3 py-2 transition-colors min-w-0"
+              >
                 <span className="text-muted-foreground block truncate font-mono text-sm">
                   {publicUrl.replace(/^https?:\/\//, "")}
                 </span>
-              </div>
-              <div className="flex items-center justify-between gap-2">
+              </Link>
+              <div className="flex items-center gap-2">
                 <CopyLinkButton value={publicUrl} />
-                <Button asChild variant="ghost" size="sm" className="h-8 shrink-0 gap-1.5 px-3">
-                  <Link href={`/circles/${circle.slug}`} target="_blank">
-                    <ExternalLink className="size-3.5" />
-                    Voir
-                  </Link>
-                </Button>
               </div>
             </div>
           )}
