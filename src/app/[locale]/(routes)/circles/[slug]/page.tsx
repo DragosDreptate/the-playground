@@ -537,9 +537,18 @@ export default async function PublicCirclePage({
                                 )}
                               </div>
                               <div
-                                className={`size-[60px] shrink-0 rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
-                                style={{ background: momentGradient }}
-                              />
+                                className={`size-[60px] shrink-0 overflow-hidden rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
+                                style={!moment.coverImage ? { background: momentGradient } : undefined}
+                              >
+                                {moment.coverImage && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={moment.coverImage}
+                                    alt={moment.title}
+                                    className="size-full object-cover"
+                                  />
+                                )}
+                              </div>
                             </div>
                           </div>
                         </Link>
