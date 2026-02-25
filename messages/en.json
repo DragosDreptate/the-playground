@@ -530,9 +530,9 @@
       "title": "Install on iPhone",
       "step1Label": "Tap Share",
       "step1Hint": "Button at the bottom of Safari",
-      "step2Label": "Select "Add to Home Screen"",
+      "step2Label": "Select \"Add to Home Screen\"",
       "step2Hint": "Scroll down the list of options",
-      "step3Label": "Tap "Add"",
+      "step3Label": "Tap \"Add\"",
       "step3Hint": "The app will appear on your home screen"
     }
   },
