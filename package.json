@@ -29,6 +29,8 @@
     "db:seed-demo-data:prod": "bash scripts/db-seed-demo-data-prod.sh",
     "db:cleanup-demo-data": "tsx scripts/db-cleanup-demo-data.ts",
     "db:cleanup-demo-data:prod": "bash scripts/db-cleanup-demo-data-prod.sh",
+    "db:backfill-notification-prefs": "tsx scripts/backfill-notification-prefs.ts",
+    "db:backfill-notification-prefs:prod": "bash scripts/backfill-notification-prefs-prod.sh",
     "db:seed-covers": "tsx scripts/seed-covers.ts",
     "db:seed-covers:execute": "tsx scripts/seed-covers.ts --execute",
     "db:seed-covers:prod": "bash scripts/seed-covers-prod.sh",
