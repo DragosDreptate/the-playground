@@ -1,6 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
@@ -15,16 +16,6 @@ type Props = {
   isLast: boolean;
 };
 
-function formatTimelineDate(date: Date): { weekday: string; dateStr: string; isToday: boolean } {
-  const now = new Date();
-  const isToday = date.toDateString() === now.toDateString();
-
-  const weekday = date.toLocaleDateString(undefined, { weekday: "short" });
-  const dateStr = date.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
-
-  return { weekday, dateStr, isToday };
-}
-
 export async function MomentTimelineItem({
   moment,
   circleSlug,
@@ -36,6 +27,7 @@ export async function MomentTimelineItem({
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
+  const locale = await getLocale();
 
   const isCancelled = moment.status === "CANCELLED";
 
@@ -53,12 +45,10 @@ export async function MomentTimelineItem({
         : "bg-border";
 
   const gradient = getMomentGradient(moment.title);
-  const { weekday, dateStr, isToday } = formatTimelineDate(moment.startsAt);
-
-  const timeStr = moment.startsAt.toLocaleTimeString(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const now = new Date();
+  const isToday = moment.startsAt.toDateString() === now.toDateString();
+  const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
+  const timeStr = formatTime(moment.startsAt);
 
   const locationLabel =
     moment.locationType === "ONLINE"

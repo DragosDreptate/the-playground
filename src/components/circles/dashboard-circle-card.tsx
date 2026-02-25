@@ -1,6 +1,7 @@
 import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatDayMonth } from "@/lib/format-date";
 import { Users, CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { DashboardCircle } from "@/domain/models/circle";
@@ -13,14 +14,12 @@ export async function DashboardCircleCard({ circle }: Props) {
   const t = await getTranslations("Explorer");
   const tDashboard = await getTranslations("Dashboard");
   const tCategory = await getTranslations("CircleCategory");
+  const locale = await getLocale();
 
   const gradient = getMomentGradient(circle.name);
 
   const nextMomentDate = circle.nextMoment
-    ? circle.nextMoment.startsAt.toLocaleDateString(undefined, {
-        day: "numeric",
-        month: "short",
-      })
+    ? formatDayMonth(circle.nextMoment.startsAt, locale)
     : null;
 
   return (

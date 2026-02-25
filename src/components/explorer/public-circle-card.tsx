@@ -3,6 +3,7 @@
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatDayMonth } from "@/lib/format-date";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
@@ -20,10 +21,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const gradient = getMomentGradient(circle.name);
 
   const nextMomentDate = circle.nextMoment
-    ? new Date(circle.nextMoment.startsAt).toLocaleDateString(locale, {
-        day: "numeric",
-        month: "short",
-      })
+    ? formatDayMonth(new Date(circle.nextMoment.startsAt), locale)
     : null;
 
   const categoryBadge = circle.category && (
@@ -67,7 +65,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
       <p className="mt-0.5 truncate text-sm font-medium">
         {circle.nextMoment.title}
       </p>
-      <p className="text-muted-foreground text-xs">{nextMomentDate}</p>
+      <p className="text-muted-foreground text-xs" suppressHydrationWarning>{nextMomentDate}</p>
     </div>
   );
 
