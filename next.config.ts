@@ -1,8 +1,17 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
+import withPWAInit from "@ducanh2912/next-pwa";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+const withPWA = withPWAInit({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+  reloadOnOnline: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
 const securityHeaders = [
   // Empêche le navigateur de détecter (sniffer) le Content-Type
@@ -34,6 +43,8 @@ const securityHeaders = [
       "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
       // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
       "connect-src 'self' *.sentry.io api.stripe.com",
+      // Service Worker PWA
+      "worker-src 'self'",
       "font-src 'self'",
       // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
       "frame-src js.stripe.com www.google.com",
@@ -62,7 +73,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(withNextIntl(nextConfig), {
+export default withSentryConfig(withPWA(withNextIntl(nextConfig)), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,

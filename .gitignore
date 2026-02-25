@@ -67,3 +67,9 @@ test-results/
 
 # sentry
 .sentryclirc
+
+# PWA — fichiers générés par next-pwa au build
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
