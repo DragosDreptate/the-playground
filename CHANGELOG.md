@@ -10,6 +10,28 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [1.3.0] — 2026-02-26 — PWA & Notifications événement
+
+### Ajouté
+
+- Support **Progressive Web App** : installable sur iOS (Safari) et Android (Chrome)
+  - Icônes haute résolution (192×512px), manifest, service worker
+  - Landing page : section « Télécharger l'app » avec badges iOS/Android et instructions pas-à-pas
+  - Mode standalone : redirection automatique vers le dashboard, logo adapté (plus de flash landing)
+- Notifications email aux participants en cas de **changement de date, heure ou lieu** d'un événement
+  - Email avec les modifications mises en évidence + nouvelle invitation calendrier (ICS)
+- Footer : affichage de la **version de l'app** à côté du copyright
+
+### Corrigé
+
+- ICS : décalage horaire corrigé dans `combineDateAndTime` (heure locale → UTC)
+- Formatage des dates : centralisation via `Intl` + fuseau `Europe/Paris` (supprime les erreurs SSR/hydration)
+- Sentry : capture des erreurs inattendues côté serveur (unexpected response + hydration)
+- Config : `bodySizeLimit` des Server Actions augmenté à 4 Mo
+- i18n : bouton « Publier » sur le formulaire événement (était « Submit »)
+
+---
+
 ## [1.2.0] — 2026-02-25 — Préférences de notifications
 
 ### Ajouté
