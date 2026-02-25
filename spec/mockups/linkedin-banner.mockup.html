@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mockup — Bannière LinkedIn v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a12;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .page-title {
+      color: #666;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .page-title span { color: #e8457a; }
+
+    /* ── LinkedIn page frame ── */
+    .li-page {
+      width: 900px;
+      background: #fff;
+      border-radius: 8px;
+      overflow: visible; /* pour que l'avatar dépasse */
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    /* ── Banner zone ── */
+    .banner-wrap {
+      width: 100%;
+      aspect-ratio: 1128 / 191;
+      position: relative;
+      overflow: hidden;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(135deg, #0d0e1a 0%, #1a1b2e 55%, #1e1030 100%);
+    }
+
+    /* ── Danger zone overlay (zone couverte par logo entreprise) ── */
+    /* Sur 900px : logo LinkedIn ≈ 110px large, déborde ~60% vers le bas */
+    /* Zone rouge semi-transparente pour montrer ce qui est couvert */
+    .danger-zone {
+      position: absolute;
+      left: 0;
+      top: 0;
+      /* logo = ~112px wide, overlap ≈ 65% de la hauteur de la bannière */
+      width: 148px;
+      height: 100%;
+      background: rgba(220,40,40,0.18);
+      border-right: 2px dashed rgba(255,80,80,0.5);
+      z-index: 10;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+    }
+    .danger-label {
+      font-size: 9px;
+      font-weight: 700;
+      color: rgba(255,120,120,0.9);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ── Glows ── */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(55px);
+      pointer-events: none;
+    }
+
+    /* ── Banner content ── */
+    .banner-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Padding left large pour laisser place au logo entreprise */
+      padding: 0 80px 0 220px;
+      gap: 32px;
+    }
+
+    /* ── Logo block ── */
+    .logo-block {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 42px; height: 42px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: #f0f0f5;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .logo-text span { color: #e8457a; }
+
+    /* ── Divider ── */
+    .vdivider {
+      width: 1px;
+      height: 52px;
+      background: rgba(255,255,255,0.14);
+      flex-shrink: 0;
+    }
+
+    /* ── Taglines ── */
+    .taglines {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+    .tagline {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: #7a7c9a;
+      white-space: nowrap;
+      line-height: 1.45;
+    }
+    .tagline strong {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    /* ── Spacer ── */
+    .spacer { flex: 1; }
+
+    /* ── Badge ── */
+    .badge {
+      flex-shrink: 0;
+      padding: 5px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(232,69,122,0.45);
+      background: rgba(232,69,122,0.10);
+      color: #e8457a;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── LinkedIn company avatar (overlapping) ── */
+    .li-company-avatar {
+      position: absolute;
+      left: 16px;
+      /* La bannière fait ~160px de haut (900 * 191/1128), l'avatar déborde de ~55px */
+      bottom: -55px;
+      width: 112px; height: 112px;
+      border-radius: 8px;
+      border: 3px solid #fff;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 20;
+      overflow: hidden;
+    }
+
+    /* ── LinkedIn UI below ── */
+    .li-profile {
+      padding: 68px 24px 20px 148px;
+      background: #fff;
+      border-radius: 0 0 8px 8px;
+    }
+    .li-name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .li-name { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+    .li-sub  { font-size: 13px; color: #666; margin-top: 2px; }
+    .li-follow {
+      padding: 6px 20px;
+      border-radius: 999px;
+      border: 1.5px solid #0a66c2;
+      color: #0a66c2;
+      font-size: 14px;
+      font-weight: 600;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    /* ── Annotation ── */
+    .annotation {
+      max-width: 900px;
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 24px;
+    }
+    .anno-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.5;
+    }
+    .anno-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<p class="page-title">Bannière LinkedIn — Mockup v2 · <span>Zone logo entreprise visualisée</span></p>
+
+<!-- ── LinkedIn page ── -->
+<div class="li-page">
+
+  <!-- Banner -->
+  <div class="banner-wrap">
+
+    <!-- Glows décoratifs -->
+    <div class="blob" style="width:260px;height:200px;background:#e8457a;opacity:0.11;top:-60px;left:350px;"></div>
+    <div class="blob" style="width:200px;height:160px;background:#8b5cf6;opacity:0.14;bottom:-50px;right:260px;"></div>
+    <div class="blob" style="width:150px;height:120px;background:#ec4899;opacity:0.09;bottom:-30px;right:60px;"></div>
+
+    <!-- Zone rouge = couverte par le logo entreprise LinkedIn -->
+    <div class="danger-zone">
+      <p class="danger-label">Logo<br>entreprise<br>ici</p>
+    </div>
+
+    <!-- Content décalé à droite de la zone logo -->
+    <div class="banner-content">
+
+      <!-- Logo The Playground -->
+      <div class="logo-block">
+        <div class="logo-icon">
+          <svg width="16" height="19" viewBox="0 0 10 12" fill="none">
+            <polygon points="0,0 0,12 10,6" fill="white"/>
+          </svg>
+        </div>
+        <span class="logo-text">the&thinsp;<span>playground</span></span>
+      </div>
+
+      <!-- Séparateur -->
+      <div class="vdivider"></div>
+
+      <!-- Taglines -->
+      <div class="taglines">
+        <p class="tagline"><strong>Lancez</strong> votre communauté.</p>
+        <p class="tagline"><strong>Organisez</strong> vos événements.</p>
+        <p class="tagline"><strong>Animez</strong> votre réseau.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Logo entreprise qui chevauche -->
+  <div class="li-company-avatar">
+    <svg width="44" height="52" viewBox="0 0 10 12" fill="none">
+      <polygon points="0,0 0,12 10,6" fill="white"/>
+    </svg>
+  </div>
+
+  <!-- Profile info -->
+  <div class="li-profile">
+    <div class="li-name-row">
+      <div>
+        <p class="li-name">The Playground</p>
+        <p class="li-sub">Plateforme communautaire · SaaS · Paris, France · 1–10 employés</p>
+      </div>
+      <button class="li-follow">+ Suivre</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Annotations -->
+<div class="annotation">
+  <div class="anno-item">
+    <div class="anno-dot" style="background:#ff5555;"></div>
+    <span><strong style="color:#ddd;">Zone rouge</strong> — couverte par le logo entreprise LinkedIn (~148px). Aucun contenu important dans cette zone.</span>
+  </div>
+  <div class="anno-item">
+    <div class="anno-dot" style="background:#e8457a;"></div>
+    <span><strong style="color:#ddd;">Verbes en blanc</strong> — Lancez, Organisez, Animez · même couleur (#ffffff)</span>
+  </div>
+  <div class="anno-item">
+    <div class="anno-dot" style="background:#8b5cf6;"></div>
+    <span><strong style="color:#ddd;">Dimensions</strong> — 1128 × 191 px · ratio ~5.9:1</span>
+  </div>
+</div>
+
+</body>
+</html>

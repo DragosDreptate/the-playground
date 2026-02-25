@@ -106,6 +106,13 @@
   - Contenu : nom du nouvel inscrit, total inscrits / places restantes, lien vers gestion
   - Skip quand l'Organisateur s'inscrit lui-même
 
+- [ ] **Email alerte Organisateur : nouveau follower de sa Communauté** 🔴 prio haute
+  - Déclenché dans `followCircleAction` après `followCircle` — fire-and-forget
+  - Destinataires : tous les HOSTs du Circle suivi
+  - Contenu : prénom/nom du follower, lien vers la page Communauté, lien vers la liste des membres
+  - Dépendance : respecter les **préférences de notifications** de l'Organisateur (voir "Menu Paramètres") — si la préférence `notifyNewFollower` est désactivée, ne pas envoyer
+  - Template à créer : `host-new-follower` (react-email, même style que les templates existants)
+
 - [x] **Architecture email multi-canal** (infrastructure) ✅
   - Port `EmailService` (3 méthodes) + adapter `ResendEmailService`
   - Templates React (react-email) : calendar badge gradient, layout blanc/gris
@@ -230,6 +237,19 @@
   - Dashboard stats + listes paginées + détail + suppression (Users, Circles, Moments)
   - Forcer annulation Moment
   - Champ `role` (USER/ADMIN) sur User, middleware guard sur `/admin/*`
+
+- [ ] **Menu Paramètres utilisateur** 🔴 prio haute
+  - Page dédiée `/dashboard/settings` (lien dans le `UserMenu` à côté de "Mon profil")
+  - **Premier paramètre : préférences de notifications email**
+    - Quelles alertes l'utilisateur souhaite recevoir — case à cocher par type :
+      - `notifyNewFollower` — Organisateur : alerte quand quelqu'un suit ma Communauté
+      - `notifyNewRegistration` — Organisateur : alerte à chaque nouvelle inscription sur mes événements
+      - `notifyNewComment` — Organisateur : alerte quand un commentaire est posté sur mon événement
+      - `notifyNewMomentInCircle` — Participant/Follower : alerte quand un nouvel événement est créé dans une Communauté dont je suis membre ou follower
+    - Toutes les préférences activées par défaut (opt-out, pas opt-in)
+  - **Modèle domaine** : table `UserNotificationPreferences` (ou champs JSON sur `User`) — `userId` unique, un champ booléen par type
+  - **Intégration** : chaque server action qui envoie un email consulte la préférence de l'utilisateur cible avant d'appeler `emailService` — logique dans la server action (pas dans l'usecase ni le port)
+  - **UI** : page settings avec section "Notifications", toggles shadcn `Switch` par type, sauvegarde auto ou bouton Enregistrer
 
 - [ ] **Outils Organisateur enrichis**
   - Co-Organisateurs (plusieurs HOST par Circle)

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 32" width="180" height="32" fill="none">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon background -->
+  <rect width="28" height="28" x="0" y="2" rx="6" fill="url(#iconGrad)"/>
+
+  <!-- Play triangle, centered in icon with slight right offset -->
+  <polygon points="11,9 11,23 21,16" fill="white"/>
+
+  <!-- Wordmark -->
+  <text
+    x="36"
+    y="22"
+    font-family="Inter, system-ui, -apple-system, sans-serif"
+    font-size="16"
+    font-weight="800"
+    letter-spacing="-0.5"
+    fill="#1a1b2e"
+  >the&#x2009;<tspan fill="#e8457a">playground</tspan></text>
+</svg>
