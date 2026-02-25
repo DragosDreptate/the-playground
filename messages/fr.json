@@ -499,6 +499,13 @@
       "commentPreviewLabel": "Commentaire",
       "viewCommentCta": "Voir le commentaire"
     },
+    "momentUpdate": {
+      "subject": "Mise à jour : {momentTitle}",
+      "heading": "Un événement a été modifié",
+      "intro": "L'organisateur a apporté des modifications à un événement auquel vous êtes inscrit(e).",
+      "dateChangedLabel": "Nouvelle date",
+      "locationChangedLabel": "Nouveau lieu"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",
