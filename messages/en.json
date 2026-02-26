@@ -516,6 +516,16 @@
       "dateChangedLabel": "New date",
       "locationChangedLabel": "New location"
     },
+    "hostMomentUpdate": {
+      "heading": "Your event has been updated",
+      "intro": "You updated your event. Registered participants have been automatically notified."
+    },
+    "momentCancelled": {
+      "subject": "Cancelled: {momentTitle}",
+      "heading": "This event has been cancelled",
+      "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the Community.",
+      "ctaLabel": "View Community"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",

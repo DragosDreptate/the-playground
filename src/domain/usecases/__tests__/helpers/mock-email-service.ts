@@ -12,6 +12,7 @@ export function createMockEmailService(
     sendNewMomentToFollower: vi.fn().mockResolvedValue(undefined),
     sendNewMomentToMember: vi.fn().mockResolvedValue(undefined),
     sendMomentUpdate: vi.fn().mockResolvedValue(undefined),
+    sendMomentCancelled: vi.fn().mockResolvedValue(undefined),
     sendHostMomentCreated: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };

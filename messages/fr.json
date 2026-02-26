@@ -516,6 +516,16 @@
       "dateChangedLabel": "Nouvelle date",
       "locationChangedLabel": "Nouveau lieu"
     },
+    "hostMomentUpdate": {
+      "heading": "Votre événement a été modifié",
+      "intro": "Vous avez modifié votre événement. Les participants inscrits ont été notifiés automatiquement."
+    },
+    "momentCancelled": {
+      "subject": "Annulé : {momentTitle}",
+      "heading": "Cet événement a été annulé",
+      "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la Communauté.",
+      "ctaLabel": "Voir la Communauté"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",

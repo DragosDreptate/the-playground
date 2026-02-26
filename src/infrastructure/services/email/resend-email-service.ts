@@ -8,6 +8,7 @@ import type {
   NewMomentFollowerEmailData,
   NewMomentMemberEmailData,
   MomentUpdateEmailData,
+  MomentCancelledEmailData,
   HostMomentCreatedEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
@@ -16,6 +17,7 @@ import { HostNewRegistrationEmail } from "./templates/host-new-registration";
 import { HostNewCommentEmail } from "./templates/host-new-comment";
 import { NewMomentNotificationEmail } from "./templates/new-moment-notification";
 import { MomentUpdateEmail } from "./templates/moment-update";
+import { MomentCancelledEmail } from "./templates/moment-cancelled";
 import { HostMomentCreatedEmail } from "./templates/host-moment-created";
 
 function getBaseUrl(): string {
@@ -133,6 +135,15 @@ export function createResendEmailService(): EmailService {
             },
           ],
         }),
+      });
+    },
+
+    async sendMomentCancelled(data: MomentCancelledEmailData): Promise<void> {
+      await resend.emails.send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: MomentCancelledEmail({ ...data, baseUrl }),
       });
     },
 

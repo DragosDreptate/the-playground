@@ -136,6 +136,25 @@ export type MomentUpdateEmailData = {
   };
 };
 
+export type MomentCancelledEmailData = {
+  to: string;
+  recipientName: string;
+  momentTitle: string;
+  momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
+  locationText: string;
+  circleName: string;
+  circleSlug: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 export type HostMomentCreatedEmailData = {
   to: string;
   hostName: string;
@@ -171,5 +190,6 @@ export interface EmailService {
   sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
+  sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
 }
