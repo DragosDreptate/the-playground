@@ -130,7 +130,7 @@ export function CommentThread({
   const formatRelativeTime = useRelativeTime(t);
 
   const isAuthenticated = currentUserId !== null;
-  const canComment = isAuthenticated && !isPastMoment;
+  const canComment = isAuthenticated;
 
   function handleSubmit() {
     if (!content.trim()) return;
@@ -213,13 +213,13 @@ export function CommentThread({
         )}
 
         {/* Form or sign-in prompt */}
-        {isPastMoment ? null : isAuthenticated ? (
+        {isAuthenticated ? (
           <div className="space-y-2 pt-2">
             <textarea
               ref={textareaRef}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={t("comments.placeholder")}
+              placeholder={isPastMoment ? t("comments.placeholderPast") : t("comments.placeholder")}
               rows={3}
               maxLength={MAX_CONTENT_LENGTH}
               className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full resize-none rounded-xl border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
