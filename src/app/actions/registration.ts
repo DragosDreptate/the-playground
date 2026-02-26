@@ -200,6 +200,7 @@ async function sendRegistrationEmails(
       locationLabel: t("common.locationLabel"),
       viewMomentCta: t("common.viewMomentCta"),
       cancelLink: t("common.cancelLink"),
+      dashboardLink: t("common.dashboardLink"),
       footer: t("common.footer"),
     },
   });

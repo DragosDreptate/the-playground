@@ -313,6 +313,7 @@
       "count": "{count} commentaire(s)",
       "empty": "Aucun commentaire pour le moment. Soyez le premier à réagir !",
       "placeholder": "Partagez votre avis...",
+      "placeholderPast": "Remerciements, photos, retours... partagez !",
       "submit": "Publier",
       "signInToComment": "Se connecter pour commenter",
       "deleteTitle": "Supprimer le commentaire",
@@ -531,6 +532,7 @@
       "locationLabel": "Lieu",
       "viewMomentCta": "Voir l'événement",
       "cancelLink": "Annuler mon inscription",
+      "dashboardLink": "Retrouvez tous vos événements dans Mon espace →",
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     }
   },

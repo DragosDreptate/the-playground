@@ -20,6 +20,7 @@ export function RegistrationConfirmationEmail({
   strings,
 }: Props) {
   const momentUrl = `${baseUrl}/m/${momentSlug}`;
+  const dashboardUrl = `${baseUrl}/dashboard`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
@@ -52,6 +53,12 @@ export function RegistrationConfirmationEmail({
       <Text style={cancelLinkStyle}>
         <Link href={momentUrl} style={cancelLinkAnchor}>
           {strings.cancelLink}
+        </Link>
+      </Text>
+
+      <Text style={dashboardLinkStyle}>
+        <Link href={dashboardUrl} style={dashboardLinkAnchor}>
+          {strings.dashboardLink}
         </Link>
       </Text>
     </EmailLayout>
@@ -127,11 +134,22 @@ const ctaButton: React.CSSProperties = {
 
 const cancelLinkStyle: React.CSSProperties = {
   textAlign: "center" as const,
-  margin: "0",
+  margin: "0 0 12px 0",
 };
 
 const cancelLinkAnchor: React.CSSProperties = {
   color: "#a1a1aa",
   fontSize: "12px",
   textDecoration: "underline",
+};
+
+const dashboardLinkStyle: React.CSSProperties = {
+  textAlign: "center" as const,
+  margin: "0",
+};
+
+const dashboardLinkAnchor: React.CSSProperties = {
+  color: "#71717a",
+  fontSize: "12px",
+  textDecoration: "none",
 };
