@@ -113,6 +113,8 @@ export default async function MomentDetailPage({
     );
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
   return (
     <MomentDetailView
       variant="host"
@@ -127,6 +129,17 @@ export default async function MomentDetailPage({
       circleSlug={slug}
       momentSlug={momentSlug}
       publicUrl={publicUrl}
+      calendarData={{
+        title: moment.title,
+        startsAt: moment.startsAt,
+        endsAt: moment.endsAt,
+        locationType: moment.locationType,
+        locationName: moment.locationName,
+        locationAddress: moment.locationAddress,
+        circleName: circle.name,
+        slug: moment.slug,
+      }}
+      appUrl={appUrl}
     />
   );
 }
