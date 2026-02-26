@@ -62,18 +62,22 @@ export async function generateMetadata({
     const circle = await getCircleBySlug(slug, {
       circleRepository: prismaCircleRepository,
     });
+    const isPrivate = circle.visibility !== "PUBLIC";
     return {
       title: circle.name,
       description: circle.description,
-      openGraph: {
-        title: circle.name,
-        description: circle.description ?? undefined,
-        type: "website",
-      },
-      twitter: {
-        title: circle.name,
-        description: circle.description ?? undefined,
-      },
+      ...(isPrivate && { robots: { index: false, follow: false } }),
+      ...(!isPrivate && {
+        openGraph: {
+          title: circle.name,
+          description: circle.description ?? undefined,
+          type: "website",
+        },
+        twitter: {
+          title: circle.name,
+          description: circle.description ?? undefined,
+        },
+      }),
     };
   } catch {
     return {};
