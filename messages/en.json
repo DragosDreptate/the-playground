@@ -523,12 +523,10 @@
     "subtitle": "Install the app for free on your phone",
     "note": "Progressive web app (PWA) — no download required",
     "ios": {
-      "badgeLine1": "Download on the",
-      "badgeLine2": "App Store"
+      "label": "Add to iPhone"
     },
     "android": {
-      "badgeLine1": "Get it on",
-      "badgeLine2": "Google Play"
+      "label": "Add to Android"
     },
     "modal": {
       "title": "Install on iPhone",
