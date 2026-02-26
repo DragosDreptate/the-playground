@@ -10,6 +10,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaUserRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService } from "@/infrastructure/services";
@@ -107,13 +108,69 @@ export async function createMomentAction(
       }
     );
 
-    // Fire-and-forget : notifier les followers et membres du Circle
-    prismaCircleRepository.findById(circleId).then((circle) => {
-      if (circle) {
-        notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
-          console.error
-        );
-      }
+    // Fire-and-forget : notifier les followers/membres + envoyer email de confirmation à l'organisateur
+    prismaCircleRepository.findById(circleId).then(async (circle) => {
+      if (!circle) return;
+
+      // Notifier les followers et membres du Circle
+      notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
+        console.error
+      );
+
+      // Email de confirmation à l'organisateur avec ICS
+      const [host, locale] = await Promise.all([
+        prismaUserRepository.findById(session.user.id),
+        getLocale(),
+      ]);
+      if (!host?.email) return;
+
+      const dateFnsLocale = getDateFnsLocale(locale);
+      const momentDate = format(result.moment.startsAt, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+      const momentDateMonth = format(result.moment.startsAt, "MMM", { locale: dateFnsLocale }).toUpperCase();
+      const momentDateDay = format(result.moment.startsAt, "d");
+      const locationText = formatLocationText(
+        result.moment.locationType,
+        result.moment.locationName,
+        result.moment.locationAddress,
+        locale
+      );
+      const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+      const icsContent = generateIcs({
+        uid: result.moment.id,
+        title: result.moment.title,
+        description: result.moment.description,
+        startsAt: result.moment.startsAt,
+        endsAt: result.moment.endsAt,
+        location: locationText,
+        url: `${appUrl}/m/${result.moment.slug}`,
+        organizerName: circle.name,
+      });
+
+      const t = await getTranslations({ locale, namespace: "Email" });
+      await emailService.sendHostMomentCreated({
+        to: host.email,
+        hostName,
+        momentTitle: result.moment.title,
+        momentSlug: result.moment.slug,
+        circleSlug: circle.slug,
+        momentDate,
+        momentDateMonth,
+        momentDateDay,
+        locationText,
+        circleName: circle.name,
+        icsContent,
+        strings: {
+          subject: t("hostMomentCreated.subject", { momentTitle: result.moment.title }),
+          heading: t("hostMomentCreated.heading"),
+          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: result.moment.title }),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          manageMomentCta: t("hostMomentCreated.manageMomentCta"),
+          footer: t("common.footer"),
+        },
+      });
     }).catch(console.error);
 
     return { success: true, data: result.moment };
