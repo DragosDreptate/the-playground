@@ -488,6 +488,12 @@
       "heading": "Bonne nouvelle !",
       "statusMessage": "Une place s'est libérée ! Votre inscription à {momentTitle} est confirmée."
     },
+    "hostMomentCreated": {
+      "subject": "Votre événement est en ligne : {momentTitle}",
+      "heading": "Votre événement est publié !",
+      "statusMessage": "Vous avez programmé {momentTitle}. Partagez le lien pour inviter vos participants.",
+      "manageMomentCta": "Gérer l'événement"
+    },
     "hostNotification": {
       "subject": "{playerName} s'est inscrit(e) à {momentTitle}",
       "heading": "Nouvelle inscription",

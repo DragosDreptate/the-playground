@@ -488,6 +488,12 @@
       "heading": "Great news!",
       "statusMessage": "A spot opened up! Your registration for {momentTitle} is confirmed."
     },
+    "hostMomentCreated": {
+      "subject": "Your event is live: {momentTitle}",
+      "heading": "Your event is published!",
+      "statusMessage": "You've scheduled {momentTitle}. Share the link to invite your participants.",
+      "manageMomentCta": "Manage event"
+    },
     "hostNotification": {
       "subject": "{playerName} joined {momentTitle}",
       "heading": "New registration",
