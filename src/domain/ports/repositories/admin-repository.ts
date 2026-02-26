@@ -113,6 +113,7 @@ export type AdminMomentRow = {
   status: MomentStatus;
   circleName: string;
   registrationCount: number;
+  commentCount: number;
   capacity: number | null;
   startsAt: Date;
   createdAt: Date;

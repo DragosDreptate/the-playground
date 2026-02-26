@@ -296,7 +296,7 @@ export const prismaAdminRepository: AdminRepository = {
       where: momentWhere(filters),
       include: {
         circle: { select: { name: true } },
-        _count: { select: { registrations: true } },
+        _count: { select: { registrations: true, comments: true } },
       },
       orderBy: { createdAt: "desc" },
       take: filters.limit ?? DEFAULT_LIMIT,
@@ -309,6 +309,7 @@ export const prismaAdminRepository: AdminRepository = {
       status: r.status,
       circleName: r.circle.name,
       registrationCount: r._count.registrations,
+      commentCount: r._count.comments,
       capacity: r.capacity,
       startsAt: r.startsAt,
       createdAt: r.createdAt,
@@ -325,6 +326,7 @@ export const prismaAdminRepository: AdminRepository = {
       include: {
         circle: { select: { name: true, slug: true } },
         createdBy: { select: { email: true, firstName: true, lastName: true } },
+        _count: { select: { comments: true } },
         registrations: {
           select: {
             id: true,
@@ -349,6 +351,7 @@ export const prismaAdminRepository: AdminRepository = {
       circleId: record.circle.slug, // used for links
       circleSlug: record.circle.slug,
       registrationCount: record.registrations.length,
+      commentCount: record._count.comments,
       capacity: record.capacity,
       startsAt: record.startsAt,
       createdAt: record.createdAt,
