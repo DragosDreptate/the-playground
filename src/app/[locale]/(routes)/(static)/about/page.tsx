@@ -242,22 +242,26 @@ export default async function AboutPage() {
             <p>
               {isFr ? (
                 <>
-                  Une question, une idée, envie d'essayer ?{" "}
+                  Une question, une idée, envie d'échanger ?{" "}
                   <a
-                    href="mailto:dragos@thespark.fr"
+                    href="https://www.linkedin.com/in/dragosdreptate/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-primary font-semibold hover:underline"
                   >
-                    dragos@thespark.fr
+                    Retrouvez-moi sur LinkedIn.
                   </a>
                 </>
               ) : (
                 <>
-                  A question, an idea, want to try it?{" "}
+                  A question, an idea, want to connect?{" "}
                   <a
-                    href="mailto:dragos@thespark.fr"
+                    href="https://www.linkedin.com/in/dragosdreptate/"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-primary font-semibold hover:underline"
                   >
-                    dragos@thespark.fr
+                    Find me on LinkedIn.
                   </a>
                 </>
               )}
