@@ -63,6 +63,17 @@ export type PublicMoment = {
   };
 };
 
+export type UpcomingCircleMoment = {
+  id: string;
+  slug: string;
+  title: string;
+  coverImage: string | null;
+  startsAt: Date;
+  locationType: LocationType;
+  locationName: string | null;
+  registrationCount: number;
+};
+
 export interface MomentRepository {
   create(input: CreateMomentInput): Promise<Moment>;
   findById(id: string): Promise<Moment | null>;
@@ -74,4 +85,5 @@ export interface MomentRepository {
   /** Transition PUBLISHED → PAST for Moments whose end time (or start time) has passed. */
   transitionPastMoments(): Promise<number>;
   findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]>;
+  findUpcomingByCircleId(circleId: string, excludeMomentId: string, limit: number): Promise<UpcomingCircleMoment[]>;
 }

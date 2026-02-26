@@ -15,6 +15,7 @@ export function createMockMomentRepository(
     slugExists: vi.fn<MomentRepository["slugExists"]>().mockResolvedValue(false),
     transitionPastMoments: vi.fn<MomentRepository["transitionPastMoments"]>().mockResolvedValue(0),
     findPublicUpcoming: vi.fn<MomentRepository["findPublicUpcoming"]>().mockResolvedValue([]),
+    findUpcomingByCircleId: vi.fn<MomentRepository["findUpcomingByCircleId"]>().mockResolvedValue([]),
     ...overrides,
   };
 }

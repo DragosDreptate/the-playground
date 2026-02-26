@@ -290,6 +290,8 @@
       "eventCancelled": "Événement annulé",
       "attendedCount": "{count} personnes ont participé",
       "viewCircleMoments": "Voir les prochains événements de la Communauté",
+      "upcomingInCircle": "Aussi dans cette Communauté",
+      "seeAllCircleEvents": "Voir tous les événements",
       "addToCalendar": {
         "label": "Ajouter à mon calendrier",
         "google": "Google Calendar",

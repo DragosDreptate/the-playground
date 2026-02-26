@@ -103,7 +103,7 @@ export default async function PublicMomentPage({
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   // Parallélise : inscription existante + données publiques en une seule vague
-  const [existingRegistration, registeredCount, allAttendees, comments] = await Promise.all([
+  const [existingRegistration, registeredCount, allAttendees, comments, upcomingCircleMoments] = await Promise.all([
     isAuthenticated
       ? getUserRegistration(
           { momentId: moment.id, userId: session!.user!.id! },
@@ -119,6 +119,7 @@ export default async function PublicMomentPage({
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
+    prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
   ]);
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
@@ -168,6 +169,7 @@ export default async function PublicMomentPage({
         calendarData={calendarData}
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
+        upcomingCircleMoments={upcomingCircleMoments}
       />
     </main>
   );
