@@ -4,6 +4,7 @@ import type { CircleRepository } from "@/domain/ports/repositories/circle-reposi
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
   MomentSlugAlreadyExistsError,
+  MomentPastDateError,
   UnauthorizedMomentActionError,
 } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
@@ -49,6 +50,10 @@ export async function createMoment(
 
   if (!membership || membership.role !== "HOST") {
     throw new UnauthorizedMomentActionError();
+  }
+
+  if (input.startsAt < new Date()) {
+    throw new MomentPastDateError();
   }
 
   let slug = generateSlug(input.title);

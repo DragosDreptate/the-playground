@@ -3,6 +3,7 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import {
   MomentNotFoundError,
+  MomentPastDateError,
   UnauthorizedMomentActionError,
 } from "@/domain/errors";
 
@@ -53,6 +54,10 @@ export async function updateMoment(
 
   if (!membership || membership.role !== "HOST") {
     throw new UnauthorizedMomentActionError();
+  }
+
+  if (input.startsAt !== undefined && input.startsAt < new Date()) {
+    throw new MomentPastDateError();
   }
 
   const { momentId: _, userId: __, ...updates } = input;

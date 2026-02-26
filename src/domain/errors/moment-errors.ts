@@ -23,3 +23,11 @@ export class UnauthorizedMomentActionError extends DomainError {
     super("You are not authorized to perform this action on this Moment");
   }
 }
+
+export class MomentPastDateError extends DomainError {
+  readonly code = "MOMENT_PAST_DATE";
+
+  constructor() {
+    super("The event start date cannot be in the past");
+  }
+}
