@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Changelog · The Playground",
-    description: "Les évolutions du Playground, semaine après semaine.",
+    description: "Les évolutions du Playground, jour après jour.",
   };
 }
 
@@ -49,7 +49,7 @@ export default function ChangelogPage() {
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight">Changelog</h1>
         <p className="text-muted-foreground">
-          Les évolutions du Playground, semaine après semaine.
+          Les évolutions du Playground, jour après jour.
         </p>
       </div>
 
