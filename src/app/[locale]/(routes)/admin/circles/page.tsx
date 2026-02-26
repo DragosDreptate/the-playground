@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
@@ -49,12 +50,13 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
               <TableHead>{t("columns.visibility")}</TableHead>
               <TableHead>{t("columns.category")}</TableHead>
               <TableHead>{t("columns.createdAt")}</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
             {circles.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                   {t("table.noResults")}
                 </TableCell>
               </TableRow>
@@ -80,6 +82,16 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {circle.createdAt.toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/circles/${circle.slug}`}
+                      target="_blank"
+                      className="text-muted-foreground hover:text-foreground"
+                      title="Voir la page publique"
+                    >
+                      <ExternalLink className="size-4" />
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))

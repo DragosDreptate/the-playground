@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminMomentActions } from "./actions";
 
@@ -36,7 +38,15 @@ export default async function AdminMomentDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground">{t("momentDetail.title")}</p>
           <h1 className="text-2xl font-bold">{moment.title}</h1>
         </div>
-        <AdminMomentActions momentId={moment.id} status={moment.status} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/m/${moment.slug}`} target="_blank">
+              <ExternalLink className="size-4" />
+              {t("viewPublicPage")}
+            </Link>
+          </Button>
+          <AdminMomentActions momentId={moment.id} status={moment.status} />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
