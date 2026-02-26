@@ -25,15 +25,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
   const description = t("heroSubtitle");
   return {
-    title: "The Playground",
+    title: "The Playground — Lancez votre communauté, organisez vos événements",
     description,
     openGraph: {
-      title: "The Playground",
+      title: "The Playground — Lancez votre communauté, organisez vos événements",
       description,
       siteName: "The Playground",
     },
     twitter: {
-      title: "The Playground",
+      title: "The Playground — Lancez votre communauté, organisez vos événements",
       description,
     },
   };
