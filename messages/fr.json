@@ -394,6 +394,7 @@
       "totalCircles": "Communautés",
       "totalMoments": "Événements",
       "totalRegistrations": "Inscriptions",
+      "totalComments": "Commentaires",
       "thisWeek": "cette semaine"
     },
     "table": {
@@ -441,6 +442,7 @@
       "date": "Date",
       "capacity": "Capacité",
       "registrations": "Inscriptions",
+      "comments": "Commentaires",
       "noRegistrations": "Aucune inscription.",
       "unlimited": "Illimitée"
     },
@@ -460,6 +462,7 @@
       "date": "Date",
       "status": "Statut",
       "registrations": "Inscrits",
+      "comments": "Commentaires",
       "actions": "Actions"
     }
   },

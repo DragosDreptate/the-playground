@@ -80,6 +80,10 @@ export default async function AdminMomentDetailPage({ params }: Props) {
               label={t("momentDetail.registrations")}
               value={String(moment.registrationCount)}
             />
+            <Row
+              label={t("momentDetail.comments")}
+              value={String(moment.commentCount)}
+            />
           </CardContent>
         </Card>
       </div>

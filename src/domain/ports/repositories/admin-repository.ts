@@ -11,9 +11,11 @@ export type AdminStats = {
   totalCircles: number;
   totalMoments: number;
   totalRegistrations: number;
+  totalComments: number;
   recentUsers: number; // derniers 7 jours
   recentCircles: number;
   recentMoments: number;
+  recentComments: number;
 };
 
 // ─────────────────────────────────────────────
@@ -111,6 +113,7 @@ export type AdminMomentRow = {
   status: MomentStatus;
   circleName: string;
   registrationCount: number;
+  commentCount: number;
   capacity: number | null;
   startsAt: Date;
   createdAt: Date;

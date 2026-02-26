@@ -58,13 +58,14 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
               <TableHead>{t("columns.date")}</TableHead>
               <TableHead>{t("columns.status")}</TableHead>
               <TableHead className="text-right">{t("columns.registrations")}</TableHead>
+              <TableHead className="text-right">{t("columns.comments")}</TableHead>
               <TableHead>{t("columns.createdAt")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {moments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                   {t("table.noResults")}
                 </TableCell>
               </TableRow>
@@ -91,6 +92,9 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
                   <TableCell className="text-right tabular-nums">
                     {moment.registrationCount}
                     {moment.capacity ? `/${moment.capacity}` : ""}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-muted-foreground">
+                    {moment.commentCount}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {moment.createdAt.toLocaleDateString()}
