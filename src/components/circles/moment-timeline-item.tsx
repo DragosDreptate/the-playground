@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
@@ -155,10 +156,11 @@ export async function MomentTimelineItem({
 
               {/* Thumbnail */}
               {moment.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={moment.coverImage}
                   alt={moment.title}
+                  width={60}
+                  height={60}
                   className={`size-[60px] shrink-0 rounded-lg object-cover ${isCancelled ? "grayscale opacity-40" : ""}`}
                 />
               ) : (

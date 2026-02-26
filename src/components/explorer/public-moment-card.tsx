@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
@@ -100,11 +101,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
               style={moment.coverImage ? undefined : { background: gradient }}
             >
               {moment.coverImage && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={moment.coverImage}
                   alt={moment.title}
-                  className="size-full object-cover"
+                  width={72}
+                  height={72}
+                  className="object-cover"
                 />
               )}
             </div>
@@ -143,11 +145,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             />
             <div className="relative aspect-square w-full overflow-hidden rounded-xl">
               {moment.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={moment.coverImage}
                   alt={moment.title}
-                  className="size-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 280px"
                 />
               ) : (
                 <>

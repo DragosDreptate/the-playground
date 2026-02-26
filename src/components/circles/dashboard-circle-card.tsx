@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
@@ -34,11 +35,12 @@ export async function DashboardCircleCard({ circle }: Props) {
           />
           <div className="relative aspect-square w-full overflow-hidden rounded-xl">
             {circle.coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                className="size-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 100vw, 280px"
               />
             ) : (
               <>

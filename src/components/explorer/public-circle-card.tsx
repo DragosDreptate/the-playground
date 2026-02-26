@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
@@ -81,11 +82,12 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
               style={circle.coverImage ? undefined : { background: gradient }}
             >
               {circle.coverImage && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={circle.coverImage}
                   alt={circle.name}
-                  className="size-full object-cover"
+                  width={72}
+                  height={72}
+                  className="object-cover"
                 />
               )}
             </div>
@@ -121,11 +123,12 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
             />
             <div className="relative aspect-square w-full overflow-hidden rounded-xl">
               {circle.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={circle.coverImage}
                   alt={circle.name}
-                  className="size-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 280px"
                 />
               ) : (
                 <>
