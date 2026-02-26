@@ -225,40 +225,43 @@ async function sendRegistrationEmails(
         count: registeredCount,
       });
 
+  // Récupère toutes les préférences en une seule requête pour éviter le N+1
+  const filteredHosts = hosts.filter((host) => host.userId !== userId);
+  const hostUserIds = filteredHosts.map((h) => h.userId);
+  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+
   await Promise.all(
-    hosts
-      .filter((host) => host.userId !== userId)
-      .map(async (host) => {
-        const prefs = await prismaUserRepository.getNotificationPreferences(host.userId);
-        if (!prefs.notifyNewRegistration) return;
+    filteredHosts.map(async (host) => {
+      const prefs = prefsMap.get(host.userId);
+      if (!prefs?.notifyNewRegistration) return;
 
-        const hostName =
-          [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
-          host.user.email;
+      const hostName =
+        [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
+        host.user.email;
 
-        return emailService.sendHostNewRegistration({
-          to: host.user.email,
-          hostName,
-          playerName,
-          momentTitle: moment.title,
-          momentSlug: moment.slug,
-          circleSlug: circle.slug,
-          registrationInfo,
-          strings: {
-            subject: t("hostNotification.subject", {
-              playerName,
-              momentTitle: moment.title,
-            }),
-            heading: t("hostNotification.heading"),
-            message: t("hostNotification.message", {
-              playerName,
-              momentTitle: moment.title,
-            }),
-            manageRegistrationsCta: t("hostNotification.manageRegistrationsCta"),
-            footer: t("common.footer"),
-          },
-        });
-      })
+      return emailService.sendHostNewRegistration({
+        to: host.user.email,
+        hostName,
+        playerName,
+        momentTitle: moment.title,
+        momentSlug: moment.slug,
+        circleSlug: circle.slug,
+        registrationInfo,
+        strings: {
+          subject: t("hostNotification.subject", {
+            playerName,
+            momentTitle: moment.title,
+          }),
+          heading: t("hostNotification.heading"),
+          message: t("hostNotification.message", {
+            playerName,
+            momentTitle: moment.title,
+          }),
+          manageRegistrationsCta: t("hostNotification.manageRegistrationsCta"),
+          footer: t("common.footer"),
+        },
+      });
+    })
   );
 }
 

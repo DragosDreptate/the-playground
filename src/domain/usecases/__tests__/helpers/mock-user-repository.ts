@@ -14,6 +14,9 @@ export function createMockUserRepository(
     getNotificationPreferences: vi
       .fn<UserRepository["getNotificationPreferences"]>()
       .mockResolvedValue(makeNotificationPreferences()),
+    findNotificationPreferencesByIds: vi
+      .fn<UserRepository["findNotificationPreferencesByIds"]>()
+      .mockResolvedValue(new Map()),
     updateNotificationPreferences: vi
       .fn<UserRepository["updateNotificationPreferences"]>()
       .mockResolvedValue(makeNotificationPreferences()),

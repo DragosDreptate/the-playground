@@ -63,4 +63,26 @@ describe("GetCircleMoments", () => {
       ).rejects.toThrow(CircleNotFoundError);
     });
   });
+
+  describe("given the skipCircleCheck option is true", () => {
+    it("should skip the Circle existence check and return Moments directly", async () => {
+      const moments = [makeMoment({ id: "m1", title: "Fast Meetup" })];
+      // findById retourne null — sans skipCircleCheck, lèverait CircleNotFoundError
+      const circleRepo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(null),
+      });
+      const momentRepo = createMockMomentRepository({
+        findByCircleId: vi.fn().mockResolvedValue(moments),
+      });
+
+      const result = await getCircleMoments(
+        "circle-1",
+        { momentRepository: momentRepo, circleRepository: circleRepo },
+        { skipCircleCheck: true }
+      );
+
+      expect(circleRepo.findById).not.toHaveBeenCalled();
+      expect(result).toHaveLength(1);
+    });
+  });
 });

@@ -1,6 +1,8 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+
+export const revalidate = 30;
 import { getTranslations } from "next-intl/server";
 import {
   prismaMomentRepository,

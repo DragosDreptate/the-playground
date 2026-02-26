@@ -57,15 +57,17 @@ export default async function CircleDetailPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const { slug } = await params;
-  const { tab } = await searchParams;
+  const [{ slug }, { tab }, t, tCommon, tDashboard, session] = await Promise.all([
+    params,
+    searchParams,
+    getTranslations("Circle"),
+    getTranslations("Common"),
+    getTranslations("Dashboard"),
+    auth(),
+  ]);
+
   const activeTab = tab === "past" ? "past" : "upcoming";
 
-  const t = await getTranslations("Circle");
-  const tCommon = await getTranslations("Common");
-  const tDashboard = await getTranslations("Dashboard");
-
-  const session = await auth();
   if (!session?.user?.id) notFound();
 
   let circle;
@@ -89,10 +91,11 @@ export default async function CircleDetailPage({
   const [hosts, players, allMoments] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
-    getCircleMoments(circle.id, {
-      momentRepository: prismaMomentRepository,
-      circleRepository: prismaCircleRepository,
-    }),
+    getCircleMoments(
+      circle.id,
+      { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
+      { skipCircleCheck: true }
+    ),
   ]);
 
   const totalMembers = hosts.length + players.length;

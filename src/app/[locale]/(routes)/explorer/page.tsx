@@ -1,4 +1,6 @@
 import { getTranslations } from "next-intl/server";
+
+export const revalidate = 300;
 import {
   prismaCircleRepository,
   prismaMomentRepository,

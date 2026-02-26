@@ -39,20 +39,22 @@ export async function createCircle(
     }
   }
 
-  const circle = await circleRepository.create({
-    name: input.name,
-    slug,
-    description: input.description,
-    visibility: input.visibility,
-    ...(input.category !== undefined && { category: input.category }),
-    ...(input.city !== undefined && { city: input.city }),
-    ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
-    ...(input.coverImageAttribution !== undefined && {
-      coverImageAttribution: input.coverImageAttribution,
-    }),
-  });
-
-  await circleRepository.addMembership(circle.id, input.userId, "HOST");
+  // Création atomique : le Circle et la membership HOST sont créés dans une seule transaction
+  const circle = await circleRepository.createWithHostMembership(
+    {
+      name: input.name,
+      slug,
+      description: input.description,
+      visibility: input.visibility,
+      ...(input.category !== undefined && { category: input.category }),
+      ...(input.city !== undefined && { city: input.city }),
+      ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+      ...(input.coverImageAttribution !== undefined && {
+        coverImageAttribution: input.coverImageAttribution,
+      }),
+    },
+    input.userId
+  );
 
   return { circle };
 }
