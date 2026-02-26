@@ -10,6 +10,21 @@ Les évolutions de The Playground, version après version.
 
 ---
 
+## [1.4.0] — 2026-02-26 — Performance & Admin enrichi
+
+### Amélioré
+
+- **Dashboard** : streaming Suspense — FCP réduit de ~3.5 s à <0.5 s grâce à `loading.tsx` + `<Suspense>` interne
+  - Squelette instantané à la navigation, données streamées en arrière-plan
+  - `shouldRedirectToWelcome` extrait en fonction pure (testable, 10 cas couverts)
+- **Audit perf** : corrections N+1, transactions atomiques, ISR et parallélisation des requêtes
+
+### Ajouté
+
+- **Admin — Commentaires** : compteur global (stats dashboard) + détail par événement (liste + fiche)
+
+---
+
 ## [1.3.0] — 2026-02-26 — PWA & Notifications événement
 
 ### Ajouté
