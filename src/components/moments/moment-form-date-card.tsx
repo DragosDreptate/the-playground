@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { generateTimeOptions } from "@/lib/time-options";
+import { generateTimeOptions, combineDateAndTime } from "@/lib/time-options";
 
 type MomentFormDateCardProps = {
   startDate: Date | undefined;
@@ -49,6 +49,14 @@ export function MomentFormDateCard({
   const dateFnsLocale = locale === "fr" ? fr : enUS;
   const timeOptions = useMemo(() => generateTimeOptions(), []);
   const [timezone, setTimezone] = useState("");
+
+  const isEndBeforeStart = useMemo(() => {
+    if (!startDate || !endDate) return false;
+    const start = combineDateAndTime(startDate, startTime);
+    const end = combineDateAndTime(endDate, endTime);
+    if (!start || !end) return false;
+    return end <= start;
+  }, [startDate, startTime, endDate, endTime]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -140,6 +148,13 @@ export function MomentFormDateCard({
           options={timeOptions}
         />
       </div>
+
+      {/* End before start warning */}
+      {isEndBeforeStart && (
+        <p className="text-destructive pl-12 text-xs">
+          {t("form.endBeforeStart")}
+        </p>
+      )}
 
       {/* Timezone badge */}
       {timezone && (
