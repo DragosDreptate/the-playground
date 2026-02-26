@@ -34,7 +34,9 @@ export function generateTimeOptions(): TimeOption[] {
  */
 export function combineDateAndTime(date: Date, time: string): string {
   const [h, m] = time.split(":").map(Number);
+  if (isNaN(h) || isNaN(m)) return "";
   const d = new Date(date);
+  if (isNaN(d.getTime())) return "";
   d.setHours(h, m, 0, 0);
   return d.toISOString();
 }
