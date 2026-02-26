@@ -70,7 +70,10 @@ export async function joinMomentAction(
       result.registration,
       t,
       locale
-    ).catch(console.error);
+    ).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
 
     return { success: true, data: result.registration };
   } catch (error) {
@@ -106,7 +109,10 @@ export async function cancelRegistrationAction(
       const t = await getTranslations("Email");
 
       sendPromotionEmail(result.promotedRegistration, t, locale).catch(
-        console.error
+        (err) => {
+          console.error(err);
+          Sentry.captureException(err);
+        }
       );
     }
 

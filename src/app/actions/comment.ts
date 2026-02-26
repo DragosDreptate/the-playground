@@ -47,7 +47,10 @@ export async function addCommentAction(
       content,
       t,
       locale
-    ).catch(console.error);
+    ).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
 
     return { success: true, data: result.comment };
   } catch (error) {
