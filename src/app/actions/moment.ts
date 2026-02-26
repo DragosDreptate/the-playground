@@ -23,6 +23,7 @@ import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
+import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
 
 const emailService = createResendEmailService();
@@ -177,6 +178,7 @@ export async function createMomentAction(
       Sentry.captureException(err);
     });
 
+    revalidatePath("/", "layout");
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -283,6 +285,7 @@ export async function updateMomentAction(
       }
     }
 
+    revalidatePath("/", "layout");
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -443,6 +446,7 @@ export async function deleteMomentAction(
       );
     }
 
+    revalidatePath("/", "layout");
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
