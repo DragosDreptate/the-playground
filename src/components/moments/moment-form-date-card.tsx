@@ -50,6 +50,35 @@ export function MomentFormDateCard({
   const timeOptions = useMemo(() => generateTimeOptions(), []);
   const [timezone, setTimezone] = useState("");
 
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
+  const isStartToday =
+    startDate?.toDateString() === new Date().toDateString();
+
+  const filteredStartTimeOptions = useMemo(() => {
+    if (!isStartToday) return timeOptions;
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    return timeOptions.filter(({ value }) => {
+      const [h, m] = value.split(":").map(Number);
+      return h * 60 + m > nowMinutes;
+    });
+  }, [isStartToday, timeOptions]);
+
+  useEffect(() => {
+    if (!isStartToday || filteredStartTimeOptions.length === 0) return;
+    const isValid = filteredStartTimeOptions.some(
+      (opt) => opt.value === startTime
+    );
+    if (!isValid) {
+      onStartTimeChange(filteredStartTimeOptions[0].value);
+    }
+  }, [isStartToday, startTime, filteredStartTimeOptions, onStartTimeChange]);
+
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const offset = new Date().toLocaleString("en", {
@@ -78,6 +107,7 @@ export function MomentFormDateCard({
           date={startDate}
           label={formatDate(startDate)}
           locale={dateFnsLocale}
+          disabledBefore={today}
           onSelect={(d) => {
             onStartDateChange(d);
             if (d) onEndDateChange(d);
@@ -86,7 +116,7 @@ export function MomentFormDateCard({
         <TimeSelect
           value={startTime}
           onChange={onStartTimeChange}
-          options={timeOptions}
+          options={filteredStartTimeOptions}
         />
       </div>
 
@@ -127,11 +157,13 @@ function DatePickerButton({
   date,
   label,
   locale,
+  disabledBefore,
   onSelect,
 }: {
   date: Date | undefined;
   label: string;
   locale: Locale;
+  disabledBefore?: Date;
   onSelect: (date: Date | undefined) => void;
 }) {
   return (
@@ -152,6 +184,7 @@ function DatePickerButton({
           selected={date}
           onSelect={onSelect}
           locale={locale}
+          disabled={disabledBefore ? { before: disabledBefore } : undefined}
         />
       </PopoverContent>
     </Popover>

@@ -10,6 +10,7 @@ export {
   MomentNotFoundError,
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
+  MomentPastDateError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {
