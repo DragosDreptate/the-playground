@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
@@ -60,12 +61,13 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
               <TableHead className="text-right">{t("columns.registrations")}</TableHead>
               <TableHead className="text-right">{t("columns.comments")}</TableHead>
               <TableHead>{t("columns.createdAt")}</TableHead>
+              <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
             {moments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                   {t("table.noResults")}
                 </TableCell>
               </TableRow>
@@ -98,6 +100,16 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {moment.createdAt.toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/m/${moment.slug}`}
+                      target="_blank"
+                      className="text-muted-foreground hover:text-foreground"
+                      title="Voir la page publique"
+                    >
+                      <ExternalLink className="size-4" />
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))

@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminCircleDeleteButton } from "./delete-button";
 
@@ -26,7 +28,15 @@ export default async function AdminCircleDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground">{t("circleDetail.title")}</p>
           <h1 className="text-2xl font-bold">{circle.name}</h1>
         </div>
-        <AdminCircleDeleteButton circleId={circle.id} />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/circles/${circle.slug}`} target="_blank">
+              <ExternalLink className="size-4" />
+              {t("viewPublicPage")}
+            </Link>
+          </Button>
+          <AdminCircleDeleteButton circleId={circle.id} />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
