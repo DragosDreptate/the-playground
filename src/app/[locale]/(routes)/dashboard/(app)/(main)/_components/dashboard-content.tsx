@@ -8,6 +8,7 @@ import {
 import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
 import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-moments";
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
+import { shouldRedirectToWelcome } from "@/lib/dashboard";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 
@@ -33,9 +34,13 @@ export async function DashboardContent({
     }),
   ]);
 
-  const hasActivity =
-    circles.length > 0 || upcomingMoments.length > 0 || pastMoments.length > 0;
-  if (!hasActivity) {
+  if (
+    shouldRedirectToWelcome({
+      circleCount: circles.length,
+      upcomingMomentCount: upcomingMoments.length,
+      pastMomentCount: pastMoments.length,
+    })
+  ) {
     redirect("/dashboard/welcome");
   }
 
