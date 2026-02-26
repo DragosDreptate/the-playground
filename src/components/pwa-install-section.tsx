@@ -69,39 +69,29 @@ export function PwaInstallSection() {
       </p>
 
       <div className="flex justify-center gap-3">
-        {/* Badge iOS */}
+        {/* Bouton iOS */}
         {(platform === "ios" || platform === "other") && (
           <button
             onClick={() => setIosModalOpen(true)}
-            className="flex min-w-[148px] cursor-pointer items-center gap-2.5 rounded-xl bg-[#0a0a0a] px-4 py-2.5 text-left shadow-lg transition-transform hover:-translate-y-px hover:shadow-xl dark:border dark:border-white/[0.06] dark:bg-[#1a1a1a]"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-2.5 text-left shadow-sm transition-all hover:border-foreground/20 hover:shadow-md"
           >
             <AppleLogo />
-            <div className="flex flex-col gap-px">
-              <span className="text-[10px] font-normal leading-none text-white/75">
-                {t("ios.badgeLine1")}
-              </span>
-              <span className="text-[15px] font-bold leading-tight tracking-tight text-white">
-                {t("ios.badgeLine2")}
-              </span>
-            </div>
+            <span className="text-sm font-semibold text-foreground">
+              {t("ios.label")}
+            </span>
           </button>
         )}
 
-        {/* Badge Android */}
+        {/* Bouton Android */}
         {(platform === "android" || (platform === "other" && deferredPrompt)) && (
           <button
             onClick={handleAndroidInstall}
-            className="flex min-w-[148px] cursor-pointer items-center gap-2.5 rounded-xl bg-[#0a0a0a] px-4 py-2.5 text-left shadow-lg transition-transform hover:-translate-y-px hover:shadow-xl dark:border dark:border-white/[0.06] dark:bg-[#1a1a1a]"
+            className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border bg-card px-4 py-2.5 text-left shadow-sm transition-all hover:border-foreground/20 hover:shadow-md"
           >
-            <GooglePlayLogo />
-            <div className="flex flex-col gap-px">
-              <span className="text-[10px] font-normal leading-none text-white/75">
-                {t("android.badgeLine1")}
-              </span>
-              <span className="text-[15px] font-bold leading-tight tracking-tight text-white">
-                {t("android.badgeLine2")}
-              </span>
-            </div>
+            <AndroidLogo />
+            <span className="text-sm font-semibold text-foreground">
+              {t("android.label")}
+            </span>
           </button>
         )}
       </div>
@@ -175,19 +165,16 @@ function IosStep({
 
 function AppleLogo() {
   return (
-    <svg width="20" height="24" viewBox="0 0 814 1000" fill="white" className="shrink-0">
+    <svg width="20" height="24" viewBox="0 0 814 1000" fill="currentColor" className="shrink-0 text-foreground">
       <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z" />
     </svg>
   );
 }
 
-function GooglePlayLogo() {
+function AndroidLogo() {
   return (
-    <svg width="22" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0">
-      <path d="M3.18 23.76a2 2 0 0 0 2.22-.22L17.12 12 5.4.46A2 2 0 0 0 3.18.7C2.45 1.13 2 1.9 2 2.74v18.52c0 .84.45 1.61 1.18 2z" fill="#EA4335" />
-      <path d="M20.82 10.22 18.09 8.7 14.63 12l3.46 3.3 2.73-1.52A2 2 0 0 0 22 12c0-.8-.45-1.55-1.18-1.78z" fill="#FBBC04" />
-      <path d="M5.4.46 17.12 12 20.82 8.7c.15-.08.3-.18.42-.29L5.4.46z" fill="#4285F4" />
-      <path d="M5.4 23.54l15.84-7.95a2 2 0 0 0-.42-.29L17.12 12 5.4 23.54z" fill="#34A853" />
+    <svg width="22" height="24" viewBox="0 0 24 24" fill="#3DDC84" className="shrink-0">
+      <path d="M17.523 15.341a.85.85 0 0 1-.848.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .848.848v4.681zm-9.37 0a.85.85 0 0 1-.849.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .849.848v4.681zm9.744-6.631 1.57-2.721a.327.327 0 0 0-.12-.447.327.327 0 0 0-.447.12l-1.59 2.754A9.323 9.323 0 0 0 12 7.647a9.323 9.323 0 0 0-5.31 1.769L5.1 6.662a.327.327 0 0 0-.447-.12.327.327 0 0 0-.12.447l1.57 2.721C4.055 10.85 2.927 12.854 2.927 15.12H21.07c0-2.266-1.128-4.27-3.173-5.41zm-7.54 2.544a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571zm3.286 0a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571z" />
     </svg>
   );
 }

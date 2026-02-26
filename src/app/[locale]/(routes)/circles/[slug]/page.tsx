@@ -114,9 +114,6 @@ export default async function PublicCirclePage({
     throw error;
   }
 
-  // Only PUBLIC circles are accessible without auth
-  if (circle.visibility !== "PUBLIC") notFound();
-
   // Parallélise les requêtes indépendantes
   const parallelQueries: [
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,

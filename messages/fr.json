@@ -523,12 +523,10 @@
     "subtitle": "Installez l'app gratuitement sur votre téléphone",
     "note": "Application web progressive (PWA) — aucun téléchargement requis",
     "ios": {
-      "badgeLine1": "Télécharger sur",
-      "badgeLine2": "App Store"
+      "label": "Ajouter sur iPhone"
     },
     "android": {
-      "badgeLine1": "Disponible sur",
-      "badgeLine2": "Google Play"
+      "label": "Ajouter sur Android"
     },
     "modal": {
       "title": "Installer sur iPhone",
