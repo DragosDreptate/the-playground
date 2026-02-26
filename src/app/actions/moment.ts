@@ -20,6 +20,7 @@ import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { DomainError } from "@/domain/errors";
 import type { LocationType, Moment } from "@/domain/models/moment";
+import type { RegistrationWithUser } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
 import { notifyNewMoment } from "./notify-new-moment";
@@ -334,6 +335,16 @@ async function sendMomentUpdateEmails(
     organizerName: circle.name,
   });
 
+  const updateStrings = {
+    subject: t("momentUpdate.subject", { momentTitle: moment.title }),
+    dateChangedLabel: t("momentUpdate.dateChangedLabel"),
+    locationChangedLabel: t("momentUpdate.locationChangedLabel"),
+    dateLabel: t("common.dateLabel"),
+    locationLabel: t("common.locationLabel"),
+    viewMomentCta: t("common.viewMomentCta"),
+    footer: t("common.footer"),
+  };
+
   await Promise.all(
     confirmed.map(async (registration) => {
       const user = registration.user;
@@ -357,15 +368,42 @@ async function sendMomentUpdateEmails(
         locationChanged,
         icsContent,
         strings: {
-          subject: t("momentUpdate.subject", { momentTitle: moment.title }),
+          ...updateStrings,
           heading: t("momentUpdate.heading"),
           intro: t("momentUpdate.intro"),
-          dateChangedLabel: t("momentUpdate.dateChangedLabel"),
-          locationChangedLabel: t("momentUpdate.locationChangedLabel"),
-          dateLabel: t("common.dateLabel"),
-          locationLabel: t("common.locationLabel"),
-          viewMomentCta: t("common.viewMomentCta"),
-          footer: t("common.footer"),
+        },
+      });
+    })
+  );
+
+  // Notifier l'organisateur aussi
+  const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
+  await Promise.all(
+    hosts.map(async (host) => {
+      const user = host.user;
+      if (!user?.email) return;
+
+      const hostName =
+        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+
+      return emailService.sendMomentUpdate({
+        to: user.email,
+        playerName: hostName,
+        momentTitle: moment.title,
+        momentSlug: moment.slug,
+        momentDate,
+        momentDateMonth,
+        momentDateDay,
+        locationText,
+        circleName: circle.name,
+        circleSlug: circle.slug,
+        dateChanged,
+        locationChanged,
+        icsContent,
+        strings: {
+          ...updateStrings,
+          heading: t("hostMomentUpdate.heading"),
+          intro: t("hostMomentUpdate.intro"),
         },
       });
     })
@@ -381,6 +419,12 @@ export async function deleteMomentAction(
   }
 
   try {
+    // Fetch data before deletion — needed for email notifications
+    const [momentToDelete, registrationsToNotify] = await Promise.all([
+      prismaMomentRepository.findById(momentId),
+      prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
+    ]);
+
     await deleteMoment(
       { momentId, userId: session.user.id },
       {
@@ -388,6 +432,14 @@ export async function deleteMomentAction(
         circleRepository: prismaCircleRepository,
       }
     );
+
+    // Fire-and-forget : notifier les participants de l'annulation
+    if (momentToDelete && registrationsToNotify.length > 0) {
+      sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
+        (err) => Sentry.captureException(err)
+      );
+    }
+
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -396,4 +448,58 @@ export async function deleteMomentAction(
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
+}
+
+async function sendMomentCancelledEmails(
+  moment: Moment,
+  registrations: RegistrationWithUser[]
+): Promise<void> {
+  const circle = await prismaCircleRepository.findById(moment.circleId);
+  if (!circle) return;
+
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "Email" });
+  const dateFnsLocale = getDateFnsLocale(locale);
+
+  const momentDate = format(moment.startsAt, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+  const momentDateMonth = format(moment.startsAt, "MMM", { locale: dateFnsLocale }).toUpperCase();
+  const momentDateDay = format(moment.startsAt, "d");
+  const locationText = formatLocationText(
+    moment.locationType,
+    moment.locationName,
+    moment.locationAddress,
+    locale
+  );
+
+  const strings = {
+    subject: t("momentCancelled.subject", { momentTitle: moment.title }),
+    heading: t("momentCancelled.heading"),
+    message: t("momentCancelled.message", { momentTitle: moment.title }),
+    ctaLabel: t("momentCancelled.ctaLabel"),
+    footer: t("common.footer"),
+  };
+
+  // Notifier REGISTERED et WAITLISTED (tous les participants actifs)
+  await Promise.all(
+    registrations.map(async (registration) => {
+      const user = registration.user;
+      if (!user?.email) return;
+
+      const recipientName =
+        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+
+      return emailService.sendMomentCancelled({
+        to: user.email,
+        recipientName,
+        momentTitle: moment.title,
+        momentDate,
+        momentDateMonth,
+        momentDateDay,
+        locationText,
+        circleName: circle.name,
+        circleSlug: circle.slug,
+        strings,
+      });
+    })
+  );
 }
