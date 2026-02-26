@@ -290,6 +290,8 @@
       "eventCancelled": "Event cancelled",
       "attendedCount": "{count} members attended",
       "viewCircleMoments": "See upcoming Events from this Community",
+      "upcomingInCircle": "Also in this Community",
+      "seeAllCircleEvents": "See all events",
       "addToCalendar": {
         "label": "Add to calendar",
         "google": "Google Calendar",

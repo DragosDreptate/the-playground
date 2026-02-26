@@ -13,6 +13,7 @@ import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
 import type { CalendarEventData } from "@/lib/calendar";
+import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
 import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -62,6 +63,7 @@ type PublicViewProps = CommonProps & {
   calendarData: CalendarEventData;
   appUrl: string;
   waitlistPosition: number;
+  upcomingCircleMoments: UpcomingCircleMoment[];
 };
 
 export type MomentDetailViewProps = HostViewProps | PublicViewProps;
@@ -465,6 +467,76 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 hostUserIds={new Set(hosts.map((h) => h.user.id))}
                 momentSlug={isHostView ? moment.slug : undefined}
               />
+            </div>
+          )}
+
+          {/* Prochains événements du Circle — public view uniquement */}
+          {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
+            <div className="border-border rounded-2xl border p-6">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold">
+                  {t("public.upcomingInCircle")}
+                </h2>
+                <p className="text-muted-foreground text-sm">{circle.name}</p>
+              </div>
+              <div className="divide-border divide-y">
+                {(props as PublicViewProps).upcomingCircleMoments.map((upcoming) => {
+                  const upcomingGradient = getMomentGradient(upcoming.title);
+                  const dateLocale = locale === "fr" ? "fr-FR" : "en-US";
+                  const dateLabel = upcoming.startsAt.toLocaleDateString(dateLocale, {
+                    day: "numeric",
+                    month: "short",
+                  });
+                  const locationLabel =
+                    upcoming.locationType === "ONLINE"
+                      ? t("form.locationOnline")
+                      : upcoming.locationName ?? t("form.locationInPerson");
+                  return (
+                    <Link
+                      key={upcoming.id}
+                      href={`/m/${upcoming.slug}`}
+                      className="hover:bg-muted/50 -mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition-colors"
+                    >
+                      <div
+                        className="size-12 shrink-0 rounded-lg"
+                        style={
+                          upcoming.coverImage
+                            ? undefined
+                            : { background: upcomingGradient }
+                        }
+                      >
+                        {upcoming.coverImage && (
+                          <Image
+                            src={upcoming.coverImage}
+                            alt={upcoming.title}
+                            width={48}
+                            height={48}
+                            className="size-12 rounded-lg object-cover"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{upcoming.title}</p>
+                        <p className="text-muted-foreground mt-0.5 text-xs">
+                          {dateLabel}
+                          {" · "}
+                          {locationLabel}
+                        </p>
+                      </div>
+                      <ChevronRight className="text-muted-foreground size-4 shrink-0" />
+                    </Link>
+                  );
+                })}
+              </div>
+              <div className="border-border mt-4 border-t pt-4 text-center">
+                <Link
+                  href={`/circles/${circle.slug}`}
+                  className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+                >
+                  {t("public.seeAllCircleEvents")}
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
             </div>
           )}
 

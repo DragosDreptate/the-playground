@@ -5,6 +5,7 @@ import type {
   UpdateMomentInput,
   PublicMomentFilters,
   PublicMoment,
+  UpcomingCircleMoment,
 } from "@/domain/ports/repositories/moment-repository";
 import type { Moment, CoverImageAttribution } from "@/domain/models/moment";
 import type { Moment as PrismaMoment } from "@prisma/client";
@@ -167,6 +168,45 @@ export const prismaMomentRepository: MomentRepository = {
         category: m.circle.category ?? null,
         city: m.circle.city ?? null,
       },
+    }));
+  },
+
+  async findUpcomingByCircleId(
+    circleId: string,
+    excludeMomentId: string,
+    limit: number
+  ): Promise<UpcomingCircleMoment[]> {
+    const now = new Date();
+    const records = await prisma.moment.findMany({
+      where: {
+        circleId,
+        id: { not: excludeMomentId },
+        status: "PUBLISHED",
+        startsAt: { gte: now },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        startsAt: true,
+        locationType: true,
+        locationName: true,
+        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+      },
+      orderBy: { startsAt: "asc" },
+      take: limit,
+    });
+
+    return records.map((m) => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      coverImage: m.coverImage ?? null,
+      startsAt: m.startsAt,
+      locationType: m.locationType,
+      locationName: m.locationName,
+      registrationCount: m._count.registrations,
     }));
   },
 };

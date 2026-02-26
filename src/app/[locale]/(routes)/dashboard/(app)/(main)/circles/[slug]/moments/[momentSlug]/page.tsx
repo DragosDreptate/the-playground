@@ -64,11 +64,10 @@ export default async function MomentDetailPage({
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/m/${moment.slug}`;
 
   if (!isHost) {
-    const existingRegistration =
-      await prismaRegistrationRepository.findByMomentAndUser(
-        moment.id,
-        session.user.id
-      );
+    const [existingRegistration, upcomingCircleMoments] = await Promise.all([
+      prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
+      prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
+    ]);
     const waitlistPosition =
       existingRegistration?.status === "WAITLISTED"
         ? await prismaRegistrationRepository.countWaitlistPosition(
@@ -109,6 +108,7 @@ export default async function MomentDetailPage({
         }}
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
+        upcomingCircleMoments={upcomingCircleMoments}
       />
     );
   }
