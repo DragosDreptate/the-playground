@@ -27,6 +27,8 @@
     "db:cleanup-test-data:prod": "bash scripts/db-cleanup-test-data-prod.sh",
     "db:seed-demo-data": "tsx scripts/db-seed-demo-data.ts",
     "db:seed-demo-data:prod": "bash scripts/db-seed-demo-data-prod.sh",
+    "db:export-brevo-contacts": "tsx scripts/export-brevo-contacts.ts",
+    "db:export-brevo-contacts:prod": "bash scripts/export-brevo-contacts-prod.sh",
     "db:cleanup-demo-data": "tsx scripts/db-cleanup-demo-data.ts",
     "db:cleanup-demo-data:prod": "bash scripts/db-cleanup-demo-data-prod.sh",
     "db:backfill-notification-prefs": "tsx scripts/backfill-notification-prefs.ts",
