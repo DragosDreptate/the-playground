@@ -1,6 +1,6 @@
 # Changelog
 
-Les évolutions de The Playground, version après version.
+Les évolutions du Playground, jour après jour.
 
 > Ce projet est construit avec [Claude Code](https://claude.ai/claude-code) (Anthropic).
 
