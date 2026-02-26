@@ -17,17 +17,27 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8 text-center">
-          <h1 className="text-2xl font-bold">Une erreur inattendue s&apos;est produite</h1>
-          <p className="text-muted-foreground">
-            Notre équipe a été notifiée. Veuillez réessayer.
-          </p>
-          <button
-            onClick={reset}
-            className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
-          >
-            Réessayer
-          </button>
+        <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-8 text-center">
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold">Quelque chose s&apos;est mal passé</h1>
+            <p className="text-muted-foreground max-w-sm">
+              Une erreur inattendue s&apos;est produite. Notre équipe en a été notifiée.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-3">
+            <a
+              href="/"
+              className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              Retour à l&apos;accueil
+            </a>
+            <button
+              onClick={reset}
+              className="text-muted-foreground text-sm hover:underline"
+            >
+              Réessayer
+            </button>
+          </div>
         </div>
       </body>
     </html>

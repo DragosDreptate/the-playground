@@ -463,6 +463,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 capacity={moment.capacity}
                 variant={isHostView ? "host" : "public"}
                 hostUserIds={new Set(hosts.map((h) => h.user.id))}
+                momentSlug={isHostView ? moment.slug : undefined}
               />
             </div>
           )}
