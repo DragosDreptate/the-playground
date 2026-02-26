@@ -171,14 +171,24 @@ export const prismaAdminRepository: AdminRepository = {
         select: { circleId: true },
       });
 
-      for (const { circleId } of hostMemberships) {
-        // Count other Hosts in this Circle
-        const otherHosts = await tx.circleMembership.count({
-          where: { circleId, role: "HOST", userId: { not: id } },
-        });
+      if (hostMemberships.length > 0) {
+        const circleIds = hostMemberships.map((m) => m.circleId);
 
-        if (otherHosts === 0) {
-          // Sole Host → delete the entire Circle (cascades to Moments, Registrations, Comments, Memberships)
+        // Compter les co-Hosts restants pour chaque Circle en une seule requête GROUP BY
+        const otherHostCounts = await tx.circleMembership.groupBy({
+          by: ["circleId"],
+          where: { circleId: { in: circleIds }, role: "HOST", userId: { not: id } },
+          _count: { _all: true },
+        });
+        const otherHostCountMap = new Map(
+          otherHostCounts.map((r) => [r.circleId, r._count._all])
+        );
+
+        // Sole Host → delete the entire Circle (cascades to Moments, Registrations, Comments, Memberships)
+        const circleIdsToDelete = circleIds.filter(
+          (cid) => (otherHostCountMap.get(cid) ?? 0) === 0
+        );
+        for (const circleId of circleIdsToDelete) {
           await tx.circle.delete({ where: { id: circleId } });
         }
       }
@@ -310,10 +320,15 @@ export const prismaAdminRepository: AdminRepository = {
         circle: { select: { name: true, slug: true } },
         createdBy: { select: { email: true, firstName: true, lastName: true } },
         registrations: {
-          include: {
+          select: {
+            id: true,
+            status: true,
+            registeredAt: true,
             user: { select: { id: true, email: true, firstName: true, lastName: true } },
           },
           orderBy: { registeredAt: "desc" },
+          // Limite à 500 inscriptions pour éviter le sur-fetching sur les événements populaires
+          take: 500,
         },
       },
     });

@@ -7,6 +7,7 @@ export function createMockCircleRepository(
 ): CircleRepository {
   return {
     create: vi.fn<CircleRepository["create"]>().mockResolvedValue(makeCircle()),
+    createWithHostMembership: vi.fn<CircleRepository["createWithHostMembership"]>().mockResolvedValue(makeCircle()),
     findById: vi.fn<CircleRepository["findById"]>().mockResolvedValue(null),
     findBySlug: vi.fn<CircleRepository["findBySlug"]>().mockResolvedValue(null),
     findByUserId: vi.fn<CircleRepository["findByUserId"]>().mockResolvedValue([]),

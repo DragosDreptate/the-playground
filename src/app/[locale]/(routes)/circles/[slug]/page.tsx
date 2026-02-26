@@ -88,18 +88,20 @@ export default async function PublicCirclePage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const { slug } = await params;
-  const { tab } = await searchParams;
+  const [{ slug }, { tab }, t, tExplorer, tCategory, tDashboard, tMoment, session] =
+    await Promise.all([
+      params,
+      searchParams,
+      getTranslations("Circle"),
+      getTranslations("Explorer"),
+      getTranslations("CircleCategory"),
+      getTranslations("Dashboard"),
+      getTranslations("Moment"),
+      // Session optionnelle — les pages publiques sont accessibles sans auth
+      auth(),
+    ]);
+
   const activeTab = tab === "past" ? "past" : "upcoming";
-
-  const t = await getTranslations("Circle");
-  const tExplorer = await getTranslations("Explorer");
-  const tCategory = await getTranslations("CircleCategory");
-  const tDashboard = await getTranslations("Dashboard");
-  const tMoment = await getTranslations("Moment");
-
-  // Session optionnelle — les pages publiques sont accessibles sans auth
-  const session = await auth();
 
   let circle;
   try {
@@ -123,10 +125,11 @@ export default async function PublicCirclePage({
     Promise<boolean | null>,
   ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
-    getCircleMoments(circle.id, {
-      momentRepository: prismaMomentRepository,
-      circleRepository: prismaCircleRepository,
-    }),
+    getCircleMoments(
+      circle.id,
+      { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
+      { skipCircleCheck: true }
+    ),
     prismaCircleRepository.countMembers(circle.id),
     session?.user?.id
       ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m !== null)

@@ -62,6 +62,33 @@ export const prismaCircleRepository: CircleRepository = {
     return toDomainCircle(record);
   },
 
+  async createWithHostMembership(input: CreateCircleInput, userId: string): Promise<Circle> {
+    const record = await prisma.$transaction(async (tx) => {
+      const circle = await tx.circle.create({
+        data: {
+          name: input.name,
+          slug: input.slug,
+          description: input.description,
+          visibility: input.visibility,
+          ...(input.category !== undefined && { category: input.category }),
+          ...(input.city !== undefined && { city: input.city }),
+          ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+          ...(input.coverImageAttribution !== undefined && {
+            coverImageAttribution:
+              input.coverImageAttribution === null
+                ? Prisma.DbNull
+                : input.coverImageAttribution,
+          }),
+        },
+      });
+      await tx.circleMembership.create({
+        data: { circleId: circle.id, userId, role: "HOST" },
+      });
+      return circle;
+    });
+    return toDomainCircle(record);
+  },
+
   async findById(id: string): Promise<Circle | null> {
     const record = await prisma.circle.findUnique({ where: { id } });
     return record ? toDomainCircle(record) : null;

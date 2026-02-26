@@ -15,9 +15,9 @@ describe("CreateCircle", () => {
   };
 
   describe("given a valid input with a unique name", () => {
-    it("should create the circle with a generated slug", async () => {
+    it("should create the circle with a generated slug via createWithHostMembership", async () => {
       const repo = createMockCircleRepository({
-        create: vi.fn().mockResolvedValue(
+        createWithHostMembership: vi.fn().mockResolvedValue(
           makeCircle({ name: "My Circle", slug: "my-circle" })
         ),
       });
@@ -26,13 +26,14 @@ describe("CreateCircle", () => {
         circleRepository: repo,
       });
 
-      expect(repo.create).toHaveBeenCalledWith(
+      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
         expect.objectContaining({
           name: "My Circle",
           slug: "my-circle",
           description: "A community for testing",
           visibility: "PUBLIC",
-        })
+        }),
+        "user-1"
       );
       expect(result.circle.name).toBe("My Circle");
     });
@@ -40,7 +41,7 @@ describe("CreateCircle", () => {
     it("should pass coverImage and coverImageAttribution when provided", async () => {
       const attribution = { name: "John Doe", url: "https://unsplash.com/@johndoe" };
       const repo = createMockCircleRepository({
-        create: vi.fn().mockResolvedValue(
+        createWithHostMembership: vi.fn().mockResolvedValue(
           makeCircle({ coverImage: "https://blob.example.com/cover.webp", coverImageAttribution: attribution })
         ),
       });
@@ -50,34 +51,35 @@ describe("CreateCircle", () => {
         { circleRepository: repo }
       );
 
-      expect(repo.create).toHaveBeenCalledWith(
+      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
         expect.objectContaining({
           coverImage: "https://blob.example.com/cover.webp",
           coverImageAttribution: attribution,
-        })
+        }),
+        "user-1"
       );
     });
 
-    it("should add the creator as HOST", async () => {
-      const created = makeCircle({ id: "new-circle-id" });
+    it("should create the Circle and HOST membership atomically (no separate addMembership call)", async () => {
       const repo = createMockCircleRepository({
-        create: vi.fn().mockResolvedValue(created),
+        createWithHostMembership: vi.fn().mockResolvedValue(makeCircle({ id: "new-circle-id" })),
       });
 
       await createCircle(defaultInput, { circleRepository: repo });
 
-      expect(repo.addMembership).toHaveBeenCalledWith(
-        "new-circle-id",
-        "user-1",
-        "HOST"
+      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
+        expect.objectContaining({}),
+        "user-1"
       );
+      // addMembership ne doit plus être appelé séparément
+      expect(repo.addMembership).not.toHaveBeenCalled();
     });
   });
 
   describe("given a valid input with category and city", () => {
     it("should pass category and city to the repository", async () => {
       const repo = createMockCircleRepository({
-        create: vi.fn().mockImplementation((input) =>
+        createWithHostMembership: vi.fn().mockImplementation((input) =>
           Promise.resolve(makeCircle({ ...input }))
         ),
       });
@@ -87,22 +89,23 @@ describe("CreateCircle", () => {
         { circleRepository: repo }
       );
 
-      expect(repo.create).toHaveBeenCalledWith(
+      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
         expect.objectContaining({
           category: "TECH",
           city: "Paris",
-        })
+        }),
+        "user-1"
       );
     });
 
     it("should not include category or city when not provided", async () => {
       const repo = createMockCircleRepository({
-        create: vi.fn().mockResolvedValue(makeCircle()),
+        createWithHostMembership: vi.fn().mockResolvedValue(makeCircle()),
       });
 
       await createCircle(defaultInput, { circleRepository: repo });
 
-      const [callArg] = (repo.create as ReturnType<typeof vi.fn>).mock.calls[0];
+      const [callArg] = (repo.createWithHostMembership as ReturnType<typeof vi.fn>).mock.calls[0];
       expect(callArg).not.toHaveProperty("category");
       expect(callArg).not.toHaveProperty("city");
     });
@@ -115,7 +118,7 @@ describe("CreateCircle", () => {
           .fn()
           .mockResolvedValueOnce(true)
           .mockResolvedValueOnce(false),
-        create: vi.fn().mockImplementation((input) =>
+        createWithHostMembership: vi.fn().mockImplementation((input) =>
           Promise.resolve(makeCircle({ slug: input.slug }))
         ),
       });

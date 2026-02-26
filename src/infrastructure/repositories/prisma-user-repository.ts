@@ -45,14 +45,28 @@ export const prismaUserRepository: UserRepository = {
         select: { circleId: true },
       });
 
-      for (const { circleId } of hostMemberships) {
-        const otherHostsCount = await tx.circleMembership.count({
-          where: { circleId, role: "HOST", userId: { not: id } },
-        });
+      if (hostMemberships.length > 0) {
+        const circleIds = hostMemberships.map((m) => m.circleId);
 
-        if (otherHostsCount === 0) {
-          // Seul Organisateur → supprimer la Communauté entière (cascade : Moments, inscriptions, commentaires, membres)
-          await tx.circle.delete({ where: { id: circleId } });
+        // Compter les co-Hosts restants pour chaque Circle en une seule requête GROUP BY
+        const otherHostCounts = await tx.circleMembership.groupBy({
+          by: ["circleId"],
+          where: { circleId: { in: circleIds }, role: "HOST", userId: { not: id } },
+          _count: { _all: true },
+        });
+        const otherHostCountMap = new Map(
+          otherHostCounts.map((r) => [r.circleId, r._count._all])
+        );
+
+        // Supprimer les Circles dont cet utilisateur est le seul Organisateur
+        const circleIdsToDelete = circleIds.filter(
+          (cid) => (otherHostCountMap.get(cid) ?? 0) === 0
+        );
+        if (circleIdsToDelete.length > 0) {
+          // deleteMany ne cascade pas — on supprime via delete pour déclencher les cascades Prisma
+          for (const circleId of circleIdsToDelete) {
+            await tx.circle.delete({ where: { id: circleId } });
+          }
         }
       }
 
@@ -91,6 +105,33 @@ export const prismaUserRepository: UserRepository = {
       },
     });
     return record;
+  },
+
+  async findNotificationPreferencesByIds(
+    userIds: string[]
+  ): Promise<Map<string, NotificationPreferences>> {
+    if (userIds.length === 0) return new Map();
+    const records = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: {
+        id: true,
+        notifyNewRegistration: true,
+        notifyNewComment: true,
+        notifyNewFollower: true,
+        notifyNewMomentInCircle: true,
+      },
+    });
+    return new Map(
+      records.map((r) => [
+        r.id,
+        {
+          notifyNewRegistration: r.notifyNewRegistration,
+          notifyNewComment: r.notifyNewComment,
+          notifyNewFollower: r.notifyNewFollower,
+          notifyNewMomentInCircle: r.notifyNewMomentInCircle,
+        },
+      ])
+    );
   },
 
   async updateNotificationPreferences(
