@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Crown } from "lucide-react";
+import { Clock, Crown, Download } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
@@ -17,6 +17,7 @@ type RegistrationsListProps = {
   capacity: number | null;
   variant?: "host" | "public";
   hostUserIds?: Set<string>;
+  momentSlug?: string;
 };
 
 function getDisplayName(firstName: string | null, lastName: string | null, email: string): string {
@@ -32,34 +33,73 @@ export function RegistrationsList({
   capacity,
   variant = "host",
   hostUserIds = new Set(),
+  momentSlug,
 }: RegistrationsListProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const tDashboard = useTranslations("Dashboard");
 
   const [showAll, setShowAll] = useState(false);
+
+  function handleExportCsv() {
+    const headers = [
+      t("registrations.csvHeaders.firstName"),
+      t("registrations.csvHeaders.lastName"),
+      t("registrations.csvHeaders.email"),
+      t("registrations.csvHeaders.status"),
+      t("registrations.csvHeaders.registeredAt"),
+    ];
+    const rows = registrations.map((r) => [
+      r.user.firstName ?? "",
+      r.user.lastName ?? "",
+      r.user.email,
+      t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted"}`),
+      new Date(r.registeredAt).toLocaleDateString(),
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `participants-${momentSlug ?? "export"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
   const displayed = showAll ? registrations : registrations.slice(0, PAGE_SIZE);
   const hasMore = registrations.length > PAGE_SIZE;
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold">{t("registrations.title")}</h2>
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="default">
-            {t("registrations.registered", { count: registeredCount })}
-          </Badge>
-          {waitlistedCount > 0 && (
-            <Badge variant="secondary">
-              {t("registrations.waitlisted", { count: waitlistedCount })}
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-lg font-semibold">{t("registrations.title")}</h2>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="default">
+              {t("registrations.registered", { count: registeredCount })}
             </Badge>
-          )}
-          {capacity !== null && (
-            <Badge variant="outline">
-              {t("registrations.capacity", { count: capacity })}
-            </Badge>
-          )}
+            {waitlistedCount > 0 && (
+              <Badge variant="secondary">
+                {t("registrations.waitlisted", { count: waitlistedCount })}
+              </Badge>
+            )}
+            {capacity !== null && (
+              <Badge variant="outline">
+                {t("registrations.capacity", { count: capacity })}
+              </Badge>
+            )}
+          </div>
         </div>
+        {variant === "host" && registrations.length > 0 && (
+          <Button variant="outline" size="sm" onClick={handleExportCsv}>
+            <Download className="size-3.5" />
+            {t("registrations.exportCsv")}
+            <span className="text-muted-foreground font-normal">
+              ({registrations.length})
+            </span>
+          </Button>
+        )}
       </div>
 
       {registrations.length === 0 ? (

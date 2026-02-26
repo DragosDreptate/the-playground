@@ -306,6 +306,14 @@
       "status": {
         "registered": "Inscrit",
         "waitlisted": "Liste d'attente"
+      },
+      "exportCsv": "Exporter CSV",
+      "csvHeaders": {
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "Email",
+        "status": "Statut",
+        "registeredAt": "Date d'inscription"
       }
     },
     "comments": {
