@@ -31,7 +31,7 @@ export function UserAvatar({ name, email, image, size = "default" }: UserAvatarP
         size === "xl" && "size-24 text-3xl",
       )}
     >
-      {image && <AvatarImage src={image} alt={name ?? email} />}
+      {image && <AvatarImage src={image} alt={name ?? email} referrerPolicy="no-referrer" />}
       <AvatarFallback className="bg-primary/10 text-primary font-medium">
         {initials}
       </AvatarFallback>
