@@ -79,26 +79,32 @@ export const prismaAdminRepository: AdminRepository = {
       totalCircles,
       totalMoments,
       totalRegistrations,
+      totalComments,
       recentUsers,
       recentCircles,
       recentMoments,
+      recentComments,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.circle.count(),
       prisma.moment.count(),
       prisma.registration.count({ where: { status: { not: "CANCELLED" } } }),
+      prisma.comment.count(),
       prisma.user.count({ where: { createdAt: { gte: since } } }),
       prisma.circle.count({ where: { createdAt: { gte: since } } }),
       prisma.moment.count({ where: { createdAt: { gte: since } } }),
+      prisma.comment.count({ where: { createdAt: { gte: since } } }),
     ]);
     return {
       totalUsers,
       totalCircles,
       totalMoments,
       totalRegistrations,
+      totalComments,
       recentUsers,
       recentCircles,
       recentMoments,
+      recentComments,
     };
   },
 
