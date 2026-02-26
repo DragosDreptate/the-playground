@@ -23,6 +23,7 @@ export type RegistrationConfirmationEmailData = {
     locationLabel: string;
     viewMomentCta: string;
     cancelLink: string;
+    dashboardLink: string;
     footer: string;
   };
 };

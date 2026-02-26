@@ -313,6 +313,7 @@
       "count": "{count} comment(s)",
       "empty": "No comments yet. Be the first to say something!",
       "placeholder": "Share your thoughts...",
+      "placeholderPast": "Thanks, photos, feedback... share it!",
       "submit": "Post",
       "signInToComment": "Sign in to comment",
       "deleteTitle": "Delete comment",
@@ -531,6 +532,7 @@
       "locationLabel": "Location",
       "viewMomentCta": "View Event",
       "cancelLink": "Cancel my registration",
+      "dashboardLink": "Find all your events in your Dashboard →",
       "footer": "Powered by The Playground — Launch your community, for free."
     }
   },
