@@ -13,6 +13,7 @@ import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
 import type { CalendarEventData } from "@/lib/calendar";
+import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import Image from "next/image";
@@ -46,6 +47,8 @@ type HostViewProps = CommonProps & {
   circleSlug: string;
   momentSlug: string;
   publicUrl: string;
+  calendarData?: CalendarEventData;
+  appUrl?: string;
 };
 
 type PublicViewProps = CommonProps & {
@@ -384,7 +387,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Host : lien partageable */}
+          {/* Host : lien partageable + calendrier */}
           {isHostView && (
             <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
               <div className="flex items-center gap-2 lg:col-span-2">
@@ -403,6 +406,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="flex items-center gap-2">
                 <CopyLinkButton value={props.publicUrl} />
               </div>
+              {props.calendarData && props.appUrl && moment.status !== "PAST" && (
+                <div className="lg:col-span-2">
+                  <AddToCalendarButtons data={props.calendarData} appUrl={props.appUrl} />
+                </div>
+              )}
             </div>
           )}
 
