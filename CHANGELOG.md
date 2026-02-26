@@ -10,6 +10,29 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.5.0] — 2026-02-26 — Notifications & qualité
+
+### Ajouté
+
+- **Email Organisateur** : confirmation à la création d'un événement (avec ICS en pièce jointe)
+- **Email Organisateur** : notification lors d'un nouveau follower de la Communauté
+- **Email participants** : notification d'annulation lors de la suppression d'un événement
+- **Boutons calendrier** : "Ajouter au calendrier" disponible pour l'Organisateur (Google, Apple, ICS)
+- **Export CSV** : export des inscrits depuis la vue Organisateur (colonnes prénom, nom, email, statut, date)
+- **Commentaires** : formulaire activé sur les événements passés (pic d'engagement post-event)
+- **Page événement** : prochains événements du Circle affichés en bas de page (rétention)
+- **Lien Mon espace** : ajouté dans l'email de confirmation d'inscription pour guider les nouveaux membres
+
+### Corrigé
+
+- **ICS — date invalide** : validation côté formulaire empêchant une date de fin antérieure à la date de début
+- **ICS — cache** : `revalidatePath` ajouté après create/update/delete — la page publique se rafraîchit immédiatement
+- **Erreurs email** : capturées dans Sentry (permet d'alerter en cas de quota Resend dépassé)
+- **iOS Chrome** : `RangeError: Invalid Date` sur la création d'événement à minuit — guard ajouté dans `combineDateAndTime`
+- **Page d'erreur globale** : amélioration du rendu et du message
+
+---
+
 ## [1.4.0] — 2026-02-26 — Performance & Admin enrichi
 
 ### Amélioré
