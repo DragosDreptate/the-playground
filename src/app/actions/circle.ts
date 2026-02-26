@@ -191,7 +191,10 @@ export async function followCircleAction(
           )
         );
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
 
     return { success: true, data: { following: true } };
   } catch (error) {
