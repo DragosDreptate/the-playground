@@ -110,6 +110,21 @@ export type NewMomentFollowerEmailData = {
 
 export type NewMomentMemberEmailData = NewMomentFollowerEmailData;
 
+export type HostNewFollowerEmailData = {
+  to: string;
+  hostName: string;
+  followerName: string;
+  circleName: string;
+  circleSlug: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    viewMembersCta: string;
+    footer: string;
+  };
+};
+
 export type MomentUpdateEmailData = {
   to: string;
   playerName: string;
@@ -190,6 +205,7 @@ export interface EmailService {
   sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
   sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
+  sendHostNewFollower(data: HostNewFollowerEmailData): Promise<void>;
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;

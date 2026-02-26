@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
+import { createResendEmailService } from "@/infrastructure/services";
 import { createCircle } from "@/domain/usecases/create-circle";
 import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
@@ -162,6 +163,36 @@ export async function followCircleAction(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
+
+    // Fire-and-forget : notifier les HOSTs du Circle qu'un nouveau follower les suit
+    const followerName = session.user.name ?? session.user.email;
+    prismaCircleRepository
+      .findById(circleId)
+      .then(async (circle) => {
+        if (!circle) return;
+        const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
+        const emailService = createResendEmailService();
+        await Promise.allSettled(
+          hosts.map((h) =>
+            emailService.sendHostNewFollower({
+              to: h.user.email,
+              hostName: h.user.firstName ?? h.user.email,
+              followerName,
+              circleName: circle.name,
+              circleSlug: circle.slug,
+              strings: {
+                subject: `🔔 Nouveau follower — ${circle.name}`,
+                heading: `Nouveau follower sur ${circle.name}`,
+                message: `${followerName} suit maintenant votre Communauté.`,
+                viewMembersCta: "Voir les membres",
+                footer: `Vous recevez cet email car vous êtes Organisateur de ${circle.name} sur The Playground.`,
+              },
+            })
+          )
+        );
+      })
+      .catch(console.error);
+
     return { success: true, data: { following: true } };
   } catch (error) {
     if (error instanceof DomainError) {
