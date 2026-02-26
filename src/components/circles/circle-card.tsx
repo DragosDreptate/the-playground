@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -34,11 +35,12 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
           style={circle.coverImage ? undefined : { background: gradient }}
         >
           {circle.coverImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={circle.coverImage}
               alt={circle.name}
-              className="size-full object-cover"
+              width={72}
+              height={72}
+              className="object-cover"
             />
           ) : (
             <>

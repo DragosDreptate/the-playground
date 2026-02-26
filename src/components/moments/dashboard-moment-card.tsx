@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -85,10 +86,11 @@ export function DashboardMomentCard({ registration, isLast, isHost = false, isPa
 
             {/* Cover — LEFT, 64×64px */}
             {moment.coverImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={moment.coverImage}
                 alt={moment.title}
+                width={64}
+                height={64}
                 className={`size-16 shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (

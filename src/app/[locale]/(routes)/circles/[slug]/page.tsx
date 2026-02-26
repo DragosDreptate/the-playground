@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { FollowButton } from "@/components/circles/follow-button";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+import Image from "next/image";
 import {
   Globe,
   Lock,
@@ -188,11 +189,13 @@ export default async function PublicCirclePage({
               style={{ aspectRatio: "1 / 1" }}
             >
               {circle.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={circle.coverImage}
                   alt={circle.name}
-                  className="size-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 340px"
+                  priority
                 />
               ) : (
                 <>
@@ -540,15 +543,16 @@ export default async function PublicCirclePage({
                                 )}
                               </div>
                               <div
-                                className={`size-[60px] shrink-0 overflow-hidden rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
+                                className={`relative size-[60px] shrink-0 overflow-hidden rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
                                 style={!moment.coverImage ? { background: momentGradient } : undefined}
                               >
                                 {moment.coverImage && (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
+                                  <Image
                                     src={moment.coverImage}
                                     alt={moment.title}
-                                    className="size-full object-cover"
+                                    width={60}
+                                    height={60}
+                                    className="object-cover"
                                   />
                                 )}
                               </div>

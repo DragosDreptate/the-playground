@@ -19,6 +19,7 @@ import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+import Image from "next/image";
 import {
   Globe,
   Lock,
@@ -160,11 +161,13 @@ export default async function CircleDetailPage({
               style={{ aspectRatio: "1 / 1" }}
             >
               {circle.coverImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={circle.coverImage}
                   alt={circle.name}
-                  className="size-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 340px"
+                  priority
                 />
               ) : (
                 <>

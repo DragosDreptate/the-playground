@@ -15,6 +15,7 @@ import type { CommentWithUser } from "@/domain/models/comment";
 import type { CalendarEventData } from "@/lib/calendar";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import Image from "next/image";
 import {
   CalendarIcon,
   MapPin,
@@ -171,11 +172,13 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 style={{ aspectRatio: "1 / 1" }}
               >
                 {moment.coverImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={moment.coverImage}
                     alt={moment.title}
-                    className="size-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 340px"
+                    priority
                   />
                 ) : (
                   <>
