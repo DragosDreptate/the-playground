@@ -1,10 +1,13 @@
 "use server";
 
+import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService } from "@/infrastructure/services";
+
+const emailService = createResendEmailService();
 import { createCircle } from "@/domain/usecases/create-circle";
 import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
@@ -164,14 +167,13 @@ export async function followCircleAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Fire-and-forget : notifier les HOSTs du Circle qu'un nouveau follower les suit
+    // Notifier les HOSTs après la réponse (after garantit l'exécution en serverless)
     const followerName = session.user.name ?? session.user.email;
-    prismaCircleRepository
-      .findById(circleId)
-      .then(async (circle) => {
+    after(async () => {
+      try {
+        const circle = await prismaCircleRepository.findById(circleId);
         if (!circle) return;
         const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
-        const emailService = createResendEmailService();
         await Promise.allSettled(
           hosts.map((h) =>
             emailService.sendHostNewFollower({
@@ -190,11 +192,10 @@ export async function followCircleAction(
             })
           )
         );
-      })
-      .catch((err) => {
-        console.error(err);
-        Sentry.captureException(err);
-      });
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
 
     return { success: true, data: { following: true } };
   } catch (error) {
