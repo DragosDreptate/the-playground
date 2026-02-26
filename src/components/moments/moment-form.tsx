@@ -99,6 +99,10 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     _prev: FormState,
     formData: FormData
   ): Promise<FormState> {
+    if (startsAtValue && endsAtValue && endsAtValue <= startsAtValue) {
+      return { error: t("form.endBeforeStart") };
+    }
+
     if (coverSelection?.type === "upload") {
       formData.set("coverImageFile", coverSelection.file);
     } else if (coverSelection?.type === "unsplash") {

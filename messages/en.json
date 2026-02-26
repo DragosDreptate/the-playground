@@ -244,6 +244,7 @@
       "startLabel": "Start",
       "endLabel": "End",
       "pickDate": "Pick a date",
+      "endBeforeStart": "The end date must be after the start date.",
       "createMoment": "Publish"
     },
     "delete": {
