@@ -25,13 +25,13 @@ export async function CreateMomentButton() {
 
   const hostCircles = allCircles.filter((c) => c.memberRole === "HOST");
 
-  // 0 communauté → guider vers la création de communauté
+  // 0 communauté → guider vers la création de communauté d'abord
   if (hostCircles.length === 0) {
     return (
       <Button asChild size="sm" className="w-full sm:w-auto gap-1.5">
         <Link href="/dashboard/circles/new">
           <Plus className="size-3.5" />
-          {t("createMoment")}
+          {t("createCircleFirst")}
         </Link>
       </Button>
     );
