@@ -165,7 +165,9 @@
     "greetingSubtitleOrganizer": "Gérez vos Communautés et vos événements.",
     "memberCount": "{count} membres",
     "modeParticipant": "Participant",
-    "modeOrganizer": "Organisateur"
+    "modeOrganizer": "Organisateur",
+    "modeBadgeParticipant": "Vue Participant",
+    "modeBadgeOrganizer": "Vue Organisateur"
   },
   "Circle": {
     "create": {

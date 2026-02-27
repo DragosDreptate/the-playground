@@ -38,9 +38,9 @@ export default async function DashboardPage({
 
   const modeLabel =
     resolvedMode === "ORGANIZER"
-      ? t("modeOrganizer")
+      ? t("modeBadgeOrganizer")
       : resolvedMode === "PARTICIPANT"
-        ? t("modeParticipant")
+        ? t("modeBadgeParticipant")
         : null;
 
   return (
