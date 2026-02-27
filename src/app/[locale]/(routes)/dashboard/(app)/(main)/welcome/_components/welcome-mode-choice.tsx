@@ -21,7 +21,7 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
       if (mode === "ORGANIZER") {
         router.push("/dashboard/circles/new");
       } else {
-        router.push("/dashboard?mode=participant&tab=moments");
+        router.push("/explorer");
       }
     });
   }
