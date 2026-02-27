@@ -56,7 +56,7 @@ export default async function DashboardPage({
               <span className="text-primary block">{modeLabel}</span>
             )}
           </h1>
-          <div className="shrink-0">
+          <div className="shrink-0 self-start">
             <DashboardModeSwitcher currentMode={resolvedMode} activeTab={activeTab} />
           </div>
         </div>
@@ -69,7 +69,7 @@ export default async function DashboardPage({
 
       {/* Tab selector + CTA conditionnel */}
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1 rounded-full border p-1">
+        <div className="flex w-full items-center gap-1 rounded-full border p-1 sm:w-auto">
           <Link
             href={`?tab=moments${resolvedMode ? `&mode=${resolvedMode.toLowerCase()}` : ""}`}
             className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors sm:flex-none ${
