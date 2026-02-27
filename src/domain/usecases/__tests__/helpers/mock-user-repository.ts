@@ -20,6 +20,7 @@ export function createMockUserRepository(
     updateNotificationPreferences: vi
       .fn<UserRepository["updateNotificationPreferences"]>()
       .mockResolvedValue(makeNotificationPreferences()),
+    updateDashboardMode: vi.fn<UserRepository["updateDashboardMode"]>().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -39,6 +40,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     notifyNewComment: true,
     notifyNewFollower: true,
     notifyNewMomentInCircle: true,
+    dashboardMode: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,

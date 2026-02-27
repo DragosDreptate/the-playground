@@ -1,4 +1,4 @@
-import type { User, NotificationPreferences } from "@/domain/models/user";
+import type { User, NotificationPreferences, DashboardMode } from "@/domain/models/user";
 
 export type UpdateProfileInput = {
   firstName: string;
@@ -20,4 +20,5 @@ export interface UserRepository {
     userId: string,
     input: UpdateNotificationPreferencesInput
   ): Promise<NotificationPreferences>;
+  updateDashboardMode(userId: string, mode: DashboardMode): Promise<void>;
 }

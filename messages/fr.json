@@ -97,11 +97,30 @@
       "title": "Découvrir des Communautés",
       "description": "Explorez les communautés publiques et rejoignez celles qui vous correspondent.",
       "cta": "Explorer"
+    },
+    "modeChoice": {
+      "greeting": "Bienvenue, {name} 👋",
+      "greetingAnonymous": "Bienvenue sur The Playground 👋",
+      "subtitle": "Que veux-tu faire ?",
+      "participant": {
+        "title": "Je participe",
+        "description": "Découvre des événements et rejoins des communautés qui te correspondent.",
+        "cta": "Explorer les événements"
+      },
+      "organizer": {
+        "title": "J'organise",
+        "description": "Crée ta communauté, organise tes événements et anime ton réseau.",
+        "cta": "Créer ma Communauté"
+      },
+      "continue": "Continuer",
+      "continuing": "Chargement...",
+      "hint": "Tu pourras changer de mode à tout moment depuis ton espace."
     }
   },
   "Dashboard": {
     "title": "Mon espace",
     "myCircles": "Mes Communautés",
+    "myCirclesOrganizer": "Mes Communautés",
     "createCircle": "Créer une Communauté",
     "createMoment": "Créer un événement",
     "selectCircle": {
@@ -113,13 +132,19 @@
       "description": "Vous devez créer une Communauté avant de créer un événement."
     },
     "myMoments": "Mes événements",
+    "myMomentsOrganizer": "Mes événements",
     "upcomingMoments": "Mes prochains événements",
     "pastMoments": "Passés",
     "noUpcomingMoments": "Aucun événement à venir.",
     "noMoments": "Aucun événement pour l'instant.",
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
+    "noMomentsHintExplore": "Découvrir des événements →",
+    "noMomentsOrganizer": "Aucun événement organisé pour l'instant.",
+    "noMomentsOrganizerHint": "Créez votre premier événement depuis une Communauté.",
     "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
+    "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
+    "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
     "noCirclesMember": "Vous n'êtes membre d'aucune Communauté.",
     "role": {
       "host": "Organisateur",
@@ -135,7 +160,10 @@
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
     "greetingSubtitle": "Vos Communautés et vos prochains événements, au même endroit.",
-    "memberCount": "{count} membres"
+    "greetingSubtitleOrganizer": "Gérez vos Communautés et vos événements.",
+    "memberCount": "{count} membres",
+    "modeParticipant": "Participant",
+    "modeOrganizer": "Organisateur"
   },
   "Circle": {
     "create": {

@@ -7,7 +7,7 @@ import type {
   PublicMoment,
   UpcomingCircleMoment,
 } from "@/domain/ports/repositories/moment-repository";
-import type { Moment, CoverImageAttribution } from "@/domain/models/moment";
+import type { Moment, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -207,6 +207,94 @@ export const prismaMomentRepository: MomentRepository = {
       locationType: m.locationType,
       locationName: m.locationName,
       registrationCount: m._count.registrations,
+    }));
+  },
+
+  async findUpcomingByHostUserId(hostUserId: string): Promise<HostMomentSummary[]> {
+    const now = new Date();
+    const records = await prisma.moment.findMany({
+      where: {
+        status: "PUBLISHED",
+        startsAt: { gte: now },
+        circle: {
+          memberships: { some: { userId: hostUserId, role: "HOST" } },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        startsAt: true,
+        endsAt: true,
+        locationType: true,
+        locationName: true,
+        status: true,
+        circle: { select: { slug: true, name: true, coverImage: true } },
+        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+      },
+      orderBy: { startsAt: "asc" },
+    });
+
+    return records.map((m) => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      coverImage: m.coverImage ?? null,
+      startsAt: m.startsAt,
+      endsAt: m.endsAt,
+      locationType: m.locationType,
+      locationName: m.locationName,
+      status: m.status,
+      registrationCount: m._count.registrations,
+      circle: {
+        slug: m.circle.slug,
+        name: m.circle.name,
+        coverImage: m.circle.coverImage ?? null,
+      },
+    }));
+  },
+
+  async findPastByHostUserId(hostUserId: string): Promise<HostMomentSummary[]> {
+    const records = await prisma.moment.findMany({
+      where: {
+        status: "PAST",
+        circle: {
+          memberships: { some: { userId: hostUserId, role: "HOST" } },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        startsAt: true,
+        endsAt: true,
+        locationType: true,
+        locationName: true,
+        status: true,
+        circle: { select: { slug: true, name: true, coverImage: true } },
+        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+      },
+      orderBy: { startsAt: "desc" },
+    });
+
+    return records.map((m) => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      coverImage: m.coverImage ?? null,
+      startsAt: m.startsAt,
+      endsAt: m.endsAt,
+      locationType: m.locationType,
+      locationName: m.locationName,
+      status: m.status,
+      registrationCount: m._count.registrations,
+      circle: {
+        slug: m.circle.slug,
+        name: m.circle.name,
+        coverImage: m.circle.coverImage ?? null,
+      },
     }));
   },
 };

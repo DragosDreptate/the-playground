@@ -1,5 +1,7 @@
 export type UserRole = "USER" | "ADMIN";
 
+export type DashboardMode = "PARTICIPANT" | "ORGANIZER";
+
 export type NotificationPreferences = {
   notifyNewRegistration: boolean;
   notifyNewComment: boolean;
@@ -21,6 +23,7 @@ export type User = {
   notifyNewComment: boolean;
   notifyNewFollower: boolean;
   notifyNewMomentInCircle: boolean;
+  dashboardMode: DashboardMode | null;
   createdAt: Date;
   updatedAt: Date;
 };

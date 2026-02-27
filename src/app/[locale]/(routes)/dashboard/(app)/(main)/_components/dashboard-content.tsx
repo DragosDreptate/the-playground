@@ -8,21 +8,27 @@ import {
 import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
 import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-moments";
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
+import { getHostUpcomingMoments } from "@/domain/usecases/get-host-upcoming-moments";
+import { getHostPastMoments } from "@/domain/usecases/get-host-past-moments";
 import { shouldRedirectToWelcome } from "@/lib/dashboard";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
+import type { DashboardMode } from "@/domain/models/user";
+import { Link } from "@/i18n/navigation";
 
 export async function DashboardContent({
   userId,
   activeTab,
+  mode,
 }: {
   userId: string;
   activeTab: "moments" | "circles";
+  mode: DashboardMode | null;
 }) {
   // Transition PUBLISHED → PAST pour les Moments terminés
   await prismaMomentRepository.transitionPastMoments();
 
-  const [upcomingMoments, pastMoments, circles] = await Promise.all([
+  const [upcomingRegistrations, pastRegistrations, circles] = await Promise.all([
     getUserUpcomingMoments(userId, {
       registrationRepository: prismaRegistrationRepository,
     }),
@@ -36,9 +42,10 @@ export async function DashboardContent({
 
   if (
     shouldRedirectToWelcome({
+      dashboardMode: mode,
       circleCount: circles.length,
-      upcomingMomentCount: upcomingMoments.length,
-      pastMomentCount: pastMoments.length,
+      upcomingMomentCount: upcomingRegistrations.length,
+      pastMomentCount: pastRegistrations.length,
     })
   ) {
     redirect("/dashboard/welcome");
@@ -49,7 +56,100 @@ export async function DashboardContent({
   const hostCircleSlugs = new Set(
     circles.filter((c) => c.memberRole === "HOST").map((c) => c.slug)
   );
-  const hasMoments = upcomingMoments.length > 0 || pastMoments.length > 0;
+
+  // ─── Mode ORGANIZER ──────────────────────────────────────────────────────────
+  if (mode === "ORGANIZER") {
+    const [hostUpcoming, hostPast] = await Promise.all([
+      getHostUpcomingMoments(userId, { momentRepository: prismaMomentRepository }),
+      getHostPastMoments(userId, { momentRepository: prismaMomentRepository }),
+    ]);
+
+    const hostCircles = circles.filter((c) => c.memberRole === "HOST");
+    const hasHostMoments = hostUpcoming.length > 0 || hostPast.length > 0;
+
+    if (activeTab === "moments") {
+      return (
+        <section>
+          {!hasHostMoments ? (
+            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+              <p className="text-muted-foreground text-sm">{t("noMomentsOrganizer")}</p>
+              <p className="text-muted-foreground mt-1 text-xs">{t("noMomentsOrganizerHint")}</p>
+            </div>
+          ) : (
+            <div>
+              {hostUpcoming.map((moment, i) => (
+                <DashboardMomentCard
+                  key={moment.id}
+                  variant="organizer"
+                  moment={moment}
+                  isLast={i === hostUpcoming.length - 1 && hostPast.length === 0}
+                />
+              ))}
+
+              {hostUpcoming.length > 0 && hostPast.length > 0 && (
+                <div className="flex items-center gap-0 pb-8">
+                  <div className="w-[100px] shrink-0 pr-4" />
+                  <div className="flex shrink-0 flex-col items-center">
+                    <div className="size-2 shrink-0" />
+                  </div>
+                  <div className="min-w-0 flex-1 pl-4">
+                    <div className="border-border flex items-center gap-3 border-t pt-0">
+                      <span className="text-muted-foreground/60 -mt-3 bg-background pr-3 text-xs font-medium">
+                        {t("pastMoments")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {hostUpcoming.length === 0 && hostPast.length > 0 && (
+                <p className="text-muted-foreground mb-4 text-xs font-semibold uppercase tracking-wider">
+                  {t("pastMoments")}
+                </p>
+              )}
+
+              {hostPast.map((moment, i) => (
+                <DashboardMomentCard
+                  key={moment.id}
+                  variant="organizer"
+                  moment={moment}
+                  isLast={i === hostPast.length - 1}
+                  isPast
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    return (
+      <section>
+        {hostCircles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+            <p className="text-muted-foreground text-sm">{t("noCirclesOrganizer")}</p>
+            <p className="text-muted-foreground mt-1 text-xs">{t("noCirclesOrganizerHint")}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {hostCircles.map((circle) => (
+              <DashboardCircleCard key={circle.id} circle={circle} />
+            ))}
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // ─── Mode PARTICIPANT (ou null avec activité → traité comme participant) ─────
+  const playerCircles = circles.filter((c) => c.memberRole === "PLAYER");
+  const participantUpcoming = upcomingRegistrations.filter(
+    (reg) => !hostCircleSlugs.has(reg.moment.circleSlug)
+  );
+  const participantPast = pastRegistrations.filter(
+    (reg) => !hostCircleSlugs.has(reg.moment.circleSlug)
+  );
+  const hasMoments = participantUpcoming.length > 0 || participantPast.length > 0;
 
   if (activeTab === "moments") {
     return (
@@ -57,22 +157,24 @@ export async function DashboardContent({
         {!hasMoments ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
             <p className="text-muted-foreground text-sm">{t("noMoments")}</p>
-            <p className="text-muted-foreground mt-1 text-xs">{t("noMomentsHint")}</p>
+            <p className="text-muted-foreground mt-1 text-xs">
+              <Link href="/explorer" className="hover:text-foreground underline underline-offset-4">
+                {t("noMomentsHintExplore")}
+              </Link>
+            </p>
           </div>
         ) : (
           <div>
-            {/* Upcoming moments */}
-            {upcomingMoments.map((reg, i) => (
+            {participantUpcoming.map((reg, i) => (
               <DashboardMomentCard
                 key={reg.id}
+                variant="participant"
                 registration={reg}
-                isLast={i === upcomingMoments.length - 1 && pastMoments.length === 0}
-                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
+                isLast={i === participantUpcoming.length - 1 && participantPast.length === 0}
               />
             ))}
 
-            {/* Separator between upcoming and past */}
-            {upcomingMoments.length > 0 && pastMoments.length > 0 && (
+            {participantUpcoming.length > 0 && participantPast.length > 0 && (
               <div className="flex items-center gap-0 pb-8">
                 <div className="w-[100px] shrink-0 pr-4" />
                 <div className="flex shrink-0 flex-col items-center">
@@ -88,20 +190,18 @@ export async function DashboardContent({
               </div>
             )}
 
-            {/* Past moments (no upcoming) — section label */}
-            {upcomingMoments.length === 0 && pastMoments.length > 0 && (
+            {participantUpcoming.length === 0 && participantPast.length > 0 && (
               <p className="text-muted-foreground mb-4 text-xs font-semibold uppercase tracking-wider">
                 {t("pastMoments")}
               </p>
             )}
 
-            {/* Past moments */}
-            {pastMoments.map((reg, i) => (
+            {participantPast.map((reg, i) => (
               <DashboardMomentCard
                 key={reg.id}
+                variant="participant"
                 registration={reg}
-                isLast={i === pastMoments.length - 1}
-                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
+                isLast={i === participantPast.length - 1}
                 isPast
               />
             ))}
@@ -113,14 +213,14 @@ export async function DashboardContent({
 
   return (
     <section>
-      {circles.length === 0 ? (
+      {playerCircles.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
           <p className="text-muted-foreground text-sm">{t("emptyCircles")}</p>
           <p className="text-muted-foreground mt-1 text-xs">{t("emptyCirclesHint")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {circles.map((circle) => (
+          {playerCircles.map((circle) => (
             <DashboardCircleCard key={circle.id} circle={circle} />
           ))}
         </div>
