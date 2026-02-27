@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Radar Événements (Option B : section inline)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --card-foreground: #1a1b2e;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+      --radar-bg: #f7f6fc;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #eeeef6;
+      color: var(--foreground);
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Page title (mockup label) ── */
+    .mockup-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--foreground);
+      margin-bottom: 6px;
+    }
+    .mockup-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 48px;
+    }
+
+    /* ── Browser chrome wrapper ── */
+    .browser {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 80px rgba(26,27,46,0.15);
+      overflow: hidden;
+    }
+
+    /* ── Browser top bar ── */
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: #f0eff7;
+      border-bottom: 1px solid var(--border);
+    }
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .browser-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .browser-dot-red   { background: #ff6058; }
+    .browser-dot-amber { background: #ffbd2e; }
+    .browser-dot-green { background: #28ca42; }
+    .browser-url {
+      flex: 1;
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── SiteHeader ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(255,255,255,0.92);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    .logo-text span { color: var(--primary); }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+    .nav-link.active { color: var(--foreground); }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: white;
+    }
+
+    /* ── Page layout ── */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 900px;
+    }
+
+    /* ── LEFT sticky column ── */
+    .col-left {
+      padding: 32px 24px;
+      border-right: 1px solid var(--border);
+      background: #faf9ff;
+      position: relative;
+    }
+
+    /* Draft banner on cover */
+    .cover-wrap {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .cover-glow-bg {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -12px;
+      height: 40px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      opacity: 0.35;
+      filter: blur(20px);
+      border-radius: 50%;
+    }
+    .cover {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4c1d95 70%, #6d28d9 100%);
+    }
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.20);
+    }
+    .cover-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-icon-inner {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-draft-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted-foreground);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Circle info in left column */
+    .circle-info-block {
+      margin-bottom: 20px;
+    }
+    .block-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+    .circle-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .circle-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .circle-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    .circle-sub {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    /* Hosts block */
+    .hosts-block {
+      margin-bottom: 20px;
+    }
+    .hosts-avatars {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .host-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .host-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Left stats */
+    .stats-row {
+      display: flex;
+      gap: 0;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .stat-cell {
+      flex: 1;
+      padding: 10px 12px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    .stat-label {
+      font-size: 10px;
+      color: var(--muted-foreground);
+    }
+
+    /* Left actions */
+    .left-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-ghost {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      cursor: pointer;
+    }
+    .btn-ghost svg { width: 13px; height: 13px; }
+
+    /* ── RIGHT content column ── */
+    .col-right {
+      padding: 32px 40px;
+      overflow-y: auto;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+    }
+    .breadcrumb a { color: var(--muted-foreground); text-decoration: underline; text-underline-offset: 2px; }
+    .breadcrumb svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+    /* Status + title header */
+    .event-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 8px;
+    }
+    .badge-draft {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+      white-space: nowrap;
+    }
+    .badge-draft-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+
+    .event-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--foreground);
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    /* Meta rows (date, lieu) */
+    .meta-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .meta-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .meta-icon svg { width: 15px; height: 15px; color: var(--muted-foreground); }
+    .meta-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .meta-main {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    .meta-sub {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    /* Description */
+    .event-description {
+      margin-bottom: 28px;
+    }
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 10px;
+    }
+    .description-body {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--muted-foreground);
+    }
+    .description-body p { margin-bottom: 8px; }
+    .description-body p:last-child { margin-bottom: 0; }
+
+    /* Séparateur */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* ── Publish action zone ── */
+    .publish-zone {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 28px;
+    }
+    .publish-zone-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+    .publish-zone-sub {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+    .publish-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(232,69,122,0.30);
+    }
+    .btn-primary svg { width: 15px; height: 15px; }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+
+    /* ── Radar section (Option B — inline) ── */
+    .radar-section {
+      background: var(--radar-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .radar-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .radar-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .radar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    .radar-icon-wrap {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #e8457a22, #9333ea18);
+      border: 1px solid #e8457a30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radar-icon-wrap svg {
+      width: 14px;
+      height: 14px;
+      color: var(--primary);
+    }
+    .radar-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .radar-subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    /* Radar loading state (shown as comment / toggle) */
+    .radar-loading {
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .skeleton {
+      border-radius: 8px;
+      background: linear-gradient(90deg, #e8e7f0 25%, #f0eff7 50%, #e8e7f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .skeleton-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .skeleton-lines {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      padding-top: 2px;
+    }
+    .skeleton-line { height: 11px; }
+    .skeleton-line.w-3-4 { width: 75%; }
+    .skeleton-line.w-1-2 { width: 50%; }
+    .skeleton-line.w-1-3 { width: 35%; }
+
+    /* Radar event list */
+    .radar-list {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .radar-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .radar-card:last-child {
+      border-bottom: none;
+    }
+
+    /* Thumbnail */
+    .radar-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .radar-thumb-gradient {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radar-thumb svg {
+      width: 18px;
+      height: 18px;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* Card body */
+    .radar-card-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .radar-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .radar-event-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--foreground);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+    .platform-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .platform-meetup {
+      background: #fff0e6;
+      color: #c05911;
+      border: 1px solid #ffd4aa;
+    }
+    .platform-luma {
+      background: #f0ebff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+    .platform-google {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+    .radar-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .radar-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .radar-meta-item svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+    .radar-distance {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--primary);
+      background: #fce7f3;
+      border: 1px solid #fbcfe8;
+      border-radius: 999px;
+      padding: 1px 7px;
+    }
+    .radar-attendees {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    /* Radar footer */
+    .radar-footer {
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.6);
+    }
+    .radar-footer-text {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .radar-footer-link {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .radar-footer-link svg { width: 12px; height: 12px; }
+
+    /* Radar helper text */
+    .radar-helper {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      padding: 0 4px;
+      line-height: 1.5;
+    }
+
+    /* ── Annotation callouts ── */
+    .annotation-zone {
+      max-width: 1100px;
+      margin: 32px auto 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .annotation {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .annotation-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .annotation-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+    .annotation-body {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      line-height: 1.55;
+    }
+
+    /* ── Tab variant toggle ── */
+    .tab-toggle {
+      max-width: 1100px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .tab-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .tab-pills {
+      display: flex;
+      background: var(--muted);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .tab-pill {
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted-foreground);
+    }
+    .tab-pill.active {
+      background: white;
+      color: var(--foreground);
+      box-shadow: 0 1px 4px rgba(26,27,46,0.10);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Mockup label -->
+  <p class="mockup-title">Radar — Événements similaires</p>
+  <p class="mockup-subtitle">Option B · Section inline · Page événement dashboard (statut DRAFT)</p>
+
+  <!-- Variant toggle (illustrative) -->
+  <div class="tab-toggle">
+    <span class="tab-label">État affiché :</span>
+    <div class="tab-pills">
+      <span class="tab-pill active">Résultats chargés</span>
+      <span class="tab-pill">Chargement (skeleton)</span>
+    </div>
+  </div>
+
+  <!-- Browser chrome -->
+  <div class="browser">
+
+    <!-- Browser bar -->
+    <div class="browser-bar">
+      <div class="browser-dots">
+        <div class="browser-dot browser-dot-red"></div>
+        <div class="browser-dot browser-dot-amber"></div>
+        <div class="browser-dot browser-dot-green"></div>
+      </div>
+      <div class="browser-url">https://theplayground.co/dashboard/communities/react-paris/events/workshop-react-avance</div>
+    </div>
+
+    <!-- SiteHeader -->
+    <div class="site-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <!-- Logo icon: play triangle -->
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <path d="M3 2.5L10.5 6.5L3 10.5V2.5Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="logo-text">the<span>playground</span></div>
+      </div>
+      <div class="header-nav">
+        <span class="nav-link active">Mon espace</span>
+        <span class="nav-link">Découvrir</span>
+      </div>
+      <div class="header-right">
+        <div class="header-avatar">SL</div>
+      </div>
+    </div>
+
+    <!-- Page layout : 2 colonnes -->
+    <div class="page-layout">
+
+      <!-- ─── LEFT column ─── -->
+      <div class="col-left">
+
+        <!-- Cover 1:1 avec badge DRAFT -->
+        <div class="cover-wrap">
+          <div class="cover-glow-bg"></div>
+          <div class="cover">
+            <div class="cover-overlay"></div>
+            <div class="cover-icon">
+              <div class="cover-icon-inner">
+                <!-- Code brackets icon -->
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="cover-draft-badge">Brouillon</div>
+          </div>
+        </div>
+
+        <!-- Communauté liée -->
+        <div class="circle-info-block">
+          <div class="block-label">Communauté</div>
+          <div class="circle-chip">
+            <div class="circle-avatar">R</div>
+            <div>
+              <div class="circle-name">React Paris</div>
+              <div class="circle-sub">147 membres</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Organisateurs -->
+        <div class="hosts-block">
+          <div class="block-label">Organisateur</div>
+          <div class="hosts-avatars">
+            <div class="host-avatar" style="background: linear-gradient(135deg,#e8457a,#9333ea);">SL</div>
+            <div class="host-name">Sophie Leclerc</div>
+          </div>
+        </div>
+
+        <!-- Stats fictives -->
+        <div class="stats-row">
+          <div class="stat-cell">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Inscrits</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-value">60</div>
+            <div class="stat-label">Places</div>
+          </div>
+        </div>
+
+        <!-- Actions secondaires -->
+        <div class="left-actions">
+          <button class="btn-ghost">
+            <!-- Edit icon -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11.333 2a1.886 1.886 0 0 1 2.667 2.667L4.667 14H2v-2.667L11.333 2Z"/>
+            </svg>
+            Modifier les détails
+          </button>
+          <button class="btn-ghost">
+            <!-- Trash icon -->
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 4h12M5.333 4V2.667A.667.667 0 0 1 6 2h4a.667.667 0 0 1 .667.667V4M12.667 4l-.667 9.333A.667.667 0 0 1 11.333 14H4.667A.667.667 0 0 1 4 13.333L3.333 4"/>
+            </svg>
+            Supprimer
+          </button>
+        </div>
+
+      </div><!-- /col-left -->
+
+      <!-- ─── RIGHT column ─── -->
+      <div class="col-right">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="#">Mon espace</a>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg>
+          <a href="#">React Paris</a>
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg>
+          <span class="current">Workshop React Avancé</span>
+        </div>
+
+        <!-- Title + status -->
+        <div class="event-header">
+          <h1 class="event-title">Workshop React Avancé</h1>
+          <span class="badge-draft">
+            <span class="badge-draft-dot"></span>
+            Brouillon
+          </span>
+        </div>
+
+        <!-- Meta rows : date, lieu -->
+        <div class="meta-rows">
+          <div class="meta-row">
+            <div class="meta-icon">
+              <!-- Calendar icon -->
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1.333" y="2" width="13.333" height="12.667" rx="1.333"/>
+                <path d="M10.667 1.333v1.334M5.333 1.333v1.334M1.333 5.333h13.334"/>
+              </svg>
+            </div>
+            <div class="meta-text">
+              <span class="meta-main">Samedi 15 mars 2026 · 14h00 – 17h00</span>
+              <span class="meta-sub">3 heures · dans 18 jours</span>
+            </div>
+          </div>
+          <div class="meta-row">
+            <div class="meta-icon">
+              <!-- Map pin icon -->
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 1.333A4.667 4.667 0 0 1 12.667 6c0 3.5-4.667 8.667-4.667 8.667S3.333 9.5 3.333 6A4.667 4.667 0 0 1 8 1.333Z"/>
+                <circle cx="8" cy="6" r="1.667"/>
+              </svg>
+            </div>
+            <div class="meta-text">
+              <span class="meta-main">Station F — Paris 13e</span>
+              <span class="meta-sub">5 Parvis Alan Turing, 75013 Paris</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="event-description">
+          <div class="section-title">À propos</div>
+          <div class="description-body">
+            <p>Un workshop pratique pour les développeurs React souhaitant maîtriser les patterns avancés : hooks personnalisés, Server Components, optimisation des performances et architecture à grande échelle.</p>
+            <p>Niveau requis : 1 an minimum d'expérience React. Places limitées pour garantir la qualité des échanges.</p>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ── Zone de publication (action principale) ── -->
+        <div class="publish-zone">
+          <div class="publish-zone-title">Prêt à publier cet événement ?</div>
+          <div class="publish-zone-sub">Une fois publié, les membres de votre communauté pourront s'inscrire et vous recevrez un lien partageable.</div>
+          <div class="publish-actions">
+            <button class="btn-primary">
+              <!-- Globe icon -->
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="8" r="6.667"/>
+                <path d="M8 1.333a10.22 10.22 0 0 1 2.667 6.667A10.22 10.22 0 0 1 8 14.667 10.22 10.22 0 0 1 5.333 8 10.22 10.22 0 0 1 8 1.333z"/>
+                <path d="M1.333 8h13.334"/>
+              </svg>
+              Publier l'événement
+            </button>
+            <button class="btn-outline">Aperçu public</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ── RADAR SECTION (Option B — inline, toujours visible) ── -->
+        <div class="radar-section">
+
+          <!-- Header du Radar -->
+          <div class="radar-header">
+            <div class="radar-title-row">
+              <div class="radar-title">
+                <div class="radar-icon-wrap">
+                  <!-- Radar / signal icon -->
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="8" cy="8" r="1.5"/>
+                    <path d="M5.172 5.172a4 4 0 1 0 5.656 5.656"/>
+                    <path d="M3.05 3.05a7 7 0 1 0 9.9 9.9"/>
+                  </svg>
+                </div>
+                Radar
+              </div>
+              <span class="radar-badge">4 trouvés</span>
+            </div>
+            <div class="radar-subtitle">Événements ciblant une audience similaire à Paris le 15 mars</div>
+          </div>
+
+          <!-- Liste des événements concurrents -->
+          <div class="radar-list">
+
+            <!-- Card 1 — Meetup -->
+            <div class="radar-card">
+              <div class="radar-thumb">
+                <div class="radar-thumb-gradient" style="background: linear-gradient(135deg, #ea580c, #dc2626);">
+                  <!-- Code icon -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 18 22 12 16 6"></polyline>
+                    <polyline points="8 6 2 12 8 18"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="radar-card-body">
+                <div class="radar-card-top">
+                  <div class="radar-event-title">React & TypeScript — Bonnes Pratiques 2026</div>
+                  <span class="platform-badge platform-meetup">Meetup</span>
+                </div>
+                <div class="radar-card-meta">
+                  <div class="radar-meta-item">
+                    <!-- Clock icon -->
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+                    14h00 – 17h30
+                  </div>
+                  <div class="radar-meta-item">
+                    <!-- Map pin icon -->
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1a3.5 3.5 0 0 1 3.5 3.5c0 2.625-3.5 6.5-3.5 6.5S2.5 7.125 2.5 4.5A3.5 3.5 0 0 1 6 1z"/><circle cx="6" cy="4.5" r="1.25"/></svg>
+                    Bastille, Paris 12e
+                  </div>
+                  <span class="radar-distance">1.4 km</span>
+                  <span class="radar-attendees">89 inscrits</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 — Luma -->
+            <div class="radar-card">
+              <div class="radar-thumb">
+                <div class="radar-thumb-gradient" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);">
+                  <!-- Server icon -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/>
+                    <line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="radar-card-body">
+                <div class="radar-card-top">
+                  <div class="radar-event-title">Next.js 15 — Server Components Deep Dive</div>
+                  <span class="platform-badge platform-luma">Luma</span>
+                </div>
+                <div class="radar-card-meta">
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+                    10h00 – 13h00
+                  </div>
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1a3.5 3.5 0 0 1 3.5 3.5c0 2.625-3.5 6.5-3.5 6.5S2.5 7.125 2.5 4.5A3.5 3.5 0 0 1 6 1z"/><circle cx="6" cy="4.5" r="1.25"/></svg>
+                    Le Wagon, Paris 9e
+                  </div>
+                  <span class="radar-distance">3.1 km</span>
+                  <span class="radar-attendees">42 inscrits</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 — Google Events -->
+            <div class="radar-card">
+              <div class="radar-thumb">
+                <div class="radar-thumb-gradient" style="background: linear-gradient(135deg, #1d4ed8, #0369a1);">
+                  <!-- Layers icon -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="radar-card-body">
+                <div class="radar-card-top">
+                  <div class="radar-event-title">Frontend Performance & Web Vitals — Paris</div>
+                  <span class="platform-badge platform-google">Google</span>
+                </div>
+                <div class="radar-card-meta">
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+                    14h30 – 17h00
+                  </div>
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1a3.5 3.5 0 0 1 3.5 3.5c0 2.625-3.5 6.5-3.5 6.5S2.5 7.125 2.5 4.5A3.5 3.5 0 0 1 6 1z"/><circle cx="6" cy="4.5" r="1.25"/></svg>
+                    Google Paris, Paris 8e
+                  </div>
+                  <span class="radar-distance">4.7 km</span>
+                  <span class="radar-attendees">210 inscrits</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 — Meetup -->
+            <div class="radar-card">
+              <div class="radar-thumb">
+                <div class="radar-thumb-gradient" style="background: linear-gradient(135deg, #059669, #0d9488);">
+                  <!-- Zap icon -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="radar-card-body">
+                <div class="radar-card-top">
+                  <div class="radar-event-title">JavaScript Meetup — Architecture & Patterns</div>
+                  <span class="platform-badge platform-meetup">Meetup</span>
+                </div>
+                <div class="radar-card-meta">
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="6" cy="6" r="5"/><path d="M6 3.5v2.5l1.5 1.5"/></svg>
+                    19h00 – 21h30
+                  </div>
+                  <div class="radar-meta-item">
+                    <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 1a3.5 3.5 0 0 1 3.5 3.5c0 2.625-3.5 6.5-3.5 6.5S2.5 7.125 2.5 4.5A3.5 3.5 0 0 1 6 1z"/><circle cx="6" cy="4.5" r="1.25"/></svg>
+                    NUMA, Paris 3e
+                  </div>
+                  <span class="radar-distance">2.3 km</span>
+                  <span class="radar-attendees">67 inscrits</span>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /radar-list -->
+
+          <!-- Footer Radar -->
+          <div class="radar-footer">
+            <span class="radar-footer-text">Données agrégées depuis Meetup, Luma, Google Events — actualisées toutes les 6h</span>
+            <span class="radar-footer-link">
+              Voir tous les résultats
+              <!-- Arrow right icon -->
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2.5 6h7M6.5 3l3 3-3 3"/></svg>
+            </span>
+          </div>
+
+        </div><!-- /radar-section -->
+
+        <!-- Helper text under Radar -->
+        <p class="radar-helper">
+          Le Radar analyse le thème, la localisation et la date de votre événement pour identifier les événements concurrents. Utilisez ces informations pour affiner votre créneau horaire ou votre positionnement.
+        </p>
+
+        <!-- État Skeleton — masqué dans ce variant (visible en commentaire) -->
+        <!--
+        <div class="radar-section" style="opacity: 1;">
+          <div class="radar-header">
+            <div class="radar-title-row">
+              <div class="radar-title">
+                <div class="radar-icon-wrap">...</div>
+                Radar
+              </div>
+            </div>
+            <div class="radar-subtitle">Analyse en cours…</div>
+          </div>
+          <div class="radar-loading">
+            [3x skeleton-row]
+          </div>
+        </div>
+        -->
+
+      </div><!-- /col-right -->
+
+    </div><!-- /page-layout -->
+  </div><!-- /browser -->
+
+  <!-- ── Variant : état skeleton (second mockup) ── -->
+  <div style="max-width: 1100px; margin: 48px auto 0;">
+    <p style="text-align: center; font-size: 13px; font-weight: 700; color: var(--muted-foreground); margin-bottom: 20px; letter-spacing: 0.08em; text-transform: uppercase;">État Chargement — Skeleton Loader</p>
+
+    <div class="browser">
+      <div class="browser-bar">
+        <div class="browser-dots">
+          <div class="browser-dot browser-dot-red"></div>
+          <div class="browser-dot browser-dot-amber"></div>
+          <div class="browser-dot browser-dot-green"></div>
+        </div>
+        <div class="browser-url">https://theplayground.co/dashboard/communities/react-paris/events/workshop-react-avance</div>
+      </div>
+
+      <!-- Header seul pour le skeleton variant -->
+      <div class="site-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M3 2.5L10.5 6.5L3 10.5V2.5Z" fill="white"/>
+            </svg>
+          </div>
+          <div class="logo-text">the<span>playground</span></div>
+        </div>
+        <div class="header-nav">
+          <span class="nav-link active">Mon espace</span>
+          <span class="nav-link">Découvrir</span>
+        </div>
+        <div class="header-right">
+          <div class="header-avatar">SL</div>
+        </div>
+      </div>
+
+      <!-- Layout simplifié pour montrer uniquement le Radar skeleton -->
+      <div style="padding: 32px 40px; max-width: 700px;">
+        <div style="font-size: 11px; color: var(--muted-foreground); margin-bottom: 16px; font-style: italic;">
+          … (contenu page événement) …
+        </div>
+
+        <!-- Publish zone -->
+        <div class="publish-zone" style="margin-bottom: 24px;">
+          <div class="publish-zone-title">Prêt à publier cet événement ?</div>
+          <div class="publish-zone-sub">Une fois publié, les membres de votre communauté pourront s'inscrire et vous recevrez un lien partageable.</div>
+          <div class="publish-actions">
+            <button class="btn-primary">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8" cy="8" r="6.667"/>
+                <path d="M8 1.333a10.22 10.22 0 0 1 2.667 6.667A10.22 10.22 0 0 1 8 14.667 10.22 10.22 0 0 1 5.333 8 10.22 10.22 0 0 1 8 1.333z"/>
+                <path d="M1.333 8h13.334"/>
+              </svg>
+              Publier l'événement
+            </button>
+            <button class="btn-outline">Aperçu public</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Radar section — état skeleton -->
+        <div class="radar-section">
+          <div class="radar-header">
+            <div class="radar-title-row">
+              <div class="radar-title">
+                <div class="radar-icon-wrap">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="8" cy="8" r="1.5"/>
+                    <path d="M5.172 5.172a4 4 0 1 0 5.656 5.656"/>
+                    <path d="M3.05 3.05a7 7 0 1 0 9.9 9.9"/>
+                  </svg>
+                </div>
+                Radar
+              </div>
+              <!-- Badge animé pulse -->
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted-foreground);">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary); display: inline-block; animation: pulse-dot 1.2s ease-in-out infinite;"></span>
+                Analyse en cours…
+              </span>
+            </div>
+            <div class="radar-subtitle">Recherche d'événements similaires à Paris le 15 mars…</div>
+          </div>
+
+          <!-- Skeleton rows -->
+          <div class="radar-loading">
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-thumb"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton skeleton-line w-3-4"></div>
+                <div class="skeleton skeleton-line w-1-2"></div>
+                <div class="skeleton skeleton-line w-1-3"></div>
+              </div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-thumb"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton skeleton-line w-3-4"></div>
+                <div class="skeleton skeleton-line w-1-2"></div>
+                <div class="skeleton skeleton-line w-1-3"></div>
+              </div>
+            </div>
+            <div class="skeleton-row">
+              <div class="skeleton skeleton-thumb"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton skeleton-line w-3-4"></div>
+                <div class="skeleton skeleton-line w-1-2"></div>
+                <div class="skeleton skeleton-line w-1-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Annotations ── -->
+  <div class="annotation-zone">
+    <div class="annotation">
+      <div class="annotation-num">1</div>
+      <div class="annotation-title">Hiérarchie visuelle claire</div>
+      <div class="annotation-body">Le bouton "Publier l'événement" (rose, primaire) est toujours au-dessus du Radar. La section Radar est une information contextuelle, jamais un obstacle à l'action principale.</div>
+    </div>
+    <div class="annotation">
+      <div class="annotation-num">2</div>
+      <div class="annotation-title">Background différencié</div>
+      <div class="annotation-body">Le Radar utilise <code style="font-size:10px; background:#f0eff7; padding: 1px 4px; border-radius: 3px;">--radar-bg: #f7f6fc</code> pour se distinguer visuellement du contenu principal sans créer de rupture. Même approche que les blocs "À propos" ou les cartes de statistiques.</div>
+    </div>
+    <div class="annotation">
+      <div class="annotation-num">3</div>
+      <div class="annotation-title">Badges plateforme colorés</div>
+      <div class="annotation-body">Meetup = orange (#ea580c), Luma = violet (#7c3aed), Google = bleu (#1d4ed8). Toujours en <code style="font-size:10px; background:#f0eff7; padding: 1px 4px; border-radius: 3px;">outline</code> (fond clair + bordure + texte) pour rester lisibles sans dominer.</div>
+    </div>
+    <div class="annotation">
+      <div class="annotation-num">4</div>
+      <div class="annotation-title">Skeleton loader animé</div>
+      <div class="annotation-body">Pendant l'analyse (requête vers les APIs événements), 3 rangées skeleton avec animation shimmer. Le badge "Analyse en cours…" avec dot pulsant remplace temporairement le badge de résultats.</div>
+    </div>
+    <div class="annotation">
+      <div class="annotation-num">5</div>
+      <div class="annotation-title">Distance en accent rose</div>
+      <div class="annotation-body">La distance ("1.4 km") est le signal le plus actionnable pour l'Organisateur. Elle est mise en avant avec la couleur primary rose dans une pill, tout en restant petite pour ne pas écraser le titre de l'événement concurrent.</div>
+    </div>
+    <div class="annotation">
+      <div class="annotation-num">6</div>
+      <div class="annotation-title">Section uniquement en DRAFT</div>
+      <div class="annotation-body">Le Radar est masqué une fois l'événement publié. Sa valeur est avant la publication : aider l'Organisateur à ajuster son créneau ou son positionnement pour éviter les conflits de date.</div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.75); }
+    }
+  </style>
+
+</body>
+</html>

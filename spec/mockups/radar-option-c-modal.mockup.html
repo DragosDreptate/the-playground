@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Radar d'événements concurrents (Option C)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --card-foreground: #1a1b2e;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #eeeef6;
+      color: var(--foreground);
+      padding: 48px 24px;
+    }
+
+    /* ── Mockup title ── */
+    .mockup-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--foreground);
+      margin-bottom: 6px;
+    }
+    .mockup-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 48px;
+    }
+
+    /* ══════════════════════════════════════════
+       BROWSER CHROME WRAPPER
+    ══════════════════════════════════════════ */
+    .browser-chrome {
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      background: #fff;
+      position: relative;
+    }
+
+    .browser-bar {
+      background: #f0f0f5;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .browser-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .browser-dots span {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red   { background: #ff5f57; }
+    .dot-amber { background: #febc2e; }
+    .dot-green { background: #28c840; }
+    .browser-url {
+      flex: 1;
+      background: #e5e5ef;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: #666;
+      font-family: monospace;
+    }
+
+    /* ══════════════════════════════════════════
+       PAGE BACKGROUND (dashboard event page)
+    ══════════════════════════════════════════ */
+    .page-bg {
+      background: var(--background);
+      min-height: 640px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Site header ── */
+    .site-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .site-logo {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .avatar-sm {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #c03060);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* ── Page layout ── */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0;
+      min-height: 592px;
+    }
+
+    /* ── LEFT column (sticky sidebar) ── */
+    .col-left {
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      filter: blur(1.5px);
+      opacity: 0.7;
+    }
+    .cover-image {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #2d1b4e, #6b21a8, #c026d3);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-icon {
+      font-size: 40px;
+      opacity: 0.6;
+    }
+    .circle-info-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .circle-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted-foreground);
+    }
+    .circle-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .circle-avatar-mini {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .circle-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    .sidebar-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .sidebar-stat-icon {
+      font-size: 12px;
+    }
+
+    /* ── RIGHT column ── */
+    .col-right {
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      filter: blur(1.5px);
+      opacity: 0.7;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .breadcrumb-sep {
+      font-size: 11px;
+      opacity: 0.5;
+    }
+    .breadcrumb-link {
+      color: var(--muted-foreground);
+      text-decoration: none;
+    }
+    .breadcrumb-current {
+      color: var(--foreground);
+      font-weight: 500;
+    }
+
+    /* ── Page action header ── */
+    .page-action-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge-draft {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #f0eff7;
+      color: var(--muted-foreground);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Buttons (blurred background) ── */
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-outline {
+      background: #fff;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted-foreground);
+      border: 1px solid transparent;
+    }
+
+    /* ── Radar button with badge (on top of blur) ── */
+    .btn-radar-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #fff;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+      position: relative;
+      white-space: nowrap;
+      filter: none !important;
+    }
+    .radar-badge {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      background: #e53e3e;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #fff;
+      letter-spacing: 0;
+    }
+
+    /* ── Moment title & details ── */
+    .moment-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--foreground);
+      line-height: 1.2;
+    }
+    .moment-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+    .meta-icon {
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+    }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+    .description-block {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+
+    /* ══════════════════════════════════════════
+       MODAL OVERLAY
+    ══════════════════════════════════════════ */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 15, 30, 0.55);
+      backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      z-index: 100;
+    }
+
+    .modal {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.12);
+      width: 100%;
+      max-width: 660px;
+      max-height: 540px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    /* ── Modal header ── */
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .modal-header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--foreground);
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-title-icon {
+      font-size: 16px;
+    }
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal-subtitle-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--muted-foreground);
+      display: inline-block;
+    }
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      flex-shrink: 0;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+    }
+    .modal-close:hover {
+      background: var(--muted);
+    }
+
+    /* ── Modal body (scrollable) ── */
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+    }
+    .modal-body::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .modal-body::-webkit-scrollbar-thumb {
+      background: #d0d0de;
+      border-radius: 4px;
+    }
+
+    /* ── Section separator ── */
+    .section-sep {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 8px 24px 6px;
+      background: rgba(245, 245, 250, 0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-sep-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+    .section-sep-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-sep-conflict {
+      background: rgba(254, 215, 215, 0.5);
+    }
+    .section-sep-conflict .section-sep-label {
+      color: #c53030;
+    }
+    .section-sep-conflict .section-sep-line {
+      background: #fca5a5;
+    }
+    .section-sep-indirect {
+      background: rgba(245, 245, 250, 0.92);
+    }
+
+    /* ── Event card ── */
+    .event-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .event-card {
+      padding: 14px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+    .event-card:hover {
+      background: var(--muted);
+    }
+    .event-card:last-child {
+      border-bottom: none;
+    }
+
+    .event-card-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      min-width: 40px;
+    }
+    .event-date-box {
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .event-date-month {
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted-foreground);
+      line-height: 1;
+    }
+    .event-date-day {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--foreground);
+      line-height: 1;
+    }
+    .event-date-conflict {
+      background: rgba(254, 215, 215, 0.4);
+      border-color: #fca5a5;
+    }
+    .event-date-conflict .event-date-month {
+      color: #c53030;
+    }
+    .event-date-conflict .event-date-day {
+      color: #c53030;
+    }
+
+    .event-card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .event-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--foreground);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .event-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .event-card-sep {
+      color: var(--border);
+    }
+    .event-distance {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+
+    .event-card-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* ── Platform badges ── */
+    .badge-platform {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .badge-meetup {
+      background: rgba(237, 110, 45, 0.12);
+      color: #c05620;
+      border: 1px solid rgba(237, 110, 45, 0.25);
+    }
+    .badge-luma {
+      background: rgba(109, 40, 217, 0.10);
+      color: #6d28d9;
+      border: 1px solid rgba(109, 40, 217, 0.2);
+    }
+    .badge-google {
+      background: rgba(37, 99, 235, 0.10);
+      color: #1d4ed8;
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .badge-meetup .badge-dot { background: #ed6e2d; }
+    .badge-luma .badge-dot   { background: #7c3aed; }
+    .badge-google .badge-dot { background: #2563eb; }
+
+    .external-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      color: var(--muted-foreground);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-size: 11px;
+      transition: background 0.12s, color 0.12s;
+    }
+    .external-link:hover {
+      background: var(--muted);
+      color: var(--foreground);
+    }
+
+    /* ── Conflict indicator ── */
+    .conflict-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #e53e3e;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Modal footer ── */
+    .modal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: var(--card);
+    }
+    .modal-footer-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .refresh-link {
+      color: var(--primary);
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .refresh-link:hover {
+      text-decoration: underline;
+    }
+    .footer-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+      border-radius: 5px;
+    }
+
+    /* ══════════════════════════════════════════
+       ANNOTATION LAYER
+    ══════════════════════════════════════════ */
+    .annotation-wrapper {
+      position: relative;
+      max-width: 1100px;
+      margin: 32px auto 0;
+    }
+    .annotations {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .annotation-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .annotation-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .annotation-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+    .annotation-text {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-title">Radar d'événements concurrents — Option C</div>
+  <div class="mockup-subtitle">Modale déclenchée depuis le header de la page événement dashboard · DRAFT · Workshop React Avancé</div>
+
+  <!-- ── Browser Chrome ── -->
+  <div class="browser-chrome">
+    <div class="browser-bar">
+      <div class="browser-dots">
+        <span class="dot-red"></span>
+        <span class="dot-amber"></span>
+        <span class="dot-green"></span>
+      </div>
+      <div class="browser-url">app.theplayground.io/dashboard/circles/react-paris/moments/workshop-react-avance</div>
+    </div>
+
+    <!-- ── Page background ── -->
+    <div class="page-bg">
+
+      <!-- Site header (blurred) -->
+      <div class="site-header" style="filter: blur(1.5px); opacity: 0.7;">
+        <div class="site-logo">The Playground</div>
+        <div class="site-nav">
+          <div class="avatar-sm">SL</div>
+        </div>
+      </div>
+
+      <!-- Page layout (blurred) -->
+      <div class="page-layout">
+
+        <!-- LEFT column -->
+        <div class="col-left">
+          <div class="cover-image">
+            <div class="cover-icon">⚛️</div>
+          </div>
+          <div class="circle-info-box">
+            <div class="circle-label">Communauté</div>
+            <div class="circle-name-row">
+              <div class="circle-avatar-mini">R</div>
+              <div class="circle-name">React Paris</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div class="sidebar-stat">
+              <span class="sidebar-stat-icon">👥</span>
+              <span>248 membres</span>
+            </div>
+            <div class="sidebar-stat">
+              <span class="sidebar-stat-icon">📅</span>
+              <span>12 événements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT column -->
+        <div class="col-right">
+
+          <!-- Breadcrumb -->
+          <div class="breadcrumb">
+            <span class="breadcrumb-link">Mon espace</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-link">React Paris</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">Workshop React Avancé</span>
+          </div>
+
+          <!-- Action header -->
+          <div class="page-action-header">
+            <div class="badge-draft">BROUILLON</div>
+            <div class="btn-row">
+              <!-- Radar button — NOT blurred, shown clearly below the overlay -->
+              <button class="btn btn-outline btn-sm" style="opacity:0.7;">
+                ✏️ Modifier
+              </button>
+              <button class="btn btn-outline btn-sm" style="opacity:0.7;">
+                🗑 Supprimer
+              </button>
+              <button class="btn btn-primary btn-sm" style="opacity:0.7;">
+                🚀 Publier
+              </button>
+            </div>
+          </div>
+
+          <!-- Moment info -->
+          <div class="moment-title">Workshop React Avancé</div>
+
+          <div class="moment-meta">
+            <div class="meta-row">
+              <span class="meta-icon">📅</span>
+              <span>Dimanche 15 mars 2026 · 14h00 – 17h00</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">📍</span>
+              <span>Station F, Paris 13e</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-icon">🎟</span>
+              <span>Gratuit · 40 places</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="description-block">
+            Un workshop intensif de 3h sur les patterns avancés de React 19 : Server Components, Suspense, et optimisation des performances. Niveau intermédiaire requis.
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══ MODAL OVERLAY ══ -->
+      <div class="modal-overlay">
+
+        <!-- Radar button in context (floating, not blurred, showing where it appears) -->
+        <div style="position: absolute; top: 88px; right: 32px; z-index: 200;">
+          <div style="position: relative; display: inline-block;">
+            <button class="btn btn-outline btn-sm btn-radar-live">
+              <!-- Radar SVG icon -->
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+                <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/>
+                <path d="M4 6h.01"/>
+                <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/>
+                <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/>
+                <path d="M12 18h.01"/>
+                <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/>
+                <circle cx="12" cy="12" r="2"/>
+                <path d="m13.41 10.59 5.66-5.66"/>
+              </svg>
+              Radar
+              <div class="radar-badge">4</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- The modal -->
+        <div class="modal">
+
+          <!-- Modal header -->
+          <div class="modal-header">
+            <div class="modal-header-top">
+              <div class="modal-title-group">
+                <div class="modal-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); flex-shrink:0;">
+                    <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/>
+                    <path d="M4 6h.01"/>
+                    <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/>
+                    <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/>
+                    <path d="M12 18h.01"/>
+                    <path d="M17.99 11.66A6 6 0 1 0 15.77 16.67"/>
+                    <circle cx="12" cy="12" r="2"/>
+                    <path d="m13.41 10.59 5.66-5.66"/>
+                  </svg>
+                  Radar
+                  <span style="font-weight: 400; color: var(--muted-foreground); font-size: 14px;">— 4 événements similaires détectés</span>
+                </div>
+                <div class="modal-subtitle">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Paris
+                  <span class="modal-subtitle-dot"></span>
+                  15 mars 2026
+                  <span class="modal-subtitle-dot"></span>
+                  Tech &amp; Dev
+                </div>
+              </div>
+              <button class="modal-close">✕</button>
+            </div>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+            <div class="event-cards">
+
+              <!-- ══ SECTION : Même jour ══ -->
+              <div class="section-sep section-sep-conflict">
+                <span class="section-sep-label">⚠ Même jour — conflits directs</span>
+                <div class="section-sep-line"></div>
+                <span style="font-size: 10px; color: #c53030; font-weight: 600;">3</span>
+              </div>
+
+              <!-- Card 1 — Conflict, Meetup -->
+              <div class="event-card">
+                <div class="event-card-left">
+                  <div class="event-date-box event-date-conflict">
+                    <div class="event-date-month">Mar</div>
+                    <div class="event-date-day">15</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items: flex-start; gap:8px; flex: 1; min-width:0;">
+                  <div class="conflict-dot" style="margin-top: 3px;"></div>
+                  <div class="event-card-body">
+                    <div class="event-card-title">React Advanced — Patterns &amp; Performance 2026</div>
+                    <div class="event-card-meta">
+                      <span>14h30 – 17h30</span>
+                      <span class="event-card-sep">·</span>
+                      <span>Numa Paris, 13e</span>
+                      <span class="event-card-sep">·</span>
+                      <span class="event-distance">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        0.8 km
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card-right">
+                  <span class="badge-platform badge-meetup">
+                    <span class="badge-dot"></span>Meetup
+                  </span>
+                  <a href="#" class="external-link" title="Voir l'événement">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Card 2 — Conflict, Luma -->
+              <div class="event-card">
+                <div class="event-card-left">
+                  <div class="event-date-box event-date-conflict">
+                    <div class="event-date-month">Mar</div>
+                    <div class="event-date-day">15</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items: flex-start; gap:8px; flex: 1; min-width:0;">
+                  <div class="conflict-dot" style="margin-top: 3px;"></div>
+                  <div class="event-card-body">
+                    <div class="event-card-title">Next.js 15 Workshop — Server Components Deep Dive</div>
+                    <div class="event-card-meta">
+                      <span>13h00 – 16h00</span>
+                      <span class="event-card-sep">·</span>
+                      <span>Le Cargo, Paris 11e</span>
+                      <span class="event-card-sep">·</span>
+                      <span class="event-distance">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        2.1 km
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card-right">
+                  <span class="badge-platform badge-luma">
+                    <span class="badge-dot"></span>Luma
+                  </span>
+                  <a href="#" class="external-link" title="Voir l'événement">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Card 3 — Conflict, Google -->
+              <div class="event-card">
+                <div class="event-card-left">
+                  <div class="event-date-box event-date-conflict">
+                    <div class="event-date-month">Mar</div>
+                    <div class="event-date-day">15</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items: flex-start; gap:8px; flex: 1; min-width:0;">
+                  <div class="conflict-dot" style="margin-top: 3px;"></div>
+                  <div class="event-card-body">
+                    <div class="event-card-title">GDG Paris — JavaScript &amp; Web Frameworks Meetup</div>
+                    <div class="event-card-meta">
+                      <span>15h00 – 18h00</span>
+                      <span class="event-card-sep">·</span>
+                      <span>Google Paris, Opéra</span>
+                      <span class="event-card-sep">·</span>
+                      <span class="event-distance">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        3.4 km
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card-right">
+                  <span class="badge-platform badge-google">
+                    <span class="badge-dot"></span>Google
+                  </span>
+                  <a href="#" class="external-link" title="Voir l'événement">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+              </div>
+
+              <!-- ══ SECTION : Même semaine ══ -->
+              <div class="section-sep section-sep-indirect">
+                <span class="section-sep-label">Même semaine — conflits indirects</span>
+                <div class="section-sep-line"></div>
+                <span style="font-size: 10px; color: var(--muted-foreground); font-weight: 600;">1</span>
+              </div>
+
+              <!-- Card 4 — Indirect, Meetup -->
+              <div class="event-card">
+                <div class="event-card-left">
+                  <div class="event-date-box">
+                    <div class="event-date-month">Mar</div>
+                    <div class="event-date-day">18</div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items: flex-start; gap:8px; flex: 1; min-width:0;">
+                  <div style="width: 7px; height: 7px; border-radius: 50%; background: var(--muted-foreground); margin-top: 3px; opacity: 0.4; flex-shrink:0;"></div>
+                  <div class="event-card-body">
+                    <div class="event-card-title">Frontend Paris — TypeScript &amp; React Best Practices</div>
+                    <div class="event-card-meta">
+                      <span>Mardi 18 mars</span>
+                      <span class="event-card-sep">·</span>
+                      <span>18h30 – 21h00</span>
+                      <span class="event-card-sep">·</span>
+                      <span>Deskeo, Paris 2e</span>
+                      <span class="event-card-sep">·</span>
+                      <span class="event-distance">
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        4.7 km
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="event-card-right">
+                  <span class="badge-platform badge-meetup">
+                    <span class="badge-dot"></span>Meetup
+                  </span>
+                  <a href="#" class="external-link" title="Voir l'événement">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
+                </div>
+              </div>
+
+            </div><!-- /event-cards -->
+          </div><!-- /modal-body -->
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <div class="modal-footer-meta">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Dernière mise à jour il y a 2h
+              <span style="color: var(--border);">·</span>
+              <a href="#" class="refresh-link">Actualiser</a>
+            </div>
+            <div class="footer-actions">
+              <button class="btn btn-outline btn-sm">Fermer</button>
+            </div>
+          </div>
+
+        </div><!-- /modal -->
+
+      </div><!-- /modal-overlay -->
+
+    </div><!-- /page-bg -->
+  </div><!-- /browser-chrome -->
+
+  <!-- ── Annotations ── -->
+  <div class="annotation-wrapper">
+    <div class="annotations">
+
+      <div class="annotation-card">
+        <div class="annotation-num">1</div>
+        <div class="annotation-title">Bouton Radar + badge rouge</div>
+        <div class="annotation-text">Le bouton "Radar" apparaît dans l'action header de la page événement, entre les boutons secondaires et le bouton "Publier". Un badge rouge "4" signale les conflits détectés sans ouvrir la modale.</div>
+      </div>
+
+      <div class="annotation-card">
+        <div class="annotation-num">2</div>
+        <div class="annotation-title">Séparation Même jour / Même semaine</div>
+        <div class="annotation-text">Les labels sticky distinguent visuellement les conflits directs (même jour, fond rose pâle, texte rouge) des conflits indirects (même semaine, neutre). Chaque section affiche un compteur.</div>
+      </div>
+
+      <div class="annotation-card">
+        <div class="annotation-num">3</div>
+        <div class="annotation-title">Cards légères et badges plateforme</div>
+        <div class="annotation-text">Chaque card affiche : titre, heure, adresse courte, distance. Le badge plateforme (Meetup = orange, Luma = violet, Google = bleu) permet d'identifier l'origine. L'icône lien externe ouvre l'événement dans un nouvel onglet.</div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

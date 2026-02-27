@@ -76,3 +76,6 @@ public/workbox-*.js.map
 
 # Exports locaux (données sensibles)
 exports/
+
+# spec — marketing local uniquement
+/spec/mkt/

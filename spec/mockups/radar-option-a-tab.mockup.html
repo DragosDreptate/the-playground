@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Radar événements concurrents (onglet dashboard organisateur)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --destructive: #e8457a;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* ── SiteHeader ── */
+.site-header {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 1.5rem;
+  gap: 1rem;
+}
+.site-header .logo {
+  font-weight: 700; font-size: 1rem; color: var(--foreground); text-decoration: none;
+}
+.site-header .logo span { color: var(--primary); }
+.site-header nav { display: flex; gap: 1.5rem; margin-left: auto; align-items: center; }
+.site-header nav a { font-size: 0.875rem; color: var(--muted-foreground); text-decoration: none; }
+.site-header nav a:hover { color: var(--foreground); }
+.site-header .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  font-size: 0.75rem; font-weight: 600; color: white;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── Page wrapper ── */
+.page-wrapper { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ── Breadcrumb ── */
+.breadcrumb { display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem; color: var(--muted-foreground); }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+.chevron { font-size: 0.75rem; color: var(--muted-foreground); }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.75rem; font-weight: 500;
+  border: 1px solid transparent;
+}
+.badge-host { border-color: rgba(232,69,122,0.4); color: var(--primary); background: transparent; }
+.badge-draft { background: var(--muted); color: var(--muted-foreground); border-color: var(--border); }
+.badge-secondary { background: var(--muted); color: var(--muted-foreground); }
+
+/* Platform source badges */
+.badge-meetup {
+  background: rgba(237,108,2,0.1);
+  border-color: rgba(237,108,2,0.3);
+  color: #c05a00;
+}
+.badge-luma {
+  background: rgba(124,58,237,0.1);
+  border-color: rgba(124,58,237,0.3);
+  color: #6d28d9;
+}
+.badge-eventbrite {
+  background: rgba(249,115,22,0.1);
+  border-color: rgba(249,115,22,0.25);
+  color: #c2410c;
+}
+.badge-google {
+  background: rgba(59,130,246,0.1);
+  border-color: rgba(59,130,246,0.3);
+  color: #1d4ed8;
+}
+
+/* Radar count badge */
+.badge-radar {
+  background: rgba(232,69,122,0.1);
+  border-color: rgba(232,69,122,0.25);
+  color: var(--primary);
+  font-size: 0.8125rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  display: inline-flex; align-items: center; gap: 0.375rem;
+}
+
+/* ── Two-column layout ── */
+.two-col { display: flex; flex-direction: column; gap: 2rem; margin-top: 2rem; }
+@media (min-width: 1024px) {
+  .two-col { flex-direction: row; align-items: flex-start; }
+  .col-left { width: 300px; flex-shrink: 0; position: sticky; top: 72px; }
+  .col-right { flex: 1; min-width: 0; }
+}
+
+/* ── LEFT sidebar ── */
+.cover-wrap { position: relative; margin-bottom: 1.5rem; }
+.cover-glow {
+  position: absolute; bottom: -12px; left: 16px; right: 16px;
+  height: 40px; opacity: 0.55;
+  filter: blur(16px);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 0 0 1rem 1rem;
+}
+.cover-img {
+  position: relative;
+  aspect-ratio: 1/1;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+.cover-img .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.15); }
+.cover-img .icon-center {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-icon-bg {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-label {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(0,0,0,0.45);
+  color: white;
+  font-size: 0.7rem; font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+.sidebar-section { margin-bottom: 1.25rem; padding: 0 2px; }
+.section-label {
+  font-size: 0.7rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--muted-foreground); margin-bottom: 0.5rem;
+}
+.avatars-row { display: flex; gap: 6px; margin-bottom: 0.375rem; }
+.host-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 600; color: white;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  flex-shrink: 0;
+}
+.host-name { font-size: 0.875rem; font-weight: 500; }
+
+.stats-row { display: flex; gap: 1.25rem; }
+.stat-num { font-size: 1.375rem; font-weight: 700; line-height: 1.2; }
+.stat-label { font-size: 0.7rem; color: var(--muted-foreground); margin-top: 0.1rem; }
+.stat-divider { border-left: 1px solid var(--border); padding-left: 1.25rem; }
+
+/* ── RIGHT column ── */
+.hosted-by { font-size: 0.8125rem; color: var(--muted-foreground); margin-bottom: 0.5rem; }
+.hosted-by strong { color: var(--foreground); }
+.actions-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+h1 {
+  font-size: 1.75rem; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1.25;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0.5rem 1rem; border-radius: var(--radius);
+  font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; border: none; text-decoration: none;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { opacity: 0.85; }
+.btn-default { background: var(--primary); color: white; }
+.btn-outline {
+  background: transparent; color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost {
+  background: transparent; color: var(--muted-foreground);
+  padding: 0.375rem 0.75rem;
+}
+.btn-ghost:hover { color: var(--foreground); background: var(--muted); }
+.btn-sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+
+/* ── Separator ── */
+.separator { border: none; border-top: 1px solid var(--border); margin: 1.25rem 0; }
+
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex; gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.75rem;
+}
+.tab-item {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem; font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.tab-item:hover { color: var(--foreground); }
+.tab-item.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+.tab-count {
+  font-size: 0.7rem; font-weight: 600;
+  background: rgba(232,69,122,0.12);
+  color: var(--primary);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+}
+.tab-count-neutral {
+  font-size: 0.7rem; font-weight: 600;
+  background: var(--muted);
+  color: var(--muted-foreground);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+}
+
+/* ── Radar section ── */
+.radar-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.radar-header-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.radar-title {
+  font-size: 0.9375rem; font-weight: 600;
+}
+.radar-subtitle {
+  font-size: 0.8125rem; color: var(--muted-foreground); margin-top: 0.125rem;
+}
+
+/* ── Radar info banner ── */
+.radar-info {
+  background: rgba(232,69,122,0.05);
+  border: 1px solid rgba(232,69,122,0.18);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.radar-info-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  background: rgba(232,69,122,0.12);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 0.1rem;
+}
+.radar-info-text { font-size: 0.8125rem; color: var(--muted-foreground); line-height: 1.6; }
+.radar-info-text strong { color: var(--foreground); }
+
+/* ── Competitor cards ── */
+.competitor-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.competitor-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1rem 1.125rem;
+  display: flex; align-items: flex-start; gap: 1rem;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  cursor: default;
+}
+.competitor-card:hover {
+  border-color: rgba(232,69,122,0.25);
+  box-shadow: var(--shadow-md);
+}
+
+.competitor-thumb {
+  width: 52px; height: 52px; border-radius: 0.5rem;
+  flex-shrink: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+}
+
+.competitor-body { flex: 1; min-width: 0; }
+.competitor-title {
+  font-size: 0.9375rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 0.25rem;
+  color: var(--foreground);
+}
+.competitor-meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem;
+  font-size: 0.8rem; color: var(--muted-foreground);
+  margin-bottom: 0.5rem;
+}
+.competitor-meta-item { display: flex; align-items: center; gap: 0.3rem; }
+.meta-dot {
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--border); flex-shrink: 0;
+}
+
+.competitor-tags { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+.distance-chip {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.75rem; font-weight: 500;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+}
+
+.competitor-action { flex-shrink: 0; padding-top: 0.125rem; }
+.external-link {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.8rem; color: var(--muted-foreground);
+  text-decoration: none; padding: 0.375rem 0.625rem;
+  border: 1px solid var(--border); border-radius: 0.375rem;
+  background: transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.external-link:hover {
+  color: var(--primary);
+  border-color: rgba(232,69,122,0.4);
+  background: rgba(232,69,122,0.04);
+}
+
+/* ── Conflict indicator ── */
+.conflict-high .competitor-card {
+  border-color: rgba(232,69,122,0.3);
+  background: rgba(232,69,122,0.025);
+}
+.conflict-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0; margin-top: 6px;
+}
+.conflict-dot-high { background: var(--primary); }
+.conflict-dot-med { background: #f59e0b; }
+.conflict-dot-low { background: #94a3b8; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center; padding: 3rem 2rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.empty-icon {
+  font-size: 2.5rem; margin-bottom: 0.75rem;
+  display: block;
+}
+.empty-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.375rem; }
+.empty-subtitle { font-size: 0.875rem; color: var(--muted-foreground); }
+
+/* ── Footer note ── */
+.radar-footer {
+  margin-top: 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.75rem; color: var(--muted-foreground);
+  flex-wrap: wrap; gap: 0.5rem;
+}
+.radar-footer a { color: var(--muted-foreground); text-decoration: underline; text-decoration-color: var(--border); }
+.radar-footer a:hover { color: var(--primary); }
+
+/* ── SVG icons inline ── */
+.icon { display: inline-flex; align-items: center; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ── SiteHeader ── -->
+<header class="site-header">
+  <a href="#" class="logo">The <span>Playground</span></a>
+  <nav>
+    <a href="#">Découvrir</a>
+    <a href="#">Mon espace</a>
+    <div class="avatar">S</div>
+  </nav>
+</header>
+
+<!-- ── Page ── -->
+<div class="page-wrapper">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="chevron">›</span>
+    <a href="#">React &amp; Frontend Paris</a>
+    <span class="chevron">›</span>
+    <a href="#">Événements</a>
+    <span class="chevron">›</span>
+    <span class="current">Workshop React Avancé</span>
+  </nav>
+
+  <!-- Two columns -->
+  <div class="two-col">
+
+    <!-- ── LEFT sidebar ── -->
+    <aside class="col-left">
+      <!-- Cover -->
+      <div class="cover-wrap">
+        <div class="cover-glow"></div>
+        <div class="cover-img">
+          <div class="overlay"></div>
+          <span class="cover-label">Brouillon</span>
+          <div class="icon-center">
+            <div class="cover-icon-bg">
+              <!-- Code icon -->
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Circle info -->
+      <div class="sidebar-section">
+        <div class="section-label">Communauté</div>
+        <div class="host-name" style="font-weight:600; margin-bottom:0.25rem;">React &amp; Frontend Paris</div>
+        <div style="font-size:0.8rem; color:var(--muted-foreground);">Communauté · 847 membres</div>
+      </div>
+
+      <div class="separator" style="margin: 1rem 0;"></div>
+
+      <!-- Organisateurs -->
+      <div class="sidebar-section">
+        <div class="section-label">Organisateur</div>
+        <div class="avatars-row">
+          <div class="host-avatar">S</div>
+        </div>
+        <div class="host-name">Sophie Martin</div>
+        <div style="font-size:0.8rem; color:var(--muted-foreground);">Host</div>
+      </div>
+
+      <div class="separator" style="margin: 1rem 0;"></div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div>
+          <div class="stat-num">0</div>
+          <div class="stat-label">Inscrits</div>
+        </div>
+        <div class="stat-divider">
+          <div class="stat-num">30</div>
+          <div class="stat-label">Places max</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── RIGHT column ── -->
+    <main class="col-right">
+
+      <!-- Hosted by + actions -->
+      <div class="hosted-by">Organisé par <strong>Sophie Martin</strong></div>
+      <div class="actions-row">
+        <span class="badge badge-draft">Brouillon</span>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <button class="btn btn-outline btn-sm" style="border-color:rgba(232,69,122,0.4); color:var(--destructive);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Supprimer
+          </button>
+          <button class="btn btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Modifier
+          </button>
+          <button class="btn btn-default btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Publier
+          </button>
+        </div>
+      </div>
+
+      <h1>Workshop React Avancé</h1>
+
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <a href="#" class="tab-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Détails
+        </a>
+        <a href="#" class="tab-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Inscriptions
+          <span class="tab-count-neutral">0</span>
+        </a>
+        <a href="#" class="tab-item active">
+          <!-- Radar icon -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+          Radar
+          <span class="tab-count">4</span>
+        </a>
+      </div>
+
+      <!-- ══════════════════════════════════
+           RADAR TAB CONTENT
+      ══════════════════════════════════ -->
+
+      <!-- Section header -->
+      <div class="radar-header">
+        <div class="radar-header-left">
+          <div>
+            <div class="radar-title" style="display:flex; align-items:center; gap:0.5rem;">
+              <span class="badge-radar">
+                <!-- signal icon -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.636 18.364a9 9 0 010-12.728"/><path d="M18.364 5.636a9 9 0 010 12.728"/><path d="M9.172 14.828a4 4 0 010-5.656"/><path d="M14.828 9.172a4 4 0 010 5.656"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+                4 événements similaires détectés à Paris le 15 mars
+              </span>
+            </div>
+            <div class="radar-subtitle" style="margin-top:0.5rem;">Votre événement est en concurrence directe avec d'autres ce même jour.</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="flex-shrink:0;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Actualiser
+        </button>
+      </div>
+
+      <!-- Info banner -->
+      <div class="radar-info">
+        <div class="radar-info-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="radar-info-text">
+          Le Radar détecte les événements <strong>React, JavaScript et frontend</strong> publiés sur d'autres plateformes à Paris le <strong>15 mars 2026</strong>.
+          Ces informations vous aident à <strong>choisir le meilleur créneau</strong> avant de publier.
+        </div>
+      </div>
+
+      <!-- ── Competitor cards ── -->
+      <div class="competitor-list">
+
+        <!-- Card 1 — Forte concurrence (même heure) -->
+        <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+          <div class="conflict-dot conflict-dot-high" style="margin-top:1.25rem;"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="competitor-card" style="border-color:rgba(232,69,122,0.28); background:rgba(232,69,122,0.025);">
+              <div class="competitor-thumb" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">
+                ⚛️
+              </div>
+              <div class="competitor-body">
+                <div class="competitor-title">React Paris Meetup #42 — Hooks avancés &amp; Suspense</div>
+                <div class="competitor-meta">
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    15 mars · 14h00–17h00
+                  </span>
+                  <span class="meta-dot"></span>
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Station F, 5 Parvis Alan Turing, Paris 13e
+                  </span>
+                </div>
+                <div class="competitor-tags">
+                  <span class="badge badge-meetup">Meetup</span>
+                  <span class="distance-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    2.3 km
+                  </span>
+                  <span style="font-size:0.75rem; color:var(--destructive); font-weight:500; background:rgba(232,69,122,0.08); padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid rgba(232,69,122,0.2);">
+                    ⚠ Même créneau horaire
+                  </span>
+                </div>
+              </div>
+              <div class="competitor-action">
+                <a href="#" class="external-link" target="_blank">
+                  Voir
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — Concurrence modérée -->
+        <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+          <div class="conflict-dot conflict-dot-high" style="margin-top:1.25rem;"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="competitor-card" style="border-color:rgba(232,69,122,0.28); background:rgba(232,69,122,0.025);">
+              <div class="competitor-thumb" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+                🛠️
+              </div>
+              <div class="competitor-body">
+                <div class="competitor-title">Frontend Craft — TypeScript &amp; React Performance Deep Dive</div>
+                <div class="competitor-meta">
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    15 mars · 13h30–16h30
+                  </span>
+                  <span class="meta-dot"></span>
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    WeWork Nation, Paris 2e
+                  </span>
+                </div>
+                <div class="competitor-tags">
+                  <span class="badge badge-luma">Luma</span>
+                  <span class="distance-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    4.1 km
+                  </span>
+                  <span style="font-size:0.75rem; color:var(--destructive); font-weight:500; background:rgba(232,69,122,0.08); padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid rgba(232,69,122,0.2);">
+                    ⚠ Chevauchement partiel
+                  </span>
+                </div>
+              </div>
+              <div class="competitor-action">
+                <a href="#" class="external-link" target="_blank">
+                  Voir
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — Faible concurrence (le soir) -->
+        <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+          <div class="conflict-dot conflict-dot-med" style="margin-top:1.25rem;"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="competitor-card">
+              <div class="competitor-thumb" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8);">
+                🔥
+              </div>
+              <div class="competitor-body">
+                <div class="competitor-title">JavaScript Night — Next.js App Router &amp; Server Components</div>
+                <div class="competitor-meta">
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    15 mars · 19h00–21h30
+                  </span>
+                  <span class="meta-dot"></span>
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    42 Paris, rue de la Roquette, Paris 11e
+                  </span>
+                </div>
+                <div class="competitor-tags">
+                  <span class="badge badge-meetup">Meetup</span>
+                  <span class="distance-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    6.8 km
+                  </span>
+                  <span style="font-size:0.75rem; color:#b45309; font-weight:500; background:rgba(245,158,11,0.1); padding:0.15rem 0.5rem; border-radius:9999px; border:1px solid rgba(245,158,11,0.25);">
+                    Même jour, créneau différent
+                  </span>
+                </div>
+              </div>
+              <div class="competitor-action">
+                <a href="#" class="external-link" target="_blank">
+                  Voir
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Faible concurrence (thème adjacent) -->
+        <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+          <div class="conflict-dot conflict-dot-low" style="margin-top:1.25rem;"></div>
+          <div style="flex:1; min-width:0;">
+            <div class="competitor-card">
+              <div class="competitor-thumb" style="background:linear-gradient(135deg,#10b981,#34d399);">
+                💡
+              </div>
+              <div class="competitor-body">
+                <div class="competitor-title">DevTalks Paris — Web Perf, Accessibilité &amp; Design Systems</div>
+                <div class="competitor-meta">
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    15 mars · 14h30–17h00
+                  </span>
+                  <span class="meta-dot"></span>
+                  <span class="competitor-meta-item">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Epitech Paris, rue de Vincennes, Paris 20e
+                  </span>
+                </div>
+                <div class="competitor-tags">
+                  <span class="badge badge-google">Google / SerpAPI</span>
+                  <span class="distance-chip">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    9.2 km
+                  </span>
+                  <span style="font-size:0.75rem; color:var(--muted-foreground); font-weight:400;">
+                    Thème adjacent
+                  </span>
+                </div>
+              </div>
+              <div class="competitor-action">
+                <a href="#" class="external-link" target="_blank">
+                  Voir
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <!-- /competitor-list -->
+
+      <!-- Legend -->
+      <div style="display:flex; gap:1.25rem; margin-top:1rem; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--muted-foreground);">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--primary);flex-shrink:0;display:inline-block;"></span>
+          Conflit direct
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--muted-foreground);">
+          <span style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block;"></span>
+          Concurrence modérée
+        </div>
+        <div style="display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--muted-foreground);">
+          <span style="width:8px;height:8px;border-radius:50%;background:#94a3b8;flex-shrink:0;display:inline-block;"></span>
+          Faible concurrence
+        </div>
+      </div>
+
+      <!-- Footer note -->
+      <div class="radar-footer">
+        <span>Dernière mise à jour il y a 12 minutes · Sources : Meetup, Luma, Google Events</span>
+        <a href="#">Comment fonctionne le Radar ?</a>
+      </div>
+
+      <!-- ══════════════════════════════════
+           ÉTAT VIDE — commenté pour référence
+           (décommenter pour voir l'état vide)
+      ══════════════════════════════════
+      <div class="empty-state">
+        <span class="empty-icon">🎉</span>
+        <div class="empty-title">Aucun événement similaire détecté — bonne nouvelle !</div>
+        <div class="empty-subtitle">Aucun autre événement React ou frontend n'est programmé à Paris le 15 mars 2026.</div>
+      </div>
+      -->
+
+    </main>
+    <!-- /col-right -->
+
+  </div>
+  <!-- /two-col -->
+</div>
+<!-- /page-wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     SECTION ÉTAT VIDE — démonstration séparée
+═══════════════════════════════════════════════════════════ -->
+<div style="max-width:1100px; margin:3rem auto 0; padding:0 1.5rem 4rem;">
+  <div style="border-top:2px dashed var(--border); padding-top:2rem; margin-bottom:1.5rem;">
+    <span style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted-foreground); background:var(--background); padding:0 0.5rem; position:relative; top:-0.1rem;">
+      Variante — État vide
+    </span>
+  </div>
+
+  <!-- Simplified page fragment showing empty state -->
+  <div style="background:var(--card); border:1px solid var(--border); border-radius:1rem; padding:2rem; max-width:700px;">
+
+    <!-- Mini tab bar -->
+    <div class="tab-bar" style="margin-bottom:1.5rem;">
+      <a href="#" class="tab-item">Détails</a>
+      <a href="#" class="tab-item">Inscriptions <span class="tab-count-neutral">0</span></a>
+      <a href="#" class="tab-item active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Radar
+      </a>
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem;">
+      <div style="font-size:0.875rem; color:var(--muted-foreground);">Paris · 15 mars 2026 · React &amp; frontend</div>
+      <button class="btn btn-ghost btn-sm">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        Actualiser
+      </button>
+    </div>
+
+    <div class="empty-state" style="padding:2.5rem 2rem;">
+      <span class="empty-icon">🎉</span>
+      <div class="empty-title">Aucun événement similaire détecté — bonne nouvelle !</div>
+      <div class="empty-subtitle" style="max-width:360px; margin:0 auto;">Aucun autre événement React ou frontend n'est programmé à Paris le 15 mars 2026. Vous avez le créneau pour vous.</div>
+    </div>
+
+    <div class="radar-footer" style="margin-top:1rem;">
+      <span>Dernière mise à jour il y a 3 minutes · Sources : Meetup, Luma, Google Events</span>
+      <a href="#">Comment fonctionne le Radar ?</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

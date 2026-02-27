@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page événement — Section "Prochains événements"</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 15px; line-height: 1.6; color: var(--foreground); background: var(--background); }
+
+/* Header */
+.header { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.header-logo { font-weight: 700; font-size: 15px; color: var(--foreground); display: flex; align-items: center; gap: 6px; }
+.header-logo span { color: var(--primary); }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.btn-ghost { padding: 6px 12px; border-radius: 8px; border: none; background: transparent; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--muted-foreground); cursor: pointer; }
+.btn-outline { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: transparent; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--foreground); cursor: pointer; }
+
+/* Page */
+.page { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+
+/* Cover */
+.cover-wrap { position: relative; margin-bottom: 4px; }
+.cover-glow { position: absolute; bottom: -12px; left: 16px; right: 16px; height: 40px; background: linear-gradient(135deg,#e8457a,#9333ea); opacity: .55; filter: blur(20px); border-radius: 50%; }
+.cover { width: 100%; aspect-ratio: 1/1; border-radius: 20px; background: linear-gradient(135deg,#e8457a,#9333ea); position: relative; overflow: hidden; }
+.cover-icon { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.cover-icon-inner { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; }
+.cover-icon-inner svg { color: white; width: 24px; height: 24px; }
+
+/* Circle link */
+.circle-link { display: flex; align-items: flex-start; gap: 12px; padding: 12px 4px; text-decoration: none; }
+.circle-avatar { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg,#e8457a,#9333ea); flex-shrink: 0; margin-top: 2px; }
+.circle-name { font-size: 14px; font-weight: 600; color: var(--foreground); line-height: 1.3; }
+.circle-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Right col */
+.hosted-by { font-size: 14px; color: var(--muted-foreground); }
+.event-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; margin-top: 12px; }
+.description { font-size: 14px; color: var(--muted-foreground); line-height: 1.7; margin-top: 4px; }
+.separator { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+/* Meta rows */
+.meta-list { display: flex; flex-direction: column; gap: 12px; }
+.meta-row { display: flex; align-items: flex-start; gap: 12px; }
+.meta-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(232,69,122,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.meta-icon svg { width: 16px; height: 16px; color: var(--primary); }
+.meta-label { font-size: 11px; color: var(--muted-foreground); }
+.meta-value { font-size: 14px; font-weight: 500; }
+
+/* Card */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+
+/* Registration CTA */
+.reg-section { display: flex; flex-direction: column; gap: 16px; }
+.spots-text { font-size: 13px; color: var(--muted-foreground); text-align: center; }
+.btn-primary { width: 100%; padding: 13px; border-radius: 12px; background: var(--primary); color: white; font-family: inherit; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
+.avatar-stack { display: flex; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--card); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: white; margin-left: -8px; }
+.avatar:first-child { margin-left: 0; }
+.avatar-1 { background: linear-gradient(135deg,#3b82f6,#06b6d4); }
+.avatar-2 { background: linear-gradient(135deg,#10b981,#3b82f6); }
+.avatar-3 { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+.avatar-4 { background: linear-gradient(135deg,#8b5cf6,#ec4899); }
+.avatars-row { display: flex; align-items: center; gap: 8px; }
+.avatars-count { font-size: 13px; color: var(--muted-foreground); }
+
+/* Participants */
+.participants-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px; }
+.participants-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.participant-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.participant-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+.participant-name { font-size: 14px; font-weight: 500; }
+.participant-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: rgba(232,69,122,0.1); color: var(--primary); font-weight: 500; margin-left: auto; }
+
+/* ============================================================
+   NOUVELLE SECTION — Prochains événements de la Communauté
+   ============================================================ */
+.upcoming-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px 24px;
+  /* Légère teinte pour la distinguer subtilement */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Badge "NOUVEAU" pour le mockup uniquement */
+.new-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.upcoming-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.upcoming-title {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.upcoming-circle-chip {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.upcoming-circle-chip strong {
+  color: var(--foreground);
+}
+
+/* Chaque carte événement */
+.upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.upcoming-event {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.upcoming-event:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+.upcoming-event:hover {
+  background: var(--muted);
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+/* Thumbnail carré 1:1 */
+.upcoming-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.upcoming-thumb-a { background: linear-gradient(135deg,#3b82f6,#06b6d4); }
+.upcoming-thumb-b { background: linear-gradient(135deg,#10b981,#3b82f6); }
+.upcoming-thumb-c { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+
+.upcoming-info { flex: 1; min-width: 0; }
+.upcoming-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.upcoming-meta {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.upcoming-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted-foreground); flex-shrink: 0; }
+
+.upcoming-chevron {
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* CTA "Voir tous" */
+.upcoming-cta {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upcoming-cta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+.upcoming-cta a:hover { text-decoration: underline; }
+.upcoming-cta svg { width: 14px; height: 14px; }
+
+/* Comments */
+.comments-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px; }
+.comments-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.empty-comments { font-size: 14px; color: var(--muted-foreground); padding: 8px 0 16px; }
+.comment-textarea { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; font-family: inherit; font-size: 14px; resize: none; background: var(--background); color: var(--foreground); outline: none; }
+.comment-textarea:focus { border-color: var(--primary); }
+.comment-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.char-count { font-size: 12px; color: var(--muted-foreground); }
+.btn-sm { padding: 7px 16px; border-radius: 8px; background: var(--primary); color: white; font-family: inherit; font-size: 13px; font-weight: 500; border: none; cursor: pointer; }
+
+/* Dark toggle */
+.dark-toggle { position: fixed; bottom: 20px; right: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); z-index: 100; }
+
+/* Annotation */
+.annotation {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232,69,122,0.08);
+  border: 1px dashed rgba(232,69,122,0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* Desktop 2-col */
+@media (min-width: 1024px) {
+  .two-col { display: flex; gap: 32px; align-items: flex-start; }
+  .col-left { width: 340px; flex-shrink: 0; position: sticky; top: 72px; }
+  .col-right { flex: 1; min-width: 0; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="5,3 19,12 5,21" fill="#e8457a"/></svg>
+    The <span>Playground</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ghost">Découvrir</button>
+    <button class="btn-outline">Se connecter</button>
+  </div>
+</header>
+
+<div class="page">
+  <div class="two-col">
+
+    <!-- LEFT -->
+    <div class="col-left">
+      <div class="cover-wrap">
+        <div class="cover-glow"></div>
+        <div class="cover">
+          <div class="cover-icon">
+            <div class="cover-icon-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a class="circle-link" href="#">
+        <div class="circle-avatar"></div>
+        <div>
+          <div class="circle-name">Tech Paris</div>
+          <div class="circle-desc">La communauté des développeurs parisiens. Meetups, ateliers et conférences chaque mois.</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-right" style="display:flex;flex-direction:column;gap:20px;">
+
+      <div class="hosted-by">Organisé par <strong>Marie Dupont</strong></div>
+      <h1 class="event-title">Soirée React & Next.js — Printemps 2026</h1>
+      <hr class="separator">
+      <div class="description">
+        Rejoignez-nous pour une soirée dédiée à l'écosystème React et Next.js. Au programme : retours d'expérience sur Next.js 15, présentation de Server Components en production, et session de networking.<br><br>
+        Tous niveaux bienvenus. Boissons et snacks offerts.
+      </div>
+      <hr class="separator">
+
+      <!-- Meta -->
+      <div class="meta-list">
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="meta-label">Quand</div>
+            <div class="meta-value">Sam. 15 mars 2026, 19h00 – 22h00</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <div class="meta-label">Où</div>
+            <div class="meta-value">Station F — Paris 13e</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="separator">
+
+      <!-- CTA Inscription -->
+      <div class="card">
+        <div class="reg-section">
+          <div class="avatars-row">
+            <div class="avatar-stack">
+              <div class="avatar avatar-1">M</div>
+              <div class="avatar avatar-2">T</div>
+              <div class="avatar avatar-3">A</div>
+              <div class="avatar avatar-4">L</div>
+            </div>
+            <div class="avatars-count">34 inscrits · <strong style="color:var(--primary)">16 places restantes</strong></div>
+          </div>
+          <button class="btn-primary">S'inscrire</button>
+          <div class="spots-text">Gratuit · Inscription rapide</div>
+        </div>
+      </div>
+
+      <!-- Participants -->
+      <div class="participants-card">
+        <div class="participants-title">Participants <span style="color:var(--muted-foreground);font-weight:400;font-size:15px;">(34)</span></div>
+        <div class="participant-row">
+          <div class="participant-avatar avatar-1">M</div>
+          <div class="participant-name">Marie Dupont</div>
+          <div class="participant-badge">Organisatrice</div>
+        </div>
+        <div class="participant-row">
+          <div class="participant-avatar avatar-2">T</div>
+          <div class="participant-name">Thomas Bernard</div>
+        </div>
+        <div class="participant-row">
+          <div class="participant-avatar avatar-3">A</div>
+          <div class="participant-name">Alix Martin</div>
+        </div>
+        <div style="font-size:13px;color:var(--primary);margin-top:10px;cursor:pointer;">Voir les 34 participants →</div>
+      </div>
+
+      <!-- ══════════════════════════════════════════
+           NOUVELLE SECTION
+           ══════════════════════════════════════════ -->
+      <div>
+        <div class="annotation">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+          Nouvelle section — placée entre Participants et Commentaires
+        </div>
+
+        <div class="upcoming-section">
+          <div class="new-badge">NOUVEAU</div>
+
+          <div class="upcoming-header">
+            <div>
+              <div class="upcoming-title">
+                Aussi dans cette communauté
+              </div>
+              <div class="upcoming-circle-chip">
+                <strong>Tech Paris</strong> · 3 événements à venir
+              </div>
+            </div>
+          </div>
+
+          <div class="upcoming-list">
+
+            <!-- Événement 1 -->
+            <div class="upcoming-event">
+              <div class="upcoming-thumb upcoming-thumb-a"></div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Workshop TypeScript avancé</div>
+                <div class="upcoming-meta">
+                  <span>22 mars</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>Paris 11e</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>18 inscrits</span>
+                </div>
+              </div>
+              <svg class="upcoming-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <!-- Événement 2 -->
+            <div class="upcoming-event">
+              <div class="upcoming-thumb upcoming-thumb-b"></div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Conférence IA & Web — Édition 2026</div>
+                <div class="upcoming-meta">
+                  <span>5 avr.</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>En ligne</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>47 inscrits</span>
+                </div>
+              </div>
+              <svg class="upcoming-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+            <!-- Événement 3 -->
+            <div class="upcoming-event">
+              <div class="upcoming-thumb upcoming-thumb-c"></div>
+              <div class="upcoming-info">
+                <div class="upcoming-name">Apéro Dev — Edition printemps</div>
+                <div class="upcoming-meta">
+                  <span>18 avr.</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>La Défense</span>
+                  <span class="upcoming-meta-dot"></span>
+                  <span>9 inscrits</span>
+                </div>
+              </div>
+              <svg class="upcoming-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+
+          </div>
+
+          <!-- CTA "Voir tous" -->
+          <div class="upcoming-cta">
+            <a href="#">
+              Voir tous les événements de Tech Paris
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div class="comments-card">
+        <div class="comments-title">Commentaires <span style="color:var(--muted-foreground);font-weight:400;font-size:15px;">(0)</span></div>
+        <div class="empty-comments">Aucun commentaire pour l'instant.</div>
+        <textarea class="comment-textarea" rows="3" placeholder="Poser une question, partager une attente..."></textarea>
+        <div class="comment-footer">
+          <span class="char-count">0 / 2000</span>
+          <button class="btn-sm">Envoyer</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<button class="dark-toggle" onclick="document.documentElement.classList.toggle('dark')">🌓</button>
+</body>
+</html>

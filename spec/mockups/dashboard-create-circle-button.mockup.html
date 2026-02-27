@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Dashboard bouton Créer une Communauté</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #0e0f1c;
+      --foreground: #f1f1f8;
+      --card: #161726;
+      --muted: #1e1f30;
+      --muted-foreground: #8b8ea8;
+      --border: #2a2b3d;
+      --radius: 0.5rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #07080f;
+      color: var(--foreground);
+      padding: 40px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    /* ── Colonne ── */
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .col-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+    .col-label .tag {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+    }
+    .tag-bad    { background: #3b1a1a; color: #f87171; }
+    .tag-a      { background: #1e1f2e; color: #818cf8; }
+    .tag-b      { background: #1a2e1a; color: #4ade80; }
+    .tag-c      { background: #1e2a1e; color: #86efac; }
+    .tag-rec    { background: var(--primary); color: white; }
+
+    /* ── Phone ── */
+    .phone {
+      width: 320px;
+      background: var(--background);
+      border-radius: 36px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    }
+
+    /* ── SiteHeader ── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 7px; }
+    .logo-icon {
+      width: 26px; height: 26px;
+      background: var(--primary);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon svg { width: 12px; height: 12px; fill: white; }
+    .logo-text { font-size: 13px; font-weight: 700; }
+    .logo-text span { color: var(--primary); }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      font-size: 10px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; color: white;
+    }
+    .hamburger { display: flex; flex-direction: column; gap: 3.5px; }
+    .hamburger span { display: block; width: 16px; height: 1.5px; background: var(--foreground); border-radius: 2px; }
+
+    /* ── Page ── */
+    .page { padding: 20px 16px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* Greeting */
+    .greeting h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+    .greeting p  { font-size: 12px; color: var(--muted-foreground); margin-top: 6px; line-height: 1.5; }
+
+    /* Pill tabs */
+    .pill-tabs {
+      display: flex; align-items: center; gap: 2px;
+      border: 1.5px solid var(--border); border-radius: 999px; padding: 3px; width: fit-content;
+    }
+    .pill-tab {
+      padding: 5px 13px; border-radius: 999px;
+      font-size: 12px; font-weight: 500; cursor: pointer;
+    }
+    .pill-tab.active  { background: var(--foreground); color: var(--background); }
+    .pill-tab.inactive { color: var(--muted-foreground); }
+
+    /* Buttons */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 14px; background: var(--primary); color: white;
+      font-size: 12px; font-weight: 600; border-radius: var(--radius);
+      border: none; cursor: pointer; white-space: nowrap;
+    }
+    .btn-primary.sm { padding: 5px 11px; font-size: 11px; }
+    .btn-primary svg { width: 12px; height: 12px; fill: white; flex-shrink: 0; }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px; background: transparent; color: var(--foreground);
+      font-size: 11px; font-weight: 600; border-radius: var(--radius);
+      border: 1.5px solid var(--border); cursor: pointer; white-space: nowrap;
+    }
+    .btn-full {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 14px; background: var(--primary); color: white;
+      font-size: 12px; font-weight: 600; border-radius: var(--radius);
+      border: none; cursor: pointer; width: 100%;
+    }
+    .btn-full svg { width: 13px; height: 13px; fill: white; flex-shrink: 0; }
+
+    /* Circle card */
+    .circle-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .circle-cover {
+      aspect-ratio: 1/1;
+      width: 100%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .circle-cover-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.2); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .circle-cover-icon svg { width: 14px; height: 14px; fill: none; stroke: white; stroke-width: 2; }
+    .circle-glow {
+      position: absolute; bottom: -4px; left: 12px; right: 12px; height: 16px;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      opacity: 0.4; filter: blur(10px); border-radius: 50%;
+    }
+    .circle-body { padding: 10px 10px 8px; }
+    .circle-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 5px; }
+    .circle-cat { font-size: 10px; font-weight: 700; color: var(--foreground); }
+    .badge-host {
+      font-size: 9px; font-weight: 600;
+      padding: 1.5px 6px; border-radius: 999px;
+      border: 1.5px solid var(--primary); color: var(--primary);
+    }
+    .circle-city { font-size: 10px; color: var(--muted-foreground); }
+    .circle-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .circle-desc { font-size: 11px; color: var(--muted-foreground); margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .circle-stats { display: flex; gap: 8px; font-size: 10px; color: var(--muted-foreground); }
+    .circle-next {
+      margin: 6px 0 0;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03); padding: 7px 8px;
+    }
+    .next-label { font-size: 9px; font-weight: 500; color: var(--muted-foreground); }
+    .next-title { font-size: 12px; font-weight: 600; margin-top: 1px; }
+    .next-date  { font-size: 10px; color: var(--muted-foreground); }
+    .circle-action { padding: 0 10px 10px; }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* Dashed create card (Option B) */
+    .create-card-dashed {
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      padding: 20px 12px;
+      cursor: pointer;
+      aspect-ratio: auto;
+      min-height: 120px;
+      transition: border-color 0.15s;
+    }
+    .create-card-dashed:hover { border-color: var(--primary); }
+    .create-card-icon {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(232,69,122,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .create-card-icon svg { width: 16px; height: 16px; fill: none; stroke: var(--primary); stroke-width: 2; stroke-linecap: round; }
+    .create-card-label { font-size: 11px; font-weight: 600; color: var(--muted-foreground); text-align: center; line-height: 1.3; }
+
+    /* Annotation */
+    .note {
+      font-size: 10.5px; color: var(--muted-foreground); text-align: center;
+      max-width: 300px; line-height: 1.6;
+    }
+    .note strong { color: var(--foreground); }
+    .note .plus  { color: #4ade80; }
+    .note .minus { color: #f87171; }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); width: 100%; }
+
+    /* Tab row variants */
+    .tab-row-a {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 8px;
+    }
+    .tab-row-c {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════ AVANT (problème) ══════════════ -->
+  <div class="col">
+    <div class="col-label">Actuel<br><span class="tag tag-bad">Problème</span></div>
+    <div class="phone">
+      <div class="site-header">
+        <div class="logo">
+          <div class="logo-icon"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg></div>
+          <div class="logo-text">the <span>playground</span></div>
+        </div>
+        <div class="header-right">
+          <div class="avatar">D</div>
+          <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="page">
+        <div class="greeting">
+          <h1>Bonjour, Dragos</h1>
+          <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+        </div>
+        <!-- Tab row actuel : flex-col, bouton orphelin à droite -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div class="pill-tabs">
+            <div class="pill-tab inactive">Mes événements</div>
+            <div class="pill-tab active">Mes Communautés</div>
+          </div>
+          <div style="display:flex; justify-content:flex-end;">
+            <div class="btn-primary">Créer une Communauté</div>
+          </div>
+        </div>
+        <!-- Grid -->
+        <div class="grid-2">
+          <div class="circle-card">
+            <div class="circle-cover">
+              <div class="circle-cover-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="circle-glow"></div>
+            </div>
+            <div class="circle-body">
+              <div class="circle-meta">
+                <span class="circle-cat">Product & Design</span>
+                <span class="badge-host">Organisateur</span>
+                <span class="circle-city">Paris</span>
+              </div>
+              <div class="circle-name">Communauté WOLD</div>
+              <div class="circle-desc">La communauté des consultants Wold</div>
+              <div class="circle-stats"><span>👥 1</span><span>📅 1 à venir</span></div>
+              <div class="circle-next">
+                <div class="next-label">Prochain événement</div>
+                <div class="next-title">AI from the trenches</div>
+                <div class="next-date">28 févr.</div>
+              </div>
+            </div>
+            <div class="circle-action">
+              <div class="btn-outline" style="width:100%; justify-content:center;">+ Créer un événement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="minus">✕ Bouton orphelin, mal aligné</span><br>
+      <span class="minus">✕ Flottant à droite hors contexte</span>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ OPTION A ══════════════ -->
+  <div class="col">
+    <div class="col-label">Option A<br><span class="tag tag-a">Inline avec les tabs</span></div>
+    <div class="phone">
+      <div class="site-header">
+        <div class="logo">
+          <div class="logo-icon"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg></div>
+          <div class="logo-text">the <span>playground</span></div>
+        </div>
+        <div class="header-right">
+          <div class="avatar">D</div>
+          <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="page">
+        <div class="greeting">
+          <h1>Bonjour, Dragos</h1>
+          <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+        </div>
+        <!-- Tabs + bouton sur même ligne -->
+        <div class="tab-row-a">
+          <div class="pill-tabs" style="flex-shrink:0;">
+            <div class="pill-tab inactive" style="font-size:11px; padding:4px 10px;">Événements</div>
+            <div class="pill-tab active" style="font-size:11px; padding:4px 10px;">Communautés</div>
+          </div>
+          <div class="btn-primary sm">
+            <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Créer
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="circle-card">
+            <div class="circle-cover">
+              <div class="circle-cover-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="circle-glow"></div>
+            </div>
+            <div class="circle-body">
+              <div class="circle-meta">
+                <span class="circle-cat">Product & Design</span>
+                <span class="badge-host">Organisateur</span>
+              </div>
+              <div class="circle-name">Communauté WOLD</div>
+              <div class="circle-desc">La communauté des consultants Wold</div>
+              <div class="circle-stats"><span>👥 1</span><span>📅 1</span></div>
+              <div class="circle-next">
+                <div class="next-label">Prochain événement</div>
+                <div class="next-title">AI from the trenches</div>
+                <div class="next-date">28 févr.</div>
+              </div>
+            </div>
+            <div class="circle-action">
+              <div class="btn-outline" style="width:100%; justify-content:center;">+ Créer un événement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="plus">✓ Une seule ligne, pas de décalage</span><br>
+      <span class="minus">△ "Créer" tronqué — perd le contexte</span><br>
+      <span class="minus">△ Serré avec les tabs sur petit écran</span>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ OPTION B ══════════════ -->
+  <div class="col">
+    <div class="col-label">Option B<br><span class="tag tag-b">Carte dans la grille</span><br><span class="tag tag-rec">Recommandé</span></div>
+    <div class="phone">
+      <div class="site-header">
+        <div class="logo">
+          <div class="logo-icon"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg></div>
+          <div class="logo-text">the <span>playground</span></div>
+        </div>
+        <div class="header-right">
+          <div class="avatar">D</div>
+          <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="page">
+        <div class="greeting">
+          <h1>Bonjour, Dragos</h1>
+          <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+        </div>
+        <!-- Tabs seuls, pas de bouton -->
+        <div class="pill-tabs">
+          <div class="pill-tab inactive">Mes événements</div>
+          <div class="pill-tab active">Mes Communautés</div>
+        </div>
+        <!-- Grille avec carte dashed -->
+        <div class="grid-2">
+          <div class="circle-card">
+            <div class="circle-cover">
+              <div class="circle-cover-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="circle-glow"></div>
+            </div>
+            <div class="circle-body">
+              <div class="circle-meta">
+                <span class="circle-cat">Product & Design</span>
+                <span class="badge-host">Organisateur</span>
+              </div>
+              <div class="circle-name">Communauté WOLD</div>
+              <div class="circle-desc">La communauté des consultants Wold</div>
+              <div class="circle-stats"><span>👥 1</span><span>📅 1</span></div>
+            </div>
+          </div>
+          <!-- Carte dashed -->
+          <div class="create-card-dashed">
+            <div class="create-card-icon">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div class="create-card-label">Créer une<br>Communauté</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="plus">✓ Contextuellement cohérent — dans la liste</span><br>
+      <span class="plus">✓ Tabs propres, pas de bouton orphelin</span><br>
+      <span class="plus">✓ Pattern reconnu (Notion, Linear, Luma)</span><br>
+      <span class="plus">✓ Texte complet visible</span>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ OPTION C ══════════════ -->
+  <div class="col">
+    <div class="col-label">Option C<br><span class="tag tag-c">Full-width sous les tabs</span></div>
+    <div class="phone">
+      <div class="site-header">
+        <div class="logo">
+          <div class="logo-icon"><svg viewBox="0 0 16 16"><polygon points="4,2 14,8 4,14"/></svg></div>
+          <div class="logo-text">the <span>playground</span></div>
+        </div>
+        <div class="header-right">
+          <div class="avatar">D</div>
+          <div class="hamburger"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+      <div class="page">
+        <div class="greeting">
+          <h1>Bonjour, Dragos</h1>
+          <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+        </div>
+        <!-- Tabs puis bouton full-width -->
+        <div class="tab-row-c">
+          <div class="pill-tabs">
+            <div class="pill-tab inactive">Mes événements</div>
+            <div class="pill-tab active">Mes Communautés</div>
+          </div>
+          <div class="btn-full">
+            <svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="14" stroke="white" stroke-width="2.5" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+            Créer une Communauté
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="circle-card">
+            <div class="circle-cover">
+              <div class="circle-cover-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="circle-glow"></div>
+            </div>
+            <div class="circle-body">
+              <div class="circle-meta">
+                <span class="circle-cat">Product & Design</span>
+                <span class="badge-host">Organisateur</span>
+              </div>
+              <div class="circle-name">Communauté WOLD</div>
+              <div class="circle-desc">La communauté des consultants Wold</div>
+              <div class="circle-stats"><span>👥 1</span><span>📅 1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="plus">✓ Aligné, propre, texte complet</span><br>
+      <span class="minus">△ Bloc rose très lourd visuellement</span><br>
+      <span class="minus">△ Prend trop de place entre tabs et contenu</span>
+    </div>
+  </div>
+
+</body>
+</html>
