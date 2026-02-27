@@ -100,7 +100,7 @@
     },
     "modeChoice": {
       "greetingPrefix": "Welcome,",
-      "greetingSuffix": "what do you want to do?",
+      "greetingSuffix": "What do you want to do?",
       "greetingAnonymous": "Welcome — what do you want to do?",
       "subtitle": "Choose your default mode. You can change it at any time.",
       "participant": {

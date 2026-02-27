@@ -34,10 +34,12 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {firstName ? (
             <>
-              {t("modeChoice.greetingPrefix")}{" "}
-              <span className="text-primary">{firstName}</span>
-              {" — "}
-              {t("modeChoice.greetingSuffix")}
+              <span className="block">
+                {t("modeChoice.greetingPrefix")}{" "}
+                <span className="text-primary">{firstName}</span>
+                {" 👋"}
+              </span>
+              <span className="block">{t("modeChoice.greetingSuffix")}</span>
             </>
           ) : (
             t("modeChoice.greetingAnonymous")
