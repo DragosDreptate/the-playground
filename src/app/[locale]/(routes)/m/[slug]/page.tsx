@@ -144,6 +144,7 @@ export default async function PublicMomentPage({
     locationType: moment.locationType,
     locationName: moment.locationName,
     locationAddress: moment.locationAddress,
+    videoLink: moment.videoLink,
     circleName: circle.name,
     slug: moment.slug,
   };

@@ -50,15 +50,43 @@ describe("buildGoogleCalendarUrl", () => {
     });
   });
 
-  describe("given an online event", () => {
+  describe("given an online event without videoLink", () => {
     it("should set location to empty string", () => {
       const url = buildGoogleCalendarUrl(
         makeEvent({ locationType: "ONLINE", locationName: null, locationAddress: null }),
         APP_URL
       );
       expect(url).toContain("location=");
-      // Should not include any physical address
       expect(url).not.toContain("Station+F");
+    });
+  });
+
+  describe("given an online event with a videoLink", () => {
+    it("should use the video link as the location", () => {
+      const url = buildGoogleCalendarUrl(
+        makeEvent({
+          locationType: "ONLINE",
+          locationName: null,
+          locationAddress: null,
+          videoLink: "https://meet.google.com/abc-defg-hij",
+        }),
+        APP_URL
+      );
+      expect(url).toContain(encodeURIComponent("https://meet.google.com/abc-defg-hij"));
+    });
+
+    it("should include the video link in the event details", () => {
+      const url = buildGoogleCalendarUrl(
+        makeEvent({
+          locationType: "ONLINE",
+          locationName: null,
+          locationAddress: null,
+          videoLink: "https://meet.google.com/abc-defg-hij",
+        }),
+        APP_URL
+      );
+      expect(url).toContain("Rejoindre");
+      expect(url).toContain(encodeURIComponent("https://meet.google.com/abc-defg-hij"));
     });
   });
 
