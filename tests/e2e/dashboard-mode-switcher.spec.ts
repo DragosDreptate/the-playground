@@ -23,9 +23,9 @@ test.describe("Dashboard mode switcher — Host connecté", () => {
 
   test("should show Organizer CTA when in organizer mode", async ({ page }) => {
     await page.goto("/fr/dashboard?mode=organizer&tab=moments");
-    // Le bouton "Créer un événement" doit être visible en mode Organisateur
-    const createBtn = page.locator("a[href*='/moments/new']");
-    await expect(createBtn).toBeVisible();
+    // Un CTA de création est visible (lien direct ou dropdown selon nb de communautés)
+    const createCTA = page.locator("a, button").filter({ hasText: /Créer/i }).first();
+    await expect(createCTA).toBeVisible();
   });
 
   test("should show create Circle CTA in organizer mode on circles tab", async ({ page }) => {
@@ -34,18 +34,19 @@ test.describe("Dashboard mode switcher — Host connecté", () => {
     await expect(createCircleBtn).toBeVisible();
   });
 
-  test("should display H1 with mode label in organizer mode", async ({ page }) => {
+  test("should highlight the Organisateur pill in organizer mode", async ({ page }) => {
     await page.goto("/fr/dashboard?mode=organizer");
-    const h1 = page.locator("h1").first();
-    await expect(h1).toBeVisible();
-    await expect(h1).toContainText("Organisateur");
+    // Le pill Organisateur doit avoir le style actif (bg-foreground)
+    const organizerPill = page.locator("button").filter({ hasText: "Organisateur" }).first();
+    await expect(organizerPill).toBeVisible();
+    await expect(organizerPill).toHaveClass(/bg-foreground/);
   });
 
-  test("should display H1 with mode label in participant mode", async ({ page }) => {
+  test("should highlight the Participant pill in participant mode", async ({ page }) => {
     await page.goto("/fr/dashboard?mode=participant");
-    const h1 = page.locator("h1").first();
-    await expect(h1).toBeVisible();
-    await expect(h1).toContainText("Participant");
+    const participantPill = page.locator("button").filter({ hasText: "Participant" }).first();
+    await expect(participantPill).toBeVisible();
+    await expect(participantPill).toHaveClass(/bg-foreground/);
   });
 
   test("should show the host Circle in organizer mode", async ({ page }) => {

@@ -3,10 +3,12 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
   prismaRegistrationRepository,
+  prismaUserRepository,
 } from "@/infrastructure/repositories";
 import { getUserCirclesWithRole } from "@/domain/usecases/get-user-circles-with-role";
 import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-moments";
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
+import { setDashboardMode } from "@/domain/usecases/set-dashboard-mode";
 import { WelcomeModeChoice } from "./_components/welcome-mode-choice";
 
 export default async function WelcomePage() {
@@ -29,11 +31,13 @@ export default async function WelcomePage() {
     getUserPastMoments(userId, { registrationRepository: prismaRegistrationRepository }),
   ]);
 
-  // Si l'utilisateur a de l'activité, il n'a pas besoin de choisir un mode ici
+  // Utilisateur existant avec activité mais sans mode → PARTICIPANT par défaut
+  // (évite une boucle infinie avec page.tsx qui redirige vers welcome si mode=null)
   const hasActivity =
     circles.length > 0 || upcomingMoments.length > 0 || pastMoments.length > 0;
 
   if (hasActivity) {
+    await setDashboardMode(userId, "PARTICIPANT", { userRepository: prismaUserRepository });
     redirect("/dashboard");
   }
 

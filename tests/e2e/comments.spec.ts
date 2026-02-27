@@ -15,13 +15,13 @@ test.describe("Fil de commentaires — affichage public", () => {
   test("should display the comments section on the Moment page", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
     // La section commentaires est présente (même si vide)
-    await expect(page.locator("main")).toBeVisible();
+    await expect(page.locator("main").first()).toBeVisible();
   });
 
   test("should display existing comments on a PAST Moment", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAST_MOMENT}`);
     // Des commentaires sont seedés sur la Soirée JS & Pizza
-    await expect(page.locator("main")).toContainText(/Super soirée|Server Components|Bun vs Node/i);
+    await expect(page.locator("main").first()).toContainText(/Super soirée|Server Components|Bun vs Node/i);
   });
 });
 
@@ -112,6 +112,6 @@ test.describe("Fil de commentaires — Moment passé", () => {
   test("should still display existing comments on a PAST Moment", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAST_MOMENT}`);
     // Les commentaires seedés sont visibles
-    await expect(page.locator("main")).toContainText(/Super soirée|Server Components/i);
+    await expect(page.locator("main").first()).toContainText(/Super soirée|Server Components/i);
   });
 });
