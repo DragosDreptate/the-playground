@@ -60,12 +60,13 @@ test.describe("Inscription à un Moment — utilisateur authentifié", () => {
       .filter({ hasText: /inscrire|s'inscrire|rejoindre|join|register/i })
       .first();
 
-    // Player1 est déjà inscrit (seedé) — soit on voit "Annuler" soit on peut s'inscrire
+    // Player1 est déjà inscrit (seedé) — attendre que la page soit stable avant de vérifier
+    // isVisible() sans timeout retourne false si la page n'a pas encore rendu le statut
     const isAlreadyRegistered = await page
       .locator("button, [data-testid='registration-status']")
       .filter({ hasText: /inscrit|registered|annuler|cancel/i })
       .first()
-      .isVisible()
+      .isVisible({ timeout: 8_000 })
       .catch(() => false);
 
     if (!isAlreadyRegistered) {

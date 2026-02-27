@@ -11,7 +11,7 @@ import { SLUGS, AUTH } from "./fixtures";
  */
 
 test.describe("Liste d'attente — affichage Moment complet (non inscrit)", () => {
-  test.use({ storageState: AUTH.HOST });
+  // Pas de storageState : visiteur non-auth pour voir "complet" (HOST est inscrit au moment seedé)
 
   test("should display the Moment as full with a waitlist option", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.FULL_MOMENT}`);

@@ -27,10 +27,10 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
   test("should cancel the registration and show the register CTA again", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
 
-    // Cliquer sur annuler
+    // Cliquer sur annuler (le bouton peut dire "Annuler" ou "Annuler l'inscription")
     const cancelButton = page
       .locator("button")
-      .filter({ hasText: /annuler.*inscription|cancel.*registration/i })
+      .filter({ hasText: /annuler|cancel/i })
       .first();
     await cancelButton.click();
 

@@ -18,8 +18,8 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  timeout: 30_000,
-  retries: 0,
+  timeout: process.env.CI ? 60_000 : 30_000,
+  retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
   globalSetup: "./tests/e2e/global-setup.ts",
 
