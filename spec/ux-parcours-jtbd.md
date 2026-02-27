@@ -434,7 +434,8 @@
 
 **État actuel (implémenté) :**
 - Onboarding profil obligatoire ✓
-- Dashboard avec CTA "Créer une Communauté" si aucune Communauté ✓
+- Welcome page avec choix de mode "Je participe / J'organise" ✓ (redesignée — remplace les 2 cartes CTA statiques)
+- En mode Organisateur sans Communauté : CTA "Créer une Communauté d'abord" ✓
 - Formulaire création Communauté + événement ✓
 
 **Gaps :**
@@ -442,7 +443,7 @@
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
 | G1 | L'onboarding profil ne détecte pas l'intention (Organisateur vs Participant). Un futur Organisateur passe par le même écran qu'un Participant | Onboarding non personnalisé | Moyenne |
-| G2 | Le dashboard vide d'un nouveau user est peu guidant : juste un bouton "Créer une Communauté" | Time-to-first-event trop long | Haute |
+| ~~G2~~ | ~~Le dashboard vide d'un nouveau user est peu guidant : juste un bouton "Créer une Communauté"~~ ✅ **Partiellement résolu** — Welcome page redesignée : deux cartes cliquables ("Je participe" / "J'organise") orientent le nouvel utilisateur dès l'arrivée. Le guide pas-à-pas Organisateur (stepper 3 étapes) reste à faire (gap H-7). | ~~Time-to-first-event trop long~~ | ~~Haute~~ |
 | G3 | Pas de page marketing/landing pour expliquer la proposition de valeur avant de créer un compte | Conversion cold traffic nulle | Post-MVP |
 | G4 | Pas de guide "3 étapes pour lancer votre première communauté" | L'Organisateur débutant est perdu | Haute |
 
@@ -467,9 +468,9 @@
 
 | Persona | Voit | Peut faire | Manque |
 |---------|------|------------|--------|
-| Nouveau user (sans Communauté) | Dashboard vide + CTA Créer Communauté | Créer une Communauté | Guide onboarding Organisateur, explication de la plateforme |
-| Participant récurrent | Prochains événements + Communautés | Naviguer vers événements/Communautés | Nouveaux événements dans mes Communautés, événements PAST récents |
-| Organisateur actif | Prochains événements + Communautés + CTAs | Créer événement, Créer Communauté, Naviguer | Vue consolidée activité Communauté (inscriptions récentes) |
+| Nouveau user (sans Communauté) | Welcome page — 2 cartes "Je participe / J'organise" ✅ | Choisir son mode | Guide pas-à-pas Organisateur (stepper 3 étapes — gap H-7) |
+| Participant récurrent | Mode Participant : prochains événements inscrits + Communautés membres | Naviguer vers événements/Communautés, basculer en mode Organisateur | Nouveaux événements dans mes Communautés, événements PAST récents |
+| Organisateur actif | Mode Organisateur : événements créés + CTA Créer un événement adaptatif | Créer événement (direct ou dropdown), Créer Communauté, Naviguer, basculer en mode Participant | Vue consolidée activité Communauté (inscriptions récentes) |
 
 ### `/dashboard/circles/[slug]` — Page Communauté (dashboard)
 
@@ -508,7 +509,7 @@
 | H-2 | **CTA "Créer le prochain événement" depuis un événement PAST** | Organisateur post-événement | F |
 | ~~H-3~~ | ~~**Position dans la liste d'attente visible**~~ ✅ **Résolu** | ~~Participant en liste d'attente~~ | ~~C~~ |
 | H-4 | **Autres événements de la Communauté visibles sur page événement dashboard** | Participant récurrent | B |
-| H-5 | **CTA "Devenir organisateur" pour Participants sans Communauté** | Organisateur débutant | G |
+| ~~H-5~~ | ~~**CTA "Devenir organisateur" pour Participants sans Communauté**~~ ✅ **Résolu** — Dashboard Mode Switcher : le pill "Organisateur" est visible pour tous. En mode Organisateur sans Communauté : CTA "Créer une Communauté d'abord" → `/dashboard/circles/new`. | ~~Organisateur débutant~~ | ~~G~~ |
 | ~~H-6~~ | ~~**Export CSV des inscrits**~~ ✅ **Résolu** — bouton "Exporter CSV" sur vue Organisateur, client-side avec BOM UTF-8 | ~~Organisateur pré-événement~~ | ~~E~~ |
 | H-7 | **Guide onboarding Organisateur** ("3 étapes pour lancer votre communauté") | Organisateur débutant | G |
 | H-8 | **Compteur "X inscrits / Y en attente / Z places" sur vue Organisateur** | Organisateur pré-événement | E |
@@ -592,7 +593,8 @@
 ### Points forts actuels
 - **Page événement** : qualité visuelle Luma-level, informations claires, inscription en 2 clics
 - **Rétention Communauté** : CTA vers la Communauté sur tous les événements (y compris PAST), timeline communautaire
-- **Dashboard Participant-first** : vue personnalisée, statuts inscription visibles
+- **Dashboard Mode Switcher** : pill "Participant / Organisateur" — chaque utilisateur voit exactement ce qui le concerne selon son mode actif, persisté en DB
+- **Welcome page** : nouveaux utilisateurs orientés dès l'arrivée via le choix "Je participe / J'organise"
 - **Fil de commentaires** : engagement post-événement, communauté vivante
 
 ### Talons d'Achille actuels
