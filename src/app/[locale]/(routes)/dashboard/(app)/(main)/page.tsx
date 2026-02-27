@@ -3,7 +3,9 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Crown, User } from "lucide-react";
 import { DashboardContent } from "./_components/dashboard-content";
 import { DashboardModeSwitcher } from "@/components/dashboard/dashboard-mode-switcher";
 import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
@@ -46,16 +48,24 @@ export default async function DashboardPage({
       {/* Header : greeting + mode switcher */}
       <div className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight leading-tight">
-            <span className="block">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">
               {firstName
                 ? t("greeting", { name: firstName })
                 : t("greetingAnonymous")}
-            </span>
+            </h1>
             {modeLabel && (
-              <span className="text-primary block">{modeLabel}</span>
+              <Badge
+                variant="outline"
+                className="border-primary/40 text-primary gap-1"
+              >
+                {resolvedMode === "ORGANIZER"
+                  ? <Crown className="size-3" />
+                  : <User className="size-3" />}
+                {modeLabel}
+              </Badge>
             )}
-          </h1>
+          </div>
           <div className="shrink-0 self-start">
             <DashboardModeSwitcher currentMode={resolvedMode} activeTab={activeTab} />
           </div>
