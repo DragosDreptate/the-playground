@@ -228,6 +228,7 @@
       "locationAddressPlaceholder": "123 Main Street, Paris",
       "videoLink": "Video link",
       "videoLinkPlaceholder": "https://meet.google.com/...",
+      "videoLinkOr": "or paste the link",
       "eventOptions": "Event options",
       "ticketPrice": "Ticket price",
       "priceSoon": "Coming soon",

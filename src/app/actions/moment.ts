@@ -36,10 +36,11 @@ function formatLocationText(
   locationType: string,
   locationName: string | null,
   locationAddress: string | null,
+  videoLink: string | null,
   locale: string
 ): string {
   if (locationType === "ONLINE") {
-    return locale === "fr" ? "En ligne" : "Online";
+    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
   }
   return (
     [locationName, locationAddress].filter(Boolean).join(", ") ||
@@ -134,6 +135,7 @@ export async function createMomentAction(
         result.moment.locationType,
         result.moment.locationName,
         result.moment.locationAddress,
+        result.moment.videoLink,
         locale
       );
       const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
@@ -146,6 +148,7 @@ export async function createMomentAction(
         startsAt: result.moment.startsAt,
         endsAt: result.moment.endsAt,
         location: locationText,
+        videoLink: result.moment.videoLink,
         url: `${appUrl}/m/${result.moment.slug}`,
         organizerName: circle.name,
       });
@@ -326,6 +329,7 @@ async function sendMomentUpdateEmails(
     moment.locationType,
     moment.locationName,
     moment.locationAddress,
+    moment.videoLink,
     locale
   );
 
@@ -337,6 +341,7 @@ async function sendMomentUpdateEmails(
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
     location: locationText,
+    videoLink: moment.videoLink,
     url: `${baseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
   });
@@ -475,6 +480,7 @@ async function sendMomentCancelledEmails(
     moment.locationType,
     moment.locationName,
     moment.locationAddress,
+    moment.videoLink,
     locale
   );
 

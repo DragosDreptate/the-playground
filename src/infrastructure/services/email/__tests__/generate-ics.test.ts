@@ -105,6 +105,66 @@ describe("generateIcs", () => {
     );
   });
 
+  describe("given a Moment with a videoLink", () => {
+    it("should use the video link as LOCATION instead of the text fallback", () => {
+      const ics = generateIcs({
+        ...defaultData,
+        location: "En ligne",
+        videoLink: "https://meet.google.com/abc-defg-hij",
+      });
+
+      expect(ics).toContain(
+        "LOCATION:https://meet.google.com/abc-defg-hij"
+      );
+      expect(ics).not.toContain("LOCATION:En ligne");
+    });
+
+    it("should add a CONFERENCE property with the video link", () => {
+      const ics = generateIcs({
+        ...defaultData,
+        location: "En ligne",
+        videoLink: "https://meet.google.com/abc-defg-hij",
+      });
+
+      expect(ics).toContain(
+        'CONFERENCE;FEATURE=VIDEO;LABEL="Lien de réunion";VALUE=URI:https://meet.google.com/abc-defg-hij'
+      );
+    });
+
+    it("should work for Zoom links", () => {
+      const ics = generateIcs({
+        ...defaultData,
+        location: "En ligne",
+        videoLink: "https://zoom.us/j/98765432100",
+      });
+
+      expect(ics).toContain("LOCATION:https://zoom.us/j/98765432100");
+      expect(ics).toContain(
+        'CONFERENCE;FEATURE=VIDEO;LABEL="Lien de réunion";VALUE=URI:https://zoom.us/j/98765432100'
+      );
+    });
+
+    it("should not add CONFERENCE when videoLink is absent", () => {
+      const ics = generateIcs(defaultData);
+
+      expect(ics).not.toContain("CONFERENCE");
+    });
+
+    it("should not add CONFERENCE when videoLink is null", () => {
+      const ics = generateIcs({ ...defaultData, videoLink: null });
+
+      expect(ics).not.toContain("CONFERENCE");
+    });
+
+    it("should use the text location when videoLink is absent", () => {
+      const ics = generateIcs(defaultData);
+
+      expect(ics).toContain(
+        "LOCATION:Le Comptoir\\, 12 rue de Rivoli\\, Paris"
+      );
+    });
+  });
+
   describe("given a DTSTAMP", () => {
     it("should include a DTSTAMP with current time", () => {
       vi.useFakeTimers();

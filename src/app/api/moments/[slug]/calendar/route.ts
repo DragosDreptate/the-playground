@@ -36,7 +36,7 @@ export async function GET(
 
   const location =
     moment.locationType === "ONLINE"
-      ? "En ligne"
+      ? moment.videoLink ?? "En ligne"
       : [moment.locationName, moment.locationAddress].filter(Boolean).join(", ");
 
   const appUrl =
@@ -49,6 +49,7 @@ export async function GET(
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
     location,
+    videoLink: moment.videoLink,
     url: `${appUrl}/m/${moment.slug}`,
     organizerName: circle.name,
   });
