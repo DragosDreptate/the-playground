@@ -45,15 +45,14 @@ export default async function DashboardPage({
       {/* Header : greeting + mode switcher */}
       <div className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {firstName
-              ? t("greeting", { name: firstName })
-              : t("greetingAnonymous")}
+          <h1 className="text-3xl font-bold tracking-tight leading-tight">
+            <span className="block">
+              {firstName
+                ? t("greeting", { name: firstName })
+                : t("greetingAnonymous")}
+            </span>
             {modeLabel && (
-              <>
-                {" · "}
-                <span className="text-primary">{modeLabel}</span>
-              </>
+              <span className="text-primary block">{modeLabel}</span>
             )}
           </h1>
           <div className="shrink-0">
