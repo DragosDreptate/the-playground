@@ -18,6 +18,7 @@ export function SiteHeader() {
   const tDashboard = useTranslations("Dashboard");
 
   const user = session?.user;
+  const dashboardHref = user?.dashboardMode == null ? "/dashboard/welcome" : "/dashboard";
   const pathname = usePathname();
   const [isPWA, setIsPWA] = useState(false);
 
@@ -32,7 +33,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
         {/* Logo — left */}
-        <Link href={isPWA && user ? "/dashboard" : "/"} className="flex items-center gap-2 shrink-0">
+        <Link href={isPWA && user ? dashboardHref : "/"} className="flex items-center gap-2 shrink-0">
           <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
               <polygon points="0,0 0,12 10,6" fill="white" />
@@ -53,7 +54,7 @@ export function SiteHeader() {
                 {tExplorer("navLink")}
               </Link>
               <Link
-                href="/dashboard"
+                href={dashboardHref}
                 className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
               >
                 <LayoutDashboard className="size-3.5" />
@@ -79,7 +80,7 @@ export function SiteHeader() {
               <Link href="/auth/sign-in">{t("signIn.title")}</Link>
             </Button>
           )}
-          <MobileNav isAuthenticated={!!user} />
+          <MobileNav isAuthenticated={!!user} dashboardHref={dashboardHref} />
         </div>
       </div>
     </header>

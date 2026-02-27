@@ -16,9 +16,10 @@ import { LocaleToggle } from "@/components/locale-toggle";
 
 type MobileNavProps = {
   isAuthenticated: boolean;
+  dashboardHref?: string;
 };
 
-export function MobileNav({ isAuthenticated }: MobileNavProps) {
+export function MobileNav({ isAuthenticated, dashboardHref = "/dashboard" }: MobileNavProps) {
   const tExplorer = useTranslations("Explorer");
   const tDashboard = useTranslations("Dashboard");
   const tAuth = useTranslations("Auth");
@@ -42,7 +43,7 @@ export function MobileNav({ isAuthenticated }: MobileNavProps) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/dashboard" className={`cursor-pointer ${pathname.startsWith("/dashboard") ? "text-foreground font-medium" : ""}`}>
+              <Link href={dashboardHref} className={`cursor-pointer ${pathname.startsWith("/dashboard") ? "text-foreground font-medium" : ""}`}>
                 <LayoutDashboard className="mr-2 size-4" />
                 {tDashboard("title")}
               </Link>
