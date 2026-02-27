@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
@@ -10,7 +9,6 @@ import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-mome
 import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
 import { getHostUpcomingMoments } from "@/domain/usecases/get-host-upcoming-moments";
 import { getHostPastMoments } from "@/domain/usecases/get-host-past-moments";
-import { shouldRedirectToWelcome } from "@/lib/dashboard";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import type { DashboardMode } from "@/domain/models/user";
@@ -39,17 +37,6 @@ export async function DashboardContent({
       circleRepository: prismaCircleRepository,
     }),
   ]);
-
-  if (
-    shouldRedirectToWelcome({
-      dashboardMode: mode,
-      circleCount: circles.length,
-      upcomingMomentCount: upcomingRegistrations.length,
-      pastMomentCount: pastRegistrations.length,
-    })
-  ) {
-    redirect("/dashboard/welcome");
-  }
 
   const t = await getTranslations("Dashboard");
 

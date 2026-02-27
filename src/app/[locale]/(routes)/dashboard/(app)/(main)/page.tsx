@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -31,6 +32,11 @@ export default async function DashboardPage({
       : modeParam === "participant"
         ? "PARTICIPANT"
         : sessionMode;
+
+  // Redirect immédiat avant tout render — évite le flash du shell dashboard
+  if (resolvedMode === null) {
+    redirect("/dashboard/welcome");
+  }
 
   const firstName = session.user.name?.split(" ")[0];
 
