@@ -57,6 +57,9 @@ const USERS = [
   { key: "nathan",   email: "nathan@demo.playground",   firstName: "Nathan",  lastName: "Bernard" },
   { key: "oceane",   email: "oceane@demo.playground",   firstName: "Océane",  lastName: "Lefebvre" },
   { key: "louis",    email: "louis@demo.playground",    firstName: "Louis",   lastName: "Moreau" },
+  // Utilisateur "blank slate" — aucune communauté, aucune inscription
+  // dashboardMode: null → redirigé vers la welcome page (test du flux onboarding mode)
+  { key: "thomas",   email: "thomas@demo.playground",   firstName: "Thomas",  lastName: "Renard" },
 ];
 
 // ── Données démo ──────────────────────────────────────────────────────────────
@@ -897,6 +900,13 @@ async function main() {
     const memberCount = playersInCircle.size + 1; // +1 pour le Host
     console.log(`  ✓ ${memberCount} membres (1 host + ${playersInCircle.size} players)`);
   }
+
+  // Reset dashboardMode pour le user "blank slate" (thomas) — garantit le flux welcome page
+  await prisma.user.updateMany({
+    where: { email: "thomas@demo.playground" },
+    data: { dashboardMode: null },
+  });
+  console.log("  ✓ thomas@demo.playground — dashboardMode remis à null");
 
   // Récapitulatif
   console.log("\n✅ Données démo injectées avec succès.\n");
