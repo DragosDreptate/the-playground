@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { Users, Compass } from "lucide-react";
+import { Check, Compass, Crown, ArrowRight } from "lucide-react";
 import { setDashboardModeAction } from "@/app/actions/dashboard";
 import type { DashboardMode } from "@/domain/models/user";
 
@@ -23,91 +23,138 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
     startTransition(async () => {
       await setDashboardModeAction(selectedMode);
       if (selectedMode === "ORGANIZER") {
-        router.push("/dashboard?mode=organizer&tab=circles");
+        router.push("/dashboard?mode=organizer&tab=moments");
       } else {
         router.push("/dashboard?mode=participant&tab=moments");
       }
     });
   }
 
+  function handleCardCta(mode: DashboardMode, href: string) {
+    startTransition(async () => {
+      await setDashboardModeAction(mode);
+      router.push(href);
+    });
+  }
+
   return (
-    <div className="mx-auto w-full max-w-lg space-y-8 text-center">
+    <div className="mx-auto w-full max-w-xl space-y-8 text-center">
+
       {/* Greeting */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">
-          {firstName ? t("modeChoice.greeting", { name: firstName }) : t("modeChoice.greetingAnonymous")}
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+          {firstName ? (
+            <>
+              {t("modeChoice.greetingPrefix")}{" "}
+              <span className="text-primary">{firstName}</span>
+              {" — "}
+              {t("modeChoice.greetingSuffix")}
+            </>
+          ) : (
+            t("modeChoice.greetingAnonymous")
+          )}
         </h1>
         <p className="text-muted-foreground">{t("modeChoice.subtitle")}</p>
       </div>
 
-      {/* Mode cards */}
+      {/* Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* Participant card */}
+
+        {/* Participant */}
         <button
           type="button"
           onClick={() => setSelectedMode("PARTICIPANT")}
-          className={`flex flex-col items-center gap-4 rounded-2xl border-2 px-6 py-8 text-center transition-all ${
+          className={`relative flex flex-col items-center gap-4 rounded-2xl border-2 px-6 py-8 text-center transition-all ${
             selectedMode === "PARTICIPANT"
               ? "border-primary"
               : "border-border hover:border-muted-foreground/40"
           }`}
         >
-          <Compass
-            className={`size-10 ${selectedMode === "PARTICIPANT" ? "text-primary" : "text-muted-foreground"}`}
-          />
+          {selectedMode === "PARTICIPANT" && (
+            <span className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-white">
+              <Check className="size-3.5" strokeWidth={3} />
+            </span>
+          )}
+          <span className={`flex size-14 items-center justify-center rounded-2xl ${
+            selectedMode === "PARTICIPANT" ? "bg-primary/10" : "bg-muted"
+          }`}>
+            <Compass className={`size-7 ${selectedMode === "PARTICIPANT" ? "text-primary" : "text-muted-foreground"}`} />
+          </span>
           <div className="space-y-1.5">
-            <p className="font-semibold">{t("modeChoice.participant.title")}</p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-base font-semibold">{t("modeChoice.participant.title")}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {t("modeChoice.participant.description")}
             </p>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardCta("PARTICIPANT", "/explorer");
+            }}
+            disabled={isPending}
+          >
+            {t("modeChoice.participant.cta")}
+          </Button>
         </button>
 
-        {/* Organizer card */}
+        {/* Organizer */}
         <button
           type="button"
           onClick={() => setSelectedMode("ORGANIZER")}
-          className={`flex flex-col items-center gap-4 rounded-2xl border-2 px-6 py-8 text-center transition-all ${
+          className={`relative flex flex-col items-center gap-4 rounded-2xl border-2 px-6 py-8 text-center transition-all ${
             selectedMode === "ORGANIZER"
               ? "border-primary"
               : "border-border hover:border-muted-foreground/40"
           }`}
         >
-          <Users
-            className={`size-10 ${selectedMode === "ORGANIZER" ? "text-primary" : "text-muted-foreground"}`}
-          />
+          {selectedMode === "ORGANIZER" && (
+            <span className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-primary text-white">
+              <Check className="size-3.5" strokeWidth={3} />
+            </span>
+          )}
+          <span className={`flex size-14 items-center justify-center rounded-2xl ${
+            selectedMode === "ORGANIZER" ? "bg-primary/10" : "bg-muted"
+          }`}>
+            <Crown className={`size-7 ${selectedMode === "ORGANIZER" ? "text-primary" : "text-muted-foreground"}`} />
+          </span>
           <div className="space-y-1.5">
-            <p className="font-semibold">{t("modeChoice.organizer.title")}</p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-base font-semibold">{t("modeChoice.organizer.title")}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">
               {t("modeChoice.organizer.description")}
             </p>
           </div>
+          <Button
+            size="sm"
+            className="w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCardCta("ORGANIZER", "/dashboard/circles/new");
+            }}
+            disabled={isPending}
+          >
+            {t("modeChoice.organizer.cta")}
+          </Button>
         </button>
+
       </div>
 
-      {/* CTAs */}
+      {/* Bottom CTA + hint */}
       <div className="space-y-3">
         <Button
           onClick={handleContinue}
           disabled={isPending}
-          className="w-full"
+          className="w-full gap-2"
           size="lg"
         >
           {isPending ? t("modeChoice.continuing") : t("modeChoice.continue")}
+          {!isPending && <ArrowRight className="size-4" />}
         </Button>
-
-        {selectedMode === "PARTICIPANT" ? (
-          <Button asChild variant="outline" className="w-full" size="lg">
-            <Link href="/explorer">{t("modeChoice.participant.cta")}</Link>
-          </Button>
-        ) : (
-          <Button asChild variant="outline" className="w-full" size="lg">
-            <Link href="/dashboard/circles/new">{t("modeChoice.organizer.cta")}</Link>
-          </Button>
-        )}
-
         <p className="text-muted-foreground text-xs">{t("modeChoice.hint")}</p>
       </div>
+
     </div>
   );
 }

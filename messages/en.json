@@ -99,20 +99,21 @@
       "cta": "Explore"
     },
     "modeChoice": {
-      "greeting": "Welcome, {name} 👋",
-      "greetingAnonymous": "Welcome to The Playground 👋",
-      "subtitle": "What do you want to do?",
+      "greetingPrefix": "Welcome,",
+      "greetingSuffix": "what do you want to do?",
+      "greetingAnonymous": "Welcome — what do you want to do?",
+      "subtitle": "Choose your default mode. You can change it at any time.",
       "participant": {
-        "title": "I join events",
-        "description": "Discover events and join communities that match your interests.",
+        "title": "I participate",
+        "description": "Discover and join events that inspire me",
         "cta": "Explore events"
       },
       "organizer": {
-        "title": "I organize events",
-        "description": "Create your community, organize your events and grow your network.",
+        "title": "I organize",
+        "description": "Create my community and host events",
         "cta": "Create my Community"
       },
-      "continue": "Continue",
+      "continue": "Go to my dashboard",
       "continuing": "Loading...",
       "hint": "You can switch modes at any time from your dashboard."
     }
