@@ -46,6 +46,7 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
           )}
         </h1>
         <p className="text-muted-foreground">{t("modeChoice.subtitle")}</p>
+        <p className="text-muted-foreground text-xs">{t("modeChoice.hint")}</p>
       </div>
 
       {/* Cards */}
@@ -87,8 +88,6 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
 
       </div>
 
-      {/* Hint */}
-      <p className="text-muted-foreground text-xs">{t("modeChoice.hint")}</p>
 
     </div>
   );
