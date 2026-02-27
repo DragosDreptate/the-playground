@@ -30,10 +30,11 @@ function formatLocationText(
   locationType: string,
   locationName: string | null,
   locationAddress: string | null,
+  videoLink: string | null,
   locale: string
 ): string {
   if (locationType === "ONLINE") {
-    return locale === "fr" ? "En ligne" : "Online";
+    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
   }
   return (
     [locationName, locationAddress].filter(Boolean).join(", ") ||
@@ -159,6 +160,7 @@ async function sendRegistrationEmails(
     moment.locationType,
     moment.locationName,
     moment.locationAddress,
+    moment.videoLink,
     locale
   );
   const playerName =
@@ -177,6 +179,7 @@ async function sendRegistrationEmails(
         startsAt: moment.startsAt,
         endsAt: moment.endsAt,
         location: locationText,
+        videoLink: moment.videoLink,
         url: `${baseUrl}/m/${moment.slug}`,
         organizerName: circle.name,
       })
@@ -298,6 +301,7 @@ async function sendPromotionEmail(
     moment.locationType,
     moment.locationName,
     moment.locationAddress,
+    moment.videoLink,
     locale
   );
   const playerName =
@@ -313,6 +317,7 @@ async function sendPromotionEmail(
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
     location: locationText,
+    videoLink: moment.videoLink,
     url: `${promotionBaseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
   });

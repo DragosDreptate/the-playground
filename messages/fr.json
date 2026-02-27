@@ -228,6 +228,7 @@
       "locationAddressPlaceholder": "123 rue Principale, Paris",
       "videoLink": "Lien vidéo",
       "videoLinkPlaceholder": "https://meet.google.com/...",
+      "videoLinkOr": "ou coller le lien",
       "eventOptions": "Options de l'événement",
       "ticketPrice": "Prix du billet",
       "priceSoon": "Bientôt disponible",

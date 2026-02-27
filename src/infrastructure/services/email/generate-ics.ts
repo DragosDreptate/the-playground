@@ -12,6 +12,7 @@ type IcsEventData = {
   startsAt: Date;
   endsAt: Date | null; // Falls back to startsAt + 2h
   location: string; // Pre-formatted location text
+  videoLink?: string | null; // Video conference URL — overrides location for ONLINE events
   url: string; // Public URL of the Moment
   organizerName: string; // Circle name
 };
@@ -35,7 +36,11 @@ export function generateIcs(data: IcsEventData): string {
   );
   const now = formatIcsDate(new Date());
 
-  return [
+  // For online events with a video link, use the URL as LOCATION so calendar
+  // apps (Apple Calendar, Outlook) display a clickable link directly in the event.
+  const locationValue = data.videoLink ?? data.location;
+
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//The Playground//EN",
@@ -48,11 +53,17 @@ export function generateIcs(data: IcsEventData): string {
     `DTEND:${dtEnd}`,
     `SUMMARY:${escapeIcsText(data.title)}`,
     `DESCRIPTION:${escapeIcsText(data.description)}`,
-    `LOCATION:${escapeIcsText(data.location)}`,
+    `LOCATION:${escapeIcsText(locationValue)}`,
+    // CONFERENCE property (RFC 7986) — Google Calendar renders a "Join" button
+    ...(data.videoLink
+      ? [`CONFERENCE;FEATURE=VIDEO;LABEL="Lien de réunion";VALUE=URI:${data.videoLink}`]
+      : []),
     `URL:${data.url}`,
     `ORGANIZER;CN=${escapeIcsText(data.organizerName)}:MAILTO:noreply@theplayground.community`,
     "STATUS:CONFIRMED",
     "END:VEVENT",
     "END:VCALENDAR",
-  ].join("\r\n");
+  ];
+
+  return lines.join("\r\n");
 }
