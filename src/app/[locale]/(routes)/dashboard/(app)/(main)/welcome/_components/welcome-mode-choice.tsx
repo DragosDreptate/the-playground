@@ -30,7 +30,7 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
     <div className="mx-auto w-full max-w-xl space-y-8 text-center">
 
       {/* Greeting */}
-      <div className="space-y-2">
+      <div className="space-y-4">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {firstName ? (
             <>

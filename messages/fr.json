@@ -102,7 +102,7 @@
       "greetingPrefix": "Bienvenue,",
       "greetingSuffix": "Que veux-tu faire ?",
       "greetingAnonymous": "Bienvenue — que veux-tu faire ?",
-      "subtitle": "Choisis ton mode par défaut. Tu pourras changer à tout moment.",
+      "subtitle": "Choisis ton mode par défaut.",
       "participant": {
         "title": "Je participe",
         "description": "Découvrir et rejoindre des événements qui m'inspirent"
@@ -111,7 +111,7 @@
         "title": "J'organise",
         "description": "Créer ma communauté et animer des événements"
       },
-      "hint": "Tu peux changer de mode à tout moment depuis ton espace."
+      "hint": "Tu pourras changer de mode à tout moment depuis ton espace."
     }
   },
   "Dashboard": {
