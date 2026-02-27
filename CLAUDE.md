@@ -212,7 +212,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 ## Stack technique
 
 ### Core
-- **Framework** : Next.js 15 (App Router) — SSR pour les pages Moment, API Routes, i18n
+- **Framework** : Next.js 16 (App Router) — SSR pour les pages Moment, API Routes, i18n
 - **Langage** : TypeScript (strict) — types partagés front/back
 - **ORM** : Prisma — schema déclaratif, migrations
 - **Base de données** : PostgreSQL — multi-tenant
@@ -283,6 +283,10 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:seed-demo-data:prod` | Injecte les données de démo en production (avec confirmation) |
 | `pnpm db:cleanup-demo-data` | Dry-run : affiche ce qui serait supprimé (@demo.playground) |
 | `pnpm db:cleanup-demo-data:prod` | Supprime les données démo en production (avec double confirmation) |
+| `pnpm db:backfill-notification-prefs` | Backfill des préférences de notifications (dev) — met à true pour les utilisateurs existants |
+| `pnpm db:backfill-notification-prefs:prod` | Backfill des préférences de notifications en production (avec confirmation) |
+| `pnpm db:export-brevo-contacts` | Exporte les utilisateurs réels vers un CSV prêt à importer dans Brevo (exclut test/démo) |
+| `pnpm db:export-brevo-contacts:prod` | Exporte les contacts Brevo depuis la production (avec confirmation) |
 | `pnpm db:seed-covers` | Dry-run : affiche les images de couverture à injecter |
 | `pnpm db:seed-covers:execute` | Injecte les images de couverture en base |
 | `pnpm db:seed-covers:prod` | Injecte les images de couverture en production (avec confirmation) |
@@ -551,7 +555,7 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 | 2026-02-19 | Export données ambitieux (CSV + JSON + API Pro) |
 | 2026-02-19 | UI bilingue FR/EN dès V1, architecture i18n native pour multi-langue futur |
 | 2026-02-19 | Lancement France d'abord, puis expansion européenne et internationale |
-| 2026-02-19 | Stack technique : TypeScript full-stack (Next.js 15, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon/Supabase) |
+| 2026-02-19 | Stack technique : TypeScript full-stack (Next.js 16, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon/Supabase) |
 | 2026-02-19 | Architecture hexagonale : domain/ (models, ports, usecases) + infrastructure/ (repositories, services) + app/ (routes Next.js) |
 | 2026-02-19 | Questions ouvertes résolues : découverte publique = oui, freemium = non, langue = bilingue FR/EN, géo = France d'abord |
 | 2026-02-19 | Track retiré du MVP V1 → Phase 2. MVP se concentre sur Circle + Escale |
