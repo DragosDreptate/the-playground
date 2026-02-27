@@ -34,7 +34,7 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
     const result = await leaveCircleAction(circleId);
 
     if (result.success) {
-      router.push("/dashboard");
+      router.push("/dashboard?tab=circles");
     } else {
       setError(result.error);
       setIsPending(false);
