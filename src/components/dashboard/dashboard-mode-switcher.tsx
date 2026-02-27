@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Crown, User } from "lucide-react";
 import { setDashboardModeAction } from "@/app/actions/dashboard";
 import type { DashboardMode } from "@/domain/models/user";
 
@@ -29,23 +30,25 @@ export function DashboardModeSwitcher({ currentMode, activeTab }: DashboardModeS
       <button
         type="button"
         onClick={() => handleSwitch("PARTICIPANT")}
-        className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+        className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
           currentMode === "PARTICIPANT" || currentMode === null
             ? "bg-foreground text-background"
             : "text-muted-foreground hover:text-foreground"
         }`}
       >
+        <User className="size-3" />
         {t("modeParticipant")}
       </button>
       <button
         type="button"
         onClick={() => handleSwitch("ORGANIZER")}
-        className={`rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+        className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
           currentMode === "ORGANIZER"
             ? "bg-foreground text-background"
             : "text-muted-foreground hover:text-foreground"
         }`}
       >
+        <Crown className="size-3" />
         {t("modeOrganizer")}
       </button>
     </div>
