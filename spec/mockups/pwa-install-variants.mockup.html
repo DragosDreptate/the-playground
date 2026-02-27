@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PWA Install — 3 variantes</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26, 27, 46, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26, 27, 46, 0.08), 0 2px 4px -2px rgba(26, 27, 46, 0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  padding: 48px 24px;
+}
+
+/* ── PAGE LAYOUT ── */
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-bottom: 56px;
+}
+
+/* ── SECTION WRAPPER ── */
+.variant-block {
+  margin-bottom: 64px;
+}
+.variant-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-bottom: 16px;
+}
+.variant-label .label-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--foreground);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+.variant-label .label-badge.legacy {
+  background: var(--muted-foreground);
+}
+
+/* Preview frame */
+.preview-frame {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  max-width: 480px;
+}
+
+/* Legacy frame — désaturé */
+.preview-frame.legacy {
+  opacity: 0.5;
+  filter: grayscale(0.4);
+}
+
+/* ── SECTION PWA (structure commune) ── */
+.pwa-section {
+  padding: 56px 24px;
+  text-align: center;
+  background: var(--background);
+}
+
+.pwa-heading {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin-bottom: 8px;
+}
+
+.pwa-subtitle {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin-bottom: 32px;
+}
+
+.pwa-note {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.pwa-note .dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* Buttons row */
+.buttons-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── LEGACY — store badges noirs ── */
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 148px;
+  background: #0a0a0a;
+  border-radius: 12px;
+  padding: 10px 16px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+  text-decoration: none;
+}
+.store-badge .badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.store-badge .badge-line1 {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+  line-height: 1;
+}
+.store-badge .badge-line2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* ── VARIANTE A — Boutons outline sobres ── */
+.btn-outline-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 20px;
+  background: var(--card);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.btn-outline-platform:hover {
+  border-color: rgba(26, 27, 46, 0.25);
+  background: #fafafa;
+  box-shadow: var(--shadow-sm);
+}
+.btn-outline-platform .btn-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+}
+.btn-outline-platform .btn-label-small {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  line-height: 1;
+  font-weight: 400;
+}
+.btn-outline-platform .btn-label-main {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* ── VARIANTE B — Chips pills ── */
+.chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--muted);
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+  border: none;
+  transition: background 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+}
+.chip-pill:hover {
+  background: #e6e5f2;
+  box-shadow: var(--shadow-sm);
+}
+.chip-pill .chip-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.chip-pill .chip-label {
+  font-weight: 600;
+  color: var(--foreground);
+}
+.chip-pill .chip-sub {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-weight: 400;
+}
+
+/* ── VARIANTE C — Deux cartes ── */
+.platform-cards-row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.platform-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 28px;
+  cursor: pointer;
+  min-width: 140px;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  color: inherit;
+}
+.platform-card:hover {
+  border-color: rgba(26, 27, 46, 0.2);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.platform-card .card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--muted);
+}
+.platform-card .card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 2px;
+}
+.platform-card .card-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  text-align: center;
+}
+.platform-card .card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+</style>
+</head>
+<body>
+
+<p class="page-title">PWA Install — Section actuelle vs 3 variantes</p>
+<p class="page-subtitle">Remplacement des faux badges "App Store / Google Play" par une UI PWA honnête</p>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION ACTUELLE (référence grisée)
+══════════════════════════════════════════════ -->
+<div class="variant-block">
+  <div class="variant-label">
+    <span class="label-badge legacy">0</span>
+    Section actuelle — à remplacer (faux badges store, trompeurs)
+  </div>
+  <div class="preview-frame legacy">
+    <section class="pwa-section">
+      <h2 class="pwa-heading">Disponible sur iOS et Android</h2>
+      <p class="pwa-subtitle">Installez l'app gratuitement sur votre téléphone</p>
+
+      <div class="buttons-row">
+        <!-- Badge Apple existant -->
+        <a class="store-badge" href="#">
+          <svg width="20" height="24" viewBox="0 0 814 1000" fill="white" style="flex-shrink:0">
+            <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z"/>
+          </svg>
+          <div class="badge-text">
+            <span class="badge-line1">Télécharger sur</span>
+            <span class="badge-line2">App Store</span>
+          </div>
+        </a>
+
+        <!-- Badge Google Play existant -->
+        <a class="store-badge" href="#">
+          <svg width="22" height="24" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+            <path d="M3.18 23.76a2 2 0 0 0 2.22-.22L17.12 12 5.4.46A2 2 0 0 0 3.18.7C2.45 1.13 2 1.9 2 2.74v18.52c0 .84.45 1.61 1.18 2z" fill="#EA4335"/>
+            <path d="M20.82 10.22 18.09 8.7 14.63 12l3.46 3.3 2.73-1.52A2 2 0 0 0 22 12c0-.8-.45-1.55-1.18-1.78z" fill="#FBBC04"/>
+            <path d="M5.4.46 17.12 12 20.82 8.7c.15-.08.3-.18.42-.29L5.4.46z" fill="#4285F4"/>
+            <path d="M5.4 23.54l15.84-7.95a2 2 0 0 0-.42-.29L17.12 12 5.4 23.54z" fill="#34A853"/>
+          </svg>
+          <div class="badge-text">
+            <span class="badge-line1">Disponible sur</span>
+            <span class="badge-line2">Google Play</span>
+          </div>
+        </a>
+      </div>
+
+      <p class="pwa-note">
+        <span class="dot"></span>
+        Application web progressive (PWA) — aucun téléchargement requis
+      </p>
+    </section>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     VARIANTE A — Boutons outline sobres
+══════════════════════════════════════════════ -->
+<div class="variant-block">
+  <div class="variant-label">
+    <span class="label-badge">A</span>
+    Boutons outline sobres — honnêtes, discrets, bien intégrés au design system
+  </div>
+  <div class="preview-frame">
+    <section class="pwa-section">
+      <h2 class="pwa-heading">Installez l'app sur votre téléphone</h2>
+      <p class="pwa-subtitle">Accès rapide depuis votre écran d'accueil — aucun téléchargement</p>
+
+      <div class="buttons-row">
+        <!-- Bouton iPhone -->
+        <a class="btn-outline-platform" href="#">
+          <svg width="20" height="24" viewBox="0 0 814 1000" fill="currentColor" style="flex-shrink:0; color: var(--foreground)">
+            <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z"/>
+          </svg>
+          <div class="btn-text">
+            <span class="btn-label-small">iPhone / iPad</span>
+            <span class="btn-label-main">Ajouter sur iPhone</span>
+          </div>
+        </a>
+
+        <!-- Bouton Android -->
+        <a class="btn-outline-platform" href="#">
+          <svg width="22" height="24" viewBox="0 0 24 24" fill="#3DDC84" style="flex-shrink:0">
+            <path d="M17.523 15.341a.85.85 0 0 1-.848.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .848.848v4.681zm-9.37 0a.85.85 0 0 1-.849.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .849.848v4.681zm9.744-6.631l1.57-2.721a.327.327 0 0 0-.12-.447.327.327 0 0 0-.447.12l-1.59 2.754A9.323 9.323 0 0 0 12 7.647a9.323 9.323 0 0 0-5.31 1.769L5.1 6.662a.327.327 0 0 0-.447-.12.327.327 0 0 0-.12.447l1.57 2.721C4.055 10.85 2.927 12.854 2.927 15.12H21.07c0-2.266-1.128-4.27-3.173-5.41zm-7.54 2.544a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571zm3.286 0a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571z"/>
+          </svg>
+          <div class="btn-text">
+            <span class="btn-label-small">Android</span>
+            <span class="btn-label-main">Ajouter sur Android</span>
+          </div>
+        </a>
+      </div>
+
+      <p class="pwa-note">
+        <span class="dot"></span>
+        Application web progressive (PWA) — aucun téléchargement requis
+      </p>
+    </section>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     VARIANTE B — Chips pills
+══════════════════════════════════════════════ -->
+<div class="variant-block">
+  <div class="variant-label">
+    <span class="label-badge">B</span>
+    Chips pills — ultra-compact, minimaliste, idéal si la section doit rester discrète
+  </div>
+  <div class="preview-frame">
+    <section class="pwa-section">
+      <h2 class="pwa-heading">Installez l'app sur votre téléphone</h2>
+      <p class="pwa-subtitle">Accès rapide depuis votre écran d'accueil — aucun téléchargement</p>
+
+      <div class="buttons-row">
+        <!-- Pill iPhone -->
+        <a class="chip-pill" href="#">
+          <svg width="16" height="20" viewBox="0 0 814 1000" fill="currentColor" style="flex-shrink:0; color: var(--foreground)">
+            <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z"/>
+          </svg>
+          <div class="chip-text">
+            <span class="chip-label">iPhone</span>
+            <span class="chip-sub">/ iPad</span>
+          </div>
+        </a>
+
+        <!-- Pill Android -->
+        <a class="chip-pill" href="#">
+          <svg width="18" height="20" viewBox="0 0 24 24" fill="#3DDC84" style="flex-shrink:0">
+            <path d="M17.523 15.341a.85.85 0 0 1-.848.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .848.848v4.681zm-9.37 0a.85.85 0 0 1-.849.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .849.848v4.681zm9.744-6.631l1.57-2.721a.327.327 0 0 0-.12-.447.327.327 0 0 0-.447.12l-1.59 2.754A9.323 9.323 0 0 0 12 7.647a9.323 9.323 0 0 0-5.31 1.769L5.1 6.662a.327.327 0 0 0-.447-.12.327.327 0 0 0-.12.447l1.57 2.721C4.055 10.85 2.927 12.854 2.927 15.12H21.07c0-2.266-1.128-4.27-3.173-5.41zm-7.54 2.544a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571zm3.286 0a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571z"/>
+          </svg>
+          <span class="chip-label">Android</span>
+        </a>
+      </div>
+
+      <p class="pwa-note">
+        <span class="dot"></span>
+        Application web progressive (PWA) — aucun téléchargement requis
+      </p>
+    </section>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     VARIANTE C — Deux cartes
+══════════════════════════════════════════════ -->
+<div class="variant-block">
+  <div class="variant-label">
+    <span class="label-badge">C</span>
+    Deux cartes — plus de hiérarchie visuelle, explique l'action, look premium
+  </div>
+  <div class="preview-frame">
+    <section class="pwa-section">
+      <h2 class="pwa-heading">Installez l'app sur votre téléphone</h2>
+      <p class="pwa-subtitle">Accès rapide depuis votre écran d'accueil — aucun téléchargement</p>
+
+      <div class="platform-cards-row">
+        <!-- Card iPhone -->
+        <a class="platform-card" href="#">
+          <div class="card-icon">
+            <svg width="28" height="34" viewBox="0 0 814 1000" fill="currentColor" style="color: var(--foreground)">
+              <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <span class="card-title">iPhone</span>
+            <span class="card-hint">Ajouter à l'écran d'accueil</span>
+          </div>
+        </a>
+
+        <!-- Card Android -->
+        <a class="platform-card" href="#">
+          <div class="card-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#3DDC84">
+              <path d="M17.523 15.341a.85.85 0 0 1-.848.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .848.848v4.681zm-9.37 0a.85.85 0 0 1-.849.848.85.85 0 0 1-.848-.848V10.66a.85.85 0 0 1 .848-.848.85.85 0 0 1 .849.848v4.681zm9.744-6.631l1.57-2.721a.327.327 0 0 0-.12-.447.327.327 0 0 0-.447.12l-1.59 2.754A9.323 9.323 0 0 0 12 7.647a9.323 9.323 0 0 0-5.31 1.769L5.1 6.662a.327.327 0 0 0-.447-.12.327.327 0 0 0-.12.447l1.57 2.721C4.055 10.85 2.927 12.854 2.927 15.12H21.07c0-2.266-1.128-4.27-3.173-5.41zm-7.54 2.544a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571zm3.286 0a.57.57 0 0 1-.571-.571.57.57 0 0 1 .571-.571.57.57 0 0 1 .571.571.57.57 0 0 1-.571.571z"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <span class="card-title">Android</span>
+            <span class="card-hint">Ajouter à l'écran d'accueil</span>
+          </div>
+        </a>
+      </div>
+
+      <p class="pwa-note">
+        <span class="dot"></span>
+        Application web progressive (PWA) — aucun téléchargement requis
+      </p>
+    </section>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     NOTES DE DESIGN
+══════════════════════════════════════════════ -->
+<div style="max-width: 480px; margin-top: 16px; padding: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 12px;">
+  <p style="font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 12px;">Notes de design</p>
+  <ul style="font-size: 13px; color: var(--muted-foreground); line-height: 1.7; padding-left: 16px;">
+    <li><strong style="color: var(--foreground);">Variante A</strong> — Recommandée. Cohérente avec le design system (outline buttons), honnête sur la nature PWA, lisible.</li>
+    <li style="margin-top: 6px;"><strong style="color: var(--foreground);">Variante B</strong> — Plus compacte, adaptée si la section doit occuper moins de place. Moins d'affordance click.</li>
+    <li style="margin-top: 6px;"><strong style="color: var(--foreground);">Variante C</strong> — Plus explicative, met en valeur chaque plateforme. À privilégier si l'installation est un objectif fort.</li>
+    <li style="margin-top: 6px;"><strong style="color: var(--foreground);">Composant actuel</strong> affiche les deux boutons uniquement sur la plateforme correspondante (iOS ou Android, pas les deux). Les mockups montrent les deux pour la comparaison visuelle.</li>
+  </ul>
+</div>
+
+</body>
+</html>

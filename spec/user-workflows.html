@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workflows utilisateurs — The Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #e8457a;
+      --primary-light: #fce7ef;
+      --primary-muted: rgba(232, 69, 122, 0.12);
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --success: #22c55e;
+      --success-light: #dcfce7;
+      --warning: #f59e0b;
+      --warning-light: #fef3c7;
+      --info: #3b82f6;
+      --info-light: #dbeafe;
+      --sidebar-width: 220px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────── */
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ────────────────────────────────────────────── */
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 20px 16px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sidebar-logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .sidebar-subtitle {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+    }
+
+    .sidebar-nav {
+      padding: 12px 8px;
+      flex: 1;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0 8px;
+      margin-bottom: 4px;
+      margin-top: 12px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      border-radius: 7px;
+      text-decoration: none;
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 1px;
+    }
+
+    .nav-link:hover {
+      background: var(--muted);
+      color: var(--foreground);
+    }
+
+    .nav-link.active {
+      background: var(--primary-muted);
+      color: var(--primary);
+    }
+
+    .nav-link-icon {
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+    }
+
+    /* ── Main content ───────────────────────────────────────── */
+
+    .main {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .section {
+      padding: 40px 40px 60px;
+      max-width: 1100px;
+    }
+
+    .section-header {
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--foreground);
+      letter-spacing: -0.03em;
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-top: 6px;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── Status pills ───────────────────────────────────────── */
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .pill-implemented { background: var(--success-light); color: #15803d; }
+    .pill-partial     { background: var(--warning-light); color: #92400e; }
+    .pill-phase2      { background: var(--info-light);    color: #1d4ed8; }
+    .pill-missing     { background: #fee2e2;              color: #991b1b; }
+
+    /* ── SECTION 1 — Personas ───────────────────────────────── */
+
+    .personas-group {
+      margin-bottom: 36px;
+    }
+
+    .group-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-foreground);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .group-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .personas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .persona-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .persona-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+
+    .persona-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .persona-card.player::before { background: var(--primary); }
+    .persona-card.host::before   { background: linear-gradient(90deg, #7c3aed, #e8457a); }
+
+    .persona-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .persona-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .avatar-pink    { background: linear-gradient(135deg, #e8457a, #f472b6); }
+    .avatar-orange  { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+    .avatar-blue    { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .avatar-amber   { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .avatar-violet  { background: linear-gradient(135deg, #7c3aed, #e8457a); }
+    .avatar-emerald { background: linear-gradient(135deg, #059669, #3b82f6); }
+    .avatar-indigo  { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .avatar-rose    { background: linear-gradient(135deg, #e11d48, #e8457a); }
+
+    .persona-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    .persona-role-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .badge-player { background: var(--primary-light); color: var(--primary); }
+    .badge-host   { background: #ede9fe; color: #7c3aed; }
+
+    .persona-desc {
+      font-size: 12.5px;
+      color: var(--muted-foreground);
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+
+    .persona-row {
+      font-size: 12px;
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .persona-row-label {
+      font-weight: 600;
+      color: var(--foreground);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .persona-row-value {
+      color: var(--muted-foreground);
+    }
+
+    /* ── SECTION 2 — Flowcharts ─────────────────────────────── */
+
+    .flowchart-wrapper {
+      margin-bottom: 36px;
+    }
+
+    .flowchart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flowchart-label {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .flowchart-subtitle {
+      font-size: 12.5px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+
+    .flowchart {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 20px 16px;
+      overflow-x: auto;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      gap: 0;
+      min-width: max-content;
+    }
+
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .flow-box {
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--foreground);
+      white-space: nowrap;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .flow-box.cta {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      font-weight: 600;
+    }
+
+    .flow-box.system {
+      background: var(--muted);
+      color: var(--muted-foreground);
+      border-style: dashed;
+    }
+
+    .flow-box.success {
+      background: var(--success-light);
+      color: #15803d;
+      border-color: #bbf7d0;
+      font-weight: 600;
+    }
+
+    .flow-box.warning {
+      background: var(--warning-light);
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .flow-box.info {
+      background: var(--info-light);
+      color: #1d4ed8;
+      border-color: #bfdbfe;
+    }
+
+    .flow-box.decision {
+      background: #f3e8ff;
+      color: #7c3aed;
+      border-color: #ddd6fe;
+      border-radius: 0;
+      transform: rotate(0deg);
+      position: relative;
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      color: var(--muted-foreground);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .flow-sub {
+      font-size: 10px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .flow-status {
+      font-size: 10px;
+      margin-top: 3px;
+    }
+
+    /* Branch flows */
+    .flow-branch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .flow-branch-item {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-down-arrow {
+      display: flex;
+      justify-content: center;
+      padding: 2px 0;
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+
+    .flow-vertical {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .flow-vertical-step {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Gap note */
+    .gap-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: var(--muted);
+      border-radius: 8px;
+      border-left: 3px solid var(--warning);
+    }
+
+    .gap-note-text {
+      font-size: 11.5px;
+      color: var(--muted-foreground);
+    }
+
+    .gap-note-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--warning);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── SECTION 3 — Matrix ─────────────────────────────────── */
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+    }
+
+    .matrix-table th {
+      background: var(--muted);
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    .matrix-table th:first-child {
+      min-width: 180px;
+    }
+
+    .matrix-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .matrix-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .matrix-table tr:hover td {
+      background: var(--muted);
+    }
+
+    .matrix-table td:first-child {
+      font-weight: 600;
+      color: var(--foreground);
+      font-size: 12.5px;
+    }
+
+    .matrix-table td:not(:first-child) {
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .matrix-section-header td {
+      background: var(--background);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-foreground);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .matrix-th-persona {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+
+    /* ── SECTION 4 — Entry Points ───────────────────────────── */
+
+    .entry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .entry-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .entry-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    .entry-card-accent {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .accent-viral   { background: var(--primary); }
+    .accent-organic { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+    .accent-logged  { background: linear-gradient(90deg, #7c3aed, #e8457a); }
+    .accent-community { background: linear-gradient(90deg, #059669, #3b82f6); }
+
+    .entry-route {
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      color: var(--primary);
+      background: var(--primary-muted);
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+
+    .entry-route.blue   { color: #1d4ed8; background: #dbeafe; }
+    .entry-route.violet { color: #7c3aed; background: #ede9fe; }
+    .entry-route.green  { color: #059669; background: #d1fae5; }
+
+    .entry-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .entry-desc {
+      font-size: 12.5px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .entry-personas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .entry-persona-chip {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      background: var(--muted);
+      color: var(--muted-foreground);
+    }
+
+    .entry-trigger {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .entry-trigger-icon {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── Misc ───────────────────────────────────────────────── */
+
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      padding: 10px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted-foreground);
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    .tag-green  { background: var(--success-light); color: #15803d; }
+    .tag-amber  { background: var(--warning-light); color: #92400e; }
+    .tag-blue   { background: var(--info-light);    color: #1d4ed8; }
+    .tag-red    { background: #fee2e2;              color: #991b1b; }
+
+    /* ── Mobile top tabs ────────────────────────────────────── */
+
+    .mobile-tabs {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-tabs-inner {
+      display: flex;
+      gap: 0;
+      min-width: max-content;
+      padding: 0 12px;
+    }
+
+    .mobile-tab {
+      padding: 12px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .mobile-tab.active,
+    .mobile-tab:hover {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .mobile-tabs { display: block; }
+      .main { margin-left: 0; padding-top: 48px; }
+      .section { padding: 24px 16px 40px; }
+      .section-title { font-size: 20px; }
+      .personas-grid { grid-template-columns: 1fr; }
+      .entry-grid { grid-template-columns: 1fr; }
+      .flow-row { flex-direction: column; min-width: unset; align-items: flex-start; }
+      .flow-arrow { transform: rotate(90deg); padding: 2px 0; }
+      .matrix-table { font-size: 11px; }
+      .matrix-table th, .matrix-table td { padding: 7px 8px; }
+    }
+
+    /* ── Scrollspy active update ─────────────────────────────── */
+    html { scroll-behavior: smooth; }
+
+    .info-banner {
+      background: linear-gradient(135deg, var(--primary-muted), #ede9fe20);
+      border: 1px solid rgba(232, 69, 122, 0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      font-size: 12.5px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+
+    .info-banner strong { color: var(--foreground); }
+  </style>
+</head>
+<body>
+
+<!-- Mobile top tabs -->
+<nav class="mobile-tabs" role="navigation">
+  <div class="mobile-tabs-inner">
+    <a href="#personas"   class="mobile-tab active">Personas</a>
+    <a href="#parcours"   class="mobile-tab">Parcours</a>
+    <a href="#matrice"    class="mobile-tab">Matrice</a>
+    <a href="#entrees"    class="mobile-tab">Points d'entrée</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+  <!-- ── Sidebar ──────────────────────────────────────────────── -->
+  <aside class="sidebar" role="navigation" aria-label="Navigation principale">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="sidebar-logo-dot"></span>
+        The Playground
+      </div>
+      <div class="sidebar-subtitle">Workflows utilisateurs · MVP V1</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Documentation</div>
+      <a href="#personas" class="nav-link active">
+        <span class="nav-link-icon">👤</span> Personas
+      </a>
+      <a href="#parcours" class="nav-link">
+        <span class="nav-link-icon">🔀</span> Parcours critiques
+      </a>
+      <a href="#matrice" class="nav-link">
+        <span class="nav-link-icon">📊</span> Matrice
+      </a>
+      <a href="#entrees" class="nav-link">
+        <span class="nav-link-icon">🚪</span> Points d'entrée
+      </a>
+
+      <div class="nav-section-label" style="margin-top: 24px;">Parcours</div>
+      <a href="#parcours-a" class="nav-link" style="padding-left: 16px; font-size: 12px;">
+        <span class="nav-link-icon">A</span> Découverte virale
+      </a>
+      <a href="#parcours-b" class="nav-link" style="padding-left: 16px; font-size: 12px;">
+        <span class="nav-link-icon">B</span> Player récurrent
+      </a>
+      <a href="#parcours-c" class="nav-link" style="padding-left: 16px; font-size: 12px;">
+        <span class="nav-link-icon">C</span> Liste d'attente
+      </a>
+      <a href="#parcours-d" class="nav-link" style="padding-left: 16px; font-size: 12px;">
+        <span class="nav-link-icon">D</span> Host crée un événement
+      </a>
+      <a href="#parcours-e" class="nav-link" style="padding-left: 16px; font-size: 12px;">
+        <span class="nav-link-icon">E</span> Onboarding Host
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ── Main ──────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1 — Personas                                     -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="personas" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Personas</h1>
+        <p class="section-desc">
+          Deux grandes catégories d'utilisateurs : les <strong>Players</strong> (participants) et les <strong>Hosts</strong> (organisateurs).
+          Un même utilisateur peut être les deux selon les Communautés.
+        </p>
+      </div>
+
+      <!-- Players -->
+      <div class="personas-group">
+        <div class="group-title">Player — Participant</div>
+        <div class="personas-grid">
+
+          <div class="persona-card player">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-pink">V</div>
+              <div>
+                <div class="persona-name">Visiteur anonyme</div>
+                <div class="persona-role-badge badge-player">Découvreur</div>
+              </div>
+            </div>
+            <p class="persona-desc">Reçoit un lien <code>/m/[slug]</code> via WhatsApp, email ou réseaux sociaux. Ne connaît pas The Playground. A 10 secondes pour être convaincu.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Comprendre vite et s'inscrire sans friction</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Moindre obstacle = abandon immédiat</span>
+            </div>
+          </div>
+
+          <div class="persona-card player">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-orange">N</div>
+              <div>
+                <div class="persona-name">Nouveau membre</div>
+                <div class="persona-role-badge badge-player">Fraîchement inscrit</div>
+              </div>
+            </div>
+            <p class="persona-desc">Vient de créer un compte et de s'inscrire à son premier événement. Ne connaît pas encore la plateforme ni la communauté.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Confirmation, "Et maintenant ?"</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Absence de feedback post-inscription</span>
+            </div>
+          </div>
+
+          <div class="persona-card player">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-blue">M</div>
+              <div>
+                <div class="persona-name">Membre actif</div>
+                <div class="persona-role-badge badge-player">Player récurrent</div>
+              </div>
+            </div>
+            <p class="persona-desc">Membre d'un ou plusieurs Circles, revient régulièrement. Connaît la plateforme, cherche l'efficacité.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Vue rapide des prochains événements</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Navigation lente, infos pratiques cachées</span>
+            </div>
+          </div>
+
+          <div class="persona-card player">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-amber">A</div>
+              <div>
+                <div class="persona-name">Candidat</div>
+                <div class="persona-role-badge badge-player">En liste d'attente</div>
+              </div>
+            </div>
+            <p class="persona-desc">Inscrit sur un événement complet. Attend une place, incertain, risque de décrocher si pas notifié rapidement.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Savoir sa position, être promu</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Incertitude sans notification de promotion</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Hosts -->
+      <div class="personas-group">
+        <div class="group-title">Host — Organisateur</div>
+        <div class="personas-grid">
+
+          <div class="persona-card host">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-violet">D</div>
+              <div>
+                <div class="persona-name">Host débutant</div>
+                <div class="persona-role-badge badge-host">En découverte</div>
+              </div>
+            </div>
+            <p class="persona-desc">Évalue si The Playground peut remplacer Meetup ou Luma. Arrive via bouche-à-oreille ou recommandation. Veut voir si ça "marche".</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Créer son premier événement en &lt; 5 min</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Onboarding Host inexistant, dashboard vide</span>
+            </div>
+          </div>
+
+          <div class="persona-card host">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-emerald">H</div>
+              <div>
+                <div class="persona-name">Host actif</div>
+                <div class="persona-role-badge badge-host">Communautaire</div>
+              </div>
+            </div>
+            <p class="persona-desc">Organise régulièrement. Sa communauté est établie. Accède directement au dashboard par habitude. Cherche l'efficacité à chaque clic.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Créer vite, partager le lien, gérer les inscrits</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Chaque clic inutile est trop</span>
+            </div>
+          </div>
+
+          <div class="persona-card host">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-indigo">P</div>
+              <div>
+                <div class="persona-name">Host pré-événement</div>
+                <div class="persona-role-badge badge-host">En préparation</div>
+              </div>
+            </div>
+            <p class="persona-desc">Son événement est dans les 48h. Sous pression logistique. Vérifie les inscrits, modifie les infos si besoin.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Compteur inscrits, lien partageable</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Pas d'outil de rappel groupé</span>
+            </div>
+          </div>
+
+          <div class="persona-card host">
+            <div class="persona-header">
+              <div class="persona-avatar avatar-rose">R</div>
+              <div>
+                <div class="persona-name">Host post-événement</div>
+                <div class="persona-role-badge badge-host">En rétention</div>
+              </div>
+            </div>
+            <p class="persona-desc">Son événement vient de se terminer. Fenêtre d'engagement court (24-48h). Veut remercier, analyser, et annoncer le prochain événement.</p>
+            <div class="persona-row">
+              <span class="persona-row-label">Motivation :</span>
+              <span class="persona-row-value">Capitaliser sur l'élan post-événement</span>
+            </div>
+            <div class="persona-row">
+              <span class="persona-row-label">Friction :</span>
+              <span class="persona-row-value">Formulaire commentaire masqué sur PAST</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2 — Parcours critiques                           -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="parcours" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Parcours critiques</h1>
+        <p class="section-desc">
+          Cinq flowcharts représentant les parcours utilisateurs clés, du point d'entrée jusqu'au résultat final.
+        </p>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="flow-box cta" style="padding:3px 8px;font-size:11px;">Étape CTA</span> Action principale</div>
+        <div class="legend-item"><span class="flow-box" style="padding:3px 8px;font-size:11px;">Étape</span> Étape standard</div>
+        <div class="legend-item"><span class="flow-box system" style="padding:3px 8px;font-size:11px;">Système</span> Action automatique</div>
+        <div class="legend-item"><span class="flow-box success" style="padding:3px 8px;font-size:11px;">✓ Résultat</span> Résultat positif</div>
+        <div class="legend-item"><span class="flow-box warning" style="padding:3px 8px;font-size:11px;">⚠ Gap</span> Fonctionnalité manquante</div>
+        <div class="legend-item"><span class="flow-box info" style="padding:3px 8px;font-size:11px;">Phase 2</span> Prévu phase 2</div>
+      </div>
+
+      <!-- ── Parcours A ── -->
+      <div id="parcours-a" class="flowchart-wrapper">
+        <div class="flowchart-title">
+          <span class="flowchart-label">A</span>
+          Découverte virale — Du lien au premier engagement
+        </div>
+        <p class="flowchart-subtitle">Persona : Visiteur anonyme → Nouveau membre · Le parcours le plus critique pour la croissance</p>
+
+        <div class="flowchart">
+          <div class="flow-row">
+            <div class="flow-step">
+              <div class="flow-box">📱 Lien reçu</div>
+              <div class="flow-sub">WhatsApp · email · réseaux</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box"><code>/m/[slug]</code></div>
+              <div class="flow-sub">Page événement publique</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box">Lecture du contenu</div>
+              <div class="flow-sub">Titre · date · lieu · inscrits</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">S'inscrire</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Auth</div>
+              <div class="flow-sub">Magic link · OAuth</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Onboarding profil</div>
+              <div class="flow-sub">1ère fois seulement</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box success">✓ Inscrit</div>
+              <div class="flow-sub">Retour sur /m/[slug]</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Email confirmation</div>
+              <div class="flow-sub">+ pièce jointe .ics</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div class="flow-row">
+              <div class="flow-step">
+                <div class="flow-box">📅 Ajouter au calendrier</div>
+                <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box">🔗 Voir la Communauté</div>
+                <div class="flow-sub">CTA vers /circles/[slug]</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box warning">⚠ Lien vers dashboard</div>
+                <div class="flow-sub">Gap A2 — absent</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box warning">⚠ Autres événements du Circle</div>
+                <div class="flow-sub">Gap A4 — absent sur page PAST</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gap-note">
+            <span class="gap-note-label">Gap ouvert</span>
+            <span class="gap-note-text">Post-inscription : lien vers le dashboard absent (Gap A2). Les autres événements du Circle ne sont pas proposés sur les pages d'événements actifs (Gap A4).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Parcours B ── -->
+      <div id="parcours-b" class="flowchart-wrapper">
+        <div class="flowchart-title">
+          <span class="flowchart-label">B</span>
+          Player récurrent — Retour sur la plateforme
+        </div>
+        <p class="flowchart-subtitle">Persona : Membre actif · Consulte ses prochains événements, gère ses inscriptions</p>
+
+        <div class="flowchart">
+          <div class="flow-row">
+            <div class="flow-step">
+              <div class="flow-box cta">/dashboard</div>
+              <div class="flow-sub">Tab "Mes événements"</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box">Timeline prochains Moments</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">Clic sur un Moment</div>
+              <div class="flow-sub">Lien vers vue dashboard</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box"><code>/circles/[s]/moments/[s]</code></div>
+              <div class="flow-sub">Vue Player</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <div>
+              <div class="flow-row">
+                <div class="flow-arrow" style="padding: 0 8px 0 0;">→</div>
+                <div class="flow-step">
+                  <div class="flow-box">Vérifier lieu · heure</div>
+                  <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flow-row">
+                <div class="flow-arrow" style="padding: 0 8px 0 0;">→</div>
+                <div class="flow-step">
+                  <div class="flow-box">Lire commentaires</div>
+                  <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flow-row">
+                <div class="flow-arrow" style="padding: 0 8px 0 0;">→</div>
+                <div class="flow-step">
+                  <div class="flow-box cta">Annuler inscription</div>
+                  <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="flow-row">
+                <div class="flow-arrow" style="padding: 0 8px 0 0;">→</div>
+                <div class="flow-step">
+                  <div class="flow-box warning">⚠ Autres Moments du Circle</div>
+                  <div class="flow-sub">Gap B2 — absent</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gap-note">
+            <span class="gap-note-label">Gap ouvert</span>
+            <span class="gap-note-text">
+              Depuis la page Moment dashboard, aucune vue des autres événements du même Circle (Gap B2).
+              Les rappels email 24h/1h avant déprioritisés en Phase 2 (nécessite Vercel Cron / QStash).
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Parcours C ── -->
+      <div id="parcours-c" class="flowchart-wrapper">
+        <div class="flowchart-title">
+          <span class="flowchart-label">C</span>
+          Liste d'attente — Du refus à la place confirmée
+        </div>
+        <p class="flowchart-subtitle">Persona : Candidat (Player en liste d'attente) · Gestion de la file automatique</p>
+
+        <div class="flowchart">
+          <div class="flow-row">
+            <div class="flow-step">
+              <div class="flow-box"><code>/m/[slug]</code> complet</div>
+              <div class="flow-sub">Capacité atteinte</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">Rejoindre la liste</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box success">Position visible</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Désistement inscrit</div>
+              <div class="flow-sub">cancelRegistrationAction</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Promotion automatique</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Email de promotion</div>
+              <div class="flow-sub">+ pièce jointe .ics</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box success">✓ Inscrit confirmé</div>
+            </div>
+          </div>
+
+          <div class="gap-note" style="border-left-color: #22c55e;">
+            <span class="gap-note-label" style="color: #15803d;">Entièrement résolu</span>
+            <span class="gap-note-text">Parcours C complet : inscription en liste, position visible, promotion auto, email de notification. Gap C3 (message explicite "vous serez alerté") reste à affiner UI.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Parcours D ── -->
+      <div id="parcours-d" class="flowchart-wrapper">
+        <div class="flowchart-title">
+          <span class="flowchart-label">D</span>
+          Host crée un événement — De l'idée au premier inscrit
+        </div>
+        <p class="flowchart-subtitle">Persona : Host actif · Parcours le plus fréquent pour un Host établi</p>
+
+        <div class="flowchart">
+          <div class="flow-row">
+            <div class="flow-step">
+              <div class="flow-box cta">/dashboard</div>
+              <div class="flow-sub">Tab "Mes événements"</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">Créer un événement</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box">Formulaire minimaliste</div>
+              <div class="flow-sub">Titre · date · lieu · desc</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Options avancées masquées</div>
+              <div class="flow-sub">Capacité · prix · cover</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box success">✓ Publié</div>
+              <div class="flow-sub">Slug généré</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div class="flow-row">
+              <div class="flow-step">
+                <div class="flow-box">Page Moment dashboard</div>
+                <div class="flow-sub">Lien partageable visible</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box cta">Copier le lien</div>
+                <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box">Partage WhatsApp · email · réseaux</div>
+                <div class="flow-sub">Distribution par l'organisateur</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box system">Premiers inscrits</div>
+                <div class="flow-sub">Email notif. Host</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box success">✓ Notifié</div>
+                <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gap-note">
+            <span class="gap-note-label">Gap ouvert</span>
+            <span class="gap-note-text">
+              Gap D2 : un Player sans Circle ne voit pas de CTA "Devenir organisateur".
+              Gap D3 : pas d'étape "Partagez maintenant" post-création avec le lien mis en avant.
+              Gap D4 : sélection du Circle dans le formulaire si le Host a plusieurs Circles.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Parcours E ── -->
+      <div id="parcours-e" class="flowchart-wrapper">
+        <div class="flowchart-title">
+          <span class="flowchart-label">E</span>
+          Onboarding Host débutant — De la découverte au premier événement partagé
+        </div>
+        <p class="flowchart-subtitle">Persona : Host débutant · Parcours le plus à risque — time-to-first-event doit être minimal</p>
+
+        <div class="flowchart">
+          <div class="flow-row">
+            <div class="flow-step">
+              <div class="flow-box">Découverte plateforme</div>
+              <div class="flow-sub">Bouche-à-oreille · recommandation</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">Créer un compte</div>
+              <div class="flow-sub">Magic link · OAuth</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box system">Onboarding profil</div>
+              <div class="flow-sub">Prénom · nom · avatar</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box warning">⚠ Dashboard vide</div>
+              <div class="flow-sub">Gap G2 — peu guidant</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">
+              <div class="flow-box cta">Créer une Communauté</div>
+              <div class="flow-sub"><span class="pill pill-implemented">✅ CTA présent</span></div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div class="flow-row">
+              <div class="flow-step">
+                <div class="flow-box">Formulaire Circle</div>
+                <div class="flow-sub">Nom · description · visibilité</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box success">✓ Circle créé</div>
+                <div class="flow-sub"><span class="pill pill-implemented">✅ Implémenté</span></div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box cta">Créer un événement</div>
+                <div class="flow-sub">Dans la Communauté</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box success">✓ Premier événement publié</div>
+              </div>
+              <div class="flow-arrow">→</div>
+              <div class="flow-step">
+                <div class="flow-box cta">Partager le lien</div>
+                <div class="flow-sub">Viralité distribuée</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="gap-note">
+            <span class="gap-note-label">Gap critique</span>
+            <span class="gap-note-text">
+              Gap G2 : le dashboard vide est peu guidant — juste un bouton "Créer une Communauté" sans contexte.
+              Gap G4 : pas de guide "3 étapes pour lancer votre première communauté".
+              Gap G1 : l'onboarding ne distingue pas Host vs Player (intention non détectée).
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3 — Matrice Persona × Fonctionnalité            -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="matrice" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Matrice Persona × Fonctionnalité</h1>
+        <p class="section-desc">
+          Vue d'ensemble de ce que chaque persona peut faire sur la plateforme, et ce qui manque encore.
+        </p>
+      </div>
+
+      <div class="legend" style="margin-bottom: 20px;">
+        <div class="legend-item"><span style="font-size:16px;">✅</span> Implémenté</div>
+        <div class="legend-item"><span style="font-size:16px;">⚠️</span> Partiel / Gap ouvert</div>
+        <div class="legend-item"><span style="font-size:16px;">🔜</span> Prévu Phase 2</div>
+        <div class="legend-item"><span style="font-size:16px;">❌</span> Non implémenté (MVP)</div>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Fonctionnalité</th>
+              <th><span class="matrix-th-persona">Visiteur</span></th>
+              <th><span class="matrix-th-persona">Nouveau<br>membre</span></th>
+              <th><span class="matrix-th-persona">Membre<br>actif</span></th>
+              <th><span class="matrix-th-persona">Candidat<br>(attente)</span></th>
+              <th><span class="matrix-th-persona">Host<br>débutant</span></th>
+              <th><span class="matrix-th-persona">Host<br>actif</span></th>
+              <th><span class="matrix-th-persona">Host<br>pré-event</span></th>
+              <th><span class="matrix-th-persona">Host<br>post-event</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="matrix-section-header">
+              <td colspan="9">Découverte & Inscription</td>
+            </tr>
+            <tr>
+              <td>Voir page événement publique</td>
+              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Voir page Communauté publique</td>
+              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Parcourir le répertoire (Découvrir)</td>
+              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>S'inscrire à un événement</td>
+              <td>✅</td><td>—</td><td>✅</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Rejoindre la liste d'attente</td>
+              <td>✅</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Email de confirmation d'inscription</td>
+              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+
+            <tr class="matrix-section-header">
+              <td colspan="9">Post-inscription (Player)</td>
+            </tr>
+            <tr>
+              <td>Voir statut inscription (dashboard)</td>
+              <td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Position dans la liste d'attente</td>
+              <td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Promotion automatique (liste d'attente)</td>
+              <td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Email de promotion (liste d'attente)</td>
+              <td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Ajouter au calendrier (Google, ICS)</td>
+              <td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Annuler son inscription</td>
+              <td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Email de rappel 24h/1h avant</td>
+              <td>—</td><td>—</td><td>🔜</td><td>🔜</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Notification nouveaux événements (Circle)</td>
+              <td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+
+            <tr class="matrix-section-header">
+              <td colspan="9">Engagement & Communauté</td>
+            </tr>
+            <tr>
+              <td>Commenter un événement (futur)</td>
+              <td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Commenter un événement passé</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>⚠️</td><td>—</td><td>❌</td>
+            </tr>
+            <tr>
+              <td>Voir liste des membres du Circle</td>
+              <td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Suivre un Circle (sans s'inscrire)</td>
+              <td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+
+            <tr class="matrix-section-header">
+              <td colspan="9">Outils Host</td>
+            </tr>
+            <tr>
+              <td>Créer une Communauté</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Créer un événement</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Modifier un événement</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Lien partageable (copier)</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Voir liste des inscrits</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td>
+            </tr>
+            <tr>
+              <td>Liste inscrits filtrée (REGISTERED / WAITLISTED)</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>⚠️</td><td>⚠️</td><td>⚠️</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Compteur inscrits / attente / places</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>⚠️</td><td>⚠️</td><td>⚠️</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Export CSV des inscrits</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>❌</td><td>❌</td><td>❌</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Rappel groupé aux inscrits</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>❌</td><td>❌</td><td>❌</td><td>—</td>
+            </tr>
+            <tr>
+              <td>Email notif. Host — nouvelle inscription</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td>
+            </tr>
+            <tr>
+              <td>CTA "Créer le prochain événement" (post)</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>❌</td>
+            </tr>
+            <tr>
+              <td>Stats post-événement (taux présence)</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>❌</td>
+            </tr>
+            <tr>
+              <td>Image de couverture (Circle + Moment)</td>
+              <td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr class="section-divider" />
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4 — Points d'entrée                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <section id="entrees" class="section">
+      <div class="section-header">
+        <h1 class="section-title">Points d'entrée</h1>
+        <p class="section-desc">
+          Les quatre routes principales par lesquelles les utilisateurs arrivent sur The Playground.
+          L'architecture distribution-by-organizer : pas d'algorithme de recommandation, la viralité vient des liens.
+        </p>
+      </div>
+
+      <div class="entry-grid">
+
+        <div class="entry-card">
+          <div class="entry-card-accent accent-viral"></div>
+          <div class="entry-route">/m/[slug]</div>
+          <div class="entry-name">Lien partagé — Viralité</div>
+          <p class="entry-desc">
+            Page événement publique. Premier contact d'un visiteur avec la plateforme. Conçue pour être autonome, belle et convaincante sans effort de l'organisateur.
+          </p>
+          <div class="entry-personas">
+            <span class="entry-persona-chip">Visiteur anonyme</span>
+            <span class="entry-persona-chip">Nouveau membre</span>
+            <span class="entry-persona-chip">Player inscrit</span>
+            <span class="entry-persona-chip">Player (attente)</span>
+          </div>
+          <div class="entry-trigger">
+            <span class="entry-trigger-icon">↗</span>
+            WhatsApp, email, Instagram story, Slack, LinkedIn — lien direct. Premier point de contact.
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="pill pill-implemented">✅ Implémenté</span>
+            <span style="font-size: 11px; color: var(--muted-foreground); align-self: center;">Porte d'entrée virale principale</span>
+          </div>
+        </div>
+
+        <div class="entry-card">
+          <div class="entry-card-accent accent-organic"></div>
+          <div class="entry-route blue">/explorer</div>
+          <div class="entry-name">Découvrir — Découverte organique</div>
+          <p class="entry-desc">
+            Répertoire public de Communautés. Filtrable par thème et localisation. Pas de ranking algorithmique. Accessible sans compte.
+          </p>
+          <div class="entry-personas">
+            <span class="entry-persona-chip">Visiteur anonyme</span>
+            <span class="entry-persona-chip">Host débutant</span>
+            <span class="entry-persona-chip">Player actif</span>
+          </div>
+          <div class="entry-trigger">
+            <span class="entry-trigger-icon">↗</span>
+            SEO, curiosité, exploration volontaire. Deuxième canal de découverte.
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="pill pill-implemented">✅ Implémenté</span>
+            <span style="font-size: 11px; color: var(--muted-foreground); align-self: center;">Annuaire public filtrable</span>
+          </div>
+        </div>
+
+        <div class="entry-card">
+          <div class="entry-card-accent accent-logged"></div>
+          <div class="entry-route violet">/dashboard</div>
+          <div class="entry-name">Mon espace — Utilisateurs connectés</div>
+          <p class="entry-desc">
+            Tableau de bord central. Deux tabs : "Mes événements" (timeline prochains + passés) et "Mes Communautés". CTAs contextuels selon le rôle.
+          </p>
+          <div class="entry-personas">
+            <span class="entry-persona-chip">Membre actif</span>
+            <span class="entry-persona-chip">Host actif</span>
+            <span class="entry-persona-chip">Host pré-event</span>
+          </div>
+          <div class="entry-trigger">
+            <span class="entry-trigger-icon">↗</span>
+            Habitude, favoris du navigateur, email de notification. Accès direct.
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="pill pill-implemented">✅ Implémenté</span>
+            <span style="font-size: 11px; color: var(--muted-foreground); align-self: center;">Cockpit Community-first</span>
+          </div>
+        </div>
+
+        <div class="entry-card">
+          <div class="entry-card-accent accent-community"></div>
+          <div class="entry-route green">/circles/[slug]</div>
+          <div class="entry-name">Page Communauté — Couche de rétention</div>
+          <p class="entry-desc">
+            L'avantage structurel vs Luma. Affiche l'identité de la Communauté, ses prochains événements, ses événements passés, et ses membres. Convertit des participants ponctuels en membres fidèles.
+          </p>
+          <div class="entry-personas">
+            <span class="entry-persona-chip">Visiteur anonyme</span>
+            <span class="entry-persona-chip">Nouveau membre</span>
+            <span class="entry-persona-chip">Membre actif</span>
+          </div>
+          <div class="entry-trigger">
+            <span class="entry-trigger-icon">↗</span>
+            Depuis la page événement (CTA "Voir la Communauté"), email, lien direct.
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 6px; flex-wrap: wrap;">
+            <span class="pill pill-implemented">✅ Implémenté</span>
+            <span style="font-size: 11px; color: var(--muted-foreground); align-self: center;">Absente chez Luma — différenciateur clé</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Architecture diagram -->
+      <div style="margin-top: 32px;">
+        <div class="group-title">Architecture des flux</div>
+
+        <div class="flowchart">
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 16px; align-items: center;">
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Monde extérieur</div>
+              <div class="flow-box" style="text-align: center;">📱 WhatsApp · SMS · email</div>
+              <div class="flow-box" style="text-align: center;">🔗 LinkedIn · Instagram</div>
+              <div class="flow-box" style="text-align: center;">🔍 Recherche organique</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="font-size: 20px; color: var(--primary);">→</div>
+              <div style="font-size: 10px; color: var(--muted-foreground); text-align: center;">Distribution<br>par l'organisateur</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Points d'entrée</div>
+              <div class="flow-box cta" style="text-align: center;"><code>/m/[slug]</code> — événement</div>
+              <div class="flow-box" style="text-align: center; border-color: #bfdbfe; background: #dbeafe; color: #1d4ed8;"><code>/explorer</code> — Découvrir</div>
+              <div class="flow-box" style="text-align: center; border-color: #d1fae5; background: #d1fae5; color: #059669;"><code>/circles/[slug]</code> — Communauté</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+              <div style="font-size: 20px; color: var(--primary);">→</div>
+              <div style="font-size: 10px; color: var(--muted-foreground); text-align: center;">Conversion<br>& Rétention</div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Résultat</div>
+              <div class="flow-box success" style="text-align: center;">✓ Inscription → Membre Circle</div>
+              <div class="flow-box" style="text-align: center;"><code>/dashboard</code> — Espace</div>
+              <div class="flow-box success" style="text-align: center;">✓ Rétention communautaire</div>
+            </div>
+
+          </div>
+
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted-foreground); line-height: 1.6;">
+            <strong style="color: var(--foreground);">Principe fondamental :</strong>
+            The Playground est <strong>community-centric</strong> (comme Meetup), pas event-centric (comme Luma).
+            L'événement (<code>/m/[slug]</code>) est la <strong>porte d'entrée virale</strong>.
+            La Communauté (<code>/circles/[slug]</code>) est la <strong>couche de rétention</strong>.
+            S'inscrire à un événement = devenir membre de la Communauté automatiquement.
+          </div>
+        </div>
+      </div>
+
+      <!-- Gaps summary -->
+      <div style="margin-top: 32px;">
+        <div class="group-title">Gaps ouverts prioritaires</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--warning); text-transform: uppercase; margin-bottom: 6px;">Haute priorité</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">Commentaires sur événements PAST</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Le formulaire de commentaire est masqué sur les événements terminés, même pour le Host. Or le pic d'engagement post-événement est là.</div>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--warning); text-transform: uppercase; margin-bottom: 6px;">Haute priorité</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">Export CSV des inscrits</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Besoin logistique fort pour les Hosts — badges, listes d'émargement, suivi de présence.</div>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--warning); text-transform: uppercase; margin-bottom: 6px;">Haute priorité</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">Onboarding Host débutant</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Le dashboard vide sans guide est la principale cause de churn Host. Un guide "3 étapes" augmenterait significativement la rétention.</div>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--info); text-transform: uppercase; margin-bottom: 6px;">Phase 2</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">Rappels email 24h/1h avant</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Nécessite Vercel Cron ou QStash — déprioritisé MVP mais fort impact sur le taux de présence.</div>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--info); text-transform: uppercase; margin-bottom: 6px;">Phase 2</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">Communication groupée Host → membres</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">Envoyer un message ou un rappel à tous les inscrits d'un événement. Actuellement impossible depuis la plateforme.</div>
+          </div>
+
+          <div style="background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--info); border-radius: 10px; padding: 14px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--info); text-transform: uppercase; margin-bottom: 6px;">Phase 2</div>
+            <div style="font-size: 12.5px; color: var(--foreground); font-weight: 600; margin-bottom: 4px;">CTA "Créer le prochain événement" post-event</div>
+            <div style="font-size: 12px; color: var(--muted-foreground);">La fenêtre d'engagement post-événement est courte. Un CTA ciblé sur les pages PAST capitaliserait sur l'élan.</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 12px;">
+        <div style="font-size: 12px; color: var(--muted-foreground);">
+          Dernière mise à jour : <strong>Février 2026</strong> · MVP V1 en cours · Source : code source + spec/ux-parcours-jtbd.md
+        </div>
+        <div style="font-size: 11px; color: var(--muted-foreground);">
+          Powered by <span style="color: var(--primary); font-weight: 700;">The Playground</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Scrollspy — update active nav link
+  const sections = ['personas', 'parcours', 'matrice', 'entrees'];
+  const navLinks = document.querySelectorAll('.nav-link, .mobile-tab');
+
+  function updateActive() {
+    let current = sections[0];
+    for (const id of sections) {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top <= 100) {
+        current = id;
+      }
+    }
+    navLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === '#' + current) {
+        link.classList.add('active');
+      } else if (href && sections.some(s => href === '#' + s)) {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+</body>
+</html>

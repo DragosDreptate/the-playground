@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Onglet Mes Communautés | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+    }
+    .dark {
+      --background: #1a1b2e;
+      --foreground: #f0eff7;
+      --card: #252640;
+      --muted: #2a2b45;
+      --muted-foreground: #8b8faa;
+      --border: #353658;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background); color: var(--foreground);
+      font-size: 14px; line-height: 1.5;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ─── Toolbar ─── */
+    .toolbar {
+      position: fixed; bottom: 16px; right: 16px; z-index: 100;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+    }
+    .toolbar label { color: var(--muted-foreground); font-weight: 500; }
+    .toolbar select, .toolbar button {
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 10px; cursor: pointer;
+      background: var(--muted); color: var(--foreground);
+    }
+
+    /* ─── SiteHeader ─── */
+    .site-header {
+      border-bottom: 1px solid var(--border); background: var(--card);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-weight: 800; font-size: 16px; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-nav { display: flex; gap: 2px; }
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--muted-foreground);
+      padding: 6px 12px; border-radius: 8px;
+    }
+    .nav-link.active { color: var(--foreground); background: var(--muted); }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white;
+    }
+
+    /* ─── Page ─── */
+    .page { max-width: 672px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ─── Greeting ─── */
+    .greeting { margin-bottom: 32px; }
+    .greeting h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .greeting p { color: var(--muted-foreground); font-size: 14px; }
+
+    /* ─── Tabs row ─── */
+    .tabs-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px;
+    }
+    .tab-pills {
+      display: flex; gap: 1px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 4px;
+    }
+    .tab-pill {
+      font-size: 13px; font-weight: 500; border-radius: 99px;
+      padding: 6px 16px; cursor: pointer;
+      color: var(--muted-foreground); background: none; border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab-pill.active { background: var(--foreground); color: var(--background); }
+
+    /* CTA "Nouvelle Communauté" — affiché seulement si l'utilisateur a déjà des communautés */
+    .btn-new-circle {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; border: none;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+
+    /* ─── Empty state ─── */
+    .empty-state {
+      border: 1.5px dashed var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .empty-top {
+      padding: 32px 24px 24px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 4px;
+    }
+    .empty-icon {
+      width: 40px; height: 40px; border-radius: 12px; background: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px; font-size: 18px;
+    }
+    .empty-title { font-size: 13px; font-weight: 500; color: var(--muted-foreground); }
+    .empty-hint { font-size: 12px; color: var(--muted-foreground); opacity: 0.7; }
+    .empty-divider { border: none; border-top: 1px dashed var(--border); margin: 0 24px; }
+
+    /* ─── Guide 3 étapes ─── */
+    .getting-started { padding: 20px 24px 24px; }
+    .gs-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      color: var(--primary); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .gs-heading { font-size: 15px; font-weight: 700; color: var(--foreground); margin-bottom: 4px; }
+    .gs-sub { font-size: 12px; color: var(--muted-foreground); margin-bottom: 20px; }
+
+    .steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+    .step-row {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+    }
+    .step-row + .step-row { border-top: 1px solid var(--border); }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; margin-top: 1px;
+    }
+    .step-num.active { background: var(--primary); color: white; }
+    .step-num.pending {
+      background: var(--muted); color: var(--muted-foreground);
+      border: 1.5px solid var(--border);
+    }
+    .step-text { flex: 1; }
+    .step-name { font-size: 13px; font-weight: 600; color: var(--foreground); }
+    .step-name.muted { color: var(--muted-foreground); font-weight: 500; }
+    .step-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; line-height: 1.4; }
+    .step-desc.faded { opacity: 0.6; }
+
+    .btn-start {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 10px 24px; border-radius: 10px; cursor: pointer; border: none;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; transition: opacity 0.15s;
+    }
+    .btn-start:hover { opacity: 0.88; }
+
+    /* ─── Circle cards grid ─── */
+    .circles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 480px) { .circles-grid { grid-template-columns: 1fr; } }
+
+    .circle-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+    .circle-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .circle-cover {
+      aspect-ratio: 1/1; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; color: rgba(255,255,255,0.9);
+      font-weight: 800;
+    }
+    .circle-body { padding: 12px 14px 14px; }
+    .circle-role {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+      color: var(--primary); margin-bottom: 6px;
+    }
+    .circle-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .circle-meta { font-size: 12px; color: var(--muted-foreground); }
+    .circle-stats {
+      display: flex; gap: 12px; margin-top: 8px;
+      padding-top: 8px; border-top: 1px solid var(--border);
+    }
+    .circle-stat { font-size: 11px; color: var(--muted-foreground); }
+    .circle-stat strong { color: var(--foreground); font-weight: 600; }
+
+    /* ─── Annotation badge (mockup only) ─── */
+    .annotation {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      color: #7c3aed; background: #f5f3ff;
+      border: 1px solid #ddd6fe; border-radius: 99px;
+      padding: 3px 10px; margin-bottom: 16px;
+    }
+    .dark .annotation { background: #2e1065; color: #c4b5fd; border-color: #4c1d95; }
+    .annotation-dot { width: 6px; height: 6px; border-radius: 50%; background: #7c3aed; }
+
+    @media (max-width: 480px) {
+      .page { padding: 24px 16px 60px; }
+      .header-inner { padding: 0 16px; }
+      .header-nav { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <label>État :</label>
+  <select onchange="applyState(this.value)">
+    <option value="empty">Aucune communauté</option>
+    <option value="has-circles">A des communautés</option>
+  </select>
+  <button onclick="toggleDark()">🌙 Dark</button>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <span class="logo">The Playground</span>
+    <nav class="header-nav">
+      <a href="#" class="nav-link active">Mon espace</a>
+      <a href="#" class="nav-link">Découvrir</a>
+    </nav>
+    <div class="header-avatar">S</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <div class="greeting">
+    <h1>Bonjour, Sophie 👋</h1>
+    <p>Voici ce qui se passe dans tes communautés.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ÉTAT A — Aucune communauté
+       · Pas de bouton "Nouvelle Communauté" dans les tabs
+       · Empty state avec guide 3 étapes
+       · Un seul CTA : "Créer ma Communauté" dans le guide
+  ══════════════════════════════════════════════ -->
+  <div id="state-empty">
+
+    <div class="annotation"><span class="annotation-dot"></span>État A — liste vide</div>
+
+    <div class="tabs-row">
+      <div class="tab-pills">
+        <button class="tab-pill">Mes événements</button>
+        <button class="tab-pill active">Mes Communautés</button>
+      </div>
+      <!-- Pas de bouton ici -->
+    </div>
+
+    <div class="empty-state">
+      <!-- Texte existant (inchangé) -->
+      <div class="empty-top">
+        <div class="empty-icon">👥</div>
+        <p class="empty-title">Aucune communauté pour l'instant</p>
+        <p class="empty-hint">Crée la tienne ou rejoins une communauté via un événement.</p>
+      </div>
+
+      <hr class="empty-divider">
+
+      <!-- Guide 3 étapes (NOUVEAU) -->
+      <div class="getting-started">
+        <div class="gs-label">Pour organiser des événements</div>
+        <div class="gs-heading">3 étapes pour lancer ta Communauté</div>
+        <div class="gs-sub">Ça prend moins de 5 minutes.</div>
+
+        <div class="steps">
+          <div class="step-row">
+            <div class="step-num active">1</div>
+            <div class="step-text">
+              <div class="step-name">Créer ta Communauté</div>
+              <div class="step-desc">Un nom, une description, une photo — ton espace est prêt.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num pending">2</div>
+            <div class="step-text">
+              <div class="step-name muted">Créer ton premier événement</div>
+              <div class="step-desc faded">Un titre, une date, un lieu — c'est tout ce qu'il faut.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num pending">3</div>
+            <div class="step-text">
+              <div class="step-name muted">Partager le lien</div>
+              <div class="step-desc faded">Envoie-le sur WhatsApp, Slack ou Instagram.</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-start">
+          Créer ma Communauté
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ÉTAT B — A déjà des communautés
+       · Bouton "Nouvelle Communauté" dans les tabs (visible)
+       · Grille de cards (comportement actuel, inchangé)
+       · Pas de guide
+  ══════════════════════════════════════════════ -->
+  <div id="state-has-circles" style="display:none">
+
+    <div class="annotation"><span class="annotation-dot"></span>État B — a des communautés</div>
+
+    <div class="tabs-row">
+      <div class="tab-pills">
+        <button class="tab-pill">Mes événements</button>
+        <button class="tab-pill active">Mes Communautés</button>
+      </div>
+      <!-- Bouton visible car l'utilisateur a déjà des communautés -->
+      <button class="btn-new-circle">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M6.5 1.5v10M1.5 6.5h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Nouvelle Communauté
+      </button>
+    </div>
+
+    <div class="circles-grid">
+      <div class="circle-card">
+        <div class="circle-cover" style="background: linear-gradient(135deg, #e8457a, #9333ea)">🎨</div>
+        <div class="circle-body">
+          <div class="circle-role">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M5 1l1.03 2.09L8.5 3.45l-1.75 1.7.41 2.4L5 6.5 2.84 7.55l.41-2.4L1.5 3.45l2.47-.36L5 1z" fill="#e8457a"/>
+            </svg>
+            Organisatrice
+          </div>
+          <div class="circle-name">Design & Craft Paris</div>
+          <div class="circle-meta">Art • Paris</div>
+          <div class="circle-stats">
+            <span class="circle-stat"><strong>24</strong> membres</span>
+            <span class="circle-stat"><strong>2</strong> événements à venir</span>
+          </div>
+        </div>
+      </div>
+      <div class="circle-card">
+        <div class="circle-cover" style="background: linear-gradient(135deg, #3b82f6, #06b6d4)">💻</div>
+        <div class="circle-body">
+          <div class="circle-role">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M5 1l1.03 2.09L8.5 3.45l-1.75 1.7.41 2.4L5 6.5 2.84 7.55l.41-2.4L1.5 3.45l2.47-.36L5 1z" fill="#e8457a"/>
+            </svg>
+            Organisatrice
+          </div>
+          <div class="circle-name">Paris JS</div>
+          <div class="circle-meta">Tech • Paris</div>
+          <div class="circle-stats">
+            <span class="circle-stat"><strong>87</strong> membres</span>
+            <span class="circle-stat"><strong>1</strong> événement à venir</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  function applyState(v) {
+    document.getElementById('state-empty').style.display = v === 'empty' ? 'block' : 'none';
+    document.getElementById('state-has-circles').style.display = v === 'has-circles' ? 'block' : 'none';
+  }
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    document.querySelector('.toolbar button').textContent =
+      document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+  }
+</script>
+</body>
+</html>

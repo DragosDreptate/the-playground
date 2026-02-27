@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Landing Page · Section PWA (ajout après CTA final)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   DESIGN TOKENS — The Playground
+   ============================================================ */
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --secondary: #f0eff7;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08), 0 2px 4px -2px rgba(26,27,46,0.05);
+  --shadow-xl: 0 20px 40px rgba(26,27,46,0.16), 0 8px 16px rgba(26,27,46,0.08);
+}
+
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --border: #383a55;
+  --secondary: #222336;
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   OUTER PAGE LAYOUT
+   ============================================================ */
+.page-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { background: var(--muted); }
+
+/* ============================================================
+   MAIN SCENE
+   ============================================================ */
+.phone-scene {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.phone-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.phone-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.phone-frame {
+  width: 375px;
+  border-radius: 44px;
+  border: 8px solid #1a1b2e;
+  background: var(--background);
+  overflow: hidden;
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 2px 0 0 #333650 inset;
+  position: relative;
+}
+
+html.dark .phone-frame {
+  border-color: #383a55;
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.04) inset;
+}
+
+/* Dynamic Island */
+.phone-notch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px 6px;
+  background: var(--background);
+  position: relative;
+}
+
+.phone-notch-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.phone-notch-island {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 26px;
+  background: #0a0a0a;
+  border-radius: 14px;
+}
+
+html.dark .phone-notch-island { background: #000; }
+
+.phone-notch-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.phone-notch-icons svg {
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+/* Phone scrollable content */
+.phone-scroll {
+  overflow-y: auto;
+  max-height: 720px;
+  background: var(--background);
+  scrollbar-width: none;
+}
+.phone-scroll::-webkit-scrollbar { display: none; }
+
+/* ============================================================
+   SITE HEADER (inside phone)
+   ============================================================ */
+.site-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.logo-icon {
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #f43f5e, #a855f7);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg { color: white; }
+
+.logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.header-sign-in {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  padding: 48px 20px 52px;
+  text-align: center;
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-heading {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+
+.hero-heading .line {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hero-heading .grad {
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 15px;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  line-height: 1.55;
+  margin-top: 20px;
+  max-width: 300px;
+}
+
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 36px;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  box-shadow: 0 4px 14px rgba(232,69,122,0.35);
+  letter-spacing: -0.01em;
+}
+
+.scroll-fold {
+  width: 100%;
+  margin-top: 36px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.4;
+}
+.fold-line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--muted-foreground) 0px, var(--muted-foreground) 6px,
+    transparent 6px, transparent 12px
+  );
+}
+.fold-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.section-muted {
+  background: var(--muted);
+  padding: 48px 20px;
+}
+
+.section-white {
+  background: var(--background);
+  padding: 48px 20px;
+}
+
+.section-heading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin-bottom: 36px;
+  color: var(--foreground);
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, #f43f5e 0%, #d946ef 50%, #8b5cf6 100%);
+  opacity: 0.2;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f43f5e, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(232,69,122,0.25);
+}
+
+.step-dot svg { color: white; }
+
+.step-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.section-cta-wrap {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-primary-sm {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  box-shadow: 0 4px 12px rgba(232,69,122,0.3);
+}
+
+/* ============================================================
+   3 PILIERS
+   ============================================================ */
+.pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pillar-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f43f5e, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(232,69,122,0.25);
+}
+
+.pillar-icon svg { color: white; }
+
+.pillar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 6px;
+}
+
+.pillar-desc {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   CTA FINAL SECTION — "Prêt à lancer votre communauté ?"
+   ============================================================ */
+.cta-final-section {
+  background: var(--muted);
+  padding: 56px 20px 52px;
+  text-align: center;
+}
+
+.cta-final-heading {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+  line-height: 1.25;
+  margin-bottom: 14px;
+}
+
+.cta-final-sub {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+  margin-bottom: 32px;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ============================================================
+   PWA SECTION — NOUVELLE (ajoutée après CTA final)
+   ============================================================ */
+.pwa-section {
+  background: var(--background);
+  padding: 56px 20px 48px;
+  text-align: center;
+}
+
+.pwa-section-heading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foreground);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.pwa-section-sub {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+
+/* Store badges row */
+.store-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* Each store badge button */
+.store-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #0a0a0a;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-align: left;
+  min-width: 142px;
+  box-shadow: 0 4px 14px rgba(10,10,10,0.3);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+html.dark .store-badge {
+  background: #1a1a1a;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.store-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(10,10,10,0.35);
+}
+
+.store-badge-logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.store-badge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.store-badge-line1 {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.store-badge-line2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+/* PWA note below badges */
+.pwa-note {
+  margin-top: 18px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pwa-note-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   iOS MODAL (bottom sheet — shown below the phone)
+   ============================================================ */
+.ios-modal-demo {
+  margin-top: 28px;
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  box-shadow:
+    0 -4px 24px rgba(26,27,46,0.12),
+    0 -1px 0 var(--border);
+  padding: 0 0 24px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  /* cap width to phone width */
+  width: 100%;
+}
+
+html.dark .ios-modal-demo {
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.5), 0 -1px 0 var(--border);
+}
+
+/* Bottom sheet handle */
+.modal-handle {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+.modal-handle-bar {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+/* Modal header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 16px;
+}
+.modal-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+.modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--muted);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+
+/* Modal steps */
+.modal-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0 20px;
+}
+
+.modal-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.modal-step:last-child {
+  border-bottom: none;
+}
+
+.modal-step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-step-icon svg { color: var(--primary); }
+
+.modal-step-content {}
+
+.modal-step-num {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.modal-step-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+
+.modal-step-hint {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   SITE FOOTER
+   ============================================================ */
+.site-footer {
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 8px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.footer-link {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.footer-copy {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+/* ============================================================
+   ANNOTATION PANEL (beside phone)
+   ============================================================ */
+.annotation-panel {
+  max-width: 290px;
+  align-self: flex-start;
+  margin-top: 80px;
+}
+
+.annotation-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 16px;
+}
+
+.annotation-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.annotation-tag {
+  background: var(--primary);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.annotation-body {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.65;
+}
+
+.annotation-body strong { color: var(--foreground); font-weight: 600; }
+
+.annotation-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+.annotation-spec {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.8;
+}
+
+.annotation-spec span { display: block; }
+
+.annotation-spec .spec-key {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Behavior row */
+.behavior-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.behavior-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.behavior-dot.android { background: #3ddc84; }
+
+/* Context note */
+.context-note {
+  margin-top: 3rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.context-note-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--foreground);
+}
+
+.context-note-body {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+.context-note-body strong { color: var(--foreground); font-weight: 600; }
+
+.phone-column-inner {
+  position: relative;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- ============================================================
+       PAGE HEADER
+       ============================================================ -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Landing page — Section PWA (ajout après CTA final)</div>
+      <div class="page-subtitle">
+        Vue mobile complète (375 px · iPhone), scrollable. La section
+        <strong>"Prêt à lancer votre communauté&nbsp;?"</strong> est conservée telle quelle.
+        La nouvelle section <strong>"Disponible sur iOS et Android"</strong> avec les badges store
+        et la modale iOS est ajoutée juste après, avant le footer. Toutes les autres sections restent inchangées.
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">
+      Thème sombre ☽
+    </button>
+  </div>
+
+  <!-- ============================================================
+       MAIN SCENE
+       ============================================================ -->
+  <div class="phone-scene">
+
+    <!-- ---- PHONE ---- -->
+    <div class="phone-column">
+      <div class="phone-label">Scroll complet — 375 px</div>
+
+      <div class="phone-column-inner">
+
+        <div class="phone-frame">
+          <!-- Dynamic Island / Notch -->
+          <div class="phone-notch">
+            <span class="phone-notch-time">19:00</span>
+            <div class="phone-notch-island"></div>
+            <div class="phone-notch-icons">
+              <!-- Signal bars -->
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+                <rect x="0" y="6" width="3" height="6" rx="0.5"/>
+                <rect x="4.5" y="4" width="3" height="8" rx="0.5"/>
+                <rect x="9" y="2" width="3" height="10" rx="0.5"/>
+                <rect x="13" y="0" width="3" height="12" rx="0.5" opacity="0.3"/>
+              </svg>
+              <!-- WiFi -->
+              <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor">
+                <path d="M7.5 3.6a5.2 5.2 0 0 1 3.5 1.3l1.1-1.2A7 7 0 0 0 7.5 2a7 7 0 0 0-4.6 1.7L4 4.9a5.2 5.2 0 0 1 3.5-1.3z"/>
+                <path d="M7.5 6.6c1 0 1.9.35 2.5.9l1.1-1.1A5 5 0 0 0 7.5 5a5 5 0 0 0-3.6 1.4L5 7.5c.7-.55 1.5-.9 2.5-.9z"/>
+                <circle cx="7.5" cy="10" r="1.5"/>
+              </svg>
+              <!-- Battery -->
+              <div style="display:flex;align-items:center;height:12px;">
+                <div style="width:22px;height:11px;border:1.5px solid currentColor;border-radius:2px;opacity:0.7;display:flex;align-items:center;padding:1.5px;">
+                  <div style="width:68%;height:100%;background:currentColor;border-radius:1px;opacity:0.9;"></div>
+                </div>
+                <div style="width:2px;height:5px;background:currentColor;border-radius:0 1px 1px 0;opacity:0.5;margin-left:1px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrollable page content -->
+          <div class="phone-scroll">
+
+            <!-- SITE HEADER -->
+            <header class="site-header">
+              <div class="logo-mark">
+                <div class="logo-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <span class="logo-text">The Playground</span>
+              </div>
+              <button class="header-sign-in">Se connecter</button>
+            </header>
+
+            <!-- =====================
+                 HERO — inchangé
+                 ===================== -->
+            <section class="hero">
+              <h1 class="hero-heading">
+                <span class="line"><span class="grad">Lancez</span> votre</span>
+                <span class="line"><span class="grad">communauté.</span></span>
+                <span class="line"><span class="grad">Organisez</span> vos</span>
+                <span class="line"><span class="grad">événements.</span></span>
+                <span class="line"><span class="grad">Animez</span> votre</span>
+                <span class="line"><span class="grad">réseau.</span></span>
+              </h1>
+
+              <p class="hero-subtitle">
+                La plateforme communautaire 100&nbsp;% gratuite pour organiser vos événements et fidéliser vos membres.
+              </p>
+
+              <div class="hero-cta-group">
+                <button class="btn-primary">Commencer gratuitement</button>
+              </div>
+
+              <div class="scroll-fold">
+                <div class="fold-line"></div>
+                <div class="fold-label">&#8595; Scroll</div>
+                <div class="fold-line"></div>
+              </div>
+            </section>
+
+            <!-- =====================
+                 COMMENT CA MARCHE — inchangé
+                 ===================== -->
+            <section class="section-muted">
+              <h2 class="section-heading">Comment ça marche</h2>
+              <div class="steps">
+
+                <div class="step-item">
+                  <div class="step-dot">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-eyebrow">Étape 1</div>
+                    <div class="step-title">Créez votre Communauté</div>
+                    <div class="step-desc">Lancez votre espace en quelques secondes — nom, description, c'est tout.</div>
+                  </div>
+                </div>
+
+                <div class="step-item">
+                  <div class="step-dot">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-eyebrow">Étape 2</div>
+                    <div class="step-title">Organisez vos événements</div>
+                    <div class="step-desc">Créez un événement, partagez le lien — vos membres s'inscrivent en un clic.</div>
+                  </div>
+                </div>
+
+                <div class="step-item">
+                  <div class="step-dot">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                      <polyline points="17 6 23 6 23 12"/>
+                    </svg>
+                  </div>
+                  <div class="step-content">
+                    <div class="step-eyebrow">Étape 3</div>
+                    <div class="step-title">Fidélisez vos membres</div>
+                    <div class="step-desc">Les inscrits restent membres de votre Communauté — ils reviennent naturellement.</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="section-cta-wrap">
+                <button class="btn-primary-sm">Découvrir les Communautés</button>
+              </div>
+            </section>
+
+            <!-- =====================
+                 3 PILIERS — inchangé
+                 ===================== -->
+            <section class="section-white">
+              <h2 class="section-heading">3 raisons de choisir<br>The Playground</h2>
+              <div class="pillars">
+
+                <div class="pillar-card">
+                  <div class="pillar-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                    </svg>
+                  </div>
+                  <div class="pillar-title">Viral par conception</div>
+                  <div class="pillar-desc">Chaque événement est une page partageable. Un lien suffit pour attirer de nouveaux membres.</div>
+                </div>
+
+                <div class="pillar-card">
+                  <div class="pillar-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </div>
+                  <div class="pillar-title">Zéro friction</div>
+                  <div class="pillar-desc">Magic link, Google, GitHub — s'inscrire prend 10 secondes. Pas de compte lourd avant de découvrir.</div>
+                </div>
+
+                <div class="pillar-card">
+                  <div class="pillar-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 12 20 22 4 22 4 12"/>
+                      <rect x="2" y="7" width="20" height="5"/>
+                      <line x1="12" y1="22" x2="12" y2="7"/>
+                      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                    </svg>
+                  </div>
+                  <div class="pillar-title">100&nbsp;% gratuit</div>
+                  <div class="pillar-desc">Aucune commission, aucun abonnement. Seuls les frais Stripe (~2,9&nbsp;%) s'appliquent aux événements payants.</div>
+                </div>
+
+              </div>
+            </section>
+
+            <!-- =====================
+                 CTA FINAL — inchangé
+                 ===================== -->
+            <section class="cta-final-section">
+              <h2 class="cta-final-heading">Prêt à lancer votre<br>communauté&nbsp;?</h2>
+              <p class="cta-final-sub">
+                Rejoignez les organisateurs qui ont choisi la liberté. Gratuit, sans abonnement, sans commission.
+              </p>
+              <button class="btn-primary">Commencer gratuitement</button>
+            </section>
+
+            <!-- =====================
+                 PWA SECTION — NOUVELLE
+                 Ajoutée après "Prêt à lancer votre communauté ?"
+                 ===================== -->
+            <section class="pwa-section">
+
+              <h2 class="pwa-section-heading">Disponible sur iOS<br>et Android</h2>
+              <p class="pwa-section-sub">Installez l'app gratuitement sur votre téléphone</p>
+
+              <!-- Store badges -->
+              <div class="store-badges">
+
+                <!-- Apple iOS badge -->
+                <button class="store-badge" onclick="document.getElementById('ios-modal').scrollIntoView({behavior:'smooth',block:'start'})">
+                  <div class="store-badge-logo">
+                    <!-- Apple logo SVG -->
+                    <svg width="22" height="26" viewBox="0 0 814 1000" fill="white">
+                      <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 790.7 0 663 0 541.8c0-207.5 135.4-317.4 268.8-317.4 64.4 0 117.9 42.5 158.2 42.5 38.4 0 98.9-45.2 170.9-45.2zm-41.4-90.5c31.1-37.9 53.1-90.5 53.1-143.1 0-7.3-.6-14.6-1.9-20.5-50.6 1.9-110.8 33.7-147.1 75.8-28.5 32.4-55.1 84.9-55.1 138.2 0 8 1.3 16 1.9 18.6 3.2.6 8.4 1.3 13.6 1.3 45.4 0 102.5-30.4 135.5-70.3z"/>
+                    </svg>
+                  </div>
+                  <div class="store-badge-text">
+                    <span class="store-badge-line1">Télécharger sur</span>
+                    <span class="store-badge-line2">App Store</span>
+                  </div>
+                </button>
+
+                <!-- Android / Google Play badge -->
+                <button class="store-badge">
+                  <div class="store-badge-logo">
+                    <!-- Google Play triangle logo (simplified colorful version) -->
+                    <svg width="22" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M3.18 23.76a2 2 0 0 0 2.22-.22L17.12 12 5.4.46A2 2 0 0 0 3.18.7C2.45 1.13 2 1.9 2 2.74v18.52c0 .84.45 1.61 1.18 2z" fill="#EA4335"/>
+                      <path d="M20.82 10.22 18.09 8.7 14.63 12l3.46 3.3 2.73-1.52A2 2 0 0 0 22 12c0-.8-.45-1.55-1.18-1.78z" fill="#FBBC04"/>
+                      <path d="M5.4.46 17.12 12 20.82 8.7c.15-.08.3-.18.42-.29L5.4.46z" fill="#4285F4"/>
+                      <path d="M5.4 23.54l15.84-7.95a2 2 0 0 0-.42-.29L17.12 12 5.4 23.54z" fill="#34A853"/>
+                    </svg>
+                  </div>
+                  <div class="store-badge-text">
+                    <span class="store-badge-line1">Disponible sur</span>
+                    <span class="store-badge-line2">Google Play</span>
+                  </div>
+                </button>
+
+              </div><!-- /store-badges -->
+
+              <!-- PWA note -->
+              <div class="pwa-note">
+                <div class="pwa-note-dot"></div>
+                Application web progressive (PWA) — aucun téléchargement requis
+              </div>
+
+            </section>
+
+            <!-- =====================
+                 iOS MODAL (bottom sheet)
+                 Montre la modale qui s'ouvre au tap du bouton Apple
+                 ===================== -->
+            <div id="ios-modal" class="ios-modal-demo">
+
+              <div class="modal-handle">
+                <div class="modal-handle-bar"></div>
+              </div>
+
+              <div class="modal-header">
+                <div class="modal-title">Installer sur iPhone</div>
+                <button class="modal-close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+
+              <div class="modal-steps">
+
+                <!-- Step 1 -->
+                <div class="modal-step">
+                  <div class="modal-step-icon">
+                    <!-- iOS Share icon (box with arrow up) -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                      <polyline points="16 6 12 2 8 6"/>
+                      <line x1="12" y1="2" x2="12" y2="15"/>
+                    </svg>
+                  </div>
+                  <div class="modal-step-content">
+                    <div class="modal-step-num">Étape 1</div>
+                    <div class="modal-step-label">Appuie sur Partage</div>
+                    <div class="modal-step-hint">Bouton &#9633;&#8593; en bas de Safari</div>
+                  </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="modal-step">
+                  <div class="modal-step-icon">
+                    <!-- Home / Plus icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="3"/>
+                      <line x1="12" y1="8" x2="12" y2="16"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                  </div>
+                  <div class="modal-step-content">
+                    <div class="modal-step-num">Étape 2</div>
+                    <div class="modal-step-label">Sélectionne «&nbsp;Sur l'écran d'accueil&nbsp;»</div>
+                    <div class="modal-step-hint">Fais défiler la liste des options vers le bas</div>
+                  </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="modal-step">
+                  <div class="modal-step-icon">
+                    <!-- Checkmark -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                  <div class="modal-step-content">
+                    <div class="modal-step-num">Étape 3</div>
+                    <div class="modal-step-label">Appuie sur «&nbsp;Ajouter&nbsp;»</div>
+                    <div class="modal-step-hint">L'app apparaît sur ton écran d'accueil</div>
+                  </div>
+                </div>
+
+              </div><!-- /modal-steps -->
+
+            </div><!-- /ios-modal-demo -->
+
+            <!-- FOOTER -->
+            <footer class="site-footer">
+              <div class="footer-logo">The Playground</div>
+              <div class="footer-links">
+                <span class="footer-link">Découvrir</span>
+                <span class="footer-link">À propos</span>
+                <span class="footer-link">Contact</span>
+              </div>
+              <div class="footer-copy">Powered by The Playground · 2026</div>
+            </footer>
+
+          </div><!-- /phone-scroll -->
+        </div><!-- /phone-frame -->
+
+      </div><!-- /phone-column-inner -->
+
+      <div class="phone-label" style="opacity:0.5;">Défilez dans le cadre pour voir la section PWA</div>
+    </div><!-- /phone-column -->
+
+    <!-- ---- ANNOTATION PANEL ---- -->
+    <div class="annotation-panel">
+
+      <!-- What changes -->
+      <div class="annotation-card">
+        <div class="annotation-card-title">
+          Section PWA
+          <span class="annotation-tag">Nouveau</span>
+        </div>
+        <div class="annotation-body">
+          La section <strong>"Prêt à lancer votre Communauté&nbsp;?"</strong> est conservée telle quelle.
+          La nouvelle section <strong>"Disponible sur iOS et Android"</strong> est ajoutée juste après,
+          avant le footer, avec les deux badges store.
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-spec">
+          <span><span class="spec-key">Ordre final :</span></span>
+          <span>1. Hero</span>
+          <span>2. Comment ça marche</span>
+          <span>3. 3 piliers</span>
+          <span>4. Prêt à lancer (conservé)</span>
+          <span>5. Section PWA ← nouvelle</span>
+          <span>6. Footer</span>
+          <div style="height:8px;"></div>
+          <span><span class="spec-key">Fond :</span> bg-background (blanc) — alterne avec muted du CTA final</span>
+          <span><span class="spec-key">Padding :</span> py-24 — identique</span>
+          <span><span class="spec-key">Alignement :</span> centré (text-center)</span>
+        </div>
+      </div>
+
+      <!-- iOS badge specs -->
+      <div class="annotation-card">
+        <div class="annotation-card-title">Bouton Apple — App Store</div>
+
+        <div class="behavior-row">
+          <div class="behavior-dot"></div>
+          <span>Fond noir <code>#0a0a0a</code>, coins 12px</span>
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-dot"></div>
+          <span>Logo Apple blanc SVG à gauche</span>
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-dot"></div>
+          <span>Texte : <em>Télécharger sur</em> (light) + <strong>App Store</strong> (bold)</span>
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-spec">
+          <span><span class="spec-key">Comportement :</span></span>
+          <span>Ouvre la modale bottom sheet</span>
+          <span>avec les 3 étapes d'installation iOS</span>
+        </div>
+      </div>
+
+      <!-- Android badge specs -->
+      <div class="annotation-card">
+        <div class="annotation-card-title">Bouton Android — Google Play</div>
+
+        <div class="behavior-row">
+          <div class="behavior-dot android"></div>
+          <span>Fond noir <code>#0a0a0a</code>, coins 12px</span>
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-dot android"></div>
+          <span>Logo Google Play coloré (4 couleurs officielles)</span>
+        </div>
+        <div class="behavior-row">
+          <div class="behavior-dot android"></div>
+          <span>Texte : <em>Disponible sur</em> + <strong>Google Play</strong></span>
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-spec">
+          <span><span class="spec-key">Comportement :</span></span>
+          <span>Déclenche directement la</span>
+          <span>popup native Android</span>
+          <span><code>beforeinstallprompt.prompt()</code></span>
+        </div>
+      </div>
+
+      <!-- iOS modal specs -->
+      <div class="annotation-card">
+        <div class="annotation-card-title">Modale iOS — Bottom Sheet</div>
+        <div class="annotation-body">
+          S'affiche quand l'utilisateur tape le badge Apple.
+          <br><br>
+          Montée depuis le bas (slide-up), fond blanc, handle de drag visible.
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-spec">
+          <span><span class="spec-key">Structure :</span></span>
+          <span>· Handle de drag (barre grise)</span>
+          <span>· En-tête : titre + bouton ✕</span>
+          <span>· 3 étapes avec icône + texte + indice</span>
+          <div style="height:6px;"></div>
+          <span><span class="spec-key">Icônes :</span></span>
+          <span>1. Partage ↑ (flèche iOS)</span>
+          <span>2. + (Sur l'écran d'accueil)</span>
+          <span>3. ✓ (Ajouter)</span>
+        </div>
+      </div>
+
+      <!-- PWA note -->
+      <div class="annotation-card">
+        <div class="annotation-card-title">Note PWA</div>
+        <div class="annotation-body">
+          La note sous les badges précise qu'il s'agit d'une <strong>PWA</strong> — aucun vrai téléchargement App Store/Play Store n'est requis. C'est un point de réassurance pour les utilisateurs méfiants.
+        </div>
+      </div>
+
+    </div><!-- /annotation-panel -->
+
+  </div><!-- /phone-scene -->
+
+  <!-- ============================================================
+       CONTEXT NOTE
+       ============================================================ -->
+  <div class="context-note">
+    <div class="context-note-title">Pourquoi ajouter la section PWA après le CTA final plutôt que de le remplacer&nbsp;?</div>
+    <div class="context-note-body">
+      La section <strong>"Prêt à lancer votre Communauté&nbsp;?"</strong> est conservée&nbsp;: c'est un CTA de conversion directe vers l'inscription, qui reste pertinent en bas de page pour l'utilisateur qui a scrollé jusqu'au bout.
+      <br><br>
+      La section PWA est ajoutée juste après comme <strong>deuxième couche de conversion</strong>&nbsp;: l'utilisateur qui a scrollé encore plus loin est très engagé — c'est le moment idéal pour lui proposer d'installer l'app. Les deux sections ciblent des intentions différentes (créer un compte vs. installer l'app).
+      <br><br>
+      L'alternance de fond est préservée&nbsp;: le CTA final utilise <strong>bg-muted</strong>, la section PWA utilise <strong>bg-background</strong> (blanc) pour maintenir le rythme visuel muted / white.
+      <br><br>
+      La <strong>modale iOS</strong> est nécessaire car Safari sur iPhone n'a pas de popup native <code>beforeinstallprompt</code> — les 3 étapes manuelles doivent être expliquées. Sur Android, la popup native gère tout directement.
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+</body>
+</html>

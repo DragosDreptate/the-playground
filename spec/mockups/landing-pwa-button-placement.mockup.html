@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Landing Page · Placement bouton PWA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   DESIGN TOKENS — The Playground
+   ============================================================ */
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --secondary: #f0eff7;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08), 0 2px 4px -2px rgba(26,27,46,0.05);
+  --shadow-xl: 0 20px 40px rgba(26,27,46,0.16), 0 8px 16px rgba(26,27,46,0.08);
+}
+
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --border: #383a55;
+  --secondary: #222336;
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   OUTER PAGE LAYOUT
+   ============================================================ */
+.page-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+.page-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   PHONE FRAME
+   ============================================================ */
+.phone-scene {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.phone-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.phone-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.phone-frame {
+  width: 375px;
+  border-radius: 44px;
+  border: 8px solid #1a1b2e;
+  background: var(--background);
+  overflow: hidden;
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 2px 0 0 #333650 inset;
+  position: relative;
+}
+
+html.dark .phone-frame {
+  border-color: #383a55;
+  box-shadow:
+    0 30px 60px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.04) inset;
+}
+
+/* Notch / Dynamic Island */
+.phone-notch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px 6px;
+  background: var(--background);
+  position: relative;
+}
+
+.phone-notch-time {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.phone-notch-island {
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 26px;
+  background: #0a0a0a;
+  border-radius: 14px;
+}
+
+html.dark .phone-notch-island {
+  background: #000;
+}
+
+.phone-notch-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.phone-notch-icons svg {
+  color: var(--foreground);
+  opacity: 0.7;
+}
+
+/* Phone scrollable content */
+.phone-scroll {
+  overflow-y: auto;
+  max-height: 720px;
+  background: var(--background);
+  /* hide scrollbar */
+  scrollbar-width: none;
+}
+.phone-scroll::-webkit-scrollbar { display: none; }
+
+/* ============================================================
+   SITE HEADER (inside phone)
+   ============================================================ */
+.site-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.logo-icon {
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #f43f5e, #a855f7);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg {
+  color: white;
+}
+
+.logo-text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.header-sign-in {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  padding: 48px 20px 52px;
+  text-align: center;
+  min-height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-heading {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+  margin-bottom: 0;
+}
+
+.hero-heading .line {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.hero-heading .grad {
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 15px;
+  color: var(--muted-foreground);
+  font-weight: 400;
+  line-height: 1.55;
+  margin-top: 20px;
+  max-width: 300px;
+}
+
+/* CTA group */
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 36px;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  box-shadow: 0 4px 14px rgba(232,69,122,0.35);
+  letter-spacing: -0.01em;
+}
+
+/* ---- NEW ELEMENT ---- */
+.btn-pwa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 13px 24px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  color: var(--foreground);
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: -0.01em;
+  position: relative;
+  /* subtle highlight to draw attention in the mockup */
+  outline: 2.5px solid rgba(232, 69, 122, 0.35);
+  outline-offset: 3px;
+}
+
+.btn-pwa svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+/* annotation badge */
+.nouveau-badge {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--primary);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(232,69,122,0.4);
+}
+
+/* annotation arrow */
+.annotation-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.annotation-line {
+  position: absolute;
+  right: -88px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/* ============================================================
+   SCROLL INDICATOR
+   ============================================================ */
+.scroll-hint {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.4;
+}
+
+.scroll-hint-text {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+
+.scroll-arrow {
+  width: 1px;
+  height: 28px;
+  background: linear-gradient(to bottom, var(--muted-foreground), transparent);
+  position: relative;
+}
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.section-muted {
+  background: var(--muted);
+  padding: 48px 20px;
+}
+
+.section-white {
+  background: var(--background);
+  padding: 48px 20px;
+}
+
+.section-heading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+  margin-bottom: 36px;
+  color: var(--foreground);
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, #f43f5e 0%, #d946ef 50%, #8b5cf6 100%);
+  opacity: 0.2;
+}
+
+.step-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.step-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f43f5e, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 4px 12px rgba(232,69,122,0.25);
+}
+
+.step-dot svg {
+  color: white;
+}
+
+.step-content {}
+
+.step-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+
+.step-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.step-desc {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.section-cta-wrap {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-primary-sm {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  cursor: pointer;
+  color: white;
+  background: linear-gradient(90deg, #f43f5e, #d946ef, #8b5cf6);
+  box-shadow: 0 4px 12px rgba(232,69,122,0.3);
+}
+
+/* ============================================================
+   3 PILIERS
+   ============================================================ */
+.pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pillar-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  transition: border-color 0.15s;
+}
+
+.pillar-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f43f5e, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(232,69,122,0.25);
+}
+
+.pillar-icon svg { color: white; }
+
+.pillar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 6px;
+}
+
+.pillar-desc {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   CTA FINAL
+   ============================================================ */
+.cta-final {
+  background: var(--muted);
+  padding: 56px 20px;
+  text-align: center;
+}
+
+.cta-final-heading {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  color: var(--foreground);
+}
+
+.cta-final-sub {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+  margin-bottom: 28px;
+}
+
+/* ============================================================
+   SITE FOOTER
+   ============================================================ */
+.site-footer {
+  background: var(--background);
+  border-top: 1px solid var(--border);
+  padding: 24px 20px;
+  text-align: center;
+}
+
+.footer-logo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 8px;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+
+.footer-copy {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+}
+
+/* ============================================================
+   ANNOTATION PANEL (beside the phone)
+   ============================================================ */
+.annotation-panel {
+  max-width: 280px;
+  align-self: flex-start;
+  margin-top: 120px; /* align roughly with hero */
+}
+
+.annotation-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+}
+
+.annotation-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.annotation-tag {
+  background: var(--primary);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.annotation-body {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.annotation-body strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.annotation-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 14px 0;
+}
+
+.annotation-spec {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+.annotation-spec span {
+  display: block;
+}
+
+.annotation-spec .spec-key {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* Arrow connecting annotation to button */
+.connector-arrow {
+  display: flex;
+  align-items: center;
+  margin: 14px 0;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.connector-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--primary), transparent);
+}
+
+/* ============================================================
+   CONTEXT NOTE (below phone)
+   ============================================================ */
+.context-note {
+  margin-top: 3rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.context-note-title {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--foreground);
+}
+
+.context-note-body {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+.context-note-body strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.fold-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+
+.fold-line {
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--primary) 0px, var(--primary) 6px,
+    transparent 6px, transparent 12px
+  );
+  opacity: 0.5;
+}
+
+.fold-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- ============================================================
+       PAGE HEADER
+       ============================================================ -->
+  <div class="page-header">
+    <div>
+      <div class="page-title">Landing page — Placement bouton "Télécharger l'app"</div>
+      <div class="page-subtitle">
+        Vue mobile complète (375 px · iPhone) montrant le scroll entier de la landing page.
+        Le bouton PWA s'insère <strong>juste sous le CTA principal</strong> dans la section Hero,
+        avant le premier scroll — visible sans action de l'utilisateur.
+      </div>
+    </div>
+    <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">
+      Thème sombre ☽
+    </button>
+  </div>
+
+  <!-- ============================================================
+       MAIN SCENE
+       ============================================================ -->
+  <div class="phone-scene">
+
+    <!-- ---- PHONE ---- -->
+    <div class="phone-column">
+      <div class="phone-label">Scroll complet — 375 px</div>
+
+      <div class="phone-frame">
+        <!-- Notch -->
+        <div class="phone-notch">
+          <span class="phone-notch-time">19:00</span>
+          <div class="phone-notch-island"></div>
+          <div class="phone-notch-icons">
+            <!-- Signal bars -->
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor">
+              <rect x="0" y="6" width="3" height="6" rx="0.5"/>
+              <rect x="4.5" y="4" width="3" height="8" rx="0.5"/>
+              <rect x="9" y="2" width="3" height="10" rx="0.5"/>
+              <rect x="13" y="0" width="3" height="12" rx="0.5" opacity="0.3"/>
+            </svg>
+            <!-- WiFi -->
+            <svg width="15" height="12" viewBox="0 0 15 12" fill="currentColor">
+              <path d="M7.5 3.6a5.2 5.2 0 0 1 3.5 1.3l1.1-1.2A7 7 0 0 0 7.5 2a7 7 0 0 0-4.6 1.7L4 4.9a5.2 5.2 0 0 1 3.5-1.3z"/>
+              <path d="M7.5 6.6c1 0 1.9.35 2.5.9l1.1-1.1A5 5 0 0 0 7.5 5a5 5 0 0 0-3.6 1.4L5 7.5c.7-.55 1.5-.9 2.5-.9z"/>
+              <circle cx="7.5" cy="10" r="1.5"/>
+            </svg>
+            <!-- Battery -->
+            <div style="display:flex;align-items:center;height:12px;">
+              <div style="width:22px;height:11px;border:1.5px solid currentColor;border-radius:2px;opacity:0.7;display:flex;align-items:center;padding:1.5px;">
+                <div style="width:68%;height:100%;background:currentColor;border-radius:1px;opacity:0.9;"></div>
+              </div>
+              <div style="width:2px;height:5px;background:currentColor;border-radius:0 1px 1px 0;opacity:0.5;margin-left:1px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrollable page content -->
+        <div class="phone-scroll">
+
+          <!-- SITE HEADER -->
+          <header class="site-header">
+            <div class="logo-mark">
+              <div class="logo-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+              </div>
+              <span class="logo-text">The Playground</span>
+            </div>
+            <button class="header-sign-in">Se connecter</button>
+          </header>
+
+          <!-- HERO -->
+          <section class="hero">
+            <h1 class="hero-heading">
+              <span class="line">
+                <span class="grad">Lancez</span> votre
+              </span>
+              <span class="line">
+                <span class="grad">communauté.</span>
+              </span>
+              <span class="line">
+                <span class="grad">Organisez</span> vos
+              </span>
+              <span class="line">
+                <span class="grad">événements.</span>
+              </span>
+              <span class="line">
+                <span class="grad">Animez</span> votre
+              </span>
+              <span class="line">
+                <span class="grad">réseau.</span>
+              </span>
+            </h1>
+
+            <p class="hero-subtitle">
+              La plateforme communautaire 100&nbsp;% gratuite pour organiser vos événements et fidéliser vos membres.
+            </p>
+
+            <!-- CTA GROUP -->
+            <div class="hero-cta-group">
+
+              <!-- PRIMARY CTA — existing -->
+              <button class="btn-primary">
+                Commencer gratuitement
+              </button>
+
+              <!-- PWA INSTALL BUTTON — NEW -->
+              <div class="annotation-wrap">
+                <button class="btn-pwa">
+                  <!-- Download / smartphone icon -->
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                    <line x1="12" y1="18" x2="12" y2="18.01"/>
+                  </svg>
+                  Télécharger l'app
+                  <span class="nouveau-badge">Nouveau</span>
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Fold indicator -->
+            <div style="width:100%;margin-top:36px;">
+              <div class="fold-indicator">
+                <div class="fold-line"></div>
+                <div class="fold-label">⬇ Scroll</div>
+                <div class="fold-line"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- COMMENT CA MARCHE -->
+          <section class="section-muted">
+            <h2 class="section-heading">Comment ça marche</h2>
+            <div class="steps">
+
+              <div class="step-item">
+                <div class="step-dot">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                </div>
+                <div class="step-content">
+                  <div class="step-eyebrow">Étape 1</div>
+                  <div class="step-title">Créez votre Communauté</div>
+                  <div class="step-desc">Lancez votre espace en quelques secondes — nom, description, c'est tout.</div>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-dot">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </div>
+                <div class="step-content">
+                  <div class="step-eyebrow">Étape 2</div>
+                  <div class="step-title">Organisez vos événements</div>
+                  <div class="step-desc">Créez un événement, partagez le lien — vos membres s'inscrivent en un clic.</div>
+                </div>
+              </div>
+
+              <div class="step-item">
+                <div class="step-dot">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                    <polyline points="17 6 23 6 23 12"/>
+                  </svg>
+                </div>
+                <div class="step-content">
+                  <div class="step-eyebrow">Étape 3</div>
+                  <div class="step-title">Fidélisez vos membres</div>
+                  <div class="step-desc">Les inscrits restent membres de votre Communauté — ils reviennent naturellement.</div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="section-cta-wrap">
+              <button class="btn-primary-sm">Découvrir les Communautés</button>
+            </div>
+          </section>
+
+          <!-- 3 PILIERS -->
+          <section class="section-white">
+            <h2 class="section-heading">3 raisons de choisir<br>The Playground</h2>
+            <div class="pillars">
+
+              <div class="pillar-card">
+                <div class="pillar-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                  </svg>
+                </div>
+                <div class="pillar-title">Viral par conception</div>
+                <div class="pillar-desc">Chaque événement est une page partageable. Un lien suffit pour attirer de nouveaux membres.</div>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </div>
+                <div class="pillar-title">Zéro friction</div>
+                <div class="pillar-desc">Magic link, Google, GitHub — s'inscrire prend 10 secondes. Pas de compte lourd avant de découvrir.</div>
+              </div>
+
+              <div class="pillar-card">
+                <div class="pillar-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 12 20 22 4 22 4 12"/>
+                    <rect x="2" y="7" width="20" height="5"/>
+                    <line x1="12" y1="22" x2="12" y2="7"/>
+                    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+                    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+                  </svg>
+                </div>
+                <div class="pillar-title">100&nbsp;% gratuit</div>
+                <div class="pillar-desc">Aucune commission, aucun abonnement. Seuls les frais Stripe (~2,9&nbsp;%) s'appliquent aux événements payants.</div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- CTA FINAL -->
+          <section class="cta-final">
+            <div class="cta-final-heading">Prêt à lancer<br>votre Communauté&nbsp;?</div>
+            <div class="cta-final-sub">Rejoignez les organisateurs qui construisent leur réseau sur The Playground.</div>
+            <button class="btn-primary" style="width:100%;">Commencer gratuitement</button>
+          </section>
+
+          <!-- FOOTER -->
+          <footer class="site-footer">
+            <div class="footer-logo">The Playground</div>
+            <div class="footer-links">
+              <span class="footer-link">Découvrir</span>
+              <span class="footer-link">À propos</span>
+              <span class="footer-link">Contact</span>
+            </div>
+            <div class="footer-copy">Powered by The Playground · 2026</div>
+          </footer>
+
+        </div><!-- /phone-scroll -->
+      </div><!-- /phone-frame -->
+
+      <div class="phone-label" style="opacity:0.5;">Défilez dans le cadre pour voir le scroll complet</div>
+    </div><!-- /phone-column -->
+
+    <!-- ---- ANNOTATION PANEL ---- -->
+    <div class="annotation-panel">
+
+      <div class="annotation-card">
+        <div class="annotation-card-title">
+          Bouton PWA
+          <span class="annotation-tag">Nouveau</span>
+        </div>
+        <div class="annotation-body">
+          Positionné <strong>immédiatement sous</strong> le CTA principal "Commencer gratuitement",
+          toujours <strong>au-dessus de la ligne de flottaison</strong> sur mobile.
+          <br><br>
+          L'utilisateur le voit sans aucun scroll.
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-spec">
+          <span><span class="spec-key">Variant :</span> outline (secondaire)</span>
+          <span><span class="spec-key">Taille :</span> full-width, size="lg"</span>
+          <span><span class="spec-key">Icône :</span> Smartphone (lucide)</span>
+          <span><span class="spec-key">Texte :</span> "Télécharger l'app"</span>
+          <span><span class="spec-key">Visibilité :</span> conditionnel (PWA non installée)</span>
+          <span><span class="spec-key">Comportement :</span> déclenche beforeinstallprompt</span>
+        </div>
+      </div>
+
+      <div style="height: 1.5rem;"></div>
+
+      <div class="annotation-card">
+        <div class="annotation-card-title">Hiérarchie dans le Hero</div>
+        <div class="annotation-body" style="font-size:12px;line-height:1.8;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#f43f5e,#8b5cf6);flex-shrink:0;"></div>
+            <strong>1.</strong> Commencer gratuitement <span style="color:var(--muted-foreground);">(primary, gradient)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:10px;height:10px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;"></div>
+            <strong>2.</strong> Télécharger l'app <span style="color:var(--primary);font-weight:600;">&larr; ici</span>
+          </div>
+        </div>
+
+        <div class="annotation-divider"></div>
+
+        <div class="annotation-body" style="font-size:11px;color:var(--muted-foreground);">
+          Respect de la règle design system : <strong>un seul bouton <code>default</code></strong> par section.
+          Le bouton PWA est <code>outline</code> — action secondaire.
+        </div>
+      </div>
+
+      <div style="height: 1.5rem;"></div>
+
+      <div class="annotation-card">
+        <div class="annotation-card-title">Logique d'affichage</div>
+        <div class="annotation-spec">
+          <span style="margin-bottom:4px;display:block;"><span class="spec-key">Affiché si :</span></span>
+          <span>· PWA non encore installée</span>
+          <span>· <code>beforeinstallprompt</code> disponible</span>
+          <span>· OU iOS Safari (prompt manuel)</span>
+          <div style="height:8px;"></div>
+          <span style="margin-bottom:4px;display:block;"><span class="spec-key">Masqué si :</span></span>
+          <span>· App déjà installée</span>
+          <span>· Navigateur non compatible</span>
+        </div>
+      </div>
+
+    </div><!-- /annotation-panel -->
+
+  </div><!-- /phone-scene -->
+
+  <!-- ============================================================
+       CONTEXT NOTE
+       ============================================================ -->
+  <div class="context-note" style="margin-top:3rem;">
+    <div class="context-note-title">Contexte de placement — Pourquoi ici ?</div>
+    <div class="context-note-body">
+      Le bouton "Télécharger l'app" est placé dans le Hero parce que c'est la <strong>seule section
+      visible sans scroll</strong> sur mobile. Les visiteurs qui arrivent via un lien WhatsApp ou Instagram
+      voient immédiatement les deux options : s'inscrire sur le web, ou installer l'app.
+      <br><br>
+      La hiérarchie visuelle est respectée : le gradient rose/violet du CTA principal capte l'oeil en premier,
+      le bouton outline secondaire est accessible sans effort mais ne concurrence pas l'action principale.
+      <br><br>
+      <strong>Le bouton n'apparaît pas</strong> si l'app est déjà installée (détection via
+      <code>window.matchMedia('(display-mode: standalone)')</code>), ce qui élimine le bruit
+      visuel pour les utilisateurs existants.
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
+
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Réplique — Page événement (vue Organisateur)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--background); color: var(--foreground); font-size: 14px; line-height: 1.5; }
+
+    /* Header */
+    .site-header { background: var(--card); border-bottom: 1px solid var(--border); height: 56px; display: flex; align-items: center; padding: 0 24px; gap: 16px; position: sticky; top: 0; z-index: 10; }
+    .logo { font-weight: 800; font-size: 15px; background: linear-gradient(135deg, #e8457a, #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav { display: flex; gap: 4px; margin-left: auto; }
+    .nav a { font-size: 13px; color: var(--muted-foreground); padding: 6px 12px; border-radius: 6px; text-decoration: none; }
+    .nav a:hover { background: var(--muted); color: var(--foreground); }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #e8457a, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; }
+
+    /* Page layout */
+    .page { max-width: 1024px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Breadcrumb */
+    .breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted-foreground); margin-bottom: 4px; }
+    .breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--foreground); }
+    .breadcrumb span.current { color: var(--foreground); font-weight: 500; }
+    .chevron { font-size: 11px; }
+
+    /* Badge */
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 9999px; border: 1px solid transparent; }
+    .badge-default { background: var(--primary); color: white; }
+    .badge-secondary { background: var(--muted); color: var(--muted-foreground); border-color: var(--border); }
+    .badge-outline { background: transparent; border-color: var(--border); color: var(--foreground); }
+    .badge-outline-primary { background: transparent; border-color: rgba(232,69,122,0.4); color: var(--primary); }
+    .badge-past { color: var(--muted-foreground); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; transition: all 0.15s; }
+    .btn-default { background: var(--primary); color: white; }
+    .btn-default:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--foreground); }
+    .btn-outline:hover { border-color: var(--foreground); }
+    .btn-destructive-outline { background: transparent; border: 1px solid rgba(232,69,122,0.4); color: var(--primary); }
+    .btn-ghost { background: transparent; border: 1px solid transparent; color: var(--muted-foreground); }
+
+    /* Two-col layout */
+    .two-col { display: flex; flex-direction: column; gap: 32px; margin-top: 32px; }
+    @media (min-width: 1024px) { .two-col { flex-direction: row; align-items: flex-start; } }
+    .col-left { width: 100%; }
+    @media (min-width: 1024px) { .col-left { width: 340px; flex-shrink: 0; position: sticky; top: 72px; } }
+    .col-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Cover 1:1 */
+    .cover-wrap { position: relative; margin-bottom: 8px; }
+    .cover-glow { position: absolute; left: 16px; right: 16px; bottom: -12px; height: 40px; opacity: 0.6; filter: blur(20px); background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 50%; }
+    .cover { width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, #3b82f6, #06b6d4); position: relative; }
+
+    /* Circle info */
+    .circle-link { display: flex; align-items: flex-start; gap: 12px; padding: 0 4px; text-decoration: none; color: inherit; margin-top: 8px; }
+    .circle-avatar { width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, #3b82f6, #06b6d4); flex-shrink: 0; margin-top: 2px; }
+    .circle-name { font-size: 13px; font-weight: 600; }
+    .circle-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Right col elements */
+    .hosted-by { font-size: 13px; color: var(--muted-foreground); }
+    .hosted-by strong { color: var(--foreground); font-weight: 500; }
+    .title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .title-row h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .action-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .event-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.2; }
+    hr { border: none; border-top: 1px solid var(--border); }
+    .description { font-size: 14px; color: var(--muted-foreground); line-height: 1.7; }
+
+    /* Meta rows */
+    .meta-list { display: flex; flex-direction: column; gap: 12px; }
+    .meta-row { display: flex; align-items: flex-start; gap: 12px; }
+    .meta-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(232,69,122,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+    .meta-label { font-size: 11px; color: var(--muted-foreground); }
+    .meta-value { font-size: 13px; font-weight: 500; }
+
+    /* Shareable link card */
+    .link-card { border: 1px solid var(--border); background: var(--card); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .link-card-header { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; }
+    .link-url { border: 1px solid var(--border); background: var(--muted); border-radius: 8px; padding: 8px 12px; font-family: monospace; font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .copy-btn { border: 1px solid var(--border); background: white; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+    /* Registrations block */
+    .registrations-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+    .reg-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
+    .reg-title { font-size: 16px; font-weight: 600; }
+    .reg-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .reg-list { }
+    .reg-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .reg-row:last-child { border-bottom: none; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 500; }
+    .user-email { font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">The Playground</div>
+  <nav class="nav">
+    <a href="#">Découvrir</a>
+    <a href="#">Mon espace</a>
+  </nav>
+  <div class="avatar">D</div>
+</header>
+
+<div class="page">
+
+  <!-- Breadcrumb + badge -->
+  <div class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="chevron">›</span>
+    <a href="#">Tech Makers Lyon</a>
+    <span class="chevron">›</span>
+    <span class="current">Workshop TypeScript Avancé</span>
+  </div>
+  <div style="margin-top:6px;">
+    <span class="badge badge-default">Publié</span>
+  </div>
+
+  <!-- Two-col layout -->
+  <div class="two-col">
+
+    <!-- LEFT -->
+    <div class="col-left">
+      <div class="cover-wrap">
+        <div class="cover-glow"></div>
+        <div class="cover"></div>
+      </div>
+      <a class="circle-link" href="#">
+        <div class="circle-avatar"></div>
+        <div>
+          <div class="circle-name">Tech Makers Lyon</div>
+          <div class="circle-desc">La communauté des développeurs et makers lyonnais. Workshops, conférences et projets open-source.</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="col-right">
+
+      <!-- Hosted by + actions -->
+      <div class="title-row">
+        <span class="hosted-by">Organisé par <strong>Dragos Dreptate</strong></span>
+        <div class="action-btns">
+          <a href="#" class="btn btn-default">Modifier</a>
+          <button class="btn btn-destructive-outline">Supprimer</button>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <h1 class="event-title">Workshop TypeScript Avancé</h1>
+
+      <hr />
+
+      <!-- Description -->
+      <div class="description">
+        Une session intensive pour maîtriser les types avancés de TypeScript : génériques, types conditionnels, mapped types et infer. Niveau intermédiaire requis.
+      </div>
+
+      <hr />
+
+      <!-- Meta -->
+      <div class="meta-list">
+        <div class="meta-row">
+          <div class="meta-icon">📅</div>
+          <div>
+            <div class="meta-label">Quand</div>
+            <div class="meta-value">Samedi 15 mars 2026, 14:00 – 17:00</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">📍</div>
+          <div>
+            <div class="meta-label">Où</div>
+            <div class="meta-value">La Cordée Confluence</div>
+          </div>
+        </div>
+      </div>
+
+      <hr />
+
+      <!-- Lien partageable -->
+      <div class="link-card">
+        <div class="link-card-header">🔗 Lien partageable</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="link-url" style="flex:1;">the-playground.fr/m/workshop-typescript-avance</div>
+          <button class="copy-btn">📋 Copier</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-outline" style="font-size:12px;padding:5px 12px;">📅 Google Calendar</button>
+          <button class="btn btn-outline" style="font-size:12px;padding:5px 12px;">🍎 Apple Calendar</button>
+          <button class="btn btn-outline" style="font-size:12px;padding:5px 12px;">⬇ Télécharger .ics</button>
+        </div>
+      </div>
+
+      <!-- Registrations -->
+      <div class="registrations-card">
+        <div class="reg-header">
+          <span class="reg-title">Participants</span>
+          <div class="reg-badges">
+            <span class="badge badge-default">12 inscrits</span>
+            <span class="badge badge-secondary">2 en attente</span>
+            <span class="badge badge-outline">20 places</span>
+          </div>
+        </div>
+
+        <div class="reg-list">
+          <div class="reg-row">
+            <div class="user-avatar" style="background:linear-gradient(135deg,#e8457a,#9333ea);">A</div>
+            <div class="user-info">
+              <div class="user-name">Alice Martin</div>
+              <div class="user-email">alice.martin@example.com</div>
+            </div>
+          </div>
+          <div class="reg-row">
+            <div class="user-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);">B</div>
+            <div class="user-info">
+              <div class="user-name">Baptiste Dupont</div>
+              <div class="user-email">baptiste.dupont@example.com</div>
+            </div>
+          </div>
+          <div class="reg-row">
+            <div class="user-avatar" style="background:linear-gradient(135deg,#10b981,#3b82f6);">C</div>
+            <div class="user-info">
+              <div class="user-name">Clara Lefebvre</div>
+              <div class="user-email">clara.lefebvre@example.com</div>
+            </div>
+          </div>
+          <div class="reg-row">
+            <div class="user-avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">M</div>
+            <div class="user-info">
+              <div class="user-name">Mohammed Alaoui</div>
+              <div class="user-email">m.alaoui@example.com</div>
+            </div>
+            <span class="badge badge-secondary" style="gap:4px;"><span style="font-size:11px;">⏱</span> Liste d'attente</span>
+          </div>
+          <div class="reg-row">
+            <div class="user-avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">S</div>
+            <div class="user-info">
+              <div class="user-name">Sophie Chen</div>
+              <div class="user-email">sophie.chen@example.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

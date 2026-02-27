@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Footer — Version Placement Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /*
+      CSS Variables — dark mode values from globals.css (.dark)
+      Converted from OKLCH to sRGB hex for standalone HTML:
+        --background : oklch(0.1649 0.0352 281.8285) → #0f0f1a
+        --foreground : oklch(0.9513 0.0074 260.7315) → #e8e8f0
+        --card       : oklch(0.2542 0.0611 281.1423) → #1a1b2e
+        --muted      : oklch(0.2123 0.0522 280.9917) → #191a2c
+        --muted-foreground: oklch(0.6245 0.05 278.1046) → #7e7fa8
+        --border     : oklch(0.3279 0.0832 280.789)  → rgba(255,255,255,0.08) approximated → #2d2e4a
+        --primary    : oklch(0.6726 0.2904 341.4084) → #e8457a (pink)
+    */
+
+    :root {
+      --bg:              #0f0f1a;
+      --fg:              #e8e8f0;
+      --card:            #1a1b2e;
+      --muted:           #191a2c;
+      --muted-fg:        #7e7fa8;
+      --muted-fg-extra:  #565775; /* even more muted — for version text */
+      --border:          rgba(255, 255, 255, 0.08);
+      --primary:         #e8457a;
+      --primary-violet:  #8b5cf6;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #070710;
+      color: var(--fg);
+      padding: 48px 24px 80px;
+      min-height: 100vh;
+    }
+
+    /* ─── Page chrome ─── */
+    .page-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 48px;
+    }
+    .page-subtitle span {
+      color: var(--primary);
+    }
+
+    /* ─── Variant wrapper ─── */
+    .variant-block {
+      margin-bottom: 52px;
+    }
+    .variant-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .variant-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 12px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .variant-label .variant-number {
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 5px;
+      letter-spacing: 0;
+    }
+    .variant-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      margin-bottom: 14px;
+      padding-left: 11px;
+    }
+
+    /* ─── Footer shell ─── */
+    .footer-shell {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      /* simulate page body above */
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    /* pseudo page-body above footer for context */
+    .page-body-stub {
+      background: var(--bg);
+      height: 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 8px;
+    }
+    .stub-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+    .stub-line {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--muted);
+    }
+
+    /* ─── Footer inner layout ─── */
+    .footer-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 24px;
+    }
+    @media (min-width: 560px) {
+      .footer-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        gap: 0;
+      }
+    }
+
+    /* ─── Logo block ─── */
+    .logo-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    @media (min-width: 560px) {
+      .logo-block {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg {
+      display: block;
+    }
+
+    .logo-text {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--fg);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .logo-text .pink {
+      color: var(--primary);
+    }
+
+    .copyright {
+      font-size: 11px;
+      color: var(--muted-fg);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    /* ─── Nav links ─── */
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-link {
+      font-size: 11px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      line-height: 1;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-link:hover {
+      color: var(--fg);
+    }
+
+    /* ─── Version text styles ─── */
+
+    /* V1: inline with copyright — same row */
+    .copyright-with-version {
+      font-size: 11px;
+      color: var(--muted-fg);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .copyright-with-version .version-inline {
+      color: var(--muted-fg-extra);
+      /* slightly more muted than the copyright */
+    }
+
+    /* V2: last nav item, non-clickable, extra muted */
+    .version-tag {
+      font-size: 11px;
+      color: var(--muted-fg-extra);
+      line-height: 1;
+      white-space: nowrap;
+      cursor: default;
+      user-select: none;
+      /* visually distinct from the clickable links */
+      letter-spacing: 0.01em;
+    }
+
+    /* V3: replaces Changelog link — clickable, same style as other links but with a subtle underline */
+    .nav-link-version {
+      font-size: 11px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      line-height: 1;
+      white-space: nowrap;
+      border-bottom: 1px dashed var(--muted-fg-extra);
+      padding-bottom: 1px;
+    }
+    .nav-link-version:hover {
+      color: var(--fg);
+      border-bottom-color: var(--fg);
+    }
+
+    /* ─── Annotation callout ─── */
+    .annotation {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: var(--card);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--muted-fg);
+      line-height: 1.5;
+    }
+    .annotation strong {
+      color: var(--fg);
+      font-weight: 600;
+    }
+    .annotation code {
+      font-family: 'Menlo', 'Consolas', monospace;
+      font-size: 10px;
+      background: var(--muted);
+      color: var(--primary);
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    /* ─── Highlight overlay for version element ─── */
+    .highlight-version {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
+    .highlight-version::after {
+      content: '';
+      position: absolute;
+      inset: -3px -5px;
+      border: 1.5px solid var(--primary);
+      border-radius: 4px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* ─── Divider between variants ─── */
+    .divider {
+      width: 100%;
+      max-width: 900px;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 52px;
+    }
+  </style>
+</head>
+<body>
+
+  <p class="page-title">The Playground — Footer</p>
+  <h1 class="page-subtitle">Placement de la version <span>v1.2.0</span> — 3 variantes</h1>
+
+  <!-- ══════════════════════════════════════════
+       VARIANTE 1 — À côté du copyright
+  ══════════════════════════════════════════ -->
+  <div class="variant-block">
+    <div class="variant-label">
+      <span class="variant-number">1</span>
+      Variante 1 — À côté du copyright
+    </div>
+    <p class="variant-name">Logo + "© 2026 · v1.2.0" inline, liens nav à droite</p>
+
+    <div class="footer-shell">
+      <!-- Stub page body above -->
+      <div class="page-body-stub">
+        <div class="stub-dot"></div>
+        <div class="stub-line" style="width:80px;"></div>
+        <div class="stub-line" style="width:120px;opacity:0.5;"></div>
+      </div>
+
+      <footer>
+        <div class="footer-inner">
+          <!-- Logo + copyright + version inline -->
+          <div class="logo-block">
+            <a href="#" class="logo-link">
+              <div class="logo-icon">
+                <svg width="8" height="10" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+              <span class="logo-text">the&thinsp;<span class="pink">playground</span></span>
+            </a>
+            <span class="copyright-with-version">
+              © 2026 · <span class="highlight-version version-inline">v1.2.0</span>
+            </span>
+          </div>
+
+          <!-- Nav links -->
+          <nav class="footer-nav">
+            <a href="#" class="nav-link">À propos</a>
+            <a href="#" class="nav-link">Changelog</a>
+            <a href="#" class="nav-link">Mentions légales</a>
+            <a href="#" class="nav-link">Confidentialité</a>
+            <a href="#" class="nav-link">CGU</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <div class="annotation">
+      <strong>Logique :</strong> La version remplace le point séparateur habituel — <code>© 2026 · v1.2.0</code>.
+      Elle est dans la même <code>copyright</code> span, légèrement plus atténuée que le copyright.
+      Lecture naturelle : date + version dans un seul bloc de métadonnées.
+      Pas de lien, pas d'interactivité — information passive.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VARIANTE 2 — Dernier élément du nav (non-cliquable)
+  ══════════════════════════════════════════ -->
+  <div class="variant-block">
+    <div class="variant-label">
+      <span class="variant-number">2</span>
+      Variante 2 — Dernier élément du nav (non-cliquable)
+    </div>
+    <p class="variant-name">Logo + copyright à gauche, liens nav + "v1.2.0" en dernier (non-cliquable, plus atténué)</p>
+
+    <div class="footer-shell">
+      <div class="page-body-stub">
+        <div class="stub-dot"></div>
+        <div class="stub-line" style="width:80px;"></div>
+        <div class="stub-line" style="width:120px;opacity:0.5;"></div>
+      </div>
+
+      <footer>
+        <div class="footer-inner">
+          <!-- Logo + copyright -->
+          <div class="logo-block">
+            <a href="#" class="logo-link">
+              <div class="logo-icon">
+                <svg width="8" height="10" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+              <span class="logo-text">the&thinsp;<span class="pink">playground</span></span>
+            </a>
+            <span class="copyright">© 2026 The Playground</span>
+          </div>
+
+          <!-- Nav links + version as last non-clickable item -->
+          <nav class="footer-nav">
+            <a href="#" class="nav-link">À propos</a>
+            <a href="#" class="nav-link">Changelog</a>
+            <a href="#" class="nav-link">Mentions légales</a>
+            <a href="#" class="nav-link">Confidentialité</a>
+            <a href="#" class="nav-link">CGU</a>
+            <!-- version separator -->
+            <span style="width:1px;height:10px;background:var(--border);display:inline-block;"></span>
+            <span class="highlight-version version-tag">v1.2.0</span>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <div class="annotation">
+      <strong>Logique :</strong> La version est séparée visuellement du nav par un <code>|</code> 1px.
+      Elle utilise <code>cursor: default</code> et une couleur encore plus atténuée que les liens nav
+      pour signaler l'absence de clic. Distinction claire entre liens navigables et métadonnée passive.
+      Regroupée côté nav pour suggérer que c'est une info "produit".
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VARIANTE 3 — Remplace le lien Changelog (cliquable)
+  ══════════════════════════════════════════ -->
+  <div class="variant-block">
+    <div class="variant-label">
+      <span class="variant-number">3</span>
+      Variante 3 — Remplace le lien Changelog (cliquable)
+    </div>
+    <p class="variant-name">"Changelog" remplacé par "v1.2.0" — lien cliquable vers /changelog, tiret bas en pointillé</p>
+
+    <div class="footer-shell">
+      <div class="page-body-stub">
+        <div class="stub-dot"></div>
+        <div class="stub-line" style="width:80px;"></div>
+        <div class="stub-line" style="width:120px;opacity:0.5;"></div>
+      </div>
+
+      <footer>
+        <div class="footer-inner">
+          <!-- Logo + copyright -->
+          <div class="logo-block">
+            <a href="#" class="logo-link">
+              <div class="logo-icon">
+                <svg width="8" height="10" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+              <span class="logo-text">the&thinsp;<span class="pink">playground</span></span>
+            </a>
+            <span class="copyright">© 2026 The Playground</span>
+          </div>
+
+          <!-- Nav links — Changelog replaced by v1.2.0 -->
+          <nav class="footer-nav">
+            <a href="#" class="nav-link">À propos</a>
+            <a href="#" class="nav-link-version highlight-version">v1.2.0</a>
+            <a href="#" class="nav-link">Mentions légales</a>
+            <a href="#" class="nav-link">Confidentialité</a>
+            <a href="#" class="nav-link">CGU</a>
+          </nav>
+        </div>
+      </footer>
+    </div>
+
+    <div class="annotation">
+      <strong>Logique :</strong> La version <em>est</em> le lien Changelog — double rôle : étiquette de version + navigabilité.
+      Le <code>border-bottom: 1px dashed</code> signale discrètement que c'est cliquable sans attirer l'attention.
+      Avantage : un item de nav en moins, info version toujours accessible. Inconvénient : le mot "Changelog"
+      disparaît — les utilisateurs qui cherchent ce label peuvent ne pas comprendre que <code>v1.2.0</code> mène au changelog.
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       COMPARAISON RAPIDE
+  ══════════════════════════════════════════ -->
+  <div style="
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    max-width: 860px;
+  ">
+    <p style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted-fg);margin-bottom:14px;">
+      Comparaison rapide
+    </p>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--fg);">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:6px 12px 6px 0;color:var(--muted-fg);font-weight:600;border-bottom:1px solid var(--border);">Variante</th>
+          <th style="text-align:left;padding:6px 12px 6px 0;color:var(--muted-fg);font-weight:600;border-bottom:1px solid var(--border);">Cliquable</th>
+          <th style="text-align:left;padding:6px 12px 6px 0;color:var(--muted-fg);font-weight:600;border-bottom:1px solid var(--border);">Placement</th>
+          <th style="text-align:left;padding:6px 0;color:var(--muted-fg);font-weight:600;border-bottom:1px solid var(--border);">Recommandé si…</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);font-weight:600;color:var(--primary);">1 — Copyright inline</td>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);color:var(--muted-fg);">Non</td>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);">Gauche, dans le copyright</td>
+          <td style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--muted-fg);">Version = info légale/branding, pas de changelog à exposer</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);font-weight:600;color:var(--primary);">2 — Dernier nav item</td>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);color:var(--muted-fg);">Non</td>
+          <td style="padding:8px 12px 8px 0;border-bottom:1px solid var(--border);">Droite, après les liens nav</td>
+          <td style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--muted-fg);">On veut signaler la version sans la rendre actionnable</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 12px 8px 0;font-weight:600;color:var(--primary);">3 — Remplace Changelog</td>
+          <td style="padding:8px 12px 8px 0;color:var(--muted-fg);">Oui → /changelog</td>
+          <td style="padding:8px 12px 8px 0;">Droite, 2e lien nav</td>
+          <td style="padding:8px 0;color:var(--muted-fg);">Changelog existe déjà — la version devient son raccourci naturel</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

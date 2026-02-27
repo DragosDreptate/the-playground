@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — PWA Install Button</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   DESIGN TOKENS — The Playground
+   ============================================================ */
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --secondary: #f0eff7;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08), 0 2px 4px -2px rgba(26,27,46,0.05);
+  --shadow-xl: 0 20px 40px rgba(26,27,46,0.16), 0 8px 16px rgba(26,27,46,0.08);
+}
+
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --border: #383a55;
+  --secondary: #222336;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -2px rgba(0,0,0,0.3);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.3);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   MOCKUP LAYOUT
+   ============================================================ */
+.mockup-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+}
+
+.mockup-header {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.mockup-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.35rem;
+}
+.mockup-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* Section labels */
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+}
+
+/* State label pill */
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--primary);
+  color: white;
+  padding: 0.2em 0.75em;
+  border-radius: 999px;
+  margin-bottom: 1rem;
+}
+
+.section-block {
+  margin-bottom: 3.5rem;
+}
+
+.panels-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .panels-row { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   DARK MODE TOGGLE
+   ============================================================ */
+.theme-btn {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 999;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.theme-btn:hover { background: var(--muted); }
+
+/* ============================================================
+   BUTTONS (exact shadcn variants)
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.btn-default {
+  background: var(--primary);
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-default:hover { background: #d63d6e; }
+.btn-default-lg {
+  background: var(--primary);
+  color: white;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  justify-content: center;
+}
+.btn-default-lg:hover { background: #d63d6e; }
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+}
+.btn-outline:hover { background: var(--muted); }
+.btn-outline-lg {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+  justify-content: center;
+}
+.btn-outline-lg:hover { background: var(--muted); }
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  padding: 0.5rem;
+}
+.btn-ghost:hover { background: var(--muted); color: var(--foreground); }
+
+/* ============================================================
+   HERO SECTION PREVIEW
+   ============================================================ */
+.hero-preview {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Simulated site header inside preview */
+.preview-header {
+  height: 52px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+}
+.preview-logo {
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: -0.02em;
+}
+.preview-logo span { color: var(--primary); }
+.preview-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.preview-nav-link {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius);
+}
+.preview-nav-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* Hero content */
+.hero-content {
+  padding: 3.5rem 2rem 3rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  background: linear-gradient(160deg, #f5f5fa 0%, #fdf0f5 40%, #f5f5fa 100%);
+}
+html.dark .hero-content {
+  background: linear-gradient(160deg, #1a1b2e 0%, #22152a 40%, #1a1b2e 100%);
+}
+
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+.hero-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+  max-width: 420px;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, #e8457a, #c026d3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--muted-foreground);
+  max-width: 380px;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+/* CTA group */
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* Primary CTA — gradient rose */
+.btn-cta-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, #e8457a, #d63d6e);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 4px 14px rgba(232,69,122,0.35);
+  line-height: 1;
+}
+.btn-cta-primary:hover { opacity: 0.93; transform: translateY(-1px); }
+
+/* Install button */
+.btn-install {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.7rem 1.5rem;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.btn-install:hover {
+  background: var(--muted);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.hero-trust {
+  margin-top: 1.75rem;
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.hero-trust span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ============================================================
+   IOS MODAL — Bottom Sheet
+   ============================================================ */
+.modal-backdrop {
+  background: rgba(26,27,46,0.5);
+  border-radius: calc(var(--radius) * 2);
+  overflow: hidden;
+  position: relative;
+  min-height: 380px;
+  display: flex;
+  align-items: flex-end;
+}
+html.dark .modal-backdrop {
+  background: rgba(0,0,0,0.65);
+}
+
+/* Blurred hero behind backdrop */
+.modal-bg-blur {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #f5f5fa 0%, #fdf0f5 40%, #f5f5fa 100%);
+  filter: blur(2px);
+  opacity: 0.4;
+}
+html.dark .modal-bg-blur {
+  background: linear-gradient(160deg, #1a1b2e 0%, #22152a 40%, #1a1b2e 100%);
+}
+
+.bottom-sheet {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  background: var(--card);
+  border-radius: calc(var(--radius) * 2.5) calc(var(--radius) * 2.5) 0 0;
+  box-shadow: 0 -8px 32px rgba(26,27,46,0.12);
+  padding: 0 1.25rem 1.75rem;
+  animation: slideUp 0.3s ease-out;
+}
+html.dark .bottom-sheet {
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.35);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(60px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Drag handle */
+.sheet-handle {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 0 0.25rem;
+}
+.sheet-handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+/* Sheet header */
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0 1.25rem;
+}
+.sheet-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.sheet-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--muted);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  transition: background 0.15s;
+}
+.sheet-close:hover { background: var(--border); }
+
+/* Steps */
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.install-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 0;
+  position: relative;
+}
+.install-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 54px;
+  bottom: -6px;
+  width: 2px;
+  background: var(--border);
+  border-radius: 1px;
+}
+
+/* Step icon */
+.step-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: calc(var(--radius) * 1.25);
+  background: var(--muted);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.step-icon-wrap.step-accent {
+  background: rgba(232,69,122,0.08);
+  border-color: rgba(232,69,122,0.2);
+}
+
+/* Step number badge */
+.step-num {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--card);
+}
+
+/* Step text */
+.step-body {
+  flex: 1;
+  padding-top: 0.1rem;
+}
+.step-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  margin-bottom: 0.15rem;
+}
+.step-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.45;
+}
+.step-text .highlight {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* App identity footer */
+.sheet-app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+.app-icon-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e8457a, #c026d3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(232,69,122,0.3);
+}
+.app-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+.app-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+.app-tagline {
+  font-size: 0.68rem;
+  color: var(--muted-foreground);
+  line-height: 1.2;
+}
+
+/* ============================================================
+   ANDROID PROMPT MOCKUP
+   ============================================================ */
+.android-wrapper {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Chrome address bar */
+.chrome-bar {
+  background: var(--muted);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.chrome-url-pill {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.chrome-actions {
+  display: flex;
+  gap: 0.25rem;
+  color: var(--muted-foreground);
+}
+
+/* Blurred page content behind prompt */
+.android-page-blur {
+  padding: 1.25rem;
+  filter: blur(1.5px);
+  opacity: 0.5;
+  pointer-events: none;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.blur-line {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--muted);
+}
+
+/* Native Android install banner */
+.android-install-banner {
+  margin: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 20px rgba(26,27,46,0.1);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+html.dark .android-install-banner {
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+
+.android-banner-top {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+.android-app-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e8457a, #c026d3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 10px rgba(232,69,122,0.3);
+}
+.android-app-info {
+  flex: 1;
+}
+.android-app-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.android-app-url {
+  font-size: 0.72rem;
+  color: var(--muted-foreground);
+}
+.android-close-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.android-desc {
+  font-size: 0.78rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  padding: 0 0 0 0;
+}
+
+.android-banner-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.android-btn-cancel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius);
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.android-btn-cancel:hover { background: var(--muted); }
+.android-btn-install {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(232,69,122,0.08);
+  border: 1px solid rgba(232,69,122,0.2);
+  cursor: pointer;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius);
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.android-btn-install:hover { background: rgba(232,69,122,0.14); }
+
+/* Dots pattern (Android "install" visual cue) */
+.android-progress-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.android-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary);
+  border-radius: 999px;
+}
+
+/* ============================================================
+   ANNOTATION NOTES
+   ============================================================ */
+.annotation {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  margin-top: 0.75rem;
+}
+.annotation strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.note-box {
+  background: rgba(232,69,122,0.05);
+  border: 1px solid rgba(232,69,122,0.2);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  font-size: 0.8rem;
+  color: var(--foreground);
+  line-height: 1.6;
+  margin-top: 0.75rem;
+}
+.note-box strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+.note-box ul {
+  margin-top: 0.4rem;
+  padding-left: 1.1rem;
+}
+.note-box li {
+  margin-bottom: 0.2rem;
+}
+
+/* ============================================================
+   SVG ICONS (inline, no deps)
+   ============================================================ */
+
+</style>
+</head>
+<body>
+
+<button class="theme-btn" onclick="document.documentElement.classList.toggle('dark')">
+  ☀︎ / ☾ mode
+</button>
+
+<div class="mockup-page">
+
+  <!-- ========================================================
+       HEADER
+       ======================================================== -->
+  <div class="mockup-header">
+    <div class="mockup-title">PWA Install Button — Mockup</div>
+    <div class="mockup-subtitle">Landing page · État bouton + Modal iOS + Prompt Android natif</div>
+  </div>
+
+
+  <!-- ========================================================
+       SECTION 1 — HERO AVEC BOUTON EN CONTEXTE
+       ======================================================== -->
+  <div class="section-block">
+    <div class="section-label">01 — Hero section avec bouton Télécharger l'app</div>
+
+    <div class="hero-preview">
+
+      <!-- Simulated site header -->
+      <div class="preview-header">
+        <div class="preview-logo">The <span>Playground</span></div>
+        <div class="preview-nav">
+          <span class="preview-nav-link">Découvrir</span>
+          <span class="preview-nav-link">Mon espace</span>
+          <div class="preview-nav-avatar">A</div>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero-content">
+        <div class="hero-eyebrow">100% gratuit · Communauté-first</div>
+        <h1 class="hero-title">
+          Lancez votre<br><em>communauté.</em>
+        </h1>
+        <p class="hero-subtitle">
+          Organisez des événements, fédérez vos membres et animez votre réseau.<br>
+          Comme Meetup, avec l'expérience Luma.
+        </p>
+
+        <!-- CTA Group -->
+        <div class="hero-cta-group">
+
+          <!-- Primary CTA -->
+          <button class="btn-cta-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+            Commencer gratuitement
+          </button>
+
+          <!-- Install button (outline, secondary) -->
+          <button class="btn-install" onclick="document.getElementById('ios-modal-section').scrollIntoView({behavior:'smooth'})">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+              <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5"/>
+            </svg>
+            Télécharger l'app
+          </button>
+
+        </div>
+
+        <!-- Trust signals -->
+        <div class="hero-trust">
+          <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Sans inscription requise
+          </span>
+          <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Aucune commission
+          </span>
+          <span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Open source
+          </span>
+        </div>
+      </div>
+
+    </div><!-- /hero-preview -->
+
+    <div class="annotation">
+      <strong>Placement :</strong> Le bouton "Télécharger l'app" est en position secondaire (<code>outline</code>), directement sous le CTA principal "Commencer gratuitement" (<code>default</code> rose). Un seul <code>default</code> par section — règle du design system respectée.
+    </div>
+
+  </div><!-- /section-block -->
+
+
+  <!-- ========================================================
+       SECTION 2 — ÉTATS CÔTE À CÔTE
+       ======================================================== -->
+  <div class="section-block" id="ios-modal-section">
+    <div class="section-label">02 — Comportements selon la plateforme</div>
+
+    <div class="panels-row">
+
+      <!-- LEFT: iOS / Safari bottom sheet -->
+      <div>
+        <div class="state-pill">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="white">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.3.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          iPhone · Safari
+        </div>
+
+        <!-- Bottom sheet shown open -->
+        <div class="modal-backdrop">
+          <div class="modal-bg-blur"></div>
+          <div class="bottom-sheet">
+            <div class="sheet-handle">
+              <div class="sheet-handle-bar"></div>
+            </div>
+
+            <div class="sheet-header">
+              <div class="sheet-title">Installer l'app</div>
+              <button class="sheet-close">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="install-steps">
+
+              <!-- Step 1: Share -->
+              <div class="install-step">
+                <div class="step-icon-wrap step-accent">
+                  <div class="step-num">1</div>
+                  <!-- iOS Share icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                  </svg>
+                </div>
+                <div class="step-body">
+                  <div class="step-label">Étape 1</div>
+                  <div class="step-text">Appuie sur le bouton <span class="highlight">Partage</span> en bas de Safari</div>
+                </div>
+              </div>
+
+              <!-- Step 2: Add to home -->
+              <div class="install-step">
+                <div class="step-icon-wrap step-accent">
+                  <div class="step-num">2</div>
+                  <!-- Home screen icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                  </svg>
+                </div>
+                <div class="step-body">
+                  <div class="step-label">Étape 2</div>
+                  <div class="step-text">Fais défiler et sélectionne <span class="highlight">« Sur l'écran d'accueil »</span></div>
+                </div>
+              </div>
+
+              <!-- Step 3: Confirm -->
+              <div class="install-step">
+                <div class="step-icon-wrap step-accent">
+                  <div class="step-num">3</div>
+                  <!-- Checkmark / tap icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </div>
+                <div class="step-body">
+                  <div class="step-label">Étape 3</div>
+                  <div class="step-text">Appuie sur <span class="highlight">« Ajouter »</span> en haut à droite</div>
+                </div>
+              </div>
+
+            </div><!-- /install-steps -->
+
+            <!-- App identity footer -->
+            <div class="sheet-app-footer">
+              <div class="app-icon-sm">
+                <!-- Playground "P" icon -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                  <path d="M6 4h8a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H6V4z" opacity="0.9"/>
+                  <path d="M6 12v8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="app-identity">
+                <div class="app-name">The Playground</div>
+                <div class="app-tagline">the-playground.app</div>
+              </div>
+            </div>
+
+          </div><!-- /bottom-sheet -->
+        </div><!-- /modal-backdrop -->
+
+        <div class="annotation">
+          <strong>Comportement Safari :</strong> iOS ne permet pas l'installation PWA via l'API <code>BeforeInstallPromptEvent</code>. La modal s'affiche systématiquement lorsque le user-agent est Safari/iOS, avec les 3 étapes manuelles. La bottom sheet slide up depuis le bas (animation <code>slideUp</code>).
+        </div>
+      </div>
+
+      <!-- RIGHT: Android / Chrome native prompt -->
+      <div>
+        <div class="state-pill" style="background: #3dba6e;">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="white">
+            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4482-.9993-.9993s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5515-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 0 0-.1521-.5676.416.416 0 0 0-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0675L4.841 5.4161a.4159.4159 0 0 0-.5677-.1521.4157.4157 0 0 0-.1521.5676l1.9973 3.4592C2.6889 10.1867.3432 13.6589 0 17.9994h24c-.3435-4.3405-2.6892-7.8127-6.1185-9.6774"/>
+          </svg>
+          Android · Chrome
+        </div>
+
+        <div class="android-wrapper">
+
+          <!-- Chrome address bar simulation -->
+          <div class="chrome-bar">
+            <div class="chrome-url-pill">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              the-playground.app
+            </div>
+            <div class="chrome-actions">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Blurred page behind the prompt -->
+          <div class="android-page-blur">
+            <div class="blur-line" style="width:60%"></div>
+            <div class="blur-line" style="width:90%"></div>
+            <div class="blur-line" style="width:75%"></div>
+            <div style="height:24px"></div>
+            <div class="blur-line" style="width:45%; height:36px; border-radius: 6px;"></div>
+            <div class="blur-line" style="width:45%; height:36px; border-radius: 6px;"></div>
+          </div>
+
+          <!-- Android native install banner -->
+          <div class="android-install-banner">
+
+            <div class="android-banner-top">
+              <div class="android-app-icon">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+                  <path d="M6 4h8a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4H6V4z" opacity="0.9"/>
+                  <path d="M6 12v8" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="android-app-info">
+                <div class="android-app-name">The Playground</div>
+                <div class="android-app-url">the-playground.app</div>
+              </div>
+              <button class="android-close-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="android-desc">
+              Ajouter The Playground à votre écran d'accueil pour un accès rapide, même hors connexion.
+            </div>
+
+            <div class="android-banner-actions">
+              <button class="android-btn-cancel">Plus tard</button>
+              <button class="android-btn-install">Installer</button>
+            </div>
+
+          </div><!-- /android-install-banner -->
+
+        </div><!-- /android-wrapper -->
+
+        <div class="annotation">
+          <strong>Comportement Chrome / Android :</strong> L'événement <code>BeforeInstallPromptEvent</code> est capturé et stocké. Au clic sur "Télécharger l'app", <code>prompt()</code> est appelé — le navigateur affiche le dialogue natif ci-dessus. Aucune modal custom n'est nécessaire.
+        </div>
+      </div>
+
+    </div><!-- /panels-row -->
+  </div><!-- /section-block -->
+
+
+  <!-- ========================================================
+       SECTION 3 — NOTE IMPLÉMENTATION
+       ======================================================== -->
+  <div class="section-block">
+    <div class="section-label">03 — Notes d'implémentation</div>
+
+    <div class="note-box">
+      <strong>Détection de plateforme et logique du bouton</strong>
+      <ul>
+        <li><strong>iOS/Safari :</strong> <code>navigator.standalone</code> absent + <code>userAgent</code> contient <em>iPhone/iPad</em> → afficher la bottom sheet avec les 3 étapes manuelles.</li>
+        <li><strong>Android/Chrome :</strong> Écouter <code>window.beforeinstallprompt</code> → stocker l'événement → au clic sur le bouton, appeler <code>deferredPrompt.prompt()</code>. Si l'événement n'est pas disponible (déjà installé ou navigateur non supporté) → masquer le bouton ou afficher un message "Déjà installée".</li>
+        <li><strong>Desktop Chrome/Edge :</strong> Même logique que Android — l'API est supportée. Le prompt natif s'affiche en haut à droite dans Chrome desktop.</li>
+        <li><strong>Déjà installé :</strong> Si <code>window.matchMedia('(display-mode: standalone)').matches</code> → masquer le bouton complètement.</li>
+        <li><strong>Autres :</strong> Bouton masqué par défaut si ni iOS ni PWA prompt disponible.</li>
+      </ul>
+    </div>
+
+    <div class="annotation" style="margin-top: 1rem;">
+      <strong>Positionnement bouton :</strong> Le bouton "Télécharger l'app" n'est affiché que si l'installation PWA est pertinente pour le contexte détecté. Il reste en <code>outline</code> (secondaire) — le CTA principal "Commencer gratuitement" reste toujours visible et dominant.
+    </div>
+
+  </div><!-- /section-block -->
+
+
+  <!-- ========================================================
+       SECTION 4 — VARIANTE MOBILE NATIVE (375px)
+       ======================================================== -->
+  <div class="section-block">
+    <div class="section-label">04 — Rendu mobile 375px (hero + bouton)</div>
+
+    <div style="display:flex; justify-content:center;">
+      <div style="width:375px; background:var(--card); border:1px solid var(--border); border-radius:24px; overflow:hidden; box-shadow:var(--shadow-xl);">
+
+        <!-- Mini header -->
+        <div style="height:48px; background:var(--card); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 1rem;">
+          <div style="font-weight:800; font-size:0.9rem; letter-spacing:-0.02em;">The <span style="color:var(--primary);">Playground</span></div>
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#e8457a,#9333ea); display:flex; align-items:center; justify-content:center; color:white; font-size:0.6rem; font-weight:700;">A</div>
+          </div>
+        </div>
+
+        <!-- Hero mobile -->
+        <div style="padding:2.5rem 1.25rem 2rem; text-align:center; background:linear-gradient(160deg, #f5f5fa 0%, #fdf0f5 40%, #f5f5fa 100%); display:flex; flex-direction:column; align-items:center; gap:0;">
+          <div style="font-size:0.65rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--primary); margin-bottom:0.875rem;">100% gratuit · Communauté-first</div>
+          <h1 style="font-size:1.875rem; font-weight:800; letter-spacing:-0.03em; line-height:1.15; margin-bottom:0.875rem; color:var(--foreground);">
+            Lancez votre<br>
+            <span style="background:linear-gradient(135deg,#e8457a,#c026d3); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">communauté.</span>
+          </h1>
+          <p style="font-size:0.875rem; color:var(--muted-foreground); line-height:1.65; margin-bottom:1.75rem; max-width:280px;">
+            Organisez des événements, fédérez vos membres. Comme Meetup, avec l'expérience Luma.
+          </p>
+
+          <!-- Mobile CTAs -->
+          <div style="width:100%; max-width:300px; display:flex; flex-direction:column; gap:0.625rem;">
+            <button style="display:flex; align-items:center; justify-content:center; gap:0.45rem; width:100%; padding:0.8125rem 1.25rem; background:linear-gradient(135deg,#e8457a,#d63d6e); color:white; font-size:0.9375rem; font-weight:600; border-radius:var(--radius); border:none; cursor:pointer; font-family:inherit; box-shadow:0 4px 14px rgba(232,69,122,0.35); line-height:1;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+              Commencer gratuitement
+            </button>
+            <button style="display:flex; align-items:center; justify-content:center; gap:0.45rem; width:100%; padding:0.65rem 1.25rem; background:transparent; color:var(--muted-foreground); font-size:0.875rem; font-weight:500; border-radius:var(--radius); border:1px solid var(--border); cursor:pointer; font-family:inherit; line-height:1;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                <line x1="12" y1="18" x2="12.01" y2="18" stroke-width="2.5"/>
+              </svg>
+              Télécharger l'app
+            </button>
+          </div>
+
+          <div style="margin-top:1.5rem; font-size:0.68rem; color:var(--muted-foreground); display:flex; align-items:center; gap:0.875rem;">
+            <span style="display:flex; align-items:center; gap:0.25rem;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Gratuit
+            </span>
+            <span style="display:flex; align-items:center; gap:0.25rem;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Sans friction
+            </span>
+            <span style="display:flex; align-items:center; gap:0.25rem;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Open source
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="annotation" style="margin-top:1rem; max-width:375px; margin-left:auto; margin-right:auto;">
+      <strong>Mobile-first :</strong> Sur 375px, le bouton "Télécharger l'app" passe en pleine largeur sous le CTA principal, comme les deux s'empilent naturellement en <code>flex-direction: column</code>.
+    </div>
+
+  </div><!-- /section-block -->
+
+</div><!-- /mockup-page -->
+
+</body>
+</html>
