@@ -22,16 +22,16 @@ test.describe("Flux Host — dashboard", () => {
   });
 
   test("should show the create Circle button on the dashboard", async ({ page }) => {
-    // Le bouton "Créer une Communauté" n'apparaît que sur l'onglet Communautés
-    await page.goto("/fr/dashboard?tab=circles");
+    // Le bouton "Créer une Communauté" n'apparaît qu'en mode Organisateur sur l'onglet Communautés
+    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
     const createCircleButton = page.locator("a[href*='/circles/new']").first();
     await expect(createCircleButton).toBeVisible();
   });
 
   test("should show the paris-creative-tech Circle on the dashboard", async ({ page }) => {
-    await page.goto("/fr/dashboard");
-    // Le Circle seedé doit apparaître dans la liste
-    await expect(page.locator("main")).toContainText("Paris Creative Tech");
+    // Les Communautés organisées n'apparaissent qu'en mode Organisateur
+    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
+    await expect(page.locator("main").first()).toContainText("Paris Creative Tech");
   });
 });
 
@@ -40,8 +40,8 @@ test.describe("Flux Host — page Circle", () => {
 
   test("should display the Circle dashboard with its name", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
-    await expect(page.locator("h1")).toBeVisible();
-    await expect(page.locator("h1")).toContainText("Paris Creative Tech");
+    await expect(page.locator("h1").first()).toBeVisible();
+    await expect(page.locator("h1").first()).toContainText("Paris Creative Tech");
   });
 
   test("should show upcoming events in the Circle timeline", async ({ page }) => {
