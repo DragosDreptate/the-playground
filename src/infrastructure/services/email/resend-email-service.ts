@@ -35,7 +35,10 @@ function getSender(): string {
 }
 
 export function createResendEmailService(): EmailService {
-  const resend = new Resend(process.env.AUTH_RESEND_KEY);
+  // Utiliser un placeholder si la clé est absente pour éviter de crasher au chargement
+  // du module (notify-new-moment.ts l'appelle au top-level). Les envois échoueront
+  // silencieusement en CI/dev sans clé — fire-and-forget côté serveur actions.
+  const resend = new Resend(process.env.AUTH_RESEND_KEY ?? "re_not_configured");
   const from = getSender();
   const baseUrl = getBaseUrl();
 

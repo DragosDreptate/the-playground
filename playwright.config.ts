@@ -7,20 +7,21 @@ import { defineConfig, devices } from "@playwright/test";
  * Prérequis :
  *   - pnpm dev en cours (ou BASE_URL pointant vers un env déployé)
  *
- * Variables d'env optionnelles :
- *   BASE_URL                      URL de base (défaut : http://localhost:3000)
- *   E2E_AUTH_STORAGE_STATE        Session JSON d'un user ayant complété l'onboarding
- *   E2E_ONBOARDING_STORAGE_STATE  Session JSON d'un user avec onboardingCompleted=false
- *   E2E_TEST_MOMENT_SLUG          Slug d'un Moment public existant pour tests
+ * Variables d'env :
+ *   BASE_URL  URL de base (défaut : http://localhost:3000)
+ *
+ * Le globalSetup génère automatiquement les storage states d'auth
+ * et seed les données de test nécessaires.
  */
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 
 export default defineConfig({
   testDir: "./tests/e2e",
-  timeout: 30_000,
-  retries: 0,
+  timeout: process.env.CI ? 60_000 : 30_000,
+  retries: process.env.CI ? 1 : 0,
   reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
+  globalSetup: "./tests/e2e/global-setup.ts",
 
   use: {
     baseURL: BASE_URL,

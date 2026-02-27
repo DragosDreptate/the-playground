@@ -1,22 +1,18 @@
 import { test, expect } from "@playwright/test";
+import { SLUGS } from "./fixtures";
 
 /**
- * Tests E2E — La Carte / Explore (découverte publique)
+ * Tests E2E — La Carte / Découvrir (découverte publique)
  *
  * Couvre :
- *   - Affichage de la page Explorer avec les onglets Cercles / Escales
+ *   - Affichage de la page Découvrir avec les onglets Communautés / Événements
  *   - Filtrage par catégorie
- *   - Navigation vers une page Circle publique
- *   - Navigation vers une page Moment publique depuis l'Explorer
- *   - Page Circle publique : affichage des Escales à venir
- *
- * Prérequis :
- *   - Serveur Next.js en cours (BASE_URL)
- *   - Au moins un Circle public et un Moment PUBLISHED en base de données
- *   - E2E_PUBLIC_CIRCLE_SLUG (optionnel) : slug d'un Circle public
+ *   - Navigation vers une page Communauté publique
+ *   - Navigation vers une page Événement publique depuis Découvrir
+ *   - Page Communauté publique : affichage des événements à venir
  */
 
-test.describe("La Carte — page Explorer", () => {
+test.describe("Découvrir — page Explorer", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/fr/explorer");
   });
@@ -26,15 +22,14 @@ test.describe("La Carte — page Explorer", () => {
     await expect(page.locator("main")).toBeVisible();
   });
 
-  test("should display the Circles and Moments tabs", async ({ page }) => {
-    // Explorer has two tabs: Cercles and Escales
+  test("should display the Communities and Events tabs", async ({ page }) => {
     const circlesTab = page
       .locator("button, [role='tab'], a")
-      .filter({ hasText: /cercles|circles/i })
+      .filter({ hasText: /communauté|community|cercle|circle/i })
       .first();
     const momentsTab = page
       .locator("button, [role='tab'], a")
-      .filter({ hasText: /escales|moments/i })
+      .filter({ hasText: /événement|event|escale|moment/i })
       .first();
 
     await expect(circlesTab).toBeVisible();
@@ -42,7 +37,6 @@ test.describe("La Carte — page Explorer", () => {
   });
 
   test("should display category filter options", async ({ page }) => {
-    // Category filter should be present (dropdown, buttons, or tabs)
     const categoryFilter = page
       .locator("select, [role='combobox'], button, [data-testid='category-filter']")
       .filter({
@@ -53,9 +47,7 @@ test.describe("La Carte — page Explorer", () => {
   });
 
   test("should list public Circles", async ({ page }) => {
-    // At least one Circle card should be visible (if data exists)
     const circleCards = page.locator("a[href*='/circles/']");
-    // We expect at least one public Circle in the database
     await expect(circleCards.first()).toBeVisible({ timeout: 10_000 });
   });
 
@@ -68,47 +60,33 @@ test.describe("La Carte — page Explorer", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("should switch to Escales tab and display upcoming Moments", async ({ page }) => {
+  test("should switch to Events tab and display upcoming Moments", async ({ page }) => {
     const momentsTab = page
       .locator("button, [role='tab'], a")
-      .filter({ hasText: /escales|moments/i })
+      .filter({ hasText: /événement|event|escale|moment/i })
       .first();
     await momentsTab.click();
 
-    // Moment cards linking to /m/ pages
     const momentLinks = page.locator("a[href*='/m/']");
-    // At least one upcoming Moment should be visible (if data exists)
     await expect(momentLinks.first()).toBeVisible({ timeout: 10_000 });
   });
 });
 
-test.describe("La Carte — page Circle publique", () => {
-  test.skip(
-    !process.env.E2E_PUBLIC_CIRCLE_SLUG,
-    "E2E_PUBLIC_CIRCLE_SLUG non défini"
-  );
-
+test.describe("Découvrir — page Communauté publique", () => {
   test("should display the public Circle page with its name and description", async ({ page }) => {
-    const circleSlug = process.env.E2E_PUBLIC_CIRCLE_SLUG;
-    await page.goto(`/fr/circles/${circleSlug}`);
-
-    await expect(page.locator("h1")).toBeVisible();
-    await expect(page.locator("main")).toBeVisible();
+    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
+    await expect(page.locator("h1").first()).toBeVisible();
+    await expect(page.locator("h1").first()).toContainText("Yoga Montmartre");
   });
 
-  test("should display upcoming Escales on the Circle page", async ({ page }) => {
-    const circleSlug = process.env.E2E_PUBLIC_CIRCLE_SLUG;
-    await page.goto(`/fr/circles/${circleSlug}`);
-
-    // The Circle page shows a timeline of upcoming Escales
-    await expect(page.locator("main")).toBeVisible();
+  test("should display upcoming events on the Circle page", async ({ page }) => {
+    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
+    // Des événements à venir sont seedés dans yoga-montmartre
+    await expect(page.locator("main")).toContainText(/Méditation|Retraite|événement/i);
   });
 
   test("should display the Organisateurs (Hosts) on the Circle page", async ({ page }) => {
-    const circleSlug = process.env.E2E_PUBLIC_CIRCLE_SLUG;
-    await page.goto(`/fr/circles/${circleSlug}`);
-
-    // Organisateurs section should be visible
+    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
     const hostSection = page
       .locator("main")
       .filter({ hasText: /organisé par|hosted by|organisateur/i });
@@ -116,46 +94,40 @@ test.describe("La Carte — page Circle publique", () => {
   });
 
   test("should display member count on the Circle page", async ({ page }) => {
-    const circleSlug = process.env.E2E_PUBLIC_CIRCLE_SLUG;
-    await page.goto(`/fr/circles/${circleSlug}`);
-
-    // Member count stat should be visible
+    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
     const memberStat = page
       .locator("main")
       .filter({ hasText: /membre|member/i });
     await expect(memberStat).toBeVisible();
   });
 
-  test("should allow navigating to an Escale from the Circle page", async ({ page }) => {
-    const circleSlug = process.env.E2E_PUBLIC_CIRCLE_SLUG;
-    await page.goto(`/fr/circles/${circleSlug}`);
+  test("should allow navigating to an Event from the Circle page", async ({ page }) => {
+    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
 
-    // Click on an Escale link in the timeline
-    const escaleLink = page.locator("a[href*='/m/']").first();
-    const isVisible = await escaleLink.isVisible().catch(() => false);
+    const eventLink = page.locator("a[href*='/m/']").first();
+    const isVisible = await eventLink.isVisible().catch(() => false);
     if (isVisible) {
-      await escaleLink.click();
+      await eventLink.click();
       await expect(page).toHaveURL(/\/m\//, { timeout: 10_000 });
       await expect(page.locator("h1")).toBeVisible();
     }
   });
 });
 
-test.describe("La Carte — accès Explorer depuis le header", () => {
-  test("should have a link to La Carte / Explore in the header navigation", async ({ page }) => {
-    await page.goto("/fr");
+test.describe("Découvrir — accès depuis le header (utilisateur connecté)", () => {
+  // Le lien Explorer dans le header n'est affiché que pour les utilisateurs connectés
+  test.use({ storageState: "tests/e2e/.auth/host.json" });
 
-    // The header should contain a link to the Explorer page
+  test("should have a link to Découvrir in the header navigation", async ({ page }) => {
+    await page.goto("/fr/dashboard");
     const exploreLink = page.locator("header a[href*='/explorer']");
     await expect(exploreLink.first()).toBeVisible();
   });
 
   test("should navigate to Explorer when clicking the header link", async ({ page }) => {
-    await page.goto("/fr");
-
+    await page.goto("/fr/dashboard");
     const exploreLink = page.locator("header a[href*='/explorer']").first();
     await exploreLink.click();
-
     await expect(page).toHaveURL(/\/explorer/, { timeout: 10_000 });
   });
 });
