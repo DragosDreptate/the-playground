@@ -145,12 +145,12 @@ src/domain/usecases/admin/
 | `get-admin-users.ts` | `getAdminUsers(callerRole, filters, deps)` | Liste utilisateurs paginée |
 | `get-admin-user.ts` | `getAdminUser(callerRole, userId, deps)` | Détail utilisateur |
 | `admin-delete-user.ts` | `adminDeleteUser(callerRole, userId, deps)` | Supprimer un utilisateur |
-| `get-admin-circles.ts` | `getAdminCircles(callerRole, filters, deps)` | Liste Circles paginée |
-| `get-admin-circle.ts` | `getAdminCircle(callerRole, circleId, deps)` | Détail Circle |
-| `admin-delete-circle.ts` | `adminDeleteCircle(callerRole, circleId, deps)` | Supprimer un Circle |
-| `get-admin-moments.ts` | `getAdminMoments(callerRole, filters, deps)` | Liste Moments paginée |
-| `get-admin-moment.ts` | `getAdminMoment(callerRole, momentId, deps)` | Détail Moment |
-| `admin-delete-moment.ts` | `adminDeleteMoment(callerRole, momentId, deps)` | Supprimer un Moment |
+| `get-admin-circles.ts` | `getAdminCircles(callerRole, filters, deps)` | Liste Communautés paginée |
+| `get-admin-circle.ts` | `getAdminCircle(callerRole, circleId, deps)` | Détail Communauté |
+| `admin-delete-circle.ts` | `adminDeleteCircle(callerRole, circleId, deps)` | Supprimer une Communauté |
+| `get-admin-moments.ts` | `getAdminMoments(callerRole, filters, deps)` | Liste événements paginée |
+| `get-admin-moment.ts` | `getAdminMoment(callerRole, momentId, deps)` | Détail événement |
+| `admin-delete-moment.ts` | `adminDeleteMoment(callerRole, momentId, deps)` | Supprimer un événement |
 | `admin-update-moment-status.ts` | `adminUpdateMomentStatus(callerRole, momentId, status, deps)` | Forcer annulation (PUBLISHED → CANCELLED) |
 
 **Pattern commun** :
@@ -243,24 +243,24 @@ src/app/[locale]/(routes)/admin/layout.tsx
 
 ```
 Transaction Prisma :
-1. Trouver les Circles où l'utilisateur est HOST
-2. Pour chaque Circle :
-   - Compter les autres Hosts
-   - Si seul Host → supprimer le Circle entier (cascade moments, registrations, etc.)
+1. Trouver les Communautés où l'utilisateur est Organisateur
+2. Pour chaque Communauté :
+   - Compter les autres Organisateurs
+   - Si seul Organisateur → supprimer la Communauté entière (cascade moments, registrations, etc.)
 3. Supprimer l'utilisateur (cascade memberships, registrations restantes, comments)
 ```
 
-### Suppression Circle
+### Suppression Communauté
 
 Cascade Prisma naturelle : supprime memberships, moments (+ leurs registrations, comments).
 
-### Suppression Moment
+### Suppression événement
 
 Cascade Prisma naturelle : supprime registrations, comments.
 
-### Forcer annulation Moment
+### Forcer annulation événement
 
-Met le statut à `CANCELLED`. Uniquement possible sur les Moments `PUBLISHED`.
+Met le statut à `CANCELLED`. Uniquement possible sur les événements `PUBLISHED`.
 Ne supprime pas les inscriptions existantes (elles restent visibles dans l'historique).
 
 ---
@@ -295,10 +295,10 @@ Les termes domaine suivent la convention de nommage : Circle → Communauté (FR
 | `src/app/[locale]/(routes)/admin/page.tsx` | Dashboard stats |
 | `src/app/[locale]/(routes)/admin/users/page.tsx` | Liste utilisateurs |
 | `src/app/[locale]/(routes)/admin/users/[id]/page.tsx` | Détail utilisateur |
-| `src/app/[locale]/(routes)/admin/circles/page.tsx` | Liste Circles |
-| `src/app/[locale]/(routes)/admin/circles/[id]/page.tsx` | Détail Circle |
-| `src/app/[locale]/(routes)/admin/moments/page.tsx` | Liste Moments |
-| `src/app/[locale]/(routes)/admin/moments/[id]/page.tsx` | Détail Moment |
+| `src/app/[locale]/(routes)/admin/circles/page.tsx` | Liste Communautés |
+| `src/app/[locale]/(routes)/admin/circles/[id]/page.tsx` | Détail Communauté |
+| `src/app/[locale]/(routes)/admin/moments/page.tsx` | Liste Événements |
+| `src/app/[locale]/(routes)/admin/moments/[id]/page.tsx` | Détail Événement |
 | Composants : `AdminSidebar`, `AdminSearch`, `AdminPagination`, `StatsCard` | UI partagée |
 
 ### Modifiés

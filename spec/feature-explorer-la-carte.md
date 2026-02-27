@@ -27,9 +27,9 @@ recommandation, pas de classement. Un annuaire ouvert, community-first.
 **Invariants** :
 - Seules les Communautés `PUBLIC` apparaissent
 - Seuls les événements `PUBLISHED` (à venir) de Communautés publiques apparaissent
-- Le Circle est toujours plus visible que le Moment sur les cards
+- La Communauté est toujours plus visible que l'événement sur les cards
 - Ordre chronologique uniquement (pas de ranking)
-- Un Host contrôle sa visibilité via `visibility: PRIVATE` sur son Circle
+- Un Organisateur contrôle sa visibilité via `visibility: PRIVATE` sur sa Communauté
 
 ---
 
@@ -70,7 +70,7 @@ model Circle {
 }
 ```
 
-**Décision** : champ optionnel, string libre, enrichit la card Circle ("Paris · Tech & Dev")
+**Décision** : champ optionnel, string libre, enrichit la card Communauté ("Paris · Tech & Dev")
 sans être un axe de filtrage. Le filtrage géographique est post-MVP : la densité par ville
 ne sera pas suffisante au lancement pour que le filtre soit utile.
 
@@ -433,7 +433,7 @@ Découvrir est accessible depuis :
 
 | Étape | Tâche | Dépendances |
 | --- | --- | --- |
-| 1 | Schema : ajouter `category` + `city` sur Circle | — |
+| 1 | Schema : ajouter `category` + `city` sur Communauté | — |
 | 2 | `db:push` dev + prod | Étape 1 |
 | 3 | Formulaire Communauté : ajouter champs category + city | Étape 1 |
 | 4 | Domaine : types `PublicCircle`, `PublicMoment`, filtres | Étape 1 |

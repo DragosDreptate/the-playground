@@ -5,6 +5,8 @@ export {
   UnauthorizedCircleActionError,
   AlreadyFollowingCircleError,
   NotFollowingCircleError,
+  CannotLeaveAsHostError,
+  NotMemberOfCircleError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,

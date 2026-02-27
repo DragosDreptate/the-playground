@@ -186,8 +186,8 @@ Au-delà de la date et du lieu (axes de base), plusieurs leviers permettent d'am
 
 C'est le levier de ciblage le plus puissant. Plusieurs niveaux de précision :
 
-**Niveau 1 — Catégorie Circle → categoryId Meetup**
-Meetup expose une taxonomie de Topic Categories. Mapper nos catégories Circle :
+**Niveau 1 — Catégorie Communauté → categoryId Meetup**
+Meetup expose une taxonomie de Topic Categories. Mapper nos catégories Communauté :
 ```
 TECH         → Meetup topic "Technology" (ID à récupérer via Topics API)
 SPORT        → Meetup topic "Sports & Fitness"
@@ -197,7 +197,7 @@ BUSINESS     → Meetup topic "Career & Business"
 ```
 Simple, zéro coût, bonne précision.
 
-**Niveau 2 — Catégorie Circle → mots-clés de requête**
+**Niveau 2 — Catégorie Communauté → mots-clés de requête**
 Enrichir la query `q` avec des termes représentatifs de la catégorie :
 ```
 TECH         → "tech developer startup coding"
@@ -345,7 +345,7 @@ Formulaire création → sauvegarde DRAFT → page événement DRAFT → [Radar 
 4. ~~Eventbrite + Meetup couvrent 80% du cas d'usage FR~~ → **Meetup seul est viable via API officielle** (Eventbrite Search API supprimée en 2020)
 5. Un cache de 24h est acceptable pour ce type d'information
 6. Le matching par **catégorie + rayon géographique** suffit pour un MVP — l'IA (embeddings) est un nice-to-have V2
-7. **Audience similaire = même catégorie Circle** (TECH, SPORT, ART_CULTURE, etc.) — pas de matching sémantique au MVP
+7. **Audience similaire = même catégorie Communauté** (TECH, SPORT, ART_CULTURE, etc.) — pas de matching sémantique au MVP
 
 ---
 
@@ -443,7 +443,7 @@ Meetup pour la richesse des données communautaires (catégories, membres, group
 | 2026-02-25 | Sources réellement viables | **Meetup** (API GraphQL) + **SerpAPI Google Events** (proxy) + **Luma scraping direct** (faible volume) | Audit API : Eventbrite Search API supprimée 2020, Helloasso sans recherche géo. Luma scrapeable via **NEXT\_DATA** sans headless browser. |
 | 2026-02-25 | Valeur principale | **Éviter les conflits de date pour une audience similaire** | Décision utilisateur |
 | 2026-02-25 | UX placement | **Onglet ou modale "Radar"** — à affiner | Décision utilisateur (en cours) |
-| 2026-02-25 | Matching sémantique | **Par catégorie Circle** (MVP) — embeddings en V2 | Pragmatisme, coût minimal |
+| 2026-02-25 | Matching sémantique | **Par catégorie Communauté** (MVP) — embeddings en V2 | Pragmatisme, coût minimal |
 | — | Rayon géographique | À décider | — |
 | — | Fenêtre temporelle | À décider | — |
 | — | Fraîcheur données / cache | À décider | — |

@@ -57,7 +57,7 @@
 
 **Qui** : Participant inscrit sur un événement complet, en attente d'un désistement.
 
-**Comment il arrive** : s'est inscrit sur un Moment complet, ou vient de recevoir une notification.
+**Comment il arrive** : s'est inscrit sur un événement complet, ou vient de recevoir une notification.
 
 **Ce qu'il cherche** : savoir s'il a une place, et gérer son inscription.
 
@@ -116,7 +116,7 @@
 
 **Ce qu'il cherche** :
 - Lire les commentaires de remerciement
-- Annoncer le prochain Moment
+- Annoncer le prochain événement
 - Analyser la participation (qui est venu, taux de présence)
 - Capitaliser sur la dynamique post-événement pour fidéliser les membres
 
@@ -210,7 +210,7 @@
 ```
 
 **État actuel (implémenté) :**
-- Page Moment publique : titre, date, lieu, description, inscrits, commentaires ✓
+- Page événement publique : titre, date, lieu, description, inscrits, commentaires ✓
 - Bouton d'inscription avec gestion capacité/liste d'attente ✓
 - Auth magic link + OAuth ✓
 - Onboarding profil obligatoire ✓
@@ -236,9 +236,9 @@
 **Fréquence** : usage régulier post-inscription
 
 ```
-[Accès direct /dashboard] → [Vue "Mes prochains Moments"]
+[Accès direct /dashboard] → [Vue "Mes prochains événements"]
                                        ↓
-                          [Clic sur un Moment]
+                          [Clic sur un événement]
                                        ↓
                           [/dashboard/circles/[slug]/moments/[slug]]
                                        ↓
@@ -310,14 +310,14 @@
 **Fréquence** : récurrent, critique pour la rétention Host
 
 ```
-[/dashboard] → [Bouton "Créer un Moment"]
+[/dashboard] → [Bouton "Créer un événement"]
                         ↓
               [Formulaire : titre, date, lieu, description]
               [Options avancées masquées : capacité, prix]
                         ↓
               [Publication → slug généré → /m/[slug] créée]
                         ↓
-              [Page Moment dashboard → lien partageable visible]
+              [Page événement dashboard → lien partageable visible]
                         ↓
               [Copie + partage WhatsApp/email/réseaux]
                         ↓
@@ -350,7 +350,7 @@
 **Déclencheur** : événement dans les 48h
 
 ```
-[/dashboard/circles/[slug]/moments/[slug]] → [Vue gestion Moment]
+[/dashboard/circles/[slug]/moments/[slug]] → [Vue gestion événement]
                         ↓
               ┌──────────────────────────────────────────┐
               │ Voir liste des inscrits + waitlist        │
@@ -382,13 +382,13 @@
 **Déclencheur** : transition automatique PUBLISHED → PAST
 
 ```
-[Moment → statut PAST] → [Page Moment en vue PAST]
+[événement → statut PAST] → [Page événement en vue PAST]
                                     ↓
                 [Lire les commentaires des participants]
                                     ↓
               ┌────────────────────────────────────────────┐
               │ Répondre / remercier (formulaire masqué !)  │ ← GAP
-              │ Créer le prochain Moment                    │
+              │ Créer le prochain événement                 │
               │ Voir les stats de présence                  │ ← GAP
               └────────────────────────────────────────────┘
 ```
@@ -396,7 +396,7 @@
 **État actuel (implémenté) :**
 - Indicateurs visuels PAST (cover grisée, badge, banner) ✓
 - Commentaires visibles en lecture ✓
-- Carte "Événement terminé" avec CTA vers le Circle ✓
+- Carte "Événement terminé" avec CTA vers la Communauté ✓
 
 **Gaps :**
 

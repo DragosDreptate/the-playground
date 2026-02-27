@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Quitter une Communauté</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --destructive: #e8457a;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,.08), 0 2px 4px -2px rgba(26,27,46,.05);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #e8e8f0; color: var(--foreground); }
+
+/* ── Layout doc ── */
+.doc { max-width: 1400px; margin: 0 auto; padding: 40px 24px 80px; }
+.doc-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--foreground); }
+.doc-sub { font-size: 14px; color: var(--muted-foreground); margin-bottom: 48px; }
+.section-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted-foreground); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section { margin-bottom: 56px; }
+.new-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #dcfce7; color: #166534; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px; letter-spacing: .03em;
+}
+.changed-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #fef9c3; color: #854d0e; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px;
+}
+
+/* ── Site header ── */
+.site-header {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  height: 56px; display: flex; align-items: center; padding: 0 24px;
+  gap: 12px; position: sticky; top: 0; z-index: 10;
+}
+.header-logo { font-size: 15px; font-weight: 800; color: var(--primary); text-decoration: none; }
+.header-nav { display: flex; gap: 2px; margin-left: auto; }
+.header-nav a {
+  font-size: 13px; font-weight: 500; color: var(--muted-foreground);
+  text-decoration: none; padding: 6px 12px; border-radius: var(--radius);
+  transition: color .15s, background .15s;
+}
+.header-nav a:hover, .header-nav a.active { color: var(--foreground); background: var(--muted); }
+.header-avatar {
+  width: 32px; height: 32px; border-radius: 50%; margin-left: 8px;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 12px; font-weight: 700; flex-shrink: 0;
+}
+
+/* ── Page shell ── */
+.page-shell {
+  background: var(--card); border-radius: 16px; overflow: hidden;
+  box-shadow: var(--shadow-md); border: 1px solid var(--border);
+}
+.page-content { background: var(--background); padding: 32px 24px; }
+
+/* ── Breadcrumb ── */
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); margin-bottom: 6px; }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb-sep { font-size: 12px; }
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: 99px; line-height: 1.5; border: 1px solid transparent;
+}
+.badge-secondary { background: var(--muted); color: var(--muted-foreground); }
+.badge-outline-primary { border-color: rgba(232,69,122,.4); color: var(--primary); background: transparent; }
+
+/* ── Boutons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  padding: 7px 14px; border-radius: var(--radius); cursor: pointer;
+  border: 1px solid transparent; transition: all .15s; text-decoration: none;
+  white-space: nowrap;
+}
+.btn-default { background: var(--primary); color: white; }
+.btn-default:hover { background: #d63d6e; }
+.btn-outline { background: transparent; border-color: var(--border); color: var(--foreground); }
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--muted-foreground); }
+.btn-ghost:hover { background: var(--muted); color: var(--foreground); }
+.btn-destructive-outline {
+  background: transparent;
+  border-color: rgba(232,69,122,.35);
+  color: var(--destructive);
+}
+.btn-destructive-outline:hover {
+  background: rgba(232,69,122,.08);
+  border-color: var(--destructive);
+}
+.btn-sm { font-size: 12px; padding: 5px 12px; }
+.btn-full { width: 100%; justify-content: center; }
+.btn-destructive-confirm { background: var(--destructive); color: white; border-color: var(--destructive); }
+.btn-destructive-confirm:hover { background: #c9385e; }
+
+/* ── Two-column layout ── */
+.two-col {
+  display: flex; flex-direction: column; gap: 32px;
+}
+@media (min-width: 900px) {
+  .two-col { flex-direction: row; align-items: flex-start; }
+  .col-left { width: 280px; flex-shrink: 0; position: sticky; top: 80px; }
+  .col-right { flex: 1; min-width: 0; }
+}
+
+/* ── Cover 1:1 ── */
+.cover-wrap { position: relative; margin-bottom: 4px; }
+.cover-glow {
+  position: absolute; left: 16px; right: 16px; bottom: -12px;
+  height: 40px; opacity: .6; filter: blur(20px);
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  border-radius: 0 0 16px 16px;
+}
+.cover {
+  position: relative; width: 100%; aspect-ratio: 1/1;
+  border-radius: 16px; overflow: hidden;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+.cover-icon {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+}
+.cover-icon-inner {
+  width: 56px; height: 56px; background: rgba(255,255,255,.2);
+  backdrop-filter: blur(4px); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.cover-icon-inner svg { width: 24px; height: 24px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Hosts bloc ── */
+.hosts-section { padding: 0 4px; }
+.section-micro-label { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); margin-bottom: 8px; }
+.host-avatars { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.avatar-sm {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.host-name { font-size: 13px; font-weight: 500; }
+
+/* ── Stats ── */
+.stats { display: flex; gap: 24px; padding: 0 4px; }
+.stat-num { font-size: 24px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 11px; color: var(--muted-foreground); margin-top: 2px; }
+.stats-divider { border-left: 1px solid var(--border); padding-left: 24px; }
+
+/* ── Meta rows ── */
+.meta-row { display: flex; align-items: center; gap: 12px; }
+.meta-icon {
+  width: 36px; height: 36px; border-radius: var(--radius);
+  background: rgba(232,69,122,.1); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.meta-icon svg { width: 16px; height: 16px; stroke: var(--primary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.meta-sublabel { font-size: 11px; color: var(--muted-foreground); }
+.meta-value { font-size: 13px; font-weight: 500; }
+
+/* ── Separator ── */
+.sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+/* ── Tab selector ── */
+.tab-row { display: flex; gap: 4px; }
+.tab {
+  font-size: 13px; font-weight: 500; padding: 6px 14px;
+  border-radius: var(--radius); cursor: pointer; border: none;
+  background: transparent; color: var(--muted-foreground); font-family: 'Inter', sans-serif;
+}
+.tab.active { background: var(--foreground); color: white; }
+
+/* ── Timeline ── */
+.timeline { position: relative; }
+.timeline-item { display: flex; gap: 16px; padding-bottom: 24px; position: relative; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-date { width: 52px; flex-shrink: 0; text-align: center; }
+.timeline-date-month { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted-foreground); }
+.timeline-date-day { font-size: 22px; font-weight: 700; line-height: 1; }
+.timeline-dot-col { display: flex; flex-direction: column; align-items: center; gap: 0; width: 16px; flex-shrink: 0; padding-top: 4px; }
+.timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+.timeline-line { width: 1px; flex: 1; border-left: 1px dashed var(--border); margin-top: 4px; min-height: 32px; }
+.timeline-card {
+  flex: 1; background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; display: flex; gap: 0; min-width: 0;
+  box-shadow: var(--shadow-sm);
+}
+.timeline-card-cover {
+  width: 64px; height: 64px; flex-shrink: 0;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+}
+.timeline-card-body { flex: 1; padding: 10px 12px; min-width: 0; }
+.timeline-card-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.timeline-card-meta { font-size: 11px; color: var(--muted-foreground); }
+
+/* ── Members list ── */
+.members-card { border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.members-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+.member-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+.member-row + .member-row { border-top: 1px solid var(--border); }
+.member-name { font-size: 13px; font-weight: 500; }
+.member-email { font-size: 11px; color: var(--muted-foreground); }
+
+/* ── Modal overlay ── */
+.modal-overlay {
+  position: absolute; inset: 0; background: rgba(26,27,46,.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 50; border-radius: 16px;
+}
+.modal {
+  background: var(--card); border-radius: 16px; padding: 24px;
+  width: 380px; max-width: calc(100% - 32px);
+  box-shadow: 0 20px 40px rgba(26,27,46,.2); position: relative;
+}
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+.modal-desc { font-size: 13px; color: var(--muted-foreground); line-height: 1.6; margin-bottom: 16px; }
+.modal-warning {
+  background: rgba(232,69,122,.06); border: 1px solid rgba(232,69,122,.2);
+  border-radius: var(--radius); padding: 12px 14px; margin-bottom: 20px;
+  font-size: 12px; color: var(--foreground); line-height: 1.6; display: flex; gap: 8px;
+}
+.modal-warning-icon { flex-shrink: 0; margin-top: 1px; }
+.modal-warning-icon svg { width: 14px; height: 14px; stroke: var(--destructive); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ── Mobile shell ── */
+.mobile-shell {
+  width: 390px; max-width: 100%;
+  border-radius: 40px; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(26,27,46,.2);
+  border: 1px solid var(--border); position: relative;
+}
+.mobile-statusbar {
+  background: var(--card); height: 44px; display: flex;
+  align-items: center; justify-content: space-between; padding: 0 20px 0 28px;
+}
+.mobile-statusbar-time { font-size: 15px; font-weight: 600; }
+.mobile-statusbar-icons { display: flex; align-items: center; gap: 6px; }
+.mobile-statusbar-icons svg { width: 16px; height: 16px; stroke: var(--foreground); fill: none; stroke-width: 2; }
+.mobile-header {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  height: 52px; display: flex; align-items: center; padding: 0 16px; gap: 8px;
+}
+.mobile-header-back { color: var(--primary); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 2px; }
+.mobile-header-back svg { width: 18px; height: 18px; stroke: var(--primary); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.mobile-header-title { font-size: 16px; font-weight: 600; margin: auto; }
+.mobile-content { background: var(--background); overflow-y: auto; max-height: 720px; padding: 20px 16px; position: relative; }
+.mobile-home-indicator {
+  background: var(--card); height: 34px; display: flex; align-items: center; justify-content: center;
+}
+.mobile-home-bar { width: 120px; height: 5px; background: var(--foreground); border-radius: 99px; opacity: .2; }
+
+/* ── Side by side ── */
+.side-by-side { display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; }
+.frame-label { font-size: 12px; color: var(--muted-foreground); font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+/* Annotations */
+.annotation {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary); color: white; font-size: 11px; font-weight: 700;
+  flex-shrink: 0;
+}
+.annotation-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+.annotation-text { font-size: 13px; color: var(--muted-foreground); line-height: 1.5; }
+.annotation-text strong { color: var(--foreground); }
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="doc-title">Quitter une Communauté — Participant</div>
+  <div class="doc-sub">Page Circle dashboard (vue membre) · Desktop + Mobile · Avant clic & Modale de confirmation</div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- DESKTOP — BOUTON VISIBLE                               -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">
+      Desktop — bouton visible
+      <span class="new-badge">● Nouveau</span>
+    </div>
+
+    <div class="page-shell">
+      <!-- Header -->
+      <div class="site-header">
+        <a class="header-logo" href="#">The Playground</a>
+        <nav class="header-nav">
+          <a href="#">Découvrir</a>
+          <a href="#" class="active">Mon espace</a>
+        </nav>
+        <div class="header-avatar">AD</div>
+      </div>
+
+      <!-- Page content -->
+      <div class="page-content">
+        <!-- Breadcrumb + badge -->
+        <div class="breadcrumb">
+          <a href="#">Mon espace</a>
+          <span class="breadcrumb-sep">›</span>
+          <span>Tech &amp; Product Paris</span>
+        </div>
+        <span class="badge badge-secondary" style="margin-bottom: 24px; display: inline-flex;">Participant</span>
+
+        <div class="two-col">
+
+          <!-- ── LEFT column ── -->
+          <div class="col-left" style="display: flex; flex-direction: column; gap: 16px;">
+
+            <!-- Cover 1:1 -->
+            <div class="cover-wrap">
+              <div class="cover-glow"></div>
+              <div class="cover">
+                <div class="cover-icon">
+                  <div class="cover-icon-inner">
+                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hosts -->
+            <div class="hosts-section">
+              <div class="section-micro-label">Organisateur</div>
+              <div class="host-avatars">
+                <div class="avatar-sm" style="background: linear-gradient(135deg,#e8457a,#9333ea)">SL</div>
+              </div>
+              <div class="host-name">Sophie Laurent</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats">
+              <div>
+                <div class="stat-num">124</div>
+                <div class="stat-label">membres</div>
+              </div>
+              <div class="stats-divider">
+                <div class="stat-num">18</div>
+                <div class="stat-label">événements</div>
+              </div>
+            </div>
+
+            <!-- ✦ Bouton Quitter — NOUVEAU -->
+            <div style="padding: 0 2px; margin-top: 4px;">
+              <button class="btn btn-sm btn-destructive-outline btn-full" style="position: relative;">
+                <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Quitter la Communauté
+              </button>
+              <!-- annotation flèche -->
+              <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+                <span class="annotation">1</span>
+                <span style="font-size:11px;color:var(--muted-foreground);">Bouton discret, visible uniquement pour les Participants (pas les Organisateurs)</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── RIGHT column ── -->
+          <div class="col-right" style="display: flex; flex-direction: column; gap: 16px;">
+
+            <!-- Hosted by + (pas de boutons Host) -->
+            <div>
+              <p style="font-size:13px;color:var(--muted-foreground);">Organisé par <strong style="color:var(--foreground);">Sophie Laurent</strong></p>
+            </div>
+
+            <!-- Titre -->
+            <h1 style="font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.2;">Tech &amp; Product Paris</h1>
+
+            <!-- À propos -->
+            <div>
+              <div class="section-micro-label">À propos</div>
+              <p style="font-size:13px;line-height:1.7;color:var(--muted-foreground);">La communauté des Product Managers, Designers et Ingénieurs à Paris. On se retrouve chaque mois pour partager, apprendre et construire ensemble.</p>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Meta rows -->
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="meta-row">
+                <div class="meta-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                <div><div class="meta-sublabel">Visibilité</div><div class="meta-value">Communauté publique</div></div>
+              </div>
+              <div class="meta-row">
+                <div class="meta-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                <div><div class="meta-sublabel">Membres</div><div class="meta-value">124 membres</div></div>
+              </div>
+              <div class="meta-row">
+                <div class="meta-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <div><div class="meta-sublabel">Créée le</div><div class="meta-value">15 janvier 2026</div></div>
+              </div>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Tabs -->
+            <div class="tab-row">
+              <button class="tab active">À venir</button>
+              <button class="tab">Passés</button>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-date"><div class="timeline-date-month">MAR</div><div class="timeline-date-day">14</div></div>
+                <div class="timeline-dot-col"><div class="timeline-dot" style="background:var(--primary)"></div><div class="timeline-line"></div></div>
+                <div class="timeline-card">
+                  <div class="timeline-card-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4)"></div>
+                  <div class="timeline-card-body">
+                    <div class="timeline-card-title">Product Discovery Workshop</div>
+                    <div class="timeline-card-meta">18h30 · Station F, Paris</div>
+                    <div style="margin-top:6px;"><span class="badge badge-secondary" style="font-size:10px;">Inscrit</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-date"><div class="timeline-date-month">AVR</div><div class="timeline-date-day">3</div></div>
+                <div class="timeline-dot-col"><div class="timeline-dot" style="background:var(--border)"></div></div>
+                <div class="timeline-card">
+                  <div class="timeline-card-cover" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)"></div>
+                  <div class="timeline-card-body">
+                    <div class="timeline-card-title">Design Systems @ Scale</div>
+                    <div class="timeline-card-meta">19h00 · Paris 11e</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Members -->
+            <div class="members-card">
+              <div class="members-title">Membres</div>
+              <div class="member-row">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#e8457a,#9333ea);width:32px;height:32px;border-radius:50%;font-size:11px">SL</div>
+                <div><div class="member-name">Sophie Laurent <span class="badge badge-outline-primary" style="font-size:10px;">Organisatrice</span></div><div class="member-email">sophie@example.com</div></div>
+              </div>
+              <div class="member-row">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#10b981,#3b82f6);width:32px;height:32px;border-radius:50%;font-size:11px">AD</div>
+                <div><div class="member-name">Alex Dupont <span class="badge badge-secondary" style="font-size:10px;">Participant</span></div><div class="member-email">alex@example.com</div></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- DESKTOP — MODALE DE CONFIRMATION                       -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">
+      Desktop — modale de confirmation
+      <span class="new-badge">● Nouveau</span>
+    </div>
+
+    <div class="page-shell" style="position:relative;">
+      <!-- Header -->
+      <div class="site-header">
+        <a class="header-logo" href="#">The Playground</a>
+        <nav class="header-nav">
+          <a href="#">Découvrir</a>
+          <a href="#" class="active">Mon espace</a>
+        </nav>
+        <div class="header-avatar">AD</div>
+      </div>
+
+      <!-- Page content (floutée) -->
+      <div class="page-content" style="filter:blur(2px);pointer-events:none;user-select:none;opacity:.6;">
+        <div class="breadcrumb"><a>Mon espace</a><span class="breadcrumb-sep">›</span><span>Tech &amp; Product Paris</span></div>
+        <span class="badge badge-secondary" style="margin-bottom:24px;display:inline-flex;">Participant</span>
+        <div class="two-col">
+          <div class="col-left" style="display:flex;flex-direction:column;gap:16px;">
+            <div class="cover-wrap"><div class="cover-glow"></div><div class="cover"><div class="cover-icon"><div class="cover-icon-inner"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div></div></div>
+            <div class="stats"><div><div class="stat-num">124</div><div class="stat-label">membres</div></div><div class="stats-divider"><div class="stat-num">18</div><div class="stat-label">événements</div></div></div>
+            <div style="padding:0 2px;"><button class="btn btn-sm btn-destructive-outline btn-full">Quitter la Communauté</button></div>
+          </div>
+          <div class="col-right">
+            <h1 style="font-size:28px;font-weight:800;">Tech &amp; Product Paris</h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal overlay -->
+      <div class="modal-overlay">
+        <div class="modal">
+          <div class="modal-title">Quitter Tech &amp; Product Paris ?</div>
+          <div class="modal-desc">Tu vas quitter cette Communauté. Tu n'apparaîtras plus dans la liste des membres.</div>
+          <div class="modal-warning">
+            <div class="modal-warning-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>Tes inscriptions aux événements à venir <strong>restent actives</strong>. Tu pourras toujours y assister.</div>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-outline btn-sm">Annuler</button>
+            <button class="btn btn-sm btn-destructive-confirm">Quitter la Communauté</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- MOBILE                                                  -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">Mobile</div>
+
+    <div class="side-by-side">
+
+      <!-- Mobile — bouton visible -->
+      <div>
+        <div class="frame-label">
+          <span>Bouton visible (bas de page)</span>
+          <span class="new-badge">● Nouveau</span>
+        </div>
+        <div class="mobile-shell">
+          <!-- Statusbar -->
+          <div class="mobile-statusbar">
+            <div class="mobile-statusbar-time">9:41</div>
+            <div class="mobile-statusbar-icons">
+              <svg viewBox="0 0 24 24"><path d="M1 6l5 5 5-5"/><path d="M12 6l5 5 5-5"/></svg>
+              <svg viewBox="0 0 24 24"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M23 11v2"/></svg>
+            </div>
+          </div>
+
+          <!-- Mobile header -->
+          <div class="mobile-header">
+            <div class="mobile-header-back">
+              <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              Retour
+            </div>
+            <div class="mobile-header-title">Tech &amp; Product Paris</div>
+          </div>
+
+          <!-- Mobile content -->
+          <div class="mobile-content">
+            <!-- Badge -->
+            <span class="badge badge-secondary" style="margin-bottom:16px;display:inline-flex;">Participant</span>
+
+            <!-- Cover 1:1 -->
+            <div class="cover-wrap" style="margin-bottom:20px;">
+              <div class="cover-glow"></div>
+              <div class="cover">
+                <div class="cover-icon"><div class="cover-icon-inner"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div></div>
+              </div>
+            </div>
+
+            <!-- Hosts -->
+            <div class="hosts-section" style="margin-bottom:16px;">
+              <div class="section-micro-label">Organisateur</div>
+              <div class="host-avatars"><div class="avatar-sm" style="background:linear-gradient(135deg,#e8457a,#9333ea)">SL</div></div>
+              <div class="host-name">Sophie Laurent</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats" style="margin-bottom:16px;">
+              <div><div class="stat-num">124</div><div class="stat-label">membres</div></div>
+              <div class="stats-divider"><div class="stat-num">18</div><div class="stat-label">événements</div></div>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Titre + description -->
+            <h1 style="font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px;">Tech &amp; Product Paris</h1>
+            <p style="font-size:13px;color:var(--muted-foreground);line-height:1.7;margin-bottom:16px;">La communauté des Product Managers, Designers et Ingénieurs à Paris.</p>
+
+            <hr class="sep">
+
+            <!-- Meta rows -->
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+              <div class="meta-row">
+                <div class="meta-icon" style="width:32px;height:32px;border-radius:6px;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                <div><div class="meta-sublabel">Visibilité</div><div class="meta-value" style="font-size:12px;">Communauté publique</div></div>
+              </div>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Tabs -->
+            <div class="tab-row" style="margin-bottom:16px;">
+              <button class="tab active">À venir</button>
+              <button class="tab">Passés</button>
+            </div>
+
+            <!-- Timeline item -->
+            <div class="timeline-item" style="margin-bottom:16px;">
+              <div class="timeline-date"><div class="timeline-date-month" style="font-size:9px;">MAR</div><div class="timeline-date-day" style="font-size:18px;">14</div></div>
+              <div class="timeline-dot-col"><div class="timeline-dot"></div></div>
+              <div class="timeline-card">
+                <div class="timeline-card-cover" style="width:56px;height:56px;"></div>
+                <div class="timeline-card-body">
+                  <div class="timeline-card-title" style="font-size:12px;">Product Discovery Workshop</div>
+                  <div class="timeline-card-meta" style="font-size:10px;">18h30 · Station F</div>
+                  <div style="margin-top:4px;"><span class="badge badge-secondary" style="font-size:10px;">Inscrit</span></div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="sep">
+
+            <!-- Members -->
+            <div class="members-card" style="margin-bottom:20px;">
+              <div class="members-title" style="font-size:13px;">Membres</div>
+              <div class="member-row">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#e8457a,#9333ea);width:28px;height:28px;border-radius:50%;font-size:10px;">SL</div>
+                <div><div class="member-name" style="font-size:12px;">Sophie Laurent <span class="badge badge-outline-primary" style="font-size:10px;">Organisatrice</span></div></div>
+              </div>
+              <div class="member-row">
+                <div class="avatar-sm" style="background:linear-gradient(135deg,#10b981,#3b82f6);width:28px;height:28px;border-radius:50%;font-size:10px;">AD</div>
+                <div><div class="member-name" style="font-size:12px;">Alex Dupont <span class="badge badge-secondary" style="font-size:10px;">Participant</span></div></div>
+              </div>
+            </div>
+
+            <!-- ✦ Bouton Quitter — BAS DE PAGE -->
+            <div style="padding-top:8px;border-top:1px solid var(--border);">
+              <button class="btn btn-sm btn-destructive-outline btn-full">
+                <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Quitter la Communauté
+              </button>
+            </div>
+
+          </div>
+          <div class="mobile-home-indicator"><div class="mobile-home-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- Mobile — modale -->
+      <div>
+        <div class="frame-label">
+          <span>Modale de confirmation</span>
+          <span class="new-badge">● Nouveau</span>
+        </div>
+        <div class="mobile-shell" style="position:relative;">
+          <div class="mobile-statusbar">
+            <div class="mobile-statusbar-time">9:41</div>
+            <div class="mobile-statusbar-icons">
+              <svg viewBox="0 0 24 24"><path d="M1 6l5 5 5-5"/><path d="M12 6l5 5 5-5"/></svg>
+              <svg viewBox="0 0 24 24"><rect x="1" y="6" width="15" height="12" rx="2"/><path d="M23 11v2"/></svg>
+            </div>
+          </div>
+          <div class="mobile-header">
+            <div class="mobile-header-back"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Retour</div>
+            <div class="mobile-header-title">Tech &amp; Product Paris</div>
+          </div>
+
+          <!-- Content flouté -->
+          <div class="mobile-content" style="filter:blur(2px);opacity:.5;pointer-events:none;user-select:none;max-height:520px;">
+            <span class="badge badge-secondary" style="margin-bottom:16px;display:inline-flex;">Participant</span>
+            <div class="cover-wrap" style="margin-bottom:20px;"><div class="cover-glow"></div><div class="cover"><div class="cover-icon"><div class="cover-icon-inner"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div></div></div></div>
+            <h1 style="font-size:22px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px;">Tech &amp; Product Paris</h1>
+          </div>
+
+          <!-- Bottom sheet modale (mobile) -->
+          <div style="
+            position:absolute; bottom:34px; left:0; right:0;
+            background:var(--card); border-radius:20px 20px 0 0;
+            padding:20px 20px 24px; box-shadow:0 -8px 32px rgba(26,27,46,.2);
+            z-index:50;
+          ">
+            <!-- Handle -->
+            <div style="width:40px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 20px;"></div>
+            <div class="modal-title" style="font-size:15px;">Quitter Tech &amp; Product Paris ?</div>
+            <div class="modal-desc" style="margin-top:6px;margin-bottom:12px;font-size:12px;">Tu vas quitter cette Communauté. Tu n'apparaîtras plus dans la liste des membres.</div>
+            <div class="modal-warning" style="font-size:12px;margin-bottom:16px;">
+              <div class="modal-warning-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+              <div>Tes inscriptions aux événements à venir <strong>restent actives</strong>. Tu pourras toujours y assister.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <button class="btn btn-sm btn-destructive-confirm btn-full">Quitter la Communauté</button>
+              <button class="btn btn-sm btn-outline btn-full">Annuler</button>
+            </div>
+          </div>
+
+          <div class="mobile-home-indicator"><div class="mobile-home-bar"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- ANNOTATIONS                                            -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-label">Notes de design</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px;max-width:680px;">
+      <div class="annotation-row">
+        <span class="annotation">1</span>
+        <div class="annotation-text"><strong>Placement desktop</strong> : bouton dans la colonne gauche sticky, sous les stats. Discret (outline destructive sm) — pas le CTA principal.</div>
+      </div>
+      <div class="annotation-row">
+        <span class="annotation">2</span>
+        <div class="annotation-text"><strong>Placement mobile</strong> : bas de page, après la liste des membres, séparé par un border-top. Accessible sans être intrusif.</div>
+      </div>
+      <div class="annotation-row">
+        <span class="annotation">3</span>
+        <div class="annotation-text"><strong>Mobile : bottom sheet</strong> plutôt que Dialog centré — pattern natif iOS/Android, plus confortable au pouce.</div>
+      </div>
+      <div class="annotation-row">
+        <span class="annotation">4</span>
+        <div class="annotation-text"><strong>Message d'avertissement</strong> : rassurer explicitement que les inscriptions aux événements restent actives. Réduit l'hésitation.</div>
+      </div>
+      <div class="annotation-row">
+        <span class="annotation">5</span>
+        <div class="annotation-text"><strong>Absent en vue Host</strong> : le bouton ne s'affiche que pour les Participants. Un Organisateur ne peut pas quitter — il doit transférer la Communauté d'abord.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

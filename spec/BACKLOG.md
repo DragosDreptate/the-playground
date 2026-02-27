@@ -10,13 +10,13 @@
 | Feature | Date | Commit |
 | --- | --- | --- |
 | Auth (magic link + OAuth Google/GitHub) | 2026-02-19 | — |
-| CRUD Circle (domain, tests, UI, i18n) | 2026-02-19 | `dd41709` |
+| CRUD Communauté (domain, tests, UI, i18n) | 2026-02-19 | `dd41709` |
 | Design system Cyberpunk + dark/light toggle | 2026-02-19 | `2250774` |
-| CRUD Moment (domain, tests, UI, i18n, page publique `/m/[slug]`) | 2026-02-20 | `7c507cb` |
+| CRUD événement (domain, tests, UI, i18n, page publique `/m/[slug]`) | 2026-02-20 | `7c507cb` |
 | Refactor membership : Host extends Player | 2026-02-20 | `d9139f4` |
 | Neon branching dev/prod + script `db:dev:reset` | 2026-02-20 | `036d93e` |
 | Profil utilisateur + onboarding obligatoire au premier login | 2026-02-20 | `fd024a7` |
-| Registration : `JoinMoment` (inscription + auto-join Circle + liste d'attente) | 2026-02-20 | non commité |
+| Registration : `JoinMoment` (inscription + auto-join Communauté + liste d'attente) | 2026-02-20 | non commité |
 | Registration : `CancelRegistration` (annulation + promotion liste d'attente) | 2026-02-20 | non commité |
 | Registration : `GetMomentRegistrations`, `GetUserRegistration` | 2026-02-20 | non commité |
 | Page publique `/m/[slug]` : bouton inscription fonctionnel (`RegistrationButton`, `RegistrationsList`) | 2026-02-20 | non commité |
@@ -32,7 +32,7 @@
 | Page Communauté redesignée : layout 2 colonnes aligné sur événement (cover gradient, Organisateurs, stats) | 2026-02-21 | `0deec99` |
 | Timeline événements sur page Communauté : toggle "À venir / Passés" (URL param `?tab=past`) + fil d'ariane avec dates | 2026-02-21 | `0deec99` |
 | Statut inscription dans la timeline : dot coloré (rose/amber) + badge (Inscrit / Liste d'attente) | 2026-02-21 | `b9a9993` |
-| Formulaire Moment : auto-sync date de fin = date de début à la sélection | 2026-02-21 | `0deec99` |
+| Formulaire événement : auto-sync date de fin = date de début à la sélection | 2026-02-21 | `0deec99` |
 | Indicateurs événement passé : cover grisée + badge "Passé" overlay + banner contextuel + carte "Événement terminé" avec CTA rétention Communauté | 2026-02-21 | `488ddb8` |
 | Fil de commentaires sur événement : `CommentThread` (plat, chronologique) sur pages publique + dashboard Organisateur/Participant | 2026-02-21 | non commité |
 | Scripts données test : `db:seed-test-data` (réaliste, idempotent, FR) + `db:cleanup-test-data` (dry-run par défaut) + variantes prod | 2026-02-21 | non commité |
@@ -421,7 +421,7 @@
 | 2026-02-21 | Découvrir (spec/feature-explorer-la-carte.md) : `/explorer` avec tabs Communautés + Événements, community-first, pas d'algorithme. Décision révisée : Découvrir = Communautés + événements à venir de Communautés publiques (pas Communautés uniquement). Métaphore : "répertoire de tous les possibles" = incarnation du nom Playground. Schema : `category` + `city` sur Communauté. Page Communauté publique `/circles/[slug]` pour le cold traffic et le SEO. |
 | 2026-02-21 | Dashboard redesigné : pill tabs + timeline unifiée. Pas de CTAs dans les tab headers, uniquement dans les empty states. Page de consultation, pas de création. |
 | 2026-02-21 | Terminologie i18n rebranding (intermédiaire). FR : Moment → **Escale** (féminin — Publiée, Annulée, Passée), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. EN : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. *(Terminologie FR finalisée le 2026-02-22 : Escale → événement, Mon Playground → Mon espace, Rejoindre → S'inscrire)* |
-| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). *(La Carte renommée ****\*\*\*\*Découvrir****\*\*\*\* en FR le 2026-02-22)* |
+| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et namespace i18n `Explorer` inchangés. **La Boussole** réservée pour l'assistant IA (futur). *(La Carte renommée ****\*\*\*\*\*\*Découvrir****\*\*\*\*\*\* en FR le 2026-02-22)* |
 | 2026-02-21 | Convention démo : domaine **`@demo.playground`** distinct de `@test.playground`. Démo = contenu réaliste pour présentation/validation produit. Test = données techniques pour QA/dev. Reset complet de base (dev + prod) via `prisma db push --force-reset` avant injection démo. |
 | 2026-02-21 | Données démo : 6 Communautés publiques (TECH/Paris, DESIGN/Lyon, SPORT_WELLNESS/Paris, BUSINESS/Bordeaux, ART_CULTURE/Nantes, SCIENCE_EDUCATION/online), 20 users FR, 30 événements (1 passé + 4 à venir par Communauté), ratio 20%/80%, contenu entièrement en français. |
 | 2026-02-21 | Emails transactionnels : envoyés depuis les server actions (pas les usecases). Usecases restent purs (pas de side effects). Fire-and-forget (si email échoue, inscription réussit). Traductions i18n résolues dans le flux principal avant le fire-and-forget. Port `EmailService` avec 8 méthodes + adapter `ResendEmailService` (Resend + react-email). 4 emails MVP : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Organisateur. |

@@ -184,7 +184,7 @@ Sur mobile (< lg), le layout est en colonne. La cover a `aspect-ratio: 1/1` et `
 
 **Note** : L'ordre CSS (`order-2` pour la cover, `order-1` pour le contenu) fait que sur mobile, le contenu (titre, date, CTA) apparait **en premier** et la cover en second. C'est le bon comportement. Ce point est donc bien gere.
 
-**Neanmoins** : Quand l'utilisateur scroll, la cover occupe 343px de hauteur verticale. Sur les pages Circle (dashboard et publique), cela repousse les meta-informations et la timeline tres loin.
+**Neanmoins** : Quand l'utilisateur scroll, la cover occupe 343px de hauteur verticale. Sur les pages Communauté (dashboard et publique), cela repousse les meta-informations et la timeline tres loin.
 
 **Solution** : Limiter la hauteur de la cover sur mobile : `aspect-[4/3] lg:aspect-square` ou `max-h-[250px] lg:max-h-none` avec `object-cover`.
 
@@ -550,16 +550,16 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 
 ---
 
-### 8. Formulaires (Circle, Moment)
+### 8. Formulaires (Communauté, événement)
 
-#### Formulaire Circle (`circle-form.tsx`)
+#### Formulaire Communauté (`circle-form.tsx`)
 
 - Labels + inputs standards avec composant `Input` (`text-base md:text-sm`)
 - Selects (`category`, `visibility`) : fonctionnent bien sur mobile natif
 - Boutons Submit/Cancel en `flex gap-3` : OK
 - `space-y-6` : espacement genereux
 
-#### Formulaire Moment (`moment-form.tsx`)
+#### Formulaire événement (`moment-form.tsx`)
 
 - **P1-2** : Les lignes date/heure debordent sur < 375px
 - **P1-4** : Le champ titre (`text-3xl` sans bordure) est atypique sur mobile
