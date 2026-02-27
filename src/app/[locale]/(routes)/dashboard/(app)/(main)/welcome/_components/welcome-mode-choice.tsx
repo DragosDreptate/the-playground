@@ -45,8 +45,9 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
             t("modeChoice.greetingAnonymous")
           )}
         </h1>
-        <p className="text-muted-foreground">{t("modeChoice.subtitle")}</p>
-        <p className="text-muted-foreground text-xs">{t("modeChoice.hint")}</p>
+        <p className="text-muted-foreground">
+          {t("modeChoice.subtitle")}{" "}{t("modeChoice.hint")}
+        </p>
       </div>
 
       {/* Cards */}
