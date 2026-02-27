@@ -137,6 +137,7 @@ export default async function MomentDetailPage({
         locationType: moment.locationType,
         locationName: moment.locationName,
         locationAddress: moment.locationAddress,
+        videoLink: moment.videoLink,
         circleName: circle.name,
         slug: moment.slug,
       }}
