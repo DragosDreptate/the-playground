@@ -105,16 +105,12 @@
       "subtitle": "Choisis ton mode par défaut. Tu pourras changer à tout moment.",
       "participant": {
         "title": "Je participe",
-        "description": "Découvrir et rejoindre des événements qui m'inspirent",
-        "cta": "Explorer les événements"
+        "description": "Découvrir et rejoindre des événements qui m'inspirent"
       },
       "organizer": {
         "title": "J'organise",
-        "description": "Créer ma communauté et animer des événements",
-        "cta": "Créer ma Communauté"
+        "description": "Créer ma communauté et animer des événements"
       },
-      "continue": "Accéder à mon espace",
-      "continuing": "Chargement...",
       "hint": "Tu peux changer de mode à tout moment depuis ton espace."
     }
   },

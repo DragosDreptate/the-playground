@@ -105,16 +105,12 @@
       "subtitle": "Choose your default mode. You can change it at any time.",
       "participant": {
         "title": "I participate",
-        "description": "Discover and join events that inspire me",
-        "cta": "Explore events"
+        "description": "Discover and join events that inspire me"
       },
       "organizer": {
         "title": "I organize",
-        "description": "Create my community and host events",
-        "cta": "Create my Community"
+        "description": "Create my community and host events"
       },
-      "continue": "Go to my dashboard",
-      "continuing": "Loading...",
       "hint": "You can switch modes at any time from your dashboard."
     }
   },
