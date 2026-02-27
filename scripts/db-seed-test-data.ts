@@ -106,6 +106,39 @@ const SEED_DATA = [
         comments: [],
       },
       {
+        slug: "test-webinaire-annule",
+        title: "Webinaire TypeScript Avancé — ANNULÉ",
+        description:
+          "Webinaire sur les types avancés TypeScript : generics, mapped types, conditional types. " +
+          "Malheureusement annulé suite à un imprévu de l'intervenant.",
+        startsAt: new Date("2026-03-10T18:00:00"),
+        endsAt: new Date("2026-03-10T19:30:00"),
+        locationType: "ONLINE" as const,
+        locationName: "Zoom",
+        locationAddress: null,
+        capacity: 100,
+        status: "CANCELLED" as const,
+        registrations: [],
+        comments: [],
+      },
+      {
+        slug: "test-atelier-complet",
+        title: "Atelier Design System — Complet",
+        description:
+          "Atelier pratique sur la création d'un Design System avec Figma et Tailwind. " +
+          "Places très limitées pour garantir un suivi personnalisé.",
+        startsAt: new Date("2026-04-15T14:00:00"),
+        endsAt: new Date("2026-04-15T17:00:00"),
+        locationType: "IN_PERSON" as const,
+        locationName: "NUMA Paris",
+        locationAddress: "39 Rue du Caire, 75002 Paris",
+        capacity: 3,
+        status: "PUBLISHED" as const,
+        registrations: ["host", "player1", "player2"],
+        waitlisted: ["player3"],
+        comments: [],
+      },
+      {
         slug: "test-hackathon-printemps-2026",
         title: "Hackathon Printemps 2026",
         description:
@@ -293,6 +326,19 @@ async function main() {
           update: { status: "REGISTERED" },
         });
         if (userKey !== "host") playersInCircle.add(userId);
+      }
+
+      // Waitlisted registrations
+      const waitlisted = (momentData as { waitlisted?: string[] }).waitlisted ?? [];
+      for (const userKey of waitlisted) {
+        const userId = userMap[userKey];
+        if (!userId) continue;
+        await prisma.registration.upsert({
+          where: { momentId_userId: { momentId: moment.id, userId } },
+          create: { momentId: moment.id, userId, status: "WAITLISTED", paymentStatus: "NONE" },
+          update: { status: "WAITLISTED" },
+        });
+        playersInCircle.add(userId);
       }
 
       // Comments (idempotent : crée seulement si le user n'a pas encore commenté ce Moment)

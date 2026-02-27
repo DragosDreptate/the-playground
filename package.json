@@ -37,7 +37,6 @@
     "db:seed-covers:execute": "tsx scripts/seed-covers.ts --execute",
     "db:seed-covers:prod": "bash scripts/seed-covers-prod.sh",
     "test:e2e": "playwright test",
-    "test:e2e:setup-onboarding": "tsx tests/e2e/setup-onboarding-auth.ts",
     "test:mobile": "playwright test --config playwright.config.mobile.ts",
     "test:mobile:setup": "tsx tests/mobile/setup-auth.ts",
     "postinstall": "prisma generate"

@@ -1,34 +1,22 @@
 import { test, expect } from "@playwright/test";
+import { SLUGS, AUTH } from "./fixtures";
 
 /**
  * Tests E2E — Annulation d'inscription
  *
  * Couvre :
  *   - Annuler une inscription depuis la page Moment publique
- *   - Le statut passe à "annulé" après annulation
- *   - Promotion depuis la liste d'attente après annulation
- *
- * Prérequis :
- *   - Serveur Next.js en cours (BASE_URL)
- *   - E2E_TEST_MOMENT_SLUG : slug d'un Moment PUBLISHED
- *   - E2E_AUTH_STORAGE_STATE : fichier JSON de session Playwright avec un utilisateur INSCRIT
+ *   - Le CTA S'inscrire réapparaît après annulation
+ *   - Dashboard utilisateur : liste des inscriptions à venir
  */
 
 test.describe("Annulation d'inscription — utilisateur authentifié", () => {
-  test.skip(
-    !process.env.E2E_TEST_MOMENT_SLUG || !process.env.E2E_AUTH_STORAGE_STATE,
-    "E2E_TEST_MOMENT_SLUG ou E2E_AUTH_STORAGE_STATE non défini"
-  );
-
-  test.use({
-    storageState: process.env.E2E_AUTH_STORAGE_STATE ?? "",
-  });
+  test.use({ storageState: AUTH.PLAYER });
 
   test("should display a cancel button for a registered user", async ({ page }) => {
-    const momentSlug = process.env.E2E_TEST_MOMENT_SLUG;
-    await page.goto(`/fr/m/${momentSlug}`);
+    await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
 
-    // A registered user sees a cancel button
+    // Player1 est inscrit au Meetup IA — doit voir le bouton annuler
     const cancelButton = page
       .locator("button")
       .filter({ hasText: /annuler|cancel/i })
@@ -36,18 +24,17 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
     await expect(cancelButton).toBeVisible({ timeout: 10_000 });
   });
 
-  test("should cancel the registration and update the UI", async ({ page }) => {
-    const momentSlug = process.env.E2E_TEST_MOMENT_SLUG;
-    await page.goto(`/fr/m/${momentSlug}`);
+  test("should cancel the registration and show the register CTA again", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
 
-    // Click cancel
+    // Cliquer sur annuler
     const cancelButton = page
       .locator("button")
       .filter({ hasText: /annuler.*inscription|cancel.*registration/i })
       .first();
     await cancelButton.click();
 
-    // Confirm in the dialog if there is one
+    // Confirmer dans la modale si elle apparaît
     const confirmButton = page
       .locator("button, [role='alertdialog'] button")
       .filter({ hasText: /confirmer|confirm|oui|yes/i })
@@ -56,7 +43,7 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
       await confirmButton.click();
     }
 
-    // After cancellation, the register CTA should appear again
+    // Après annulation, le CTA S'inscrire doit réapparaître
     await expect(
       page
         .locator("button")
@@ -67,18 +54,12 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
 });
 
 test.describe("Annulation — depuis le dashboard utilisateur", () => {
-  test.skip(
-    !process.env.E2E_AUTH_STORAGE_STATE,
-    "E2E_AUTH_STORAGE_STATE non défini"
-  );
-
-  test.use({
-    storageState: process.env.E2E_AUTH_STORAGE_STATE ?? "",
-  });
+  test.use({ storageState: AUTH.PLAYER });
 
   test("should list upcoming registrations on the dashboard", async ({ page }) => {
     await page.goto("/fr/dashboard");
-    // The dashboard shows "Mes prochains Moments" tab
+    await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+    // Le dashboard affiche les inscriptions à venir
     await expect(page.locator("main")).toBeVisible();
   });
 });
