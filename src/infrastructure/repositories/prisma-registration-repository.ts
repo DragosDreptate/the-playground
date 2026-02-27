@@ -267,6 +267,21 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return record ? toDomainRegistration(record) : null;
   },
 
+  async findFutureActiveByUserAndCircle(userId: string, circleId: string): Promise<Registration[]> {
+    const now = new Date();
+    const records = await prisma.registration.findMany({
+      where: {
+        userId,
+        status: { in: ["REGISTERED", "WAITLISTED"] },
+        moment: {
+          circleId,
+          startsAt: { gt: now },
+        },
+      },
+    });
+    return records.map(toDomainRegistration);
+  },
+
   async countWaitlistPosition(momentId: string, userId: string): Promise<number> {
     const registration = await prisma.registration.findUnique({
       where: { momentId_userId: { momentId, userId } },

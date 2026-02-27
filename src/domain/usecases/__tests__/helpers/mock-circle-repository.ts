@@ -22,6 +22,7 @@ export function createMockCircleRepository(
     countMembers: vi.fn<CircleRepository["countMembers"]>().mockResolvedValue(0),
     findPublic: vi.fn<CircleRepository["findPublic"]>().mockResolvedValue([]),
     findMemberCountsByCircleIds: vi.fn<CircleRepository["findMemberCountsByCircleIds"]>().mockResolvedValue(new Map()),
+    removeMembership: vi.fn<CircleRepository["removeMembership"]>().mockResolvedValue(undefined),
     followCircle: vi.fn<CircleRepository["followCircle"]>().mockResolvedValue(makeCircleFollow()),
     unfollowCircle: vi.fn<CircleRepository["unfollowCircle"]>().mockResolvedValue(undefined),
     getFollowStatus: vi.fn<CircleRepository["getFollowStatus"]>().mockResolvedValue(false),

@@ -292,6 +292,12 @@ export const prismaCircleRepository: CircleRepository = {
     }));
   },
 
+  async removeMembership(circleId: string, userId: string): Promise<void> {
+    await prisma.circleMembership.delete({
+      where: { userId_circleId: { userId, circleId } },
+    });
+  },
+
   async followCircle(userId: string, circleId: string): Promise<CircleFollow> {
     const row = await prisma.circleFollow.create({
       data: { userId, circleId },

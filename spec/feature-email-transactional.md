@@ -126,7 +126,7 @@ src/infrastructure/services/email/generate-ics.ts
 Fonction pure générant un fichier iCalendar conforme RFC 5545 :
 
 - `UID` : `{momentId}@theplayground`
-- `ORGANIZER` : nom du Circle, `MAILTO:noreply@theplayground.community`
+- `ORGANIZER` : nom de la Communauté, `MAILTO:noreply@theplayground.community`
 - `DTEND` fallback : `startsAt + 2h` si `endsAt` est `null`
 - Échappement des caractères spéciaux (`;`, `,`, `\n`, `\`)
 - Terminaisons de ligne CRLF (`\r\n`) — obligatoire RFC 5545

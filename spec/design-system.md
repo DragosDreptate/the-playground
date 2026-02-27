@@ -44,7 +44,7 @@
 5. [Patterns de layout](#5-patterns-de-layout)
    - 5.1 SiteHeader
    - 5.2 SiteFooter
-   - 5.3 Layout 2 colonnes (Circle & Moment)
+   - 5.3 Layout 2 colonnes (Communauté & événement)
    - 5.4 Dashboard layout
    - 5.5 Onboarding layout
 6. [Patterns UX récurrents](#6-patterns-ux-récurrents)
@@ -302,7 +302,7 @@ link:        text-primary underline-offset-4 hover:underline
 <Button variant="default" size="sm">Modifier</Button>
 ```
 
-**Bouton Suivre** (cas spécial, sidebar Circle) :
+**Bouton Suivre** (cas spécial, sidebar Communauté) :
 ```tsx
 // État inactif
 <Button variant="outline" size="sm" className="w-full border-primary/40 text-primary hover:border-primary hover:bg-primary/5">
@@ -714,12 +714,12 @@ div (max-w-5xl mx-auto px-4 py-8)
    ├─ LEFT (lg:w-[340px] shrink-0 flex flex-col gap-4 lg:sticky lg:top-6)
    │  ├─ Cover (w-full aspect-square rounded-2xl — CARRÉ 1:1)
    │  │  └─ Glow blur : absolute -bottom-3 inset-x-4 h-10 opacity-60 blur-xl
-   │  └─ Circle info card (clickable → page Circle)
+   │  └─ Communauté info card (clickable → page Communauté)
    └─ RIGHT (flex-1 flex flex-col gap-6)
-      ├─ Breadcrumb (Host seulement)
+      ├─ Breadcrumb (Organisateur seulement)
       ├─ Status badge
       ├─ Title (h1 text-4xl font-bold tracking-tight)
-      ├─ Banner "Événement terminé" (si PAST, rétention → Circle)
+      ├─ Banner "Événement terminé" (si PAST, rétention → Communauté)
       ├─ Description (collapsible si longue)
       ├─ Meta rows (Quand / Où)
       ├─ Carte / iframe map (si adresse)
@@ -967,9 +967,9 @@ footer (border-t/40)
 
 ---
 
-### 5.3 Layout 2 colonnes (Circle & Moment)
+### 5.3 Layout 2 colonnes (Communauté & événement)
 
-**Utilisé sur** : page Circle publique, page Moment publique, vue Moment organisateur.
+**Utilisé sur** : page Communauté publique, page événement publique, vue événement organisateur.
 
 ```
 div (max-w-5xl mx-auto px-4 py-8)
@@ -978,8 +978,8 @@ div (max-w-5xl mx-auto px-4 py-8)
    └─ RIGHT (flex-1 flex flex-col gap-6)
 ```
 
-**LEFT** contient : cover (carré 1:1), infos Circle (hosts, stats, description), sidebar actions.
-**RIGHT** contient : breadcrumb (si host), titre, méta, contenu principal, actions.
+**LEFT** contient : cover (carré 1:1), infos Communauté (organisateurs, stats, description), sidebar actions.
+**RIGHT** contient : breadcrumb (si organisateur), titre, méta, contenu principal, actions.
 
 **Règle cover** : toujours `aspect-square` (1:1). Jamais 16:9 ni autre ratio.
 
@@ -1079,7 +1079,7 @@ Caractéristiques : `border-dashed`, `rounded-xl`, texte centré, CTA optionnel.
 </div>
 ```
 
-S'applique à : cards, pages Circle, pages Moment, mockups, OG images, CoverImagePicker.
+S'applique à : cards, pages Communauté, pages événement, mockups, OG images, CoverImagePicker.
 
 ---
 
@@ -1095,7 +1095,7 @@ S'applique à : cards, pages Circle, pages Moment, mockups, OG images, CoverImag
 | 4 | `135deg` | `#10b981` (vert) | `#3b82f6` (bleu) |
 | 5 | `135deg` | `#8b5cf6` (violet) | `#ec4899` (pink) |
 
-Usages : covers Circle et Moment sans image, avatars CircleAvatar.
+Usages : covers Communauté et événement sans image, avatars CircleAvatar.
 
 ---
 
@@ -1239,7 +1239,7 @@ className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
 className="w-full sm:w-auto"
 ```
 
-### Sticky sidebar (pages Circle/Moment)
+### Sticky sidebar (pages Communauté/événement)
 
 ```tsx
 className="lg:sticky lg:top-6 self-start"
@@ -1385,7 +1385,7 @@ La valeur actuelle (`oklch(0.1649 0.0352 281.8285)`) est identique à `--foregro
 
 ### Feature "Suivre" — non implémentée
 
-Le bouton Suivre (abonnement aux mises à jour d'un Circle sans inscription à un événement) est documenté dans le style guide HTML comme pattern mais n'est pas encore implémenté. À implémenter en Phase 2.
+Le bouton Suivre (abonnement aux mises à jour d'une Communauté sans inscription à un événement) est documenté dans le style guide HTML comme pattern mais n'est pas encore implémenté. À implémenter en Phase 2.
 
 ### Skeleton / loading states — non standardisés
 

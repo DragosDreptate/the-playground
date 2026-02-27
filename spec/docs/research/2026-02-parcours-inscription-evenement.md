@@ -111,7 +111,7 @@ Ce que nous cherchions à apprendre :
 
 ### 5. Post-inscription — confirmation et étapes suivantes
 
-> _Le Participant comprend-il qu'il est inscrit ? Qu'il est membre du Circle ? Qu'il peut ajouter au calendrier ?_
+> _Le Participant comprend-il qu'il est inscrit ? Qu'il est membre de la Communauté ? Qu'il peut ajouter au calendrier ?_
 
 **Observations** :
 -

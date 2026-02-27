@@ -13,6 +13,8 @@ import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
 import { followCircle } from "@/domain/usecases/follow-circle";
 import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
+import { leaveCircle } from "@/domain/usecases/leave-circle";
+import { prismaRegistrationRepository } from "@/infrastructure/repositories";
 import { DomainError } from "@/domain/errors";
 import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
@@ -219,6 +221,32 @@ export async function unfollowCircleAction(
     await unfollowCircle(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
+    );
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function leaveCircleAction(
+  circleId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await leaveCircle(
+      { circleId, userId: session.user.id },
+      {
+        circleRepository: prismaCircleRepository,
+        registrationRepository: prismaRegistrationRepository,
+      }
     );
     return { success: true, data: undefined };
   } catch (error) {

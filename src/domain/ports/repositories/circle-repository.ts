@@ -70,6 +70,7 @@ export interface CircleRepository {
   /** Renvoie une Map circleId → nombre de membres pour une liste de Circles (une seule requête GROUP BY). */
   findMemberCountsByCircleIds(circleIds: string[]): Promise<Map<string, number>>;
   findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]>;
+  removeMembership(circleId: string, userId: string): Promise<void>;
   // Follow
   followCircle(userId: string, circleId: string): Promise<CircleFollow>;
   unfollowCircle(userId: string, circleId: string): Promise<void>;

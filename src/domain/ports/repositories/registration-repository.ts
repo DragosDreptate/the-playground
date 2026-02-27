@@ -47,4 +47,6 @@ export interface RegistrationRepository {
   findPastByUserId(userId: string): Promise<RegistrationWithMoment[]>;
   findFirstWaitlisted(momentId: string): Promise<Registration | null>;
   countWaitlistPosition(momentId: string, userId: string): Promise<number>;
+  /** Renvoie les inscriptions actives (REGISTERED ou WAITLIST) à venir pour un User dans un Circle. */
+  findFutureActiveByUserAndCircle(userId: string, circleId: string): Promise<Registration[]>;
 }

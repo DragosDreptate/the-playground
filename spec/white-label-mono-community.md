@@ -10,7 +10,7 @@
 The Playground est une plateforme **multi-communautés** (community-centric). Certaines organisations souhaitent une version dédiée à **une seule communauté** : leur propre, avec leur propre branding.
 
 Dans ce modèle :
-- Le **Circle disparaît de l'interface** (il existe toujours en DB mais est implicite — un seul, fixe)
+- La **Communauté disparaît de l'interface** (elle existe toujours en DB mais est implicite — une seule, fixe)
 - Les **événements, inscriptions, liste d'attente, membres, commentaires, emails, paiement** restent intacts
 - Le nom de la plateforme, les couleurs, le logo sont ceux du client
 
@@ -21,13 +21,13 @@ Ce qui disparaît de l'UI :
 
 Ce qui change de sens :
 - "Membres" = membres de la communauté unique (pas d'une Communauté parmi d'autres)
-- Dashboard = liste des événements directement, sans couche Circle
+- Dashboard = liste des événements directement, sans couche Communauté
 
 ---
 
 ## Option A — Flag d'environnement `SINGLE_TENANT`
 
-Une variable `SINGLE_TENANT_CIRCLE_ID=xxx` en env. Le code affiche ou masque la couche Circle selon ce flag. Même codebase, même DB.
+Une variable `SINGLE_TENANT_CIRCLE_ID=xxx` en env. Le code affiche ou masque la couche Communauté selon ce flag. Même codebase, même DB.
 
 **Pour :**
 - Zéro fork, zéro duplication
@@ -89,9 +89,9 @@ apps/
 
 ---
 
-## Option D — Domaine personnalisé par Circle ⭐ recommandée
+## Option D — Domaine personnalisé par Communauté ⭐ recommandée
 
-Chaque Circle peut avoir un domaine custom (`events.mycommunity.com`). Sur ce domaine, seul ce Circle est affiché. The Playground reste l'infrastructure invisible.
+Chaque Communauté peut avoir un domaine custom (`events.mycommunity.com`). Sur ce domaine, seule cette Communauté est affichée. The Playground reste l'infrastructure invisible.
 
 ```
 the-playground.fr          → plateforme multi-communauté (Découvrir, etc.)
@@ -100,7 +100,7 @@ events.mycommunity.com     → Circle ID=xxx, branding custom, mono-communauté
 
 **Principe technique :**
 - Le middleware détecte le domaine entrant → résout le Circle associé
-- L'UI masque la couche Circle (plus de selector, plus de Découvrir)
+- L'UI masque la couche Communauté (plus de selector, plus de Découvrir)
 - Le header affiche le nom et le logo du client
 - Un objet `theme` en DB contient les variables CSS du client
 
@@ -112,7 +112,7 @@ events.mycommunity.com     → Circle ID=xxx, branding custom, mono-communauté
 
 **Contre :**
 - Gestion des domaines custom complexe (Vercel Domains API, DNS, SSL)
-- Middleware de routing à écrire (détecter le domaine → résoudre le Circle)
+- Middleware de routing à écrire (détecter le domaine → résoudre la Communauté)
 - UI "mode domaine custom" à implémenter
 
 **Difficulté :** ⭐⭐⭐ démarrage / ⭐⭐ long terme
@@ -297,4 +297,4 @@ Créée depuis `production` (schéma propre + données démo `@demo.playground` 
 - [ ] Identifier le premier client potentiel pour la démo
 - [ ] Choisir la stratégie de démo (branche Git ou worktree local)
 - [ ] Décider si le theming couleur est dans le scope de la démo ou post-démo
-- [ ] Définir le périmètre fonctionnel minimal de la démo (quels éléments Circle masquer)
+- [ ] Définir le périmètre fonctionnel minimal de la démo (quels éléments de la Communauté masquer)

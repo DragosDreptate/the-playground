@@ -41,3 +41,19 @@ export class NotFollowingCircleError extends DomainError {
     super("Not following this circle");
   }
 }
+
+export class CannotLeaveAsHostError extends DomainError {
+  readonly code = "CANNOT_LEAVE_AS_HOST";
+
+  constructor() {
+    super("A host cannot leave their own circle");
+  }
+}
+
+export class NotMemberOfCircleError extends DomainError {
+  readonly code = "NOT_MEMBER_OF_CIRCLE";
+
+  constructor(circleId: string) {
+    super(`User is not a member of circle ${circleId}`);
+  }
+}

@@ -13,6 +13,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
+import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
@@ -241,6 +242,13 @@ export default async function CircleDetailPage({
               </p>
             </div>
           </div>
+
+          {/* Quitter la Communauté — Participant uniquement */}
+          {!isHost && (
+            <div className="px-1">
+              <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
+            </div>
+          )}
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
