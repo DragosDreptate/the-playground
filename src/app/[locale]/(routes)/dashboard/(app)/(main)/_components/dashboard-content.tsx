@@ -53,10 +53,6 @@ export async function DashboardContent({
 
   const t = await getTranslations("Dashboard");
 
-  const hostCircleSlugs = new Set(
-    circles.filter((c) => c.memberRole === "HOST").map((c) => c.slug)
-  );
-
   // ─── Mode ORGANIZER ──────────────────────────────────────────────────────────
   if (mode === "ORGANIZER") {
     const [hostUpcoming, hostPast] = await Promise.all([
@@ -142,13 +138,12 @@ export async function DashboardContent({
   }
 
   // ─── Mode PARTICIPANT (ou null avec activité → traité comme participant) ─────
-  const playerCircles = circles.filter((c) => c.memberRole === "PLAYER");
-  const participantUpcoming = upcomingRegistrations.filter(
-    (reg) => !hostCircleSlugs.has(reg.moment.circleSlug)
-  );
-  const participantPast = pastRegistrations.filter(
-    (reg) => !hostCircleSlugs.has(reg.moment.circleSlug)
-  );
+  // HOST implique PLAYER (un seul row membership) → afficher toutes les communautés
+  // dont on est membre, qu'on soit HOST ou PLAYER. La distinction vient des CTAs,
+  // pas du contenu affiché.
+  const participantCircles = circles;
+  const participantUpcoming = upcomingRegistrations;
+  const participantPast = pastRegistrations;
   const hasMoments = participantUpcoming.length > 0 || participantPast.length > 0;
 
   if (activeTab === "moments") {
@@ -213,14 +208,14 @@ export async function DashboardContent({
 
   return (
     <section>
-      {playerCircles.length === 0 ? (
+      {participantCircles.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
           <p className="text-muted-foreground text-sm">{t("emptyCircles")}</p>
           <p className="text-muted-foreground mt-1 text-xs">{t("emptyCirclesHint")}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {playerCircles.map((circle) => (
+          {participantCircles.map((circle) => (
             <DashboardCircleCard key={circle.id} circle={circle} />
           ))}
         </div>
