@@ -123,6 +123,7 @@
     "myCirclesOrganizer": "My Communities",
     "createCircle": "Create a Community",
     "createMoment": "Create an Event",
+    "selectCircleDropdown": "Which Community?",
     "selectCircle": {
       "title": "Choose a Community",
       "description": "Which Community should this Event belong to?"

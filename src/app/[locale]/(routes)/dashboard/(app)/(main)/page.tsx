@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardContent } from "./_components/dashboard-content";
 import { DashboardModeSwitcher } from "@/components/dashboard/dashboard-mode-switcher";
+import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
 import type { DashboardMode } from "@/domain/models/user";
 
 export default async function DashboardPage({
@@ -94,9 +95,7 @@ export default async function DashboardPage({
         {resolvedMode === "ORGANIZER" && (
           <div className="sm:contents">
             {activeTab === "moments" ? (
-              <Button asChild size="sm" className="w-full sm:w-auto">
-                <Link href="/dashboard/moments/new">{t("createMoment")}</Link>
-              </Button>
+              <CreateMomentButton />
             ) : (
               <Button asChild size="sm" className="w-full sm:w-auto">
                 <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
