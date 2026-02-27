@@ -119,6 +119,18 @@ describe("generateIcs", () => {
       expect(ics).not.toContain("LOCATION:En ligne");
     });
 
+    it("should prepend the video link in DESCRIPTION for reliable persistence", () => {
+      const ics = generateIcs({
+        ...defaultData,
+        location: "En ligne",
+        videoLink: "https://meet.google.com/abc-defg-hij",
+      });
+
+      expect(ics).toContain(
+        "DESCRIPTION:Rejoindre : https://meet.google.com/abc-defg-hij\\n\\n"
+      );
+    });
+
     it("should add a CONFERENCE property with the video link", () => {
       const ics = generateIcs({
         ...defaultData,
@@ -139,6 +151,7 @@ describe("generateIcs", () => {
       });
 
       expect(ics).toContain("LOCATION:https://zoom.us/j/98765432100");
+      expect(ics).toContain("DESCRIPTION:Rejoindre : https://zoom.us/j/98765432100\\n\\n");
       expect(ics).toContain(
         'CONFERENCE;FEATURE=VIDEO;LABEL="Lien de réunion";VALUE=URI:https://zoom.us/j/98765432100'
       );
@@ -154,6 +167,15 @@ describe("generateIcs", () => {
       const ics = generateIcs({ ...defaultData, videoLink: null });
 
       expect(ics).not.toContain("CONFERENCE");
+    });
+
+    it("should not prepend 'Rejoindre' in DESCRIPTION when videoLink is absent", () => {
+      const ics = generateIcs(defaultData);
+
+      expect(ics).not.toContain("Rejoindre");
+      expect(ics).toContain(
+        "DESCRIPTION:Un moment convivial autour du design."
+      );
     });
 
     it("should use the text location when videoLink is absent", () => {
