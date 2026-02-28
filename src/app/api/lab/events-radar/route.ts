@@ -263,21 +263,9 @@ INSTRUCTIONS :
 6. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
 7. Déduplique si un même événement apparaît dans les deux sources
 
-SORTIE — JSON uniquement, aucun texte avant ou après :
-{
-  "events": [
-    {
-      "title": "string",
-      "date": "YYYY-MM-DD",
-      "time": "HH:MM ou null",
-      "location": "lieu ou null",
-      "url": "https://...",
-      "source": "luma ou meetup",
-      "description": "1-2 phrases ou null"
-    }
-  ],
-  "summary": "X événements trouvés pour ${date} (Luma + Meetup)"
-}`;
+RÈGLE ABSOLUE : réponds UNIQUEMENT avec le JSON brut ci-dessous. Zéro texte, zéro markdown, zéro explication. Commence par { et termine par }.
+
+{"events":[{"title":"string","date":"YYYY-MM-DD","time":"HH:MM ou null","location":"lieu ou null","url":"https://...","source":"luma ou meetup","description":"1-2 phrases ou null"}],"summary":"X événements trouvés pour ${date} (Luma + Meetup)"}`;
 
         send({ type: "status", message: "Analyse par Claude…" });
 
@@ -293,10 +281,20 @@ SORTIE — JSON uniquement, aucun texte avant ou après :
 
         if (textBlock) {
           try {
-            const clean = textBlock.text
-              .replace(/^```json\s*/i, "")
-              .replace(/```\s*$/i, "")
-              .trim();
+            // Extrait le JSON de façon robuste :
+            // 1. Cherche un bloc ```json ... ``` (Claude ajoute parfois du texte après)
+            // 2. Sinon, cherche le premier { jusqu'au dernier }
+            const raw = textBlock.text;
+            const codeBlock = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+            const clean = codeBlock
+              ? codeBlock[1].trim()
+              : (() => {
+                  const first = raw.indexOf("{");
+                  const last = raw.lastIndexOf("}");
+                  return first !== -1 && last !== -1
+                    ? raw.slice(first, last + 1)
+                    : raw.trim();
+                })();
             const parsed = JSON.parse(clean) as {
               events: unknown[];
               summary: string;
