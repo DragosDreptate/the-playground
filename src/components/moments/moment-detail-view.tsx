@@ -7,7 +7,6 @@ import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
-import { CircleAvatar } from "@/components/circles/circle-avatar";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
@@ -226,9 +225,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             href={circleHref}
             className="group flex items-start gap-3 px-1"
           >
-            <div className="mt-0.5 shrink-0">
-              <CircleAvatar name={circle.name} image={circle.coverImage} />
-            </div>
+            <div
+              className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
+              style={
+                circle.coverImage
+                  ? { backgroundImage: `url(${circle.coverImage})` }
+                  : { background: getMomentGradient(circle.name) }
+              }
+            />
             <div className="min-w-0">
               <p className="text-sm font-semibold leading-snug group-hover:underline">
                 {circle.name}
