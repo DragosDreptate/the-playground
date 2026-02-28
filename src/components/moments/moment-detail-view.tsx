@@ -7,6 +7,7 @@ import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
+import { CircleAvatar } from "@/components/circles/circle-avatar";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
@@ -107,7 +108,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const locale = await getLocale();
 
   const gradient = getMomentGradient(moment.title);
-  const circleGradient = getMomentGradient(circle.name);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -226,10 +226,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             href={circleHref}
             className="group flex items-start gap-3 px-1"
           >
-            <div
-              className="mt-0.5 size-9 shrink-0 rounded-lg"
-              style={{ background: circleGradient }}
-            />
+            <div className="mt-0.5 shrink-0">
+              <CircleAvatar name={circle.name} image={circle.coverImage} />
+            </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold leading-snug group-hover:underline">
                 {circle.name}
