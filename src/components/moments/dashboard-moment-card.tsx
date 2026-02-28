@@ -69,11 +69,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     setIsToday(momentData.startsAt.toDateString() === now.toDateString());
   }, [momentData.startsAt]);
 
+  const isHost = !isOrganizer && (props as ParticipantProps).isHost === true;
   const isRegistered =
     !isOrganizer &&
+    !isHost &&
     (props.registration.status === "REGISTERED" ||
       props.registration.status === "CHECKED_IN");
-  const isWaitlisted = !isOrganizer && props.registration.status === "WAITLISTED";
+  const isWaitlisted = !isOrganizer && !isHost && props.registration.status === "WAITLISTED";
 
   const dotClass = isPast
     ? "bg-border"
@@ -220,6 +222,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                           {(props as OrganizerProps).moment.registrationCount}
                         </span>
                       )}
+                    </Badge>
+                  ) : isHost ? (
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
+                    >
+                      <Crown className="size-3" />
+                      {t("role.host")}
                     </Badge>
                   ) : isRegistered ? (
                     <Badge
