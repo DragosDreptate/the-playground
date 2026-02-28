@@ -1,6 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { auth } from "@/infrastructure/auth/auth.config";
+import { prisma } from "@/infrastructure/db/prisma";
+import { UserRole } from "@prisma/client";
+
+const DAILY_LIMIT = 10;
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
@@ -117,7 +121,7 @@ JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null
 
 export async function POST(request: NextRequest) {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return Response.json({ error: "Non authentifié" }, { status: 401 });
   }
 
@@ -127,6 +131,30 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return Response.json({ error: "ANTHROPIC_API_KEY manquante" }, { status: 500 });
+  }
+
+  // Rate limiting — skip pour les admins
+  const isAdmin = session.user.role === UserRole.ADMIN;
+  if (!isAdmin) {
+    const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
+    const usage = await prisma.radarUsage.upsert({
+      where: { userId_date: { userId: session.user.id, date: today } },
+      create: { userId: session.user.id, date: today, count: 1 },
+      update: { count: { increment: 1 } },
+    });
+    if (usage.count > DAILY_LIMIT) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "error_rate_limit", limit: DAILY_LIMIT })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: "done" })}\n\n`));
+          controller.close();
+        },
+      });
+      return new Response(stream, {
+        headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive", "X-Accel-Buffering": "no" },
+      });
+    }
   }
 
   const encoder = new TextEncoder();

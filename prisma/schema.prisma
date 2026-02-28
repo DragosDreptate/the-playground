@@ -146,6 +146,7 @@ model User {
   registrations Registration[]
   comments      Comment[]
   circleFollows CircleFollow[]
+  radarUsages   RadarUsage[]
 
   @@map("users")
 }
@@ -266,6 +267,18 @@ model Comment {
   // Index sur momentId : utilisé dans findByMomentIdWithUser, countByMomentId
   @@index([momentId])
   @@map("comments")
+}
+
+model RadarUsage {
+  id     String @id @default(cuid())
+  userId String
+  date   String // "YYYY-MM-DD" UTC
+  count  Int    @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("radar_usage")
 }
 
 model CircleFollow {
