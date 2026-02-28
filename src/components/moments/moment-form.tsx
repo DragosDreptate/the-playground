@@ -202,9 +202,15 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           {/* Status select (edit mode only) */}
           {moment && (
             <div className="flex justify-end">
-              <Select name="status" defaultValue={moment.status}>
+              <Select
+                name="status"
+                defaultValue={moment.status === "PAST" ? undefined : moment.status}
+                disabled={moment.status === "PAST"}
+              >
                 <SelectTrigger className="w-auto">
-                  <SelectValue />
+                  <SelectValue
+                    placeholder={moment.status === "PAST" ? t("status.past") : undefined}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="PUBLISHED">
