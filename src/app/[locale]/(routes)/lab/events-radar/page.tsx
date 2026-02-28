@@ -61,7 +61,8 @@ const CITIES = [
 
 export default function EventsRadarPage() {
   const [ville, setVille] = useState("paris");
-  const [date, setDate] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [keywords, setKeywords] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +85,7 @@ export default function EventsRadarPage() {
       const res = await fetch("/api/lab/events-radar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ville, date, keywords }),
+        body: JSON.stringify({ ville, dateFrom, dateTo, keywords }),
       });
 
       if (!res.body) throw new Error("Pas de corps dans la réponse");
@@ -158,7 +159,7 @@ export default function EventsRadarPage() {
         {/* Formulaire */}
         <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
 
               <div className="space-y-1.5">
                 <Label>Ville</Label>
@@ -177,12 +178,26 @@ export default function EventsRadarPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Date</Label>
+                <Label>Du</Label>
                 <Input
                   type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  value={dateFrom}
+                  onChange={(e) => {
+                    setDateFrom(e.target.value);
+                    if (dateTo && e.target.value > dateTo) setDateTo(e.target.value);
+                  }}
                   required
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Au</Label>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  min={dateFrom}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  placeholder={dateFrom}
                 />
               </div>
 
@@ -196,7 +211,7 @@ export default function EventsRadarPage() {
               </div>
             </div>
 
-            <Button type="submit" disabled={isLoading || !date}>
+            <Button type="submit" disabled={isLoading || !dateFrom}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />

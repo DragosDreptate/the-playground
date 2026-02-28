@@ -80,14 +80,14 @@ const MEETUP_LOCATION: Record<string, string> = {
   amsterdam: "nl--Amsterdam",
 };
 
-// URL Meetup avec date + mots-clés pour que leur moteur filtre en amont
-function buildMeetupUrl(ville: string, date: string, keywords: string): string {
+// URL Meetup avec plage de dates + mots-clés pour que leur moteur filtre en amont
+function buildMeetupUrl(ville: string, dateFrom: string, dateTo: string, keywords: string): string {
   const location = MEETUP_LOCATION[ville.toLowerCase()] ?? `fr--${ville}`;
   const params = new URLSearchParams({
     location,
     source: "EVENTS",
-    startDateRange: date,
-    endDateRange: date,
+    startDateRange: dateFrom,
+    endDateRange: dateTo || dateFrom,
   });
   if (keywords) params.set("keywords", keywords);
   return `https://www.meetup.com/find/events/?${params.toString()}`;
@@ -165,11 +165,13 @@ async function fetchMeetupPage(url: string): Promise<string> {
 // --- Route POST ---
 
 export async function POST(request: NextRequest) {
-  const { ville, date, keywords } = (await request.json()) as {
+  const { ville, dateFrom, dateTo, keywords } = (await request.json()) as {
     ville: string;
-    date: string;
+    dateFrom: string;
+    dateTo: string;
     keywords: string;
   };
+  const dateEnd = dateTo || dateFrom;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -187,9 +189,10 @@ export async function POST(request: NextRequest) {
       };
 
       try {
-        send({ type: "status", message: `Démarrage du radar — ${ville} — ${date}` });
+        const periodLabel = dateEnd === dateFrom ? dateFrom : `${dateFrom} → ${dateEnd}`;
+        send({ type: "status", message: `Démarrage du radar — ${ville} — ${periodLabel}` });
 
-        const meetupUrl = buildMeetupUrl(ville, date, keywords);
+        const meetupUrl = buildMeetupUrl(ville, dateFrom, dateEnd, keywords);
 
         // Fetch Luma API + Meetup en parallèle
         send({ type: "tool_call", message: `Fetching Luma API + Meetup en parallèle…` });
@@ -216,21 +219,20 @@ ${meetupContent}
 
 MISSION :
 Trouve les événements correspondant à ces critères :
-- Date cible : ${date}
+- Période : du ${dateFrom} au ${dateEnd} inclus
 - Mots-clés (logique OR) : ${keywords || "aucun filtre — garde tout"}${ville.toLowerCase() === "paris" ? "\n- Zone : Paris et Île-de-France" : ""}
 
 INSTRUCTIONS :
 1. SOURCE 1 Luma : chaque objet a start_at (ISO8601), name, url (déjà complet https://lu.ma/...)
 2. SOURCE 2 Meetup : cherche les tableaux d'événements, extrais titre, date, heure, lieu, URL
-3. Filtre sur la date ${date} — compare la partie date de start_at ou dateTime avec ${date}
-4. Si peu de résultats exacts, garde aussi les événements dans la semaine autour de ${date}
-5. Mots-clés OR — garde si le titre ou la description contient AU MOINS UN des mots-clés
-6. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
-7. Déduplique si un même événement apparaît dans les deux sources
+3. Filtre sur la période — garde les événements dont start_at ou dateTime est entre ${dateFrom} et ${dateEnd} inclus
+4. Mots-clés OR — garde si le titre ou la description contient AU MOINS UN des mots-clés
+5. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
+6. Déduplique si un même événement apparaît dans les deux sources
 
 RÈGLE ABSOLUE : réponds UNIQUEMENT avec le JSON brut. Zéro texte, zéro markdown. Commence par { et termine par }.
 
-{"events":[{"title":"string","date":"YYYY-MM-DD","time":"HH:MM ou null","location":"lieu ou null","url":"https://...","source":"luma ou meetup","description":"1-2 phrases ou null"}],"summary":"X événements trouvés pour ${date} (Luma + Meetup)"}`;
+{"events":[{"title":"string","date":"YYYY-MM-DD","time":"HH:MM ou null","location":"lieu ou null","url":"https://...","source":"luma ou meetup","description":"1-2 phrases ou null"}],"summary":"X événements trouvés du ${dateFrom} au ${dateEnd} (Luma + Meetup)"}`;
 
         send({ type: "status", message: "Analyse par Claude…" });
 
