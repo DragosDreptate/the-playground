@@ -152,7 +152,7 @@ export default function EventsRadarPage() {
             Radar d&apos;événements
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Agent IA — Luma + Meetup via Claude ·{" "}
+            Agent IA — Luma + Meetup + Eventbrite via Claude ·{" "}
             <code className="rounded bg-zinc-800 px-1 py-0.5 text-xs text-zinc-300">
               /lab/events-radar
             </code>
@@ -286,6 +286,7 @@ export default function EventsRadarPage() {
 const SOURCE_COLORS: Record<string, string> = {
   luma: "border-violet-800 text-violet-400",
   meetup: "border-red-800 text-red-400",
+  eventbrite: "border-orange-800 text-orange-400",
 };
 
 function EventCard({ event }: { event: EventResult }) {

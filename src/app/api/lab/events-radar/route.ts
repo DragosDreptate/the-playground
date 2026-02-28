@@ -89,6 +89,71 @@ async function fetchAndFilterLumaEvents(
   }
 }
 
+// --- Eventbrite — scraping + extraction Claude (fusionné avec Meetup) ---
+
+// Format Eventbrite : country--city (lowercase, tirets)
+const EVENTBRITE_LOCATION: Record<string, string> = {
+  paris: "france--paris", lyon: "france--lyon", bordeaux: "france--bordeaux",
+  marseille: "france--marseille", toulouse: "france--toulouse", nantes: "france--nantes",
+  lille: "france--lille", strasbourg: "france--strasbourg",
+  london: "united-kingdom--london", berlin: "germany--berlin", amsterdam: "netherlands--amsterdam",
+};
+
+function buildEventbriteUrl(ville: string, dateFrom: string, dateEnd: string, keywords: string): string {
+  const location = EVENTBRITE_LOCATION[ville.toLowerCase()] ?? `france--${ville.toLowerCase()}`;
+  const params = new URLSearchParams({
+    start_date: dateFrom,
+    end_date: dateEnd,
+  });
+  if (keywords) params.set("q", keywords);
+  return `https://www.eventbrite.fr/d/${location}/events/?${params}`;
+}
+
+function extractEventbriteData(html: string): string {
+  // 1. window.__SERVER_DATA__ (données principales Eventbrite)
+  const sdMatch = html.match(/window\.__SERVER_DATA__\s*=\s*(\{[\s\S]*?\});\s*(?:<\/script>|window\.)/);
+  if (sdMatch) {
+    try {
+      const json = JSON.parse(sdMatch[1]) as Record<string, unknown>;
+      const searchEvents = (json?.search_data as Record<string, unknown>)?.events as Record<string, unknown> | undefined;
+      const results =
+        searchEvents?.results ??
+        (json?.events as unknown[]) ??
+        json?.data;
+      if (results) {
+        const s = JSON.stringify(results);
+        return s.length > 10000 ? s.slice(0, 10000) + "…" : s;
+      }
+    } catch { /* next */ }
+  }
+  // 2. JSON-LD
+  const blocks: string[] = [];
+  html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi, (_, b) => { blocks.push(b); return ""; });
+  if (blocks.length) {
+    const s = "[" + blocks.join(",") + "]";
+    return s.length > 10000 ? s.slice(0, 10000) + "…" : s;
+  }
+  // 3. HTML nettoyé
+  return html.replace(/<script[\s\S]*?<\/script>/gi, "").replace(/<style[\s\S]*?<\/style>/gi, "").slice(0, 6000);
+}
+
+async function fetchEventbriteData(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
+        Accept: "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return "";
+    return extractEventbriteData(await res.text());
+  } catch {
+    return "";
+  }
+}
+
 // --- Meetup — scraping + extraction Claude ---
 
 const MEETUP_LOCATION: Record<string, string> = {
@@ -170,30 +235,41 @@ export async function POST(request: NextRequest) {
         const periodLabel = dateEnd === dateFrom ? dateFrom : `${dateFrom} → ${dateEnd}`;
         send({ type: "status", message: `Radar — ${ville} — ${periodLabel}` });
 
-        send({ type: "tool_call", message: "Fetching Luma API + Meetup en parallèle…" });
-        const [lumaEvents, meetupRaw] = await Promise.all([
+        send({ type: "tool_call", message: "Fetching Luma API + Meetup + Eventbrite en parallèle…" });
+        const [lumaEvents, meetupRaw, eventbriteRaw] = await Promise.all([
           fetchAndFilterLumaEvents(ville, keywords, dateFrom, dateEnd),
           fetchMeetupData(buildMeetupUrl(ville, dateFrom, dateEnd, keywords)),
+          fetchEventbriteData(buildEventbriteUrl(ville, dateFrom, dateEnd, keywords)),
         ]);
-        send({ type: "tool_result", message: `✓ Luma : ${lumaEvents.length} événement(s) côté serveur · Meetup : ${Math.round(meetupRaw.length / 1024)}KB` });
+        send({
+          type: "tool_result",
+          message: `✓ Luma : ${lumaEvents.length} evt · Meetup : ${Math.round(meetupRaw.length / 1024)}KB · Eventbrite : ${Math.round(eventbriteRaw.length / 1024)}KB`,
+        });
 
-        // Luma est déjà prêt — pas de Claude nécessaire
-        // Claude traite UNIQUEMENT Meetup
-        let meetupEvents: EventResult[] = [];
+        // Luma est déjà prêt — 0 token Claude
+        // Claude traite Meetup + Eventbrite en un seul appel
+        let scrapedEvents: EventResult[] = [];
+        const hasMeetup = meetupRaw.length > 50;
+        const hasEventbrite = eventbriteRaw.length > 50;
 
-        if (meetupRaw.length > 50) {
-          send({ type: "status", message: "Claude extrait les événements Meetup…" });
+        if (hasMeetup || hasEventbrite) {
+          send({ type: "status", message: "Claude extrait Meetup + Eventbrite…" });
           const client = new Anthropic({ apiKey });
 
           const kw = keywords || "tous";
-          const prompt = `Meetup ${ville} ${dateFrom}→${dateEnd} mots-clés OR: ${kw}
-Données:
-${meetupRaw}
-JSON UNIQUEMENT (pas de texte):{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://...","source":"meetup","description":"...|null"}]}`;
+          const sections = [
+            hasMeetup ? `[MEETUP]\n${meetupRaw}` : null,
+            hasEventbrite ? `[EVENTBRITE]\n${eventbriteRaw}` : null,
+          ].filter(Boolean).join("\n\n");
+
+          const prompt = `${ville} ${dateFrom}→${dateEnd} mots-clés OR: ${kw}
+Données (source entre crochets):
+${sections}
+JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://...","source":"meetup|eventbrite","description":"...|null"}]}`;
 
           const resp = await client.messages.create({
             model: "claude-haiku-4-5-20251001",
-            max_tokens: 1024,
+            max_tokens: 1500,
             messages: [{ role: "user", content: prompt }],
           });
 
@@ -204,21 +280,23 @@ JSON UNIQUEMENT (pas de texte):{"events":[{"title":"...","date":"YYYY-MM-DD","ti
               const cb = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
               const clean = cb ? cb[1].trim() : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
               const parsed = JSON.parse(clean) as { events: EventResult[] };
-              meetupEvents = (parsed.events ?? []).filter((e) => {
+              const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
+              scrapedEvents = (parsed.events ?? []).filter((e) => {
                 if (!e.date || e.date < dateFrom || e.date > dateEnd) return false;
-                if (!keywords) return true;
-                const kwList = keywords.toLowerCase().split(/[\s,]+/).filter(Boolean);
+                if (kwList.length === 0) return true;
                 return kwList.some((kw) => e.title.toLowerCase().includes(kw));
               });
             } catch { /* ignore parse error */ }
           }
         }
 
-        const allEvents = [...lumaEvents, ...meetupEvents];
+        const meetupCount = scrapedEvents.filter((e) => e.source === "meetup").length;
+        const eventbriteCount = scrapedEvents.filter((e) => e.source === "eventbrite").length;
+        const allEvents = [...lumaEvents, ...scrapedEvents];
         send({
           type: "events",
           events: allEvents,
-          summary: `${allEvents.length} événement(s) du ${dateFrom} au ${dateEnd} — ${lumaEvents.length} Luma · ${meetupEvents.length} Meetup`,
+          summary: `${allEvents.length} événement(s) du ${dateFrom} au ${dateEnd} — ${lumaEvents.length} Luma · ${meetupCount} Meetup · ${eventbriteCount} Eventbrite`,
         });
         send({ type: "done" });
       } catch (err) {
