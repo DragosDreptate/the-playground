@@ -10,6 +10,23 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.7.0] — 2026-02-28 — Support multilingue ES / RO / NL
+
+### Ajouté
+
+- **Espagnol (ES)** : traduction complète de l'interface (576 clés)
+- **Roumain (RO)** : traduction complète de l'interface (576 clés)
+- **Néerlandais (NL)** : traduction complète de l'interface (576 clés)
+- Le sélecteur de langue propose désormais 5 langues : FR, EN, ES, RO, NL
+
+### Corrigé
+
+- **Hero roumain** : texte ajusté — « Organizează evenimente. » et « Animă colectivul. »
+- **Dashboard roumain** : « Panou » remplacé par « Tablou de bord » (4 occurrences)
+- **Page À propos** : mise à jour des types d'événements organisés (produit, agile)
+
+---
+
 ## [1.6.0] — 2026-02-28 — Mode switcher Participant / Organisateur
 
 ### Ajouté
