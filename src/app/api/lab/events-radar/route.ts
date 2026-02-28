@@ -16,20 +16,34 @@ const LUMA_URLS: Record<string, string> = {
   amsterdam: "https://lu.ma/amsterdam",
 };
 
-// URLs Meetup par ville — format: countryCode--City
-const MEETUP_URLS: Record<string, string> = {
-  paris: "https://www.meetup.com/find/events/?location=fr--Paris&source=EVENTS",
-  lyon: "https://www.meetup.com/find/events/?location=fr--Lyon&source=EVENTS",
-  bordeaux: "https://www.meetup.com/find/events/?location=fr--Bordeaux&source=EVENTS",
-  marseille: "https://www.meetup.com/find/events/?location=fr--Marseille&source=EVENTS",
-  toulouse: "https://www.meetup.com/find/events/?location=fr--Toulouse&source=EVENTS",
-  nantes: "https://www.meetup.com/find/events/?location=fr--Nantes&source=EVENTS",
-  lille: "https://www.meetup.com/find/events/?location=fr--Lille&source=EVENTS",
-  strasbourg: "https://www.meetup.com/find/events/?location=fr--Strasbourg&source=EVENTS",
-  london: "https://www.meetup.com/find/events/?location=gb--London&source=EVENTS",
-  berlin: "https://www.meetup.com/find/events/?location=de--Berlin&source=EVENTS",
-  amsterdam: "https://www.meetup.com/find/events/?location=nl--Amsterdam&source=EVENTS",
+// Codes pays Meetup par ville (format countryCode--City)
+const MEETUP_LOCATION: Record<string, string> = {
+  paris: "fr--Paris",
+  lyon: "fr--Lyon",
+  bordeaux: "fr--Bordeaux",
+  marseille: "fr--Marseille",
+  toulouse: "fr--Toulouse",
+  nantes: "fr--Nantes",
+  lille: "fr--Lille",
+  strasbourg: "fr--Strasbourg",
+  london: "gb--London",
+  berlin: "de--Berlin",
+  amsterdam: "nl--Amsterdam",
 };
+
+// Construit l'URL Meetup avec date + mots-clés pour que leur moteur filtre en amont
+// (au lieu de la page de découverte générale qui ne montre que ~10 événements "featured")
+function buildMeetupUrl(ville: string, date: string, keywords: string): string {
+  const location = MEETUP_LOCATION[ville.toLowerCase()] ?? `fr--${ville}`;
+  const params = new URLSearchParams({
+    location,
+    source: "EVENTS",
+    startDateRange: date,
+    endDateRange: date,
+  });
+  if (keywords) params.set("keywords", keywords);
+  return `https://www.meetup.com/find/events/?${params.toString()}`;
+}
 
 // Extrait uniquement la portion événements du __NEXT_DATA__ Luma
 // pour éviter d'envoyer des centaines de KB à Claude
@@ -228,7 +242,7 @@ export async function POST(request: NextRequest) {
       try {
         send({ type: "status", message: `Démarrage du radar — ${ville} — ${date}` });
 
-        const meetupUrl = MEETUP_URLS[ville.toLowerCase()] ?? `https://www.meetup.com/find/events/?location=${ville.toLowerCase()}&source=EVENTS`;
+        const meetupUrl = buildMeetupUrl(ville, date, keywords);
 
         // Fetch Luma + Meetup en parallèle
         send({ type: "tool_call", message: `Fetching ${lumaUrl} + Meetup en parallèle…` });
