@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
+import { auth } from "@/infrastructure/auth/auth.config";
 
 // --- Types ---
 
@@ -364,6 +365,11 @@ async function fetchMeetupData(url: string): Promise<string> {
 // --- Route POST ---
 
 export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return Response.json({ error: "Accès refusé" }, { status: 403 });
+  }
+
   const { ville, dateFrom, dateTo, keywords } = (await request.json()) as {
     ville: string; dateFrom: string; dateTo: string; keywords: string;
   };
