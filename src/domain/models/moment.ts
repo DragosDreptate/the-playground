@@ -6,6 +6,24 @@ export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
 export type MomentStatus = "PUBLISHED" | "CANCELLED" | "PAST";
 
+export type HostMomentSummary = {
+  id: string;
+  slug: string;
+  title: string;
+  coverImage: string | null;
+  startsAt: Date;
+  endsAt: Date | null;
+  locationType: LocationType;
+  locationName: string | null;
+  status: MomentStatus;
+  registrationCount: number;
+  circle: {
+    slug: string;
+    name: string;
+    coverImage: string | null;
+  };
+};
+
 export type Moment = {
   id: string;
   slug: string;

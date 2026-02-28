@@ -9,18 +9,22 @@ type DashboardActivity = {
   circleCount: number;
   upcomingMomentCount: number;
   pastMomentCount: number;
+  dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
 };
 
 /**
  * Should the user be redirected to the welcome page?
  *
- * A user with no circles and no moment registrations (upcoming or past)
- * is considered a brand-new user who should see the welcome / onboarding flow.
+ * A user is redirected to welcome ONLY when:
+ * - They haven't chosen a dashboard mode yet (`dashboardMode === null`)
+ * - AND they have no activity at all (no circles, no registrations)
  *
- * Used by DashboardContent after fetching data from the three dashboard usecases.
+ * Users who have already set a mode, or who have activity (regardless of mode),
+ * are NOT redirected to welcome.
  */
 export function shouldRedirectToWelcome(activity: DashboardActivity): boolean {
   return (
+    activity.dashboardMode === null &&
     activity.circleCount === 0 &&
     activity.upcomingMomentCount === 0 &&
     activity.pastMomentCount === 0

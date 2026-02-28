@@ -16,6 +16,8 @@ export function createMockMomentRepository(
     transitionPastMoments: vi.fn<MomentRepository["transitionPastMoments"]>().mockResolvedValue(0),
     findPublicUpcoming: vi.fn<MomentRepository["findPublicUpcoming"]>().mockResolvedValue([]),
     findUpcomingByCircleId: vi.fn<MomentRepository["findUpcomingByCircleId"]>().mockResolvedValue([]),
+    findUpcomingByHostUserId: vi.fn<MomentRepository["findUpcomingByHostUserId"]>().mockResolvedValue([]),
+    findPastByHostUserId: vi.fn<MomentRepository["findPastByHostUserId"]>().mockResolvedValue([]),
     ...overrides,
   };
 }

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Titre mode actif (3 options) — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #e8457a;
+    --background: #f5f5fa;
+    --foreground: #1a1b2e;
+    --card: #ffffff;
+    --muted: #f0eff7;
+    --muted-foreground: #6b6f87;
+    --border: #e3e3ec;
+    --accent: #6ee7d0;
+    --radius: 0.5rem;
+    --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+    --shadow-md: 0 4px 12px rgba(26,27,46,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #e8e8f0;
+    color: var(--foreground);
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 40px 24px 100px;
+  }
+
+  /* ─── Page meta header ────────────────────────────────── */
+  .meta-header {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    text-align: center;
+  }
+  .meta-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .meta-header p { font-size: 13px; color: var(--muted-foreground); }
+
+  /* ─── Option section ──────────────────────────────────── */
+  .option-section {
+    max-width: 900px;
+    margin: 0 auto 32px;
+  }
+
+  .option-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .option-badge {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: var(--foreground);
+    color: white;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-badge.rec { background: var(--primary); }
+  .option-meta-text { flex: 1; }
+  .option-name { font-size: 14px; font-weight: 700; }
+  .option-tagline { font-size: 12px; color: var(--muted-foreground); }
+  .rec-chip {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--primary);
+    background: rgba(232,69,122,.1);
+    padding: 4px 10px; border-radius: 999px;
+  }
+
+  /* toggle */
+  .option-toggle {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .toggle-label { font-size: 12px; color: var(--muted-foreground); font-weight: 500; }
+  .toggle-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    background: white;
+    color: var(--muted-foreground);
+    transition: all 0.12s;
+  }
+  .toggle-btn.active { background: var(--foreground); color: white; border-color: var(--foreground); }
+
+  /* ─── Browser frame ───────────────────────────────────── */
+  .browser-frame {
+    background: var(--card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(26,27,46,.12), 0 0 0 1px rgba(26,27,46,.08);
+  }
+
+  /* Browser chrome */
+  .browser-chrome {
+    background: #f0eff7;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .browser-dots { display: flex; gap: 5px; }
+  .browser-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .browser-dot:nth-child(1) { background: #ff5f57; }
+  .browser-dot:nth-child(2) { background: #febc2e; }
+  .browser-dot:nth-child(3) { background: #28c840; }
+  .browser-url {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .browser-url svg { flex-shrink: 0; opacity: 0.5; }
+
+  /* ─── SiteHeader inside frame ─────────────────────────── */
+  .site-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 15px; font-weight: 800;
+    background: linear-gradient(135deg, var(--primary), #9333ea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .header-nav { display: flex; gap: 2px; }
+  .nav-item {
+    font-size: 13px; font-weight: 500;
+    color: var(--muted-foreground);
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+  }
+  .nav-item.active { color: var(--foreground); background: var(--muted); font-weight: 600; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8457a, #9333ea);
+    color: white; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ─── Page content area ───────────────────────────────── */
+  .page-content {
+    background: var(--background);
+    padding: 32px 40px 28px;
+  }
+  .page-inner {
+    max-width: 672px;
+    margin: 0 auto;
+  }
+
+  /* Page header row */
+  .page-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .page-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  /* ─── Mode switcher pill ──────────────────────────────── */
+  .mode-switcher {
+    display: flex;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .mode-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 7px; border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted-foreground);
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .mode-btn.active {
+    background: var(--card);
+    color: var(--primary); font-weight: 600;
+    box-shadow: 0 1px 3px rgba(26,27,46,.12);
+  }
+
+  /* ─── Tabs row ────────────────────────────────────────── */
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .tabs {
+    display: flex;
+    background: var(--muted);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .tab-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 7px; border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted-foreground);
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: var(--card);
+    color: var(--foreground); font-weight: 600;
+    box-shadow: 0 1px 3px rgba(26,27,46,.12);
+  }
+  .cta-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px; font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px; border: none;
+    cursor: pointer;
+    background: var(--primary); color: white;
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* ─── Skeleton cards ──────────────────────────────────── */
+  .skeleton-timeline { display: flex; flex-direction: column; gap: 0; }
+  .skeleton-row {
+    display: grid;
+    grid-template-columns: 52px 20px 1fr;
+    gap: 0 12px;
+    margin-bottom: 4px;
+  }
+  .s-date {
+    display: flex; flex-direction: column;
+    align-items: flex-end; padding-top: 14px;
+  }
+  .s-day { width: 28px; height: 20px; background: var(--muted); border-radius: 4px; margin-bottom: 3px; }
+  .s-month { width: 22px; height: 10px; background: var(--muted); border-radius: 3px; }
+  .s-connector {
+    display: flex; flex-direction: column;
+    align-items: center; padding-top: 16px;
+  }
+  .s-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+  .s-dot.dim { background: var(--border); }
+  .s-line { flex: 1; width: 2px; background: var(--border); margin-top: 4px; min-height: 20px; }
+  .s-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex; gap: 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .s-cover { width: 56px; height: 56px; border-radius: 8px; flex-shrink: 0; aspect-ratio: 1/1; }
+  .s-text { flex: 1; display: flex; flex-direction: column; gap: 5px; padding-top: 2px; }
+  .s-line-sm { height: 9px; background: var(--muted); border-radius: 3px; }
+
+  /* ─── Option-specific title styles ───────────────────────*/
+
+  /* A: titre dynamique */
+  .title-a .mode-part { color: var(--primary); }
+  .title-a .sep { color: var(--muted-foreground); font-weight: 400; margin: 0 6px; }
+
+  /* B: sous-titre contextuel */
+  .subtitle-b-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .mode-subline {
+    display: inline-flex; align-items: center; gap: 6px;
+    width: fit-content;
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 13px; font-weight: 600;
+    color: var(--muted-foreground);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .mode-subline:hover { border-color: var(--primary); color: var(--primary); }
+  .mode-subline .icon { font-size: 14px; }
+  .mode-subline .arrows { font-size: 11px; opacity: 0.5; margin-left: 2px; }
+
+  /* C: badge inline */
+  .title-c-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .mode-badge-inline {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600;
+    padding: 4px 12px 4px 9px;
+    border-radius: 999px;
+    cursor: pointer; transition: all 0.15s;
+    border: 1.5px solid;
+  }
+  .mode-badge-inline.participant {
+    background: rgba(232,69,122,.08);
+    color: var(--primary);
+    border-color: rgba(232,69,122,.3);
+  }
+  .mode-badge-inline.organisateur {
+    background: rgba(110,231,208,.12);
+    color: #0d9488;
+    border-color: rgba(110,231,208,.5);
+  }
+  .mode-badge-inline .chevron { font-size: 10px; opacity: 0.6; }
+
+  /* ─── Notes bar ───────────────────────────────────────── */
+  .notes-bar {
+    display: flex;
+    gap: 24px;
+    padding: 12px 16px;
+    background: white;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 12px 12px;
+    flex-wrap: wrap;
+  }
+  .note {
+    display: flex; align-items: flex-start; gap: 5px;
+    font-size: 12px; color: var(--muted-foreground); line-height: 1.4;
+  }
+  .note-ok { color: #10b981; font-size: 13px; flex-shrink: 0; }
+  .note-mid { color: var(--muted-foreground); font-size: 13px; flex-shrink: 0; }
+
+  /* ─── Toolbar ─────────────────────────────────────────── */
+  .toolbar {
+    position: fixed;
+    bottom: 20px; right: 20px; z-index: 100;
+    background: var(--foreground); color: white;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 4px 20px rgba(26,27,46,.3);
+  }
+  .toolbar-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<div class="meta-header">
+  <h1>Mise en valeur du mode actif — 3 options</h1>
+  <p>Chaque frame montre le dashboard à taille desktop réelle. Bascule Participant / Organisateur pour comparer.</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION A — Titre dynamique
+     ══════════════════════════════════════════════════════════ -->
+<div class="option-section">
+  <div class="option-meta">
+    <div class="option-badge">A</div>
+    <div class="option-meta-text">
+      <div class="option-name">Titre dynamique</div>
+      <div class="option-tagline">Le mode s'intègre directement dans le H1 — "Mon espace · Participant"</div>
+    </div>
+    <div class="option-toggle">
+      <span class="toggle-label">Mode :</span>
+      <button class="toggle-btn active" id="tA-p" onclick="setA('participant')">Participant</button>
+      <button class="toggle-btn" id="tA-o" onclick="setA('organisateur')">Organisateur</button>
+    </div>
+  </div>
+
+  <div class="browser-frame">
+    <div class="browser-chrome">
+      <div class="browser-dots"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+      <div class="browser-url">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        the-playground.fr/fr/dashboard
+      </div>
+    </div>
+
+    <!-- SiteHeader -->
+    <div class="site-header">
+      <span class="logo">The Playground</span>
+      <div class="header-nav">
+        <span class="nav-item">Découvrir</span>
+        <span class="nav-item active">Mon espace</span>
+      </div>
+      <div class="header-right">
+        <div class="avatar">A</div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+      <div class="page-inner">
+        <!-- Page header row -->
+        <div class="page-header-row">
+          <h1 class="page-title title-a">
+            Mon espace<span class="sep">·</span><span class="mode-part" id="optA-mode">Participant</span>
+          </h1>
+          <div class="mode-switcher">
+            <button class="mode-btn active" id="optA-btn-p" onclick="setA('participant')">Participant</button>
+            <button class="mode-btn" id="optA-btn-o" onclick="setA('organisateur')">Organisateur</button>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="tabs-row">
+          <div class="tabs">
+            <button class="tab-btn active">Mes événements</button>
+            <button class="tab-btn">Mes Communautés</button>
+          </div>
+          <button class="cta-btn" id="optA-cta">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span id="optA-cta-label">Créer un événement</span>
+          </button>
+        </div>
+        <!-- Skeleton content -->
+        <div class="skeleton-timeline">
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot"></span><span class="s-line"></span></div>
+            <div class="s-card">
+              <div class="s-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:65%;"></div>
+                <div class="s-line-sm" style="width:85%;"></div>
+                <div class="s-line-sm" style="width:45%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot dim"></span></div>
+            <div class="s-card" style="opacity:.5;">
+              <div class="s-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);filter:grayscale(.5);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:55%;"></div>
+                <div class="s-line-sm" style="width:70%;"></div>
+                <div class="s-line-sm" style="width:40%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-bar">
+      <div class="note"><span class="note-ok">✓</span> Mode impossible à louper — intégré dans le H1</div>
+      <div class="note"><span class="note-ok">✓</span> Lecture immédiate</div>
+      <div class="note"><span class="note-mid">·</span> Titre plus long — peut poser problème sur petits écrans</div>
+      <div class="note"><span class="note-mid">·</span> Le switcher pill reste secondaire visuellement malgré tout</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION B — Sous-titre contextuel
+     ══════════════════════════════════════════════════════════ -->
+<div class="option-section">
+  <div class="option-meta">
+    <div class="option-badge rec">B</div>
+    <div class="option-meta-text">
+      <div class="option-name">Sous-titre contextuel <span style="color:var(--primary);font-weight:400;font-size:12px;margin-left:4px;">— Recommandé</span></div>
+      <div class="option-tagline">Pill cliquable sous le H1 — "Tu es en mode Participant ⇅" — elle remplace le switcher séparé</div>
+    </div>
+    <div class="option-toggle">
+      <span class="toggle-label">Mode :</span>
+      <button class="toggle-btn active" id="tB-p" onclick="setB('participant')">Participant</button>
+      <button class="toggle-btn" id="tB-o" onclick="setB('organisateur')">Organisateur</button>
+    </div>
+  </div>
+
+  <div class="browser-frame" style="box-shadow: 0 0 0 2px var(--primary), 0 4px 20px rgba(232,69,122,.15);">
+    <div class="browser-chrome">
+      <div class="browser-dots"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+      <div class="browser-url">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        the-playground.fr/fr/dashboard
+      </div>
+    </div>
+
+    <div class="site-header">
+      <span class="logo">The Playground</span>
+      <div class="header-nav">
+        <span class="nav-item">Découvrir</span>
+        <span class="nav-item active">Mon espace</span>
+      </div>
+      <div class="header-right">
+        <div class="avatar">A</div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-inner">
+        <!-- Page header row: titre seul sur la ligne du haut, pill en dessous -->
+        <div style="margin-bottom: 20px;">
+          <div class="page-header-row" style="margin-bottom: 8px;">
+            <h1 class="page-title">Mon espace</h1>
+            <button class="cta-btn" id="optB-cta" style="display:none;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span id="optB-cta-label">Créer un événement</span>
+            </button>
+          </div>
+          <!-- Mode subline — c'est elle-même le switcher -->
+          <div class="mode-subline" id="optB-subline" onclick="toggleB()">
+            <span class="icon" id="optB-icon">🎟️</span>
+            <span id="optB-label">Tu es en mode Participant</span>
+            <span class="arrows">⇅ Changer</span>
+          </div>
+        </div>
+        <!-- Tabs -->
+        <div class="tabs-row">
+          <div class="tabs">
+            <button class="tab-btn active">Mes événements</button>
+            <button class="tab-btn">Mes Communautés</button>
+          </div>
+        </div>
+        <!-- Skeleton -->
+        <div class="skeleton-timeline">
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot"></span><span class="s-line"></span></div>
+            <div class="s-card">
+              <div class="s-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:65%;"></div>
+                <div class="s-line-sm" style="width:85%;"></div>
+                <div class="s-line-sm" style="width:45%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot dim"></span></div>
+            <div class="s-card" style="opacity:.5;">
+              <div class="s-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);filter:grayscale(.5);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:55%;"></div>
+                <div class="s-line-sm" style="width:70%;"></div>
+                <div class="s-line-sm" style="width:40%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-bar">
+      <div class="note"><span class="note-ok">✓</span> H1 sobre et stable, mode clairement lisible sous le titre</div>
+      <div class="note"><span class="note-ok">✓</span> La pill est elle-même le switcher — 1 élément au lieu de 2</div>
+      <div class="note"><span class="note-ok">✓</span> "Tu es en mode…" explicite et pédagogique</div>
+      <div class="note"><span class="note-ok">✓</span> Fonctionne bien sur tous les breakpoints</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OPTION C — Badge inline dans le titre
+     ══════════════════════════════════════════════════════════ -->
+<div class="option-section">
+  <div class="option-meta">
+    <div class="option-badge">C</div>
+    <div class="option-meta-text">
+      <div class="option-name">Badge coloré inline</div>
+      <div class="option-tagline">Un badge coloré collé au H1 — "Mon espace [🎟️ Participant ▾]" — la couleur différencie les modes</div>
+    </div>
+    <div class="option-toggle">
+      <span class="toggle-label">Mode :</span>
+      <button class="toggle-btn active" id="tC-p" onclick="setC('participant')">Participant</button>
+      <button class="toggle-btn" id="tC-o" onclick="setC('organisateur')">Organisateur</button>
+    </div>
+  </div>
+
+  <div class="browser-frame">
+    <div class="browser-chrome">
+      <div class="browser-dots"><div class="browser-dot"></div><div class="browser-dot"></div><div class="browser-dot"></div></div>
+      <div class="browser-url">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        the-playground.fr/fr/dashboard
+      </div>
+    </div>
+
+    <div class="site-header">
+      <span class="logo">The Playground</span>
+      <div class="header-nav">
+        <span class="nav-item">Découvrir</span>
+        <span class="nav-item active">Mon espace</span>
+      </div>
+      <div class="header-right">
+        <div class="avatar">A</div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="page-inner">
+        <div class="page-header-row">
+          <div class="title-c-group">
+            <h1 class="page-title">Mon espace</h1>
+            <div class="mode-badge-inline participant" id="optC-badge">
+              <span id="optC-icon">🎟️</span>
+              <span id="optC-label">Participant</span>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="mode-switcher">
+            <button class="mode-btn active" id="optC-btn-p" onclick="setC('participant')">Participant</button>
+            <button class="mode-btn" id="optC-btn-o" onclick="setC('organisateur')">Organisateur</button>
+          </div>
+        </div>
+        <div class="tabs-row">
+          <div class="tabs">
+            <button class="tab-btn active">Mes événements</button>
+            <button class="tab-btn">Mes Communautés</button>
+          </div>
+          <button class="cta-btn" id="optC-cta" style="display:none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span id="optC-cta-label">Créer un événement</span>
+          </button>
+        </div>
+        <!-- Skeleton -->
+        <div class="skeleton-timeline">
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot"></span><span class="s-line"></span></div>
+            <div class="s-card">
+              <div class="s-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:65%;"></div>
+                <div class="s-line-sm" style="width:85%;"></div>
+                <div class="s-line-sm" style="width:45%;"></div>
+              </div>
+            </div>
+          </div>
+          <div class="skeleton-row">
+            <div class="s-date"><div class="s-day"></div><div class="s-month"></div></div>
+            <div class="s-connector"><span class="s-dot dim"></span></div>
+            <div class="s-card" style="opacity:.5;">
+              <div class="s-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);filter:grayscale(.5);"></div>
+              <div class="s-text">
+                <div class="s-line-sm" style="width:55%;"></div>
+                <div class="s-line-sm" style="width:70%;"></div>
+                <div class="s-line-sm" style="width:40%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-bar">
+      <div class="note"><span class="note-ok">✓</span> Compact — titre + mode sur une seule ligne</div>
+      <div class="note"><span class="note-ok">✓</span> La couleur différencie les modes instantanément</div>
+      <div class="note"><span class="note-mid">·</span> Moins explicite — "Participant" seul, sans phrase contextualisante</div>
+      <div class="note"><span class="note-mid">·</span> Deux éléments pour la même action (badge + pill switcher)</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ─── Toolbar ───────────────────────────────────────────── -->
+<div class="toolbar">
+  <span class="toolbar-dot"></span>
+  Comparaison — 3 options titre mode actif
+</div>
+
+<script>
+  // ─── Option A ────────────────────────────────────────────
+  function setA(mode) {
+    const isP = mode === 'participant';
+    document.getElementById('optA-mode').textContent = isP ? 'Participant' : 'Organisateur';
+    document.getElementById('optA-btn-p').className = 'mode-btn' + (isP ? ' active' : '');
+    document.getElementById('optA-btn-o').className = 'mode-btn' + (!isP ? ' active' : '');
+    document.getElementById('tA-p').className = 'toggle-btn' + (isP ? ' active' : '');
+    document.getElementById('tA-o').className = 'toggle-btn' + (!isP ? ' active' : '');
+    const cta = document.getElementById('optA-cta');
+    const ctaLabel = document.getElementById('optA-cta-label');
+    if (!isP) {
+      cta.style.display = 'flex';
+      ctaLabel.textContent = 'Créer un événement';
+    } else {
+      cta.style.display = 'none';
+    }
+  }
+
+  // ─── Option B ────────────────────────────────────────────
+  let modeB = 'participant';
+  function setB(mode) {
+    modeB = mode;
+    const isP = mode === 'participant';
+    document.getElementById('optB-icon').textContent = isP ? '🎟️' : '👑';
+    document.getElementById('optB-label').textContent = isP ? 'Tu es en mode Participant' : 'Tu es en mode Organisateur';
+    document.getElementById('tB-p').className = 'toggle-btn' + (isP ? ' active' : '');
+    document.getElementById('tB-o').className = 'toggle-btn' + (!isP ? ' active' : '');
+    const cta = document.getElementById('optB-cta');
+    if (!isP) { cta.style.display = 'flex'; } else { cta.style.display = 'none'; }
+  }
+  function toggleB() { setB(modeB === 'participant' ? 'organisateur' : 'participant'); }
+
+  // ─── Option C ────────────────────────────────────────────
+  function setC(mode) {
+    const isP = mode === 'participant';
+    const badge = document.getElementById('optC-badge');
+    badge.className = 'mode-badge-inline ' + mode;
+    document.getElementById('optC-icon').textContent = isP ? '🎟️' : '👑';
+    document.getElementById('optC-label').textContent = isP ? 'Participant' : 'Organisateur';
+    document.getElementById('optC-btn-p').className = 'mode-btn' + (isP ? ' active' : '');
+    document.getElementById('optC-btn-o').className = 'mode-btn' + (!isP ? ' active' : '');
+    document.getElementById('tC-p').className = 'toggle-btn' + (isP ? ' active' : '');
+    document.getElementById('tC-o').className = 'toggle-btn' + (!isP ? ' active' : '');
+    const cta = document.getElementById('optC-cta');
+    if (!isP) { cta.style.display = 'flex'; } else { cta.style.display = 'none'; }
+  }
+</script>
+
+</body>
+</html>

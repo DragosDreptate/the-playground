@@ -67,6 +67,11 @@ enum UserRole {
   ADMIN
 }
 
+enum DashboardMode {
+  PARTICIPANT
+  ORGANIZER
+}
+
 // ─────────────────────────────────────────────
 // Auth.js models
 // ─────────────────────────────────────────────
@@ -130,6 +135,7 @@ model User {
   notifyNewComment          Boolean   @default(true)
   notifyNewFollower         Boolean   @default(true)
   notifyNewMomentInCircle   Boolean   @default(true)
+  dashboardMode             DashboardMode?
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @updatedAt
 

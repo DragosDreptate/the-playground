@@ -82,9 +82,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     session({ session, user }) {
       session.user.id = user.id;
-      const dbUser = user as unknown as { onboardingCompleted: boolean; role: "USER" | "ADMIN" };
+      const dbUser = user as unknown as {
+        onboardingCompleted: boolean;
+        role: "USER" | "ADMIN";
+        dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+      };
       session.user.onboardingCompleted = dbUser.onboardingCompleted;
       session.user.role = dbUser.role;
+      session.user.dashboardMode = dbUser.dashboardMode ?? null;
       return session;
     },
   },

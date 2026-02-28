@@ -9,6 +9,7 @@ declare module "next-auth" {
       image?: string | null;
       onboardingCompleted: boolean;
       role: "USER" | "ADMIN";
+      dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
     };
   }
 }

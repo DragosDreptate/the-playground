@@ -4,7 +4,7 @@ import type {
   UpdateProfileInput,
   UpdateNotificationPreferencesInput,
 } from "@/domain/ports/repositories/user-repository";
-import type { User, NotificationPreferences } from "@/domain/models/user";
+import type { User, NotificationPreferences, DashboardMode } from "@/domain/models/user";
 import type { User as PrismaUser } from "@prisma/client";
 
 function toDomainUser(record: PrismaUser): User {
@@ -22,6 +22,7 @@ function toDomainUser(record: PrismaUser): User {
     notifyNewComment: record.notifyNewComment,
     notifyNewFollower: record.notifyNewFollower,
     notifyNewMomentInCircle: record.notifyNewMomentInCircle,
+    dashboardMode: record.dashboardMode as DashboardMode | null,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -148,5 +149,12 @@ export const prismaUserRepository: UserRepository = {
       },
     });
     return toNotificationPreferences(record);
+  },
+
+  async updateDashboardMode(userId: string, mode: DashboardMode): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { dashboardMode: mode },
+    });
   },
 };

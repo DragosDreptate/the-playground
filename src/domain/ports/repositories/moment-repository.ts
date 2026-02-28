@@ -1,4 +1,4 @@
-import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
+import type { Moment, LocationType, MomentStatus, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
 import type { CircleCategory } from "@/domain/models/circle";
 
 export type CreateMomentInput = {
@@ -86,4 +86,8 @@ export interface MomentRepository {
   transitionPastMoments(): Promise<number>;
   findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]>;
   findUpcomingByCircleId(circleId: string, excludeMomentId: string, limit: number): Promise<UpcomingCircleMoment[]>;
+  /** Moments à venir dans les Circles dont l'utilisateur est HOST. */
+  findUpcomingByHostUserId(hostUserId: string): Promise<HostMomentSummary[]>;
+  /** Moments passés dans les Circles dont l'utilisateur est HOST. */
+  findPastByHostUserId(hostUserId: string): Promise<HostMomentSummary[]>;
 }

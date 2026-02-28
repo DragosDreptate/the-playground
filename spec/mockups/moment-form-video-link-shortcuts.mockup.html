@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Champ lien vidéo avec raccourcis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS VARIABLES
+   ============================================================ */
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 12px rgba(26,27,46,0.08);
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --input: #383a55;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+}
+.header-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-ghost {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.btn-ghost:hover { background: var(--muted); color: var(--foreground); }
+.avatar-sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+}
+.dark-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+}
+.dark-toggle:hover { background: var(--muted); color: var(--foreground); }
+
+/* ============================================================
+   PAGE LAYOUT
+   ============================================================ */
+.page-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+.page-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-bottom: 24px;
+}
+.page-breadcrumb span { cursor: pointer; }
+.page-breadcrumb span:hover { color: var(--primary); }
+.breadcrumb-sep { color: var(--border); }
+.page-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin-bottom: 28px;
+}
+
+/* ============================================================
+   FORM 2-COL LAYOUT
+   ============================================================ */
+.form-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+.form-left {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+}
+.form-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Cover image */
+.cover-picker {
+  aspect-ratio: 1/1;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+.cover-picker-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 12px;
+}
+.cover-picker:hover .cover-picker-overlay { opacity: 1; }
+.cover-picker-btn {
+  background: white;
+  color: #1a1b2e;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.circle-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+.circle-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.circle-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+.circle-desc {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   FORM FIELDS
+   ============================================================ */
+.title-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--foreground);
+  outline: none;
+  font-family: 'Inter', sans-serif;
+  padding: 0;
+  line-height: 1.2;
+}
+.title-input::placeholder { color: var(--muted-foreground); opacity: 0.6; }
+
+/* Meta row pattern */
+.meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.meta-row:hover { background: var(--muted); padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
+.meta-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(232, 69, 122, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.meta-icon svg { width: 16px; height: 16px; color: var(--primary); }
+.meta-content { flex: 1; min-width: 0; }
+.meta-label {
+  font-size: 13px;
+  font-weight: 500;
+}
+.meta-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 1px;
+}
+.meta-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+  margin-top: 10px;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.meta-chevron.open { transform: rotate(180deg); }
+
+/* Collapsible content */
+.collapsible-content {
+  padding-left: 48px;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Form inputs */
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.field-input {
+  height: 36px;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  background: var(--card);
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.12); }
+.field-input::placeholder { color: var(--muted-foreground); }
+.field-input.has-value { color: var(--foreground); }
+
+.select-input {
+  height: 36px;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  background: var(--card);
+  outline: none;
+  width: 100%;
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6f87' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+/* ============================================================
+   VIDEO LINK FIELD — OPTION C (the new design)
+   ============================================================ */
+
+/* Platform shortcut buttons row */
+.platform-shortcuts {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.platform-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+.platform-btn:hover {
+  border-color: var(--primary);
+  color: var(--foreground);
+  background: rgba(232,69,122,0.04);
+}
+.platform-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.platform-btn .ext-icon {
+  width: 10px;
+  height: 10px;
+  color: var(--muted-foreground);
+  opacity: 0.6;
+  margin-left: 1px;
+}
+
+/* Input with clear / platform badge */
+.video-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.video-input-wrapper .field-input {
+  padding-right: 36px;
+}
+.video-input-wrapper .field-input.detected {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+  padding-left: 36px;
+}
+.video-input-platform-icon {
+  position: absolute;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+.video-input-platform-icon svg {
+  width: 15px;
+  height: 15px;
+}
+.video-input-clear {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.video-input-clear:hover { color: var(--foreground); background: var(--muted); }
+.video-input-clear svg { width: 13px; height: 13px; }
+
+/* Helper hint below input */
+.video-link-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.video-link-hint svg { width: 11px; height: 11px; flex-shrink: 0; }
+.video-link-detected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16,185,129,0.1);
+  color: #059669;
+  border: 1px solid rgba(16,185,129,0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   DATE CARD
+   ============================================================ */
+.date-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card);
+}
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.date-cell {
+  flex: 1;
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+}
+.date-cell:last-child { border-right: none; }
+.date-cell-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted-foreground);
+  margin-bottom: 2px;
+}
+.date-cell-value {
+  font-size: 13px;
+  font-weight: 500;
+}
+.date-divider { height: 1px; background: var(--border); }
+.timezone-row {
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tz-badge {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ============================================================
+   SEPARATOR
+   ============================================================ */
+.separator {
+  height: 1px;
+  background: var(--border);
+}
+
+/* ============================================================
+   DESCRIPTION FIELD
+   ============================================================ */
+.textarea-field {
+  width: 100%;
+  border: 1px solid var(--input);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  background: var(--card);
+  outline: none;
+  resize: none;
+  min-height: 90px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.textarea-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.12); }
+.textarea-field::placeholder { color: var(--muted-foreground); }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.btn-primary:hover { background: #d63d6e; border-color: #d63d6e; }
+.btn-outline {
+  background: transparent;
+  color: var(--foreground);
+  border-color: var(--border);
+}
+.btn-outline:hover { background: var(--muted); }
+.btn-group { display: flex; gap: 10px; align-items: center; }
+
+/* ============================================================
+   ANNOTATION CALLOUT (for mockup explanation)
+   ============================================================ */
+.annotation-bar {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+html.dark .annotation-bar {
+  background: rgba(251,191,36,0.08);
+  border-color: rgba(251,191,36,0.2);
+  color: #fcd34d;
+}
+.annotation-bar svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* State tabs (mockup switch) */
+.state-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.state-tab {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  background: var(--card);
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.state-tab:hover { border-color: var(--primary); color: var(--primary); }
+.state-tab.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* SECTION LABEL */
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted-foreground);
+  margin-bottom: 8px;
+  margin-top: 4px;
+}
+
+/* NEW BADGE */
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(232,69,122,0.1);
+  color: var(--primary);
+  border: 1px solid rgba(232,69,122,0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Zoom SVG color */
+.zoom-blue { color: #2D8CFF; }
+.meet-green { color: #00AC47; }
+.teams-purple { color: #5B5EA6; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 700px) {
+  .form-layout { flex-direction: column; }
+  .form-left { width: 100%; position: static; order: 2; }
+  .form-right { order: 1; }
+  .platform-shortcuts { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    <span class="logo-dot"></span>
+    The Playground
+  </div>
+  <nav class="header-nav">
+    <button class="btn-ghost">Découvrir</button>
+    <button class="btn-ghost">Mon espace</button>
+    <div class="avatar-sm">ML</div>
+    <button class="dark-toggle" onclick="document.documentElement.classList.toggle('dark')">
+      ☾ Dark
+    </button>
+  </nav>
+</header>
+
+<!-- PAGE -->
+<div class="page-container">
+
+  <!-- Breadcrumb -->
+  <nav class="page-breadcrumb">
+    <span>Mon espace</span>
+    <span class="breadcrumb-sep">›</span>
+    <span>Tech For Good Paris</span>
+    <span class="breadcrumb-sep">›</span>
+    <span style="color: var(--foreground); font-weight: 500;">Créer un événement</span>
+  </nav>
+
+  <!-- Annotation -->
+  <div class="annotation-bar">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <div>
+      <strong>Mockup — Option C :</strong> champ lien vidéo avec boutons raccourcis plateforme.
+      Utilise les <strong>onglets ci-dessous</strong> pour naviguer entre les 3 états : vide / lien Meet détecté / lien Zoom détecté.
+    </div>
+  </div>
+
+  <!-- State switch tabs -->
+  <div class="state-tabs">
+    <button class="state-tab active" onclick="setState('empty', this)">1. Champ vide (ONLINE)</button>
+    <button class="state-tab" onclick="setState('meet', this)">2. Lien Meet détecté</button>
+    <button class="state-tab" onclick="setState('zoom', this)">3. Lien Zoom détecté</button>
+  </div>
+
+  <!-- FORM -->
+  <form onsubmit="return false">
+    <div class="form-layout">
+
+      <!-- LEFT COLUMN -->
+      <div class="form-left">
+        <div class="cover-picker">
+          <div class="cover-picker-overlay">
+            <button class="cover-picker-btn">Changer l'image</button>
+          </div>
+        </div>
+        <div class="circle-info">
+          <div class="circle-avatar"></div>
+          <div>
+            <div class="circle-name">Tech For Good Paris</div>
+            <div class="circle-desc">Technologie au service de l'impact social et environnemental</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="form-right">
+
+        <!-- Title input -->
+        <input
+          class="title-input"
+          placeholder="Nom de l'événement"
+          value="Atelier IA & Sobriété numérique"
+        />
+
+        <!-- Date card -->
+        <div class="date-card">
+          <div class="date-row">
+            <div class="date-cell">
+              <div class="date-cell-label">Début</div>
+              <div class="date-cell-value">sam. 14 mars 2026, 14:00</div>
+            </div>
+            <div class="date-cell">
+              <div class="date-cell-label">Fin</div>
+              <div class="date-cell-value">sam. 14 mars 2026, 16:00</div>
+            </div>
+          </div>
+          <div class="date-divider"></div>
+          <div class="timezone-row">
+            <span class="tz-badge">GMT+1 Europe/Paris</span>
+          </div>
+        </div>
+
+        <!-- Location row — OPEN on ONLINE -->
+        <div>
+          <!-- Trigger row -->
+          <div class="meta-row" style="cursor:default; padding-left: 8px; padding-right: 8px; margin: 0 -8px; background: var(--muted);">
+            <div class="meta-icon">
+              <!-- MapPin icon -->
+              <svg fill="none" viewBox="0 0 24 24" stroke="#e8457a" stroke-width="2" style="width:16px;height:16px">
+                <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="meta-content">
+              <div class="meta-label">Lieu</div>
+              <div class="meta-hint">Type, adresse ou lien de réunion</div>
+            </div>
+            <svg class="meta-chevron open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+          </div>
+
+          <!-- Collapsible content (always open here since ONLINE is selected) -->
+          <div class="collapsible-content">
+
+            <!-- Location type select -->
+            <div class="field-group">
+              <label class="field-label">Type</label>
+              <select class="select-input">
+                <option>Présentiel</option>
+                <option selected>En ligne</option>
+                <option>Hybride</option>
+              </select>
+            </div>
+
+            <!-- ======================================
+                 VIDEO LINK FIELD — NEW DESIGN
+                 ====================================== -->
+            <div class="field-group">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 6px;">
+                <label class="field-label" style="margin-bottom:0">
+                  Lien de réunion
+                  <span class="new-badge">Nouveau</span>
+                </label>
+              </div>
+
+              <!-- Platform shortcut buttons -->
+              <div class="section-label" style="margin-bottom:6px;">Créer un lien avec</div>
+              <div class="platform-shortcuts">
+
+                <!-- Google Meet -->
+                <button class="platform-btn" type="button" onclick="openPlatform('meet')">
+                  <!-- Google Meet icon SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" class="meet-green">
+                    <rect width="24" height="24" rx="4" fill="#E8F5E9"/>
+                    <path d="M14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5C13.38 9.5 14.5 10.62 14.5 12Z" fill="#00AC47"/>
+                    <path d="M16.5 9.5L19.5 7.5V16.5L16.5 14.5V9.5Z" fill="#00AC47"/>
+                    <rect x="5" y="8" width="12" height="8" rx="2" fill="none" stroke="#00AC47" stroke-width="1.5"/>
+                  </svg>
+                  Google Meet
+                  <!-- External link icon -->
+                  <svg class="ext-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </button>
+
+                <!-- Zoom -->
+                <button class="platform-btn" type="button" onclick="openPlatform('zoom')">
+                  <svg viewBox="0 0 24 24" fill="none" class="zoom-blue">
+                    <rect width="24" height="24" rx="4" fill="#E3F0FF"/>
+                    <rect x="4" y="8" width="12" height="8" rx="2" fill="#2D8CFF"/>
+                    <path d="M16.5 10L20 8V16L16.5 14V10Z" fill="#2D8CFF"/>
+                  </svg>
+                  Zoom
+                  <svg class="ext-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </button>
+
+                <!-- Teams -->
+                <button class="platform-btn" type="button" onclick="openPlatform('teams')">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <rect width="24" height="24" rx="4" fill="#EEF0FF"/>
+                    <rect x="6" y="9" width="8" height="7" rx="1.5" fill="#5B5EA6"/>
+                    <circle cx="16.5" cy="8.5" r="2.5" fill="#5B5EA6" opacity="0.7"/>
+                    <rect x="13" y="11" width="6" height="5" rx="1" fill="#5B5EA6" opacity="0.5"/>
+                  </svg>
+                  Teams
+                  <svg class="ext-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </button>
+
+              </div>
+
+              <!-- OR separator -->
+              <div style="display:flex; align-items:center; gap:8px; margin: 6px 0;">
+                <div style="flex:1; height:1px; background:var(--border);"></div>
+                <span style="font-size:11px; color:var(--muted-foreground); font-weight:500;">ou coller le lien</span>
+                <div style="flex:1; height:1px; background:var(--border);"></div>
+              </div>
+
+              <!-- Input field — 3 states -->
+
+              <!-- STATE 1: empty -->
+              <div id="state-empty">
+                <div class="video-input-wrapper">
+                  <input
+                    class="field-input"
+                    type="url"
+                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                    id="videoLinkInput"
+                    oninput="detectPlatform(this)"
+                  />
+                </div>
+                <div class="video-link-hint">
+                  <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                  Lien Zoom, Teams, Whereby, ou tout autre service de visioconférence
+                </div>
+              </div>
+
+              <!-- STATE 2: Meet detected -->
+              <div id="state-meet" style="display:none;">
+                <div class="video-input-wrapper">
+                  <!-- Meet icon in input -->
+                  <span class="video-input-platform-icon">
+                    <svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px">
+                      <path d="M14.5 12C14.5 13.38 13.38 14.5 12 14.5C10.62 14.5 9.5 13.38 9.5 12C9.5 10.62 10.62 9.5 12 9.5C13.38 9.5 14.5 10.62 14.5 12Z" fill="#00AC47"/>
+                      <path d="M16.5 9.5L19.5 7.5V16.5L16.5 14.5V9.5Z" fill="#00AC47"/>
+                      <rect x="5" y="8" width="12" height="8" rx="2" fill="none" stroke="#00AC47" stroke-width="1.5"/>
+                    </svg>
+                  </span>
+                  <input
+                    class="field-input detected has-value"
+                    type="url"
+                    value="https://meet.google.com/abc-defg-hij"
+                    style="padding-left: 36px;"
+                  />
+                  <button class="video-input-clear" type="button">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <div class="video-link-hint">
+                  <span class="video-link-detected-badge">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:10px;height:10px"><path d="M5 13l4 4L19 7"/></svg>
+                    Google Meet détecté
+                  </span>
+                  <span style="margin-left: 4px;">Le lien sera joint à l'invitation calendrier.</span>
+                </div>
+              </div>
+
+              <!-- STATE 3: Zoom detected -->
+              <div id="state-zoom" style="display:none;">
+                <div class="video-input-wrapper">
+                  <!-- Zoom icon in input -->
+                  <span class="video-input-platform-icon">
+                    <svg viewBox="0 0 24 24" fill="none" style="width:15px;height:15px">
+                      <rect x="2" y="7" width="14" height="10" rx="2" fill="#2D8CFF"/>
+                      <path d="M16 10.5L21 8V16L16 13.5V10.5Z" fill="#2D8CFF"/>
+                    </svg>
+                  </span>
+                  <input
+                    class="field-input detected has-value"
+                    type="url"
+                    value="https://zoom.us/j/98765432100"
+                    style="border-color: #2D8CFF; box-shadow: 0 0 0 3px rgba(45,140,255,0.1); padding-left: 36px;"
+                  />
+                  <button class="video-input-clear" type="button">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </div>
+                <div class="video-link-hint">
+                  <span class="video-link-detected-badge" style="background:rgba(45,140,255,0.08); color:#1a6fc4; border-color:rgba(45,140,255,0.2);">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="width:10px;height:10px"><path d="M5 13l4 4L19 7"/></svg>
+                    Zoom détecté
+                  </span>
+                  <span style="margin-left: 4px;">Le lien sera joint à l'invitation calendrier.</span>
+                </div>
+              </div>
+
+            </div>
+            <!-- END VIDEO LINK FIELD -->
+
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- Description -->
+        <div class="meta-row" style="cursor:default; align-items: flex-start;">
+          <div class="meta-icon" style="margin-top:2px;">
+            <svg fill="none" viewBox="0 0 24 24" stroke="#e8457a" stroke-width="2" style="width:16px;height:16px"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+          </div>
+          <div class="meta-content">
+            <div class="meta-label" style="margin-bottom:6px;">Description</div>
+            <textarea class="textarea-field" placeholder="Décrivez votre événement...">Rejoignez-nous pour explorer l'impact de l'IA générative sur la sobriété numérique. Atelier pratique, échanges et retours d'expérience.</textarea>
+          </div>
+        </div>
+
+        <div class="separator"></div>
+
+        <!-- Submit -->
+        <div class="btn-group">
+          <button class="btn btn-primary" style="flex:1;">Créer l'événement</button>
+          <button class="btn btn-outline">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </form>
+
+  <!-- ============================================================
+       DESIGN NOTES SECTION
+       ============================================================ -->
+  <div style="margin-top: 56px; border-top: 1px solid var(--border); padding-top: 32px;">
+    <h2 style="font-size:16px; font-weight:700; margin-bottom:20px;">Notes de design</h2>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Comportement</div>
+        <ul style="font-size:12px; color:var(--muted-foreground); line-height:1.9; padding-left:16px;">
+          <li>Les boutons ouvrent un <strong style="color:var(--foreground);">nouvel onglet</strong> vers la plateforme</li>
+          <li>L'organisateur crée le lien, le <strong style="color:var(--foreground);">copie-colle</strong> dans le champ</li>
+          <li>La <strong style="color:var(--foreground);">détection automatique</strong> lit le domaine de l'URL</li>
+          <li>L'icône plateforme s'affiche dans le champ si détecté</li>
+          <li>Le hint change : "sera joint à l'invitation calendrier"</li>
+        </ul>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Plateformes détectées</div>
+        <ul style="font-size:12px; color:var(--muted-foreground); line-height:1.9; padding-left:16px;">
+          <li><strong style="color:#00AC47;">meet.google.com</strong> → Google Meet</li>
+          <li><strong style="color:#2D8CFF;">zoom.us</strong> → Zoom</li>
+          <li><strong style="color:#5B5EA6;">teams.microsoft.com</strong> → Teams</li>
+          <li><strong style="color:var(--foreground);">Autres URLs</strong> → icône neutre, hint générique</li>
+        </ul>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">ICS — amélioration connexe</div>
+        <ul style="font-size:12px; color:var(--muted-foreground); line-height:1.9; padding-left:16px;">
+          <li>Actuellement : <code style="font-size:11px; background:var(--muted); padding:1px 4px; border-radius:3px;">LOCATION:En ligne</code> (bug)</li>
+          <li>Après fix : <code style="font-size:11px; background:var(--muted); padding:1px 4px; border-radius:3px;">LOCATION:https://meet.google.com/…</code></li>
+          <li>Bonus : propriété <code style="font-size:11px; background:var(--muted); padding:1px 4px; border-radius:3px;">CONFERENCE;FEATURE=VIDEO</code></li>
+          <li>→ bouton "Rejoindre" natif dans Google Calendar</li>
+        </ul>
+      </div>
+
+      <div style="background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px;">
+        <div style="font-size:12px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Implémentation</div>
+        <ul style="font-size:12px; color:var(--muted-foreground); line-height:1.9; padding-left:16px;">
+          <li>Modifier <strong style="color:var(--foreground);">moment-form-location-row.tsx</strong></li>
+          <li>Détecter le domaine via <code style="font-size:11px; background:var(--muted); padding:1px 4px; border-radius:3px;">new URL(value).hostname</code></li>
+          <li>Aucune API externe, aucun OAuth supplémentaire</li>
+          <li>Fix ICS : <strong style="color:var(--foreground);">generate-ics.ts</strong> + route <strong style="color:var(--foreground);">/api/moments/[slug]/calendar</strong></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// State switching
+function setState(state, btn) {
+  // Update tabs
+  document.querySelectorAll('.state-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Show/hide states
+  document.getElementById('state-empty').style.display = state === 'empty' ? '' : 'none';
+  document.getElementById('state-meet').style.display = state === 'meet' ? '' : 'none';
+  document.getElementById('state-zoom').style.display = state === 'zoom' ? '' : 'none';
+}
+
+// Simulate opening platform (mockup — no navigation)
+function openPlatform(platform) {
+  const messages = {
+    meet: '→ Ouvrirait meet.google.com/new dans un nouvel onglet.\nL\'organisateur crée la réunion et colle le lien.',
+    zoom: '→ Ouvrirait zoom.us/meeting/schedule dans un nouvel onglet.',
+    teams: '→ Ouvrirait teams.microsoft.com dans un nouvel onglet.'
+  };
+  alert(messages[platform]);
+}
+
+// Detect platform from URL input
+function detectPlatform(input) {
+  const value = input.value.trim();
+  if (!value) return;
+  try {
+    const hostname = new URL(value).hostname;
+    if (hostname.includes('meet.google.com')) {
+      alert('Détection simulée : Google Meet. Dans l\'app réelle, l\'icône Meet apparaîtrait dans le champ.');
+    } else if (hostname.includes('zoom.us')) {
+      alert('Détection simulée : Zoom.');
+    } else if (hostname.includes('teams.microsoft.com')) {
+      alert('Détection simulée : Teams.');
+    }
+  } catch(e) { /* URL pas encore valide */ }
+}
+</script>
+</body>
+</html>

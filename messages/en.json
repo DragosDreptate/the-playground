@@ -97,13 +97,31 @@
       "title": "Discover Communities",
       "description": "Explore public communities and join the ones that match your interests.",
       "cta": "Explore"
+    },
+    "modeChoice": {
+      "greetingPrefix": "Welcome,",
+      "greetingSuffix": "What do you want to do?",
+      "greetingAnonymous": "Welcome — what do you want to do?",
+      "subtitle": "Choose your default mode. You can change it at any time.",
+      "participant": {
+        "title": "I participate",
+        "description": "Discover and join events that inspire me"
+      },
+      "organizer": {
+        "title": "I organize",
+        "description": "Create my community and host events"
+      },
+      "hint": "You can switch modes at any time from your dashboard."
     }
   },
   "Dashboard": {
     "title": "Dashboard",
     "myCircles": "My Communities",
+    "myCirclesOrganizer": "My Communities",
     "createCircle": "Create a Community",
     "createMoment": "Create an Event",
+    "createCircleFirst": "Create a Community first",
+    "selectCircleDropdown": "Which Community?",
     "selectCircle": {
       "title": "Choose a Community",
       "description": "Which Community should this Event belong to?"
@@ -113,16 +131,22 @@
       "description": "You need a Community before creating an Event."
     },
     "myMoments": "My Events",
+    "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
     "pastMoments": "Past",
     "noUpcomingMoments": "No upcoming Events.",
     "noMoments": "No Events yet.",
     "noMomentsHint": "Join an Event or create your community.",
+    "noMomentsHintExplore": "Explore events →",
+    "noMomentsOrganizer": "No Events organized yet.",
+    "noMomentsOrganizerHint": "Create your first Event from a Community.",
     "emptyCircles": "You're not a member of any Community.",
     "emptyCirclesHint": "Create a Community or join an Event to become a member of one.",
+    "noCirclesOrganizer": "You don't organize any Community yet.",
+    "noCirclesOrganizerHint": "Create your first Community to get started.",
     "noCirclesMember": "You are not a member of any Community yet.",
     "role": {
-      "host": "Host",
+      "host": "Organizer",
       "player": "Member"
     },
     "registrationStatus": {
@@ -135,7 +159,12 @@
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
     "greetingSubtitle": "Your Communities and upcoming Events, all in one place.",
-    "memberCount": "{count} members"
+    "greetingSubtitleOrganizer": "Manage your Communities and Events.",
+    "memberCount": "{count} members",
+    "modeParticipant": "Member",
+    "modeOrganizer": "Organizer",
+    "modeBadgeParticipant": "Member view",
+    "modeBadgeOrganizer": "Organizer view"
   },
   "Circle": {
     "create": {

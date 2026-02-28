@@ -75,6 +75,7 @@
 | **Email alerte Organisateur : nouveau follower** : `host-new-follower` template, `sendHostNewFollower` sur `EmailService`, déclenché depuis `followCircleAction`, respecte la préférence `notifyNewFollower`, fire-and-forget. | 2026-02-24 | — |
 | **Préférences de notifications email** : 4 booléens sur `User` (`notifyNewRegistration`, `notifyNewComment`, `notifyNewFollower`, `notifyNewMomentInCircle`), usecase `updateNotificationPreferences`, server action dans `profile.ts`, section "Notifications" sur `/dashboard/profile` avec toggles `Switch`, i18n FR/EN `Profile.notifications.*`. | 2026-02-24 | — |
 | **Export CSV des inscrits** : bouton "Exporter CSV" sur la vue Organisateur d'un événement (`RegistrationsList`), client-side avec BOM UTF-8, colonnes prénom/nom/email/statut/date. i18n `Moment.registrations.exportCsv` + `Moment.registrations.csvHeaders.*`. | 2026-02-24 | — |
+| **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
 
 ---
 
@@ -169,25 +170,33 @@
 #### Onboarding Organisateur — time-to-first-event (parcours G)
 
 - [ ] **Guide onboarding Organisateur débutant** (gap H-7)
-  - Dashboard vide (nouveau user, aucune Communauté) : remplacer le simple bouton "Créer une Communauté"
-  - Proposition : stepper 3 étapes — "Créez votre Communauté → Créez votre premier événement → Partagez le lien"
+  - Stepper 3 étapes — "Créez votre Communauté → Créez votre premier événement → Partagez le lien"
   - Objectif : réduire le time-to-first-event à < 5 minutes
+  - Note : le mode choice de la welcome page (`J'organise`) oriente déjà l'Organisateur débutant, mais sans guide pas-à-pas
 
-- [ ] **CTA "Devenir organisateur" pour Participants** (gap H-5)
-  - Sur le dashboard d'un Participant sans Communauté : lien/bouton "Vous voulez organiser ? Créez votre Communauté"
-  - Actuellement invisible pour un Participant qui découvre la plateforme via un événement
+- [x] **CTA "Devenir organisateur" pour Participants** (gap H-5) ✅
+  - Adressé par le Dashboard Mode Switcher : le pill "Organisateur" est visible pour tous les utilisateurs, même sans Communauté
+  - En mode Organisateur sans Communauté : CTA "Créer une Communauté d'abord" → `/dashboard/circles/new`
 
 #### Accueil utilisateur direct — sans lien d'entrée
 
 > Un utilisateur qui s'inscrit sans lien d'événement ni de Communauté ne sait pas où aller.
 > Le dashboard vide est silencieux — il faut l'orienter activement.
 
-- [x] **Page de bienvenue \****`/dashboard/welcome`** ✅
-  - **Trigger** : accès à `/dashboard/welcome` si l'utilisateur n'a aucune activité (aucune Communauté créée, aucune Registration). Redirect vers `/dashboard` si activité détectée.
-  - **Persistance basée sur l'état** — pas de flag DB. La page redirige vers `/dashboard` dès qu'il a une Communauté ou une Registration.
-  - **Contenu** : message d'accueil personnalisé (prénom) + 2 cartes CTA :
-    1. **Créer ma Communauté** (`default` / primary) → `/dashboard/circles/new`
-    2. **Découvrir des Communautés** (`outline`) → `/explorer`
+- [x] **Dashboard Mode Switcher + Page de bienvenue `/dashboard/welcome`** ✅
+  - **Enum `DashboardMode`** (`PARTICIPANT` / `ORGANIZER`) sur `User` (DB + domaine + session)
+  - **Usecases** : `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`
+  - **Server action** : `setDashboardModeAction` (`src/app/actions/dashboard.ts`)
+  - **Composants** : `DashboardModeSwitcher` (pill switcher client), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover sélection Communauté)
+  - **Dashboard content** : filtrage par mode — vue Participant (événements où inscrit) vs vue Organisateur (événements créés, variante `organizer` de `DashboardMomentCard`)
+  - **CTA adaptatif** en mode Organisateur : 0 Communauté → "Créer une Communauté d'abord", 1 Communauté → lien direct, 2+ → dropdown Popover
+  - **SiteHeader / MobileNav** : `dashboardHref` conditionnel (conserve le mode actif via URL param)
+  - **Homepage** : CTAs hero et section finale → `/dashboard/circles/new` si connecté
+  - **Welcome page redesignée** — deux cartes cliquables ("Je participe" / "J'organise") avec `setDashboardMode` immédiat et redirect vers `/dashboard`
+  - **Trigger welcome** : redirect vers `/dashboard/welcome` uniquement si `dashboardMode === null` ET aucune activité (pas de Communauté, pas d'inscription). Logique dans `shouldRedirectToWelcome` (`src/lib/dashboard.ts`)
+  - **Persistance** : `dashboardMode` en DB + en session Auth.js. Bascule via URL param `?mode=participant|organizer` + `setDashboardModeAction` en background (fire-and-forget)
+  - **Demo data** : `thomas@demo.playground` ajouté (user "blank slate" avec `dashboardMode: null` — permet de tester le flux welcome page)
+  - **Tests** : 19 tests unitaires `lib/__tests__/dashboard.test.ts` (règle `shouldRedirectToWelcome`, table de vérité exhaustive) + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests — switcher, CTAs, persistence URL, redirect welcome)
   - **Phase 2 — hors scope MVP** : email de re-engagement si N jours sans activité après le welcome
 
 #### Gestion des inscriptions Organisateur (parcours E)
@@ -327,9 +336,9 @@
   - Solution : Upstash Rate Limit (Redis serverless, compatible Vercel Edge)
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
-- [x] **Tests unitaires complets** — 425 tests, 54 fichiers, tous usecases couverts (29 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 447 tests, 55 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (99 tests dédiés sécurité) ✅
-- [ ] **Tests E2E Playwright** — 8 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore). `onboarding.spec.ts` : 6/6 green. Les 7 autres à brancher sur environnement de test.
+- [x] **Tests E2E Playwright** — 72 tests, 9 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
 - [ ] **Accessibilité axe-core** dans Playwright
 
 - [ ] **Bundle analyzer** (`@next/bundle-analyzer`)
@@ -432,3 +441,8 @@
 | 2026-02-23 | CoverImagePicker — photos d'ouverture = **random Unsplash** (8 thématiques fixes : technology, design studio, business meeting, fitness sport, art painting, science laboratory, community people, nature landscape). Route `/api/unsplash/random` : 8 appels `/photos/random` en parallèle. Résultat mis en cache côté composant (pas de re-fetch aux réouvertures). Abandonne les photos curées statiques par catégorie (fragiles, non représentatives). |
 | 2026-02-23 | CoverImagePicker — **Radix UI mode contrôlé** : en mode `open` contrôlé, changer l'état `open` programmatiquement via `setOpen(false)` ne déclenche PAS le callback `onOpenChange`. Pour garantir le reset de l'état interne, toujours passer par la fonction `handleOpenChange`. Règle : `handleApply` et `handleRemove` appellent `handleOpenChange(false)`, jamais `setOpen(false)` directement. |
 | 2026-02-23 | CoverImagePicker — **pagination search** : navigation prev/next (remplace les photos en place) plutôt qu'un "Voir plus" (qui agrandissait la modale). Le param `page` est propagé à la route `/api/unsplash/search`. |
+| 2026-02-28 | **Dashboard Mode Switcher** : enum `DashboardMode` (`PARTICIPANT` / `ORGANIZER`) sur `User`. Persisté en DB et en session Auth.js. Pill switcher dans le header du dashboard (client component). Le mode contrôle le contenu affiché (vue Participant = événements inscrits / vue Organisateur = événements créés + CTAs). Transition via URL param `?mode=participant\|organizer` + `setDashboardModeAction` en background. |
+| 2026-02-28 | **Welcome page redesignée** : deux cartes cliquables ("Je participe" / "J'organise") remplacent les deux cartes CTA statiques ("Créer ma Communauté" / "Découvrir des Communautés"). Le choix persiste en DB. Trigger : `dashboardMode === null` ET aucune activité. Utilisateurs existants avec activité mais sans mode → PARTICIPANT par défaut (évite boucle infinie). |
+| 2026-02-28 | **CTA Créer un événement adaptatif** : `CreateMomentButton` (Server Component) adapte le CTA selon le nombre de Communautés hébergées — 0 → redirect `/circles/new`, 1 → lien direct, 2+ → `CreateMomentDropdown` (Popover). |
+| 2026-02-28 | **Infrastructure E2E — globalTeardown** : `tests/e2e/global-teardown.ts` ajouté dans `playwright.config.ts`. Nettoyage propre des données `@test.playground` après chaque run E2E (Moments → Circles → Users, dans l'ordre des contraintes FK). Le prochain run repart d'un état propre via `globalSetup`. |
+| 2026-02-28 | **Données démo enrichies** : `thomas@demo.playground` ajouté dans `db-seed-demo-data.ts` — user "blank slate" avec `dashboardMode: null` (reset à chaque run du seed). Permet de tester le flux welcome page en prod sans créer un compte. |
