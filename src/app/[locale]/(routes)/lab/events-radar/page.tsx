@@ -137,39 +137,46 @@ export default function EventsRadarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-zinc-950">
       <div className="mx-auto max-w-4xl px-4 py-12">
 
         {/* Header */}
         <div className="mb-8">
           <div className="mb-2 flex items-center gap-2">
             <Radio className="text-primary size-4" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
               Lab — POC
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-zinc-900">
+          <h1 className="text-2xl font-bold text-zinc-100">
             Radar d&apos;événements
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Agent IA — Luma + Meetup via Claude · <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">/lab/events-radar</code>
+            Agent IA — Luma + Meetup via Claude ·{" "}
+            <code className="rounded bg-zinc-800 px-1 py-0.5 text-xs text-zinc-300">
+              /lab/events-radar
+            </code>
           </p>
         </div>
 
         {/* Formulaire */}
-        <div className="mb-6 rounded-xl border border-zinc-200 bg-white p-6">
+        <div className="mb-6 rounded-xl border border-zinc-800 bg-zinc-900 p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
 
               <div className="space-y-1.5">
-                <Label>Ville</Label>
+                <Label className="text-zinc-300">Ville</Label>
                 <Select value={ville} onValueChange={setVille}>
-                  <SelectTrigger>
+                  <SelectTrigger className="border-zinc-700 bg-zinc-800 text-zinc-100 focus:ring-zinc-600">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="border-zinc-700 bg-zinc-800">
                     {CITIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
+                      <SelectItem
+                        key={c.value}
+                        value={c.value}
+                        className="text-zinc-100 focus:bg-zinc-700 focus:text-zinc-100"
+                      >
                         {c.label}
                       </SelectItem>
                     ))}
@@ -178,7 +185,7 @@ export default function EventsRadarPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label>Du</Label>
+                <Label className="text-zinc-300">Du</Label>
                 <Input
                   type="date"
                   value={dateFrom}
@@ -187,26 +194,28 @@ export default function EventsRadarPage() {
                     if (dateTo && e.target.value > dateTo) setDateTo(e.target.value);
                   }}
                   required
+                  className="border-zinc-700 bg-zinc-800 text-zinc-100 [color-scheme:dark] focus-visible:ring-zinc-600"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label>Au</Label>
+                <Label className="text-zinc-300">Au</Label>
                 <Input
                   type="date"
                   value={dateTo}
                   min={dateFrom}
                   onChange={(e) => setDateTo(e.target.value)}
-                  placeholder={dateFrom}
+                  className="border-zinc-700 bg-zinc-800 text-zinc-100 [color-scheme:dark] focus-visible:ring-zinc-600"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label>Mots-clés</Label>
+                <Label className="text-zinc-300">Mots-clés</Label>
                 <Input
                   value={keywords}
                   onChange={(e) => setKeywords(e.target.value)}
                   placeholder="tech, startup, design…"
+                  className="border-zinc-700 bg-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus-visible:ring-zinc-600"
                 />
               </div>
             </div>
@@ -226,7 +235,7 @@ export default function EventsRadarPage() {
 
         {/* Console de l'agent (streaming) */}
         {logs.length > 0 && (
-          <div className="mb-6 max-h-52 overflow-y-auto rounded-xl bg-zinc-900 p-4 font-mono text-xs">
+          <div className="mb-6 max-h-52 overflow-y-auto rounded-xl bg-black p-4 font-mono text-xs">
             {logs.map((log, i) => (
               <div key={i} className="text-zinc-300">
                 <span className="mr-2 text-zinc-600">›</span>
@@ -235,7 +244,7 @@ export default function EventsRadarPage() {
             ))}
             {isLoading && (
               <div className="animate-pulse text-zinc-500">
-                <span className="mr-2">›</span>En attente de Claude…
+                <span className="mr-2">›</span>En attente…
               </div>
             )}
           </div>
@@ -243,7 +252,7 @@ export default function EventsRadarPage() {
 
         {/* Erreur */}
         {error && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <div className="mb-6 rounded-xl border border-red-900 bg-red-950 p-4 text-sm text-red-400">
             {error}
           </div>
         )}
@@ -262,7 +271,7 @@ export default function EventsRadarPage() {
         )}
 
         {!isLoading && events.length === 0 && logs.length > 0 && !error && (
-          <div className="py-16 text-center text-sm text-zinc-400">
+          <div className="py-16 text-center text-sm text-zinc-600">
             Aucun événement trouvé pour ces critères.
           </div>
         )}
@@ -274,16 +283,26 @@ export default function EventsRadarPage() {
 
 // --- Composant carte ---
 
+const SOURCE_COLORS: Record<string, string> = {
+  luma: "border-violet-800 text-violet-400",
+  meetup: "border-red-800 text-red-400",
+};
+
 function EventCard({ event }: { event: EventResult }) {
+  const sourceBadgeClass = SOURCE_COLORS[event.source] ?? "border-zinc-700 text-zinc-400";
+
   return (
-    <div className="flex flex-col rounded-xl border border-zinc-200 bg-white p-4 transition-colors hover:border-zinc-300">
+    <div className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900 p-4 transition-colors hover:border-zinc-700">
 
       {/* Header */}
       <div className="mb-3 flex items-start justify-between gap-2">
-        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-100">
           {event.title}
         </h3>
-        <Badge variant="outline" className="shrink-0 text-[10px] capitalize">
+        <Badge
+          variant="outline"
+          className={`shrink-0 text-[10px] capitalize ${sourceBadgeClass}`}
+        >
           {event.source}
         </Badge>
       </div>
@@ -291,7 +310,7 @@ function EventCard({ event }: { event: EventResult }) {
       {/* Métadonnées */}
       <div className="mb-3 space-y-1">
         {(event.date || event.time) && (
-          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
             <Calendar className="size-3 shrink-0" />
             <span>
               {event.date}
@@ -305,7 +324,7 @@ function EventCard({ event }: { event: EventResult }) {
           </div>
         )}
         {event.location && (
-          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
             <MapPin className="size-3 shrink-0" />
             <span className="line-clamp-1">{event.location}</span>
           </div>
@@ -314,7 +333,7 @@ function EventCard({ event }: { event: EventResult }) {
 
       {/* Description */}
       {event.description && (
-        <p className="mb-3 line-clamp-2 text-xs text-zinc-400">
+        <p className="mb-3 line-clamp-2 text-xs text-zinc-500">
           {event.description}
         </p>
       )}
