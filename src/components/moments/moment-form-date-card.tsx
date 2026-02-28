@@ -259,6 +259,7 @@ function DatePickerButton({
         <Calendar
           mode="single"
           selected={date}
+          defaultMonth={date ?? new Date()}
           onSelect={onSelect}
           locale={locale}
           disabled={disabledBefore ? { before: disabledBefore } : undefined}
