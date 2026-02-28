@@ -25,7 +25,7 @@ test.describe("Liste d'attente — affichage Moment complet (non inscrit)", () =
       .filter({ hasText: /liste d'attente|waitlist/i })
       .first();
 
-    await expect(fullBadge.or(waitlistBtn)).toBeVisible({ timeout: 8_000 });
+    await expect(fullBadge.or(waitlistBtn).first()).toBeVisible({ timeout: 8_000 });
   });
 });
 
