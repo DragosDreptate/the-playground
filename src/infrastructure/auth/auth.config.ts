@@ -10,6 +10,9 @@ import { isUploadedUrl } from "@/lib/blob";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
+  // Nécessaire sur Vercel (preview + prod) : fait confiance au header X-Forwarded-Host
+  // du proxy Vercel, ce qui évite l'erreur "UntrustedHost" sur les URLs preview dynamiques.
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     GitHub,
