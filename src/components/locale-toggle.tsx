@@ -16,11 +16,15 @@ import { useTransition } from "react";
 const localeShort: Record<string, string> = {
   fr: "FR",
   en: "EN",
+  es: "ES",
+  ro: "RO",
 };
 
 const localeFull: Record<string, string> = {
   fr: "Français",
   en: "English",
+  es: "Español",
+  ro: "Română",
 };
 
 export function LocaleToggle() {

@@ -1,0 +1,804 @@
+{
+  "HomePage": {
+    "title": "The Playground",
+    "heroHighlight1": "Lanza",
+    "heroRest1": "tu comunidad.",
+    "heroHighlight2": "Organiza",
+    "heroRest2": "tus eventos.",
+    "heroHighlight3": "Anima",
+    "heroRest3": "tu red.",
+    "heroSubtitle": "La plataforma gratuita para construir tu comunidad y organizar eventos inolvidables.",
+    "cta": "Lanza tu comunidad",
+    "mockupCircleName": "Product & IA",
+    "mockupAboutText": "La comunidad para entusiastas del Producto en la era de la IA.",
+    "mockupCreatedDate": "21 feb. 2026",
+    "mockupMomentDay": "Vie",
+    "mockupMomentDate": "27 feb.",
+    "mockupMomentTime": "19:00",
+    "mockupMomentTitle": "Design Drinks #12",
+    "mockupMomentLocation": "The Counter",
+    "mockupMomentAttendees": "8 inscritos",
+    "howItWorks": "Cómo funciona",
+    "step1Title": "Crea tu Comunidad",
+    "step1Description": "Tu espacio comunitario en 30 segundos. Público o privado, tú decides.",
+    "step2Title": "Lanza tus Eventos",
+    "step2Description": "Cada Evento tiene una página premium y compartible. Un enlace, y ya estás en línea.",
+    "step3Title": "Ve crecer tu Comunidad",
+    "step3Description": "Los miembros permanecen en tu Comunidad y vuelven para los próximos Eventos.",
+    "pillarsHeading": "Lo que hace diferente a The Playground",
+    "pillar1Title": "Comunidad primero",
+    "pillar1Description": "Tus miembros permanecen entre Eventos. Sin más audiencias de una sola vez.",
+    "pillar2Title": "Diseño premium",
+    "pillar2Description": "Páginas elegantes, sin esfuerzo. Tu Comunidad impresiona desde el primer día.",
+    "pillar3Title": "100% gratuito",
+    "pillar3Description": "Sin comisiones, sin suscripción. Solo las tarifas de Stripe en eventos de pago.",
+    "ctaFinalTitle": "¿Listo para lanzar tu comunidad?",
+    "ctaFinalSubtitle": "Crea tu Comunidad en 30 segundos. Gratis, para siempre.",
+    "ctaFinal": "Empezar gratis",
+    "ctaExplore": "Explorar",
+    "heroFamiliar1": "comunidad",
+    "heroFamiliar2": "eventos",
+    "heroBranded1": "Comunidad",
+    "heroBranded2": "Eventos",
+    "heroRestPrefix1": "tu",
+    "heroRestPrefix2": "tus"
+  },
+  "Common": {
+    "loading": "Cargando...",
+    "error": "Se ha producido un error",
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "create": "Crear",
+    "edit": "Editar",
+    "public": "Público",
+    "private": "Privado",
+    "showMore": "Ver más",
+    "showLess": "Ver menos"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Iniciar sesión",
+      "subtitle": "Inicia sesión para continuar",
+      "google": "Continuar con Google",
+      "github": "Continuar con GitHub",
+      "emailPlaceholder": "tu@email.com",
+      "magicLink": "Enviar enlace mágico",
+      "or": "o",
+      "linkedin": "Continuar con LinkedIn"
+    },
+    "verifyRequest": {
+      "title": "Comprueba tu correo",
+      "description": "Se ha enviado un enlace de acceso a tu dirección de correo. Haz clic para iniciar sesión."
+    },
+    "error": {
+      "title": "Error de autenticación",
+      "backToSignIn": "Volver al inicio de sesión"
+    },
+    "errors": {
+      "Configuration": "Error de configuración del servidor.",
+      "AccessDenied": "Acceso denegado.",
+      "Verification": "El enlace de verificación ha expirado o ya ha sido utilizado.",
+      "Default": "Se ha producido un error al iniciar sesión."
+    },
+    "signOut": "Cerrar sesión"
+  },
+  "Welcome": {
+    "greeting": "Hola {name} 👋",
+    "greetingAnonymous": "Bienvenido a The Playground 👋",
+    "subtitle": "¿Qué quieres hacer primero?",
+    "createCircle": {
+      "title": "Crear mi Comunidad",
+      "description": "Lanza tu comunidad, invita a tus miembros y organiza tus eventos.",
+      "cta": "Empezar"
+    },
+    "explore": {
+      "title": "Descubrir Comunidades",
+      "description": "Explora comunidades públicas y únete a las que coincidan con tus intereses.",
+      "cta": "Explorar"
+    },
+    "modeChoice": {
+      "greetingPrefix": "Bienvenido,",
+      "greetingSuffix": "¿Qué quieres hacer?",
+      "greetingAnonymous": "Bienvenido — ¿qué quieres hacer?",
+      "subtitle": "Elige tu modo predeterminado. Puedes cambiarlo en cualquier momento.",
+      "participant": {
+        "title": "Participo",
+        "description": "Descubrir y unirme a eventos que me inspiran"
+      },
+      "organizer": {
+        "title": "Organizo",
+        "description": "Crear mi comunidad y organizar eventos"
+      },
+      "hint": "Puedes cambiar de modo en cualquier momento desde tu panel."
+    }
+  },
+  "Dashboard": {
+    "title": "Panel",
+    "myCircles": "Mis Comunidades",
+    "myCirclesOrganizer": "Mis Comunidades",
+    "createCircle": "Crear una Comunidad",
+    "createMoment": "Crear un Evento",
+    "createCircleFirst": "Crea primero una Comunidad",
+    "selectCircleDropdown": "¿Qué Comunidad?",
+    "selectCircle": {
+      "title": "Elige una Comunidad",
+      "description": "¿A qué Comunidad debe pertenecer este Evento?"
+    },
+    "noCircles": {
+      "title": "Crea primero una Comunidad",
+      "description": "Necesitas una Comunidad antes de crear un Evento."
+    },
+    "myMoments": "Mis Eventos",
+    "myMomentsOrganizer": "Mis Eventos",
+    "upcomingMoments": "Mis próximos Eventos",
+    "pastMoments": "Pasados",
+    "noUpcomingMoments": "Sin próximos Eventos.",
+    "noMoments": "Sin Eventos aún.",
+    "noMomentsHint": "Únete a un Evento o crea tu comunidad.",
+    "noMomentsHintExplore": "Explorar eventos →",
+    "noMomentsOrganizer": "Sin Eventos organizados aún.",
+    "noMomentsOrganizerHint": "Crea tu primer Evento desde una Comunidad.",
+    "emptyCircles": "No eres miembro de ninguna Comunidad.",
+    "emptyCirclesHint": "Crea una Comunidad o únete a un Evento para ser miembro de una.",
+    "noCirclesOrganizer": "Aún no organizas ninguna Comunidad.",
+    "noCirclesOrganizerHint": "Crea tu primera Comunidad para empezar.",
+    "noCirclesMember": "Aún no eres miembro de ninguna Comunidad.",
+    "role": {
+      "host": "Organizador",
+      "player": "Miembro"
+    },
+    "registrationStatus": {
+      "registered": "Inscrito",
+      "waitlisted": "En lista de espera"
+    },
+    "online": "En línea",
+    "hybrid": "Híbrido",
+    "hostTools": "Herramientas del organizador",
+    "greeting": "Hola, {name}",
+    "greetingAnonymous": "Hola",
+    "greetingSubtitle": "Tus Comunidades y próximos Eventos, todo en un lugar.",
+    "greetingSubtitleOrganizer": "Gestiona tus Comunidades y Eventos.",
+    "memberCount": "{count} miembros",
+    "modeParticipant": "Miembro",
+    "modeOrganizer": "Organizador",
+    "modeBadgeParticipant": "Vista de miembro",
+    "modeBadgeOrganizer": "Vista de organizador"
+  },
+  "Circle": {
+    "create": {
+      "title": "Crear una Comunidad",
+      "description": "Configura tu espacio comunitario"
+    },
+    "edit": {
+      "title": "Editar Comunidad",
+      "description": "Actualiza la configuración de tu Comunidad"
+    },
+    "form": {
+      "coverImage": "Imagen de portada",
+      "name": "Nombre",
+      "namePlaceholder": "Mi increíble comunidad",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Cuéntale a la gente de qué trata tu Comunidad...",
+      "visibility": "Visibilidad",
+      "visibilityPublic": "Pública — cualquiera puede descubrir esta Comunidad",
+      "visibilityPrivate": "Privada — solo accesible por invitación",
+      "category": "Categoría",
+      "categoryPlaceholder": "Elige una categoría",
+      "city": "Ciudad",
+      "cityPlaceholder": "Madrid, Barcelona, Remoto..."
+    },
+    "delete": {
+      "title": "Eliminar Comunidad",
+      "description": "¿Estás seguro de que quieres eliminar esta Comunidad? Esta acción no se puede deshacer. Todos los Eventos y membresías se eliminarán permanentemente.",
+      "confirm": "Sí, eliminar esta Comunidad"
+    },
+    "detail": {
+      "members": "Miembros",
+      "moments": "Eventos",
+      "settings": "Configuración",
+      "editCircle": "Editar",
+      "deleteCircle": "Eliminar",
+      "created": "Creado el",
+      "hosts": "Organizadores",
+      "hostedBy": "Organizado por",
+      "about": "Acerca de",
+      "visibility": "Visibilidad",
+      "publicCircle": "Comunidad pública",
+      "privateCircle": "Comunidad privada",
+      "memberCount": "{count} miembros",
+      "upcomingMoments": "Próximos Eventos",
+      "pastMoments": "Eventos pasados",
+      "noUpcomingMoments": "Sin próximos Eventos.",
+      "noPastMoments": "Sin Eventos pasados.",
+      "today": "Hoy",
+      "manageMoment": "Gestionar este Evento",
+      "follow": "Seguir",
+      "unfollow": "Dejar de seguir",
+      "following": "Siguiendo",
+      "isMember": "Eres miembro",
+      "isHost": "Eres Organizador",
+      "manageCircle": "Gestionar esta Comunidad",
+      "shareableLink": "Enlace compartible"
+    },
+    "errors": {
+      "notFound": "Comunidad no encontrada",
+      "unauthorized": "No tienes permiso para realizar esta acción",
+      "createFailed": "Error al crear la Comunidad",
+      "updateFailed": "Error al actualizar la Comunidad",
+      "deleteFailed": "Error al eliminar la Comunidad"
+    }
+  },
+  "Moment": {
+    "create": {
+      "title": "Crear un Evento",
+      "description": "Configura tu evento"
+    },
+    "edit": {
+      "title": "Editar Evento",
+      "description": "Actualiza los detalles de tu evento"
+    },
+    "form": {
+      "title": "Título",
+      "eventName": "Nombre del evento",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Cuéntale a la gente de qué trata este Evento...",
+      "addLocation": "Añadir ubicación del evento",
+      "addLocationHint": "Lugar físico o enlace virtual",
+      "addDescription": "Añadir una descripción",
+      "locationType": "Tipo de ubicación",
+      "locationInPerson": "Presencial",
+      "locationOnline": "En línea",
+      "locationHybrid": "Híbrido",
+      "locationName": "Nombre del lugar",
+      "locationNamePlaceholder": "Café Central",
+      "locationAddress": "Dirección",
+      "locationAddressPlaceholder": "Calle Mayor 123, Madrid",
+      "videoLink": "Enlace de video",
+      "videoLinkPlaceholder": "https://meet.google.com/...",
+      "videoLinkOr": "o pega el enlace",
+      "eventOptions": "Opciones del evento",
+      "ticketPrice": "Precio de entrada",
+      "priceSoon": "Próximamente",
+      "free": "Gratis",
+      "capacity": "Capacidad",
+      "capacityLabel": "Capacidad",
+      "unlimited": "Ilimitada",
+      "capacityPlaceholder": "Dejar vacío para ilimitada",
+      "price": "Precio (en céntimos)",
+      "pricePlaceholder": "0",
+      "priceHint": "En céntimos. 1500 = 15,00. Dejar 0 para gratis.",
+      "currency": "Moneda",
+      "status": "Estado",
+      "startLabel": "Inicio",
+      "endLabel": "Fin",
+      "pickDate": "Elige una fecha",
+      "endBeforeStart": "La fecha de fin debe ser posterior a la fecha de inicio.",
+      "createMoment": "Publicar"
+    },
+    "delete": {
+      "title": "Eliminar Evento",
+      "description": "¿Estás seguro de que quieres eliminar este Evento? Esta acción no se puede deshacer. Todas las inscripciones se eliminarán permanentemente.",
+      "confirm": "Sí, eliminar este Evento"
+    },
+    "detail": {
+      "when": "Cuándo",
+      "where": "Dónde",
+      "capacity": "Capacidad",
+      "price": "Precio",
+      "created": "Creado",
+      "shareableLink": "Enlace compartible"
+    },
+    "status": {
+      "published": "Publicado",
+      "cancelled": "Cancelado",
+      "past": "Pasado"
+    },
+    "public": {
+      "hostedBy": "Organizado por",
+      "free": "Gratis",
+      "spotsAvailable": "{count} plazas",
+      "registerFree": "Inscribirse",
+      "registerPaid": "Inscribirse — {price} {currency}",
+      "comingSoon": "Próximamente",
+      "registered": "Inscrito",
+      "waitlisted": "En lista de espera",
+      "joinWaitlist": "Unirse a la lista de espera",
+      "cancelRegistration": "Cancelar mi inscripción",
+      "cancelConfirmTitle": "Cancelar inscripción",
+      "cancelConfirmDescription": "¿Estás seguro de que quieres cancelar tu inscripción a este Evento?",
+      "confirmCancel": "Sí, cancelar",
+      "spotsRemaining": "{count} plazas restantes",
+      "signInToRegister": "Inscribirse",
+      "registrantsCount": "{count} inscritos",
+      "eventFull": "Completo",
+      "attendeesCount": "{count} miembro(s)",
+      "about": "Acerca de",
+      "viewOnMap": "Ver en Google Maps",
+      "eventTookPlace": "Este evento tuvo lugar el",
+      "eventEnded": "Evento finalizado",
+      "eventCancelled": "Evento cancelado",
+      "attendedCount": "{count} miembros asistieron",
+      "viewCircleMoments": "Ver próximos Eventos de esta Comunidad",
+      "upcomingInCircle": "También en esta Comunidad",
+      "seeAllCircleEvents": "Ver todos los eventos",
+      "addToCalendar": {
+        "label": "Añadir al calendario",
+        "google": "Google Calendar",
+        "ics": "Archivo .ics"
+      },
+      "waitlistPosition": "Estás en el puesto #{position} de la lista de espera"
+    },
+    "registrations": {
+      "title": "Asistentes",
+      "registered": "{count} inscritos",
+      "waitlisted": "{count} en lista de espera",
+      "capacity": "{count} plazas",
+      "empty": "Nadie se ha inscrito aún.",
+      "status": {
+        "registered": "Inscrito",
+        "waitlisted": "En lista de espera"
+      },
+      "exportCsv": "Exportar CSV",
+      "csvHeaders": {
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "email": "Correo electrónico",
+        "status": "Estado",
+        "registeredAt": "Fecha de inscripción"
+      }
+    },
+    "comments": {
+      "title": "Comentarios",
+      "count": "{count} comentario(s)",
+      "empty": "Sin comentarios aún. ¡Sé el primero en decir algo!",
+      "placeholder": "Comparte tus opiniones...",
+      "placeholderPast": "Gracias, fotos, comentarios... ¡compártelo!",
+      "submit": "Publicar",
+      "signInToComment": "Inicia sesión para comentar",
+      "deleteTitle": "Eliminar comentario",
+      "deleteDescription": "¿Estás seguro de que quieres eliminar este comentario? Esta acción no se puede deshacer.",
+      "confirmDelete": "Sí, eliminar",
+      "justNow": "Ahora mismo",
+      "minutesAgo": "Hace {count}min",
+      "hoursAgo": "Hace {count}h",
+      "daysAgo": "Hace {count}d"
+    },
+    "empty": {
+      "description": "Sin Eventos aún. Crea tu primer evento."
+    },
+    "errors": {
+      "notFound": "Evento no encontrado",
+      "unauthorized": "No tienes permiso para gestionar este Evento",
+      "createFailed": "Error al crear el Evento",
+      "updateFailed": "Error al actualizar el Evento",
+      "deleteFailed": "Error al eliminar el Evento"
+    }
+  },
+  "CircleCategory": {
+    "TECH": "Tecnología e IA",
+    "DESIGN": "Producto y Diseño",
+    "BUSINESS": "Negocios y Emprendimiento",
+    "SPORT_WELLNESS": "Deporte y Bienestar",
+    "ART_CULTURE": "Arte y Cultura",
+    "SCIENCE_EDUCATION": "Ciencia y Educación",
+    "SOCIAL": "Social y Comunidad",
+    "OTHER": "Otros"
+  },
+  "Explorer": {
+    "title": "Explorar",
+    "description": "Comunidades que comparten tus valores, eventos que no te puedes perder.",
+    "navLink": "Explorar",
+    "tabs": {
+      "circles": "Comunidades",
+      "moments": "Eventos"
+    },
+    "filters": {
+      "allCategories": "Todas las categorías"
+    },
+    "empty": {
+      "circles": "Sin Comunidades públicas para esta categoría.",
+      "moments": "Sin próximos Eventos para esta categoría."
+    },
+    "circleCard": {
+      "members": "{count} miembros",
+      "upcomingMoments": "{count} Evento(s) próximo(s)",
+      "noUpcomingMoments": "Sin próximos Eventos",
+      "nextMoment": "Próximo Evento",
+      "roleBadge": {
+        "host": "Organizador",
+        "member": "Miembro"
+      }
+    },
+    "momentCard": {
+      "free": "Gratis",
+      "spotsRemaining": "{count} plazas restantes",
+      "registeredCount": "{count} inscritos",
+      "online": "En línea",
+      "roleBadge": {
+        "host": "Organizador",
+        "registered": "Inscrito",
+        "waitlisted": "En lista de espera"
+      }
+    },
+    "loadMore": "Ver más"
+  },
+  "Admin": {
+    "title": "Administración",
+    "dashboard": "Panel",
+    "users": "Usuarios",
+    "circles": "Comunidades",
+    "moments": "Eventos",
+    "backToSite": "Volver al sitio",
+    "stats": {
+      "totalUsers": "Usuarios",
+      "totalCircles": "Comunidades",
+      "totalMoments": "Eventos",
+      "totalRegistrations": "Inscripciones",
+      "totalComments": "Comentarios",
+      "thisWeek": "esta semana"
+    },
+    "table": {
+      "search": "Buscar...",
+      "noResults": "Sin resultados.",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "showing": "Mostrando {from} a {to} de {total}"
+    },
+    "actions": {
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "confirmDelete": "¿Estás seguro? Esta acción no se puede deshacer.",
+      "confirmCancel": "¿Estás seguro de que quieres cancelar este Evento?",
+      "cancelMoment": "Forzar cancelación",
+      "view": "Ver"
+    },
+    "userDetail": {
+      "title": "Detalle de usuario",
+      "role": "Rol",
+      "onboarding": "Incorporación",
+      "completed": "Completado",
+      "pending": "Pendiente",
+      "memberSince": "Miembro desde",
+      "circles": "Comunidades",
+      "noCircles": "Sin Comunidades."
+    },
+    "circleDetail": {
+      "title": "Detalle de Comunidad",
+      "host": "Organizador",
+      "members": "Miembros",
+      "moments": "Eventos",
+      "visibility": "Visibilidad",
+      "category": "Categoría",
+      "city": "Ciudad",
+      "description": "Descripción",
+      "recentMoments": "Eventos recientes",
+      "noMoments": "Sin Eventos."
+    },
+    "viewPublicPage": "Ver página",
+    "momentDetail": {
+      "title": "Detalle de Evento",
+      "circle": "Comunidad",
+      "createdBy": "Creado por",
+      "status": "Estado",
+      "date": "Fecha",
+      "capacity": "Capacidad",
+      "registrations": "Inscripciones",
+      "comments": "Comentarios",
+      "noRegistrations": "Sin inscripciones.",
+      "unlimited": "Ilimitada"
+    },
+    "columns": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "role": "Rol",
+      "circles": "Comunidades",
+      "moments": "Eventos",
+      "createdAt": "Unido",
+      "host": "Organizador",
+      "members": "Miembros",
+      "visibility": "Visibilidad",
+      "category": "Categoría",
+      "title": "Título",
+      "circle": "Comunidad",
+      "date": "Fecha",
+      "status": "Estado",
+      "registrations": "Inscripciones",
+      "comments": "Comentarios",
+      "actions": "Acciones"
+    }
+  },
+  "UserMenu": {
+    "dashboard": "Panel",
+    "profile": "Perfil",
+    "signOut": "Cerrar sesión"
+  },
+  "Email": {
+    "registration": {
+      "subject": "Te has inscrito en {momentTitle}",
+      "heading": "¡Inscripción confirmada!",
+      "statusMessage": "Te has inscrito en {momentTitle}."
+    },
+    "waitlist": {
+      "subject": "Lista de espera: {momentTitle}",
+      "heading": "Estás en la lista de espera",
+      "statusMessage": "Estás en la lista de espera para {momentTitle}. Te avisaremos si se libera una plaza."
+    },
+    "promotion": {
+      "subject": "Tu plaza está confirmada: {momentTitle}",
+      "heading": "¡Buenas noticias!",
+      "statusMessage": "¡Se ha liberado una plaza! Tu inscripción en {momentTitle} está confirmada."
+    },
+    "hostMomentCreated": {
+      "subject": "Tu evento está en línea: {momentTitle}",
+      "heading": "¡Tu evento está publicado!",
+      "statusMessage": "Has programado {momentTitle}. Comparte el enlace para invitar a tus participantes.",
+      "manageMomentCta": "Gestionar evento"
+    },
+    "hostNotification": {
+      "subject": "{playerName} se ha inscrito en {momentTitle}",
+      "heading": "Nueva inscripción",
+      "message": "{playerName} se ha inscrito en {momentTitle}",
+      "registrationInfo": "{count} inscritos / {capacity} plazas",
+      "registrationInfoUnlimited": "{count} inscritos",
+      "manageRegistrationsCta": "Gestionar inscripciones"
+    },
+    "commentNotification": {
+      "subject": "{playerName} comentó en {momentTitle}",
+      "heading": "Nuevo comentario",
+      "message": "{playerName} comentó en tu Evento {momentTitle}",
+      "commentPreviewLabel": "Comentario",
+      "viewCommentCta": "Ver comentario"
+    },
+    "momentUpdate": {
+      "subject": "Actualización: {momentTitle}",
+      "heading": "Un evento ha sido actualizado",
+      "intro": "El organizador ha realizado cambios en un evento en el que estás inscrito.",
+      "dateChangedLabel": "Nueva fecha",
+      "locationChangedLabel": "Nueva ubicación"
+    },
+    "hostMomentUpdate": {
+      "heading": "Tu evento ha sido actualizado",
+      "intro": "Has actualizado tu evento. Los participantes inscritos han sido notificados automáticamente."
+    },
+    "momentCancelled": {
+      "subject": "Cancelado: {momentTitle}",
+      "heading": "Este evento ha sido cancelado",
+      "message": "El organizador ha cancelado {momentTitle}. Esperamos verte en un futuro evento de la Comunidad.",
+      "ctaLabel": "Ver Comunidad"
+    },
+    "common": {
+      "dateLabel": "Fecha",
+      "locationLabel": "Ubicación",
+      "viewMomentCta": "Ver Evento",
+      "cancelLink": "Cancelar mi inscripción",
+      "dashboardLink": "Encuentra todos tus eventos en tu Panel →",
+      "footer": "Powered by The Playground — Lanza tu comunidad, gratis."
+    }
+  },
+  "PwaInstall": {
+    "heading": "Disponible en iOS y Android",
+    "subtitle": "Instala la app gratis en tu teléfono",
+    "note": "Aplicación web progresiva (PWA) — sin descarga necesaria",
+    "ios": {
+      "label": "Añadir a iPhone"
+    },
+    "android": {
+      "label": "Añadir a Android"
+    },
+    "modal": {
+      "title": "Instalar en iPhone",
+      "step1Label": "Toca Compartir",
+      "step1Hint": "Botón en la parte inferior de Safari",
+      "step2Label": "Selecciona «Añadir a pantalla de inicio»",
+      "step2Hint": "Desplázate por la lista de opciones",
+      "step3Label": "Toca «Añadir»",
+      "step3Hint": "La app aparecerá en tu pantalla de inicio"
+    }
+  },
+  "Footer": {
+    "brand": {
+      "tagline": "Lanza tu comunidad, gratis.",
+      "copyright": "© 2026 The Playground. Todos los derechos reservados."
+    },
+    "product": {
+      "title": "Producto",
+      "explore": "Explorar",
+      "howItWorks": "Cómo funciona",
+      "about": "Acerca de",
+      "changelog": "Cambios"
+    },
+    "legal": {
+      "title": "Legal",
+      "legalNotice": "Aviso legal",
+      "privacy": "Política de privacidad",
+      "terms": "Condiciones de uso"
+    }
+  },
+  "Legal": {
+    "lastUpdated": "Última actualización: {date}",
+    "legalNotice": {
+      "title": "Aviso legal",
+      "metaDescription": "Aviso legal de The Playground — información sobre el editor, alojamiento y propiedad intelectual.",
+      "editor": {
+        "title": "Editor",
+        "content": "The Playground es publicado por The Spark SASU, sociedad anónima simplificada unipersonal registrada en Francia.",
+        "siret": "SIRET: 93482575300015",
+        "address": "Domicilio social: 10 rue de la Paix, 75002 París, Francia",
+        "contact": "Contacto: linkedin.com/in/dragosdreptate",
+        "director": "Director de publicación: Dragos Dreptate"
+      },
+      "host": {
+        "title": "Proveedor de alojamiento",
+        "content": "El sitio web está alojado por Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, Estados Unidos."
+      },
+      "intellectualProperty": {
+        "title": "Propiedad intelectual",
+        "content": "Todo el contenido de este sitio web (textos, gráficos, logotipos, iconos, software) es propiedad exclusiva de The Spark SASU, salvo indicación contraria. Queda prohibida cualquier reproducción, representación o distribución, total o parcial, del contenido de este sitio sin autorización."
+      },
+      "liability": {
+        "title": "Responsabilidad",
+        "content": "The Spark SASU se esfuerza por garantizar la exactitud de la información publicada en el sitio, pero no puede garantizar su integridad ni actualidad. El uso del sitio es responsabilidad exclusiva del usuario."
+      }
+    },
+    "privacy": {
+      "title": "Política de privacidad",
+      "metaDescription": "Política de privacidad de The Playground — datos recopilados, finalidades, derechos RGPD y cookies.",
+      "intro": "The Playground, publicado por The Spark SASU, se compromete a proteger la privacidad de sus usuarios. Esta política describe los datos que recopilamos, por qué los utilizamos y cuáles son tus derechos.",
+      "dataCollected": {
+        "title": "Datos recopilados",
+        "items": {
+          "email": "Dirección de correo electrónico (inicio de sesión por enlace mágico u OAuth)",
+          "name": "Nombre y apellidos (proporcionados durante la incorporación)",
+          "oauth": "Identificador de cuenta OAuth (Google, GitHub) — solo para autenticación",
+          "usage": "Datos de uso anonimizados (Vercel Analytics)"
+        }
+      },
+      "purpose": {
+        "title": "Finalidad del tratamiento de datos",
+        "items": {
+          "auth": "Autenticación y gestión de cuentas",
+          "service": "Prestación del servicio (creación de Comunidades, inscripción en Eventos)",
+          "email": "Envío de correos transaccionales (confirmaciones de inscripción, notificaciones)",
+          "analytics": "Mejora del servicio mediante estadísticas anonimizadas"
+        }
+      },
+      "sharing": {
+        "title": "Compartición de datos",
+        "content": "Tus datos personales nunca se venden ni se comparten con terceros con fines comerciales. Podrán transmitirse a nuestros subcontratistas técnicos (alojamiento, envío de correos) únicamente para garantizar el funcionamiento del servicio."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "The Playground solo utiliza cookies estrictamente necesarias para el funcionamiento del sitio (sesión de autenticación). No se utilizan cookies publicitarias ni de seguimiento de terceros."
+      },
+      "rights": {
+        "title": "Tus derechos (RGPD)",
+        "content": "De acuerdo con el Reglamento General de Protección de Datos (RGPD), tienes los siguientes derechos:",
+        "items": {
+          "access": "Derecho de acceso a tus datos personales",
+          "rectification": "Derecho de rectificación de datos inexactos",
+          "deletion": "Derecho de supresión de tus datos",
+          "portability": "Derecho a la portabilidad de los datos",
+          "opposition": "Derecho de oposición al tratamiento"
+        },
+        "contact": "Para ejercer estos derechos, contáctanos por LinkedIn: linkedin.com/in/dragosdreptate."
+      },
+      "retention": {
+        "title": "Conservación de datos",
+        "content": "Tus datos se conservan mientras tu cuenta esté activa. Si eliminas tu cuenta, tus datos personales serán borrados en un plazo de 30 días."
+      }
+    },
+    "terms": {
+      "title": "Condiciones de uso",
+      "metaDescription": "Condiciones de uso de The Playground — aceptación, descripción del servicio, responsabilidades y ley aplicable.",
+      "intro": "Estas condiciones de uso («Condiciones») regulan el uso de la plataforma The Playground, publicada por The Spark SASU.",
+      "acceptance": {
+        "title": "Aceptación de las Condiciones",
+        "content": "Al usar The Playground, aceptas estas Condiciones en su totalidad. Si no aceptas estas condiciones, por favor no uses el servicio."
+      },
+      "service": {
+        "title": "Descripción del servicio",
+        "content": "The Playground es una plataforma gratuita para crear Comunidades y organizar Eventos. El servicio es accesible por web y se proporciona «tal cual»."
+      },
+      "account": {
+        "title": "Cuenta de usuario",
+        "content": "El acceso al servicio requiere crear una cuenta por correo electrónico (enlace mágico) o mediante un proveedor OAuth (Google, GitHub). Eres responsable de la confidencialidad de tu cuenta y de todas las actividades que ocurran bajo ella."
+      },
+      "userContent": {
+        "title": "Contenido del usuario",
+        "content": "Eres el único responsable del contenido que publicas en The Playground (descripciones de Comunidades, descripciones de Eventos, comentarios). Queda prohibido cualquier contenido ilegal, difamatorio, discriminatorio o inapropiado y podrá ser eliminado sin previo aviso."
+      },
+      "hostResponsibilities": {
+        "title": "Responsabilidades del Organizador",
+        "content": "Como Organizador, eres responsable de la exactitud de la información relacionada con tus Eventos (ubicación, fecha, descripción). Te comprometes a cumplir con toda la legislación aplicable en materia de organización de eventos."
+      },
+      "playerResponsibilities": {
+        "title": "Responsabilidades del Miembro",
+        "content": "Como Miembro, te comprometes a respetar las normas de cada Comunidad y Evento en el que participas. Inscribirse en un Evento constituye un compromiso de asistencia."
+      },
+      "pricing": {
+        "title": "Precios",
+        "content": "The Playground es completamente gratuito. La plataforma no cobra ninguna comisión. Para Eventos de pago, solo se aplican las tarifas de transacción de Stripe (aproximadamente 2,9% + 0,30$) y las asume el Organizador."
+      },
+      "liability": {
+        "title": "Limitación de responsabilidad",
+        "content": "The Spark SASU no será responsable de ningún daño directo o indirecto resultante del uso del servicio, incluyendo, entre otros, la interrupción del servicio, pérdida de datos o disputas entre Organizadores y Miembros."
+      },
+      "modification": {
+        "title": "Modificación de las Condiciones",
+        "content": "The Spark SASU se reserva el derecho de modificar estas Condiciones en cualquier momento. Los usuarios serán notificados de los cambios por correo electrónico o mediante notificación en la plataforma. El uso continuado del servicio tras la modificación constituye la aceptación de las nuevas condiciones."
+      },
+      "law": {
+        "title": "Ley aplicable",
+        "content": "Estas Condiciones se rigen por la ley francesa. En caso de litigio, los tribunales competentes de París tendrán jurisdicción exclusiva."
+      }
+    }
+  },
+  "Profile": {
+    "avatar": {
+      "add": "Añadir una foto",
+      "change": "Cambiar foto",
+      "uploading": "Subiendo...",
+      "errorType": "Formato no compatible. Usa JPEG, PNG o WebP.",
+      "errorSize": "Archivo demasiado grande (máx. 5 MB).",
+      "errorUpload": "Error al subir. Por favor, inténtalo de nuevo."
+    },
+    "setup": {
+      "title": "Completa tu perfil",
+      "description": "Cuéntanos un poco sobre ti para empezar."
+    },
+    "edit": {
+      "title": "Mi perfil",
+      "description": "Gestiona tu información personal",
+      "personalInfo": "Información personal",
+      "memberSince": "Miembro desde",
+      "account": "Cuenta",
+      "circles": "Comunidades",
+      "moments": "Eventos"
+    },
+    "form": {
+      "email": "Correo electrónico",
+      "emailHint": "Tu correo se usa para iniciar sesión y no puede cambiarse.",
+      "firstName": "Nombre",
+      "firstNamePlaceholder": "Alice",
+      "lastName": "Apellido",
+      "lastNamePlaceholder": "García",
+      "continue": "Continuar",
+      "saved": "Perfil actualizado correctamente."
+    },
+    "errors": {
+      "notFound": "Usuario no encontrado",
+      "updateFailed": "Error al actualizar el perfil"
+    },
+    "deleteAccount": {
+      "dangerZone": "Zona de peligro",
+      "description": "Eliminar tu cuenta es permanente y no se puede deshacer.",
+      "trigger": "Eliminar mi cuenta",
+      "title": "¿Eliminar tu cuenta?",
+      "warning": "Esta acción es permanente y eliminará:",
+      "items": {
+        "registrations": "Tus inscripciones a eventos",
+        "comments": "Tus comentarios",
+        "circles": "Comunidades donde eres el único Organizador (y sus eventos)"
+      },
+      "confirm": "Eliminar permanentemente",
+      "error": "Algo salió mal. Por favor, inténtalo de nuevo."
+    },
+    "notifications": {
+      "title": "Notificaciones",
+      "emailBanner": "Estas preferencias controlan los correos enviados a {email}.",
+      "organizer": "Como Organizador",
+      "participant": "Como Miembro",
+      "newRegistration": "Nueva inscripción",
+      "newRegistrationDesc": "Cuando alguien se inscribe en uno de tus eventos",
+      "newComment": "Nuevo comentario",
+      "newCommentDesc": "Cuando alguien comenta en uno de tus eventos",
+      "newFollower": "Nuevo seguidor",
+      "newFollowerDesc": "Cuando alguien sigue una de tus Comunidades",
+      "newMomentInCircle": "Nuevo evento",
+      "newMomentInCircleDesc": "Cuando se crea un evento en una Comunidad que sigues",
+      "saved": "Preferencias guardadas"
+    }
+  }
+}
