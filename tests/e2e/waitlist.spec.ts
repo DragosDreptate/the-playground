@@ -16,22 +16,16 @@ test.describe("Liste d'attente — affichage Moment complet (non inscrit)", () =
   test("should display the Moment as full with a waitlist option", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.FULL_MOMENT}`);
 
-    // La page doit indiquer que le Moment est complet ou proposer la liste d'attente
-    const waitlistIndicator = page
-      .locator("button, [data-testid='registration-cta']")
-      .filter({
-        hasText: /liste d'attente|waitlist|rejoindre.*attente|join.*waitlist/i,
-      })
+    // Pour un visiteur non-authentifié sur un événement complet (capacity=3, 3 inscrits) :
+    // StatsColumn affiche le badge "Complet" via t("public.eventFull")
+    // On attend explicitement avec toBeVisible() plutôt qu'un isVisible() immédiat
+    const fullBadge = page.locator("main").first().getByText("Complet");
+    const waitlistBtn = page
+      .locator("button")
+      .filter({ hasText: /liste d'attente|waitlist/i })
       .first();
 
-    const fullIndicator = page.locator("main").filter({
-      hasText: /complet|full|places/i,
-    });
-
-    const hasWaitlist = await waitlistIndicator.isVisible().catch(() => false);
-    const hasFull = await fullIndicator.isVisible().catch(() => false);
-
-    expect(hasWaitlist || hasFull).toBe(true);
+    await expect(fullBadge.or(waitlistBtn)).toBeVisible({ timeout: 8_000 });
   });
 });
 

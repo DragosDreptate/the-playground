@@ -27,11 +27,11 @@ const prisma = new PrismaClient({
 // ── Utilisateurs test ────────────────────────────────────────────────────────
 
 const USERS = [
-  { key: "host",    email: "host@test.playground",    firstName: "Alice",   lastName: "Martin" },
-  { key: "player1", email: "player1@test.playground", firstName: "Thomas",  lastName: "Dubois" },
-  { key: "player2", email: "player2@test.playground", firstName: "Camille", lastName: "Bernard" },
-  { key: "player3", email: "player3@test.playground", firstName: "Lucas",   lastName: "Petit" },
-  { key: "player4", email: "player4@test.playground", firstName: "Manon",   lastName: "Rousseau" },
+  { key: "host",    email: "host@test.playground",    firstName: "Alice",   lastName: "Martin",   dashboardMode: "ORGANIZER" as const },
+  { key: "player1", email: "player1@test.playground", firstName: "Thomas",  lastName: "Dubois",   dashboardMode: "PARTICIPANT" as const },
+  { key: "player2", email: "player2@test.playground", firstName: "Camille", lastName: "Bernard",  dashboardMode: "PARTICIPANT" as const },
+  { key: "player3", email: "player3@test.playground", firstName: "Lucas",   lastName: "Petit",    dashboardMode: "PARTICIPANT" as const },
+  { key: "player4", email: "player4@test.playground", firstName: "Manon",   lastName: "Rousseau", dashboardMode: "PARTICIPANT" as const },
 ];
 
 // ── Données réalistes ────────────────────────────────────────────────────────
@@ -235,7 +235,7 @@ async function main() {
   console.log("👤 Utilisateurs...");
   const userMap: Record<string, string> = {};
 
-  for (const { key, email, firstName, lastName } of USERS) {
+  for (const { key, email, firstName, lastName, dashboardMode } of USERS) {
     const user = await prisma.user.upsert({
       where: { email },
       create: {
@@ -245,6 +245,7 @@ async function main() {
         lastName,
         onboardingCompleted: true,
         emailVerified: new Date(),
+        dashboardMode,
       },
       update: {
         name: `${firstName} ${lastName}`,
@@ -252,6 +253,7 @@ async function main() {
         lastName,
         onboardingCompleted: true,
         emailVerified: new Date(),
+        dashboardMode,
       },
     });
     userMap[key] = user.id;

@@ -16,9 +16,12 @@ test.describe("Dashboard mode switcher — Host connecté", () => {
 
   test("should display the mode switcher on the dashboard", async ({ page }) => {
     await page.goto("/fr/dashboard");
+    // Attendre la stabilisation de l'URL (le dashboardMode étant seedé à ORGANIZER,
+    // il n'y a pas de redirect vers /welcome — mais on attend quand même pour la robustesse)
+    await page.waitForURL(/\/dashboard/, { timeout: 8_000 });
     // Le mode switcher doit être visible (deux pills)
     const switcher = page.locator(".rounded-full.border").filter({ hasText: /Participant|Organisateur/ }).first();
-    await expect(switcher).toBeVisible();
+    await expect(switcher).toBeVisible({ timeout: 8_000 });
   });
 
   test("should show Organizer CTA when in organizer mode", async ({ page }) => {
