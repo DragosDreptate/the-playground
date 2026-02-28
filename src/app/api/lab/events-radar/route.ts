@@ -38,8 +38,15 @@ const LUMA_LOCATION_TERMS: Record<string, string[]> = {
 };
 
 type LumaEntry = {
-  event: { name: string; start_at: string; url: string; geo_address_info?: { city_state?: string } };
+  event: {
+    name: string;
+    start_at: string;
+    url: string;
+    location_type?: string; // "offline" | "online" | "virtual"
+    geo_address_info?: { city_state?: string };
+  };
   calendar?: { name?: string };
+  featured_city?: { slug?: string; name?: string } | null;
 };
 
 async function fetchAndFilterLumaEvents(
@@ -66,10 +73,18 @@ async function fetchAndFilterLumaEvents(
         // Filtre date
         const d = e.event.start_at.slice(0, 10);
         if (d < dateFrom || d > dateEnd) return false;
-        // Filtre localisation — si renseignée, doit correspondre à la ville
-        // Les événements sans localisation (online) passent toujours
+        // Filtre localisation — 3 façons de valider la ville :
+        // 1. featured_city (Luma catégorise l'event pour cette ville)
+        const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
+        const villeKey = ville.toLowerCase();
+        if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
+        // 2. geo_address_info contient les termes de la ville
         const loc = e.event.geo_address_info?.city_state?.toLowerCase();
-        if (loc && !locationTerms.some((t) => loc.includes(t))) return false;
+        if (loc) return locationTerms.some((t) => loc.includes(t));
+        // 3. Événement online (location_type !== "offline") → accessible partout
+        if (e.event.location_type !== "offline") return true;
+        // 4. Offline sans geo et sans featured_city → on ne peut pas confirmer la ville
+        return false;
         // Filtre mots-clés OR
         if (kwList.length === 0) return true;
         const text = e.event.name.toLowerCase();
