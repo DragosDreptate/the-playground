@@ -151,7 +151,7 @@ export default function EventsRadarPage() {
             Radar d&apos;événements
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Agent IA — scraping Luma via Claude · <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">/lab/events-radar</code>
+            Agent IA — Luma + Meetup via Claude · <code className="rounded bg-zinc-100 px-1 py-0.5 text-xs">/lab/events-radar</code>
           </p>
         </div>
 

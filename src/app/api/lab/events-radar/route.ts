@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 
-// URLs Luma autorisées — Claude ne peut fetcher QUE celles-ci
+// URLs Luma autorisées
 const LUMA_URLS: Record<string, string> = {
   paris: "https://lu.ma/paris",
   lyon: "https://lu.ma/lyon",
@@ -14,6 +14,21 @@ const LUMA_URLS: Record<string, string> = {
   london: "https://lu.ma/london",
   berlin: "https://lu.ma/berlin",
   amsterdam: "https://lu.ma/amsterdam",
+};
+
+// URLs Meetup par ville — format: countryCode--City
+const MEETUP_URLS: Record<string, string> = {
+  paris: "https://www.meetup.com/find/events/?location=fr--Paris&source=EVENTS",
+  lyon: "https://www.meetup.com/find/events/?location=fr--Lyon&source=EVENTS",
+  bordeaux: "https://www.meetup.com/find/events/?location=fr--Bordeaux&source=EVENTS",
+  marseille: "https://www.meetup.com/find/events/?location=fr--Marseille&source=EVENTS",
+  toulouse: "https://www.meetup.com/find/events/?location=fr--Toulouse&source=EVENTS",
+  nantes: "https://www.meetup.com/find/events/?location=fr--Nantes&source=EVENTS",
+  lille: "https://www.meetup.com/find/events/?location=fr--Lille&source=EVENTS",
+  strasbourg: "https://www.meetup.com/find/events/?location=fr--Strasbourg&source=EVENTS",
+  london: "https://www.meetup.com/find/events/?location=gb--London&source=EVENTS",
+  berlin: "https://www.meetup.com/find/events/?location=de--Berlin&source=EVENTS",
+  amsterdam: "https://www.meetup.com/find/events/?location=nl--Amsterdam&source=EVENTS",
 };
 
 // Extrait uniquement la portion événements du __NEXT_DATA__ Luma
@@ -62,6 +77,66 @@ function extractLumaEvents(rawJson: string): string {
   }
 }
 
+// Extrait les données événements depuis une page Meetup
+// Essaie __NEXT_DATA__ en premier, puis JSON-LD, puis Apollo state
+function extractMeetupEvents(html: string): string {
+  // 1. Essai __NEXT_DATA__ (Meetup est une app Next.js)
+  const nextDataMatch = html.match(
+    /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
+  );
+  if (nextDataMatch) {
+    try {
+      const json = JSON.parse(nextDataMatch[1].trim()) as Record<string, unknown>;
+      const pageProps =
+        ((json?.props as Record<string, unknown>)?.pageProps as Record<string, unknown>) ?? {};
+
+      // Chemins connus dans Meetup find/events
+      const candidates = [
+        (pageProps?.pagePayload as Record<string, unknown>)?.eventResults,
+        pageProps?.eventSearch,
+        pageProps?.searchResultsData,
+        pageProps?.serverData,
+        pageProps?.initialData,
+      ].filter(Boolean);
+
+      if (candidates.length > 0) {
+        const compact = JSON.stringify(candidates[0]);
+        return compact.length > 12000
+          ? compact.slice(0, 12000) + "...[truncated]"
+          : compact;
+      }
+
+      // Fallback : pageProps complet sans clés internes
+      const { _sentryTraceData, _sentryBaggage, ...rest } = pageProps as Record<string, unknown>;
+      void _sentryTraceData; void _sentryBaggage;
+      const compact = JSON.stringify(rest);
+      return compact.length > 12000
+        ? compact.slice(0, 12000) + "...[truncated]"
+        : compact;
+    } catch { /* continue to next extraction */ }
+  }
+
+  // 2. JSON-LD structured data (souvent présent sur les pages d'événements)
+  const jsonLdBlocks: string[] = [];
+  const jsonLdRegex = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi;
+  let match;
+  while ((match = jsonLdRegex.exec(html)) !== null) {
+    jsonLdBlocks.push(match[1].trim());
+  }
+  if (jsonLdBlocks.length > 0) {
+    const combined = "[" + jsonLdBlocks.join(",") + "]";
+    return combined.length > 12000
+      ? combined.slice(0, 12000) + "...[truncated]"
+      : combined;
+  }
+
+  // 3. Fallback : HTML nettoyé tronqué
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .slice(0, 8000);
+}
+
 async function fetchLumaPage(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
@@ -100,6 +175,32 @@ async function fetchLumaPage(url: string): Promise<string> {
   }
 }
 
+async function fetchMeetupPage(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!res.ok) {
+      return JSON.stringify({ error: `HTTP ${res.status}`, url });
+    }
+
+    const html = await res.text();
+    return extractMeetupEvents(html);
+  } catch (err) {
+    return JSON.stringify({
+      error: err instanceof Error ? err.message : "fetch failed",
+      url,
+    });
+  }
+}
+
 export async function POST(request: NextRequest) {
   const { ville, date, keywords } = (await request.json()) as {
     ville: string;
@@ -127,18 +228,26 @@ export async function POST(request: NextRequest) {
       try {
         send({ type: "status", message: `Démarrage du radar — ${ville} — ${date}` });
 
-        // Fetch la page AVANT d'appeler Claude — pas de tool use nécessaire
-        send({ type: "tool_call", message: `Fetching ${lumaUrl}…` });
-        const pageContent = await fetchLumaPage(lumaUrl);
-        send({ type: "tool_result", message: `✓ ${lumaUrl} (${Math.round(pageContent.length / 1024)}KB extraits)` });
+        const meetupUrl = MEETUP_URLS[ville.toLowerCase()] ?? `https://www.meetup.com/find/events/?location=${ville.toLowerCase()}&source=EVENTS`;
 
-        // Claude analyse uniquement le contenu pré-extrait — 0 tool call
+        // Fetch Luma + Meetup en parallèle
+        send({ type: "tool_call", message: `Fetching ${lumaUrl} + Meetup en parallèle…` });
+        const [lumaContent, meetupContent] = await Promise.all([
+          fetchLumaPage(lumaUrl),
+          fetchMeetupPage(meetupUrl),
+        ]);
+        send({ type: "tool_result", message: `✓ Luma (${Math.round(lumaContent.length / 1024)}KB) + Meetup (${Math.round(meetupContent.length / 1024)}KB)` });
+
+        // Claude analyse les deux sources en un seul appel
         const client = new Anthropic({ apiKey });
 
-        const prompt = `Tu es un radar d'événements. Voici les données JSON extraites de la page Luma pour ${ville}.
+        const prompt = `Tu es un radar d'événements. Voici les données extraites de deux sources pour ${ville}.
 
-Données Luma (JSON partiel) :
-${pageContent}
+=== SOURCE 1 : Luma (lu.ma/${ville}) ===
+${lumaContent}
+
+=== SOURCE 2 : Meetup ===
+${meetupContent}
 
 MISSION :
 Trouve les événements correspondant à ces critères :
@@ -146,11 +255,13 @@ Trouve les événements correspondant à ces critères :
 - Mots-clés : ${keywords || "aucun filtre — garde tout"}${ville.toLowerCase() === "paris" ? "\n- Zone : Paris et Île-de-France" : ""}
 
 INSTRUCTIONS :
-1. Explore la structure JSON pour trouver les tableaux d'événements
+1. Explore chaque source pour trouver les tableaux d'événements
 2. Pour chaque événement, extrais : titre, date de début, heure, lieu, URL, description courte
-3. Filtre sur la date ${date} (garde les événements dont start_at ou date_start correspond à ce jour)
+3. Filtre sur la date ${date} (garde les événements dont start_at, date_start ou dateTime correspond à ce jour)
 4. Si peu de résultats exacts, garde aussi les événements dans la semaine autour de ${date}
-5. Les URLs d'événements Luma sont au format https://lu.ma/[slug]
+5. URLs Luma : format https://lu.ma/[slug]
+6. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
+7. Déduplique si un même événement apparaît dans les deux sources
 
 SORTIE — JSON uniquement, aucun texte avant ou après :
 {
@@ -160,12 +271,12 @@ SORTIE — JSON uniquement, aucun texte avant ou après :
       "date": "YYYY-MM-DD",
       "time": "HH:MM ou null",
       "location": "lieu ou null",
-      "url": "https://lu.ma/...",
-      "source": "luma",
+      "url": "https://...",
+      "source": "luma ou meetup",
       "description": "1-2 phrases ou null"
     }
   ],
-  "summary": "X événements trouvés pour ${date} sur lu.ma/${ville}"
+  "summary": "X événements trouvés pour ${date} (Luma + Meetup)"
 }`;
 
         send({ type: "status", message: "Analyse par Claude…" });
