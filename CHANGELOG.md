@@ -10,6 +10,24 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.6.0] — 2026-02-28 — Mode switcher Participant / Organisateur
+
+### Ajouté
+
+- **Mode switcher dashboard** : pill switcher Participant / Organisateur dans « Mon espace »
+  - Mode Participant : événements auxquels on est inscrit, toutes ses Communautés
+  - Mode Organisateur : événements organisés (badge 👑 + compteur d'inscrits), Communautés hostées, CTAs création
+  - Le mode est persisté en base et mémorisé entre les sessions
+- **Page welcome** : choix du mode au premier accès (« Je participe » / « J'organise »)
+- **Backfill production** : migration des utilisateurs existants (22 organisateurs → ORGANIZER, 26 → PARTICIPANT)
+
+### Corrigé
+
+- **Auth OAuth Vercel preview** : `trustHost: true` dans la config Auth.js v5 — résout l'erreur « Authentication error » sur les URLs preview dynamiques
+- **Badge Organisateur** : en mode Participant, les événements des Communautés hostées affichent désormais le badge 👑 Organisateur au lieu de « Inscrit »
+
+---
+
 ## [1.5.0] — 2026-02-26 — Notifications & qualité
 
 ### Ajouté
