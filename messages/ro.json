@@ -1,0 +1,804 @@
+{
+  "HomePage": {
+    "title": "The Playground",
+    "heroHighlight1": "Lansează",
+    "heroRest1": "comunitatea ta.",
+    "heroHighlight2": "Organizează",
+    "heroRest2": "evenimente.",
+    "heroHighlight3": "Animă",
+    "heroRest3": "colectivul.",
+    "heroSubtitle": "Platforma gratuită pentru a-ți construi comunitatea și a organiza evenimente de neuitat.",
+    "cta": "Lansează comunitatea ta",
+    "mockupCircleName": "Product & IA",
+    "mockupAboutText": "Comunitatea pentru entuziaștii de Produs în era inteligenței artificiale.",
+    "mockupCreatedDate": "21 feb. 2026",
+    "mockupMomentDay": "Vin",
+    "mockupMomentDate": "27 feb.",
+    "mockupMomentTime": "19:00",
+    "mockupMomentTitle": "Design Drinks #12",
+    "mockupMomentLocation": "The Counter",
+    "mockupMomentAttendees": "8 înscriși",
+    "howItWorks": "Cum funcționează",
+    "step1Title": "Creează-ți Comunitatea",
+    "step1Description": "Spațiul tău comunitar în 30 de secunde. Public sau privat, tu decizi.",
+    "step2Title": "Lansează Evenimentele tale",
+    "step2Description": "Fiecare Eveniment are o pagină premium și partajabilă. Un link, și ești live.",
+    "step3Title": "Urmărește cum crește Comunitatea ta",
+    "step3Description": "Membrii rămân în Comunitatea ta și revin pentru următoarele Evenimente.",
+    "pillarsHeading": "Ce face The Playground diferit",
+    "pillar1Title": "Comunitatea pe primul loc",
+    "pillar1Description": "Membrii tăi rămân între Evenimente. Nu mai există audiențe de o singură dată.",
+    "pillar2Title": "Design premium",
+    "pillar2Description": "Pagini elegante, fără efort. Comunitatea ta impresionează din prima zi.",
+    "pillar3Title": "100% gratuit",
+    "pillar3Description": "Zero comisioane, zero abonament. Doar taxele Stripe pentru evenimentele plătite.",
+    "ctaFinalTitle": "Gata să-ți lansezi comunitatea?",
+    "ctaFinalSubtitle": "Creează-ți Comunitatea în 30 de secunde. Gratuit, pentru totdeauna.",
+    "ctaFinal": "Începe gratuit",
+    "ctaExplore": "Explorează",
+    "heroFamiliar1": "comunitate",
+    "heroFamiliar2": "evenimente",
+    "heroBranded1": "Comunitate",
+    "heroBranded2": "Evenimente",
+    "heroRestPrefix1": "ta",
+    "heroRestPrefix2": "tale"
+  },
+  "Common": {
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare",
+    "back": "Înapoi",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "create": "Creează",
+    "edit": "Editează",
+    "public": "Public",
+    "private": "Privat",
+    "showMore": "Arată mai mult",
+    "showLess": "Arată mai puțin"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Conectează-te",
+      "subtitle": "Conectează-te pentru a continua",
+      "google": "Continuă cu Google",
+      "github": "Continuă cu GitHub",
+      "emailPlaceholder": "adresa@ta.com",
+      "magicLink": "Trimite un link magic",
+      "or": "sau",
+      "linkedin": "Continuă cu LinkedIn"
+    },
+    "verifyRequest": {
+      "title": "Verifică-ți emailul",
+      "description": "Un link de conectare a fost trimis la adresa ta de email. Dă click pe el pentru a te conecta."
+    },
+    "error": {
+      "title": "Eroare de autentificare",
+      "backToSignIn": "Înapoi la conectare"
+    },
+    "errors": {
+      "Configuration": "Eroare de configurare a serverului.",
+      "AccessDenied": "Acces refuzat.",
+      "Verification": "Linkul de verificare a expirat sau a fost deja utilizat.",
+      "Default": "A apărut o eroare la conectare."
+    },
+    "signOut": "Deconectare"
+  },
+  "Welcome": {
+    "greeting": "Salut {name} 👋",
+    "greetingAnonymous": "Bun venit pe The Playground 👋",
+    "subtitle": "Ce vrei să faci mai întâi?",
+    "createCircle": {
+      "title": "Creează-mi Comunitatea",
+      "description": "Lansează-ți comunitatea, invită-ți membrii și organizează-ți evenimentele.",
+      "cta": "Începe"
+    },
+    "explore": {
+      "title": "Descoperă Comunități",
+      "description": "Explorează comunități publice și alătură-te celor care corespund intereselor tale.",
+      "cta": "Explorează"
+    },
+    "modeChoice": {
+      "greetingPrefix": "Bun venit,",
+      "greetingSuffix": "Ce vrei să faci?",
+      "greetingAnonymous": "Bun venit — ce vrei să faci?",
+      "subtitle": "Alege modul tău implicit. Îl poți schimba oricând.",
+      "participant": {
+        "title": "Particip",
+        "description": "Descoperă și alătură-te evenimentelor care mă inspiră"
+      },
+      "organizer": {
+        "title": "Organizez",
+        "description": "Îmi creez comunitatea și organizez evenimente"
+      },
+      "hint": "Poți schimba modul oricând din panoul tău."
+    }
+  },
+  "Dashboard": {
+    "title": "Tablou de bord",
+    "myCircles": "Comunitățile mele",
+    "myCirclesOrganizer": "Comunitățile mele",
+    "createCircle": "Creează o Comunitate",
+    "createMoment": "Creează un Eveniment",
+    "createCircleFirst": "Creează mai întâi o Comunitate",
+    "selectCircleDropdown": "Ce Comunitate?",
+    "selectCircle": {
+      "title": "Alege o Comunitate",
+      "description": "Cărei Comunități ar trebui să aparțină acest Eveniment?"
+    },
+    "noCircles": {
+      "title": "Creează mai întâi o Comunitate",
+      "description": "Ai nevoie de o Comunitate înainte de a crea un Eveniment."
+    },
+    "myMoments": "Evenimentele mele",
+    "myMomentsOrganizer": "Evenimentele mele",
+    "upcomingMoments": "Evenimentele mele viitoare",
+    "pastMoments": "Trecute",
+    "noUpcomingMoments": "Niciun eveniment viitor.",
+    "noMoments": "Niciun eveniment încă.",
+    "noMomentsHint": "Alătură-te unui eveniment sau creează-ți comunitatea.",
+    "noMomentsHintExplore": "Explorează evenimente →",
+    "noMomentsOrganizer": "Niciun eveniment organizat încă.",
+    "noMomentsOrganizerHint": "Creează primul tău Eveniment dintr-o Comunitate.",
+    "emptyCircles": "Nu ești membru al niciunei Comunități.",
+    "emptyCirclesHint": "Creează o Comunitate sau alătură-te unui Eveniment pentru a deveni membru.",
+    "noCirclesOrganizer": "Nu organizezi nicio Comunitate încă.",
+    "noCirclesOrganizerHint": "Creează-ți prima Comunitate pentru a începe.",
+    "noCirclesMember": "Nu ești încă membru al niciunei Comunități.",
+    "role": {
+      "host": "Organizator",
+      "player": "Participant"
+    },
+    "registrationStatus": {
+      "registered": "Înscris",
+      "waitlisted": "Pe lista de așteptare"
+    },
+    "online": "Online",
+    "hybrid": "Hibrid",
+    "hostTools": "Instrumente organizator",
+    "greeting": "Bună, {name}",
+    "greetingAnonymous": "Bună",
+    "greetingSubtitle": "Comunitățile și evenimentele tale viitoare, toate într-un singur loc.",
+    "greetingSubtitleOrganizer": "Gestionează-ți Comunitățile și Evenimentele.",
+    "memberCount": "{count} participanți",
+    "modeParticipant": "Participant",
+    "modeOrganizer": "Organizator",
+    "modeBadgeParticipant": "Vedere participant",
+    "modeBadgeOrganizer": "Vedere organizator"
+  },
+  "Circle": {
+    "create": {
+      "title": "Creează o Comunitate",
+      "description": "Configurează-ți spațiul comunitar"
+    },
+    "edit": {
+      "title": "Editează Comunitatea",
+      "description": "Actualizează setările Comunității tale"
+    },
+    "form": {
+      "coverImage": "Imagine de copertă",
+      "name": "Nume",
+      "namePlaceholder": "Comunitatea mea grozavă",
+      "description": "Descriere",
+      "descriptionPlaceholder": "Spune-le oamenilor despre ce este Comunitatea ta...",
+      "visibility": "Vizibilitate",
+      "visibilityPublic": "Publică — oricine poate descoperi această Comunitate",
+      "visibilityPrivate": "Privată — accesibilă doar prin invitație",
+      "category": "Categorie",
+      "categoryPlaceholder": "Alege o categorie",
+      "city": "Oraș",
+      "cityPlaceholder": "București, Cluj, Remote..."
+    },
+    "delete": {
+      "title": "Șterge Comunitatea",
+      "description": "Ești sigur că vrei să ștergi această Comunitate? Această acțiune nu poate fi anulată. Toate Evenimentele și membresiile vor fi eliminate permanent.",
+      "confirm": "Da, șterge această Comunitate"
+    },
+    "detail": {
+      "members": "Participanți",
+      "moments": "Evenimente",
+      "settings": "Setări",
+      "editCircle": "Editează",
+      "deleteCircle": "Șterge",
+      "created": "Creat pe",
+      "hosts": "Organizatori",
+      "hostedBy": "Organizat de",
+      "about": "Despre",
+      "visibility": "Vizibilitate",
+      "publicCircle": "Comunitate publică",
+      "privateCircle": "Comunitate privată",
+      "memberCount": "{count} participanți",
+      "upcomingMoments": "Evenimente viitoare",
+      "pastMoments": "Evenimente trecute",
+      "noUpcomingMoments": "Niciun eveniment viitor.",
+      "noPastMoments": "Niciun eveniment trecut.",
+      "today": "Azi",
+      "manageMoment": "Gestionează acest Eveniment",
+      "follow": "Urmărește",
+      "unfollow": "Nu mai urmări",
+      "following": "Urmărești",
+      "isMember": "Ești participant",
+      "isHost": "Ești Organizator",
+      "manageCircle": "Gestionează această Comunitate",
+      "shareableLink": "Link partajabil"
+    },
+    "errors": {
+      "notFound": "Comunitatea nu a fost găsită",
+      "unauthorized": "Nu ai permisiunea să efectuezi această acțiune",
+      "createFailed": "Eroare la crearea Comunității",
+      "updateFailed": "Eroare la actualizarea Comunității",
+      "deleteFailed": "Eroare la ștergerea Comunității"
+    }
+  },
+  "Moment": {
+    "create": {
+      "title": "Creează un Eveniment",
+      "description": "Configurează-ți evenimentul"
+    },
+    "edit": {
+      "title": "Editează Evenimentul",
+      "description": "Actualizează detaliile evenimentului tău"
+    },
+    "form": {
+      "title": "Titlu",
+      "eventName": "Numele evenimentului",
+      "description": "Descriere",
+      "descriptionPlaceholder": "Spune-le oamenilor despre ce este acest Eveniment...",
+      "addLocation": "Adaugă locația evenimentului",
+      "addLocationHint": "Locație fizică sau link virtual",
+      "addDescription": "Adaugă o descriere",
+      "locationType": "Tipul locației",
+      "locationInPerson": "În persoană",
+      "locationOnline": "Online",
+      "locationHybrid": "Hibrid",
+      "locationName": "Numele locului",
+      "locationNamePlaceholder": "Cafeneaua Central",
+      "locationAddress": "Adresă",
+      "locationAddressPlaceholder": "Str. Victoriei 1, București",
+      "videoLink": "Link video",
+      "videoLinkPlaceholder": "https://meet.google.com/...",
+      "videoLinkOr": "sau lipește linkul",
+      "eventOptions": "Opțiuni eveniment",
+      "ticketPrice": "Prețul biletului",
+      "priceSoon": "În curând",
+      "free": "Gratuit",
+      "capacity": "Capacitate",
+      "capacityLabel": "Capacitate",
+      "unlimited": "Nelimitată",
+      "capacityPlaceholder": "Lasă gol pentru nelimitat",
+      "price": "Preț (în cenți)",
+      "pricePlaceholder": "0",
+      "priceHint": "În cenți. 1500 = 15,00. Lasă 0 pentru gratuit.",
+      "currency": "Monedă",
+      "status": "Status",
+      "startLabel": "Început",
+      "endLabel": "Sfârșit",
+      "pickDate": "Alege o dată",
+      "endBeforeStart": "Data de sfârșit trebuie să fie după data de început.",
+      "createMoment": "Publică"
+    },
+    "delete": {
+      "title": "Șterge Evenimentul",
+      "description": "Ești sigur că vrei să ștergi acest Eveniment? Această acțiune nu poate fi anulată. Toate înregistrările vor fi eliminate permanent.",
+      "confirm": "Da, șterge acest Eveniment"
+    },
+    "detail": {
+      "when": "Când",
+      "where": "Unde",
+      "capacity": "Capacitate",
+      "price": "Preț",
+      "created": "Creat",
+      "shareableLink": "Link partajabil"
+    },
+    "status": {
+      "published": "Publicat",
+      "cancelled": "Anulat",
+      "past": "Trecut"
+    },
+    "public": {
+      "hostedBy": "Organizat de",
+      "free": "Gratuit",
+      "spotsAvailable": "{count} locuri",
+      "registerFree": "Înscrie-te",
+      "registerPaid": "Înscrie-te — {price} {currency}",
+      "comingSoon": "În curând",
+      "registered": "Înscris",
+      "waitlisted": "Pe lista de așteptare",
+      "joinWaitlist": "Intră pe lista de așteptare",
+      "cancelRegistration": "Anulează înscrierea",
+      "cancelConfirmTitle": "Anulează înscrierea",
+      "cancelConfirmDescription": "Ești sigur că vrei să-ți anulezi înscrierea la acest Eveniment?",
+      "confirmCancel": "Da, anulează",
+      "spotsRemaining": "{count} locuri disponibile",
+      "signInToRegister": "Înscrie-te",
+      "registrantsCount": "{count} înscriși",
+      "eventFull": "Complet",
+      "attendeesCount": "{count} participant(i)",
+      "about": "Despre",
+      "viewOnMap": "Vezi pe Google Maps",
+      "eventTookPlace": "Acest eveniment a avut loc pe",
+      "eventEnded": "Eveniment încheiat",
+      "eventCancelled": "Eveniment anulat",
+      "attendedCount": "{count} participanți au fost prezenți",
+      "viewCircleMoments": "Vezi evenimentele viitoare ale acestei Comunități",
+      "upcomingInCircle": "Tot în această Comunitate",
+      "seeAllCircleEvents": "Vezi toate evenimentele",
+      "addToCalendar": {
+        "label": "Adaugă în calendar",
+        "google": "Google Calendar",
+        "ics": "Fișier .ics"
+      },
+      "waitlistPosition": "Ești pe locul #{position} în lista de așteptare"
+    },
+    "registrations": {
+      "title": "Participanți",
+      "registered": "{count} înscriși",
+      "waitlisted": "{count} pe lista de așteptare",
+      "capacity": "{count} locuri",
+      "empty": "Nimeni nu s-a înscris încă.",
+      "status": {
+        "registered": "Înscris",
+        "waitlisted": "Pe lista de așteptare"
+      },
+      "exportCsv": "Exportă CSV",
+      "csvHeaders": {
+        "firstName": "Prenume",
+        "lastName": "Nume",
+        "email": "Email",
+        "status": "Status",
+        "registeredAt": "Data înscrierii"
+      }
+    },
+    "comments": {
+      "title": "Comentarii",
+      "count": "{count} comentariu(ii)",
+      "empty": "Niciun comentariu încă. Fii primul care spune ceva!",
+      "placeholder": "Împărtășește-ți gândurile...",
+      "placeholderPast": "Mulțumiri, fotografii, impresii... împărtășește!",
+      "submit": "Postează",
+      "signInToComment": "Conectează-te pentru a comenta",
+      "deleteTitle": "Șterge comentariul",
+      "deleteDescription": "Ești sigur că vrei să ștergi acest comentariu? Această acțiune nu poate fi anulată.",
+      "confirmDelete": "Da, șterge",
+      "justNow": "Chiar acum",
+      "minutesAgo": "Acum {count}min",
+      "hoursAgo": "Acum {count}h",
+      "daysAgo": "Acum {count}z"
+    },
+    "empty": {
+      "description": "Niciun eveniment încă. Creează primul tău eveniment."
+    },
+    "errors": {
+      "notFound": "Evenimentul nu a fost găsit",
+      "unauthorized": "Nu ai permisiunea să gestionezi acest Eveniment",
+      "createFailed": "Eroare la crearea Evenimentului",
+      "updateFailed": "Eroare la actualizarea Evenimentului",
+      "deleteFailed": "Eroare la ștergerea Evenimentului"
+    }
+  },
+  "CircleCategory": {
+    "TECH": "Tech & IA",
+    "DESIGN": "Produs & Design",
+    "BUSINESS": "Business & Antreprenoriat",
+    "SPORT_WELLNESS": "Sport & Wellness",
+    "ART_CULTURE": "Artă & Cultură",
+    "SCIENCE_EDUCATION": "Știință & Educație",
+    "SOCIAL": "Social & Comunitate",
+    "OTHER": "Altele"
+  },
+  "Explorer": {
+    "title": "Explorează",
+    "description": "Comunități care îți împărtășesc valorile, evenimente pe care nu vrei să le ratezi.",
+    "navLink": "Explorează",
+    "tabs": {
+      "circles": "Comunități",
+      "moments": "Evenimente"
+    },
+    "filters": {
+      "allCategories": "Toate categoriile"
+    },
+    "empty": {
+      "circles": "Nicio Comunitate publică pentru această categorie.",
+      "moments": "Niciun eveniment viitor pentru această categorie."
+    },
+    "circleCard": {
+      "members": "{count} participanți",
+      "upcomingMoments": "{count} eveniment(e) viitor(oare)",
+      "noUpcomingMoments": "Niciun eveniment viitor",
+      "nextMoment": "Următorul Eveniment",
+      "roleBadge": {
+        "host": "Organizator",
+        "member": "Participant"
+      }
+    },
+    "momentCard": {
+      "free": "Gratuit",
+      "spotsRemaining": "{count} locuri disponibile",
+      "registeredCount": "{count} înscriși",
+      "online": "Online",
+      "roleBadge": {
+        "host": "Organizator",
+        "registered": "Înscris",
+        "waitlisted": "Pe lista de așteptare"
+      }
+    },
+    "loadMore": "Arată mai mult"
+  },
+  "Admin": {
+    "title": "Administrare",
+    "dashboard": "Tablou de bord",
+    "users": "Utilizatori",
+    "circles": "Comunități",
+    "moments": "Evenimente",
+    "backToSite": "Înapoi la site",
+    "stats": {
+      "totalUsers": "Utilizatori",
+      "totalCircles": "Comunități",
+      "totalMoments": "Evenimente",
+      "totalRegistrations": "Înregistrări",
+      "totalComments": "Comentarii",
+      "thisWeek": "săptămâna aceasta"
+    },
+    "table": {
+      "search": "Caută...",
+      "noResults": "Niciun rezultat.",
+      "previous": "Anterior",
+      "next": "Următor",
+      "showing": "Afișând {from} la {to} din {total}"
+    },
+    "actions": {
+      "delete": "Șterge",
+      "cancel": "Anulează",
+      "confirmDelete": "Ești sigur? Această acțiune nu poate fi anulată.",
+      "confirmCancel": "Ești sigur că vrei să anulezi acest Eveniment?",
+      "cancelMoment": "Forțează anularea",
+      "view": "Vezi"
+    },
+    "userDetail": {
+      "title": "Detalii utilizator",
+      "role": "Rol",
+      "onboarding": "Onboarding",
+      "completed": "Finalizat",
+      "pending": "În așteptare",
+      "memberSince": "Participant din",
+      "circles": "Comunități",
+      "noCircles": "Nicio Comunitate."
+    },
+    "circleDetail": {
+      "title": "Detalii Comunitate",
+      "host": "Organizator",
+      "members": "Participanți",
+      "moments": "Evenimente",
+      "visibility": "Vizibilitate",
+      "category": "Categorie",
+      "city": "Oraș",
+      "description": "Descriere",
+      "recentMoments": "Evenimente recente",
+      "noMoments": "Niciun eveniment."
+    },
+    "viewPublicPage": "Vezi pagina",
+    "momentDetail": {
+      "title": "Detalii Eveniment",
+      "circle": "Comunitate",
+      "createdBy": "Creat de",
+      "status": "Status",
+      "date": "Dată",
+      "capacity": "Capacitate",
+      "registrations": "Înregistrări",
+      "comments": "Comentarii",
+      "noRegistrations": "Nicio înregistrare.",
+      "unlimited": "Nelimitată"
+    },
+    "columns": {
+      "name": "Nume",
+      "email": "Email",
+      "role": "Rol",
+      "circles": "Comunități",
+      "moments": "Evenimente",
+      "createdAt": "Înscris",
+      "host": "Organizator",
+      "members": "Participanți",
+      "visibility": "Vizibilitate",
+      "category": "Categorie",
+      "title": "Titlu",
+      "circle": "Comunitate",
+      "date": "Dată",
+      "status": "Status",
+      "registrations": "Înregistrări",
+      "comments": "Comentarii",
+      "actions": "Acțiuni"
+    }
+  },
+  "UserMenu": {
+    "dashboard": "Tablou de bord",
+    "profile": "Profil",
+    "signOut": "Deconectare"
+  },
+  "Email": {
+    "registration": {
+      "subject": "Te-ai înscris la {momentTitle}",
+      "heading": "Înregistrare confirmată!",
+      "statusMessage": "Te-ai înscris la {momentTitle}."
+    },
+    "waitlist": {
+      "subject": "Lista de așteptare: {momentTitle}",
+      "heading": "Ești pe lista de așteptare",
+      "statusMessage": "Ești pe lista de așteptare pentru {momentTitle}. Te vom anunța dacă se eliberează un loc."
+    },
+    "promotion": {
+      "subject": "Locul tău este confirmat: {momentTitle}",
+      "heading": "Vești bune!",
+      "statusMessage": "S-a eliberat un loc! Înregistrarea ta la {momentTitle} este confirmată."
+    },
+    "hostMomentCreated": {
+      "subject": "Evenimentul tău este live: {momentTitle}",
+      "heading": "Evenimentul tău este publicat!",
+      "statusMessage": "Ai programat {momentTitle}. Distribuie linkul pentru a-ți invita participanții.",
+      "manageMomentCta": "Gestionează evenimentul"
+    },
+    "hostNotification": {
+      "subject": "{playerName} s-a înscris la {momentTitle}",
+      "heading": "Înregistrare nouă",
+      "message": "{playerName} s-a înscris la {momentTitle}",
+      "registrationInfo": "{count} înscriși / {capacity} locuri",
+      "registrationInfoUnlimited": "{count} înscriși",
+      "manageRegistrationsCta": "Gestionează înregistrările"
+    },
+    "commentNotification": {
+      "subject": "{playerName} a comentat la {momentTitle}",
+      "heading": "Comentariu nou",
+      "message": "{playerName} a comentat la Evenimentul tău {momentTitle}",
+      "commentPreviewLabel": "Comentariu",
+      "viewCommentCta": "Vezi comentariul"
+    },
+    "momentUpdate": {
+      "subject": "Actualizare: {momentTitle}",
+      "heading": "Un eveniment a fost actualizat",
+      "intro": "Organizatorul a efectuat modificări la un eveniment la care ești înscris.",
+      "dateChangedLabel": "Data nouă",
+      "locationChangedLabel": "Locația nouă"
+    },
+    "hostMomentUpdate": {
+      "heading": "Evenimentul tău a fost actualizat",
+      "intro": "Ai actualizat evenimentul tău. Participanții înscriși au fost notificați automat."
+    },
+    "momentCancelled": {
+      "subject": "Anulat: {momentTitle}",
+      "heading": "Acest eveniment a fost anulat",
+      "message": "Organizatorul a anulat {momentTitle}. Sperăm să te vedem la un eveniment viitor din Comunitate.",
+      "ctaLabel": "Vezi Comunitatea"
+    },
+    "common": {
+      "dateLabel": "Dată",
+      "locationLabel": "Locație",
+      "viewMomentCta": "Vezi Evenimentul",
+      "cancelLink": "Anulează înscrierea",
+      "dashboardLink": "Găsește toate evenimentele tale în Tabloul tău de bord →",
+      "footer": "Powered by The Playground — Lansează-ți comunitatea, gratuit."
+    }
+  },
+  "PwaInstall": {
+    "heading": "Disponibil pe iOS și Android",
+    "subtitle": "Instalează aplicația gratuit pe telefonul tău",
+    "note": "Aplicație web progresivă (PWA) — fără descărcare necesară",
+    "ios": {
+      "label": "Adaugă pe iPhone"
+    },
+    "android": {
+      "label": "Adaugă pe Android"
+    },
+    "modal": {
+      "title": "Instalează pe iPhone",
+      "step1Label": "Apasă Partajare",
+      "step1Hint": "Butonul din partea de jos a Safari",
+      "step2Label": "Selectează «Adaugă pe ecranul principal»",
+      "step2Hint": "Derulează lista de opțiuni",
+      "step3Label": "Apasă «Adaugă»",
+      "step3Hint": "Aplicația va apărea pe ecranul tău principal"
+    }
+  },
+  "Footer": {
+    "brand": {
+      "tagline": "Lansează-ți comunitatea, gratuit.",
+      "copyright": "© 2026 The Playground. Toate drepturile rezervate."
+    },
+    "product": {
+      "title": "Produs",
+      "explore": "Explorează",
+      "howItWorks": "Cum funcționează",
+      "about": "Despre",
+      "changelog": "Noutăți"
+    },
+    "legal": {
+      "title": "Legal",
+      "legalNotice": "Mențiuni legale",
+      "privacy": "Politică de confidențialitate",
+      "terms": "Termeni de utilizare"
+    }
+  },
+  "Legal": {
+    "lastUpdated": "Ultima actualizare: {date}",
+    "legalNotice": {
+      "title": "Mențiuni legale",
+      "metaDescription": "Mențiunile legale ale The Playground — informații despre editor, găzduire și proprietate intelectuală.",
+      "editor": {
+        "title": "Editor",
+        "content": "The Playground este publicat de The Spark SASU, societate pe acțiuni simplificată cu asociat unic înregistrată în Franța.",
+        "siret": "SIRET: 93482575300015",
+        "address": "Sediu social: 10 rue de la Paix, 75002 Paris, Franța",
+        "contact": "Contact: linkedin.com/in/dragosdreptate",
+        "director": "Director publicație: Dragos Dreptate"
+      },
+      "host": {
+        "title": "Furnizor de găzduire",
+        "content": "Site-ul este găzduit de Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, Statele Unite."
+      },
+      "intellectualProperty": {
+        "title": "Proprietate intelectuală",
+        "content": "Tot conținutul acestui site (texte, grafice, logouri, pictograme, software) este proprietatea exclusivă a The Spark SASU, dacă nu se specifică altfel. Orice reproducere, reprezentare sau distribuire, totală sau parțială, a conținutului acestui site fără autorizație este interzisă."
+      },
+      "liability": {
+        "title": "Responsabilitate",
+        "content": "The Spark SASU se străduiește să asigure exactitatea informațiilor publicate pe site, dar nu poate garanta completitudinea sau actualitatea acestora. Utilizarea site-ului se face pe riscul exclusiv al utilizatorului."
+      }
+    },
+    "privacy": {
+      "title": "Politică de confidențialitate",
+      "metaDescription": "Politica de confidențialitate a The Playground — date colectate, scopuri, drepturi GDPR și cookie-uri.",
+      "intro": "The Playground, publicat de The Spark SASU, se angajează să protejeze confidențialitatea utilizatorilor săi. Această politică descrie datele pe care le colectăm, de ce le utilizăm și care sunt drepturile tale.",
+      "dataCollected": {
+        "title": "Date colectate",
+        "items": {
+          "email": "Adresă de email (autentificare prin link magic sau OAuth)",
+          "name": "Prenume și nume (furnizate în timpul onboarding-ului)",
+          "oauth": "Identificator cont OAuth (Google, GitHub) — doar pentru autentificare",
+          "usage": "Date de utilizare anonimizate (Vercel Analytics)"
+        }
+      },
+      "purpose": {
+        "title": "Scopul prelucrării datelor",
+        "items": {
+          "auth": "Autentificare și gestionarea contului",
+          "service": "Furnizarea serviciului (crearea Comunităților, înscrierea la Evenimente)",
+          "email": "Trimiterea de emailuri tranzacționale (confirmări de înregistrare, notificări)",
+          "analytics": "Îmbunătățirea serviciului prin statistici anonimizate"
+        }
+      },
+      "sharing": {
+        "title": "Partajarea datelor",
+        "content": "Datele tale personale nu sunt niciodată vândute sau partajate cu terți în scopuri comerciale. Pot fi transmise subcontractanților noștri tehnici (găzduire, livrare email) exclusiv pentru a asigura funcționarea serviciului."
+      },
+      "cookies": {
+        "title": "Cookie-uri",
+        "content": "The Playground utilizează doar cookie-uri strict necesare pentru funcționarea site-ului (sesiunea de autentificare). Nu se utilizează cookie-uri publicitare sau de urmărire de la terți."
+      },
+      "rights": {
+        "title": "Drepturile tale (GDPR)",
+        "content": "În conformitate cu Regulamentul General privind Protecția Datelor (GDPR), ai următoarele drepturi:",
+        "items": {
+          "access": "Dreptul de acces la datele tale personale",
+          "rectification": "Dreptul de rectificare a datelor inexacte",
+          "deletion": "Dreptul la ștergerea datelor tale",
+          "portability": "Dreptul la portabilitatea datelor",
+          "opposition": "Dreptul de opoziție la prelucrare"
+        },
+        "contact": "Pentru a-ți exercita aceste drepturi, contactează-ne pe LinkedIn: linkedin.com/in/dragosdreptate."
+      },
+      "retention": {
+        "title": "Păstrarea datelor",
+        "content": "Datele tale sunt păstrate atâta timp cât contul tău este activ. Dacă contul tău este șters, datele tale personale vor fi șterse în termen de 30 de zile."
+      }
+    },
+    "terms": {
+      "title": "Termeni de utilizare",
+      "metaDescription": "Termenii de utilizare ai The Playground — acceptare, descrierea serviciului, responsabilități și legislație aplicabilă.",
+      "intro": "Acești termeni de utilizare («Termeni») reglementează utilizarea platformei The Playground, publicată de The Spark SASU.",
+      "acceptance": {
+        "title": "Acceptarea Termenilor",
+        "content": "Prin utilizarea The Playground, accepți acești Termeni în totalitate. Dacă nu accepți aceste condiții, te rugăm să nu utilizezi serviciul."
+      },
+      "service": {
+        "title": "Descrierea serviciului",
+        "content": "The Playground este o platformă gratuită pentru crearea de Comunități și organizarea de Evenimente. Serviciul este accesibil prin web și este furnizat «ca atare»."
+      },
+      "account": {
+        "title": "Contul de utilizator",
+        "content": "Accesul la serviciu necesită crearea unui cont prin email (link magic) sau printr-un furnizor OAuth (Google, GitHub). Ești responsabil pentru confidențialitatea contului tău și pentru toate activitățile care au loc sub acesta."
+      },
+      "userContent": {
+        "title": "Conținutul utilizatorului",
+        "content": "Ești singurul responsabil pentru conținutul pe care îl publici pe The Playground (descrieri de Comunități, descrieri de Evenimente, comentarii). Orice conținut ilegal, defăimător, discriminatoriu sau inadecvat este interzis și poate fi eliminat fără notificare prealabilă."
+      },
+      "hostResponsibilities": {
+        "title": "Responsabilitățile Organizatorului",
+        "content": "Ca Organizator, ești responsabil pentru exactitatea informațiilor legate de Evenimentele tale (locație, dată, descriere). Te angajezi să respecți toate legile aplicabile privind organizarea de evenimente."
+      },
+      "playerResponsibilities": {
+        "title": "Responsabilitățile Participantului",
+        "content": "Ca Participant, te angajezi să respecți regulile fiecărei Comunități și Eveniment la care participi. Înscrierea la un Eveniment constituie un angajament de prezență."
+      },
+      "pricing": {
+        "title": "Prețuri",
+        "content": "The Playground este complet gratuit. Platforma nu percepe niciun comision. Pentru Evenimentele plătite, se aplică doar taxele de tranzacție Stripe (aproximativ 2,9% + 0,30$) și sunt suportate de Organizator."
+      },
+      "liability": {
+        "title": "Limitarea răspunderii",
+        "content": "The Spark SASU nu va fi răspunzătoare pentru niciun prejudiciu direct sau indirect rezultat din utilizarea serviciului, inclusiv, dar fără a se limita la, întreruperea serviciului, pierderea datelor sau disputele dintre Organizatori și Participanți."
+      },
+      "modification": {
+        "title": "Modificarea Termenilor",
+        "content": "The Spark SASU își rezervă dreptul de a modifica acești Termeni în orice moment. Utilizatorii vor fi notificați cu privire la modificări prin email sau prin notificare pe platformă. Utilizarea continuată a serviciului după modificare constituie acceptarea noilor condiții."
+      },
+      "law": {
+        "title": "Legislație aplicabilă",
+        "content": "Acești Termeni sunt guvernați de legea franceză. În cazul unui litigiu, instanțele competente din Paris vor avea jurisdicție exclusivă."
+      }
+    }
+  },
+  "Profile": {
+    "avatar": {
+      "add": "Adaugă o fotografie",
+      "change": "Schimbă fotografia",
+      "uploading": "Se încarcă...",
+      "errorType": "Format neacceptat. Folosește JPEG, PNG sau WebP.",
+      "errorSize": "Fișier prea mare (max. 5 MB).",
+      "errorUpload": "Eroare la încărcare. Te rugăm să încerci din nou."
+    },
+    "setup": {
+      "title": "Completează-ți profilul",
+      "description": "Spune-ne puțin despre tine pentru a începe."
+    },
+    "edit": {
+      "title": "Profilul meu",
+      "description": "Gestionează-ți informațiile personale",
+      "personalInfo": "Informații personale",
+      "memberSince": "Participant din",
+      "account": "Cont",
+      "circles": "Comunități",
+      "moments": "Evenimente"
+    },
+    "form": {
+      "email": "Email",
+      "emailHint": "Emailul tău este folosit pentru autentificare și nu poate fi schimbat.",
+      "firstName": "Prenume",
+      "firstNamePlaceholder": "Ana",
+      "lastName": "Nume",
+      "lastNamePlaceholder": "Popescu",
+      "continue": "Continuă",
+      "saved": "Profil actualizat cu succes."
+    },
+    "errors": {
+      "notFound": "Utilizatorul nu a fost găsit",
+      "updateFailed": "Eroare la actualizarea profilului"
+    },
+    "deleteAccount": {
+      "dangerZone": "Zonă periculoasă",
+      "description": "Ștergerea contului tău este permanentă și nu poate fi anulată.",
+      "trigger": "Șterge contul meu",
+      "title": "Ștergi contul tău?",
+      "warning": "Această acțiune este permanentă și va șterge:",
+      "items": {
+        "registrations": "Înregistrările tale la evenimente",
+        "comments": "Comentariile tale",
+        "circles": "Comunitățile unde ești singurul Organizator (și evenimentele lor)"
+      },
+      "confirm": "Șterge permanent",
+      "error": "Ceva a mers greșit. Te rugăm să încerci din nou."
+    },
+    "notifications": {
+      "title": "Notificări",
+      "emailBanner": "Aceste preferințe controlează emailurile trimise la {email}.",
+      "organizer": "Ca Organizator",
+      "participant": "Ca Participant",
+      "newRegistration": "Înregistrare nouă",
+      "newRegistrationDesc": "Când cineva se înscrie la unul dintre evenimentele tale",
+      "newComment": "Comentariu nou",
+      "newCommentDesc": "Când cineva comentează la unul dintre evenimentele tale",
+      "newFollower": "Urmăritor nou",
+      "newFollowerDesc": "Când cineva urmărește una dintre Comunitățile tale",
+      "newMomentInCircle": "Eveniment nou",
+      "newMomentInCircleDesc": "Când este creat un eveniment într-o Comunitate pe care o urmărești",
+      "saved": "Preferințe salvate"
+    }
+  }
+}

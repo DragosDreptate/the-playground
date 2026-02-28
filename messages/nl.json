@@ -1,0 +1,804 @@
+{
+  "HomePage": {
+    "title": "The Playground",
+    "heroHighlight1": "Lanceer",
+    "heroRest1": "jouw community.",
+    "heroHighlight2": "Organiseer",
+    "heroRest2": "jouw evenementen.",
+    "heroHighlight3": "Activeer",
+    "heroRest3": "jouw netwerk.",
+    "heroSubtitle": "Het gratis platform om jouw community op te bouwen en onvergetelijke evenementen te organiseren.",
+    "cta": "Lanceer jouw community",
+    "mockupCircleName": "Product & AI",
+    "mockupAboutText": "De community voor productliefhebbers in het tijdperk van AI.",
+    "mockupCreatedDate": "21 feb. 2026",
+    "mockupMomentDay": "Vr",
+    "mockupMomentDate": "27 feb.",
+    "mockupMomentTime": "19:00",
+    "mockupMomentTitle": "Design Drinks #12",
+    "mockupMomentLocation": "The Counter",
+    "mockupMomentAttendees": "8 aangemeld",
+    "howItWorks": "Hoe het werkt",
+    "step1Title": "Maak jouw Community aan",
+    "step1Description": "Jouw communityruimte in 30 seconden. Openbaar of privé, jij beslist.",
+    "step2Title": "Lanceer jouw Evenementen",
+    "step2Description": "Elk Evenement krijgt een premium, deelbare pagina. Één link en je bent live.",
+    "step3Title": "Zie jouw Community groeien",
+    "step3Description": "Leden blijven in jouw Community en komen terug voor de volgende Evenementen.",
+    "pillarsHeading": "Wat The Playground anders maakt",
+    "pillar1Title": "Community eerst",
+    "pillar1Description": "Jouw leden blijven tussen Evenementen. Geen eenmalig publiek meer.",
+    "pillar2Title": "Premium design",
+    "pillar2Description": "Elegante pagina's, moeiteloos. Jouw Community maakt indruk vanaf dag één.",
+    "pillar3Title": "100% gratis",
+    "pillar3Description": "Geen commissie, geen abonnement. Alleen Stripe-kosten voor betaalde evenementen.",
+    "ctaFinalTitle": "Klaar om jouw community te lanceren?",
+    "ctaFinalSubtitle": "Maak jouw Community in 30 seconden aan. Gratis, voor altijd.",
+    "ctaFinal": "Gratis beginnen",
+    "ctaExplore": "Verkennen",
+    "heroFamiliar1": "community",
+    "heroFamiliar2": "evenementen",
+    "heroBranded1": "Community",
+    "heroBranded2": "Evenementen",
+    "heroRestPrefix1": "jouw",
+    "heroRestPrefix2": "jouw"
+  },
+  "Common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "back": "Terug",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "create": "Aanmaken",
+    "edit": "Bewerken",
+    "public": "Openbaar",
+    "private": "Privé",
+    "showMore": "Meer tonen",
+    "showLess": "Minder tonen"
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Inloggen",
+      "subtitle": "Log in om verder te gaan",
+      "google": "Doorgaan met Google",
+      "github": "Doorgaan met GitHub",
+      "emailPlaceholder": "jouw@email.com",
+      "magicLink": "Stuur een magische link",
+      "or": "of",
+      "linkedin": "Doorgaan met LinkedIn"
+    },
+    "verifyRequest": {
+      "title": "Controleer je e-mail",
+      "description": "Er is een inloglink naar je e-mailadres gestuurd. Klik erop om in te loggen."
+    },
+    "error": {
+      "title": "Authenticatiefout",
+      "backToSignIn": "Terug naar inloggen"
+    },
+    "errors": {
+      "Configuration": "Serverconfiguratiefout.",
+      "AccessDenied": "Toegang geweigerd.",
+      "Verification": "De verificatielink is verlopen of al gebruikt.",
+      "Default": "Er is een fout opgetreden tijdens het inloggen."
+    },
+    "signOut": "Uitloggen"
+  },
+  "Welcome": {
+    "greeting": "Hey {name} 👋",
+    "greetingAnonymous": "Welkom bij The Playground 👋",
+    "subtitle": "Wat wil je als eerste doen?",
+    "createCircle": {
+      "title": "Mijn Community aanmaken",
+      "description": "Lanceer jouw community, nodig leden uit en organiseer evenementen.",
+      "cta": "Beginnen"
+    },
+    "explore": {
+      "title": "Communities ontdekken",
+      "description": "Verken openbare communities en sluit je aan bij degene die bij jouw interesses passen.",
+      "cta": "Verkennen"
+    },
+    "modeChoice": {
+      "greetingPrefix": "Welkom,",
+      "greetingSuffix": "Wat wil je doen?",
+      "greetingAnonymous": "Welkom — wat wil je doen?",
+      "subtitle": "Kies jouw standaardmodus. Je kunt dit op elk moment wijzigen.",
+      "participant": {
+        "title": "Ik neem deel",
+        "description": "Evenementen ontdekken en deelnemen die mij inspireren"
+      },
+      "organizer": {
+        "title": "Ik organiseer",
+        "description": "Mijn community aanmaken en evenementen organiseren"
+      },
+      "hint": "Je kunt op elk moment van modus wisselen vanuit je dashboard."
+    }
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "myCircles": "Mijn Communities",
+    "myCirclesOrganizer": "Mijn Communities",
+    "createCircle": "Een Community aanmaken",
+    "createMoment": "Een Evenement aanmaken",
+    "createCircleFirst": "Maak eerst een Community aan",
+    "selectCircleDropdown": "Welke Community?",
+    "selectCircle": {
+      "title": "Kies een Community",
+      "description": "Tot welke Community moet dit Evenement behoren?"
+    },
+    "noCircles": {
+      "title": "Maak eerst een Community aan",
+      "description": "Je hebt een Community nodig voordat je een Evenement kunt aanmaken."
+    },
+    "myMoments": "Mijn Evenementen",
+    "myMomentsOrganizer": "Mijn Evenementen",
+    "upcomingMoments": "Mijn aankomende Evenementen",
+    "pastMoments": "Verleden",
+    "noUpcomingMoments": "Geen aankomende Evenementen.",
+    "noMoments": "Nog geen Evenementen.",
+    "noMomentsHint": "Neem deel aan een Evenement of maak jouw community aan.",
+    "noMomentsHintExplore": "Evenementen verkennen →",
+    "noMomentsOrganizer": "Nog geen Evenementen georganiseerd.",
+    "noMomentsOrganizerHint": "Maak jouw eerste Evenement aan vanuit een Community.",
+    "emptyCircles": "Je bent geen lid van een Community.",
+    "emptyCirclesHint": "Maak een Community aan of neem deel aan een Evenement om lid te worden.",
+    "noCirclesOrganizer": "Je organiseert nog geen Community.",
+    "noCirclesOrganizerHint": "Maak jouw eerste Community aan om te beginnen.",
+    "noCirclesMember": "Je bent nog geen lid van een Community.",
+    "role": {
+      "host": "Organisator",
+      "player": "Lid"
+    },
+    "registrationStatus": {
+      "registered": "Aangemeld",
+      "waitlisted": "Wachtlijst"
+    },
+    "online": "Online",
+    "hybrid": "Hybride",
+    "hostTools": "Organisatortools",
+    "greeting": "Hallo, {name}",
+    "greetingAnonymous": "Hallo",
+    "greetingSubtitle": "Jouw Communities en aankomende Evenementen, alles op één plek.",
+    "greetingSubtitleOrganizer": "Beheer jouw Communities en Evenementen.",
+    "memberCount": "{count} leden",
+    "modeParticipant": "Lid",
+    "modeOrganizer": "Organisator",
+    "modeBadgeParticipant": "Ledenweergave",
+    "modeBadgeOrganizer": "Organisatorweergave"
+  },
+  "Circle": {
+    "create": {
+      "title": "Een Community aanmaken",
+      "description": "Stel jouw communityruimte in"
+    },
+    "edit": {
+      "title": "Community bewerken",
+      "description": "Instellingen van jouw Community bijwerken"
+    },
+    "form": {
+      "coverImage": "Omslagafbeelding",
+      "name": "Naam",
+      "namePlaceholder": "Mijn geweldige community",
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Vertel mensen waar jouw Community over gaat...",
+      "visibility": "Zichtbaarheid",
+      "visibilityPublic": "Openbaar — iedereen kan deze Community ontdekken",
+      "visibilityPrivate": "Privé — alleen toegankelijk via uitnodiging",
+      "category": "Categorie",
+      "categoryPlaceholder": "Kies een categorie",
+      "city": "Stad",
+      "cityPlaceholder": "Amsterdam, Brussel, Op afstand..."
+    },
+    "delete": {
+      "title": "Community verwijderen",
+      "description": "Weet je zeker dat je deze Community wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt. Alle Evenementen en lidmaatschappen worden permanent verwijderd.",
+      "confirm": "Ja, verwijder deze Community"
+    },
+    "detail": {
+      "members": "Leden",
+      "moments": "Evenementen",
+      "settings": "Instellingen",
+      "editCircle": "Bewerken",
+      "deleteCircle": "Verwijderen",
+      "created": "Aangemaakt op",
+      "hosts": "Organisatoren",
+      "hostedBy": "Georganiseerd door",
+      "about": "Over",
+      "visibility": "Zichtbaarheid",
+      "publicCircle": "Openbare Community",
+      "privateCircle": "Privé Community",
+      "memberCount": "{count} leden",
+      "upcomingMoments": "Aankomende Evenementen",
+      "pastMoments": "Vorige Evenementen",
+      "noUpcomingMoments": "Geen aankomende Evenementen.",
+      "noPastMoments": "Geen vorige Evenementen.",
+      "today": "Vandaag",
+      "manageMoment": "Beheer dit Evenement",
+      "follow": "Volgen",
+      "unfollow": "Ontvolgen",
+      "following": "Volgend",
+      "isMember": "Je bent lid",
+      "isHost": "Je bent Organisator",
+      "manageCircle": "Beheer deze Community",
+      "shareableLink": "Deelbare link"
+    },
+    "errors": {
+      "notFound": "Community niet gevonden",
+      "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",
+      "createFailed": "Aanmaken van Community mislukt",
+      "updateFailed": "Bijwerken van Community mislukt",
+      "deleteFailed": "Verwijderen van Community mislukt"
+    }
+  },
+  "Moment": {
+    "create": {
+      "title": "Een Evenement aanmaken",
+      "description": "Stel jouw evenement in"
+    },
+    "edit": {
+      "title": "Evenement bewerken",
+      "description": "Gegevens van jouw evenement bijwerken"
+    },
+    "form": {
+      "title": "Titel",
+      "eventName": "Naam van het evenement",
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Vertel mensen waar dit Evenement over gaat...",
+      "addLocation": "Locatie toevoegen",
+      "addLocationHint": "Fysieke locatie of virtuele link",
+      "addDescription": "Beschrijving toevoegen",
+      "locationType": "Type locatie",
+      "locationInPerson": "Fysiek",
+      "locationOnline": "Online",
+      "locationHybrid": "Hybride",
+      "locationName": "Naam van de locatie",
+      "locationNamePlaceholder": "Café Centraal",
+      "locationAddress": "Adres",
+      "locationAddressPlaceholder": "Hoofdstraat 123, Amsterdam",
+      "videoLink": "Videolink",
+      "videoLinkPlaceholder": "https://meet.google.com/...",
+      "videoLinkOr": "of plak de link",
+      "eventOptions": "Evenementopties",
+      "ticketPrice": "Ticketprijs",
+      "priceSoon": "Binnenkort beschikbaar",
+      "free": "Gratis",
+      "capacity": "Capaciteit",
+      "capacityLabel": "Capaciteit",
+      "unlimited": "Onbeperkt",
+      "capacityPlaceholder": "Leeg laten voor onbeperkt",
+      "price": "Prijs (in centen)",
+      "pricePlaceholder": "0",
+      "priceHint": "In centen. 1500 = 15,00. Laat 0 voor gratis.",
+      "currency": "Valuta",
+      "status": "Status",
+      "startLabel": "Start",
+      "endLabel": "Einde",
+      "pickDate": "Kies een datum",
+      "endBeforeStart": "De einddatum moet na de startdatum liggen.",
+      "createMoment": "Publiceren"
+    },
+    "delete": {
+      "title": "Evenement verwijderen",
+      "description": "Weet je zeker dat je dit Evenement wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt. Alle inschrijvingen worden permanent verwijderd.",
+      "confirm": "Ja, verwijder dit Evenement"
+    },
+    "detail": {
+      "when": "Wanneer",
+      "where": "Waar",
+      "capacity": "Capaciteit",
+      "price": "Prijs",
+      "created": "Aangemaakt",
+      "shareableLink": "Deelbare link"
+    },
+    "status": {
+      "published": "Gepubliceerd",
+      "cancelled": "Geannuleerd",
+      "past": "Voorbij"
+    },
+    "public": {
+      "hostedBy": "Georganiseerd door",
+      "free": "Gratis",
+      "spotsAvailable": "{count} plaatsen",
+      "registerFree": "Aanmelden",
+      "registerPaid": "Aanmelden — {price} {currency}",
+      "comingSoon": "Binnenkort",
+      "registered": "Aangemeld",
+      "waitlisted": "Wachtlijst",
+      "joinWaitlist": "Op de wachtlijst",
+      "cancelRegistration": "Mijn inschrijving annuleren",
+      "cancelConfirmTitle": "Inschrijving annuleren",
+      "cancelConfirmDescription": "Weet je zeker dat je jouw inschrijving voor dit Evenement wilt annuleren?",
+      "confirmCancel": "Ja, annuleren",
+      "spotsRemaining": "{count} plaatsen over",
+      "signInToRegister": "Aanmelden",
+      "registrantsCount": "{count} aangemeld",
+      "eventFull": "Vol",
+      "attendeesCount": "{count} lid(leden)",
+      "about": "Over",
+      "viewOnMap": "Bekijken op Google Maps",
+      "eventTookPlace": "Dit evenement vond plaats op",
+      "eventEnded": "Evenement afgelopen",
+      "eventCancelled": "Evenement geannuleerd",
+      "attendedCount": "{count} leden aanwezig",
+      "viewCircleMoments": "Bekijk aankomende Evenementen van deze Community",
+      "upcomingInCircle": "Ook in deze Community",
+      "seeAllCircleEvents": "Alle evenementen bekijken",
+      "addToCalendar": {
+        "label": "Toevoegen aan agenda",
+        "google": "Google Agenda",
+        "ics": ".ics bestand"
+      },
+      "waitlistPosition": "Je staat op positie #{position} op de wachtlijst"
+    },
+    "registrations": {
+      "title": "Deelnemers",
+      "registered": "{count} aangemeld",
+      "waitlisted": "{count} op wachtlijst",
+      "capacity": "{count} capaciteit",
+      "empty": "Nog niemand aangemeld.",
+      "status": {
+        "registered": "Aangemeld",
+        "waitlisted": "Wachtlijst"
+      },
+      "exportCsv": "Exporteren als CSV",
+      "csvHeaders": {
+        "firstName": "Voornaam",
+        "lastName": "Achternaam",
+        "email": "E-mail",
+        "status": "Status",
+        "registeredAt": "Inschrijvingsdatum"
+      }
+    },
+    "comments": {
+      "title": "Reacties",
+      "count": "{count} reactie(s)",
+      "empty": "Nog geen reacties. Wees de eerste!",
+      "placeholder": "Deel je gedachten...",
+      "placeholderPast": "Bedankjes, foto's, feedback... deel het!",
+      "submit": "Plaatsen",
+      "signInToComment": "Log in om te reageren",
+      "deleteTitle": "Reactie verwijderen",
+      "deleteDescription": "Weet je zeker dat je deze reactie wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+      "confirmDelete": "Ja, verwijderen",
+      "justNow": "Zojuist",
+      "minutesAgo": "{count}m geleden",
+      "hoursAgo": "{count}u geleden",
+      "daysAgo": "{count}d geleden"
+    },
+    "empty": {
+      "description": "Nog geen Evenementen. Maak jouw eerste evenement aan."
+    },
+    "errors": {
+      "notFound": "Evenement niet gevonden",
+      "unauthorized": "Je hebt geen toestemming om dit Evenement te beheren",
+      "createFailed": "Aanmaken van Evenement mislukt",
+      "updateFailed": "Bijwerken van Evenement mislukt",
+      "deleteFailed": "Verwijderen van Evenement mislukt"
+    }
+  },
+  "CircleCategory": {
+    "TECH": "Tech & AI",
+    "DESIGN": "Product & Design",
+    "BUSINESS": "Business & Ondernemerschap",
+    "SPORT_WELLNESS": "Sport & Welzijn",
+    "ART_CULTURE": "Kunst & Cultuur",
+    "SCIENCE_EDUCATION": "Wetenschap & Onderwijs",
+    "SOCIAL": "Sociaal & Community",
+    "OTHER": "Anders"
+  },
+  "Explorer": {
+    "title": "Ontdekken",
+    "description": "Communities die jouw waarden delen, evenementen die je niet wilt missen.",
+    "navLink": "Ontdekken",
+    "tabs": {
+      "circles": "Communities",
+      "moments": "Evenementen"
+    },
+    "filters": {
+      "allCategories": "Alle categorieën"
+    },
+    "empty": {
+      "circles": "Geen openbare Communities voor deze categorie.",
+      "moments": "Geen aankomende Evenementen voor deze categorie."
+    },
+    "circleCard": {
+      "members": "{count} leden",
+      "upcomingMoments": "{count} aankomend(e) Evenement(en)",
+      "noUpcomingMoments": "Geen aankomende Evenementen",
+      "nextMoment": "Volgend Evenement",
+      "roleBadge": {
+        "host": "Organisator",
+        "member": "Lid"
+      }
+    },
+    "momentCard": {
+      "free": "Gratis",
+      "spotsRemaining": "{count} plaatsen over",
+      "registeredCount": "{count} aangemeld",
+      "online": "Online",
+      "roleBadge": {
+        "host": "Organisator",
+        "registered": "Aangemeld",
+        "waitlisted": "Wachtlijst"
+      }
+    },
+    "loadMore": "Meer tonen"
+  },
+  "Admin": {
+    "title": "Beheer",
+    "dashboard": "Dashboard",
+    "users": "Gebruikers",
+    "circles": "Communities",
+    "moments": "Evenementen",
+    "backToSite": "Terug naar site",
+    "stats": {
+      "totalUsers": "Gebruikers",
+      "totalCircles": "Communities",
+      "totalMoments": "Evenementen",
+      "totalRegistrations": "Inschrijvingen",
+      "totalComments": "Reacties",
+      "thisWeek": "deze week"
+    },
+    "table": {
+      "search": "Zoeken...",
+      "noResults": "Geen resultaten.",
+      "previous": "Vorige",
+      "next": "Volgende",
+      "showing": "Toont {from} tot {to} van {total}"
+    },
+    "actions": {
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "confirmDelete": "Weet je het zeker? Deze actie kan niet ongedaan worden gemaakt.",
+      "confirmCancel": "Weet je zeker dat je dit Evenement wilt annuleren?",
+      "cancelMoment": "Geforceerd annuleren",
+      "view": "Bekijken"
+    },
+    "userDetail": {
+      "title": "Gebruikersdetails",
+      "role": "Rol",
+      "onboarding": "Onboarding",
+      "completed": "Voltooid",
+      "pending": "In behandeling",
+      "memberSince": "Lid sinds",
+      "circles": "Communities",
+      "noCircles": "Geen Communities."
+    },
+    "circleDetail": {
+      "title": "Community details",
+      "host": "Organisator",
+      "members": "Leden",
+      "moments": "Evenementen",
+      "visibility": "Zichtbaarheid",
+      "category": "Categorie",
+      "city": "Stad",
+      "description": "Beschrijving",
+      "recentMoments": "Recente Evenementen",
+      "noMoments": "Geen Evenementen."
+    },
+    "viewPublicPage": "Pagina bekijken",
+    "momentDetail": {
+      "title": "Evenementdetails",
+      "circle": "Community",
+      "createdBy": "Aangemaakt door",
+      "status": "Status",
+      "date": "Datum",
+      "capacity": "Capaciteit",
+      "registrations": "Inschrijvingen",
+      "comments": "Reacties",
+      "noRegistrations": "Geen inschrijvingen.",
+      "unlimited": "Onbeperkt"
+    },
+    "columns": {
+      "name": "Naam",
+      "email": "E-mail",
+      "role": "Rol",
+      "circles": "Communities",
+      "moments": "Evenementen",
+      "createdAt": "Lid geworden",
+      "host": "Organisator",
+      "members": "Leden",
+      "visibility": "Zichtbaarheid",
+      "category": "Categorie",
+      "title": "Titel",
+      "circle": "Community",
+      "date": "Datum",
+      "status": "Status",
+      "registrations": "Inschrijvingen",
+      "comments": "Reacties",
+      "actions": "Acties"
+    }
+  },
+  "UserMenu": {
+    "dashboard": "Dashboard",
+    "profile": "Profiel",
+    "signOut": "Uitloggen"
+  },
+  "Email": {
+    "registration": {
+      "subject": "Je bent aangemeld voor {momentTitle}",
+      "heading": "Inschrijving bevestigd!",
+      "statusMessage": "Je bent aangemeld voor {momentTitle}."
+    },
+    "waitlist": {
+      "subject": "Wachtlijst: {momentTitle}",
+      "heading": "Je staat op de wachtlijst",
+      "statusMessage": "Je staat op de wachtlijst voor {momentTitle}. We laten je weten als er een plek vrijkomt."
+    },
+    "promotion": {
+      "subject": "Jouw plek is bevestigd: {momentTitle}",
+      "heading": "Goed nieuws!",
+      "statusMessage": "Er is een plek vrijgekomen! Jouw inschrijving voor {momentTitle} is bevestigd."
+    },
+    "hostMomentCreated": {
+      "subject": "Jouw evenement is live: {momentTitle}",
+      "heading": "Jouw evenement is gepubliceerd!",
+      "statusMessage": "Je hebt {momentTitle} gepland. Deel de link om deelnemers uit te nodigen.",
+      "manageMomentCta": "Evenement beheren"
+    },
+    "hostNotification": {
+      "subject": "{playerName} heeft zich aangemeld voor {momentTitle}",
+      "heading": "Nieuwe inschrijving",
+      "message": "{playerName} heeft zich aangemeld voor {momentTitle}",
+      "registrationInfo": "{count} aangemeld / {capacity} plaatsen",
+      "registrationInfoUnlimited": "{count} aangemeld",
+      "manageRegistrationsCta": "Inschrijvingen beheren"
+    },
+    "commentNotification": {
+      "subject": "{playerName} heeft gereageerd op {momentTitle}",
+      "heading": "Nieuwe reactie",
+      "message": "{playerName} heeft gereageerd op jouw Evenement {momentTitle}",
+      "commentPreviewLabel": "Reactie",
+      "viewCommentCta": "Reactie bekijken"
+    },
+    "momentUpdate": {
+      "subject": "Update: {momentTitle}",
+      "heading": "Een evenement is bijgewerkt",
+      "intro": "De organisator heeft wijzigingen aangebracht in een evenement waarvoor je bent ingeschreven.",
+      "dateChangedLabel": "Nieuwe datum",
+      "locationChangedLabel": "Nieuwe locatie"
+    },
+    "hostMomentUpdate": {
+      "heading": "Jouw evenement is bijgewerkt",
+      "intro": "Je hebt jouw evenement bijgewerkt. Ingeschreven deelnemers zijn automatisch op de hoogte gesteld."
+    },
+    "momentCancelled": {
+      "subject": "Geannuleerd: {momentTitle}",
+      "heading": "Dit evenement is geannuleerd",
+      "message": "De organisator heeft {momentTitle} geannuleerd. We hopen je te zien bij een toekomstig evenement in de Community.",
+      "ctaLabel": "Community bekijken"
+    },
+    "common": {
+      "dateLabel": "Datum",
+      "locationLabel": "Locatie",
+      "viewMomentCta": "Evenement bekijken",
+      "cancelLink": "Mijn inschrijving annuleren",
+      "dashboardLink": "Vind al jouw evenementen in jouw Dashboard →",
+      "footer": "Powered by The Playground — Lanceer jouw community, gratis."
+    }
+  },
+  "PwaInstall": {
+    "heading": "Beschikbaar op iOS en Android",
+    "subtitle": "Installeer de app gratis op je telefoon",
+    "note": "Progressive web app (PWA) — geen download vereist",
+    "ios": {
+      "label": "Toevoegen aan iPhone"
+    },
+    "android": {
+      "label": "Toevoegen aan Android"
+    },
+    "modal": {
+      "title": "Installeren op iPhone",
+      "step1Label": "Tik op Delen",
+      "step1Hint": "Knop onderaan Safari",
+      "step2Label": "Selecteer \"Zet op beginscherm\"",
+      "step2Hint": "Scrol omlaag in de lijst met opties",
+      "step3Label": "Tik op \"Voeg toe\"",
+      "step3Hint": "De app verschijnt op jouw beginscherm"
+    }
+  },
+  "Footer": {
+    "brand": {
+      "tagline": "Lanceer jouw community, gratis.",
+      "copyright": "© 2026 The Playground. Alle rechten voorbehouden."
+    },
+    "product": {
+      "title": "Product",
+      "explore": "Ontdekken",
+      "howItWorks": "Hoe het werkt",
+      "about": "Over ons",
+      "changelog": "Wijzigingslog"
+    },
+    "legal": {
+      "title": "Juridisch",
+      "legalNotice": "Juridische kennisgeving",
+      "privacy": "Privacybeleid",
+      "terms": "Gebruiksvoorwaarden"
+    }
+  },
+  "Legal": {
+    "lastUpdated": "Laatst bijgewerkt: {date}",
+    "legalNotice": {
+      "title": "Juridische kennisgeving",
+      "metaDescription": "Juridische kennisgeving voor The Playground — informatie over uitgever, hosting en intellectueel eigendom.",
+      "editor": {
+        "title": "Uitgever",
+        "content": "The Playground wordt uitgegeven door The Spark SASU, een vereenvoudigde eenpersoonsvennootschap geregistreerd in Frankrijk.",
+        "siret": "SIRET: 93482575300015",
+        "address": "Maatschappelijke zetel: 10 rue de la Paix, 75002 Parijs, Frankrijk",
+        "contact": "Contact: linkedin.com/in/dragosdreptate",
+        "director": "Directeur publicatie: Dragos Dreptate"
+      },
+      "host": {
+        "title": "Hostingprovider",
+        "content": "De website wordt gehost door Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, Verenigde Staten."
+      },
+      "intellectualProperty": {
+        "title": "Intellectueel eigendom",
+        "content": "Alle inhoud op deze website (tekst, afbeeldingen, logo's, pictogrammen, software) is exclusief eigendom van The Spark SASU, tenzij anders vermeld. Elk gebruik, reproductie of verspreiding, geheel of gedeeltelijk, van de inhoud van deze site zonder toestemming is verboden."
+      },
+      "liability": {
+        "title": "Aansprakelijkheid",
+        "content": "The Spark SASU streeft naar nauwkeurigheid van de informatie die op de site wordt gepubliceerd, maar kan de volledigheid of actualiteit ervan niet garanderen. Gebruik van de site is op eigen risico van de gebruiker."
+      }
+    },
+    "privacy": {
+      "title": "Privacybeleid",
+      "metaDescription": "Privacybeleid voor The Playground — verzamelde gegevens, doeleinden, AVG-rechten en cookies.",
+      "intro": "The Playground, uitgegeven door The Spark SASU, zet zich in voor de bescherming van de privacy van zijn gebruikers. Dit beleid beschrijft de gegevens die we verzamelen, waarom we ze gebruiken en wat uw rechten zijn.",
+      "dataCollected": {
+        "title": "Verzamelde gegevens",
+        "items": {
+          "email": "E-mailadres (inloggen via magische link of OAuth)",
+          "name": "Voor- en achternaam (opgegeven tijdens onboarding)",
+          "oauth": "OAuth-accountidentificator (Google, GitHub) — alleen voor authenticatie",
+          "usage": "Geanonimiseerde gebruiksgegevens (Vercel Analytics)"
+        }
+      },
+      "purpose": {
+        "title": "Doel van gegevensverwerking",
+        "items": {
+          "auth": "Authenticatie en accountbeheer",
+          "service": "Dienstverlening (Communities aanmaken, deelnemen aan Evenementen)",
+          "email": "Verzenden van transactionele e-mails (bevestigingen van inschrijvingen, meldingen)",
+          "analytics": "Serviceverbetering via geanonimiseerde statistieken"
+        }
+      },
+      "sharing": {
+        "title": "Gegevensdeling",
+        "content": "Uw persoonlijke gegevens worden nooit verkocht aan of gedeeld met derden voor commerciële doeleinden. Ze kunnen worden doorgegeven aan onze technische onderaannemers (hosting, e-mailbezorging) uitsluitend om de werking van de dienst te waarborgen."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "content": "The Playground gebruikt alleen cookies die strikt noodzakelijk zijn voor de werking van de site (authenticatiesessie). Er worden geen reclame- of trackingcookies van derden gebruikt."
+      },
+      "rights": {
+        "title": "Uw rechten (AVG)",
+        "content": "In overeenstemming met de Algemene Verordening Gegevensbescherming (AVG) heeft u de volgende rechten:",
+        "items": {
+          "access": "Recht op inzage in uw persoonlijke gegevens",
+          "rectification": "Recht op rectificatie van onjuiste gegevens",
+          "deletion": "Recht op wissing van uw gegevens",
+          "portability": "Recht op gegevensoverdraagbaarheid",
+          "opposition": "Recht op bezwaar tegen verwerking"
+        },
+        "contact": "Om deze rechten uit te oefenen, neem contact met ons op via LinkedIn: linkedin.com/in/dragosdreptate."
+      },
+      "retention": {
+        "title": "Bewaring van gegevens",
+        "content": "Uw gegevens worden bewaard zolang uw account actief is. Als uw account wordt verwijderd, worden uw persoonlijke gegevens binnen 30 dagen gewist."
+      }
+    },
+    "terms": {
+      "title": "Gebruiksvoorwaarden",
+      "metaDescription": "Gebruiksvoorwaarden voor The Playground — aanvaarding, servicebeschrijving, verantwoordelijkheden en toepasselijk recht.",
+      "intro": "Deze gebruiksvoorwaarden (\"Voorwaarden\") regelen het gebruik van het The Playground-platform, uitgegeven door The Spark SASU.",
+      "acceptance": {
+        "title": "Aanvaarding van Voorwaarden",
+        "content": "Door The Playground te gebruiken, aanvaardt u deze Voorwaarden volledig. Als u deze voorwaarden niet aanvaardt, gebruik de dienst dan niet."
+      },
+      "service": {
+        "title": "Servicebeschrijving",
+        "content": "The Playground is een gratis platform voor het aanmaken van Communities en het organiseren van Evenementen. De dienst is toegankelijk via het web en wordt geleverd \"as is\"."
+      },
+      "account": {
+        "title": "Gebruikersaccount",
+        "content": "Toegang tot de dienst vereist het aanmaken van een account via e-mail (magische link) of via een OAuth-provider (Google, GitHub). U bent verantwoordelijk voor de vertrouwelijkheid van uw account en alle activiteiten die daaronder plaatsvinden."
+      },
+      "userContent": {
+        "title": "Gebruikersinhoud",
+        "content": "U bent als enige verantwoordelijk voor de inhoud die u publiceert op The Playground (Community-beschrijvingen, Evenementbeschrijvingen, reacties). Onwettige, lasterlijke, discriminerende of anderszins ongepaste inhoud is verboden en kan zonder kennisgeving worden verwijderd."
+      },
+      "hostResponsibilities": {
+        "title": "Verantwoordelijkheden van de Organisator",
+        "content": "Als Organisator bent u verantwoordelijk voor de nauwkeurigheid van informatie met betrekking tot uw Evenementen (locatie, datum, beschrijving). U stemt ermee in alle toepasselijke wetten met betrekking tot evenementenorganisatie na te leven."
+      },
+      "playerResponsibilities": {
+        "title": "Verantwoordelijkheden van het Lid",
+        "content": "Als Lid stemt u ermee in de regels van elke Community en elk Evenement waaraan u deelneemt te respecteren. Aanmelden voor een Evenement is een verplichting om aanwezig te zijn."
+      },
+      "pricing": {
+        "title": "Prijzen",
+        "content": "The Playground is volledig gratis te gebruiken. Het platform rekent geen commissie. Voor betaalde Evenementen zijn alleen Stripe-transactiekosten (ongeveer 2,9% + €0,30) van toepassing en worden gedragen door de Organisator."
+      },
+      "liability": {
+        "title": "Beperking van aansprakelijkheid",
+        "content": "The Spark SASU is niet aansprakelijk voor directe of indirecte schade die voortvloeit uit het gebruik van de dienst, inclusief maar niet beperkt tot serviceonderbreking, gegevensverlies of geschillen tussen Organisatoren en Leden."
+      },
+      "modification": {
+        "title": "Wijziging van Voorwaarden",
+        "content": "The Spark SASU behoudt zich het recht voor deze Voorwaarden op elk moment te wijzigen. Gebruikers worden via e-mail of melding op het platform op de hoogte gesteld van wijzigingen. Voortgezet gebruik van de dienst na wijziging houdt aanvaarding van de nieuwe voorwaarden in."
+      },
+      "law": {
+        "title": "Toepasselijk recht",
+        "content": "Deze Voorwaarden worden beheerst door Frans recht. In geval van een geschil zijn de bevoegde rechtbanken van Parijs exclusief bevoegd."
+      }
+    }
+  },
+  "Profile": {
+    "avatar": {
+      "add": "Foto toevoegen",
+      "change": "Foto wijzigen",
+      "uploading": "Uploaden...",
+      "errorType": "Niet-ondersteund formaat. Gebruik JPEG, PNG of WebP.",
+      "errorSize": "Bestand te groot (max. 5 MB).",
+      "errorUpload": "Upload mislukt. Probeer het opnieuw."
+    },
+    "setup": {
+      "title": "Voltooi jouw profiel",
+      "description": "Vertel ons iets over jezelf om te beginnen."
+    },
+    "edit": {
+      "title": "Mijn profiel",
+      "description": "Beheer jouw persoonlijke gegevens",
+      "personalInfo": "Persoonlijke gegevens",
+      "memberSince": "Lid sinds",
+      "account": "Account",
+      "circles": "Communities",
+      "moments": "Evenementen"
+    },
+    "form": {
+      "email": "E-mail",
+      "emailHint": "Je e-mail wordt gebruikt om in te loggen en kan niet worden gewijzigd.",
+      "firstName": "Voornaam",
+      "firstNamePlaceholder": "Alice",
+      "lastName": "Achternaam",
+      "lastNamePlaceholder": "De Vries",
+      "continue": "Doorgaan",
+      "saved": "Profiel succesvol bijgewerkt."
+    },
+    "errors": {
+      "notFound": "Gebruiker niet gevonden",
+      "updateFailed": "Bijwerken van profiel mislukt"
+    },
+    "deleteAccount": {
+      "dangerZone": "Gevarenzone",
+      "description": "Het verwijderen van jouw account is permanent en kan niet ongedaan worden gemaakt.",
+      "trigger": "Mijn account verwijderen",
+      "title": "Jouw account verwijderen?",
+      "warning": "Deze actie is permanent en zal het volgende verwijderen:",
+      "items": {
+        "registrations": "Jouw evenementinschrijvingen",
+        "comments": "Jouw reacties",
+        "circles": "Communities waarvan jij de enige Organisator bent (en hun evenementen)"
+      },
+      "confirm": "Permanent verwijderen",
+      "error": "Er is iets misgegaan. Probeer het opnieuw."
+    },
+    "notifications": {
+      "title": "Meldingen",
+      "emailBanner": "Deze voorkeuren bepalen de e-mails die naar {email} worden gestuurd.",
+      "organizer": "Als Organisator",
+      "participant": "Als Lid",
+      "newRegistration": "Nieuwe inschrijving",
+      "newRegistrationDesc": "Wanneer iemand zich aanmeldt voor een van jouw evenementen",
+      "newComment": "Nieuwe reactie",
+      "newCommentDesc": "Wanneer iemand reageert op een van jouw evenementen",
+      "newFollower": "Nieuwe volger",
+      "newFollowerDesc": "Wanneer iemand een van jouw Communities volgt",
+      "newMomentInCircle": "Nieuw evenement",
+      "newMomentInCircleDesc": "Wanneer er een evenement wordt aangemaakt in een Community die jij volgt",
+      "saved": "Voorkeuren opgeslagen"
+    }
+  }
+}
