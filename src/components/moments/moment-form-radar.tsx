@@ -477,8 +477,7 @@ export function MomentFormRadar({
           </div>
 
           {/* Footer */}
-          <div className="border-border flex items-center justify-between border-t px-5 py-3">
-            <p className="text-muted-foreground text-xs">{t("sources")}</p>
+          <div className="border-border flex items-center justify-end border-t px-5 py-3">
             <Button type="button" variant="outline" size="sm" onClick={handleClose}>
               {t("close")}
             </Button>
