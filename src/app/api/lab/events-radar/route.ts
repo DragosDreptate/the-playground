@@ -252,16 +252,17 @@ ${meetupContent}
 MISSION :
 Trouve les événements correspondant à ces critères :
 - Date cible : ${date}
-- Mots-clés : ${keywords || "aucun filtre — garde tout"}${ville.toLowerCase() === "paris" ? "\n- Zone : Paris et Île-de-France" : ""}
+- Mots-clés (logique OR) : ${keywords || "aucun filtre — garde tout"}${ville.toLowerCase() === "paris" ? "\n- Zone : Paris et Île-de-France" : ""}
 
 INSTRUCTIONS :
 1. Explore chaque source pour trouver les tableaux d'événements
 2. Pour chaque événement, extrais : titre, date de début, heure, lieu, URL, description courte
 3. Filtre sur la date ${date} (garde les événements dont start_at, date_start ou dateTime correspond à ce jour)
 4. Si peu de résultats exacts, garde aussi les événements dans la semaine autour de ${date}
-5. URLs Luma : format https://lu.ma/[slug]
-6. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
-7. Déduplique si un même événement apparaît dans les deux sources
+5. Pour les mots-clés : logique OR — garde un événement si son titre ou sa description contient AU MOINS UN des mots-clés (pas besoin de tous les avoir)
+6. URLs Luma : format https://lu.ma/[slug]
+7. URLs Meetup : format https://www.meetup.com/[group]/events/[id]/
+8. Déduplique si un même événement apparaît dans les deux sources
 
 RÈGLE ABSOLUE : réponds UNIQUEMENT avec le JSON brut ci-dessous. Zéro texte, zéro markdown, zéro explication. Commence par { et termine par }.
 
