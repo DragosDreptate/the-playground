@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Mode Switcher | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+      --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+      --shadow-md: 0 4px 6px -1px rgba(26,27,46,.08), 0 2px 4px -2px rgba(26,27,46,.05);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      padding-top: 48px; /* space for view toggle bar */
+    }
+
+    /* ─── View Toggle Bar ──────────────────────────────── */
+    .view-toggle-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: var(--foreground);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 200;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .view-toggle-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,.5);
+    }
+    .view-btns { display: flex; background: rgba(255,255,255,.1); border-radius: 8px; padding: 3px; gap: 2px; }
+    .view-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; font-weight: 600;
+      padding: 5px 14px; border-radius: 6px;
+      border: none; cursor: pointer;
+      background: transparent; color: rgba(255,255,255,.6);
+      transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+    }
+    .view-btn.active { background: rgba(255,255,255,.18); color: white; }
+    .view-btn svg { opacity: 0.8; }
+
+    /* ─── App wrapper (becomes phone frame in mobile view) ─ */
+    #app-wrapper {
+      min-height: calc(100vh - 48px);
+      transition: all 0.3s ease;
+    }
+
+    /* ─── MOBILE VIEW ──────────────────────────────────── */
+    body.view-mobile {
+      background: #1e1f33;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 68px; /* toggle bar + spacing */
+      padding-bottom: 48px;
+      min-height: 100vh;
+    }
+    body.view-mobile #app-wrapper {
+      width: 390px;
+      min-height: 0;
+      height: 780px;
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 10px #2d2e48,
+        0 0 0 11px #3a3b5c,
+        0 30px 80px rgba(0,0,0,.6);
+      position: relative;
+      flex-shrink: 0;
+    }
+    /* Notch */
+    body.view-mobile #app-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #1e1f33;
+      border-radius: 0 0 20px 20px;
+      z-index: 300;
+    }
+    body.view-mobile .phone-scroll {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    body.view-mobile .phone-scroll::-webkit-scrollbar { display: none; }
+
+    /* Mobile layout adjustments */
+    body.view-mobile .site-header { padding-top: 34px; } /* notch space */
+    body.view-mobile .header-nav { display: none; }
+    body.view-mobile .header-inner { padding: 0 20px; }
+    body.view-mobile .page { padding: 20px 16px 80px; }
+    body.view-mobile .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    body.view-mobile .page-title { font-size: 19px; }
+    body.view-mobile .mode-switcher { width: 100%; }
+    body.view-mobile .mode-btn { flex: 1; justify-content: center; }
+    body.view-mobile .tabs-row { flex-direction: column; align-items: stretch; gap: 10px; }
+    body.view-mobile .tabs { width: 100%; }
+    body.view-mobile .tab-btn { flex: 1; }
+    body.view-mobile .cta-area { width: 100%; }
+    body.view-mobile .cta-area .btn,
+    body.view-mobile .cta-area .btn-create-event-arrow { width: 100%; justify-content: center; }
+    body.view-mobile .cta-link { font-size: 13px; }
+    body.view-mobile .circles-grid { grid-template-columns: 1fr; }
+    body.view-mobile .toolbar { display: none; }
+    body.view-mobile .circle-picker-dropdown { left: 0; right: 0; min-width: 0; }
+
+    /* ─── SiteHeader ─────────────────────────────────── */
+    .site-header { border-bottom: 1px solid var(--border); background: var(--card); position: sticky; top: 0; z-index: 50; }
+    .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-weight: 800; font-size: 16px; letter-spacing: -0.3px; background: linear-gradient(135deg, var(--primary), #9333ea); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .header-nav { display: flex; gap: 2px; }
+    .nav-link { font-size: 13px; font-weight: 500; color: var(--muted-foreground); padding: 6px 12px; border-radius: 8px; cursor: pointer; }
+    .nav-link.active { color: var(--foreground); background: var(--muted); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .header-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #e8457a, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; cursor: pointer; }
+
+    /* ─── Page ─────────────────────────────────────────── */
+    .page { max-width: 672px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ─── Page Header — Option A ──────────────────────── */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .page-title { font-size: 22px; font-weight: 700; color: var(--foreground); letter-spacing: -0.025em; }
+    .page-title .mode-sep { color: var(--muted-foreground); font-weight: 400; margin: 0 5px; }
+    .page-title .mode-name { color: var(--primary); }
+
+    /* ─── Mode Switcher ─── */
+    .mode-switcher { display: flex; background: var(--muted); border-radius: 10px; padding: 3px; gap: 2px; border: 1px solid var(--border); }
+    .mode-btn {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 6px 16px; border-radius: 7px; border: none; cursor: pointer;
+      background: transparent; color: var(--muted-foreground);
+      transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; justify-content: center;
+    }
+    .mode-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 1px 3px rgba(26,27,46,.12); font-weight: 600; }
+    .mode-btn:not(.active):hover { color: var(--foreground); }
+
+    /* ─── Tabs ─── */
+    .tabs-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .tabs { display: flex; background: var(--muted); border-radius: 10px; padding: 3px; gap: 2px; }
+    .tab-btn {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 7px 16px; border-radius: 7px; border: none; cursor: pointer;
+      background: transparent; color: var(--muted-foreground); transition: all 0.15s;
+    }
+    .tab-btn.active { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px rgba(26,27,46,.12); font-weight: 600; }
+
+    /* ─── CTA area ─── */
+    .cta-link { font-size: 13px; font-weight: 500; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 4px; }
+    .cta-link:hover { text-decoration: underline; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; transition: all 0.15s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; color: var(--foreground); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--muted); }
+
+    /* ─── Timeline ─── */
+    .timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: grid; grid-template-columns: 52px 20px 1fr; gap: 0 12px; margin-bottom: 4px; }
+    .timeline-date { display: flex; flex-direction: column; align-items: flex-end; padding-top: 14px; }
+    .date-day { font-size: 18px; font-weight: 700; color: var(--foreground); line-height: 1.1; }
+    .date-month { font-size: 11px; font-weight: 500; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }
+    .timeline-connector { display: flex; flex-direction: column; align-items: center; padding-top: 16px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+    .dot.past { background: var(--border); }
+    .dot.waitlist { background: #f59e0b; }
+    .connector-line { flex: 1; width: 2px; background: var(--border); margin-top: 4px; min-height: 16px; }
+    .moment-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow 0.15s; }
+    .moment-card:hover { box-shadow: var(--shadow-md); }
+    .moment-card.past { opacity: 0.65; }
+    .moment-cover { width: 56px; height: 56px; border-radius: 8px; flex-shrink: 0; aspect-ratio: 1/1; }
+    .moment-content { flex: 1; min-width: 0; }
+    .moment-time { font-size: 11px; font-weight: 500; color: var(--muted-foreground); margin-bottom: 2px; }
+    .moment-title { font-size: 14px; font-weight: 600; color: var(--foreground); line-height: 1.3; margin-bottom: 4px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .moment-location { font-size: 12px; color: var(--muted-foreground); margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .moment-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .moment-community { font-size: 11px; font-weight: 500; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ─── Badges ─── */
+    .badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+    .badge-inscrit { background: #fdf0f4; color: var(--primary); border: 1px solid rgba(232,69,122,.2); }
+    .badge-waitlist { background: #fffbeb; color: #d97706; border: 1px solid rgba(217,119,6,.2); }
+    .badge-organisateur { background: #fdf0f4; color: var(--primary); border: 1px solid rgba(232,69,122,.2); }
+    .badge-membre { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .badge-past { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+
+    /* ─── Circle Cards Grid ─── */
+    .circles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .circle-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); transition: box-shadow 0.15s; }
+    .circle-card:hover { box-shadow: var(--shadow-md); }
+    .circle-cover { aspect-ratio: 1/1; width: 100%; }
+    .circle-body { padding: 12px; }
+    .circle-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .circle-category { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); }
+    .circle-name { font-size: 14px; font-weight: 700; color: var(--foreground); margin-bottom: 4px; }
+    .circle-desc { font-size: 12px; color: var(--muted-foreground); line-height: 1.4; margin-bottom: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .circle-stats { display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px; }
+    .circle-stat { font-size: 11px; color: var(--muted-foreground); display: flex; align-items: center; gap: 4px; }
+    .next-event-box { background: var(--muted); border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+    .next-event-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin-bottom: 2px; }
+    .next-event-title { font-size: 12px; font-weight: 600; color: var(--foreground); }
+    .next-event-date { font-size: 11px; color: var(--muted-foreground); }
+    .circle-host-actions { display: flex; gap: 6px; flex-direction: column; }
+
+    /* ─── Empty State ─── */
+    .empty-state { text-align: center; padding: 40px 24px; border: 2px dashed var(--border); border-radius: 12px; }
+    .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-title { font-size: 15px; font-weight: 600; color: var(--foreground); margin-bottom: 6px; }
+    .empty-desc { font-size: 13px; color: var(--muted-foreground); margin-bottom: 16px; max-width: 280px; margin-left: auto; margin-right: auto; }
+
+    /* ─── Section label ─── */
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); margin-bottom: 12px; margin-top: 24px; }
+    .section-label:first-child { margin-top: 0; }
+
+    /* ─── Tab content visibility ─── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ─── Circle Picker Dropdown ─── */
+    .create-event-wrapper { position: relative; }
+    .btn-create-event-arrow { display: inline-flex; align-items: center; gap: 0; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; border-radius: 8px; border: none; cursor: pointer; background: var(--primary); color: white; transition: all 0.15s; overflow: hidden; }
+    .btn-create-event-main { display: flex; align-items: center; gap: 6px; padding: 8px 12px 8px 16px; background: transparent; border: none; color: white; font: inherit; cursor: pointer; }
+    .btn-create-event-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.25); flex-shrink: 0; }
+    .btn-create-event-chevron { display: flex; align-items: center; justify-content: center; padding: 8px 10px; background: transparent; border: none; color: white; font: inherit; cursor: pointer; transition: background 0.15s; }
+    .btn-create-event-chevron:hover { background: rgba(255,255,255,0.15); }
+    .btn-create-event-arrow:hover .btn-create-event-main { background: rgba(255,255,255,0.1); }
+    .circle-picker-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 8px 24px rgba(26,27,46,.14); min-width: 240px; z-index: 200; opacity: 0; transform: translateY(-6px) scale(0.97); transition: opacity 0.15s, transform 0.15s; pointer-events: none; }
+    .circle-picker-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+    .picker-header { padding: 10px 14px 8px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted-foreground); border-bottom: 1px solid var(--border); }
+    .picker-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background 0.12s; }
+    .picker-item:hover { background: var(--muted); }
+    .picker-item-cover { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; aspect-ratio: 1/1; }
+    .picker-item-info { flex: 1; min-width: 0; }
+    .picker-item-name { font-size: 13px; font-weight: 600; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .picker-item-meta { font-size: 11px; color: var(--muted-foreground); }
+    .picker-divider { height: 1px; background: var(--border); margin: 2px 0; }
+    .picker-footer { padding: 8px 14px 10px; }
+    .picker-new-circle { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--primary); cursor: pointer; padding: 6px 0; background: none; border: none; font-family: inherit; width: 100%; text-align: left; }
+    .picker-new-circle:hover { text-decoration: underline; }
+    .picker-new-icon { width: 28px; height: 28px; border-radius: 6px; border: 1.5px dashed var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--primary); flex-shrink: 0; opacity: 0.7; }
+    .picker-backdrop { position: fixed; inset: 0; z-index: 190; display: none; }
+    .picker-backdrop.open { display: block; }
+
+    /* ─── Toolbar ─── */
+    .toolbar { position: fixed; bottom: 16px; right: 16px; z-index: 100; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); display: flex; align-items: center; gap: 10px; font-size: 12px; }
+    .toolbar-label { color: var(--muted-foreground); font-weight: 500; }
+    .toolbar-badge { display: inline-flex; align-items: center; gap: 4px; background: linear-gradient(135deg, var(--primary), #9333ea); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+    .toolbar-scenario { display: flex; align-items: center; gap: 6px; }
+    .scenario-btn { font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted-foreground); transition: all 0.12s; }
+    .scenario-btn.active { background: var(--foreground); color: white; border-color: var(--foreground); }
+  </style>
+</head>
+<body class="participant">
+
+  <!-- ─── View Toggle Bar ────────────────────────────────── -->
+  <div class="view-toggle-bar">
+    <span class="view-toggle-label">Aperçu :</span>
+    <div class="view-btns">
+      <button class="view-btn active" id="view-btn-desktop" onclick="setView('desktop')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Desktop
+      </button>
+      <button class="view-btn" id="view-btn-mobile" onclick="setView('mobile')">
+        <svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Mobile
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── App Wrapper ───────────────────────────────────── -->
+  <div id="app-wrapper">
+  <div class="phone-scroll">
+
+    <!-- ─── SiteHeader ─── -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div style="display:flex;align-items:center;gap:24px;">
+          <span class="logo">The Playground</span>
+          <nav class="header-nav">
+            <span class="nav-link">Découvrir</span>
+            <span class="nav-link active">Mon espace</span>
+          </nav>
+        </div>
+        <div class="header-right">
+          <div class="header-avatar">A</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─── Page ─── -->
+    <main class="page">
+
+      <!-- Page Header — Option A : titre dynamique -->
+      <div class="page-header">
+        <h1 class="page-title">
+          Mon espace<span class="mode-sep">·</span><span class="mode-name" id="page-mode-name">Participant</span>
+        </h1>
+        <div class="mode-switcher">
+          <button class="mode-btn active" id="btn-participant" onclick="setMode('participant')">Participant</button>
+          <button class="mode-btn" id="btn-organisateur" onclick="setMode('organisateur')">Organisateur</button>
+        </div>
+      </div>
+
+      <!-- ─── TABS ROW ─── -->
+      <div class="tabs-row">
+        <div class="tabs">
+          <button class="tab-btn active" id="tab-moments" onclick="setTab('moments')">Mes événements</button>
+          <button class="tab-btn" id="tab-circles" onclick="setTab('circles')">Mes Communautés</button>
+        </div>
+
+        <!-- CTA contextuel -->
+        <div id="cta-participant-moments" class="cta-area" style="display:none;">
+          <a href="#" class="cta-link">Découvrir des événements →</a>
+        </div>
+        <div id="cta-participant-circles" class="cta-area" style="display:none;">
+          <a href="#" class="cta-link">Explorer →</a>
+        </div>
+        <div id="cta-organisateur-moments" class="cta-area" style="display:none;">
+          <div class="picker-backdrop" id="picker-backdrop" onclick="closePickerDropdown()"></div>
+
+          <!-- 2+ Communautés -->
+          <div class="create-event-wrapper" id="cta-multi">
+            <div class="btn-create-event-arrow">
+              <button class="btn-create-event-main" onclick="openPickerDropdown()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Créer un événement
+              </button>
+              <div class="btn-create-event-divider"></div>
+              <button class="btn-create-event-chevron" onclick="openPickerDropdown()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+            <div class="circle-picker-dropdown" id="circle-picker-dropdown">
+              <div class="picker-header">Dans quelle Communauté ?</div>
+              <div class="picker-item" onclick="selectCircleFromPicker('Paris Creative Tech')">
+                <div class="picker-item-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+                <div class="picker-item-info">
+                  <div class="picker-item-name">Paris Creative Tech</div>
+                  <div class="picker-item-meta">42 membres · 3 événements à venir</div>
+                </div>
+              </div>
+              <div class="picker-item" onclick="selectCircleFromPicker('Yoga Montmartre')">
+                <div class="picker-item-cover" style="background:linear-gradient(135deg,#10b981,#3b82f6);"></div>
+                <div class="picker-item-info">
+                  <div class="picker-item-name">Yoga Montmartre</div>
+                  <div class="picker-item-meta">28 membres · 2 événements à venir</div>
+                </div>
+              </div>
+              <div class="picker-divider"></div>
+              <div class="picker-footer">
+                <button class="picker-new-circle" onclick="closePickerDropdown()">
+                  <div class="picker-new-icon">＋</div>
+                  Créer une nouvelle Communauté
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1 Communauté -->
+          <div id="cta-single" style="display:none;">
+            <button class="btn btn-primary" onclick="alert('[Mockup] → /dashboard/circles/paris-creative-tech/moments/new')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer un événement
+            </button>
+          </div>
+
+          <!-- 0 Communauté -->
+          <div id="cta-zero" style="display:none;">
+            <button class="btn btn-primary" onclick="alert('[Mockup] → /dashboard/circles/new')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer une Communauté d'abord
+            </button>
+          </div>
+        </div>
+
+        <div id="cta-organisateur-circles" class="cta-area" style="display:none;">
+          <button class="btn btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Créer une Communauté
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           Participant + Mes événements
+           ═══════════════════════════════════ -->
+      <div class="tab-content" id="content-participant-moments">
+        <div class="section-label">À venir</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">20</span><span class="date-month">mar</span></div>
+            <div class="timeline-connector"><span class="dot"></span><span class="connector-line"></span></div>
+            <div class="moment-card">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+              <div class="moment-content">
+                <div class="moment-time">19h00 · Paris</div>
+                <div class="moment-title">Meetup IA Générative & Créativité</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Station F, Paris 13e</div>
+                <div class="moment-footer"><span class="moment-community">Paris Creative Tech</span><span class="badge badge-inscrit">✓ Inscrit</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">12</span><span class="date-month">mar</span></div>
+            <div class="timeline-connector"><span class="dot waitlist"></span><span class="connector-line"></span></div>
+            <div class="moment-card">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#f59e0b,#ef4444);"></div>
+              <div class="moment-content">
+                <div class="moment-time">14h00 · Lyon</div>
+                <div class="moment-title">Atelier Design System Avancé</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Le Village, Lyon</div>
+                <div class="moment-footer"><span class="moment-community">Design & Produit Lyon</span><span class="badge badge-waitlist">⏱ Liste d'attente · #3</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-label">Passés</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">14</span><span class="date-month">fév</span></div>
+            <div class="timeline-connector"><span class="dot past"></span></div>
+            <div class="moment-card past">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);filter:grayscale(0.6);"></div>
+              <div class="moment-content">
+                <div class="moment-time">19h30 · Paris</div>
+                <div class="moment-title">Soirée JS & Pizza</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Wild Code School</div>
+                <div class="moment-footer"><span class="moment-community">Paris Creative Tech</span><span class="badge badge-past">Participé</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           Participant + Mes Communautés
+           ═══════════════════════════════════ -->
+      <div class="tab-content" id="content-participant-circles" style="display:none;">
+        <div class="circles-grid">
+          <div class="circle-card">
+            <div class="circle-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+            <div class="circle-body">
+              <div class="circle-header-row"><span class="circle-category">Tech</span><span class="badge badge-membre">Membre</span></div>
+              <div class="circle-name">Paris Creative Tech</div>
+              <div class="circle-desc">La communauté des créateurs tech de Paris.</div>
+              <div class="circle-stats"><span class="circle-stat">👥 42 membres</span><span class="circle-stat">📅 3 événements à venir</span></div>
+              <div class="next-event-box"><div class="next-event-label">Prochain événement</div><div class="next-event-title">Meetup IA Générative</div><div class="next-event-date">20 mars · 19h00</div></div>
+            </div>
+          </div>
+          <div class="circle-card">
+            <div class="circle-cover" style="background:linear-gradient(135deg,#10b981,#3b82f6);"></div>
+            <div class="circle-body">
+              <div class="circle-header-row"><span class="circle-category">Bien-être</span><span class="badge badge-membre">Membre</span></div>
+              <div class="circle-name">Yoga Montmartre</div>
+              <div class="circle-desc">Séances de yoga et méditation en plein air.</div>
+              <div class="circle-stats"><span class="circle-stat">👥 28 membres</span><span class="circle-stat">📅 2 événements à venir</span></div>
+              <div class="next-event-box"><div class="next-event-label">Prochain événement</div><div class="next-event-title">Méditation matinale</div><div class="next-event-date">8 mars · 8h30</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           Organisateur + Mes événements
+           ═══════════════════════════════════ -->
+      <div class="tab-content" id="content-organisateur-moments" style="display:none;">
+        <div class="section-label">À venir</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">20</span><span class="date-month">mar</span></div>
+            <div class="timeline-connector"><span class="dot"></span><span class="connector-line"></span></div>
+            <div class="moment-card">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+              <div class="moment-content">
+                <div class="moment-time">19h00 · Paris</div>
+                <div class="moment-title">Meetup IA Générative & Créativité</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Station F, Paris 13e</div>
+                <div class="moment-footer"><span class="moment-community">Paris Creative Tech</span><span class="badge badge-organisateur">👑 Organisateur · 34 inscrits</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">2</span><span class="date-month">avr</span></div>
+            <div class="timeline-connector"><span class="dot"></span></div>
+            <div class="moment-card">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);"></div>
+              <div class="moment-content">
+                <div class="moment-time">10h00 · Paris</div>
+                <div class="moment-title">Hackathon Design x IA — 48h</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>La Paillasse, Paris</div>
+                <div class="moment-footer"><span class="moment-community">Paris Creative Tech</span><span class="badge badge-organisateur">👑 Organisateur · 12 inscrits</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="section-label">Passés</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date"><span class="date-day">14</span><span class="date-month">fév</span></div>
+            <div class="timeline-connector"><span class="dot past"></span></div>
+            <div class="moment-card past">
+              <div class="moment-cover" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);filter:grayscale(0.6);"></div>
+              <div class="moment-content">
+                <div class="moment-time">19h30 · Paris</div>
+                <div class="moment-title">Soirée JS & Pizza</div>
+                <div class="moment-location"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Wild Code School</div>
+                <div class="moment-footer"><span class="moment-community">Paris Creative Tech</span><span class="badge badge-organisateur">👑 Organisateur · 28 inscrits</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           Organisateur + Mes Communautés
+           ═══════════════════════════════════ -->
+      <div class="tab-content" id="content-organisateur-circles" style="display:none;">
+        <div class="circles-grid">
+          <div class="circle-card">
+            <div class="circle-cover" style="background:linear-gradient(135deg,#e8457a,#9333ea);"></div>
+            <div class="circle-body">
+              <div class="circle-header-row"><span class="circle-category">Tech</span><span class="badge badge-organisateur">👑 Organisateur</span></div>
+              <div class="circle-name">Paris Creative Tech</div>
+              <div class="circle-desc">La communauté des créateurs tech de Paris.</div>
+              <div class="circle-stats"><span class="circle-stat">👥 42 membres</span><span class="circle-stat">📅 3 événements à venir</span></div>
+              <div class="next-event-box"><div class="next-event-label">Prochain événement</div><div class="next-event-title">Meetup IA Générative</div><div class="next-event-date">20 mars · 19h00</div></div>
+              <div class="circle-host-actions">
+                <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:12px;padding:7px 12px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Créer un événement</button>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;font-size:12px;padding:7px 12px;">Gérer la Communauté</button>
+              </div>
+            </div>
+          </div>
+          <div class="circle-card" style="border:2px dashed var(--border);box-shadow:none;display:flex;align-items:center;justify-content:center;min-height:280px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background=''">
+            <div style="text-align:center;padding:24px;">
+              <div style="font-size:28px;margin-bottom:10px;opacity:0.4;">＋</div>
+              <div style="font-size:13px;font-weight:600;color:var(--foreground);margin-bottom:4px;">Créer une Communauté</div>
+              <div style="font-size:12px;color:var(--muted-foreground);">Lance ta prochaine communauté</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div><!-- /phone-scroll -->
+  </div><!-- /app-wrapper -->
+
+  <!-- ─── Toolbar ─── -->
+  <div class="toolbar">
+    <span class="toolbar-label">Mode :</span>
+    <span id="toolbar-mode-label" class="toolbar-badge">Participant</span>
+    <span class="toolbar-label" style="margin-left:4px;">·</span>
+    <span id="toolbar-tab-label" style="color:var(--muted-foreground);font-size:12px;margin-right:8px;">Mes événements</span>
+    <span class="toolbar-label" style="border-left:1px solid var(--border);padding-left:10px;">Communautés :</span>
+    <div class="toolbar-scenario">
+      <button class="scenario-btn active" id="scenario-btn-multi" onclick="setCircleScenario('multi')">2+</button>
+      <button class="scenario-btn" id="scenario-btn-single" onclick="setCircleScenario('single')">1</button>
+      <button class="scenario-btn" id="scenario-btn-zero" onclick="setCircleScenario('zero')">0</button>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'participant';
+    let currentTab = 'moments';
+    let circleScenario = 'multi';
+
+    // ─── View toggle ──────────────────────────────────────
+    function setView(view) {
+      document.getElementById('view-btn-desktop').className = 'view-btn' + (view === 'desktop' ? ' active' : '');
+      document.getElementById('view-btn-mobile').className  = 'view-btn' + (view === 'mobile'  ? ' active' : '');
+      if (view === 'mobile') {
+        document.body.classList.add('view-mobile');
+      } else {
+        document.body.classList.remove('view-mobile');
+      }
+    }
+
+    // ─── Mode ─────────────────────────────────────────────
+    function setMode(mode) {
+      currentMode = mode;
+      // Update mode pill
+      document.getElementById('btn-participant').className = 'mode-btn' + (mode === 'participant' ? ' active' : '');
+      document.getElementById('btn-organisateur').className = 'mode-btn' + (mode === 'organisateur' ? ' active' : '');
+      // Update page title (Option A)
+      document.getElementById('page-mode-name').textContent = mode === 'participant' ? 'Participant' : 'Organisateur';
+      updateContent();
+    }
+
+    // ─── Tab ──────────────────────────────────────────────
+    function setTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-moments').className = 'tab-btn' + (tab === 'moments' ? ' active' : '');
+      document.getElementById('tab-circles').className = 'tab-btn' + (tab === 'circles' ? ' active' : '');
+      updateContent();
+    }
+
+    // ─── Circle scenario ──────────────────────────────────
+    function setCircleScenario(scenario) {
+      circleScenario = scenario;
+      ['multi', 'single', 'zero'].forEach(s => {
+        document.getElementById('scenario-btn-' + s).className = 'scenario-btn' + (s === scenario ? ' active' : '');
+      });
+      updateCta();
+    }
+
+    function updateCta() {
+      if (currentMode !== 'organisateur' || currentTab !== 'moments') return;
+      document.getElementById('cta-multi').style.display  = 'none';
+      document.getElementById('cta-single').style.display = 'none';
+      document.getElementById('cta-zero').style.display   = 'none';
+      if (circleScenario === 'multi')  document.getElementById('cta-multi').style.display  = 'flex';
+      if (circleScenario === 'single') document.getElementById('cta-single').style.display = 'flex';
+      if (circleScenario === 'zero')   document.getElementById('cta-zero').style.display   = 'flex';
+    }
+
+    // ─── Content update ───────────────────────────────────
+    function updateContent() {
+      closePickerDropdown();
+      // Option A : synchronise le titre à chaque mise à jour
+      document.getElementById('page-mode-name').textContent = currentMode === 'participant' ? 'Participant' : 'Organisateur';
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.cta-area').forEach(el => el.style.display = 'none');
+
+      const el = document.getElementById('content-' + currentMode + '-' + currentTab);
+      if (el) el.style.display = 'block';
+
+      const cta = document.getElementById('cta-' + currentMode + '-' + currentTab);
+      if (cta) cta.style.display = 'flex';
+
+      updateCta();
+
+      document.getElementById('toolbar-mode-label').textContent = currentMode === 'participant' ? 'Participant' : 'Organisateur';
+      document.getElementById('toolbar-tab-label').textContent  = currentTab === 'moments' ? 'Mes événements' : 'Mes Communautés';
+    }
+
+    // ─── Circle picker ────────────────────────────────────
+    function openPickerDropdown() {
+      document.getElementById('circle-picker-dropdown').classList.add('open');
+      document.getElementById('picker-backdrop').classList.add('open');
+    }
+    function closePickerDropdown() {
+      const d = document.getElementById('circle-picker-dropdown');
+      const b = document.getElementById('picker-backdrop');
+      if (d) d.classList.remove('open');
+      if (b) b.classList.remove('open');
+    }
+    function selectCircleFromPicker(name) {
+      closePickerDropdown();
+      alert('[Mockup] Redirect → /dashboard/circles/' + name.toLowerCase().replace(/ /g,'-') + '/moments/new');
+    }
+
+    // Init
+    updateContent();
+  </script>
+
+</body>
+</html>
