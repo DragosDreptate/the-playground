@@ -277,6 +277,25 @@
       "endBeforeStart": "The end date must be after the start date.",
       "createMoment": "Publish"
     },
+    "radar": {
+      "title": "Planning Radar",
+      "hint": "Check for conflicts with nearby events",
+      "analyzeButton": "Analyze conflicts",
+      "analyzing": "Analyzing…",
+      "modalTitle": "Planning Radar",
+      "keywords": "Detected keywords",
+      "editKeywords": "Edit",
+      "relaunch": "Re-run",
+      "conflictsSection": "That day",
+      "weekSection": "That week",
+      "noResults": "No events found for these criteria.",
+      "errorNoCity": "City not detected. Add a more precise address.",
+      "sources": "Sources: Luma · Eventbrite · Meetup · Mobilizon",
+      "close": "Close",
+      "cityLabel": "in {city}",
+      "badgeNew": "NEW",
+      "analyzeShort": "Analyze"
+    },
     "delete": {
       "title": "Delete Event",
       "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",

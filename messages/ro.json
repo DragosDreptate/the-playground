@@ -277,6 +277,25 @@
       "endBeforeStart": "Data de sfârșit trebuie să fie după data de început.",
       "createMoment": "Publică"
     },
+    "radar": {
+      "title": "Radar de planificare",
+      "hint": "Verificați conflictele cu evenimentele din jur",
+      "analyzeButton": "Analizează conflictele",
+      "analyzing": "Analiză în curs…",
+      "modalTitle": "Radar de planificare",
+      "keywords": "Cuvinte cheie detectate",
+      "editKeywords": "Modifică",
+      "relaunch": "Relansează",
+      "conflictsSection": "În acea zi",
+      "weekSection": "În acea săptămână",
+      "noResults": "Niciun eveniment găsit pentru aceste criterii.",
+      "errorNoCity": "Oraș nedetectat. Adaugă o adresă mai precisă.",
+      "sources": "Surse: Luma · Eventbrite · Meetup · Mobilizon",
+      "close": "Închide",
+      "cityLabel": "în {city}",
+      "badgeNew": "NOU",
+      "analyzeShort": "Analizează"
+    },
     "delete": {
       "title": "Șterge Evenimentul",
       "description": "Ești sigur că vrei să ștergi acest Eveniment? Această acțiune nu poate fi anulată. Toate înregistrările vor fi eliminate permanent.",

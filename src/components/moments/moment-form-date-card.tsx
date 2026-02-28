@@ -101,6 +101,70 @@ export function MomentFormDateCard({
     return format(date, "EEE d MMM", { locale: dateFnsLocale });
   }
 
+  // --- Auto-adjustment helpers ---
+
+  /** Adds 1 hour to a "HH:mm" slot. Returns the new time and whether midnight was crossed. */
+  function addOneHour(time: string): { time: string; overflow: boolean } {
+    const [h, m] = time.split(":").map(Number);
+    const totalMin = h * 60 + m + 60;
+    const newH = Math.floor(totalMin / 60) % 24;
+    const newM = totalMin % 60;
+    return {
+      time: `${newH.toString().padStart(2, "0")}:${newM.toString().padStart(2, "0")}`,
+      overflow: totalMin >= 24 * 60,
+    };
+  }
+
+  /** Compares two dates by day only (ignores time). */
+  function dayOf(d: Date): number {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
+  /** If the new start would push past end, adjusts endTime (+1h) and endDate (if overflow). */
+  function adjustEndIfNeeded(newStartDate: Date, newStartTime: string) {
+    if (!endDate) return;
+    const startISO = combineDateAndTime(newStartDate, newStartTime);
+    const endISO = combineDateAndTime(endDate, endTime);
+    if (!startISO || !endISO || endISO > startISO) return;
+
+    const { time: newEndTime, overflow } = addOneHour(newStartTime);
+    onEndTimeChange(newEndTime);
+    if (overflow) {
+      const nextDay = new Date(newStartDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      onEndDateChange(nextDay);
+    }
+  }
+
+  // --- Handlers ---
+
+  /** Cas A: start date changes → endDate follows; adjust endTime if needed. */
+  function handleStartDateChange(d: Date | undefined) {
+    onStartDateChange(d);
+    if (!d) return;
+    onEndDateChange(d);
+    adjustEndIfNeeded(d, startTime);
+  }
+
+  /** Cas B: start time changes → adjust endTime if now past end. */
+  function handleStartTimeChange(newTime: string) {
+    onStartTimeChange(newTime);
+    if (!startDate) return;
+    adjustEndIfNeeded(startDate, newTime);
+  }
+
+  /** Cas C: end date changes → block dates before startDate. */
+  function handleEndDateChange(d: Date | undefined) {
+    if (!d || !startDate) { onEndDateChange(d); return; }
+    if (dayOf(d) < dayOf(startDate)) {
+      // Snap back to startDate and adjust time if needed
+      onEndDateChange(startDate);
+      adjustEndIfNeeded(startDate, startTime);
+    } else {
+      onEndDateChange(d);
+    }
+  }
+
   return (
     <div className="space-y-2">
       {/* Start row */}
@@ -116,14 +180,11 @@ export function MomentFormDateCard({
           label={formatDate(startDate)}
           locale={dateFnsLocale}
           disabledBefore={today}
-          onSelect={(d) => {
-            onStartDateChange(d);
-            if (d) onEndDateChange(d);
-          }}
+          onSelect={handleStartDateChange}
         />
         <TimeSelect
           value={startTime}
-          onChange={onStartTimeChange}
+          onChange={handleStartTimeChange}
           options={filteredStartTimeOptions}
         />
       </div>
@@ -140,7 +201,8 @@ export function MomentFormDateCard({
           date={endDate}
           label={formatDate(endDate)}
           locale={dateFnsLocale}
-          onSelect={onEndDateChange}
+          disabledBefore={startDate}
+          onSelect={handleEndDateChange}
         />
         <TimeSelect
           value={endTime}
@@ -197,6 +259,7 @@ function DatePickerButton({
         <Calendar
           mode="single"
           selected={date}
+          defaultMonth={date ?? new Date()}
           onSelect={onSelect}
           locale={locale}
           disabled={disabledBefore ? { before: disabledBefore } : undefined}

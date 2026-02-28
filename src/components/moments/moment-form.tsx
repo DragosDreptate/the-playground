@@ -22,12 +22,14 @@ import type { CoverImageAttribution } from "@/domain/models/moment";
 import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
 import { MomentFormOptionsSection } from "./moment-form-options-section";
+import { MomentFormRadar } from "./moment-form-radar";
 
 type MomentFormProps = {
   moment?: Moment;
   circleSlug: string;
   circleName: string;
   circleDescription?: string;
+  circleCoverImage?: string | null;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -47,7 +49,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -64,6 +66,12 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const [endTime, setEndTime] = useState(
     moment?.endsAt ? snapToSlot(extractTime(moment.endsAt)) : snapToSlot(extractTime(defaultEnd))
   );
+
+  // --- Title / description / location state (needed for radar) ---
+  const [titleValue, setTitleValue] = useState(moment?.title ?? "");
+  const [descriptionValue, setDescriptionValue] = useState(moment?.description ?? "");
+  const [locationNameValue, setLocationNameValue] = useState(moment?.locationName ?? "");
+  const [locationAddressValue, setLocationAddressValue] = useState(moment?.locationAddress ?? "");
 
   // --- Cover state ---
   const [coverSelection, setCoverSelection] = useState<CoverSelection | null>(null);
@@ -179,10 +187,18 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
               href={`/dashboard/circles/${circleSlug}`}
               className="group flex items-start gap-3 px-1"
             >
-              <div
-                className="mt-0.5 size-9 shrink-0 rounded-lg"
-                style={{ background: circleGradient }}
-              />
+              {circleCoverImage ? (
+                <img
+                  src={circleCoverImage}
+                  alt={circleName}
+                  className="mt-0.5 size-9 shrink-0 rounded-lg object-cover"
+                />
+              ) : (
+                <div
+                  className="mt-0.5 size-9 shrink-0 rounded-lg"
+                  style={{ background: circleGradient }}
+                />
+              )}
               <div className="min-w-0">
                 <p className="text-sm font-semibold leading-snug group-hover:underline">
                   {circleName}
@@ -228,7 +244,8 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           <input
             name="title"
             placeholder={t("form.eventName")}
-            defaultValue={moment?.title ?? ""}
+            value={titleValue}
+            onChange={(e) => setTitleValue(e.target.value)}
             required
             maxLength={200}
             className="placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-3xl font-bold tracking-tight outline-none lg:text-4xl"
@@ -259,6 +276,8 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             defaultLocationName={moment?.locationName ?? ""}
             defaultLocationAddress={moment?.locationAddress ?? ""}
             defaultVideoLink={moment?.videoLink ?? ""}
+            onLocationNameChange={setLocationNameValue}
+            onLocationAddressChange={setLocationAddressValue}
           />
 
           {/* Separator */}
@@ -280,13 +299,26 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 id="description"
                 name="description"
                 placeholder={t("form.descriptionPlaceholder")}
-                defaultValue={moment?.description ?? ""}
+                value={descriptionValue}
+                onChange={(e) => setDescriptionValue(e.target.value)}
                 required
                 rows={4}
                 className="resize-none"
               />
             </div>
           </div>
+
+          {/* Separator */}
+          <div className="border-border border-t" />
+
+          {/* Radar de planification */}
+          <MomentFormRadar
+            title={titleValue}
+            description={descriptionValue}
+            locationName={locationNameValue}
+            locationAddress={locationAddressValue}
+            startsAt={startsAtValue}
+          />
 
           {/* Separator */}
           <div className="border-border border-t" />

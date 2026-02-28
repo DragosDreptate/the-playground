@@ -277,6 +277,25 @@
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Publier"
     },
+    "radar": {
+      "title": "Radar de planification",
+      "hint": "Vérifiez les conflits avec les événements proches",
+      "analyzeButton": "Analyser les conflits",
+      "analyzing": "Analyse en cours…",
+      "modalTitle": "Radar de planification",
+      "keywords": "Mots-clés détectés",
+      "editKeywords": "Modifier",
+      "relaunch": "Relancer",
+      "conflictsSection": "Ce jour-là",
+      "weekSection": "Cette semaine",
+      "noResults": "Aucun événement trouvé pour ces critères.",
+      "errorNoCity": "Ville non détectée. Ajoutez une adresse plus précise.",
+      "sources": "Sources : Luma · Eventbrite · Meetup · Mobilizon",
+      "close": "Fermer",
+      "cityLabel": "dans {city}",
+      "badgeNew": "NOUVEAU",
+      "analyzeShort": "Analyser"
+    },
     "delete": {
       "title": "Supprimer l'événement",
       "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
