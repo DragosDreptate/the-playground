@@ -31,13 +31,14 @@ export default async function WelcomePage() {
     getUserPastMoments(userId, { registrationRepository: prismaRegistrationRepository }),
   ]);
 
-  // Utilisateur existant avec activité mais sans mode → PARTICIPANT par défaut
-  // (évite une boucle infinie avec page.tsx qui redirige vers welcome si mode=null)
+  // Sécurité : utilisateur avec activité mais sans mode (cas post-backfill improbable).
+  // Assigne un mode intelligent pour éviter la boucle infinie avec page.tsx.
   const hasActivity =
     circles.length > 0 || upcomingMoments.length > 0 || pastMoments.length > 0;
 
   if (hasActivity) {
-    await setDashboardMode(userId, "PARTICIPANT", { userRepository: prismaUserRepository });
+    const defaultMode = circles.some((c) => c.memberRole === "HOST") ? "ORGANIZER" : "PARTICIPANT";
+    await setDashboardMode(userId, defaultMode, { userRepository: prismaUserRepository });
     redirect("/dashboard");
   }
 
