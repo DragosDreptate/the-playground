@@ -277,6 +277,23 @@
       "endBeforeStart": "De einddatum moet na de startdatum liggen.",
       "createMoment": "Publiceren"
     },
+    "radar": {
+      "title": "Planningsradar",
+      "hint": "Controleer conflicten met evenementen in de buurt",
+      "analyzeButton": "Conflicten analyseren",
+      "analyzing": "Bezig met analyseren…",
+      "modalTitle": "Planningsradar",
+      "keywords": "Gedetecteerde trefwoorden",
+      "editKeywords": "Bewerken",
+      "relaunch": "Opnieuw uitvoeren",
+      "conflictsSection": "Die dag",
+      "weekSection": "Die week",
+      "noResults": "Geen evenementen gevonden voor deze criteria.",
+      "errorNoCity": "Stad niet gevonden. Voeg een preciezer adres toe.",
+      "sources": "Bronnen: Luma · Eventbrite · Meetup · Mobilizon",
+      "close": "Sluiten",
+      "cityLabel": "in {city}"
+    },
     "delete": {
       "title": "Evenement verwijderen",
       "description": "Weet je zeker dat je dit Evenement wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt. Alle inschrijvingen worden permanent verwijderd.",

@@ -119,6 +119,8 @@ type MomentFormLocationRowProps = {
   defaultLocationName?: string;
   defaultLocationAddress?: string;
   defaultVideoLink?: string;
+  onLocationNameChange?: (value: string) => void;
+  onLocationAddressChange?: (value: string) => void;
 };
 
 export function MomentFormLocationRow({
@@ -129,6 +131,8 @@ export function MomentFormLocationRow({
   defaultLocationName = "",
   defaultLocationAddress = "",
   defaultVideoLink = "",
+  onLocationNameChange,
+  onLocationAddressChange,
 }: MomentFormLocationRowProps) {
   const t = useTranslations("Moment");
 
@@ -213,6 +217,7 @@ export function MomentFormLocationRow({
                   placeholder={t("form.locationNamePlaceholder")}
                   defaultValue={defaultLocationName}
                   className="h-9"
+                  onChange={(e) => onLocationNameChange?.(e.target.value)}
                 />
               </div>
               <div className="space-y-1">
@@ -224,12 +229,13 @@ export function MomentFormLocationRow({
                   name="locationAddress"
                   placeholder={t("form.locationAddressPlaceholder")}
                   value={locationAddress}
-                  onChange={setLocationAddress}
+                  onChange={(v) => { setLocationAddress(v); onLocationAddressChange?.(v); }}
                   suggestions={addressAutocomplete.suggestions}
                   isLoading={addressAutocomplete.isLoading}
                   onQueryChange={addressAutocomplete.suggest}
                   onSelect={(s) => {
                     setLocationAddress(s.fullAddress);
+                    onLocationAddressChange?.(s.fullAddress);
                     addressAutocomplete.clear();
                   }}
                   onClear={addressAutocomplete.clear}
