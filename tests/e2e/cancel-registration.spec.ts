@@ -11,6 +11,7 @@ import { SLUGS, AUTH } from "./fixtures";
  */
 
 test.describe("Annulation d'inscription — utilisateur authentifié", () => {
+  test.describe.configure({ retries: 0 }); // mutation DB — pas de retry
   test.use({ storageState: AUTH.PLAYER });
 
   test("should display a cancel button for a registered user", async ({ page }) => {
