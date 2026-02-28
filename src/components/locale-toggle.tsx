@@ -18,6 +18,7 @@ const localeShort: Record<string, string> = {
   en: "EN",
   es: "ES",
   ro: "RO",
+  nl: "NL",
 };
 
 const localeFull: Record<string, string> = {
@@ -25,6 +26,7 @@ const localeFull: Record<string, string> = {
   en: "English",
   es: "Español",
   ro: "Română",
+  nl: "Nederlands",
 };
 
 export function LocaleToggle() {
