@@ -92,21 +92,30 @@ function formatShortDay(dateStr: string, locale: string): string {
 
 // --- Source badge ---
 
-const SOURCE_STYLES: Record<string, string> = {
-  luma: "border-violet-300 bg-violet-50 text-violet-700",
-  eventbrite: "border-orange-300 bg-orange-50 text-orange-700",
-  meetup: "border-red-300 bg-red-50 text-red-700",
-  mobilizon: "border-emerald-300 bg-emerald-50 text-emerald-700",
+const SOURCE_DOMAINS: Record<string, string> = {
+  luma: "lu.ma",
+  eventbrite: "eventbrite.com",
+  meetup: "meetup.com",
+  mobilizon: "mobilizon.fr",
 };
 
 function SourceBadge({ source }: { source: string }) {
-  const cls = SOURCE_STYLES[source] ?? "border-border bg-muted text-muted-foreground";
+  const domain = SOURCE_DOMAINS[source];
+  if (!domain) {
+    return (
+      <span className="border-border bg-muted text-muted-foreground inline-flex shrink-0 items-center rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase">
+        {source}
+      </span>
+    );
+  }
   return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cls}`}
-    >
-      {source}
-    </span>
+    <img
+      src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
+      alt={source}
+      width={20}
+      height={20}
+      className="shrink-0 rounded"
+    />
   );
 }
 
