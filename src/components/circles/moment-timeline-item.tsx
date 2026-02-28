@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
@@ -47,7 +47,7 @@ export async function MomentTimelineItem({
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
-  const isToday = moment.startsAt.toDateString() === now.toDateString();
+  const isToday = isSameDayInParis(moment.startsAt, now);
   const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
   const timeStr = formatTime(moment.startsAt);
 
