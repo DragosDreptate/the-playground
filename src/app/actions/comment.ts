@@ -8,6 +8,7 @@ import {
   prismaMomentRepository,
   prismaCircleRepository,
   prismaUserRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import { addComment } from "@/domain/usecases/add-comment";
@@ -40,8 +41,8 @@ export async function addCommentAction(
     const locale = await getLocale();
     const t = await getTranslations("Email");
 
-    // Fire-and-forget: notify hosts without blocking the response
-    sendHostCommentNotification(
+    // Fire-and-forget: notify all registrants without blocking the response
+    sendCommentNotifications(
       momentId,
       session.user.id,
       content,
@@ -93,7 +94,7 @@ export async function deleteCommentAction(
 
 type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
 
-async function sendHostCommentNotification(
+async function sendCommentNotifications(
   momentId: string,
   commenterId: string,
   content: string,
@@ -106,10 +107,6 @@ async function sendHostCommentNotification(
   ]);
   if (!commenter || !moment) return;
 
-  // Note : circle dépend de moment.circleId → séquentiel volontaire
-  const circle = await prismaCircleRepository.findById(moment.circleId);
-  if (!circle) return;
-
   const playerName =
     [commenter.firstName, commenter.lastName].filter(Boolean).join(" ") ||
     commenter.email;
@@ -117,47 +114,76 @@ async function sendHostCommentNotification(
   const commentPreview =
     content.length > 200 ? `${content.slice(0, 200)}…` : content;
 
-  const hosts = await prismaCircleRepository.findMembersByRole(
-    moment.circleId,
-    "HOST"
-  );
+  // Récupère inscrits actifs et hosts en parallèle
+  const [registrations, hosts] = await Promise.all([
+    prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
+    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+  ]);
 
-  // Récupère toutes les préférences en une seule requête pour éviter le N+1
-  const filteredHosts = hosts.filter((host) => host.userId !== commenterId);
-  const hostUserIds = filteredHosts.map((h) => h.userId);
-  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+  // Combine inscrits + hosts, déduplique par userId
+  type Recipient = { userId: string; name: string; email: string };
+  const recipientMap = new Map<string, Recipient>();
+
+  for (const reg of registrations) {
+    recipientMap.set(reg.userId, {
+      userId: reg.userId,
+      name:
+        [reg.user.firstName, reg.user.lastName].filter(Boolean).join(" ") ||
+        reg.user.email,
+      email: reg.user.email,
+    });
+  }
+  for (const host of hosts) {
+    if (!recipientMap.has(host.userId)) {
+      recipientMap.set(host.userId, {
+        userId: host.userId,
+        name:
+          [host.user.firstName, host.user.lastName]
+            .filter(Boolean)
+            .join(" ") || host.user.email,
+        email: host.user.email,
+      });
+    }
+  }
+
+  // Exclut l'auteur du commentaire
+  recipientMap.delete(commenterId);
+
+  if (recipientMap.size === 0) return;
+
+  // Batch fetch des préférences (évite le N+1)
+  const recipientIds = [...recipientMap.keys()];
+  const prefsMap =
+    await prismaUserRepository.findNotificationPreferencesByIds(recipientIds);
+
+  const emailStrings = {
+    subject: t("commentNotification.subject", {
+      playerName,
+      momentTitle: moment.title,
+    }),
+    heading: t("commentNotification.heading"),
+    message: t("commentNotification.message", {
+      playerName,
+      momentTitle: moment.title,
+    }),
+    commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
+    viewCommentCta: t("commentNotification.viewCommentCta"),
+    footer: t("common.footer"),
+  };
 
   await Promise.all(
-    filteredHosts.map(async (host) => {
-      const prefs = prefsMap.get(host.userId);
+    [...recipientMap.values()].map(async (recipient) => {
+      const prefs = prefsMap.get(recipient.userId);
       if (!prefs?.notifyNewComment) return;
 
-      const hostName =
-        [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
-        host.user.email;
-
-      return emailService.sendHostNewComment({
-        to: host.user.email,
-        hostName,
+      return emailService.sendNewComment({
+        to: recipient.email,
+        recipientName: recipient.name,
         playerName,
         momentTitle: moment.title,
         momentSlug: moment.slug,
-        circleSlug: circle.slug,
         commentPreview,
-        strings: {
-          subject: t("commentNotification.subject", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          heading: t("commentNotification.heading"),
-          message: t("commentNotification.message", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
-          viewCommentCta: t("commentNotification.viewCommentCta"),
-          footer: t("common.footer"),
-        },
+        strings: emailStrings,
       });
     })
   );

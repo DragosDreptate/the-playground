@@ -7,7 +7,7 @@ type Props = NewCommentEmailData & {
   baseUrl: string;
 };
 
-export function HostNewCommentEmail({
+export function NewCommentEmail({
   momentSlug,
   commentPreview,
   baseUrl,

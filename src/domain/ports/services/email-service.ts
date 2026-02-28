@@ -68,13 +68,12 @@ export type HostNewRegistrationEmailData = {
   };
 };
 
-export type HostNewCommentEmailData = {
+export type NewCommentEmailData = {
   to: string;
-  hostName: string;
+  recipientName: string;
   playerName: string;
   momentTitle: string;
   momentSlug: string;
-  circleSlug: string;
   commentPreview: string; // Comment content truncated to 200 chars
   strings: {
     subject: string;
@@ -202,7 +201,7 @@ export interface EmailService {
   ): Promise<void>;
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
-  sendHostNewComment(data: HostNewCommentEmailData): Promise<void>;
+  sendNewComment(data: NewCommentEmailData): Promise<void>;
   sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
   sendHostNewFollower(data: HostNewFollowerEmailData): Promise<void>;
