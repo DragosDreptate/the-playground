@@ -107,7 +107,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const locale = await getLocale();
 
   const gradient = getMomentGradient(moment.title);
-  const circleGradient = getMomentGradient(circle.name);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -227,8 +226,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             className="group flex items-start gap-3 px-1"
           >
             <div
-              className="mt-0.5 size-9 shrink-0 rounded-lg"
-              style={{ background: circleGradient }}
+              className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
+              style={
+                circle.coverImage
+                  ? { backgroundImage: `url(${circle.coverImage})` }
+                  : { background: getMomentGradient(circle.name) }
+              }
             />
             <div className="min-w-0">
               <p className="text-sm font-semibold leading-snug group-hover:underline">
