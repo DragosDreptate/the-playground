@@ -131,6 +131,12 @@ export async function DashboardContent({
   const participantCircles = circles;
   const participantUpcoming = upcomingRegistrations;
   const participantPast = pastRegistrations;
+
+  // Slugs des Communautés dont l'user est HOST — pour afficher le badge Organisateur
+  // sur les événements de ses propres communautés, même en mode Participant.
+  const hostCircleSlugs = new Set(
+    circles.filter((c) => c.memberRole === "HOST").map((c) => c.slug)
+  );
   const hasMoments = participantUpcoming.length > 0 || participantPast.length > 0;
 
   if (activeTab === "moments") {
@@ -152,6 +158,7 @@ export async function DashboardContent({
                 key={reg.id}
                 variant="participant"
                 registration={reg}
+                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
                 isLast={i === participantUpcoming.length - 1 && participantPast.length === 0}
               />
             ))}
@@ -183,6 +190,7 @@ export async function DashboardContent({
                 key={reg.id}
                 variant="participant"
                 registration={reg}
+                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
                 isLast={i === participantPast.length - 1}
                 isPast
               />
