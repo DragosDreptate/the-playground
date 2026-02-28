@@ -11,14 +11,17 @@
 
 const TIMEZONE = "Europe/Paris";
 
-type IntlLocaleKey = "fr" | "en";
+type IntlLocaleKey = "fr" | "en" | "ro" | "nl" | "es";
 const INTL_LOCALES: Record<IntlLocaleKey, string> = {
   fr: "fr-FR",
   en: "en-GB",
+  ro: "ro-RO",
+  nl: "nl-NL",
+  es: "es-ES",
 };
 
 function toIntlLocale(locale: string): string {
-  return INTL_LOCALES[locale as IntlLocaleKey] ?? INTL_LOCALES.en;
+  return INTL_LOCALES[locale as IntlLocaleKey] ?? locale;
 }
 
 /** "22:00" (toujours 24h, fuseau Europe/Paris) */
@@ -70,6 +73,17 @@ export function formatWeekdayAndDate(
     year: "numeric",
   }).format(date);
   return { weekday, dateStr };
+}
+
+/** Retourne true si deux dates tombent le même jour calendaire (fuseau Europe/Paris) */
+export function isSameDayInParis(a: Date, b: Date): boolean {
+  const fmt = new Intl.DateTimeFormat("fr-FR", {
+    timeZone: TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return fmt.format(a) === fmt.format(b);
 }
 
 /** "sam. 25 févr. · 22:00 – 23:00" */
