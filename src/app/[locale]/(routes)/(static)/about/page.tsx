@@ -236,8 +236,8 @@ export default async function AboutPage() {
             </p>
             <p>
               {isFr
-                ? "Depuis des années, j'organise des événements — conférences tech, masterclasses leadership, communautés agiles. C'est ce vécu d'organisateur, confronté aux mêmes outils bancals en boucle, qui est à l'origine de The Playground."
-                : "For years, I've been running events — tech conferences, leadership masterclasses, agile communities. That experience as an organizer, running into the same broken tools over and over, is what sparked The Playground."}
+                ? "Depuis des années, j'organise des événements — conférences produit, masterclasses, événements internes ou dans la communauté agile. C'est ce vécu d'organisateur, confronté aux mêmes outils bancals en boucle, qui est à l'origine de The Playground."
+                : "For years, I've been running events — product conferences, masterclasses, internal events and agile community meetups. That experience as an organizer, running into the same broken tools over and over, is what sparked The Playground."}
             </p>
             <p>
               {isFr ? (
