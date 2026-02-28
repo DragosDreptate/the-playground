@@ -115,7 +115,7 @@
     }
   },
   "Dashboard": {
-    "title": "Panou",
+    "title": "Tablou de bord",
     "myCircles": "Comunitățile mele",
     "myCirclesOrganizer": "Comunitățile mele",
     "createCircle": "Creează o Comunitate",
@@ -426,7 +426,7 @@
   },
   "Admin": {
     "title": "Administrare",
-    "dashboard": "Panou",
+    "dashboard": "Tablou de bord",
     "users": "Utilizatori",
     "circles": "Comunități",
     "moments": "Evenimente",
@@ -510,7 +510,7 @@
     }
   },
   "UserMenu": {
-    "dashboard": "Panou",
+    "dashboard": "Tablou de bord",
     "profile": "Profil",
     "signOut": "Deconectare"
   },
@@ -573,7 +573,7 @@
       "locationLabel": "Locație",
       "viewMomentCta": "Vezi Evenimentul",
       "cancelLink": "Anulează înscrierea",
-      "dashboardLink": "Găsește toate evenimentele tale în Panoul tău →",
+      "dashboardLink": "Găsește toate evenimentele tale în Tabloul tău de bord →",
       "footer": "Powered by The Playground — Lansează-ți comunitatea, gratuit."
     }
   },
