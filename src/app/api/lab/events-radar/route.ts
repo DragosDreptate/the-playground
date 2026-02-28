@@ -114,6 +114,13 @@ const EVENTBRITE_LOCATION: Record<string, string> = {
   london: "united-kingdom--london", berlin: "germany--berlin", amsterdam: "netherlands--amsterdam",
 };
 
+// Code pays ISO attendu par ville — évite les homonymes (Paris TX, London OH...)
+const EVENTBRITE_COUNTRY: Record<string, string> = {
+  paris: "fr", lyon: "fr", bordeaux: "fr", marseille: "fr",
+  toulouse: "fr", nantes: "fr", lille: "fr", strasbourg: "fr",
+  london: "gb", berlin: "de", amsterdam: "nl",
+};
+
 function buildEventbriteUrl(ville: string, dateFrom: string, dateEnd: string, keywords: string): string {
   const location = EVENTBRITE_LOCATION[ville.toLowerCase()] ?? `france--${ville.toLowerCase()}`;
   const params = new URLSearchParams({
@@ -141,6 +148,7 @@ function extractAndFilterEventbriteEvents(
   dateFrom: string,
   dateEnd: string,
   locationTerms: string[],
+  expectedCountry: string,
   keywords: string
 ): EventResult[] {
   const blocks: string[] = [];
@@ -165,10 +173,15 @@ function extractAndFilterEventbriteEvents(
 
         // Filtre localisation
         const isOnline = item.eventAttendanceMode?.includes("Online") || item.eventAttendanceMode?.includes("Mixed");
+        const country = item.location?.address?.addressCountry?.toLowerCase() ?? "";
         const locality = item.location?.address?.addressLocality?.toLowerCase() ?? "";
         const region = item.location?.address?.addressRegion?.toLowerCase() ?? "";
         const locText = `${locality} ${region}`;
-        if (!isOnline && locality && !locationTerms.some((t) => locText.includes(t))) continue;
+        if (!isOnline) {
+          // Valide le pays en premier — évite Paris TX, London OH, etc.
+          if (country && country !== expectedCountry) continue;
+          if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
+        }
 
         // Filtre mots-clés OR
         if (kwList.length > 0) {
@@ -197,6 +210,7 @@ async function fetchAndFilterEventbriteEvents(
   dateFrom: string,
   dateEnd: string,
   locationTerms: string[],
+  expectedCountry: string,
   keywords: string
 ): Promise<EventResult[]> {
   try {
@@ -209,7 +223,7 @@ async function fetchAndFilterEventbriteEvents(
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) return [];
-    return extractAndFilterEventbriteEvents(await res.text(), dateFrom, dateEnd, locationTerms, keywords);
+    return extractAndFilterEventbriteEvents(await res.text(), dateFrom, dateEnd, locationTerms, expectedCountry, keywords);
   } catch {
     return [];
   }
@@ -301,7 +315,7 @@ export async function POST(request: NextRequest) {
         send({ type: "tool_call", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
         const [lumaEvents, eventbriteEvents, meetupRaw] = await Promise.all([
           fetchAndFilterLumaEvents(ville, keywords, dateFrom, dateEnd),
-          fetchAndFilterEventbriteEvents(buildEventbriteUrl(ville, dateFrom, dateEnd, keywords), dateFrom, dateEnd, locationTerms, keywords),
+          fetchAndFilterEventbriteEvents(buildEventbriteUrl(ville, dateFrom, dateEnd, keywords), dateFrom, dateEnd, locationTerms, EVENTBRITE_COUNTRY[ville.toLowerCase()] ?? "fr", keywords),
           fetchMeetupData(buildMeetupUrl(ville, dateFrom, dateEnd, keywords)),
         ]);
         send({
