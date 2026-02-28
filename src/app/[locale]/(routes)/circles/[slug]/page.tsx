@@ -13,6 +13,7 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatWeekdayAndDate, formatTime, formatLongDate, isSameDayInParis } from "@/lib/format-date";
 import { FollowButton } from "@/components/circles/follow-button";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -55,7 +56,7 @@ function formatHostNames(hosts: CircleMemberWithUser[]): string {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   try {
@@ -90,10 +91,10 @@ export default async function PublicCirclePage({
   params,
   searchParams,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug }, { tab }, t, tExplorer, tCategory, tDashboard, tMoment, session] =
+  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, tDashboard, tMoment, session] =
     await Promise.all([
       params,
       searchParams,
@@ -423,11 +424,7 @@ export default async function PublicCirclePage({
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
-                  {circle.createdAt.toLocaleDateString(undefined, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {formatLongDate(circle.createdAt, locale)}
                 </p>
               </div>
             </div>
@@ -477,18 +474,10 @@ export default async function PublicCirclePage({
                   const isCancelled = moment.status === "CANCELLED";
                   const momentGradient = getMomentGradient(moment.title);
 
-                  const timeStr = moment.startsAt.toLocaleTimeString(undefined, {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  });
-                  const weekday = moment.startsAt.toLocaleDateString(undefined, { weekday: "short" });
-                  const dateStr = moment.startsAt.toLocaleDateString(undefined, {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  });
+                  const timeStr = formatTime(moment.startsAt);
+                  const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
                   const now = new Date();
-                  const isToday = moment.startsAt.toDateString() === now.toDateString();
+                  const isToday = isSameDayInParis(moment.startsAt, now);
 
                   const locationLabel =
                     moment.locationType === "ONLINE" || moment.locationType === "HYBRID"

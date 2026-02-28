@@ -86,6 +86,16 @@ export function isSameDayInParis(a: Date, b: Date): boolean {
   return fmt.format(a) === fmt.format(b);
 }
 
+/** "25 février 2026" / "25 February 2026" */
+export function formatLongDate(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 /** "sam. 25 févr. · 22:00 – 23:00" */
 export function formatDateRange(
   startsAt: Date,
