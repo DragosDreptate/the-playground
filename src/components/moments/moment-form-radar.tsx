@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Radar, X, ExternalLink, Pencil, Check } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useState, useRef, useMemo } from "react";
+import { Radar, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -22,19 +21,79 @@ type RadarSSEEvent =
   | { type: "error"; message: string }
   | { type: "done" };
 
-// --- Badge source ---
+// --- Date helpers ---
+
+function getWeekBounds(dateStr: string): { weekFrom: string; weekTo: string } {
+  const d = new Date(dateStr + "T12:00:00Z");
+  const day = d.getUTCDay();
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(d);
+  monday.setUTCDate(d.getUTCDate() + diffToMonday);
+  const sunday = new Date(monday);
+  sunday.setUTCDate(monday.getUTCDate() + 6);
+  return {
+    weekFrom: monday.toISOString().slice(0, 10),
+    weekTo: sunday.toISOString().slice(0, 10),
+  };
+}
+
+function formatWeekSubtitle(city: string, from: string, to: string, locale: string): string {
+  try {
+    const df = new Date(from + "T12:00:00Z");
+    const dt = new Date(to + "T12:00:00Z");
+    const month = dt.toLocaleDateString(locale, { month: "long" });
+    const year = dt.getUTCFullYear();
+    return `${city} · ${df.getUTCDate()}–${dt.getUTCDate()} ${month} ${year}`;
+  } catch {
+    return city;
+  }
+}
+
+function formatDayFull(dateStr: string, locale: string): string {
+  try {
+    const d = new Date(dateStr + "T12:00:00Z");
+    return d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" }).toUpperCase();
+  } catch {
+    return dateStr;
+  }
+}
+
+function formatWeekRange(from: string, to: string, locale: string): string {
+  try {
+    const df = new Date(from + "T12:00:00Z");
+    const dt = new Date(to + "T12:00:00Z");
+    const month = dt.toLocaleDateString(locale, { month: "long" }).toUpperCase();
+    return `${df.getUTCDate()}–${dt.getUTCDate()} ${month}`;
+  } catch {
+    return "";
+  }
+}
+
+function formatShortDay(dateStr: string, locale: string): string {
+  try {
+    const d = new Date(dateStr + "T12:00:00Z");
+    const weekday = d.toLocaleDateString(locale, { weekday: "short" }).replace(/\.$/, "");
+    return `${weekday}. ${d.getUTCDate()}`;
+  } catch {
+    return dateStr;
+  }
+}
+
+// --- Source badge ---
 
 const SOURCE_STYLES: Record<string, string> = {
-  luma: "bg-violet-100 text-violet-700 border-violet-200",
-  eventbrite: "bg-orange-100 text-orange-700 border-orange-200",
-  meetup: "bg-red-100 text-red-700 border-red-200",
-  mobilizon: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  luma: "border-violet-300 bg-violet-50 text-violet-700",
+  eventbrite: "border-orange-300 bg-orange-50 text-orange-700",
+  meetup: "border-red-300 bg-red-50 text-red-700",
+  mobilizon: "border-emerald-300 bg-emerald-50 text-emerald-700",
 };
 
 function SourceBadge({ source }: { source: string }) {
-  const cls = SOURCE_STYLES[source] ?? "bg-muted text-muted-foreground";
+  const cls = SOURCE_STYLES[source] ?? "border-border bg-muted text-muted-foreground";
   return (
-    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${cls}`}>
+    <span
+      className={`inline-flex shrink-0 items-center rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${cls}`}
+    >
       {source}
     </span>
   );
@@ -42,28 +101,76 @@ function SourceBadge({ source }: { source: string }) {
 
 // --- Event card ---
 
-function EventCard({ event }: { event: EventResult }) {
+function EventCard({
+  event,
+  showDay,
+  locale,
+}: {
+  event: EventResult;
+  showDay: boolean;
+  locale: string;
+}) {
   return (
     <a
       href={event.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="hover:bg-muted/50 group flex items-start gap-3 rounded-lg border p-3 transition-colors"
+      className="hover:bg-muted/40 flex items-center gap-3 rounded-lg border p-3 transition-colors"
     >
+      <SourceBadge source={event.source} />
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <SourceBadge source={event.source} />
+        <p className="text-sm font-semibold leading-snug">{event.title}</p>
+        <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
+          {showDay && event.date && (
+            <span className="flex items-center gap-1">
+              <Calendar className="size-3 shrink-0" />
+              {formatShortDay(event.date, locale)}
+            </span>
+          )}
           {event.time && (
-            <span className="text-muted-foreground text-xs">{event.time}</span>
+            <span className="flex items-center gap-1">
+              <Clock className="size-3 shrink-0" />
+              {event.time}
+            </span>
+          )}
+          {event.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="size-3 shrink-0" />
+              <span className="truncate">{event.location}</span>
+            </span>
           )}
         </div>
-        <p className="mt-1 text-sm font-medium leading-snug">{event.title}</p>
-        {event.location && (
-          <p className="text-muted-foreground mt-0.5 text-xs">{event.location}</p>
-        )}
       </div>
-      <ExternalLink className="text-muted-foreground mt-0.5 size-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+      <ExternalLink className="text-muted-foreground size-3.5 shrink-0" />
     </a>
+  );
+}
+
+// --- Section header ---
+
+function SectionHeader({
+  label,
+  count,
+  countLabel,
+  dotColor,
+}: {
+  label: string;
+  count: number;
+  countLabel: string;
+  dotColor: "red" | "orange";
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span
+        className={`size-2 shrink-0 rounded-full ${dotColor === "red" ? "bg-red-500" : "bg-orange-400"}`}
+      />
+      <span className="text-xs font-bold uppercase tracking-wide">{label}</span>
+      {count > 0 && (
+        <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
+          {countLabel}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -85,6 +192,7 @@ export function MomentFormRadar({
   startsAt,
 }: MomentFormRadarProps) {
   const t = useTranslations("Moment.radar");
+  const locale = useLocale();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,6 +205,12 @@ export function MomentFormRadar({
   const [error, setError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
+
+  // Week bounds computed from startsAt (known upfront, not from SSE)
+  const { weekFrom, weekTo } = useMemo(
+    () => (startsAt ? getWeekBounds(startsAt.slice(0, 10)) : { weekFrom: "", weekTo: "" }),
+    [startsAt]
+  );
 
   const canActivate =
     title.trim().length > 0 &&
@@ -197,9 +311,13 @@ export function MomentFormRadar({
     setKeywords((prev) => prev.filter((k) => k !== kw));
   }
 
-  // Split events by day
   const dayEvents = events?.filter((e) => e.date === targetDate) ?? [];
   const weekEvents = events?.filter((e) => e.date !== targetDate) ?? [];
+
+  // Subtitle: "Paris · 10–16 mars 2026" (computed as soon as city is known)
+  const subtitle = city
+    ? formatWeekSubtitle(city, weekFrom, weekTo, locale)
+    : null;
 
   return (
     <>
@@ -228,22 +346,73 @@ export function MomentFormRadar({
       {/* Modal */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
         <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-lg">
-          <DialogHeader className="border-border border-b px-5 py-4">
-            <DialogTitle className="flex items-center gap-2 text-base">
-              <Radar className="text-primary size-4" />
+
+          {/* Header */}
+          <DialogHeader className="px-5 pt-5 pb-3">
+            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+              <Radar className="text-primary size-4 shrink-0" />
               {t("modalTitle")}
-              {city && !loading && (
-                <span className="text-muted-foreground text-sm font-normal">
-                  — {t("cityLabel", { city })}
-                </span>
-              )}
             </DialogTitle>
+            {subtitle && (
+              <p className="text-muted-foreground text-sm">{subtitle}</p>
+            )}
           </DialogHeader>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Keywords — inline, séparés du header par un border-b */}
+          {!loading && keywords.length > 0 && (
+            <div className="border-border border-b px-5 pb-3">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-muted-foreground shrink-0 text-xs font-medium">
+                  {t("keywords")} :
+                </span>
+                {keywords.map((kw) => (
+                  <span
+                    key={kw}
+                    className="border-primary/40 bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                  >
+                    {kw}
+                    {editingKeywords && (
+                      <button
+                        type="button"
+                        onClick={() => removeKeyword(kw)}
+                        className="hover:text-primary/60 transition-colors"
+                        aria-label={`Supprimer ${kw}`}
+                      >
+                        <X className="size-3" />
+                      </button>
+                    )}
+                  </span>
+                ))}
+                {!editingKeywords ? (
+                  <button
+                    type="button"
+                    onClick={() => setEditingKeywords(true)}
+                    className="border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
+                  >
+                    {t("editKeywords")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingKeywords(false);
+                      runRadar(keywords);
+                    }}
+                    className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-opacity hover:opacity-90"
+                  >
+                    {t("relaunch")}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Scrollable body */}
+          <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-4">
+
             {/* Loading */}
             {loading && (
-              <div className="flex items-center gap-2 py-8 justify-center">
+              <div className="flex items-center justify-center gap-2 py-10">
                 <div className="border-primary size-5 animate-spin rounded-full border-2 border-t-transparent" />
                 <span className="text-muted-foreground text-sm">{t("analyzing")}</span>
               </div>
@@ -263,92 +432,44 @@ export function MomentFormRadar({
               </div>
             )}
 
-            {/* Keywords */}
-            {!loading && keywords.length > 0 && (
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                    {t("keywords")}
-                  </p>
-                  {!editingKeywords ? (
-                    <button
-                      type="button"
-                      onClick={() => setEditingKeywords(true)}
-                      className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
-                    >
-                      <Pencil className="size-3" />
-                      {t("editKeywords")}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditingKeywords(false);
-                        runRadar(keywords);
-                      }}
-                      className="text-primary hover:text-primary/80 flex items-center gap-1 text-xs font-medium transition-colors"
-                    >
-                      <Check className="size-3" />
-                      {t("relaunch")}
-                    </button>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {keywords.map((kw) => (
-                    <Badge
-                      key={kw}
-                      variant="secondary"
-                      className="gap-1 text-xs font-normal"
-                    >
-                      {kw}
-                      {editingKeywords && (
-                        <button
-                          type="button"
-                          onClick={() => removeKeyword(kw)}
-                          className="hover:text-destructive ml-0.5 transition-colors"
-                          aria-label={`Supprimer ${kw}`}
-                        >
-                          <X className="size-3" />
-                        </button>
-                      )}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Results */}
             {!loading && events !== null && !noCity && (
               <>
                 {/* Ce jour-là */}
-                <div>
-                  <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
-                    {t("conflictsSection")}
-                  </p>
+                <div className="space-y-2">
+                  <SectionHeader
+                    label={`${t("conflictsSection")} — ${formatDayFull(targetDate, locale)}`}
+                    count={dayEvents.length}
+                    countLabel={`${dayEvents.length} événement${dayEvents.length > 1 ? "s" : ""}`}
+                    dotColor="red"
+                  />
                   {dayEvents.length > 0 ? (
                     <div className="space-y-2">
                       {dayEvents.map((e, i) => (
-                        <EventCard key={i} event={e} />
+                        <EventCard key={i} event={e} showDay={false} locale={locale} />
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-sm">{t("noResults")}</p>
+                    <p className="text-muted-foreground pl-4 text-sm">{t("noResults")}</p>
                   )}
                 </div>
 
                 {/* Cette semaine */}
-                <div>
-                  <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
-                    {t("weekSection")}
-                  </p>
+                <div className="space-y-2">
+                  <SectionHeader
+                    label={`${t("weekSection")} — ${formatWeekRange(weekFrom, weekTo, locale)}`}
+                    count={weekEvents.length}
+                    countLabel={`${weekEvents.length} autre${weekEvents.length > 1 ? "s" : ""}`}
+                    dotColor="orange"
+                  />
                   {weekEvents.length > 0 ? (
                     <div className="space-y-2">
                       {weekEvents.map((e, i) => (
-                        <EventCard key={i} event={e} />
+                        <EventCard key={i} event={e} showDay={true} locale={locale} />
                       ))}
                     </div>
                   ) : (
-                    <p className="text-muted-foreground text-sm">{t("noResults")}</p>
+                    <p className="text-muted-foreground pl-4 text-sm">{t("noResults")}</p>
                   )}
                 </div>
               </>
@@ -358,7 +479,7 @@ export function MomentFormRadar({
           {/* Footer */}
           <div className="border-border flex items-center justify-between border-t px-5 py-3">
             <p className="text-muted-foreground text-xs">{t("sources")}</p>
-            <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
+            <Button type="button" variant="outline" size="sm" onClick={handleClose}>
               {t("close")}
             </Button>
           </div>
