@@ -290,6 +290,7 @@
       "weekSection": "Die week",
       "noResults": "Geen evenementen gevonden voor deze criteria.",
       "errorNoCity": "Stad niet gevonden. Voeg een preciezer adres toe.",
+      "rateLimitReached": "Daglimiet bereikt — maximaal {limit} analyses per dag. Kom morgen terug.",
       "sources": "Bronnen: Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Sluiten",
       "cityLabel": "in {city}",

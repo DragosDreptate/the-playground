@@ -18,6 +18,7 @@ type RadarSSEEvent =
   | { type: "keywords"; keywords: string[]; city: string | null }
   | { type: "events"; events: EventResult[]; dateFrom: string; dateTo: string; targetDate: string }
   | { type: "error_no_city" }
+  | { type: "error_rate_limit"; limit: number }
   | { type: "error"; message: string }
   | { type: "done" };
 
@@ -300,6 +301,8 @@ export function MomentFormRadar({
               setTargetDate(msg.targetDate);
             } else if (msg.type === "error_no_city") {
               setNoCity(true);
+            } else if (msg.type === "error_rate_limit") {
+              setError(t("rateLimitReached", { limit: msg.limit }));
             } else if (msg.type === "error") {
               setError(msg.message);
             } else if (msg.type === "done") {

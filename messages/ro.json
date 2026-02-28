@@ -290,6 +290,7 @@
       "weekSection": "În acea săptămână",
       "noResults": "Niciun eveniment găsit pentru aceste criterii.",
       "errorNoCity": "Oraș nedetectat. Adaugă o adresă mai precisă.",
+      "rateLimitReached": "Limită atinsă — maxim {limit} analize pe zi. Revino mâine.",
       "sources": "Surse: Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Închide",
       "cityLabel": "în {city}",
