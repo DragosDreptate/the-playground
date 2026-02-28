@@ -287,6 +287,7 @@ const SOURCE_COLORS: Record<string, string> = {
   luma: "border-violet-800 text-violet-400",
   meetup: "border-red-800 text-red-400",
   eventbrite: "border-orange-800 text-orange-400",
+  mobilizon: "border-emerald-800 text-emerald-400",
 };
 
 function EventCard({ event }: { event: EventResult }) {

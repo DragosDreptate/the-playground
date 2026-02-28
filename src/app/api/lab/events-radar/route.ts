@@ -229,6 +229,78 @@ async function fetchAndFilterEventbriteEvents(
   }
 }
 
+// --- Mobilizon — API GraphQL publique, 0 token Claude ---
+
+type MobilizonEvent = {
+  title: string;
+  beginsOn: string;
+  url: string;
+  physicalAddress?: { locality?: string | null; country?: string | null } | null;
+};
+
+async function fetchAndFilterMobilizonEvents(
+  ville: string,
+  keywords: string,
+  dateFrom: string,
+  dateEnd: string
+): Promise<EventResult[]> {
+  const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
+  const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
+
+  const query = `{
+    searchEvents(
+      term: ${JSON.stringify(keywords || "")}
+      beginsOn: "${dateFrom}T00:00:00Z"
+      endsOn: "${dateEnd}T23:59:59Z"
+      limit: 50
+    ) {
+      elements {
+        title
+        beginsOn
+        url
+        physicalAddress { locality country }
+      }
+    }
+  }`;
+
+  try {
+    const res = await fetch("https://mobilizon.fr/api", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ query }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) return [];
+
+    const json = (await res.json()) as { data?: { searchEvents?: { elements?: MobilizonEvent[] } } };
+    const elements = json.data?.searchEvents?.elements ?? [];
+
+    return elements
+      .filter((e) => {
+        // Filtre localisation — si l'événement a une adresse physique, vérifier la ville
+        const locality = e.physicalAddress?.locality?.toLowerCase() ?? "";
+        if (locality && !locationTerms.some((t) => locality.includes(t))) return false;
+        // Filtre mots-clés côté client (doublon sécurité)
+        if (kwList.length > 0) {
+          const text = e.title.toLowerCase();
+          if (!kwList.some((kw) => text.includes(kw))) return false;
+        }
+        return true;
+      })
+      .map((e) => ({
+        title: e.title,
+        date: e.beginsOn.slice(0, 10),
+        time: e.beginsOn.slice(11, 16) || null,
+        location: e.physicalAddress?.locality ?? null,
+        url: e.url,
+        source: "mobilizon",
+        description: null,
+      }));
+  } catch {
+    return [];
+  }
+}
+
 // --- Meetup — scraping + extraction Claude ---
 
 const MEETUP_LOCATION: Record<string, string> = {
@@ -312,15 +384,16 @@ export async function POST(request: NextRequest) {
 
         const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
 
-        send({ type: "tool_call", message: "Fetching Luma + Eventbrite + Meetup en parallèle…" });
-        const [lumaEvents, eventbriteEvents, meetupRaw] = await Promise.all([
+        send({ type: "tool_call", message: "Fetching Luma + Eventbrite + Meetup + Mobilizon en parallèle…" });
+        const [lumaEvents, eventbriteEvents, meetupRaw, mobilizonEvents] = await Promise.all([
           fetchAndFilterLumaEvents(ville, keywords, dateFrom, dateEnd),
           fetchAndFilterEventbriteEvents(buildEventbriteUrl(ville, dateFrom, dateEnd, keywords), dateFrom, dateEnd, locationTerms, EVENTBRITE_COUNTRY[ville.toLowerCase()] ?? "fr", keywords),
           fetchMeetupData(buildMeetupUrl(ville, dateFrom, dateEnd, keywords)),
+          fetchAndFilterMobilizonEvents(ville, keywords, dateFrom, dateEnd),
         ]);
         send({
           type: "tool_result",
-          message: `✓ Luma : ${lumaEvents.length} evt · Eventbrite : ${eventbriteEvents.length} evt · Meetup : ${Math.round(meetupRaw.length / 1024)}KB`,
+          message: `✓ Luma : ${lumaEvents.length} evt · Eventbrite : ${eventbriteEvents.length} evt · Meetup : ${Math.round(meetupRaw.length / 1024)}KB · Mobilizon : ${mobilizonEvents.length} evt`,
         });
 
         // Luma + Eventbrite : traitement 100% serveur, 0 token Claude
@@ -360,11 +433,11 @@ JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null
           }
         }
 
-        const allEvents = [...lumaEvents, ...eventbriteEvents, ...meetupEvents];
+        const allEvents = [...lumaEvents, ...eventbriteEvents, ...meetupEvents, ...mobilizonEvents];
         send({
           type: "events",
           events: allEvents,
-          summary: `${allEvents.length} événement(s) du ${dateFrom} au ${dateEnd} — ${lumaEvents.length} Luma · ${eventbriteEvents.length} Eventbrite · ${meetupEvents.length} Meetup`,
+          summary: `${allEvents.length} événement(s) du ${dateFrom} au ${dateEnd} — ${lumaEvents.length} Luma · ${eventbriteEvents.length} Eventbrite · ${meetupEvents.length} Meetup · ${mobilizonEvents.length} Mobilizon`,
         });
         send({ type: "done" });
       } catch (err) {
