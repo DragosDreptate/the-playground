@@ -95,14 +95,6 @@ export function NotificationPreferencesForm({
             }
           />
           <ToggleRow
-            label={t("newComment")}
-            description={t("newCommentDesc")}
-            checked={prefs.notifyNewComment}
-            onCheckedChange={(val) =>
-              setPrefs((p) => ({ ...p, notifyNewComment: val }))
-            }
-          />
-          <ToggleRow
             label={t("newFollower")}
             description={t("newFollowerDesc")}
             checked={prefs.notifyNewFollower}
@@ -120,6 +112,14 @@ export function NotificationPreferencesForm({
           {t("participant")}
         </p>
         <div className="flex flex-col">
+          <ToggleRow
+            label={t("newComment")}
+            description={t("newCommentDesc")}
+            checked={prefs.notifyNewComment}
+            onCheckedChange={(val) =>
+              setPrefs((p) => ({ ...p, notifyNewComment: val }))
+            }
+          />
           <ToggleRow
             label={t("newMomentInCircle")}
             description={t("newMomentInCircleDesc")}

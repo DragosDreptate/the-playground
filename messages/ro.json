@@ -547,7 +547,7 @@
     "commentNotification": {
       "subject": "{playerName} a comentat la {momentTitle}",
       "heading": "Comentariu nou",
-      "message": "{playerName} a comentat la Evenimentul tău {momentTitle}",
+      "message": "{playerName} a comentat la evenimentul {momentTitle}",
       "commentPreviewLabel": "Comentariu",
       "viewCommentCta": "Vezi comentariul"
     },
@@ -793,7 +793,7 @@
       "newRegistration": "Înregistrare nouă",
       "newRegistrationDesc": "Când cineva se înscrie la unul dintre evenimentele tale",
       "newComment": "Comentariu nou",
-      "newCommentDesc": "Când cineva comentează la unul dintre evenimentele tale",
+      "newCommentDesc": "Când cineva comentează un eveniment la care participi",
       "newFollower": "Urmăritor nou",
       "newFollowerDesc": "Când cineva urmărește una dintre Comunitățile tale",
       "newMomentInCircle": "Eveniment nou",

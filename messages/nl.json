@@ -547,7 +547,7 @@
     "commentNotification": {
       "subject": "{playerName} heeft gereageerd op {momentTitle}",
       "heading": "Nieuwe reactie",
-      "message": "{playerName} heeft gereageerd op jouw Evenement {momentTitle}",
+      "message": "{playerName} heeft gereageerd op het evenement {momentTitle}",
       "commentPreviewLabel": "Reactie",
       "viewCommentCta": "Reactie bekijken"
     },
@@ -793,7 +793,7 @@
       "newRegistration": "Nieuwe inschrijving",
       "newRegistrationDesc": "Wanneer iemand zich aanmeldt voor een van jouw evenementen",
       "newComment": "Nieuwe reactie",
-      "newCommentDesc": "Wanneer iemand reageert op een van jouw evenementen",
+      "newCommentDesc": "Wanneer iemand reageert op een evenement waaraan je deelneemt",
       "newFollower": "Nieuwe volger",
       "newFollowerDesc": "Wanneer iemand een van jouw Communities volgt",
       "newMomentInCircle": "Nieuw evenement",

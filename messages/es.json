@@ -547,7 +547,7 @@
     "commentNotification": {
       "subject": "{playerName} comentó en {momentTitle}",
       "heading": "Nuevo comentario",
-      "message": "{playerName} comentó en tu Evento {momentTitle}",
+      "message": "{playerName} comentó en el evento {momentTitle}",
       "commentPreviewLabel": "Comentario",
       "viewCommentCta": "Ver comentario"
     },
@@ -793,7 +793,7 @@
       "newRegistration": "Nueva inscripción",
       "newRegistrationDesc": "Cuando alguien se inscribe en uno de tus eventos",
       "newComment": "Nuevo comentario",
-      "newCommentDesc": "Cuando alguien comenta en uno de tus eventos",
+      "newCommentDesc": "Cuando alguien comenta en un evento al que asistes",
       "newFollower": "Nuevo seguidor",
       "newFollowerDesc": "Cuando alguien sigue una de tus Comunidades",
       "newMomentInCircle": "Nuevo evento",

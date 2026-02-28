@@ -4,7 +4,7 @@ import type {
   RegistrationConfirmationEmailData,
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
-  HostNewCommentEmailData,
+  NewCommentEmailData,
   NewMomentFollowerEmailData,
   NewMomentMemberEmailData,
   HostNewFollowerEmailData,
@@ -15,7 +15,7 @@ import type {
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "./templates/host-new-registration";
-import { HostNewCommentEmail } from "./templates/host-new-comment";
+import { NewCommentEmail } from "./templates/new-comment";
 import { NewMomentNotificationEmail } from "./templates/new-moment-notification";
 import { HostNewFollowerEmail } from "./templates/host-new-follower";
 import { MomentUpdateEmail } from "./templates/moment-update";
@@ -94,12 +94,12 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendHostNewComment(data: HostNewCommentEmailData): Promise<void> {
+    async sendNewComment(data: NewCommentEmailData): Promise<void> {
       await resend.emails.send({
         from,
         to: data.to,
         subject: data.strings.subject,
-        react: HostNewCommentEmail({ ...data, baseUrl }),
+        react: NewCommentEmail({ ...data, baseUrl }),
       });
     },
 
