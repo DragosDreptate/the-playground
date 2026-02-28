@@ -37,12 +37,14 @@ function getWeekBounds(dateStr: string): { weekFrom: string; weekTo: string } {
   };
 }
 
-function formatShortDate(dateStr: string, locale: string): string {
+function formatShortDate(isoString: string, locale: string): string {
   try {
-    const d = new Date(dateStr + "T12:00:00Z");
+    // Passer le string ISO complet (pas dateOnly) pour que toLocaleDateString
+    // applique la timezone locale — évite le décalage UTC → date J-1
+    const d = new Date(isoString);
     return d.toLocaleDateString(locale, { day: "numeric", month: "long" });
   } catch {
-    return dateStr;
+    return isoString.slice(0, 10);
   }
 }
 
@@ -357,7 +359,7 @@ export function MomentFormRadar({
                     <> à <strong className="text-foreground">{lastCity}</strong></>
                   )}
                   {startsAt && (
-                    <> autour du <strong className="text-foreground">{formatShortDate(startsAt.slice(0, 10), locale)}</strong></>
+                    <> autour du <strong className="text-foreground">{formatShortDate(startsAt, locale)}</strong></>
                   )}
                   {lastKeywords.length > 0 && (
                     <> — {lastKeywords.join(", ")}</>
