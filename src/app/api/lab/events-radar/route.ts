@@ -21,6 +21,22 @@ const LUMA_CITY: Record<string, string> = {
   london: "London", berlin: "Berlin", amsterdam: "Amsterdam",
 };
 
+// Termes de localisation acceptables par ville (insensible à la casse)
+// Un événement sans localisation (online) passe toujours
+const LUMA_LOCATION_TERMS: Record<string, string[]> = {
+  paris: ["paris", "île-de-france", "ile-de-france"],
+  lyon: ["lyon", "auvergne"],
+  bordeaux: ["bordeaux", "gironde"],
+  marseille: ["marseille", "bouches-du-rhône", "bouches-du-rhone"],
+  toulouse: ["toulouse", "haute-garonne"],
+  nantes: ["nantes", "loire-atlantique"],
+  lille: ["lille", "nord"],
+  strasbourg: ["strasbourg", "bas-rhin", "alsace"],
+  london: ["london"],
+  berlin: ["berlin"],
+  amsterdam: ["amsterdam"],
+};
+
 type LumaEntry = {
   event: { name: string; start_at: string; url: string; geo_address_info?: { city_state?: string } };
   calendar?: { name?: string };
@@ -43,13 +59,18 @@ async function fetchAndFilterLumaEvents(
 
     const json = (await res.json()) as { entries?: LumaEntry[] };
     const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
+    const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
 
     return (json.entries ?? [])
       .filter((e) => {
-        // Filtre date côté serveur (start_at est ISO8601)
+        // Filtre date
         const d = e.event.start_at.slice(0, 10);
         if (d < dateFrom || d > dateEnd) return false;
-        // Filtre mots-clés OR côté serveur
+        // Filtre localisation — si renseignée, doit correspondre à la ville
+        // Les événements sans localisation (online) passent toujours
+        const loc = e.event.geo_address_info?.city_state?.toLowerCase();
+        if (loc && !locationTerms.some((t) => loc.includes(t))) return false;
+        // Filtre mots-clés OR
         if (kwList.length === 0) return true;
         const text = e.event.name.toLowerCase();
         return kwList.some((kw) => text.includes(kw));
