@@ -14,7 +14,7 @@ import { deleteCircle } from "@/domain/usecases/delete-circle";
 import { followCircle } from "@/domain/usecases/follow-circle";
 import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
 import { leaveCircle } from "@/domain/usecases/leave-circle";
-import { prismaRegistrationRepository } from "@/infrastructure/repositories";
+import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { DomainError } from "@/domain/errors";
 import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
@@ -176,23 +176,27 @@ export async function followCircleAction(
         const circle = await prismaCircleRepository.findById(circleId);
         if (!circle) return;
         const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
+        const hostUserIds = hosts.map((h) => h.userId);
+        const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
         await Promise.allSettled(
-          hosts.map((h) =>
-            emailService.sendHostNewFollower({
-              to: h.user.email,
-              hostName: h.user.firstName ?? h.user.email,
-              followerName,
-              circleName: circle.name,
-              circleSlug: circle.slug,
-              strings: {
-                subject: `🔔 Nouveau follower — ${circle.name}`,
-                heading: `Nouveau follower sur ${circle.name}`,
-                message: `${followerName} suit maintenant votre Communauté.`,
-                viewMembersCta: "Voir les membres",
-                footer: `Vous recevez cet email car vous êtes Organisateur de ${circle.name} sur The Playground.`,
-              },
-            })
-          )
+          hosts
+            .filter((h) => prefsMap.get(h.userId)?.notifyNewFollower !== false)
+            .map((h) =>
+              emailService.sendHostNewFollower({
+                to: h.user.email,
+                hostName: h.user.firstName ?? h.user.email,
+                followerName,
+                circleName: circle.name,
+                circleSlug: circle.slug,
+                strings: {
+                  subject: `🔔 Nouveau follower — ${circle.name}`,
+                  heading: `Nouveau follower sur ${circle.name}`,
+                  message: `${followerName} suit maintenant votre Communauté.`,
+                  viewMembersCta: "Voir les membres",
+                  footer: `Vous recevez cet email car vous êtes Organisateur de ${circle.name} sur The Playground.`,
+                },
+              })
+            )
         );
       } catch (e) {
         Sentry.captureException(e);
