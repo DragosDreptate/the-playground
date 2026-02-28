@@ -292,7 +292,9 @@
       "errorNoCity": "Oraș nedetectat. Adaugă o adresă mai precisă.",
       "sources": "Surse: Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Închide",
-      "cityLabel": "în {city}"
+      "cityLabel": "în {city}",
+      "badgeNew": "NOU",
+      "analyzeShort": "Analizează"
     },
     "delete": {
       "title": "Șterge Evenimentul",

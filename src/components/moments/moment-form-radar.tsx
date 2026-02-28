@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo } from "react";
-import { Radar, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
+import { Target, Search, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +35,15 @@ function getWeekBounds(dateStr: string): { weekFrom: string; weekTo: string } {
     weekFrom: monday.toISOString().slice(0, 10),
     weekTo: sunday.toISOString().slice(0, 10),
   };
+}
+
+function formatShortDate(dateStr: string, locale: string): string {
+  try {
+    const d = new Date(dateStr + "T12:00:00Z");
+    return d.toLocaleDateString(locale, { day: "numeric", month: "long" });
+  } catch {
+    return dateStr;
+  }
 }
 
 function formatWeekSubtitle(city: string, from: string, to: string, locale: string): string {
@@ -204,6 +213,10 @@ export function MomentFormRadar({
   const [noCity, setNoCity] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Persistent across modal close — used to enrich the trigger hint
+  const [lastCity, setLastCity] = useState<string | null>(null);
+  const [lastKeywords, setLastKeywords] = useState<string[]>([]);
+
   const abortRef = useRef<AbortController | null>(null);
 
   // Week bounds computed from startsAt (known upfront, not from SSE)
@@ -269,6 +282,8 @@ export function MomentFormRadar({
             if (msg.type === "keywords") {
               if (!kw) setKeywords(msg.keywords);
               setCity(msg.city);
+              if (msg.city) setLastCity(msg.city);
+              if (!kw && msg.keywords.length > 0) setLastKeywords(msg.keywords);
             } else if (msg.type === "events") {
               setEvents(msg.events);
               setTargetDate(msg.targetDate);
@@ -321,26 +336,50 @@ export function MomentFormRadar({
 
   return (
     <>
-      {/* Trigger section in the form */}
-      <div className="flex items-start gap-3">
-        <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-          <Radar className="text-primary size-4" />
+      {/* Trigger section — card avec badge NOUVEAU */}
+      <div className="border-border bg-card relative rounded-xl border p-4">
+        {/* Badge NOUVEAU */}
+        <span className="bg-primary text-primary-foreground absolute -top-2.5 right-4 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+          {t("badgeNew")}
+        </span>
+
+        <div className="flex items-center gap-3">
+          <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+            <Target className="text-primary size-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold">{t("title")}</p>
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              {lastCity || startsAt ? (
+                <>
+                  {t("hint")}
+                  {lastCity && (
+                    <> à <strong className="text-foreground">{lastCity}</strong></>
+                  )}
+                  {startsAt && (
+                    <> autour du <strong className="text-foreground">{formatShortDate(startsAt.slice(0, 10), locale)}</strong></>
+                  )}
+                  {lastKeywords.length > 0 && (
+                    <> — {lastKeywords.join(", ")}</>
+                  )}
+                </>
+              ) : (
+                t("hint")
+              )}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            disabled={!canActivate}
+            onClick={handleOpen}
+            className="shrink-0"
+          >
+            <Search className="mr-1.5 size-3.5" />
+            {t("analyzeShort")}
+          </Button>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium">{t("title")}</p>
-          <p className="text-muted-foreground text-xs">{t("hint")}</p>
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          disabled={!canActivate}
-          onClick={handleOpen}
-          className="shrink-0"
-        >
-          <Radar className="mr-1.5 size-3.5" />
-          {t("analyzeButton")}
-        </Button>
       </div>
 
       {/* Modal */}
@@ -350,7 +389,7 @@ export function MomentFormRadar({
           {/* Header */}
           <DialogHeader className="px-5 pt-5 pb-3">
             <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <Radar className="text-primary size-4 shrink-0" />
+              <Target className="text-primary size-4 shrink-0" />
               {t("modalTitle")}
             </DialogTitle>
             {subtitle && (

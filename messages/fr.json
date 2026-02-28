@@ -292,7 +292,9 @@
       "errorNoCity": "Ville non détectée. Ajoutez une adresse plus précise.",
       "sources": "Sources : Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Fermer",
-      "cityLabel": "dans {city}"
+      "cityLabel": "dans {city}",
+      "badgeNew": "NOUVEAU",
+      "analyzeShort": "Analyser"
     },
     "delete": {
       "title": "Supprimer l'événement",

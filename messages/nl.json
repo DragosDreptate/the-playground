@@ -292,7 +292,9 @@
       "errorNoCity": "Stad niet gevonden. Voeg een preciezer adres toe.",
       "sources": "Bronnen: Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Sluiten",
-      "cityLabel": "in {city}"
+      "cityLabel": "in {city}",
+      "badgeNew": "NIEUW",
+      "analyzeShort": "Analyseren"
     },
     "delete": {
       "title": "Evenement verwijderen",
