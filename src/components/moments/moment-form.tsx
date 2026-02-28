@@ -29,6 +29,7 @@ type MomentFormProps = {
   circleSlug: string;
   circleName: string;
   circleDescription?: string;
+  circleCoverImage?: string | null;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -48,7 +49,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -186,10 +187,18 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
               href={`/dashboard/circles/${circleSlug}`}
               className="group flex items-start gap-3 px-1"
             >
-              <div
-                className="mt-0.5 size-9 shrink-0 rounded-lg"
-                style={{ background: circleGradient }}
-              />
+              {circleCoverImage ? (
+                <img
+                  src={circleCoverImage}
+                  alt={circleName}
+                  className="mt-0.5 size-9 shrink-0 rounded-lg object-cover"
+                />
+              ) : (
+                <div
+                  className="mt-0.5 size-9 shrink-0 rounded-lg"
+                  style={{ background: circleGradient }}
+                />
+              )}
               <div className="min-w-0">
                 <p className="text-sm font-semibold leading-snug group-hover:underline">
                   {circleName}
