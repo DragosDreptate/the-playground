@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo } from "react";
-import { Target, Search, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
+import { Radar, Search, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -347,19 +347,18 @@ export function MomentFormRadar({
 
   return (
     <>
-      {/* Trigger section — card avec badge NOUVEAU */}
-      <div className="border-border bg-card relative rounded-xl border p-4">
-        {/* Badge NOUVEAU */}
-        <span className="bg-primary text-primary-foreground absolute -top-2.5 right-4 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
-          {t("badgeNew")}
-        </span>
-
-        <div className="flex items-center gap-3">
+      {/* Trigger section */}
+      <div className="flex items-center gap-3">
           <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-            <Target className="text-primary size-4" />
+            <Radar className="text-primary size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold">{t("title")}</p>
+            <p className="flex items-center gap-2 text-sm font-semibold">
+              {t("title")}
+              <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                {t("badgeNew")}
+              </span>
+            </p>
             <p className="text-muted-foreground text-xs leading-relaxed">
               {lastCity || startsAt ? (
                 <>
@@ -381,7 +380,7 @@ export function MomentFormRadar({
           </div>
           <Button
             type="button"
-            variant="default"
+            variant="outline"
             size="sm"
             disabled={!canActivate}
             onClick={handleOpen}
@@ -390,7 +389,6 @@ export function MomentFormRadar({
             <Search className="mr-1.5 size-3.5" />
             {t("analyzeShort")}
           </Button>
-        </div>
       </div>
 
       {/* Modal */}
@@ -400,7 +398,7 @@ export function MomentFormRadar({
           {/* Header */}
           <DialogHeader className="px-5 pt-5 pb-3">
             <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <Target className="text-primary size-4 shrink-0" />
+              <Radar className="text-primary size-5 shrink-0" />
               {t("modalTitle")}
             </DialogTitle>
             {subtitle && (
