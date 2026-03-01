@@ -28,21 +28,21 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
   test("should cancel the registration and show the register CTA again", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
 
-    // Cliquer sur annuler (le bouton peut dire "Annuler" ou "Annuler l'inscription")
+    // Cliquer sur "Annuler mon inscription" pour ouvrir le dialog de confirmation
     const cancelButton = page
       .locator("button")
-      .filter({ hasText: /annuler|cancel/i })
+      .filter({ hasText: /annuler mon inscription|cancel.*registration/i })
       .first();
+    await expect(cancelButton).toBeVisible({ timeout: 10_000 });
     await cancelButton.click();
 
-    // Confirmer dans la modale si elle apparaît
+    // Attendre le dialog et cliquer sur confirmer
     const confirmButton = page
-      .locator("button, [role='alertdialog'] button")
-      .filter({ hasText: /confirmer|confirm|oui|yes/i })
+      .locator("[role='alertdialog'] button")
+      .filter({ hasText: /oui|yes|confirmer|confirm/i })
       .first();
-    if (await confirmButton.isVisible({ timeout: 2_000 })) {
-      await confirmButton.click();
-    }
+    await expect(confirmButton).toBeVisible({ timeout: 5_000 });
+    await confirmButton.click();
 
     // Après annulation, le CTA S'inscrire doit réapparaître
     await expect(
@@ -50,7 +50,7 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
         .locator("button")
         .filter({ hasText: /inscrire|s'inscrire|rejoindre|join|register/i })
         .first()
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible({ timeout: 15_000 });
   });
 });
 
