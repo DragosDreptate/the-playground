@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup Email — Inviter ma Communauté</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Page chrome ── */
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #e8e8f0;
+    padding: 40px 20px 80px;
+    color: #1a1b2e;
+  }
+
+  .page-header {
+    max-width: 900px;
+    margin: 0 auto 40px;
+  }
+  .page-header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a1b2e;
+    margin-bottom: 4px;
+  }
+  .page-header p {
+    font-size: 0.8125rem;
+    color: #6b6f87;
+  }
+
+  .variants-wrapper {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  .variant-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    min-width: 300px;
+    max-width: 520px;
+  }
+
+  .variant-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b6f87;
+    text-align: center;
+  }
+
+  /* ── Email client chrome ── */
+  .email-client {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .email-client-bar {
+    background: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+
+  .email-headers {
+    background: #fafafa;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #555;
+    line-height: 1.8;
+  }
+  .email-headers strong { color: #222; }
+
+  /* ── Email body — valeurs exactes du template React ── */
+  .email-body {
+    background: #f4f4f5;     /* body.backgroundColor */
+    padding: 40px 20px;      /* container padding */
+  }
+
+  .email-container {
+    max-width: 520px;        /* container.maxWidth */
+    margin: 0 auto;
+  }
+
+  .email-content {
+    background: #ffffff;     /* content.backgroundColor */
+    border-radius: 12px;     /* content.borderRadius */
+    padding: 32px;           /* content.padding */
+  }
+
+  /* heading */
+  .e-heading {
+    font-size: 16px;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 12px 0;
+    line-height: 24px;
+  }
+
+  /* intro */
+  .e-intro {
+    font-size: 14px;
+    color: #52525b;
+    margin: 0 0 20px 0;
+    line-height: 22px;
+  }
+
+  /* custom message block */
+  .e-custom-message {
+    border-left: 3px solid #ec4899;
+    background-color: #fdf2f8;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+  }
+  .e-custom-message-text {
+    font-size: 14px;
+    color: #3f3f46;
+    margin: 0;
+    line-height: 22px;
+    font-style: italic;
+  }
+
+  /* event card */
+  .e-event-card {
+    background-color: #f4f4f5;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .e-event-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #18181b;
+    margin: 0 0 6px 0;
+    line-height: 22px;
+  }
+  .e-event-meta {
+    font-size: 13px;
+    color: #71717a;
+    margin: 0 0 4px 0;
+    line-height: 20px;
+  }
+  .e-community-label {
+    font-size: 12px;
+    color: #a855f7;
+    font-weight: 500;
+    margin: 8px 0 0 0;
+    line-height: 18px;
+  }
+
+  /* CTA section */
+  .e-cta-section {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .e-cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 12px 32px;
+    text-decoration: none;
+    font-family: inherit;
+  }
+
+  /* unsubscribe */
+  .e-unsubscribe {
+    text-align: center;
+    font-size: 12px;
+    color: #a1a1aa;
+    margin: 0;
+    line-height: 18px;
+  }
+  .e-unsubscribe a {
+    color: #a1a1aa;
+    text-decoration: underline;
+  }
+
+  /* email footer (outside card) */
+  .email-footer {
+    color: #a1a1aa;          /* footerStyle.color */
+    font-size: 12px;         /* footerStyle.fontSize */
+    text-align: center;
+    margin-top: 24px;        /* footerStyle.marginTop */
+    line-height: 20px;       /* footerStyle.lineHeight */
+    padding: 0 20px;
+  }
+
+  /* ── Annotation ── */
+  .annotation {
+    position: relative;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .annotation-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+  }
+  .annotation-tag.new {
+    background: #f0fdf4;
+    border-color: #86efac;
+    color: #166534;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Email — "Inviter ma Communauté"</h1>
+  <p>Rendu pixel-perfect depuis <code>broadcast-moment.tsx</code> · Deux variantes : sans et avec message personnalisé</p>
+</div>
+
+<div class="variants-wrapper">
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- VARIANTE 1 — Sans message personnalisé   -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label">Variante A — Sans message personnalisé</div>
+
+    <div class="email-client">
+
+      <!-- Barre titre navigateur -->
+      <div class="email-client-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+
+      <!-- En-têtes email simulés -->
+      <div class="email-headers">
+        <div><strong>De :</strong> The Playground &lt;noreply@the-playground.fr&gt;</div>
+        <div><strong>À :</strong> Marie Dupont &lt;marie@example.com&gt;</div>
+        <div><strong>Objet :</strong> Vous êtes invité(e) : Apéro Produit — Mars 2026</div>
+      </div>
+
+      <!-- Corps email -->
+      <div class="email-body">
+        <div class="email-container">
+          <div class="email-content">
+
+            <p class="e-heading">Tech Paris vous invite</p>
+
+            <p class="e-intro">Tech Paris partage un événement avec vous :</p>
+
+            <!-- Event card -->
+            <div class="e-event-card">
+              <p class="e-event-title">Apéro Produit — Mars 2026</p>
+              <p class="e-event-meta">vendredi 14 mars 2026 à 19:00</p>
+              <p class="e-event-meta">Station F, Paris 13e</p>
+              <p class="e-community-label">Tech Paris</p>
+            </div>
+
+            <!-- CTA -->
+            <div class="e-cta-section">
+              <a class="e-cta-button" href="#">Voir l'événement</a>
+            </div>
+
+            <!-- Unsubscribe -->
+            <p class="e-unsubscribe">
+              <a href="#">Gérer mes notifications</a>
+            </p>
+
+          </div>
+
+          <!-- Footer hors card -->
+          <p class="email-footer">
+            Vous recevez cet email car vous suivez Tech Paris sur The Playground.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /email-client -->
+  </div><!-- /variant-col -->
+
+
+  <!-- ══════════════════════════════════════════ -->
+  <!-- VARIANTE 2 — Avec message personnalisé   -->
+  <!-- ══════════════════════════════════════════ -->
+  <div class="variant-col">
+    <div class="variant-label">Variante B — Avec message personnalisé</div>
+
+    <div class="email-client">
+
+      <div class="email-client-bar">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+
+      <div class="email-headers">
+        <div><strong>De :</strong> The Playground &lt;noreply@the-playground.fr&gt;</div>
+        <div><strong>À :</strong> Marie Dupont &lt;marie@example.com&gt;</div>
+        <div><strong>Objet :</strong> Vous êtes invité(e) : Apéro Produit — Mars 2026</div>
+      </div>
+
+      <div class="email-body">
+        <div class="email-container">
+          <div class="email-content">
+
+            <p class="e-heading">Tech Paris vous invite</p>
+
+            <p class="e-intro">Tech Paris partage un événement avec vous :</p>
+
+            <!-- Custom message block (conditionnel) -->
+            <div class="e-custom-message">
+              <p class="e-custom-message-text">
+                🚀 Ne manquez pas notre apéro de mars ! On prépare des surprises et les places sont limitées à 30 personnes. Hâte de vous retrouver !
+              </p>
+            </div>
+
+            <!-- Event card -->
+            <div class="e-event-card">
+              <p class="e-event-title">Apéro Produit — Mars 2026</p>
+              <p class="e-event-meta">vendredi 14 mars 2026 à 19:00</p>
+              <p class="e-event-meta">Station F, Paris 13e</p>
+              <p class="e-community-label">Tech Paris</p>
+            </div>
+
+            <!-- CTA -->
+            <div class="e-cta-section">
+              <a class="e-cta-button" href="#">Voir l'événement</a>
+            </div>
+
+            <!-- Unsubscribe -->
+            <p class="e-unsubscribe">
+              <a href="#">Gérer mes notifications</a>
+            </p>
+
+          </div>
+
+          <p class="email-footer">
+            Vous recevez cet email car vous suivez Tech Paris sur The Playground.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /email-client -->
+
+    <!-- Annotation bloc customMessage -->
+    <div class="annotation">
+      <span class="annotation-tag new">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Bloc affiché uniquement si message saisi dans le Dialog
+      </span>
+    </div>
+
+  </div><!-- /variant-col -->
+
+</div><!-- /variants-wrapper -->
+
+</body>
+</html>

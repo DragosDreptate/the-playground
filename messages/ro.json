@@ -400,7 +400,9 @@
       "sending": "Se trimite...",
       "successToast": "Invitație trimisă la {count} persoane",
       "alreadySentError": "Invitația a fost deja trimisă",
-      "notHostError": "Doar organizatorul poate invita Comunitatea"
+      "notHostError": "Doar organizatorul poate invita Comunitatea",
+      "hint": "Trimiteți un email de invitație tuturor membrilor și urmăritorilor",
+      "alreadySentShort": "Trimisă"
     },
     "errors": {
       "notFound": "Evenimentul nu a fost găsit",

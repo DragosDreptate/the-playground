@@ -418,21 +418,28 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </div>
               )}
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
-                <div className="lg:col-span-2">
-                  <BroadcastMomentDialog
-                    momentId={moment.id}
-                    circleId={circle.id}
-                    circleName={circle.name}
-                    broadcastSentAtLabel={
-                      moment.broadcastSentAt
-                        ? moment.broadcastSentAt.toLocaleDateString(
-                            locale === "fr" ? "fr-FR" : "en-US",
-                            { day: "numeric", month: "long", year: "numeric" }
-                          )
-                        : null
-                    }
-                  />
-                </div>
+                <>
+                  <div className="border-border border-t lg:col-span-2" />
+                  <div className="flex items-center justify-between gap-3 lg:col-span-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">{t("broadcast.triggerButton")}</p>
+                      <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
+                    </div>
+                    <BroadcastMomentDialog
+                      momentId={moment.id}
+                      circleId={circle.id}
+                      circleName={circle.name}
+                      broadcastSentAtLabel={
+                        moment.broadcastSentAt
+                          ? moment.broadcastSentAt.toLocaleDateString(
+                              locale === "fr" ? "fr-FR" : "en-US",
+                              { day: "numeric", month: "long", year: "numeric" }
+                            )
+                          : null
+                      }
+                    />
+                  </div>
+                </>
               )}
             </div>
           )}

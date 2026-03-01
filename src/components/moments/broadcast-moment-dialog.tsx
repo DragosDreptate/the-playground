@@ -66,13 +66,11 @@ export function BroadcastMomentDialog({
           variant="outline"
           size="sm"
           disabled={alreadySent}
-          className="gap-1.5"
+          className="shrink-0 gap-1.5"
           title={alreadySent ? t("alreadySent", { date: broadcastSentAtLabel }) : undefined}
         >
           <Mail className="size-4" />
-          {alreadySent
-            ? t("alreadySent", { date: broadcastSentAtLabel })
-            : t("triggerButton")}
+          {alreadySent ? t("alreadySentShort") : t("sendButton")}
         </Button>
       </DialogTrigger>
 
