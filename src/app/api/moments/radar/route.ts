@@ -4,7 +4,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { prisma } from "@/infrastructure/db/prisma";
 import { UserRole } from "@prisma/client";
 
-const DAILY_LIMIT = 10;
+const DAILY_LIMIT = 25;
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
