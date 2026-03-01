@@ -211,6 +211,7 @@ model Moment {
   price                 Int          @default(0)
   currency              String       @default("EUR")
   status                MomentStatus @default(PUBLISHED)
+  broadcastSentAt       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

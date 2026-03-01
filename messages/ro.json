@@ -388,6 +388,20 @@
     "empty": {
       "description": "Niciun eveniment încă. Creează primul tău eveniment."
     },
+    "broadcast": {
+      "triggerButton": "Invită Comunitatea",
+      "alreadySent": "Invitație trimisă pe {date}",
+      "dialogTitle": "Invită Comunitatea",
+      "dialogDescription": "Un email de invitație va fi trimis membrilor și urmăritorilor din {circleName}.",
+      "customMessageLabel": "Mesaj personalizat (opțional)",
+      "customMessagePlaceholder": "Ex: Nu rata acest eveniment! Locuri limitate.",
+      "sendButton": "Trimite",
+      "cancelButton": "Anulează",
+      "sending": "Se trimite...",
+      "successToast": "Invitație trimisă la {count} persoane",
+      "alreadySentError": "Invitația a fost deja trimisă",
+      "notHostError": "Doar organizatorul poate invita Comunitatea"
+    },
     "errors": {
       "notFound": "Evenimentul nu a fost găsit",
       "unauthorized": "Nu ai permisiunea să gestionezi acest Eveniment",
@@ -587,6 +601,15 @@
       "heading": "Acest eveniment a fost anulat",
       "message": "Organizatorul a anulat {momentTitle}. Sperăm să te vedem la un eveniment viitor din Comunitate.",
       "ctaLabel": "Vezi Comunitatea"
+    },
+    "broadcastMoment": {
+      "subject": "Eveniment nou: {momentTitle}",
+      "preheader": "{circleName} te invită la un eveniment",
+      "heading": "{circleName} te invită",
+      "intro": "{hostName} îți partajează un eveniment",
+      "ctaLabel": "Vezi evenimentul",
+      "unsubscribeText": "Primești acest email deoarece urmărești {circleName}.",
+      "unsubscribeLabel": "Gestionează notificările"
     },
     "common": {
       "dateLabel": "Dată",

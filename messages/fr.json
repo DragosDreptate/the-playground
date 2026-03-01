@@ -388,6 +388,20 @@
     "empty": {
       "description": "Aucun événement pour le moment. Créez votre premier événement."
     },
+    "broadcast": {
+      "triggerButton": "Inviter ma Communauté",
+      "alreadySent": "Invitation envoyée le {date}",
+      "dialogTitle": "Inviter ma Communauté",
+      "dialogDescription": "Un email d'invitation sera envoyé aux membres et followers de {circleName}.",
+      "customMessageLabel": "Message personnalisé (optionnel)",
+      "customMessagePlaceholder": "Ex : Ne manquez pas cet événement ! Places limitées.",
+      "sendButton": "Envoyer",
+      "cancelButton": "Annuler",
+      "sending": "Envoi en cours...",
+      "successToast": "Invitation envoyée à {count} personnes",
+      "alreadySentError": "L'invitation a déjà été envoyée",
+      "notHostError": "Seul l'organisateur peut inviter la Communauté"
+    },
     "errors": {
       "notFound": "Événement introuvable",
       "unauthorized": "Vous n'avez pas la permission de gérer cet événement",
@@ -587,6 +601,15 @@
       "heading": "Cet événement a été annulé",
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la Communauté.",
       "ctaLabel": "Voir la Communauté"
+    },
+    "broadcastMoment": {
+      "subject": "Nouveau : {momentTitle}",
+      "preheader": "{circleName} vous invite à un événement",
+      "heading": "{circleName} vous invite",
+      "intro": "{hostName} partage un événement avec vous",
+      "ctaLabel": "Voir l'événement",
+      "unsubscribeText": "Vous recevez cet email car vous suivez {circleName}.",
+      "unsubscribeLabel": "Gérer mes notifications"
     },
     "common": {
       "dateLabel": "Date",

@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
+import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dialog";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
@@ -414,6 +415,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               {props.calendarData && props.appUrl && moment.status !== "PAST" && (
                 <div className="lg:col-span-2">
                   <AddToCalendarButtons data={props.calendarData} appUrl={props.appUrl} />
+                </div>
+              )}
+              {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
+                <div className="lg:col-span-2">
+                  <BroadcastMomentDialog
+                    momentId={moment.id}
+                    circleId={circle.id}
+                    circleName={circle.name}
+                    broadcastSentAt={moment.broadcastSentAt}
+                  />
                 </div>
               )}
             </div>

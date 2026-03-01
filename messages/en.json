@@ -388,6 +388,20 @@
     "empty": {
       "description": "No Events yet. Create your first event."
     },
+    "broadcast": {
+      "triggerButton": "Invite my Community",
+      "alreadySent": "Invited on {date}",
+      "dialogTitle": "Invite my Community",
+      "dialogDescription": "An invitation email will be sent to the members and followers of {circleName}.",
+      "customMessageLabel": "Custom message (optional)",
+      "customMessagePlaceholder": "E.g. Don't miss this event! Limited spots available.",
+      "sendButton": "Send",
+      "cancelButton": "Cancel",
+      "sending": "Sending...",
+      "successToast": "Invitation sent to {count} people",
+      "alreadySentError": "The invitation has already been sent",
+      "notHostError": "Only the organizer can invite the Community"
+    },
     "errors": {
       "notFound": "Event not found",
       "unauthorized": "You don't have permission to manage this Event",
@@ -587,6 +601,15 @@
       "heading": "This event has been cancelled",
       "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the Community.",
       "ctaLabel": "View Community"
+    },
+    "broadcastMoment": {
+      "subject": "New event: {momentTitle}",
+      "preheader": "{circleName} invites you to an event",
+      "heading": "{circleName} invites you",
+      "intro": "{hostName} is sharing an event with you",
+      "ctaLabel": "View event",
+      "unsubscribeText": "You're receiving this email because you follow {circleName}.",
+      "unsubscribeLabel": "Manage notifications"
     },
     "common": {
       "dateLabel": "Date",
