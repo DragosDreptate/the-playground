@@ -42,7 +42,7 @@ const securityHeaders = [
       // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
       "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
       // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
-      "connect-src 'self' *.sentry.io api.stripe.com",
+      "connect-src 'self' *.sentry.io api.stripe.com api-adresse.data.gouv.fr",
       // Service Worker PWA
       "worker-src 'self'",
       "font-src 'self'",
