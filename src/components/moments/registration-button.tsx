@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, Download } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +21,7 @@ import {
   cancelRegistrationAction,
 } from "@/app/actions/registration";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
-import type { CalendarEventData } from "@/lib/calendar";
-import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
+import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 
 type RegistrationButtonProps = {
   momentId: string;
@@ -122,46 +121,60 @@ export function RegistrationButton({
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
     const isRegistered = localStatus === "REGISTERED";
     return (
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          {isRegistered ? (
-            <Button
-              variant="outline"
-              className="rounded-full border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
-            >
-              <Check className="size-3.5" />
-              {t("public.registered")}
-            </Button>
-          ) : (
-            <Button
-              variant="outline"
-              className="rounded-full border-amber-500/30 bg-amber-500/5 text-amber-400 hover:bg-amber-500/10 hover:text-amber-400"
-            >
-              <Clock className="size-3.5" />
-              {t("public.waitlisted")}
-            </Button>
-          )}
-          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      <div className="space-y-3">
+
+        {/* Banner de confirmation */}
+        <div className={`flex items-center gap-3 rounded-xl p-4 ${isRegistered ? "bg-primary/[0.06]" : "bg-amber-500/[0.06]"}`}>
+          <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${isRegistered ? "bg-primary/15 text-primary" : "bg-amber-500/15 text-amber-500"}`}>
+            {isRegistered ? <Check className="size-4" /> : <Clock className="size-4" />}
+          </div>
+          <div>
+            <p className="text-sm font-semibold">
+              {isRegistered ? t("public.registeredBannerTitle") : t("public.waitlistedBannerTitle")}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              {t("public.registrantsCount", { count: registrationCount })}
+              {!isRegistered && waitlistPosition != null && waitlistPosition > 0
+                ? ` · ${t("public.waitlistPosition", { position: waitlistPosition })}`
+                : !isFull && spotsRemaining !== null
+                  ? ` · ${t("public.spotsRemaining", { count: spotsRemaining })}`
+                  : isFull
+                    ? ` · ${t("public.eventFull")}`
+                    : ""}
+            </p>
+          </div>
         </div>
 
-        {/* Position liste d'attente */}
-        {!isRegistered && waitlistPosition != null && waitlistPosition > 0 && (
-          <p className="text-muted-foreground text-xs">
-            {t("public.waitlistPosition", { position: waitlistPosition })}
-          </p>
-        )}
-
-        {/* Boutons calendrier (uniquement pour les inscrits confirmés) */}
+        {/* Boutons calendrier — inscrits confirmés uniquement */}
         {isRegistered && calendarData && appUrl && (
-          <AddToCalendarButtons data={calendarData} appUrl={appUrl} />
+          <div className="flex gap-2">
+            <Button variant="outline" className="h-[34px] flex-1 gap-1.5 rounded-xl text-xs" asChild>
+              <a href={buildGoogleCalendarUrl(calendarData, appUrl)} target="_blank" rel="noopener noreferrer">
+                <svg width="13" height="13" viewBox="0 0 48 48" aria-hidden="true">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                {t("public.addToCalendar.google")}
+              </a>
+            </Button>
+            <Button variant="outline" className="h-[34px] flex-1 gap-1.5 rounded-xl text-xs" asChild>
+              <a href={`/api/moments/${calendarData.slug}/calendar`} download={`${calendarData.slug}.ics`}>
+                <Download className="size-3" />
+                {t("public.addToCalendar.ics")}
+              </a>
+            </Button>
+          </div>
         )}
 
+        {/* Annuler — lien texte discret */}
         {!isHost && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="default" size="lg" className="w-full">
+              <button className="text-muted-foreground hover:text-destructive w-full text-center text-xs underline underline-offset-2 transition-colors">
                 {t("public.cancelRegistration")}
-              </Button>
+              </button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
