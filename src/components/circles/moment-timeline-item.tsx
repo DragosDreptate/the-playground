@@ -15,6 +15,9 @@ type Props = {
   userRegistrationStatus: RegistrationStatus | null;
   isHost: boolean;
   isLast: boolean;
+  /** "dashboard" (défaut) → lien vers le dashboard Host.
+   *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
+  variant?: "dashboard" | "public";
 };
 
 export async function MomentTimelineItem({
@@ -24,6 +27,7 @@ export async function MomentTimelineItem({
   userRegistrationStatus,
   isHost,
   isLast,
+  variant = "dashboard",
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
@@ -87,7 +91,7 @@ export async function MomentTimelineItem({
       {/* Card */}
       <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
         <Link
-          href={`/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
+          href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="group block"
         >
           <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : "border-border hover:border-primary/30"}`}>
@@ -121,8 +125,8 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Inscriptions + statut */}
-                {!isCancelled && (
+                {/* Inscriptions + statut — dashboard uniquement */}
+                {!isCancelled && variant === "dashboard" && (
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     {registrationCount > 0 && (
                       <div className="text-muted-foreground flex items-center gap-1 text-xs">
