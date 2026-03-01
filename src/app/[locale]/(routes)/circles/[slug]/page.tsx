@@ -13,8 +13,9 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime, formatLongDate, isSameDayInParis } from "@/lib/format-date";
+import { formatLongDate } from "@/lib/format-date";
 import { FollowButton } from "@/components/circles/follow-button";
+import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
 import {
@@ -24,7 +25,6 @@ import {
   CalendarIcon,
   ChevronRight,
   MapPin,
-  XCircle,
   ExternalLink,
   Crown,
 } from "lucide-react";
@@ -94,15 +94,13 @@ export default async function PublicCirclePage({
   params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, tDashboard, tMoment, session] =
+  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, session] =
     await Promise.all([
       params,
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
-      getTranslations("Dashboard"),
-      getTranslations("Moment"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
       auth(),
     ]);
@@ -469,90 +467,18 @@ export default async function PublicCirclePage({
               </div>
             ) : (
               <div>
-                {displayedMoments.map((moment, i) => {
-                  const isLast = i === displayedMoments.length - 1;
-                  const isCancelled = moment.status === "CANCELLED";
-                  const momentGradient = getMomentGradient(moment.title);
-
-                  const timeStr = formatTime(moment.startsAt);
-                  const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
-                  const now = new Date();
-                  const isToday = isSameDayInParis(moment.startsAt, now);
-
-                  const locationLabel =
-                    moment.locationType === "ONLINE" || moment.locationType === "HYBRID"
-                      ? moment.locationType === "ONLINE" ? tDashboard("online") : tDashboard("hybrid")
-                      : moment.locationName ?? moment.locationAddress ?? null;
-                  const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
-
-                  return (
-                    <div key={moment.id} className="flex gap-0">
-                      {/* Date column */}
-                      <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
-                        {isToday ? (
-                          <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-                            {t("detail.today")}
-                          </span>
-                        ) : (
-                          <>
-                            <p className="text-muted-foreground text-xs">{weekday}</p>
-                            <p className="text-sm font-medium leading-snug">{dateStr}</p>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Dot + vertical line */}
-                      <div className="flex shrink-0 flex-col items-center">
-                        <div className={`mt-2 size-2 shrink-0 rounded-full ${isCancelled ? "bg-destructive/50" : "bg-border"}`} />
-                        {!isLast && (
-                          <div className="mt-2 flex-1 border-l border-dashed border-border" />
-                        )}
-                      </div>
-
-                      {/* Card */}
-                      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
-                        <Link href={`/m/${moment.slug}`} className="group block">
-                          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : "border-border hover:border-primary/30"}`}>
-                            {isCancelled && (
-                              <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
-                                <XCircle className="size-3.5 shrink-0 text-destructive" />
-                                <span className="text-destructive text-xs font-medium">{tMoment("public.eventCancelled")}</span>
-                              </div>
-                            )}
-                            <div className="flex items-start gap-4 p-4">
-                              <div className="min-w-0 flex-1 space-y-1">
-                                <p className="text-muted-foreground text-xs">{timeStr}</p>
-                                <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : "group-hover:underline"}`}>
-                                  {moment.title}
-                                </p>
-                                {locationLabel && (
-                                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                                    <LocationIcon className="size-3.5 shrink-0" />
-                                    <span className="truncate">{locationLabel}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div
-                                className={`relative size-[60px] shrink-0 overflow-hidden rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
-                                style={!moment.coverImage ? { background: momentGradient } : undefined}
-                              >
-                                {moment.coverImage && (
-                                  <Image
-                                    src={moment.coverImage}
-                                    alt={moment.title}
-                                    width={60}
-                                    height={60}
-                                    className="object-cover"
-                                  />
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </div>
-                    </div>
-                  );
-                })}
+                {displayedMoments.map((moment, i) => (
+                  <MomentTimelineItem
+                    key={moment.id}
+                    moment={moment}
+                    circleSlug={circle.slug}
+                    registrationCount={0}
+                    userRegistrationStatus={null}
+                    isHost={false}
+                    isLast={i === displayedMoments.length - 1}
+                    variant="public"
+                  />
+                ))}
               </div>
             )}
           </div>

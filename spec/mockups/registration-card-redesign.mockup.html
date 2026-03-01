@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Carte inscription Participant (redesign)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --card-foreground: #1a1b2e;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --destructive: #e8457a;
+      --amber: #f59e0b;
+      --radius: 0.5rem;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      padding: 32px 16px 64px;
+    }
+
+    /* ── Page header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .page-header h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .page-header p { font-size: 14px; color: var(--muted-foreground); }
+
+    /* ── Section label */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      margin-bottom: 12px;
+    }
+
+    /* ── Badge "Actuel" */
+    .current-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+    .new-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: #dcfce7;
+      color: #166534;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+
+    /* ── Grid de comparaison */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      max-width: 440px;
+      margin: 0 auto;
+    }
+
+    .option-block { }
+    .option-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .option-subtitle {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    /* ── Card base */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    /* ── Divider */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+    .divider-inset { border: none; border-top: 1px solid var(--border); margin: 0 0 0 44px; }
+
+    /* ── Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 99px;
+      border: 1px solid transparent;
+      padding: 0 14px;
+      height: 34px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--foreground);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { border-color: #c4c4d0; background: var(--muted); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted-foreground);
+      border-color: transparent;
+    }
+    .btn-destructive-ghost {
+      background: transparent;
+      color: var(--muted-foreground);
+      border: none;
+      font-size: 12px;
+      padding: 0;
+      height: auto;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color .15s;
+    }
+    .btn-destructive-ghost:hover { color: var(--destructive); }
+    .btn-destructive-outline {
+      background: transparent;
+      color: var(--destructive);
+      border: 1px solid color-mix(in srgb, var(--destructive) 30%, transparent);
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 99px;
+      padding: 0 14px;
+      height: 34px;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-lg { height: 44px; font-size: 14px; padding: 0 20px; border-radius: 12px; }
+    .btn-sm { height: 30px; font-size: 12px; padding: 0 12px; }
+    .btn-full { width: 100%; }
+
+    /* Status pill */
+    .pill-registered {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+      background: color-mix(in srgb, var(--primary) 8%, transparent);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .pill-waitlisted {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: 1px solid color-mix(in srgb, var(--amber) 35%, transparent);
+      background: color-mix(in srgb, var(--amber) 8%, transparent);
+      color: var(--amber);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Stats text */
+    .stats-text { font-size: 13px; font-weight: 600; }
+    .stats-sub { font-size: 11px; color: var(--muted-foreground); }
+
+    /* Google G SVG inline */
+    .google-g { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ─────────────────────────────────────────────────────────
+       ACTUEL — État existant
+    ───────────────────────────────────────────────────────── */
+    .current-card .row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .current-card .cal-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+    .current-card .cal-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .current-card .cal-row .btn { flex: 1; border-radius: 8px; }
+    .current-card .btn-cancel-current {
+      width: 100%;
+      height: 44px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       OPTION A — "Confirmation card"
+    ───────────────────────────────────────────────────────── */
+    .option-a .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .option-a .cal-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+    }
+    .option-a .cal-icon-wrap {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: color-mix(in srgb, var(--primary) 10%, transparent);
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .option-a .cal-label-text {
+      font-size: 13px; font-weight: 500; flex: 1; min-width: 0;
+    }
+    .option-a .cal-btns { display: flex; gap: 6px; flex-shrink: 0; }
+    .option-a .cancel-row {
+      display: flex;
+      justify-content: center;
+      padding-top: 14px;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       OPTION B — "Row actions" (inspiré section Partager hôte)
+    ───────────────────────────────────────────────────────── */
+    .option-b .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+    .option-b .row-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: color-mix(in srgb, var(--primary) 10%, transparent);
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .option-b .row-text { flex: 1; min-width: 0; }
+    .option-b .row-text-main { font-size: 13px; font-weight: 500; }
+    .option-b .row-text-sub { font-size: 11px; color: var(--muted-foreground); margin-top: 1px; }
+    .option-b .row-action { flex-shrink: 0; }
+    .option-b .row-action-group { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ─────────────────────────────────────────────────────────
+       OPTION C — "Luma-style success banner"
+    ───────────────────────────────────────────────────────── */
+    .option-c .success-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: color-mix(in srgb, var(--primary) 6%, transparent);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .option-c .success-icon {
+      width: 36px; height: 36px;
+      border-radius: 99px;
+      background: color-mix(in srgb, var(--primary) 15%, transparent);
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    .option-c .success-text-main { font-size: 14px; font-weight: 600; }
+    .option-c .success-text-sub { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+    .option-c .cal-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .option-c .cal-row .btn { flex: 1; }
+    .option-c .cancel-row {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <h1>Carte d'inscription — Vue Participant inscrit</h1>
+    <p>3 propositions de redesign · Mobile-first · 390px</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ══ ÉTAT ACTUEL ══════════════════════════════════════ -->
+    <div class="option-block">
+      <div class="current-badge">État actuel</div>
+      <div class="option-title">
+        <span>❌</span>
+        Problèmes identifiés
+      </div>
+      <div class="option-subtitle">
+        "Annuler" en bouton rose primaire = hiérarchie inversée.<br>
+        Boutons calendrier trop grands.<br>
+        Pas de sentiment de confirmation claire.
+      </div>
+      <div class="card current-card">
+        <div class="row-top">
+          <div class="pill-registered">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Inscrit
+          </div>
+          <div style="text-align:right">
+            <div class="stats-text">2 inscrits</div>
+          </div>
+        </div>
+        <hr class="divider" style="margin-bottom:12px" />
+        <div class="cal-label">Ajouter à mon calendrier</div>
+        <div class="cal-row">
+          <button class="btn btn-outline" style="flex:1;border-radius:8px;gap:6px">
+            <svg class="google-g" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Google Calendar
+          </button>
+          <button class="btn btn-outline" style="flex:1;border-radius:8px;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Fichier .ics
+          </button>
+        </div>
+        <button class="btn-cancel-current">Annuler mon inscription</button>
+      </div>
+    </div>
+
+    <!-- ══ OPTION A ══════════════════════════════════════════ -->
+    <div class="option-block">
+      <div class="new-badge">Option A</div>
+      <div class="option-title">
+        <span>🎯</span>
+        Confirmation + actions discrètes
+      </div>
+      <div class="option-subtitle">
+        Statut mis en valeur. Calendrier en ligne compacte. "Annuler" rétrogradé en lien texte discret — l'action est disponible mais ne sollicite pas.
+      </div>
+      <div class="card option-a">
+
+        <!-- Statut + compteur -->
+        <div class="status-row">
+          <div class="pill-registered">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Inscrit
+          </div>
+          <div style="text-align:right">
+            <div class="stats-text">2 inscrits</div>
+            <div class="stats-sub">3 places restantes</div>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Calendrier inline -->
+        <div class="cal-section">
+          <div class="cal-icon-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="cal-label-text">Ajouter à mon calendrier</div>
+          <div class="cal-btns">
+            <button class="btn btn-outline btn-sm" style="gap:5px;border-radius:8px">
+              <svg class="google-g" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Google
+            </button>
+            <button class="btn btn-outline btn-sm" style="gap:5px;border-radius:8px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              .ics
+            </button>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
+        <!-- Annuler — lien discret -->
+        <div class="cancel-row">
+          <button class="btn-destructive-ghost">Annuler mon inscription</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ OPTION B ══════════════════════════════════════════ -->
+    <div class="option-block">
+      <div class="new-badge">Option B</div>
+      <div class="option-title">
+        <span>📋</span>
+        Rows cohérentes — pattern "Partager"
+      </div>
+      <div class="option-subtitle">
+        Même structure en lignes que la section Partager de l'Organisateur. Icônes rose · label · action à droite. Cohérence maximale entre les deux vues.
+      </div>
+      <div class="card option-b">
+
+        <!-- Row 1 : Statut -->
+        <div class="row">
+          <div class="row-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-text-main">Inscrit</div>
+            <div class="row-text-sub">2 inscrits · 3 places restantes</div>
+          </div>
+          <!-- Aucune action : statut lecture seule -->
+        </div>
+
+        <hr class="divider-inset" />
+
+        <!-- Row 2 : Calendrier -->
+        <div class="row">
+          <div class="row-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-text-main">Ajouter à mon calendrier</div>
+          </div>
+          <div class="row-action-group">
+            <button class="btn btn-outline btn-sm" style="gap:5px;border-radius:8px">
+              <svg class="google-g" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+              Google
+            </button>
+            <button class="btn btn-outline btn-sm" style="gap:5px;border-radius:8px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              .ics
+            </button>
+          </div>
+        </div>
+
+        <hr class="divider-inset" />
+
+        <!-- Row 3 : Annuler -->
+        <div class="row">
+          <div class="row-icon" style="background:color-mix(in srgb,var(--destructive) 8%,transparent);color:var(--destructive)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-text-main" style="color:var(--muted-foreground);font-weight:400">Annuler mon inscription</div>
+          </div>
+          <div class="row-action">
+            <button class="btn btn-outline btn-sm" style="color:var(--destructive);border-color:color-mix(in srgb,var(--destructive) 30%,transparent);border-radius:8px">
+              Annuler
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ OPTION C ══════════════════════════════════════════ -->
+    <div class="option-block">
+      <div class="new-badge">Option C</div>
+      <div class="option-title">
+        <span>✨</span>
+        Luma-style — banner de confirmation
+      </div>
+      <div class="option-subtitle">
+        Bannière de succès rose douce en haut. Le Participant ressent clairement qu'il est inscrit. Actions utilitaires minimalistes. Annuler = lien inline.
+      </div>
+      <div class="card option-c">
+
+        <!-- Banner succès -->
+        <div class="success-banner">
+          <div class="success-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="success-text-main">Vous participez à cet événement</div>
+            <div class="success-text-sub">2 inscrits · 3 places restantes</div>
+          </div>
+        </div>
+
+        <!-- Calendrier : 2 boutons pleine largeur mais discrets -->
+        <div class="cal-row">
+          <button class="btn btn-outline" style="flex:1;gap:6px;border-radius:10px;font-size:12px;height:34px">
+            <svg class="google-g" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Google Calendar
+          </button>
+          <button class="btn btn-outline" style="flex:1;gap:6px;border-radius:10px;font-size:12px;height:34px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Fichier .ics
+          </button>
+        </div>
+
+        <!-- Annuler — lien centré discret -->
+        <div class="cancel-row">
+          <button class="btn-destructive-ghost">Annuler mon inscription</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ NOTE SUR L'ÉTAT LISTE D'ATTENTE ══════════════════ -->
+    <div class="option-block">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:12px">Note — état liste d'attente (Option B)</div>
+      <div class="option-subtitle" style="margin-bottom:16px">
+        Même structure Row que "Inscrit" mais avec la pill ambre et la position dans la liste.
+      </div>
+      <div class="card option-b">
+        <div class="row">
+          <div class="row-icon" style="background:color-mix(in srgb,var(--amber) 10%,transparent);color:var(--amber)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-text-main">Liste d'attente</div>
+            <div class="row-text-sub">Position #3 · 8 en attente</div>
+          </div>
+        </div>
+        <hr class="divider-inset" />
+        <div class="row">
+          <div class="row-icon" style="background:color-mix(in srgb,var(--destructive) 8%,transparent);color:var(--destructive)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="row-text">
+            <div class="row-text-main" style="color:var(--muted-foreground);font-weight:400">Quitter la liste d'attente</div>
+          </div>
+          <div class="row-action">
+            <button class="btn btn-outline btn-sm" style="color:var(--destructive);border-color:color-mix(in srgb,var(--destructive) 30%,transparent);border-radius:8px">
+              Quitter
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+</body>
+</html>
