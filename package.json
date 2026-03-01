@@ -68,7 +68,16 @@
       "@prisma/engines",
       "esbuild",
       "@sentry/cli"
-    ]
+    ],
+    "overrides": {
+      "glob>minimatch": "9.0.9",
+      "@sentry/node>minimatch": "9.0.9",
+      "@ts-morph/common>minimatch": "10.2.4",
+      "rollup": "4.59.0",
+      "serialize-javascript": "7.0.3",
+      "hono": "4.12.3",
+      "lodash": "4.17.23"
+    }
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
