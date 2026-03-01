@@ -147,7 +147,7 @@ export function CommentThread({
   }
 
   return (
-    <div className="border-border rounded-2xl border p-6">
+    <div className="border-border bg-card rounded-2xl border p-6">
       <div className="space-y-4">
         {/* Header */}
         <h2 className="text-lg font-semibold">
