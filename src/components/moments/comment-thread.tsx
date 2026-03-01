@@ -191,7 +191,7 @@ export function CommentThread({
                           comment.user.email
                         )}
                       </span>
-                      <span className="text-muted-foreground text-xs">
+                      <span className="text-muted-foreground text-xs" suppressHydrationWarning>
                         {formatRelativeTime(comment.createdAt)}
                       </span>
                       {canDelete && (
