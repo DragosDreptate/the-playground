@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Redesign carte actions Organisateur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens ── */
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+    }
+    html.dark {
+      --background: #1a1b2e;
+      --foreground: #f0f0f5;
+      --card: #252638;
+      --muted: #222336;
+      --muted-foreground: #8385a0;
+      --border: #383a55;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 40px 24px 80px;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── Page chrome ── */
+    .page-header {
+      max-width: 1100px;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .page-header h1 { font-size: 1.1rem; font-weight: 700; }
+    .page-header p { font-size: 0.8125rem; color: var(--muted-foreground); margin-top: 4px; }
+
+    /* ── Toggle ── */
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      background: var(--card);
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .toggle:hover { border-color: var(--muted-foreground); }
+
+    /* ── Columns wrapper ── */
+    .cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .cols { grid-template-columns: 1fr; }
+    }
+
+    .col-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .recommended-badge {
+      background: rgba(232,69,122,0.12);
+      border: 1px solid rgba(232,69,122,0.3);
+      color: #e8457a;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 999px;
+    }
+
+    /* ── Shared button styles ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--foreground);
+    }
+    .btn-outline:hover {
+      border-color: var(--muted-foreground);
+    }
+    .btn-sm { font-size: 12px; padding: 5px 10px; }
+    .btn-ghost {
+      background: transparent;
+      border-color: transparent;
+      color: var(--muted-foreground);
+    }
+
+    /* ── URL field ── */
+    .url-field {
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--muted) 50%, transparent);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+      flex: 1;
+    }
+
+    /* ══════════════════════════════════════
+       OPTION A — 3 cartes séparées
+       ══════════════════════════════════════ */
+
+    .opt-a { display: flex; flex-direction: column; gap: 8px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    /* Share card */
+    .card-share-header {
+      display: flex;
+      align-items: center;
+      gap-6px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      gap: 6px;
+    }
+    .card-share-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Calendar card */
+    .card-cal-header {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+    .card-cal-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .card-cal-btns .btn { flex: 1; justify-content: center; }
+
+    /* Invite card — rose accent */
+    .card-invite {
+      background: var(--card);
+      border: 1px solid rgba(232,69,122,0.25);
+      border-radius: 12px;
+      padding: 14px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    html:not(.dark) .card-invite {
+      background: rgba(232,69,122,0.03);
+    }
+    html.dark .card-invite {
+      background: rgba(232,69,122,0.06);
+    }
+    .card-invite-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .card-invite-text .label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .card-invite-text .hint {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+    }
+
+
+    /* ══════════════════════════════════════
+       OPTION B — Action list compacte
+       ══════════════════════════════════════ */
+
+    .opt-b .card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .action-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+    .action-row + .action-row {
+      border-top: 1px solid var(--border);
+    }
+    .action-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .action-icon.blue   { background: rgba(59,130,246,0.12); color: #3b82f6; }
+    .action-icon.teal   { background: rgba(20,184,166,0.12); color: #14b8a6; }
+    .action-icon.rose   { background: rgba(232,69,122,0.12); color: #e8457a; }
+    .action-body { flex: 1; min-width: 0; }
+    .action-label { font-size: 13px; font-weight: 600; }
+    .action-sub {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 1px;
+      margin-bottom: 8px;
+    }
+    .action-url-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .action-cal-row { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+
+
+    /* ══════════════════════════════════════
+       OPTION C — Section labels + compact
+       ══════════════════════════════════════ */
+
+    .opt-c .card { padding: 0; overflow: hidden; }
+
+    .section-block { padding: 14px 16px; }
+    .section-block + .section-block { border-top: 1px solid var(--border); }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+
+    .share-row { display: flex; align-items: center; gap: 8px; }
+
+    .cal-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+    .cal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--foreground);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    html:not(.dark) .cal-pill:hover { background: var(--muted); }
+    html.dark .cal-pill:hover { background: rgba(255,255,255,0.06); }
+
+    .invite-section-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .invite-section-row .label { font-size: 13px; font-weight: 600; }
+    .invite-section-row .hint { font-size: 11px; color: var(--muted-foreground); margin-top: 2px; }
+
+
+    /* ── Google logo inline SVG ── */
+    .g-logo { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Annotations ── */
+    .annotations { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .ann {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      line-height: 1.4;
+    }
+    .ann-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--muted-foreground);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .ann-dot.green { background: #10b981; }
+    .ann-dot.rose  { background: #e8457a; }
+    .ann-dot.blue  { background: #3b82f6; }
+
+    /* ── Comparison table ── */
+    .compare-section {
+      max-width: 1100px;
+      margin: 48px auto 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .compare-title {
+      padding: 12px 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted-foreground);
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--muted) 40%, transparent);
+    }
+    .compare-table { width: 100%; border-collapse: collapse; }
+    .compare-table th, .compare-table td {
+      padding: 10px 20px;
+      font-size: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table th {
+      font-weight: 700;
+      color: var(--muted-foreground);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: color-mix(in srgb, var(--muted) 30%, transparent);
+      width: 20%;
+    }
+    .compare-table td { color: var(--foreground); width: 26.6%; }
+    .pro { color: #10b981; font-weight: 500; }
+    .con { color: var(--muted-foreground); }
+    .tag-a, .tag-b, .tag-c {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+    .tag-a { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .tag-b { background: rgba(20,184,166,0.15); color: #14b8a6; }
+    .tag-c { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div>
+    <h1>Redesign — Carte actions Organisateur</h1>
+    <p>3 propositions pour restructurer la section "Lien partageable + Calendrier + Inviter"</p>
+  </div>
+  <button class="toggle" onclick="document.documentElement.classList.toggle('dark')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    Light / Dark
+  </button>
+</div>
+
+<div class="cols">
+
+  <!-- ═══════════════════════════════════
+       OPTION A — 3 cartes séparées
+       ═══════════════════════════════════ -->
+  <div>
+    <div class="col-label">
+      Option A — 3 cartes séparées
+      <span class="recommended-badge">Recommandée</span>
+    </div>
+
+    <div class="opt-a">
+
+      <!-- Card 1: Partager -->
+      <div class="card">
+        <div class="card-share-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted-foreground)"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          Lien partageable
+        </div>
+        <div class="card-share-row">
+          <div class="url-field">the-playground.fr/m/apero-produit-mars-2026</div>
+          <button class="btn btn-outline btn-sm" style="white-space:nowrap;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Calendrier -->
+      <div class="card">
+        <div class="card-cal-header">Ajouter à mon calendrier</div>
+        <div class="card-cal-btns">
+          <button class="btn btn-outline btn-sm">
+            <svg class="g-logo" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Google Calendar
+          </button>
+          <button class="btn btn-outline btn-sm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Fichier .ics
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Inviter — rose accent -->
+      <div class="card-invite">
+        <div class="card-invite-row">
+          <div class="card-invite-text">
+            <div class="label">Inviter ma Communauté</div>
+            <div class="hint">Envoyez un email d'invitation aux membres et followers</div>
+          </div>
+          <button class="btn btn-outline btn-sm" style="border-color:rgba(232,69,122,0.4);color:#e8457a;white-space:nowrap;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+            Envoyer
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /opt-a -->
+
+    <div class="annotations">
+      <div class="ann"><div class="ann-dot green"></div>Chaque action est isolée visuellement — pas de confusion entre partager, calendrier et inviter</div>
+      <div class="ann"><div class="ann-dot rose"></div>La card "Inviter" se distingue avec un contour rose → attire l'attention sur l'action à valeur ajoutée</div>
+      <div class="ann"><div class="ann-dot"></div>Les boutons calendrier retrouvent une taille normale (non pleine largeur)</div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       OPTION B — Action list compacte
+       ═══════════════════════════════════ -->
+  <div>
+    <div class="col-label">Option B — Action list compacte</div>
+
+    <div class="opt-b">
+      <div class="card">
+
+        <!-- Row 1: Lien -->
+        <div class="action-row">
+          <div class="action-icon blue">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="action-body">
+            <div class="action-label">Lien partageable</div>
+            <div class="action-url-row">
+              <div class="url-field">the-playground.fr/m/apero-produit-mars-2026</div>
+              <button class="btn btn-outline btn-sm" style="white-space:nowrap;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copier
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Calendrier -->
+        <div class="action-row">
+          <div class="action-icon teal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="action-body">
+            <div class="action-label">Ajouter à mon calendrier</div>
+            <div class="action-cal-row">
+              <button class="btn btn-outline btn-sm">
+                <svg class="g-logo" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Google Calendar
+              </button>
+              <button class="btn btn-outline btn-sm">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Fichier .ics
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Inviter -->
+        <div class="action-row" style="background:rgba(232,69,122,0.04);">
+          <div class="action-icon rose">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+          </div>
+          <div class="action-body">
+            <div class="action-label">Inviter ma Communauté</div>
+            <div class="action-sub">Envoyez un email d'invitation aux membres et followers</div>
+            <button class="btn btn-outline btn-sm" style="border-color:rgba(232,69,122,0.4);color:#e8457a;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+              Envoyer
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /card -->
+    </div><!-- /opt-b -->
+
+    <div class="annotations">
+      <div class="ann"><div class="ann-dot blue"></div>Les icônes colorées créent des ancres visuelles — l'œil scanne facilement les 3 actions</div>
+      <div class="ann"><div class="ann-dot teal"></div>Une seule card = moins de bruit visuel, structure unifiée</div>
+      <div class="ann"><div class="ann-dot"></div>Plus compact en hauteur que l'option A</div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════
+       OPTION C — Section labels
+       ═══════════════════════════════════ -->
+  <div>
+    <div class="col-label">Option C — Section labels</div>
+
+    <div class="opt-c">
+      <div class="card">
+
+        <!-- Section 1: Partager -->
+        <div class="section-block">
+          <div class="section-label">Partager</div>
+          <div class="share-row">
+            <div class="url-field">the-playground.fr/m/apero-produit-mars-2026</div>
+            <button class="btn btn-outline btn-sm" style="white-space:nowrap;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copier
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Calendrier -->
+        <div class="section-block">
+          <div class="section-label">Calendrier</div>
+          <div class="cal-pills">
+            <button class="cal-pill">
+              <svg class="g-logo" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google Calendar
+            </button>
+            <button class="cal-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Fichier .ics
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Inviter -->
+        <div class="section-block" style="background:rgba(232,69,122,0.04);border-top:1px solid rgba(232,69,122,0.15);">
+          <div class="section-label" style="color:#e8457a;">Inviter</div>
+          <div class="invite-section-row">
+            <div>
+              <div class="label">Inviter ma Communauté</div>
+              <div class="hint">Envoyez un email d'invitation aux membres et followers</div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="border-color:rgba(232,69,122,0.4);color:#e8457a;white-space:nowrap;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg>
+              Envoyer
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /card -->
+    </div><!-- /opt-c -->
+
+    <div class="annotations">
+      <div class="ann"><div class="ann-dot"></div>Les labels de section (PARTAGER, CALENDRIER, INVITER) guident le regard sans complexité supplémentaire</div>
+      <div class="ann"><div class="ann-dot"></div>Les boutons calendrier deviennent des pills compactes — poids visuel réduit</div>
+      <div class="ann"><div class="ann-dot rose"></div>La section "Inviter" a un fond teinté rose + label coloré pour se distinguer</div>
+    </div>
+  </div>
+
+</div><!-- /cols -->
+
+
+<!-- ── Tableau comparatif ── -->
+<div class="compare-section">
+  <div class="compare-title">Comparaison des options</div>
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th><span class="tag-a">A</span> 3 cartes séparées</th>
+        <th><span class="tag-b">B</span> Action list</th>
+        <th><span class="tag-c">C</span> Section labels</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>Clarté visuelle</th>
+        <td class="pro">Maximale — chaque action isolée</td>
+        <td class="pro">Bonne — icônes comme ancres</td>
+        <td>Correcte — labels mais dense</td>
+      </tr>
+      <tr>
+        <th>Compacité</th>
+        <td class="con">Plus haut (3 cards = plus d'espace)</td>
+        <td class="pro">La plus compacte</td>
+        <td class="pro">Compact</td>
+      </tr>
+      <tr>
+        <th>Mise en valeur "Inviter"</th>
+        <td class="pro">Card rose distincte ✓</td>
+        <td class="pro">Row rose + icône ✓</td>
+        <td class="pro">Section rose + label coloré ✓</td>
+      </tr>
+      <tr>
+        <th>Boutons calendrier</th>
+        <td class="pro">Compact (non pleine largeur)</td>
+        <td class="pro">Compact</td>
+        <td class="pro">Pills compactes</td>
+      </tr>
+      <tr>
+        <th>Effort impl.</th>
+        <td>Layout CSS + 3 cards distinctes</td>
+        <td class="pro">Minimal — refacto du layout</td>
+        <td class="pro">Minimal — refacto du layout</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

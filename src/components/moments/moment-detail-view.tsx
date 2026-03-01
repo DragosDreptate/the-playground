@@ -13,14 +13,15 @@ import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
-import type { CalendarEventData } from "@/lib/calendar";
+import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
-import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import Image from "next/image";
 import {
   CalendarIcon,
+  Download,
+  Mail,
   MapPin,
   Globe,
   ImageIcon,
@@ -393,54 +394,94 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Host : lien partageable + calendrier */}
+          {/* Host : lien partageable + calendrier + invitation */}
           {isHostView && (
-            <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
-              <div className="flex items-center gap-2 lg:col-span-2">
-                <LinkIcon className="text-muted-foreground size-4 shrink-0" />
-                <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
-              </div>
-              <Link
-                href={`/m/${moment.slug}`}
-                target="_blank"
-                className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 rounded-lg border px-3 py-2 transition-colors min-w-0"
-              >
-                <span className="text-muted-foreground block truncate font-mono text-sm">
-                  {props.publicUrl.replace(/^https?:\/\//, "")}
-                </span>
-              </Link>
-              <div className="flex items-center gap-2">
+            <div className="border-border bg-card rounded-xl border overflow-hidden">
+
+              {/* Ligne 1 — Lien partageable */}
+              <div className="flex items-center gap-3 px-4 py-3">
+                <div className="bg-blue-500/10 text-blue-500 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                  <LinkIcon className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-muted-foreground mb-1.5 text-xs">{t("detail.shareableLink")}</p>
+                  <Link
+                    href={`/m/${moment.slug}`}
+                    target="_blank"
+                    className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 block rounded-lg border px-3 py-2 transition-colors"
+                  >
+                    <span className="text-muted-foreground block truncate font-mono text-sm">
+                      {props.publicUrl.replace(/^https?:\/\//, "")}
+                    </span>
+                  </Link>
+                </div>
                 <CopyLinkButton value={props.publicUrl} />
               </div>
+
+              {/* Ligne 2 — Calendrier */}
               {props.calendarData && props.appUrl && moment.status !== "PAST" && (
-                <div className="lg:col-span-2">
-                  <AddToCalendarButtons data={props.calendarData} appUrl={props.appUrl} />
+                <div className="border-border border-t flex items-start gap-3 px-4 py-3">
+                  <div className="bg-teal-500/10 text-teal-500 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                    <CalendarIcon className="size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-muted-foreground mb-2 text-xs">{t("public.addToCalendar.label")}</p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a
+                          href={buildGoogleCalendarUrl(props.calendarData, props.appUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">
+                            <path fill="#4285F4" d="M24 20.5v7h7.4c-.6 3.4-3.6 5.9-7.4 5.9-4.4 0-8-3.6-8-8s3.6-8 8-8c2 0 3.8.7 5.2 1.9l5.2-5.2C31.3 11.9 27.8 10 24 10c-7.7 0-14 6.3-14 14s6.3 14 14 14c8 0 13.3-5.6 13.3-13.5 0-.9-.1-1.7-.2-2.5H24z" />
+                            <path fill="#34A853" d="M10.5 28.5l-3.4 2.5C9 34 13.2 36.5 18 37.5V33c-3-.7-5.6-2.4-7.5-4.5z" />
+                            <path fill="#FBBC05" d="M38 29.5c-1 2.7-2.8 5-5.2 6.6l3.4 2.5c2.5-2.2 4.4-5.1 5.3-8.4L38 29.5z" />
+                            <path fill="#EA4335" d="M18 15v-4.5C13.2 11.5 9 14 7.1 17.5L10.5 20C12.4 17.4 15 15.7 18 15z" />
+                          </svg>
+                          {t("public.addToCalendar.google")}
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1" asChild>
+                        <a
+                          href={`/api/moments/${moment.slug}/calendar`}
+                          download={`${moment.slug}.ics`}
+                        >
+                          <Download className="size-3.5" />
+                          {t("public.addToCalendar.ics")}
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
+
+              {/* Ligne 3 — Inviter ma Communauté */}
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
-                <>
-                  <div className="border-border border-t lg:col-span-2" />
-                  <div className="flex items-center justify-between gap-3 lg:col-span-2">
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{t("broadcast.triggerButton")}</p>
-                      <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
-                    </div>
-                    <BroadcastMomentDialog
-                      momentId={moment.id}
-                      circleId={circle.id}
-                      circleName={circle.name}
-                      broadcastSentAtLabel={
-                        moment.broadcastSentAt
-                          ? moment.broadcastSentAt.toLocaleDateString(
-                              locale === "fr" ? "fr-FR" : "en-US",
-                              { day: "numeric", month: "long", year: "numeric" }
-                            )
-                          : null
-                      }
-                    />
+                <div className="border-border border-t flex items-center gap-3 bg-primary/[0.04] px-4 py-3">
+                  <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                    <Mail className="size-4" />
                   </div>
-                </>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{t("broadcast.triggerButton")}</p>
+                    <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
+                  </div>
+                  <BroadcastMomentDialog
+                    momentId={moment.id}
+                    circleId={circle.id}
+                    circleName={circle.name}
+                    broadcastSentAtLabel={
+                      moment.broadcastSentAt
+                        ? moment.broadcastSentAt.toLocaleDateString(
+                            locale === "fr" ? "fr-FR" : "en-US",
+                            { day: "numeric", month: "long", year: "numeric" }
+                          )
+                        : null
+                    }
+                  />
+                </div>
               )}
+
             </div>
           )}
 

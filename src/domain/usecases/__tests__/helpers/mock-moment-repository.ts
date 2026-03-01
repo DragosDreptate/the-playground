@@ -18,6 +18,7 @@ export function createMockMomentRepository(
     findUpcomingByCircleId: vi.fn<MomentRepository["findUpcomingByCircleId"]>().mockResolvedValue([]),
     findUpcomingByHostUserId: vi.fn<MomentRepository["findUpcomingByHostUserId"]>().mockResolvedValue([]),
     findPastByHostUserId: vi.fn<MomentRepository["findPastByHostUserId"]>().mockResolvedValue([]),
+    markBroadcastSent: vi.fn<MomentRepository["markBroadcastSent"]>().mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -42,6 +43,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     price: 0,
     currency: "EUR",
     status: "PUBLISHED",
+    broadcastSentAt: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,
