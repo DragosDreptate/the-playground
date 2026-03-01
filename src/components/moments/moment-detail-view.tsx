@@ -307,23 +307,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* Séparateur avant À propos */}
-          {moment.description && <div className="border-border border-t" />}
-
           {/* Description */}
           {moment.description && (
             <CollapsibleDescription text={moment.description} />
           )}
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
           {/* Quand & Où */}
           <div className="flex flex-col gap-3">
             {/* Date */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="text-primary size-4" />
+              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="size-4" />
               </div>
               <div>
                 <p className="text-muted-foreground text-xs">{t("detail.when")}</p>
@@ -335,8 +329,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
             {/* Lieu */}
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <LocationIcon className="text-primary size-4" />
+              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                <LocationIcon className="size-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-muted-foreground text-xs">{t("detail.where")}</p>
@@ -490,10 +484,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* Public : inscription ou carte "événement terminé" */}
+          {/* Public : inscription ou carte de statut */}
           {!isHostView && (
             moment.status === "PAST" ? (
-              <div className="border-border bg-muted/30 space-y-3 rounded-xl border p-4">
+              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
                 <p className="font-semibold">{t("public.eventEnded")}</p>
                 {registeredCount > 0 && (
                   <div className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -509,8 +503,19 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   <ArrowRight className="size-3.5" />
                 </Link>
               </div>
+            ) : moment.status === "CANCELLED" ? (
+              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
+                <p className="font-semibold">{t("public.eventCancelled")}</p>
+                <Link
+                  href={circleHref}
+                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
+                >
+                  {t("public.viewCircleMoments")}
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
             ) : (
-              <div className="border-border bg-card rounded-xl border p-4">
+              <div className="border-border rounded-2xl border p-6">
                 <RegistrationButton
                   momentId={moment.id}
                   price={moment.price}
