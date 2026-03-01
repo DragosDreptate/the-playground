@@ -434,11 +434,18 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          <svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">
-                            <path fill="#4285F4" d="M24 20.5v7h7.4c-.6 3.4-3.6 5.9-7.4 5.9-4.4 0-8-3.6-8-8s3.6-8 8-8c2 0 3.8.7 5.2 1.9l5.2-5.2C31.3 11.9 27.8 10 24 10c-7.7 0-14 6.3-14 14s6.3 14 14 14c8 0 13.3-5.6 13.3-13.5 0-.9-.1-1.7-.2-2.5H24z" />
-                            <path fill="#34A853" d="M10.5 28.5l-3.4 2.5C9 34 13.2 36.5 18 37.5V33c-3-.7-5.6-2.4-7.5-4.5z" />
-                            <path fill="#FBBC05" d="M38 29.5c-1 2.7-2.8 5-5.2 6.6l3.4 2.5c2.5-2.2 4.4-5.1 5.3-8.4L38 29.5z" />
-                            <path fill="#EA4335" d="M18 15v-4.5C13.2 11.5 9 14 7.1 17.5L10.5 20C12.4 17.4 15 15.7 18 15z" />
+                          {/* Google Calendar icon */}
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect width="16" height="16" rx="2" fill="white"/>
+                            <rect width="16" height="16" rx="2" stroke="#dadce0" strokeWidth="1"/>
+                            <rect width="16" height="5" rx="2" fill="#4285F4"/>
+                            <rect y="3" width="16" height="2" fill="#4285F4"/>
+                            <rect x="2.5" y="7.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
+                            <rect x="6.75" y="7.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
+                            <rect x="11" y="7.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
+                            <rect x="2.5" y="11.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
+                            <rect x="6.75" y="11.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
+                            <rect x="11" y="11.5" width="2.5" height="2.5" rx="0.5" fill="#4285F4" fillOpacity="0.45"/>
                           </svg>
                           Google
                         </a>
