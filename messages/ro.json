@@ -220,7 +220,8 @@
       "isMember": "Ești participant",
       "isHost": "Ești Organizator",
       "manageCircle": "Gestionează această Comunitate",
-      "shareableLink": "Link partajabil"
+      "shareableLink": "Link partajabil",
+      "shareTitle": "Partajează evenimentul"
     },
     "errors": {
       "notFound": "Comunitatea nu a fost găsită",

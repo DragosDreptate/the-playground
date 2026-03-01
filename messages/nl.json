@@ -220,7 +220,8 @@
       "isMember": "Je bent lid",
       "isHost": "Je bent Organisator",
       "manageCircle": "Beheer deze Community",
-      "shareableLink": "Deelbare link"
+      "shareableLink": "Deelbare link",
+      "shareTitle": "Mijn evenement delen"
     },
     "errors": {
       "notFound": "Community niet gevonden",
