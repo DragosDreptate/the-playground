@@ -10,6 +10,31 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.8.1] — 2026-03-01 — Correctifs CSP & stabilité CI
+
+### Corrigé
+
+- **CSP** : autoriser `api-adresse.data.gouv.fr` dans `connect-src` — résout le blocage de l'autocomplétion d'adresse dans le formulaire de création d'événement
+- **Tests E2E** : test d'annulation d'inscription corrigé — stratégie `waitForResponse` + rechargement page pour éviter les aléas des transitions React 19 en CI
+
+---
+
+## [1.8.0] — 2026-02-28 — Radar de planification
+
+### Ajouté
+
+- **Radar de planification** : outil IA intégré dans le formulaire de création d'événement
+  - Analyse le titre, la description et le lieu via Claude Haiku pour extraire mots-clés et ville
+  - Recherche d'événements similaires en parallèle sur Luma, Eventbrite, Meetup et Mobilizon
+  - Résultats streamés en temps réel (SSE) avec liens vers les événements concurrents
+  - Mots-clés éditables et relançables après modification
+  - Badge « NOUVEAU » inline, icône Radar lucide, bouton outline sans conteneur
+- **Rate limiting Radar** : 10 analyses par utilisateur par jour (illimité pour les admins)
+  - Message d'erreur clair à l'atteinte de la limite
+  - Table `radar_usage` en base pour le tracking quotidien
+
+---
+
 ## [1.7.0] — 2026-02-28 — Support multilingue ES / RO / NL
 
 ### Ajouté
