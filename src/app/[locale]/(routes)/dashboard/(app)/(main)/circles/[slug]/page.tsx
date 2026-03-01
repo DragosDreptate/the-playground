@@ -416,7 +416,7 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Membres */}
-          <div className="border-border rounded-2xl border p-6">
+          <div className="border-border bg-card rounded-2xl border p-6">
             <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} />
           </div>
         </div>
