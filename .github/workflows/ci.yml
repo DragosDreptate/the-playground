@@ -94,11 +94,44 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
 
+      # Branche Neon isolée par run CI — zéro conflit entre PRs parallèles
+      - name: Create Neon branch
+        id: neon-branch
+        uses: neondatabase/create-branch-action@v5
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          branch_name: e2e-${{ github.run_id }}-${{ github.run_attempt }}
+          parent: dev
+
+      # Build stable (production) — remplace pnpm dev instable
+      - name: Build Next.js
+        run: pnpm build
+        env:
+          DATABASE_URL: ${{ steps.neon-branch.outputs.db_url_with_pooler }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_SENTRY_DSN: ""
+
       - name: Run E2E tests
         run: pnpm test:e2e
         env:
-          DATABASE_URL: ${{ secrets.NEON_DEV_DATABASE_URL }}
+          DATABASE_URL: ${{ steps.neon-branch.outputs.db_url_with_pooler }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          NEXT_PUBLIC_SENTRY_DSN: ""
+          E2E_SECRET: ${{ secrets.E2E_SECRET }}
+
+      # Nettoyage de la branche Neon — toujours, même si les tests échouent
+      - name: Delete Neon branch
+        if: always()
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch: ${{ steps.neon-branch.outputs.branch_id }}
+          api_key: ${{ secrets.NEON_API_KEY }}
 
       - name: Upload Playwright report on failure
         uses: actions/upload-artifact@v4

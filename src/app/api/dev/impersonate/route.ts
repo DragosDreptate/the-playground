@@ -3,13 +3,18 @@ import { prisma } from "@/infrastructure/db/prisma";
 import { cookies } from "next/headers";
 
 /**
- * Dev-only: impersonate a user by creating a session and setting the Auth.js cookie.
+ * Dev/E2E-only: impersonate a user by creating a session and setting the Auth.js cookie.
  *
  * GET /api/dev/impersonate?email=host@test.playground
  *   → Creates DB session → Sets cookie → 302 /dashboard
  */
 export async function GET(request: NextRequest) {
-  if (process.env.NODE_ENV === "production") {
+  const isDevMode = process.env.NODE_ENV !== "production";
+  const e2eSecret = process.env.E2E_SECRET;
+  const providedSecret = request.nextUrl.searchParams.get("secret");
+  const hasValidSecret = !!e2eSecret && providedSecret === e2eSecret;
+
+  if (!isDevMode && !hasValidSecret) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 

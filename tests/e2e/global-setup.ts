@@ -74,7 +74,9 @@ async function main() {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    const url = `${BASE_URL}/api/dev/impersonate?email=${encodeURIComponent(email)}`;
+    const e2eSecret = process.env.E2E_SECRET;
+    const secretParam = e2eSecret ? `&secret=${encodeURIComponent(e2eSecret)}` : "";
+    const url = `${BASE_URL}/api/dev/impersonate?email=${encodeURIComponent(email)}${secretParam}`;
     const response = await page.goto(url);
 
     if (!response?.ok()) {
