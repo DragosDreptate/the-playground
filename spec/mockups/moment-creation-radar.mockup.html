@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Créer un événement + Radar de planification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --accent: #6ee7d0;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+  --shadow-md: 0 4px 16px rgba(26,27,46,.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* ── SITE HEADER ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 32px;
+}
+.site-header .logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.site-header nav {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.site-header nav a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background .15s, color .15s;
+}
+.site-header nav a:hover, .site-header nav a.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+.site-header .user-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+/* ── PAGE CONTENT ── */
+.page-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-bottom: 24px;
+}
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .sep { opacity: .4; }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+/* ── FORM LAYOUT ── */
+.form-grid {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+.form-left {
+  width: 300px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 72px;
+}
+.form-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── COVER PICKER ── */
+.cover-picker {
+  aspect-ratio: 1/1;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  position: relative;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.cover-picker-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.cover-picker:hover .cover-picker-overlay { opacity: 1; }
+.cover-picker-overlay span {
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.cover-inner-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circle-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 4px;
+}
+.circle-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.circle-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+.circle-desc {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+  margin-top: 2px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-clamp: 3;
+  overflow: hidden;
+}
+
+/* ── FORM FIELDS ── */
+.title-input {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  width: 100%;
+  line-height: 1.2;
+  padding: 0;
+}
+.title-input::placeholder { color: #c4c5d4; }
+
+/* Date card */
+.date-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.date-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.date-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted-foreground);
+}
+.date-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.date-time {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.date-arrow {
+  color: var(--muted-foreground);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* Row pattern (icon + content) */
+.form-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.row-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(232,69,122,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.row-icon svg { color: var(--primary); }
+.row-content { flex: 1; min-width: 0; }
+.row-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.row-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 1px;
+}
+
+/* Location expanded */
+.location-expanded {
+  margin-top: 10px;
+  margin-left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.field-input {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--card);
+  font-family: inherit;
+  outline: none;
+}
+.field-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(232,69,122,.12); }
+.field-select {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--card);
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.sep { border: none; border-top: 1px solid var(--border); }
+
+/* Textarea */
+textarea.field-textarea {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--card);
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  width: 100%;
+  line-height: 1.6;
+}
+textarea.field-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(232,69,122,.12); }
+
+/* ── RADAR SECTION ── */
+.radar-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  position: relative;
+  transition: border-color .2s;
+}
+.radar-section:hover { border-color: rgba(232,69,122,.3); }
+.radar-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(232,69,122,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.radar-body { flex: 1; min-width: 0; }
+.radar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 2px;
+}
+.radar-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.radar-hint strong { color: var(--foreground); }
+.radar-btn {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: opacity .15s, background .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+}
+.radar-btn.active {
+  background: var(--primary);
+  color: white;
+}
+.radar-btn.active:hover { opacity: .88; }
+.radar-btn.disabled {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  cursor: not-allowed;
+}
+.radar-badge-new {
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Options */
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.option-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.option-label {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.option-hint { font-size: 11px; color: var(--muted-foreground); }
+.option-pill {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-weight: 500;
+}
+.option-btn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+.option-btn:hover { background: var(--muted); color: var(--foreground); }
+
+/* Submit */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  padding-top: 8px;
+}
+.btn-primary {
+  flex: 1;
+  height: 40px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .88; }
+.btn-outline {
+  height: 40px;
+  padding: 0 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.btn-outline:hover { background: var(--muted); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26,27,46,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--card);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(26,27,46,.18);
+}
+.modal-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-subtitle {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  transition: background .15s;
+}
+.modal-close:hover { background: var(--muted); color: var(--foreground); }
+
+/* Keywords row */
+.keywords-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.kw-label {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.kw-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(232,69,122,.08);
+  color: var(--primary);
+  border: 1px solid rgba(232,69,122,.15);
+}
+.kw-edit {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-family: inherit;
+  margin-left: 2px;
+  transition: background .15s;
+}
+.kw-edit:hover { background: var(--muted); color: var(--foreground); }
+
+/* Modal body */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.events-section {}
+.events-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.events-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted-foreground);
+}
+.conflict-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+}
+.week-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  flex-shrink: 0;
+}
+.events-count {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--muted);
+  border-radius: 20px;
+  padding: 1px 7px;
+  color: var(--muted-foreground);
+}
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  margin-bottom: 6px;
+  transition: border-color .15s, background .15s;
+}
+.event-item:hover {
+  border-color: #c4c5d4;
+  background: var(--muted);
+}
+.event-item:last-child { margin-bottom: 0; }
+.source-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid;
+  flex-shrink: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.badge-luma {
+  color: #8b5cf6;
+  border-color: rgba(139,92,246,.25);
+  background: rgba(139,92,246,.06);
+}
+.badge-eventbrite {
+  color: #f97316;
+  border-color: rgba(249,115,22,.25);
+  background: rgba(249,115,22,.06);
+}
+.badge-meetup {
+  color: #ef4444;
+  border-color: rgba(239,68,68,.25);
+  background: rgba(239,68,68,.06);
+}
+.badge-mobilizon {
+  color: #10b981;
+  border-color: rgba(16,185,129,.25);
+  background: rgba(16,185,129,.06);
+}
+.event-main { flex: 1; min-width: 0; }
+.event-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.event-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.event-meta-item {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.event-link {
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color .15s, background .15s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.event-link:hover { color: var(--foreground); background: var(--muted); }
+
+/* Modal footer */
+.modal-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.modal-sources {
+  font-size: 10px;
+  color: var(--muted-foreground);
+}
+.modal-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-sm-outline {
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--foreground);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s;
+}
+.btn-sm-outline:hover { background: var(--muted); }
+
+/* Toggle demo button */
+.demo-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--foreground);
+  color: var(--card);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  z-index: 200;
+  box-shadow: var(--shadow-md);
+  transition: opacity .15s;
+}
+.demo-toggle:hover { opacity: .85; }
+
+/* Scrollbar */
+.modal-body::-webkit-scrollbar { width: 4px; }
+.modal-body::-webkit-scrollbar-track { background: transparent; }
+.modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* SVG icons helpers */
+svg.icon-sm { width: 14px; height: 14px; flex-shrink: 0; }
+svg.icon-xs { width: 12px; height: 12px; flex-shrink: 0; }
+svg.icon-md { width: 16px; height: 16px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- SITE HEADER -->
+<header class="site-header">
+  <a href="#" class="logo">The Playground</a>
+  <nav>
+    <a href="#">Découvrir</a>
+    <a href="#" class="active">Mon espace</a>
+  </nav>
+  <div class="user-area">
+    <div class="avatar">TD</div>
+  </div>
+</header>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="sep">›</span>
+    <a href="#">Tech Builders Paris</a>
+    <span class="sep">›</span>
+    <span class="current">Créer un événement</span>
+  </nav>
+
+  <!-- Form grid -->
+  <div class="form-grid">
+
+    <!-- LEFT: Cover + Circle -->
+    <div class="form-left">
+      <div class="cover-picker">
+        <!-- Gradient placeholder: no cover selected -->
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,#3b82f6,#06b6d4);"></div>
+        <div class="cover-picker-overlay">
+          <div class="cover-inner-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2">
+              <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+              <circle cx="12" cy="13" r="3"/>
+            </svg>
+          </div>
+          <span>Choisir une photo</span>
+        </div>
+      </div>
+      <div class="circle-info">
+        <div class="circle-dot"></div>
+        <div>
+          <div class="circle-name">Tech Builders Paris</div>
+          <div class="circle-desc">Communauté de développeurs, product managers et designers qui construisent des produits tech à Paris.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Form fields -->
+    <div class="form-right">
+
+      <!-- Title -->
+      <input
+        type="text"
+        class="title-input"
+        placeholder="Nom de l'événement"
+        value="Conférence IA & Product — Innover en 2026"
+      />
+
+      <!-- Date card -->
+      <div class="date-card">
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon-md" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="date-block">
+          <div class="date-label">Début</div>
+          <div class="date-value">Vendredi 14 mars 2026</div>
+          <div class="date-time">14h00</div>
+        </div>
+        <div class="date-arrow">→</div>
+        <div class="date-block">
+          <div class="date-label">Fin</div>
+          <div class="date-value">Vendredi 14 mars 2026</div>
+          <div class="date-time">17h00</div>
+        </div>
+      </div>
+
+      <!-- Location row (expanded) -->
+      <div>
+        <div class="form-row" style="cursor:pointer;">
+          <div class="row-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+              <path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/><circle cx="12" cy="8" r="2"/>
+            </svg>
+          </div>
+          <div class="row-content">
+            <div class="row-label">Lieu</div>
+            <div class="row-hint">Station F — 5 Parvis Alan Turing, 75013 Paris</div>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2" style="flex-shrink:0;transform:rotate(180deg);">
+            <path d="M6 9l6 6 6-6"/>
+          </svg>
+        </div>
+        <!-- Location fields (expanded state) -->
+        <div class="location-expanded">
+          <div class="field-group">
+            <div class="field-label">Type</div>
+            <select class="field-select" style="width:160px;">
+              <option selected>En présentiel</option>
+              <option>En ligne</option>
+              <option>Hybride</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Lieu</div>
+            <input type="text" class="field-input" value="Station F" />
+          </div>
+          <div class="field-group">
+            <div class="field-label">Adresse</div>
+            <input type="text" class="field-input" value="5 Parvis Alan Turing, 75013 Paris" />
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- Description -->
+      <div class="form-row">
+        <div class="row-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+            <path d="M4 6h16M4 10h16M4 14h10"/>
+          </svg>
+        </div>
+        <div class="row-content">
+          <div class="row-label">Description</div>
+          <div class="row-hint" style="margin-bottom:8px;">Décrivez votre événement pour donner envie aux participants</div>
+          <textarea class="field-textarea" rows="4">Rejoignez-nous pour une journée d'exploration autour de l'intelligence artificielle et du Product Management. Au programme : keynotes, tables rondes et ateliers pratiques sur l'intégration de l'IA dans vos workflows produit.</textarea>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- ★ RADAR DE PLANIFICATION (nouvelle section) -->
+      <div class="radar-section" id="radarSection">
+        <span class="radar-badge-new">Nouveau</span>
+        <div class="radar-icon-wrap">
+          <!-- Radio/radar icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M16.24 7.76a6 6 0 010 8.49M7.76 7.76a6 6 0 000 8.49"/>
+            <path d="M20.07 3.93a12 12 0 010 16.97M3.93 3.93a12 12 0 000 16.97"/>
+          </svg>
+        </div>
+        <div class="radar-body">
+          <div class="radar-title">Radar de planification</div>
+          <div class="radar-hint">
+            Vérifiez les conflits avec les événements à <strong>Paris</strong> autour du <strong>14 mars</strong> — IA, Product, conférence
+          </div>
+        </div>
+        <button class="radar-btn active" onclick="document.getElementById('modal').classList.remove('hidden')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          Analyser
+        </button>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- Options section -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="option-row">
+          <div class="option-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+          </div>
+          <div style="flex:1;">
+            <div class="option-label">Capacité</div>
+            <div class="option-hint">Nombre maximum de participants</div>
+          </div>
+          <span class="option-pill">Illimitée</span>
+          <button class="option-btn">+ Ajouter</button>
+        </div>
+
+        <div class="option-row">
+          <div class="option-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+            </svg>
+          </div>
+          <div style="flex:1;">
+            <div class="option-label" style="color:var(--muted-foreground);">Billetterie payante</div>
+            <div class="option-hint">Bientôt disponible</div>
+          </div>
+          <span class="option-pill">Gratuit</span>
+          <button class="option-btn" disabled style="opacity:.45;cursor:not-allowed;">Bientôt</button>
+        </div>
+      </div>
+
+      <!-- Submit / Cancel -->
+      <div class="form-actions">
+        <button class="btn-primary">Créer l'événement</button>
+        <button class="btn-outline">Annuler</button>
+      </div>
+
+    </div><!-- /form-right -->
+  </div><!-- /form-grid -->
+</div><!-- /page-content -->
+
+
+<!-- ─────────────────────────────────────
+     MODAL — RADAR RESULTS
+───────────────────────────────────── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+
+    <!-- Modal header -->
+    <div class="modal-header">
+      <div class="modal-header-top">
+        <div>
+          <div class="modal-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M16.24 7.76a6 6 0 010 8.49M7.76 7.76a6 6 0 000 8.49"/>
+              <path d="M20.07 3.93a12 12 0 010 16.97M3.93 3.93a12 12 0 000 16.97"/>
+            </svg>
+            Radar de planification
+          </div>
+          <div class="modal-subtitle">Paris · semaine du 10–16 mars 2026</div>
+        </div>
+        <button class="modal-close" onclick="document.getElementById('modal').classList.add('hidden')">×</button>
+      </div>
+
+      <!-- Keywords -->
+      <div class="keywords-row">
+        <span class="kw-label">Mots-clés :</span>
+        <span class="kw-chip">IA</span>
+        <span class="kw-chip">Product</span>
+        <span class="kw-chip">conférence</span>
+        <span class="kw-chip">startup</span>
+        <button class="kw-edit">✏ Modifier</button>
+      </div>
+    </div>
+
+    <!-- Modal body -->
+    <div class="modal-body">
+
+      <!-- Section 1: Ce jour-là -->
+      <div class="events-section">
+        <div class="events-section-header">
+          <div class="conflict-dot"></div>
+          <span class="events-section-label">Ce jour-là — vendredi 14 mars</span>
+          <span class="events-count">2 événements</span>
+        </div>
+
+        <div class="event-item">
+          <span class="source-badge badge-luma">Luma</span>
+          <div class="event-main">
+            <div class="event-title">AI Builders Meetup Paris — Edition #8</div>
+            <div class="event-meta">
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                18h00
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                Station F, Paris 13
+              </span>
+            </div>
+          </div>
+          <a href="#" class="event-link">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="event-item">
+          <span class="source-badge badge-eventbrite">Eventbrite</span>
+          <div class="event-main">
+            <div class="event-title">Startup Demo Day — IA Générative Edition</div>
+            <div class="event-meta">
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                19h30
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                Numa, Paris 2
+              </span>
+            </div>
+          </div>
+          <a href="#" class="event-link">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Section 2: Cette semaine -->
+      <div class="events-section">
+        <div class="events-section-header">
+          <div class="week-dot"></div>
+          <span class="events-section-label">Cette semaine — 10–16 mars</span>
+          <span class="events-count">3 autres</span>
+        </div>
+
+        <div class="event-item">
+          <span class="source-badge badge-meetup">Meetup</span>
+          <div class="event-main">
+            <div class="event-title">Tech & AI Paris — Soirée networking</div>
+            <div class="event-meta">
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                mer. 12
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                19h00
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                WeWork République
+              </span>
+            </div>
+          </div>
+          <a href="#" class="event-link">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="event-item">
+          <span class="source-badge badge-mobilizon">Mobilizon</span>
+          <div class="event-main">
+            <div class="event-title">Logiciels libres & IA — Conférence ouverte</div>
+            <div class="event-meta">
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                jeu. 13
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                14h00
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                La Cantine, Paris 1
+              </span>
+            </div>
+          </div>
+          <a href="#" class="event-link">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="event-item">
+          <span class="source-badge badge-luma">Luma</span>
+          <div class="event-main">
+            <div class="event-title">Product Hunt Paris — Local Community #22</div>
+            <div class="event-meta">
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                lun. 10
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                18h30
+              </span>
+              <span class="event-meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon-xs" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                42 Paris, Paris 15
+              </span>
+            </div>
+          </div>
+          <a href="#" class="event-link">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <!-- Modal footer -->
+    <div class="modal-footer">
+      <div class="modal-sources">Sources : Luma · Eventbrite · Meetup · Mobilizon</div>
+      <div class="modal-footer-right">
+        <button class="btn-sm-outline" onclick="document.getElementById('modal').classList.add('hidden')">Fermer</button>
+      </div>
+    </div>
+
+  </div><!-- /modal -->
+</div><!-- /modal-overlay -->
+
+<!-- Demo toggle button -->
+<button class="demo-toggle" onclick="
+  const m = document.getElementById('modal');
+  m.classList.toggle('hidden');
+  this.textContent = m.classList.contains('hidden') ? '👁 Voir la modale Radar' : '✕ Fermer la modale';
+">✕ Fermer la modale</button>
+
+</body>
+</html>
