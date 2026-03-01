@@ -433,7 +433,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                           href={buildGoogleCalendarUrl(props.calendarData, props.appUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
-                          title={t("public.addToCalendar.google")}
                         >
                           <svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">
                             <path fill="#4285F4" d="M24 20.5v7h7.4c-.6 3.4-3.6 5.9-7.4 5.9-4.4 0-8-3.6-8-8s3.6-8 8-8c2 0 3.8.7 5.2 1.9l5.2-5.2C31.3 11.9 27.8 10 24 10c-7.7 0-14 6.3-14 14s6.3 14 14 14c8 0 13.3-5.6 13.3-13.5 0-.9-.1-1.7-.2-2.5H24z" />
@@ -441,17 +440,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                             <path fill="#FBBC05" d="M38 29.5c-1 2.7-2.8 5-5.2 6.6l3.4 2.5c2.5-2.2 4.4-5.1 5.3-8.4L38 29.5z" />
                             <path fill="#EA4335" d="M18 15v-4.5C13.2 11.5 9 14 7.1 17.5L10.5 20C12.4 17.4 15 15.7 18 15z" />
                           </svg>
-                          <span className="sr-only">{t("public.addToCalendar.google")}</span>
+                          Google
                         </a>
                       </Button>
                       <Button variant="outline" size="sm" asChild>
                         <a
                           href={`/api/moments/${moment.slug}/calendar`}
                           download={`${moment.slug}.ics`}
-                          title={t("public.addToCalendar.ics")}
                         >
                           <Download className="size-3.5" />
-                          <span className="sr-only">{t("public.addToCalendar.ics")}</span>
+                          .ics
                         </a>
                       </Button>
                     </div>
