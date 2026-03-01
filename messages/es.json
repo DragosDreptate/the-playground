@@ -220,8 +220,7 @@
       "isMember": "Eres miembro",
       "isHost": "Eres Organizador",
       "manageCircle": "Gestionar esta Comunidad",
-      "shareableLink": "Enlace compartible",
-      "shareTitle": "Compartir mi evento"
+      "shareableLink": "Enlace compartible"
     },
     "errors": {
       "notFound": "Comunidad no encontrada",
@@ -309,7 +308,8 @@
       "capacity": "Capacidad",
       "price": "Precio",
       "created": "Creado",
-      "shareableLink": "Enlace compartible"
+      "shareableLink": "Enlace compartible",
+      "shareTitle": "Compartir mi evento"
     },
     "status": {
       "published": "Publicado",

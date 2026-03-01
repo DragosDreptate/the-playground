@@ -220,8 +220,7 @@
       "isMember": "Je bent lid",
       "isHost": "Je bent Organisator",
       "manageCircle": "Beheer deze Community",
-      "shareableLink": "Deelbare link",
-      "shareTitle": "Mijn evenement delen"
+      "shareableLink": "Deelbare link"
     },
     "errors": {
       "notFound": "Community niet gevonden",
@@ -309,7 +308,8 @@
       "capacity": "Capaciteit",
       "price": "Prijs",
       "created": "Aangemaakt",
-      "shareableLink": "Deelbare link"
+      "shareableLink": "Deelbare link",
+      "shareTitle": "Mijn evenement delen"
     },
     "status": {
       "published": "Gepubliceerd",

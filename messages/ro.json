@@ -220,8 +220,7 @@
       "isMember": "Ești participant",
       "isHost": "Ești Organizator",
       "manageCircle": "Gestionează această Comunitate",
-      "shareableLink": "Link partajabil",
-      "shareTitle": "Partajează evenimentul"
+      "shareableLink": "Link partajabil"
     },
     "errors": {
       "notFound": "Comunitatea nu a fost găsită",
@@ -309,7 +308,8 @@
       "capacity": "Capacitate",
       "price": "Preț",
       "created": "Creat",
-      "shareableLink": "Link partajabil"
+      "shareableLink": "Link partajabil",
+      "shareTitle": "Partajează evenimentul"
     },
     "status": {
       "published": "Publicat",
