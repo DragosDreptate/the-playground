@@ -313,8 +313,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           )}
 
           {/* Quand & Où */}
-          <div className="border-border bg-card rounded-2xl border p-6">
-            <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             {/* Date */}
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
@@ -384,7 +383,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </div>
               </div>
             )}
-            </div>
           </div>
 
           {/* Host : Partager mon événement */}

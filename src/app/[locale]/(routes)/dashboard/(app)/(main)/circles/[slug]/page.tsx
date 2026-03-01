@@ -28,6 +28,7 @@ import {
   CalendarIcon,
   ChevronRight,
   Link as LinkIcon,
+  MapPin,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -59,12 +60,13 @@ export default async function CircleDetailPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug }, { tab }, t, tCommon, tDashboard, session] = await Promise.all([
+  const [{ slug }, { tab }, t, tCommon, tDashboard, tCategory, session] = await Promise.all([
     params,
     searchParams,
     getTranslations("Circle"),
     getTranslations("Common"),
     getTranslations("Dashboard"),
+    getTranslations("CircleCategory"),
     auth(),
   ]);
 
@@ -294,6 +296,40 @@ export default async function CircleDetailPage({
 
           {/* Meta */}
           <div className="flex flex-col gap-3">
+
+            {/* Catégorie */}
+            {circle.category && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <span className="text-primary text-base">🏷</span>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t("form.category")}
+                  </p>
+                  <p className="text-sm font-medium">
+                    <Badge variant="secondary" className="text-xs">
+                      {tCategory(circle.category)}
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Ville */}
+            {circle.city && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <MapPin className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t("form.city")}
+                  </p>
+                  <p className="text-sm font-medium">{circle.city}</p>
+                </div>
+              </div>
+            )}
 
             {/* Visibilité */}
             <div className="flex items-center gap-3">
