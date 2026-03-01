@@ -32,6 +32,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     price: record.price,
     currency: record.currency,
     status: record.status,
+    broadcastSentAt: record.broadcastSentAt,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -253,6 +254,13 @@ export const prismaMomentRepository: MomentRepository = {
         coverImage: m.circle.coverImage ?? null,
       },
     }));
+  },
+
+  async markBroadcastSent(momentId: string): Promise<void> {
+    await prisma.moment.update({
+      where: { id: momentId },
+      data: { broadcastSentAt: new Date() },
+    });
   },
 
   async findPastByHostUserId(hostUserId: string): Promise<HostMomentSummary[]> {

@@ -170,6 +170,26 @@ export type MomentCancelledEmailData = {
   };
 };
 
+export type BroadcastMomentEmailData = {
+  to: string;
+  strings: {
+    subject: string;
+    preheader: string;
+    heading: string;
+    intro: string;
+    customMessage?: string;
+    ctaLabel: string;
+    unsubscribeText: string;
+    unsubscribeLabel: string;
+  };
+  momentTitle: string;
+  momentDate: string;
+  momentLocation: string | null;
+  circleName: string;
+  momentSlug: string;
+  appUrl: string;
+};
+
 export type HostMomentCreatedEmailData = {
   to: string;
   hostName: string;
@@ -208,4 +228,5 @@ export interface EmailService {
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
+  sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
 }

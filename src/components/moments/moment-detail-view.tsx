@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
+import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dialog";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
@@ -12,14 +13,15 @@ import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
-import type { CalendarEventData } from "@/lib/calendar";
+import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
-import { AddToCalendarButtons } from "@/components/moments/add-to-calendar-buttons";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import Image from "next/image";
 import {
   CalendarIcon,
+  Download,
+  Mail,
   MapPin,
   Globe,
   ImageIcon,
@@ -305,23 +307,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* Séparateur avant À propos */}
-          {moment.description && <div className="border-border border-t" />}
-
           {/* Description */}
           {moment.description && (
             <CollapsibleDescription text={moment.description} />
           )}
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
           {/* Quand & Où */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {/* Date */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="text-primary size-4" />
+              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="size-4" />
               </div>
               <div>
                 <p className="text-muted-foreground text-xs">{t("detail.when")}</p>
@@ -333,8 +329,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
             {/* Lieu */}
             <div className="flex items-start gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <LocationIcon className="text-primary size-4" />
+              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                <LocationIcon className="size-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-muted-foreground text-xs">{t("detail.where")}</p>
@@ -389,40 +385,109 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             )}
           </div>
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
-          {/* Host : lien partageable + calendrier */}
+          {/* Host : Partager mon événement */}
           {isHostView && (
-            <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
-              <div className="flex items-center gap-2 lg:col-span-2">
-                <LinkIcon className="text-muted-foreground size-4 shrink-0" />
-                <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
-              </div>
-              <Link
-                href={`/m/${moment.slug}`}
-                target="_blank"
-                className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 rounded-lg border px-3 py-2 transition-colors min-w-0"
-              >
-                <span className="text-muted-foreground block truncate font-mono text-sm">
-                  {props.publicUrl.replace(/^https?:\/\//, "")}
-                </span>
-              </Link>
-              <div className="flex items-center gap-2">
-                <CopyLinkButton value={props.publicUrl} />
-              </div>
-              {props.calendarData && props.appUrl && moment.status !== "PAST" && (
-                <div className="lg:col-span-2">
-                  <AddToCalendarButtons data={props.calendarData} appUrl={props.appUrl} />
+            <div className="border-border bg-card rounded-2xl border p-6">
+              <h2 className="mb-4 text-lg font-semibold">{t("detail.shareTitle")}</h2>
+
+              {/* Ligne 1 — Lien partageable */}
+              <div className="flex items-start gap-3 py-3">
+                <div className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                  <LinkIcon className="size-4" />
                 </div>
+                <div className="min-w-0 flex-1">
+                  <p className="mb-1.5 text-sm font-medium">{t("detail.shareableLink")}</p>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/m/${moment.slug}`}
+                      target="_blank"
+                      className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 min-w-0 flex-1 rounded-lg border px-3 py-2 transition-colors"
+                    >
+                      <span className="text-muted-foreground block truncate font-mono text-sm">
+                        {props.publicUrl.replace(/^https?:\/\//, "")}
+                      </span>
+                    </Link>
+                    <CopyLinkButton value={props.publicUrl} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Ligne 2 — Calendrier */}
+              {props.calendarData && props.appUrl && moment.status !== "PAST" && (
+                <>
+                  <div className="border-border ml-11 border-t" />
+                  <div className="flex items-center gap-3 py-3">
+                    <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                      <CalendarIcon className="size-4" />
+                    </div>
+                    <p className="min-w-0 flex-1 text-sm font-medium">{t("public.addToCalendar.label")}</p>
+                    <div className="flex shrink-0 gap-1.5">
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={buildGoogleCalendarUrl(props.calendarData, props.appUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {/* Google G — multicolor official */}
+                          <svg width="14" height="14" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                            <path fill="none" d="M0 0h48v48H0z"/>
+                          </svg>
+                          Google
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="sm" asChild>
+                        <a
+                          href={`/api/moments/${moment.slug}/calendar`}
+                          download={`${moment.slug}.ics`}
+                        >
+                          <Download className="size-3.5" />
+                          .ics
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Ligne 3 — Inviter ma Communauté */}
+              {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
+                <>
+                  <div className="border-border ml-11 border-t" />
+                  <div className="flex items-center gap-3 py-3">
+                    <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                      <Mail className="size-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{t("broadcast.triggerButton")}</p>
+                      <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
+                    </div>
+                    <BroadcastMomentDialog
+                      momentId={moment.id}
+                      circleId={circle.id}
+                      circleName={circle.name}
+                      broadcastSentAtLabel={
+                        moment.broadcastSentAt
+                          ? moment.broadcastSentAt.toLocaleDateString(
+                              locale === "fr" ? "fr-FR" : "en-US",
+                              { day: "numeric", month: "long", year: "numeric" }
+                            )
+                          : null
+                      }
+                    />
+                  </div>
+                </>
               )}
             </div>
           )}
 
-          {/* Public : inscription ou carte "événement terminé" */}
+          {/* Public : inscription ou carte de statut */}
           {!isHostView && (
             moment.status === "PAST" ? (
-              <div className="border-border bg-muted/30 space-y-3 rounded-xl border p-4">
+              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
                 <p className="font-semibold">{t("public.eventEnded")}</p>
                 {registeredCount > 0 && (
                   <div className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -438,8 +503,19 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   <ArrowRight className="size-3.5" />
                 </Link>
               </div>
+            ) : moment.status === "CANCELLED" ? (
+              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
+                <p className="font-semibold">{t("public.eventCancelled")}</p>
+                <Link
+                  href={circleHref}
+                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
+                >
+                  {t("public.viewCircleMoments")}
+                  <ArrowRight className="size-3.5" />
+                </Link>
+              </div>
             ) : (
-              <div className="border-border bg-card rounded-xl border p-4">
+              <div className="border-border bg-card rounded-2xl border p-6">
                 <RegistrationButton
                   momentId={moment.id}
                   price={moment.price}
@@ -460,7 +536,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Liste des participants */}
           {registrations.length > 0 && (
-            <div className="border-border rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6">
               <RegistrationsList
                 registrations={registrations}
                 registeredCount={registeredCount}
@@ -475,7 +551,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Prochains événements du Circle — public view uniquement */}
           {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
-            <div className="border-border rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold">
                   {t("public.upcomingInCircle")}

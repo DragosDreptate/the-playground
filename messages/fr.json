@@ -308,7 +308,8 @@
       "capacity": "Capacité",
       "price": "Prix",
       "created": "Créé le",
-      "shareableLink": "Lien partageable"
+      "shareableLink": "Lien partageable",
+      "shareTitle": "Partager mon événement"
     },
     "status": {
       "published": "Publié",
@@ -323,7 +324,9 @@
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
       "registered": "Inscrit",
+      "registeredBannerTitle": "Vous participez à cet événement",
       "waitlisted": "Liste d'attente",
+      "waitlistedBannerTitle": "Vous êtes sur liste d'attente",
       "joinWaitlist": "S'inscrire sur la liste d'attente",
       "cancelRegistration": "Annuler mon inscription",
       "cancelConfirmTitle": "Annuler l'inscription",
@@ -387,6 +390,22 @@
     },
     "empty": {
       "description": "Aucun événement pour le moment. Créez votre premier événement."
+    },
+    "broadcast": {
+      "triggerButton": "Inviter ma Communauté",
+      "alreadySent": "Invitation envoyée le {date}",
+      "dialogTitle": "Inviter ma Communauté",
+      "dialogDescription": "Un email d'invitation sera envoyé aux membres et followers de {circleName}.",
+      "customMessageLabel": "Message personnalisé (optionnel)",
+      "customMessagePlaceholder": "Ex : Ne manquez pas cet événement ! Places limitées.",
+      "sendButton": "Envoyer",
+      "cancelButton": "Annuler",
+      "sending": "Envoi en cours...",
+      "successToast": "Invitation envoyée à {count} personnes",
+      "alreadySentError": "L'invitation a déjà été envoyée",
+      "notHostError": "Seul l'organisateur peut inviter la Communauté",
+      "hint": "Envoyez un email d'invitation à tous les membres et followers",
+      "alreadySentShort": "Envoyée"
     },
     "errors": {
       "notFound": "Événement introuvable",
@@ -587,6 +606,15 @@
       "heading": "Cet événement a été annulé",
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la Communauté.",
       "ctaLabel": "Voir la Communauté"
+    },
+    "broadcastMoment": {
+      "subject": "Nouveau : {momentTitle}",
+      "preheader": "{circleName} vous invite à un événement",
+      "heading": "{circleName} vous invite",
+      "intro": "{hostName} partage un événement avec vous",
+      "ctaLabel": "Voir l'événement",
+      "unsubscribeText": "Vous recevez cet email car vous suivez {circleName}.",
+      "unsubscribeLabel": "Gérer mes notifications"
     },
     "common": {
       "dateLabel": "Date",

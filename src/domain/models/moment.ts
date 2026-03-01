@@ -43,6 +43,7 @@ export type Moment = {
   price: number; // In cents. 0 = free. Stripe convention.
   currency: string;
   status: MomentStatus;
+  broadcastSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };

@@ -308,7 +308,8 @@
       "capacity": "Capacidad",
       "price": "Precio",
       "created": "Creado",
-      "shareableLink": "Enlace compartible"
+      "shareableLink": "Enlace compartible",
+      "shareTitle": "Compartir mi evento"
     },
     "status": {
       "published": "Publicado",
@@ -323,7 +324,9 @@
       "registerPaid": "Inscribirse — {price} {currency}",
       "comingSoon": "Próximamente",
       "registered": "Inscrito",
+      "registeredBannerTitle": "Participas en este evento",
       "waitlisted": "En lista de espera",
+      "waitlistedBannerTitle": "Estás en lista de espera",
       "joinWaitlist": "Unirse a la lista de espera",
       "cancelRegistration": "Cancelar mi inscripción",
       "cancelConfirmTitle": "Cancelar inscripción",
@@ -387,6 +390,22 @@
     },
     "empty": {
       "description": "Sin Eventos aún. Crea tu primer evento."
+    },
+    "broadcast": {
+      "triggerButton": "Invitar a mi Comunidad",
+      "alreadySent": "Invitación enviada el {date}",
+      "dialogTitle": "Invitar a mi Comunidad",
+      "dialogDescription": "Se enviará un correo de invitación a los miembros y seguidores de {circleName}.",
+      "customMessageLabel": "Mensaje personalizado (opcional)",
+      "customMessagePlaceholder": "Ej: ¡No te pierdas este evento! Plazas limitadas.",
+      "sendButton": "Enviar",
+      "cancelButton": "Cancelar",
+      "sending": "Enviando...",
+      "successToast": "Invitación enviada a {count} personas",
+      "alreadySentError": "La invitación ya ha sido enviada",
+      "notHostError": "Solo el organizador puede invitar a la Comunidad",
+      "hint": "Envía un correo de invitación a todos los miembros y seguidores",
+      "alreadySentShort": "Enviada"
     },
     "errors": {
       "notFound": "Evento no encontrado",
@@ -587,6 +606,15 @@
       "heading": "Este evento ha sido cancelado",
       "message": "El organizador ha cancelado {momentTitle}. Esperamos verte en un futuro evento de la Comunidad.",
       "ctaLabel": "Ver Comunidad"
+    },
+    "broadcastMoment": {
+      "subject": "Nuevo evento: {momentTitle}",
+      "preheader": "{circleName} te invita a un evento",
+      "heading": "{circleName} te invita",
+      "intro": "{hostName} comparte un evento contigo",
+      "ctaLabel": "Ver evento",
+      "unsubscribeText": "Recibes este correo porque sigues {circleName}.",
+      "unsubscribeLabel": "Gestionar notificaciones"
     },
     "common": {
       "dateLabel": "Fecha",

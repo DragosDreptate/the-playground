@@ -308,7 +308,8 @@
       "capacity": "Capaciteit",
       "price": "Prijs",
       "created": "Aangemaakt",
-      "shareableLink": "Deelbare link"
+      "shareableLink": "Deelbare link",
+      "shareTitle": "Mijn evenement delen"
     },
     "status": {
       "published": "Gepubliceerd",
@@ -323,7 +324,9 @@
       "registerPaid": "Aanmelden — {price} {currency}",
       "comingSoon": "Binnenkort",
       "registered": "Aangemeld",
+      "registeredBannerTitle": "Je neemt deel aan dit evenement",
       "waitlisted": "Wachtlijst",
+      "waitlistedBannerTitle": "Je staat op de wachtlijst",
       "joinWaitlist": "Op de wachtlijst",
       "cancelRegistration": "Mijn inschrijving annuleren",
       "cancelConfirmTitle": "Inschrijving annuleren",
@@ -387,6 +390,22 @@
     },
     "empty": {
       "description": "Nog geen Evenementen. Maak jouw eerste evenement aan."
+    },
+    "broadcast": {
+      "triggerButton": "Mijn Community uitnodigen",
+      "alreadySent": "Uitgenodigd op {date}",
+      "dialogTitle": "Mijn Community uitnodigen",
+      "dialogDescription": "Er wordt een uitnodigingsmail gestuurd naar de leden en volgers van {circleName}.",
+      "customMessageLabel": "Persoonlijk bericht (optioneel)",
+      "customMessagePlaceholder": "Bijv: Mis dit evenement niet! Beperkt aantal plaatsen.",
+      "sendButton": "Versturen",
+      "cancelButton": "Annuleren",
+      "sending": "Verzenden...",
+      "successToast": "Uitnodiging verzonden naar {count} personen",
+      "alreadySentError": "De uitnodiging is al verzonden",
+      "notHostError": "Alleen de organisator kan de Community uitnodigen",
+      "hint": "Stuur een uitnodigingsmail naar alle leden en volgers",
+      "alreadySentShort": "Verzonden"
     },
     "errors": {
       "notFound": "Evenement niet gevonden",
@@ -587,6 +606,15 @@
       "heading": "Dit evenement is geannuleerd",
       "message": "De organisator heeft {momentTitle} geannuleerd. We hopen je te zien bij een toekomstig evenement in de Community.",
       "ctaLabel": "Community bekijken"
+    },
+    "broadcastMoment": {
+      "subject": "Nieuw evenement: {momentTitle}",
+      "preheader": "{circleName} nodigt je uit voor een evenement",
+      "heading": "{circleName} nodigt je uit",
+      "intro": "{hostName} deelt een evenement met je",
+      "ctaLabel": "Evenement bekijken",
+      "unsubscribeText": "Je ontvangt deze e-mail omdat je {circleName} volgt.",
+      "unsubscribeLabel": "Meldingen beheren"
     },
     "common": {
       "dateLabel": "Datum",
