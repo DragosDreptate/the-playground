@@ -51,6 +51,9 @@
 | Admin plateforme : dashboard stats, listes paginées (Utilisateurs/Communautés/Événements) avec recherche, pages détail, suppression, forcer annulation événement. Middleware guard `/admin/*`, `UserRole` (USER/ADMIN), lien Admin dans UserMenu, i18n FR/EN complet | 2026-02-21 | `dbe3dda` |
 | Emails transactionnels (Resend + react-email) : confirmation inscription, confirmation liste d'attente, promotion liste d'attente, notification Organisateur nouvelle inscription. Port `EmailService` + adapter `ResendEmailService`. Templates React avec calendar badge (gradient rose→violet). Fire-and-forget depuis server actions. i18n FR/EN complet. | 2026-02-21 | — |
 | Email notification Organisateur : nouveau commentaire sur un événement (`host-new-comment` template, `sendHostNewComment` sur `EmailService`, déclenché depuis `addCommentAction`, fire-and-forget, i18n FR/EN `Email.commentNotification.*`). | 2026-02-24 | `f29287b` |
+| **Section "Prochains événements de la Communauté"** sur `/m/[slug]` (vue publique) : prop `upcomingCircleMoments` dans `MomentDetailView`, rétention depuis la porte d'entrée virale. | 2026-02-26 | `70a51f5` |
+| **Commentaires activés sur événements PAST** : formulaire toujours visible pour les utilisateurs connectés (placeholder "Remerciements, photos, retours..."). | 2026-02-26 | `bf9b036` |
+| **Notifications commentaires pour tous les inscrits** (PR #93) : `sendHostNewComment` → `sendNewComment`, notifie inscrits actifs + Organisateurs (dédupliqués par userId), exclut l'auteur, filtre par préférence `notifyNewComment`. Toggle déplacé de section Organisateur → Participant dans les préfs. MAJ traductions FR/EN/RO/NL/ES. Template `new-comment.tsx` avec URL publique `/m/[slug]`. | 2026-02-28 | `1c0d227` |
 | Couverture tests complète : 14 nouveaux fichiers (get-user-registration, get-moment-comments, get-user-past-moments, 11 usecases admin). 5 specs E2E scaffoldées (auth, join-moment, host-flow, cancel-registration, comments). *(202 tests à ce stade, avant les ajouts sécurité et suivants)* | 2026-02-21 | `3ee4865` |
 | Suppression de compte utilisateur : usecase `deleteAccount` (cascade Communauté si seul Organisateur), server action `deleteAccountAction`, section "Zone de danger" sur la page profil avec confirmation modale. i18n FR/EN `Profile.deleteAccount.*`. | 2026-02-22 | — |
 | Agents Claude Code : `test-coverage-guardian` (audit couverture + création tests manquants, run + correction en boucle) + `security-guardian` (audit RBAC/IDOR/accès admin, création tests sécurité, correction vulnérabilités). Définis dans `.claude/agents/`. | 2026-02-21 | — |
@@ -136,17 +139,17 @@
   - Sur la page `/m/[slug]` après inscription : lien visible vers `/dashboard`
   - Objectif : faire découvrir l'espace personnel au nouveau membre
 
-- [ ] **Section "Prochains événements de la Communauté" sur page événement publique** (gap M-3)
-  - Sur `/m/[slug]` pour les événements PUBLISHED (pas PAST — déjà traité)
-  - Affiche jusqu'à 3 prochains événements de la même Communauté (titre, date, CTA)
-  - Rétention Communauté depuis la porte d'entrée virale
+- [x] **Section "Prochains événements de la Communauté" sur page événement publique** (gap M-3) ✅ — PR #68 `70a51f5`
+  - Sur `/m/[slug]` (vue publique uniquement, pas la vue Organisateur)
+  - Affiche les prochains événements PUBLISHED de la même Communauté
+  - Prop `upcomingCircleMoments` dans `MomentDetailView`
 
 #### Engagement post-événement — fenêtre d'or 24h (parcours F)
 
-- [ ] **L'Organisateur peut commenter sur un événement PAST** (gap H-1 — critique)
-  - Actuellement : formulaire masqué pour tous sur PAST, y compris l'Organisateur
-  - Décision à prendre : débloquer pour l'Organisateur uniquement, ou pour tous
-  - Impact : l'Organisateur ne peut pas remercier sa communauté, pic d'engagement manqué
+- [x] **Commentaires activés sur les événements PAST** (gap H-1) ✅ — PR #93 `bf9b036`
+  - Formulaire toujours visible pour les utilisateurs connectés sur les événements passés
+  - Placeholder contextuel "Remerciements, photos, retours..."
+  - Décision prise : débloquer pour tous les connectés (pas uniquement l'Organisateur)
 
 - [ ] **CTA "Créer le prochain événement" depuis un événement PAST** (gap H-2)
   - Sur la page événement PAST, vue Organisateur : bouton "Programmer le prochain événement"
@@ -162,10 +165,8 @@
 
 #### Découverte inter-événements (parcours B)
 
-- [ ] **Autres événements de la Communauté sur la page événement dashboard Participant** (gap H-4)
-  - Sur `/dashboard/circles/[slug]/moments/[slug]` vue Participant : section "Dans cette Communauté"
-  - Liste les 3 prochains événements À VENIR de la même Communauté
-  - Actuellement absent : une fois sur un événement, le Participant ne découvre pas les autres
+- [x] **Autres événements de la Communauté sur la page événement dashboard Participant** (gap H-4) ✅
+  - `dashboard/circles/[slug]/moments/[momentSlug]/page.tsx` : `findUpcomingByCircleId(moment.circleId, moment.id, 3)` + prop `upcomingCircleMoments` passée à `MomentDetailView` (vue Participant uniquement)
 
 #### Onboarding Organisateur — time-to-first-event (parcours G)
 
@@ -207,10 +208,9 @@
   - Implémenté dans `RegistrationsList` (`src/components/moments/registrations-list.tsx`) — client-side, avec BOM UTF-8
   - Clés i18n `Moment.registrations.exportCsv` + `Moment.registrations.csvHeaders.*`
 
-- [ ] **Vue segmentée inscrits/liste d'attente sur page événement Organisateur** (gap H-8 + M-5)
-  - Compteur "X inscrits confirmés · Y en attente · Z places restantes" en haut de page
-  - Liste séparée en deux sections : Inscrits / Liste d'attente
-  - Actuellement : liste unique sans distinction claire
+- [x] **Compteurs inscrits/liste d'attente sur page événement Organisateur** (gap H-8 + M-5) ✅ (partiel)
+  - Badges `registeredCount` + `waitlistedCount` + `capacity` en haut de `RegistrationsList`, badge par ligne
+  - Ce qui reste absent : deux sections séparées Inscrits / Liste d'attente (liste unifiée avec badges par ligne)
 
 ---
 
@@ -369,7 +369,7 @@
   - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par événement
   - Option modération : l'Organisateur peut supprimer une photo
   - Viralité : lien partageable vers la galerie, CTA "Voir les photos" dans l'email post-événement
-- [ ] **Radar concurrentiel à la création d'événement**
+- [x] **Radar concurrentiel à la création d'événement** ✅ — PRs #95 #96 #97
   - Lors de la création d'un événement (step date/lieu), afficher les événements publiés sur les plateformes concurrentes (Meetup, Luma, Eventbrite…) dans la même ville, au même créneau
   - **Objectif** : permettre à l'Organisateur d'identifier les conflits potentiels avec des événements qui ciblent la même audience, avant de publier
   - **Affichage** : section "Événements le même jour dans ta ville" dans le formulaire — liste compacte (titre, plateforme source, heure, nombre d'inscrits si disponible)
