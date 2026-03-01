@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup Mobile — Créer un événement + Radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--foreground);
+  background: #e8e8f0;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 24px 80px;
+}
+
+/* ── PHONE FRAME ── */
+.phone-frame {
+  width: 390px;
+  flex-shrink: 0;
+  position: relative;
+}
+.phone-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9899a8;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+}
+.phone-screen {
+  width: 390px;
+  height: 844px;
+  background: var(--background);
+  border-radius: 40px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(26,27,46,.18), 0 0 0 1px rgba(26,27,46,.08);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Status bar */
+.status-bar {
+  height: 44px;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.status-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.status-icons svg { color: var(--foreground); }
+
+/* Mobile header */
+.mobile-header {
+  height: 52px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.mobile-header .back-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.mobile-header .page-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  text-align: center;
+}
+.mobile-header .right-placeholder { width: 60px; }
+
+/* Scrollable content */
+.phone-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 32px;
+}
+.phone-content::-webkit-scrollbar { display: none; }
+
+/* Circle info banner (mobile: top, compact) */
+.circle-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.circle-dot-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  flex-shrink: 0;
+}
+.circle-banner-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.circle-banner-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+
+/* Title input */
+.title-input {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  width: 100%;
+  line-height: 1.2;
+  padding: 4px 0;
+}
+.title-input::placeholder { color: #c4c5d4; }
+
+/* Date card */
+.date-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.date-block { display: flex; flex-direction: column; gap: 1px; }
+.date-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted-foreground);
+}
+.date-value {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.date-time { font-size: 11px; color: var(--muted-foreground); }
+
+/* Form row */
+.form-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.row-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: rgba(232,69,122,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.row-content { flex: 1; min-width: 0; }
+.row-label { font-size: 13px; font-weight: 500; color: var(--foreground); }
+.row-hint { font-size: 11px; color: var(--muted-foreground); margin-top: 1px; }
+.row-hint strong { color: var(--foreground); }
+
+.field-input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--card);
+  font-family: inherit;
+  outline: none;
+  margin-top: 8px;
+}
+
+textarea.field-textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--foreground);
+  background: var(--card);
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.sep { border: none; border-top: 1px solid var(--border); }
+
+/* Radar section */
+.radar-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  position: relative;
+}
+.radar-section:hover { border-color: rgba(232,69,122,.3); }
+.radar-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.radar-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: rgba(232,69,122,.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.radar-body { flex: 1; min-width: 0; }
+.radar-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 2px;
+}
+.radar-hint {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.radar-hint strong { color: var(--foreground); }
+.radar-btn-full {
+  width: 100%;
+  height: 38px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  transition: opacity .15s;
+}
+.radar-btn-full:hover { opacity: .88; }
+.radar-badge-new {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Options */
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.option-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.option-pill {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-weight: 500;
+}
+.option-label { font-size: 13px; font-weight: 500; color: var(--foreground); flex: 1; }
+.option-hint { font-size: 11px; color: var(--muted-foreground); }
+
+/* Submit */
+.btn-primary-full {
+  width: 100%;
+  height: 48px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity .15s;
+}
+.btn-primary-full:hover { opacity: .88; }
+.btn-outline-full {
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Cover (bottom, compact) */
+.cover-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cover-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#3b82f6,#06b6d4);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.cover-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.cover-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cover-add-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ══════════════════════════
+   BOTTOM SHEET
+══════════════════════════ */
+.bottom-sheet-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26,27,46,.45);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 50;
+  border-radius: 40px;
+  overflow: hidden;
+}
+.bottom-sheet-overlay.hidden { display: none; }
+.bottom-sheet {
+  background: var(--card);
+  border-radius: 20px 20px 0 0;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bs-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+.bs-header {
+  padding: 12px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.bs-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.bs-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.bs-subtitle {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  margin-top: 1px;
+}
+.bs-close {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-family: inherit;
+}
+.keywords-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.kw-label { font-size: 10px; color: var(--muted-foreground); font-weight: 500; }
+.kw-chip {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: rgba(232,69,122,.08);
+  color: var(--primary);
+  border: 1px solid rgba(232,69,122,.15);
+}
+.kw-edit {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-family: inherit;
+}
+
+.bs-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+}
+.bs-body::-webkit-scrollbar { display: none; }
+
+.bs-section-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+.bs-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted-foreground);
+  flex: 1;
+}
+.events-count {
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--muted);
+  border-radius: 20px;
+  padding: 1px 6px;
+  color: var(--muted-foreground);
+}
+.conflict-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
+}
+.week-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  flex-shrink: 0;
+}
+
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  margin-bottom: 5px;
+}
+.event-item:last-child { margin-bottom: 0; }
+.source-badge {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid;
+  flex-shrink: 0;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.badge-luma { color:#8b5cf6; border-color:rgba(139,92,246,.25); background:rgba(139,92,246,.06); }
+.badge-eventbrite { color:#f97316; border-color:rgba(249,115,22,.25); background:rgba(249,115,22,.06); }
+.badge-meetup { color:#ef4444; border-color:rgba(239,68,68,.25); background:rgba(239,68,68,.06); }
+.badge-mobilizon { color:#10b981; border-color:rgba(16,185,129,.25); background:rgba(16,185,129,.06); }
+
+.event-main { flex: 1; min-width: 0; }
+.event-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.event-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.event-meta-item {
+  font-size: 10px;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.event-link {
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.bs-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.bs-sources {
+  font-size: 9px;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-bottom: 10px;
+}
+.bs-close-btn {
+  width: 100%;
+  height: 44px;
+  background: var(--muted);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* ── CONTROLS (outside phone) ── */
+.controls {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+.ctrl-btn {
+  background: var(--foreground);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 16px rgba(26,27,46,.2);
+  transition: opacity .15s;
+  white-space: nowrap;
+}
+.ctrl-btn:hover { opacity: .85; }
+.ctrl-btn.secondary {
+  background: white;
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ PHONE 1 — FORM VIEW ══════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">Formulaire — Radar actif</div>
+  <div class="phone-screen">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="11" fill="none" viewBox="0 0 16 11">
+          <rect x="0" y="4" width="3" height="7" rx="1" fill="currentColor" opacity=".4"/>
+          <rect x="4.5" y="2.5" width="3" height="8.5" rx="1" fill="currentColor" opacity=".6"/>
+          <rect x="9" y="0" width="3" height="11" rx="1" fill="currentColor"/>
+          <rect x="13.5" y="3" width="2" height="5" rx=".5" stroke="currentColor" stroke-width=".8" fill="none"/>
+          <rect x="14" y="4.5" width="1" height="2" rx=".3" fill="currentColor"/>
+        </svg>
+        <svg width="15" height="11" fill="none" viewBox="0 0 15 11">
+          <path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.8C12.7 1.8 10.2.5 7.5.5S2.3 1.8.5 3.8L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5z" fill="currentColor" opacity=".4"/>
+          <path d="M7.5 5.5c1.4 0 2.6.6 3.5 1.5L12.3 5.6C11 4.3 9.3 3.5 7.5 3.5S4 4.3 2.7 5.6L4 7c.9-.9 2.1-1.5 3.5-1.5z" fill="currentColor" opacity=".7"/>
+          <path d="M7.5 8.5c.8 0 1.5.3 2 .8L11 7.8C10.1 6.9 8.9 6.5 7.5 6.5S4.9 6.9 4 7.8L5.5 9.3c.5-.5 1.2-.8 2-.8z" fill="currentColor"/>
+          <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <div class="back-btn">
+        <svg width="8" height="13" fill="none" viewBox="0 0 8 13"><path d="M7 1L1 6.5 7 12" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Retour
+      </div>
+      <div class="page-title">Créer un événement</div>
+      <div class="right-placeholder"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="phone-content" id="formContent1">
+
+      <!-- Circle banner -->
+      <div class="circle-banner">
+        <div class="circle-dot-sm"></div>
+        <div>
+          <div class="circle-banner-name">Tech Builders Paris</div>
+          <div class="circle-banner-hint">Communauté · 42 membres</div>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <input
+        type="text"
+        class="title-input"
+        placeholder="Nom de l'événement"
+        value="Conférence IA & Product — Innover en 2026"
+      />
+
+      <!-- Date card -->
+      <div class="date-card">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+        <div class="date-block">
+          <div class="date-label">Début</div>
+          <div class="date-value">Vend. 14 mars 2026</div>
+          <div class="date-time">14h00</div>
+        </div>
+        <span style="color:var(--muted-foreground);font-size:13px;flex-shrink:0;">→</span>
+        <div class="date-block">
+          <div class="date-label">Fin</div>
+          <div class="date-value">Vend. 14 mars 2026</div>
+          <div class="date-time">17h00</div>
+        </div>
+      </div>
+
+      <!-- Location row -->
+      <div class="form-row">
+        <div class="row-icon">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/><circle cx="12" cy="8" r="2"/></svg>
+        </div>
+        <div class="row-content">
+          <div class="row-label">Lieu</div>
+          <div class="row-hint">Station F — 5 Parvis Alan Turing, 75013 Paris</div>
+        </div>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2" style="flex-shrink:0;transform:rotate(180deg);"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- Description -->
+      <div class="form-row">
+        <div class="row-icon">
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h10"/></svg>
+        </div>
+        <div class="row-content">
+          <div class="row-label">Description</div>
+          <div class="row-hint">Décrivez votre événement</div>
+          <textarea class="field-textarea" rows="3">Journée d'exploration autour de l'IA et du Product Management. Keynotes, tables rondes et ateliers pratiques.</textarea>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- ★ RADAR SECTION -->
+      <div class="radar-section">
+        <span class="radar-badge-new">Nouveau</span>
+        <div class="radar-inner">
+          <div class="radar-icon-wrap">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+              <circle cx="12" cy="12" r="2"/>
+              <path d="M16.24 7.76a6 6 0 010 8.49M7.76 7.76a6 6 0 000 8.49"/>
+              <path d="M20.07 3.93a12 12 0 010 16.97M3.93 3.93a12 12 0 000 16.97"/>
+            </svg>
+          </div>
+          <div class="radar-body">
+            <div class="radar-title">Radar de planification</div>
+            <div class="radar-hint">
+              Événements à <strong>Paris</strong> autour du <strong>14 mars</strong>
+            </div>
+          </div>
+        </div>
+        <button class="radar-btn-full" onclick="document.getElementById('sheet1').classList.remove('hidden')">
+          <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Analyser les conflits
+        </button>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- Options -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="option-row">
+          <div class="option-icon">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div class="option-label">Capacité</div>
+          </div>
+          <span class="option-pill">Illimitée</span>
+        </div>
+        <div class="option-row">
+          <div class="option-icon">
+            <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="var(--muted-foreground)" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div class="option-label" style="color:var(--muted-foreground);">Billetterie</div>
+          </div>
+          <span class="option-pill">Bientôt</span>
+        </div>
+      </div>
+
+      <!-- Cover (compact, bottom) -->
+      <hr class="sep" />
+      <div class="cover-section">
+        <div class="cover-label">Photo de couverture</div>
+        <div class="cover-row">
+          <div class="cover-thumb"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+            <button class="cover-add-btn">📷 Changer la photo</button>
+            <button class="cover-add-btn">🔍 Chercher sur Unsplash</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div style="display:flex;flex-direction:column;gap:8px;padding-top:8px;">
+        <button class="btn-primary-full">Créer l'événement</button>
+        <button class="btn-outline-full">Annuler</button>
+      </div>
+
+    </div><!-- /phone-content -->
+
+    <!-- ═══ BOTTOM SHEET ═══ -->
+    <div class="bottom-sheet-overlay hidden" id="sheet1">
+      <div class="bottom-sheet">
+        <div class="bs-handle"></div>
+
+        <div class="bs-header">
+          <div class="bs-header-top">
+            <div>
+              <div class="bs-title">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+                  <circle cx="12" cy="12" r="2"/>
+                  <path d="M16.24 7.76a6 6 0 010 8.49M7.76 7.76a6 6 0 000 8.49"/>
+                  <path d="M20.07 3.93a12 12 0 010 16.97M3.93 3.93a12 12 0 000 16.97"/>
+                </svg>
+                Radar · Paris · 14 mars
+              </div>
+            </div>
+            <button class="bs-close" onclick="document.getElementById('sheet1').classList.add('hidden')">×</button>
+          </div>
+          <div class="keywords-row">
+            <span class="kw-label">Mots-clés :</span>
+            <span class="kw-chip">IA</span>
+            <span class="kw-chip">Product</span>
+            <span class="kw-chip">conférence</span>
+            <span class="kw-chip">startup</span>
+            <button class="kw-edit">✏</button>
+          </div>
+        </div>
+
+        <div class="bs-body">
+
+          <!-- Ce jour-là -->
+          <div>
+            <div class="bs-section-header">
+              <div class="conflict-dot"></div>
+              <span class="bs-section-label">Ce jour-là — vendredi 14 mars</span>
+              <span class="events-count">2</span>
+            </div>
+
+            <div class="event-item">
+              <span class="source-badge badge-luma">Luma</span>
+              <div class="event-main">
+                <div class="event-title">AI Builders Meetup Paris — Edition #8</div>
+                <div class="event-meta">
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    18h00
+                  </span>
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                    Station F
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="event-link">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+
+            <div class="event-item">
+              <span class="source-badge badge-eventbrite">Eventbrite</span>
+              <div class="event-main">
+                <div class="event-title">Startup Demo Day — IA Générative Edition</div>
+                <div class="event-meta">
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    19h30
+                  </span>
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>
+                    Numa, Paris 2
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="event-link">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+
+          <!-- Cette semaine -->
+          <div>
+            <div class="bs-section-header">
+              <div class="week-dot"></div>
+              <span class="bs-section-label">Cette semaine — 10–16 mars</span>
+              <span class="events-count">3</span>
+            </div>
+
+            <div class="event-item">
+              <span class="source-badge badge-meetup">Meetup</span>
+              <div class="event-main">
+                <div class="event-title">Tech & AI Paris — Soirée networking</div>
+                <div class="event-meta">
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    mer. 12
+                  </span>
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    19h00
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="event-link">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+
+            <div class="event-item">
+              <span class="source-badge badge-mobilizon">Mobilizon</span>
+              <div class="event-main">
+                <div class="event-title">Logiciels libres & IA — Conférence ouverte</div>
+                <div class="event-meta">
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    jeu. 13
+                  </span>
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    14h00
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="event-link">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+
+            <div class="event-item">
+              <span class="source-badge badge-luma">Luma</span>
+              <div class="event-main">
+                <div class="event-title">Product Hunt Paris — Local Community #22</div>
+                <div class="event-meta">
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    lun. 10
+                  </span>
+                  <span class="event-meta-item">
+                    <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    18h30
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="event-link">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+            </div>
+          </div>
+        </div><!-- /bs-body -->
+
+        <div class="bs-footer">
+          <div class="bs-sources">Sources : Luma · Eventbrite · Meetup · Mobilizon</div>
+          <button class="bs-close-btn" onclick="document.getElementById('sheet1').classList.add('hidden')">Fermer</button>
+        </div>
+      </div><!-- /bottom-sheet -->
+    </div><!-- /overlay -->
+
+  </div><!-- /phone-screen -->
+</div><!-- /phone-frame -->
+
+
+<!-- ══════════════ PHONE 2 — BOTTOM SHEET OPEN ══════════════ -->
+<div class="phone-frame">
+  <div class="phone-label">Bottom sheet — Résultats</div>
+  <div class="phone-screen">
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <span class="status-time">9:41</span>
+      <div class="status-icons">
+        <svg width="16" height="11" fill="none" viewBox="0 0 16 11">
+          <rect x="0" y="4" width="3" height="7" rx="1" fill="currentColor" opacity=".4"/>
+          <rect x="4.5" y="2.5" width="3" height="8.5" rx="1" fill="currentColor" opacity=".6"/>
+          <rect x="9" y="0" width="3" height="11" rx="1" fill="currentColor"/>
+          <rect x="13.5" y="3" width="2" height="5" rx=".5" stroke="currentColor" stroke-width=".8" fill="none"/>
+          <rect x="14" y="4.5" width="1" height="2" rx=".3" fill="currentColor"/>
+        </svg>
+        <svg width="15" height="11" fill="none" viewBox="0 0 15 11">
+          <path d="M7.5 2.5C9.8 2.5 11.8 3.5 13.2 5.1L14.5 3.8C12.7 1.8 10.2.5 7.5.5S2.3 1.8.5 3.8L1.8 5.1C3.2 3.5 5.2 2.5 7.5 2.5z" fill="currentColor" opacity=".4"/>
+          <path d="M7.5 5.5c1.4 0 2.6.6 3.5 1.5L12.3 5.6C11 4.3 9.3 3.5 7.5 3.5S4 4.3 2.7 5.6L4 7c.9-.9 2.1-1.5 3.5-1.5z" fill="currentColor" opacity=".7"/>
+          <path d="M7.5 8.5c.8 0 1.5.3 2 .8L11 7.8C10.1 6.9 8.9 6.5 7.5 6.5S4.9 6.9 4 7.8L5.5 9.3c.5-.5 1.2-.8 2-.8z" fill="currentColor"/>
+          <circle cx="7.5" cy="10" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Mobile header -->
+    <div class="mobile-header">
+      <div class="back-btn">
+        <svg width="8" height="13" fill="none" viewBox="0 0 8 13"><path d="M7 1L1 6.5 7 12" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Retour
+      </div>
+      <div class="page-title">Créer un événement</div>
+      <div class="right-placeholder"></div>
+    </div>
+
+    <!-- Blurred background form (dimmed) -->
+    <div style="flex:1;overflow:hidden;position:relative;">
+      <div style="padding:16px;opacity:.35;pointer-events:none;display:flex;flex-direction:column;gap:14px;">
+        <div class="circle-banner">
+          <div class="circle-dot-sm"></div>
+          <div>
+            <div class="circle-banner-name">Tech Builders Paris</div>
+            <div class="circle-banner-hint">Communauté · 42 membres</div>
+          </div>
+        </div>
+        <div style="font-size:20px;font-weight:700;color:var(--foreground);line-height:1.2;">Conférence IA & Product — Innover en 2026</div>
+        <div class="date-card">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <div class="date-block">
+            <div class="date-label">Début</div>
+            <div class="date-value">Vend. 14 mars 2026</div>
+            <div class="date-time">14h00</div>
+          </div>
+          <span style="color:var(--muted-foreground);font-size:13px;flex-shrink:0;">→</span>
+          <div class="date-block">
+            <div class="date-label">Fin</div>
+            <div class="date-value">Vend. 14 mars 2026</div>
+            <div class="date-time">17h00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom sheet (always open in phone 2) -->
+      <div class="bottom-sheet-overlay" style="display:flex;">
+        <div class="bottom-sheet">
+          <div class="bs-handle"></div>
+
+          <div class="bs-header">
+            <div class="bs-header-top">
+              <div>
+                <div class="bs-title">
+                  <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--primary)" stroke-width="2">
+                    <circle cx="12" cy="12" r="2"/>
+                    <path d="M16.24 7.76a6 6 0 010 8.49M7.76 7.76a6 6 0 000 8.49"/>
+                    <path d="M20.07 3.93a12 12 0 010 16.97M3.93 3.93a12 12 0 000 16.97"/>
+                  </svg>
+                  Radar · Paris · 14 mars
+                </div>
+              </div>
+              <button class="bs-close">×</button>
+            </div>
+            <div class="keywords-row">
+              <span class="kw-label">Mots-clés :</span>
+              <span class="kw-chip">IA</span>
+              <span class="kw-chip">Product</span>
+              <span class="kw-chip">conférence</span>
+              <span class="kw-chip">startup</span>
+              <button class="kw-edit">✏</button>
+            </div>
+          </div>
+
+          <div class="bs-body">
+            <div>
+              <div class="bs-section-header">
+                <div class="conflict-dot"></div>
+                <span class="bs-section-label">Ce jour-là — vendredi 14 mars</span>
+                <span class="events-count">2</span>
+              </div>
+              <div class="event-item">
+                <span class="source-badge badge-luma">Luma</span>
+                <div class="event-main">
+                  <div class="event-title">AI Builders Meetup Paris — Edition #8</div>
+                  <div class="event-meta">
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>18h00</span>
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>Station F</span>
+                  </div>
+                </div>
+                <a href="#" class="event-link"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+              <div class="event-item">
+                <span class="source-badge badge-eventbrite">Eventbrite</span>
+                <div class="event-main">
+                  <div class="event-title">Startup Demo Day — IA Générative Edition</div>
+                  <div class="event-meta">
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>19h30</span>
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C8.686 2 6 4.686 6 8c0 5.25 6 14 6 14s6-8.75 6-14c0-3.314-2.686-6-6-6z"/></svg>Numa, Paris 2</span>
+                  </div>
+                </div>
+                <a href="#" class="event-link"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+            </div>
+
+            <div>
+              <div class="bs-section-header">
+                <div class="week-dot"></div>
+                <span class="bs-section-label">Cette semaine — 10–16 mars</span>
+                <span class="events-count">3</span>
+              </div>
+              <div class="event-item">
+                <span class="source-badge badge-meetup">Meetup</span>
+                <div class="event-main">
+                  <div class="event-title">Tech & AI Paris — Soirée networking</div>
+                  <div class="event-meta">
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>mer. 12</span>
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>19h00</span>
+                  </div>
+                </div>
+                <a href="#" class="event-link"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+              <div class="event-item">
+                <span class="source-badge badge-mobilizon">Mobilizon</span>
+                <div class="event-main">
+                  <div class="event-title">Logiciels libres & IA — Conférence</div>
+                  <div class="event-meta">
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>jeu. 13</span>
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>14h00</span>
+                  </div>
+                </div>
+                <a href="#" class="event-link"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+              <div class="event-item">
+                <span class="source-badge badge-luma">Luma</span>
+                <div class="event-main">
+                  <div class="event-title">Product Hunt Paris — Local #22</div>
+                  <div class="event-meta">
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>lun. 10</span>
+                    <span class="event-meta-item"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>18h30</span>
+                  </div>
+                </div>
+                <a href="#" class="event-link"><svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+            </div>
+          </div>
+
+          <div class="bs-footer">
+            <div class="bs-sources">Sources : Luma · Eventbrite · Meetup · Mobilizon</div>
+            <button class="bs-close-btn">Fermer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phone-screen -->
+</div><!-- /phone-frame 2 -->
+
+<!-- Controls -->
+<div class="controls">
+  <button class="ctrl-btn secondary" onclick="
+    const s = document.getElementById('sheet1');
+    s.classList.toggle('hidden');
+    this.textContent = s.classList.contains('hidden') ? '📱 Ouvrir le radar (Phone 1)' : '✕ Fermer le radar (Phone 1)';
+  ">✕ Fermer le radar (Phone 1)</button>
+</div>
+
+</body>
+</html>
