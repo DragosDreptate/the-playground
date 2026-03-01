@@ -399,29 +399,31 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             <div className="border-border bg-card rounded-xl border overflow-hidden">
 
               {/* Ligne 1 — Lien partageable */}
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className="bg-blue-500/10 text-blue-500 flex size-8 shrink-0 items-center justify-center rounded-lg">
+              <div className="flex items-start gap-3 px-4 py-3">
+                <div className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
                   <LinkIcon className="size-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-muted-foreground mb-1.5 text-xs">{t("detail.shareableLink")}</p>
-                  <Link
-                    href={`/m/${moment.slug}`}
-                    target="_blank"
-                    className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 block rounded-lg border px-3 py-2 transition-colors"
-                  >
-                    <span className="text-muted-foreground block truncate font-mono text-sm">
-                      {props.publicUrl.replace(/^https?:\/\//, "")}
-                    </span>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/m/${moment.slug}`}
+                      target="_blank"
+                      className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 min-w-0 flex-1 rounded-lg border px-3 py-2 transition-colors"
+                    >
+                      <span className="text-muted-foreground block truncate font-mono text-sm">
+                        {props.publicUrl.replace(/^https?:\/\//, "")}
+                      </span>
+                    </Link>
+                    <CopyLinkButton value={props.publicUrl} />
+                  </div>
                 </div>
-                <CopyLinkButton value={props.publicUrl} />
               </div>
 
               {/* Ligne 2 — Calendrier */}
               {props.calendarData && props.appUrl && moment.status !== "PAST" && (
                 <div className="border-border border-t flex items-start gap-3 px-4 py-3">
-                  <div className="bg-teal-500/10 text-teal-500 mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
+                  <div className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
                     <CalendarIcon className="size-4" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -458,7 +460,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
               {/* Ligne 3 — Inviter ma Communauté */}
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
-                <div className="border-border border-t flex items-center gap-3 bg-primary/[0.04] px-4 py-3">
+                <div className="border-border border-t flex items-center gap-3 px-4 py-3">
                   <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
                     <Mail className="size-4" />
                   </div>
