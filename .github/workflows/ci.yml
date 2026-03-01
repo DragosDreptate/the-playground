@@ -4,9 +4,17 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "spec/**"
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - "spec/**"
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
 
 # Annule le run en cours si un nouveau commit est pushé sur la même branche
 concurrency:
