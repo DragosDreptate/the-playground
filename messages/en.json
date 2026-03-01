@@ -290,6 +290,7 @@
       "weekSection": "That week",
       "noResults": "No events found for these criteria.",
       "errorNoCity": "City not detected. Add a more precise address.",
+      "rateLimitReached": "Daily limit reached — {limit} analyses maximum per day. Come back tomorrow.",
       "sources": "Sources: Luma · Eventbrite · Meetup · Mobilizon",
       "close": "Close",
       "cityLabel": "in {city}",
