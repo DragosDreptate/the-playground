@@ -22,28 +22,21 @@ type Props = {
   momentId: string;
   circleId: string;
   circleName: string;
-  broadcastSentAt: Date | null;
+  /** Chaîne pré-formatée côté serveur. null = pas encore envoyé. */
+  broadcastSentAtLabel: string | null;
 };
 
 export function BroadcastMomentDialog({
   momentId,
   circleName,
-  broadcastSentAt,
+  broadcastSentAtLabel,
 }: Props) {
   const t = useTranslations("Moment.broadcast");
   const [open, setOpen] = React.useState(false);
   const [customMessage, setCustomMessage] = React.useState("");
   const [isPending, setIsPending] = React.useState(false);
 
-  const alreadySent = broadcastSentAt !== null;
-
-  const formattedDate = alreadySent
-    ? new Date(broadcastSentAt).toLocaleDateString("fr-FR", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : null;
+  const alreadySent = broadcastSentAtLabel !== null;
 
   async function handleSend() {
     setIsPending(true);
@@ -74,11 +67,11 @@ export function BroadcastMomentDialog({
           size="sm"
           disabled={alreadySent}
           className="gap-1.5"
-          title={alreadySent && formattedDate ? t("alreadySent", { date: formattedDate }) : undefined}
+          title={alreadySent ? t("alreadySent", { date: broadcastSentAtLabel }) : undefined}
         >
           <Mail className="size-4" />
-          {alreadySent && formattedDate
-            ? t("alreadySent", { date: formattedDate })
+          {alreadySent
+            ? t("alreadySent", { date: broadcastSentAtLabel })
             : t("triggerButton")}
         </Button>
       </DialogTrigger>
