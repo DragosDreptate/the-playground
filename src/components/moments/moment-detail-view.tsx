@@ -387,7 +387,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Host : Partager mon événement */}
           {isHostView && (
-            <div className="border-border rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6">
               <h2 className="mb-4 text-lg font-semibold">{t("detail.shareTitle")}</h2>
 
               {/* Ligne 1 — Lien partageable */}
@@ -515,7 +515,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </Link>
               </div>
             ) : (
-              <div className="border-border rounded-2xl border p-6">
+              <div className="border-border bg-card rounded-2xl border p-6">
                 <RegistrationButton
                   momentId={moment.id}
                   price={moment.price}
@@ -536,7 +536,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Liste des participants */}
           {registrations.length > 0 && (
-            <div className="border-border rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6">
               <RegistrationsList
                 registrations={registrations}
                 registeredCount={registeredCount}
@@ -551,7 +551,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Prochains événements du Circle — public view uniquement */}
           {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
-            <div className="border-border rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6">
               <div className="mb-4">
                 <h2 className="text-lg font-semibold">
                   {t("public.upcomingInCircle")}
