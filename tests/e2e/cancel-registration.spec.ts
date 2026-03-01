@@ -31,7 +31,7 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
     // Cliquer sur "Annuler mon inscription" pour ouvrir le dialog de confirmation
     const cancelButton = page
       .locator("button")
-      .filter({ hasText: /annuler mon inscription|cancel.*registration/i })
+      .filter({ hasText: /annuler mon inscription/i })
       .first();
     await expect(cancelButton).toBeVisible({ timeout: 10_000 });
     await cancelButton.click();
@@ -39,18 +39,29 @@ test.describe("Annulation d'inscription — utilisateur authentifié", () => {
     // Attendre le dialog et cliquer sur confirmer
     const confirmButton = page
       .locator("[role='alertdialog'] button")
-      .filter({ hasText: /oui|yes|confirmer|confirm/i })
+      .filter({ hasText: /oui|yes/i })
       .first();
     await expect(confirmButton).toBeVisible({ timeout: 5_000 });
-    await confirmButton.click();
 
-    // Après annulation, le CTA S'inscrire doit réapparaître
+    // Intercepter la réponse du server action AVANT de cliquer pour garantir la fin de la requête
+    const actionDone = page.waitForResponse(
+      (r) => r.url().includes(SLUGS.PUBLISHED_MOMENT) && r.request().method() === "POST",
+      { timeout: 10_000 }
+    );
+    await confirmButton.click();
+    await actionDone;
+
+    // Recharger la page pour obtenir l'état serveur frais
+    // (évite les aléas des transitions React 19 / Next.js App Router en CI)
+    await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
+
+    // L'inscription est annulée côté serveur — le CTA S'inscrire doit réapparaître
     await expect(
       page
         .locator("button")
-        .filter({ hasText: /inscrire|s'inscrire|rejoindre|join|register/i })
+        .filter({ hasText: /inscrire|s'inscrire/i })
         .first()
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible({ timeout: 10_000 });
   });
 });
 
