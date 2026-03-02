@@ -116,7 +116,7 @@
   },
   "Dashboard": {
     "title": "Mon espace",
-    "myCircles": "Mes Communautés",
+    "myCircles": "Communautés",
     "myCirclesOrganizer": "Mes Communautés",
     "createCircle": "Créer une Communauté",
     "createMoment": "Créer un événement",
@@ -130,7 +130,7 @@
       "title": "Créez d'abord une Communauté",
       "description": "Vous devez créer une Communauté avant de créer un événement."
     },
-    "myMoments": "Mes événements",
+    "myMoments": "Événements",
     "myMomentsOrganizer": "Mes événements",
     "upcomingMoments": "Mes prochains événements",
     "pastMoments": "Passés",

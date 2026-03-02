@@ -116,7 +116,7 @@
   },
   "Dashboard": {
     "title": "Tablou de bord",
-    "myCircles": "Comunitățile mele",
+    "myCircles": "Comunități",
     "myCirclesOrganizer": "Comunitățile mele",
     "createCircle": "Creează o Comunitate",
     "createMoment": "Creează un Eveniment",
@@ -130,7 +130,7 @@
       "title": "Creează mai întâi o Comunitate",
       "description": "Ai nevoie de o Comunitate înainte de a crea un Eveniment."
     },
-    "myMoments": "Evenimentele mele",
+    "myMoments": "Evenimente",
     "myMomentsOrganizer": "Evenimentele mele",
     "upcomingMoments": "Evenimentele mele viitoare",
     "pastMoments": "Trecute",

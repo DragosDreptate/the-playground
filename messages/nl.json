@@ -116,7 +116,7 @@
   },
   "Dashboard": {
     "title": "Dashboard",
-    "myCircles": "Mijn Communities",
+    "myCircles": "Communities",
     "myCirclesOrganizer": "Mijn Communities",
     "createCircle": "Een Community aanmaken",
     "createMoment": "Een Evenement aanmaken",
@@ -130,7 +130,7 @@
       "title": "Maak eerst een Community aan",
       "description": "Je hebt een Community nodig voordat je een Evenement kunt aanmaken."
     },
-    "myMoments": "Mijn Evenementen",
+    "myMoments": "Evenementen",
     "myMomentsOrganizer": "Mijn Evenementen",
     "upcomingMoments": "Mijn aankomende Evenementen",
     "pastMoments": "Verleden",

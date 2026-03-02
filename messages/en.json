@@ -116,7 +116,7 @@
   },
   "Dashboard": {
     "title": "Dashboard",
-    "myCircles": "My Communities",
+    "myCircles": "Communities",
     "myCirclesOrganizer": "My Communities",
     "createCircle": "Create a Community",
     "createMoment": "Create an Event",
@@ -130,7 +130,7 @@
       "title": "Create a Community first",
       "description": "You need a Community before creating an Event."
     },
-    "myMoments": "My Events",
+    "myMoments": "Events",
     "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
     "pastMoments": "Past",
