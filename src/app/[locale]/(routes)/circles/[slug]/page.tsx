@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { FollowButton } from "@/components/circles/follow-button";
+import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -293,6 +294,11 @@ export default async function PublicCirclePage({
               </svg>
               {t("detail.isMember")}
             </div>
+          )}
+
+          {/* Bouton Quitter — visible pour les membres non-Organisateurs */}
+          {showMemberBadge && (
+            <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
           )}
 
           {/* Bouton Suivre — visible uniquement pour les utilisateurs connectés non-membres */}
