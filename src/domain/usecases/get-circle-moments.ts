@@ -3,14 +3,17 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import { CircleNotFoundError } from "@/domain/errors";
 
-type GetCircleMomentsOptions = {
-  /** Passe la vérification d'existence du Circle (utile quand la page appelante l'a déjà chargé). */
-  skipCircleCheck?: boolean;
-};
-
 type GetCircleMomentsDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+};
+
+type GetCircleMomentsOptions = {
+  /**
+   * Passer `true` si le Circle a déjà été chargé et vérifié en amont.
+   * Évite un `findById` redondant (économise une requête DB).
+   */
+  skipCircleCheck?: boolean;
 };
 
 export async function getCircleMoments(
@@ -20,7 +23,6 @@ export async function getCircleMoments(
 ): Promise<Moment[]> {
   if (!options.skipCircleCheck) {
     const circle = await deps.circleRepository.findById(circleId);
-
     if (!circle) {
       throw new CircleNotFoundError(circleId);
     }

@@ -49,7 +49,7 @@ export const prismaUserRepository: UserRepository = {
       if (hostMemberships.length > 0) {
         const circleIds = hostMemberships.map((m) => m.circleId);
 
-        // Compter les co-Hosts restants pour chaque Circle en une seule requête GROUP BY
+        // Une seule requête GROUP BY pour compter les autres Hosts sur tous les Circles (évite le N+1)
         const otherHostCounts = await tx.circleMembership.groupBy({
           by: ["circleId"],
           where: { circleId: { in: circleIds }, role: "HOST", userId: { not: id } },
@@ -59,15 +59,15 @@ export const prismaUserRepository: UserRepository = {
           otherHostCounts.map((r) => [r.circleId, r._count._all])
         );
 
-        // Supprimer les Circles dont cet utilisateur est le seul Organisateur
-        const circleIdsToDelete = circleIds.filter(
+        // Supprimer uniquement les Circles sans autre Host
+        const circlesWithNoOtherHost = circleIds.filter(
           (cid) => (otherHostCountMap.get(cid) ?? 0) === 0
         );
-        if (circleIdsToDelete.length > 0) {
-          // deleteMany ne cascade pas — on supprime via delete pour déclencher les cascades Prisma
-          for (const circleId of circleIdsToDelete) {
-            await tx.circle.delete({ where: { id: circleId } });
-          }
+        if (circlesWithNoOtherHost.length > 0) {
+          // deleteMany avec cascade (Moments, inscriptions, commentaires, membres)
+          await tx.circle.deleteMany({
+            where: { id: { in: circlesWithNoOtherHost } },
+          });
         }
       }
 
@@ -112,6 +112,7 @@ export const prismaUserRepository: UserRepository = {
     userIds: string[]
   ): Promise<Map<string, NotificationPreferences>> {
     if (userIds.length === 0) return new Map();
+    // Une seule requête pour tous les utilisateurs — évite le N+1 dans les boucles de notification
     const records = await prisma.user.findMany({
       where: { id: { in: userIds } },
       select: {

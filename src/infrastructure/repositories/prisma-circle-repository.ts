@@ -62,7 +62,11 @@ export const prismaCircleRepository: CircleRepository = {
     return toDomainCircle(record);
   },
 
-  async createWithHostMembership(input: CreateCircleInput, userId: string): Promise<Circle> {
+  async createWithHostMembership(
+    input: CreateCircleInput,
+    hostUserId: string
+  ): Promise<Circle> {
+    // Transaction atomique : Circle + CircleMembership HOST en une seule opération
     const record = await prisma.$transaction(async (tx) => {
       const circle = await tx.circle.create({
         data: {
@@ -82,7 +86,7 @@ export const prismaCircleRepository: CircleRepository = {
         },
       });
       await tx.circleMembership.create({
-        data: { circleId: circle.id, userId, role: "HOST" },
+        data: { circleId: circle.id, userId: hostUserId, role: "HOST" },
       });
       return circle;
     });

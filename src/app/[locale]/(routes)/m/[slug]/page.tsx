@@ -1,9 +1,12 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-
-export const revalidate = 30;
 import { getTranslations } from "next-intl/server";
+
+// Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
+// Les inscriptions en temps réel passent par les Server Actions (revalidatePath),
+// donc l'ISR ici sert principalement le LCP pour les visiteurs non-connectés.
+export const revalidate = 30;
 import {
   prismaMomentRepository,
   prismaCircleRepository,

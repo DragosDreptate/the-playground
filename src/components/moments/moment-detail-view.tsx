@@ -126,7 +126,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
   const circleHref = isHostView
     ? `/dashboard/circles/${props.circleSlug}`
-    : `/dashboard/circles/${circle.slug}`;
+    : `/circles/${circle.slug}`;
 
   return (
     <div className="space-y-8">

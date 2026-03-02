@@ -39,7 +39,7 @@ export async function createCircle(
     }
   }
 
-  // Création atomique : le Circle et la membership HOST sont créés dans une seule transaction
+  // Création atomique : Circle + CircleMembership HOST dans une seule transaction
   const circle = await circleRepository.createWithHostMembership(
     {
       name: input.name,
