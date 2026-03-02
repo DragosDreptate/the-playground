@@ -47,7 +47,7 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
         <Button
           variant="outline"
           size="sm"
-          className="w-full gap-2 hover:border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+          className="w-full gap-2 border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary"
         >
           <LogOut className="size-3.5" />
           Quitter la Communauté
