@@ -116,7 +116,7 @@
   },
   "Dashboard": {
     "title": "Panel",
-    "myCircles": "Comunidades",
+    "myCircles": "Mis Comunidades",
     "myCirclesOrganizer": "Mis Comunidades",
     "createCircle": "Crear una Comunidad",
     "createMoment": "Crear un Evento",
@@ -130,7 +130,7 @@
       "title": "Crea primero una Comunidad",
       "description": "Necesitas una Comunidad antes de crear un Evento."
     },
-    "myMoments": "Eventos",
+    "myMoments": "Mis Eventos",
     "myMomentsOrganizer": "Mis Eventos",
     "upcomingMoments": "Mis próximos Eventos",
     "pastMoments": "Pasados",
