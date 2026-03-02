@@ -26,18 +26,27 @@ export async function sendContactMessageAction(
   }
 
   const resend = new Resend(process.env.AUTH_RESEND_KEY ?? "re_not_configured");
+  const from = process.env.EMAIL_FROM ?? process.env.AUTH_EMAIL_FROM ?? "onboarding@resend.dev";
 
-  const { error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? process.env.AUTH_EMAIL_FROM ?? "onboarding@resend.dev",
-    to: "ddreptate@gmail.com",
-    replyTo: email,
-    subject: `[Contact] Message de ${name}`,
-    text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
-    html: `<p><strong>Nom :</strong> ${name}</p><p><strong>Email :</strong> ${email}</p><hr/><p>${message.replace(/\n/g, "<br/>")}</p>`,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to: "ddreptate@gmail.com",
+      replyTo: email,
+      subject: `[Contact] Message de ${name}`,
+      text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
+      html: `<p><strong>Nom :</strong> ${name}</p><p><strong>Email :</strong> ${email}</p><hr/><p>${message.replace(/\n/g, "<br/>")}</p>`,
+    });
 
-  if (error) {
-    return { success: false, error: error.message, code: "SEND_ERROR" };
+    if (error) {
+      console.error("[contact] Resend error:", error);
+      return { success: false, error: error.message, code: "SEND_ERROR" };
+    }
+
+    console.log("[contact] Email envoyé, id:", data?.id);
+  } catch (err) {
+    console.error("[contact] Exception Resend:", err);
+    return { success: false, error: "Erreur d'envoi", code: "SEND_ERROR" };
   }
 
   return { success: true, data: undefined };
