@@ -42,7 +42,7 @@
 | Couleur destructive = primary (une seule couleur accent rose, danger communiqué par le contexte) | 2026-02-21 | `75fd383` |
 | Bouton Modifier unifié : default (rose plein) sur pages Communauté et événement | 2026-02-21 | `295575d` |
 | Le Répertoire : `/explorer` (tabs Communautés/Événements, filtre catégorie) + page Communauté publique `/circles/[slug]` + champs `category`/`city` sur Communauté | 2026-02-21 | `c3813e7` |
-| Dashboard redesigné : pill tabs (Mes Escales / Mes Cercles), timeline unifiée (upcoming + past), `DashboardMomentCard` avec `CircleAvatar`, empty states CTA | 2026-02-21 | — |
+| Dashboard redesigné : pill tabs (Mes inscriptions / Mes Communautés), timeline unifiée (upcoming + past), `DashboardMomentCard` avec `CircleAvatar`, empty states CTA | 2026-02-21 | — |
 | `CircleMembersList` : section membres sur page Communauté (Organisateurs avec Crown, emails visibles Organisateur-only via `variant`) | 2026-02-21 | — |
 | Terminologie i18n : FR Moment → **Escale**, S'inscrire → **Rejoindre**, Dashboard → **Mon Playground** / EN Player → **Member**, Register → **Join**, Dashboard → **My Playground** | 2026-02-21 | — |
 | Renommage Répertoire → **La Carte** (FR) / **Explore** (EN). Route `/explorer` inchangée. | 2026-02-21 | — |
@@ -79,7 +79,11 @@
 | **Broadcast "Inviter ma Communauté"** : bouton sur la vue Organisateur d'un événement — envoie un email à tous les membres et followers de la Communauté (envoi unique par événement, protégé par `broadcastSentAt`). `broadcastMomentAction` (`src/app/actions/broadcast-moment.ts`), usecase `broadcastMoment`, méthode `sendBroadcastMoment` sur `EmailService`, template `broadcast-moment` (react-email). Message personnalisable (`customMessage?`). i18n `Moment.broadcast.*` FR/EN complet. | 2026-02-28 | — |
 | **Préférences de notifications email** : 4 booléens sur `User` (`notifyNewRegistration`, `notifyNewComment`, `notifyNewFollower`, `notifyNewMomentInCircle`), usecase `updateNotificationPreferences`, server action dans `profile.ts`, section "Notifications" sur `/dashboard/profile` avec toggles `Switch`, i18n FR/EN `Profile.notifications.*`. | 2026-02-24 | — |
 | **Export CSV des inscrits** : bouton "Exporter CSV" sur la vue Organisateur d'un événement (`RegistrationsList`), client-side avec BOM UTF-8, colonnes prénom/nom/email/statut/date. i18n `Moment.registrations.exportCsv` + `Moment.registrations.csvHeaders.*`. | 2026-02-24 | — |
-| **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
+| **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher avec label "Vue :"), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
+| **Dashboard onglet Participant renommé** : libellé "Mes événements" → "Mes inscriptions" (FR) / "My registrations" (EN) — clé i18n `Dashboard.myMoments`. | 2026-03-02 | — |
+| **Page Aide `/help`** : page statique avec sidebar de navigation (ancres), FAQ accordion, sections Participant et Organisateur, i18n FR/EN/RO/NL/ES (namespace `Help`). Lien "Aide" ajouté dans le footer (`Footer.product.help`). | 2026-03-02 | — |
+| **Page Découvrir : H1 "Communautés & événements"** (FR) / "Communities & events" (EN) — mise à jour de la clé i18n `Explorer.title`. | 2026-03-02 | — |
+| **Suppression membre d'une Communauté** : usecase `removeCircleMember`, contrôle Organisateur, annulation automatique des inscriptions à venir, i18n FR/EN. | 2026-03-01 | `706cf9b` |
 
 ---
 
@@ -261,9 +265,10 @@
   - Chaque server action qui envoie un email consulte la préférence avant d'appeler `emailService`
   - i18n FR/EN : namespace `Profile.notifications.*`
 
-- [ ] **Outils Organisateur enrichis**
+- [ ] **Outils Organisateur enrichis** *(partiellement implémenté)*
   - Co-Organisateurs (plusieurs Organisateurs par Communauté)
-  - Gestion membres (inviter, retirer)
+  - [x] Retirer un membre d'une Communauté ✅ — usecase `removeCircleMember`, PR #123
+  - Inviter un membre (lien direct ou email)
   - Stats Communauté basiques
 
 - [ ] **Paiement Stripe Connect**
@@ -337,9 +342,9 @@
   - Solution : Upstash Rate Limit (Redis serverless, compatible Vercel Edge)
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
-- [x] **Tests unitaires complets** — 486 tests, 58 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 495 tests, 59 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (99 tests dédiés sécurité) ✅
-- [x] **Tests E2E Playwright** — 72 tests, 9 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
+- [x] **Tests E2E Playwright** — 10 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher, broadcast-moment). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
 - [ ] **Accessibilité axe-core** dans Playwright
 
 - [ ] **Bundle analyzer** (`@next/bundle-analyzer`)
