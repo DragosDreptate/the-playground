@@ -130,7 +130,7 @@
       "title": "Maak eerst een Community aan",
       "description": "Je hebt een Community nodig voordat je een Evenement kunt aanmaken."
     },
-    "myMoments": "Mijn Evenementen",
+    "myMoments": "Mijn inschrijvingen",
     "myMomentsOrganizer": "Mijn Evenementen",
     "upcomingMoments": "Mijn aankomende Evenementen",
     "pastMoments": "Verleden",
@@ -161,6 +161,7 @@
     "greetingSubtitle": "Jouw Communities en aankomende Evenementen, alles op één plek.",
     "greetingSubtitleOrganizer": "Beheer jouw Communities en Evenementen.",
     "memberCount": "{count} leden",
+    "modeLabel": "Weergave",
     "modeParticipant": "Lid",
     "modeOrganizer": "Organisator",
     "modeBadgeParticipant": "Ledenweergave",
@@ -433,7 +434,7 @@
     "OTHER": "Anders"
   },
   "Explorer": {
-    "title": "Ontdekken",
+    "title": "Communities & events",
     "description": "Communities die jouw waarden delen, evenementen die je niet wilt missen.",
     "navLink": "Ontdekken",
     "tabs": {

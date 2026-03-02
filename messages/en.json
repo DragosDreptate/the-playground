@@ -130,7 +130,7 @@
       "title": "Create a Community first",
       "description": "You need a Community before creating an Event."
     },
-    "myMoments": "My Events",
+    "myMoments": "My registrations",
     "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
     "pastMoments": "Past",
@@ -161,6 +161,7 @@
     "greetingSubtitle": "Your Communities and upcoming Events, all in one place.",
     "greetingSubtitleOrganizer": "Manage your Communities and Events.",
     "memberCount": "{count} members",
+    "modeLabel": "View",
     "modeParticipant": "Member",
     "modeOrganizer": "Organizer",
     "modeBadgeParticipant": "Member view",
@@ -433,7 +434,7 @@
     "OTHER": "Other"
   },
   "Explorer": {
-    "title": "Explore",
+    "title": "Communities & events",
     "description": "Communities that share your values, events you don't want to miss.",
     "navLink": "Explore",
     "tabs": {

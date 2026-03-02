@@ -27,6 +27,10 @@ export function DashboardModeSwitcher({ currentMode, activeTab }: DashboardModeS
 
   return (
     <div className="flex items-center gap-1 rounded-full border p-1">
+      <span className="select-none px-3 text-sm text-muted-foreground">
+        {t("modeLabel")} :
+      </span>
+      <div className="h-4 w-px bg-border" />
       <button
         type="button"
         onClick={() => handleSwitch("PARTICIPANT")}

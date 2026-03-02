@@ -130,7 +130,7 @@
       "title": "Creează mai întâi o Comunitate",
       "description": "Ai nevoie de o Comunitate înainte de a crea un Eveniment."
     },
-    "myMoments": "Evenimentele mele",
+    "myMoments": "Înscrierile mele",
     "myMomentsOrganizer": "Evenimentele mele",
     "upcomingMoments": "Evenimentele mele viitoare",
     "pastMoments": "Trecute",
@@ -161,6 +161,7 @@
     "greetingSubtitle": "Comunitățile și evenimentele tale viitoare, toate într-un singur loc.",
     "greetingSubtitleOrganizer": "Gestionează-ți Comunitățile și Evenimentele.",
     "memberCount": "{count} participanți",
+    "modeLabel": "Vizualizare",
     "modeParticipant": "Participant",
     "modeOrganizer": "Organizator",
     "modeBadgeParticipant": "Vedere participant",
@@ -433,7 +434,7 @@
     "OTHER": "Altele"
   },
   "Explorer": {
-    "title": "Explorează",
+    "title": "Communities & events",
     "description": "Comunități care îți împărtășesc valorile, evenimente pe care nu vrei să le ratezi.",
     "navLink": "Explorează",
     "tabs": {
