@@ -10,8 +10,8 @@ import {
   fetchAndFilterEventbriteEvents,
   fetchAndFilterMobilizonEvents,
   fetchMeetupData,
-  buildEventbriteUrl,
   buildMeetupUrl,
+  deduplicateByUrl,
   getWeekRange,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
@@ -51,7 +51,7 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans texte autour :
 }
 
 Règles :
-- keywords : 2 à 5 mots-clés thématiques de l'événement (ex: "tech", "startup", "yoga", "photo")
+- keywords : 2 à 3 mots-clés maximum, extraits PRINCIPALEMENT du titre (priorité 1), puis nom de lieu/communauté (priorité 2), enfin description (priorité 3). Termes les plus spécifiques et distinctifs. Éviter les termes trop génériques.
 - city : ville principale extraite de l'adresse ou du nom de lieu. null si impossible à déterminer
 - country : code pays ISO 2 lettres (fr, gb, de, nl, es...). null si inconnu`;
 
@@ -194,35 +194,26 @@ export async function POST(request: NextRequest) {
         // Étape 2 : déterminer les plages de dates
         const dateStr = startsAt.slice(0, 10);
         const { weekFrom, weekTo } = getWeekRange(dateStr);
-        const keywordsStr = keywords.join(" ");
         const locationTerms = LUMA_LOCATION_TERMS[city.toLowerCase()] ?? [city.toLowerCase()];
         const expectedCountry = EVENTBRITE_COUNTRY[city.toLowerCase()] ?? "fr";
 
-        // Étape 3 : fetches parallèles sur la semaine complète
-        const [lumaEvents, eventbriteEvents, meetupRaw, mobilizonEvents] = await Promise.all([
-          fetchAndFilterLumaEvents(city, keywordsStr, weekFrom, weekTo),
-          fetchAndFilterEventbriteEvents(
-            buildEventbriteUrl(city, weekFrom, weekTo, keywordsStr),
-            weekFrom,
-            weekTo,
-            locationTerms,
-            expectedCountry,
-            keywordsStr
+        // Étape 3 : fetches parallèles sur la semaine complète — un appel par mot-clé (OR)
+        const meetupKws = keywords.length > 0 ? keywords : [""];
+        const [lumaEvents, eventbriteEvents, mobilizonEvents, meetupResults] = await Promise.all([
+          fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
+          fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
+          fetchAndFilterMobilizonEvents(city, keywords, weekFrom, weekTo),
+          Promise.all(
+            meetupKws.map(async (kw) => {
+              const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
+              return extractMeetupEventsWithClaude(client, raw, city!, weekFrom, weekTo, kw);
+            })
           ),
-          fetchMeetupData(buildMeetupUrl(city, weekFrom, weekTo, keywordsStr)),
-          fetchAndFilterMobilizonEvents(city, keywordsStr, weekFrom, weekTo),
         ]);
 
-        const meetupEvents = await extractMeetupEventsWithClaude(
-          client,
-          meetupRaw,
-          city,
-          weekFrom,
-          weekTo,
-          keywordsStr
-        );
+        const meetupEvents = deduplicateByUrl(meetupResults.flat());
 
-        const allEvents = [...lumaEvents, ...eventbriteEvents, ...meetupEvents, ...mobilizonEvents];
+        const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents, ...mobilizonEvents]);
 
         // Trier par date
         allEvents.sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));

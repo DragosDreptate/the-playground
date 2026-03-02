@@ -10,7 +10,18 @@ export type EventResult = {
   description: string | null;
 };
 
-// --- Luma API — traitement 100% côté serveur, 0 token Claude ---
+// --- Helper : déduplication par URL ---
+
+export function deduplicateByUrl(events: EventResult[]): EventResult[] {
+  const seen = new Set<string>();
+  return events.filter((e) => {
+    if (seen.has(e.url)) return false;
+    seen.add(e.url);
+    return true;
+  });
+}
+
+// --- Luma API — une requête par mot-clé en parallèle ---
 
 export const LUMA_CITY: Record<string, string> = {
   paris: "Paris", lyon: "Lyon", bordeaux: "Bordeaux", marseille: "Marseille",
@@ -47,49 +58,57 @@ type LumaEntry = {
 
 export async function fetchAndFilterLumaEvents(
   ville: string,
-  keywords: string,
+  keywords: string[],
   dateFrom: string,
   dateEnd: string
 ): Promise<EventResult[]> {
-  try {
-    const params = new URLSearchParams({ near: LUMA_CITY[ville.toLowerCase()] ?? ville, pagination_limit: "50" });
-    if (keywords) params.set("query", keywords);
-    const res = await fetch(`https://api.lu.ma/discover/get-paginated-events?${params}`, {
-      headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) return [];
+  const queries = keywords.length > 0 ? keywords : [""];
+  const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
+  const villeKey = ville.toLowerCase();
 
-    const json = (await res.json()) as { entries?: LumaEntry[] };
-    const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
+  const results = await Promise.all(
+    queries.map(async (kw): Promise<EventResult[]> => {
+      try {
+        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "50" });
+        if (kw) params.set("query", kw);
+        const res = await fetch(`https://api.lu.ma/discover/get-paginated-events?${params}`, {
+          headers: { Accept: "application/json" },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) return [];
 
-    return (json.entries ?? [])
-      .filter((e) => {
-        const d = e.event.start_at.slice(0, 10);
-        if (d < dateFrom || d > dateEnd) return false;
-        const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
-        const villeKey = ville.toLowerCase();
-        if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
-        const loc = e.event.geo_address_info?.city_state?.toLowerCase();
-        if (loc) return locationTerms.some((t) => loc.includes(t));
-        if (e.event.location_type !== "offline") return true;
-        return false;
-      })
-      .map((e) => ({
-        title: e.event.name,
-        date: e.event.start_at.slice(0, 10),
-        time: e.event.start_at.slice(11, 16) || null,
-        location: e.event.geo_address_info?.city_state ?? null,
-        url: `https://lu.ma/${e.event.url}`,
-        source: "luma",
-        description: e.calendar?.name ?? null,
-      }));
-  } catch {
-    return [];
-  }
+        const json = (await res.json()) as { entries?: LumaEntry[] };
+
+        return (json.entries ?? [])
+          .filter((e) => {
+            const d = e.event.start_at.slice(0, 10);
+            if (d < dateFrom || d > dateEnd) return false;
+            const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
+            if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
+            const loc = e.event.geo_address_info?.city_state?.toLowerCase();
+            if (loc) return locationTerms.some((t) => loc.includes(t));
+            if (e.event.location_type !== "offline") return true;
+            return false;
+          })
+          .map((e) => ({
+            title: e.event.name,
+            date: e.event.start_at.slice(0, 10),
+            time: e.event.start_at.slice(11, 16) || null,
+            location: e.event.geo_address_info?.city_state ?? null,
+            url: `https://lu.ma/${e.event.url}`,
+            source: "luma",
+            description: e.calendar?.name ?? null,
+          }));
+      } catch {
+        return [];
+      }
+    })
+  );
+
+  return deduplicateByUrl(results.flat());
 }
 
-// --- Eventbrite — scraping JSON-LD, 0 token Claude ---
+// --- Eventbrite — une requête par mot-clé en parallèle ---
 
 export const EVENTBRITE_LOCATION: Record<string, string> = {
   paris: "france--paris", lyon: "france--lyon", bordeaux: "france--bordeaux",
@@ -104,10 +123,10 @@ export const EVENTBRITE_COUNTRY: Record<string, string> = {
   london: "gb", berlin: "de", amsterdam: "nl",
 };
 
-export function buildEventbriteUrl(ville: string, dateFrom: string, dateEnd: string, keywords: string): string {
+export function buildEventbriteUrl(ville: string, dateFrom: string, dateEnd: string, keyword: string): string {
   const location = EVENTBRITE_LOCATION[ville.toLowerCase()] ?? `france--${ville.toLowerCase()}`;
   const params = new URLSearchParams({ start_date: dateFrom, end_date: dateEnd });
-  if (keywords) params.set("q", keywords);
+  if (keyword) params.set("q", keyword);
   return `https://www.eventbrite.fr/d/${location}/events/?${params}`;
 }
 
@@ -121,13 +140,12 @@ type EventbriteJsonLd = {
   description?: string;
 };
 
-function extractAndFilterEventbriteEvents(
+function extractEventbriteEvents(
   html: string,
   dateFrom: string,
   dateEnd: string,
   locationTerms: string[],
-  expectedCountry: string,
-  keywords: string
+  expectedCountry: string
 ): EventResult[] {
   const blocks: string[] = [];
   html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi, (_, b) => {
@@ -135,7 +153,6 @@ function extractAndFilterEventbriteEvents(
     return "";
   });
 
-  const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
   const events: EventResult[] = [];
 
   for (const block of blocks) {
@@ -155,10 +172,6 @@ function extractAndFilterEventbriteEvents(
           if (country && country !== expectedCountry) continue;
           if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
         }
-        if (kwList.length > 0) {
-          const text = (item.name ?? "").toLowerCase();
-          if (!kwList.some((kw) => text.includes(kw))) continue;
-        }
         events.push({
           title: item.name ?? "Sans titre",
           date,
@@ -176,30 +189,40 @@ function extractAndFilterEventbriteEvents(
 }
 
 export async function fetchAndFilterEventbriteEvents(
-  url: string,
+  ville: string,
   dateFrom: string,
   dateEnd: string,
   locationTerms: string[],
   expectedCountry: string,
-  keywords: string
+  keywords: string[]
 ): Promise<EventResult[]> {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-        "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
-        Accept: "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) return [];
-    return extractAndFilterEventbriteEvents(await res.text(), dateFrom, dateEnd, locationTerms, expectedCountry, keywords);
-  } catch {
-    return [];
-  }
+  const queries = keywords.length > 0 ? keywords : [""];
+
+  const results = await Promise.all(
+    queries.map(async (kw): Promise<EventResult[]> => {
+      try {
+        const url = buildEventbriteUrl(ville, dateFrom, dateEnd, kw);
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+            "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
+            Accept: "text/html,application/xhtml+xml",
+          },
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) return [];
+        // Le filtrage par mot-clé est fait par l'API (?q=kw) — on ne post-filtre que par localisation
+        return extractEventbriteEvents(await res.text(), dateFrom, dateEnd, locationTerms, expectedCountry);
+      } catch {
+        return [];
+      }
+    })
+  );
+
+  return deduplicateByUrl(results.flat());
 }
 
-// --- Mobilizon — API GraphQL publique, 0 token Claude ---
+// --- Mobilizon — une requête par mot-clé en parallèle ---
 
 type MobilizonEvent = {
   title: string;
@@ -210,66 +233,69 @@ type MobilizonEvent = {
 
 export async function fetchAndFilterMobilizonEvents(
   ville: string,
-  keywords: string,
+  keywords: string[],
   dateFrom: string,
   dateEnd: string
 ): Promise<EventResult[]> {
   const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
-  const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
+  const queries = keywords.length > 0 ? keywords : [""];
 
-  const query = `{
-    searchEvents(
-      term: ${JSON.stringify(keywords || "")}
-      beginsOn: "${dateFrom}T00:00:00Z"
-      endsOn: "${dateEnd}T23:59:59Z"
-      limit: 50
-    ) {
-      elements {
-        title
-        beginsOn
-        url
-        physicalAddress { locality country }
-      }
-    }
-  }`;
-
-  try {
-    const res = await fetch("https://mobilizon.fr/api", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query }),
-      signal: AbortSignal.timeout(15000),
-    });
-    if (!res.ok) return [];
-
-    const json = (await res.json()) as { data?: { searchEvents?: { elements?: MobilizonEvent[] } } };
-    const elements = json.data?.searchEvents?.elements ?? [];
-
-    return elements
-      .filter((e) => {
-        const locality = e.physicalAddress?.locality?.toLowerCase() ?? "";
-        if (locality && !locationTerms.some((t) => locality.includes(t))) return false;
-        if (kwList.length > 0) {
-          const text = e.title.toLowerCase();
-          if (!kwList.some((kw) => text.includes(kw))) return false;
+  const results = await Promise.all(
+    queries.map(async (kw): Promise<EventResult[]> => {
+      const query = `{
+        searchEvents(
+          term: ${JSON.stringify(kw)}
+          beginsOn: "${dateFrom}T00:00:00Z"
+          endsOn: "${dateEnd}T23:59:59Z"
+          limit: 50
+        ) {
+          elements {
+            title
+            beginsOn
+            url
+            physicalAddress { locality country }
+          }
         }
-        return true;
-      })
-      .map((e) => ({
-        title: e.title,
-        date: e.beginsOn.slice(0, 10),
-        time: e.beginsOn.slice(11, 16) || null,
-        location: e.physicalAddress?.locality ?? null,
-        url: e.url,
-        source: "mobilizon",
-        description: null,
-      }));
-  } catch {
-    return [];
-  }
+      }`;
+
+      try {
+        const res = await fetch("https://mobilizon.fr/api", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ query }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!res.ok) return [];
+
+        const json = (await res.json()) as { data?: { searchEvents?: { elements?: MobilizonEvent[] } } };
+        const elements = json.data?.searchEvents?.elements ?? [];
+
+        return elements
+          .filter((e) => {
+            const locality = e.physicalAddress?.locality?.toLowerCase() ?? "";
+            // Le filtrage par mot-clé est fait par l'API (term: kw)
+            if (locality && !locationTerms.some((t) => locality.includes(t))) return false;
+            return true;
+          })
+          .map((e) => ({
+            title: e.title,
+            date: e.beginsOn.slice(0, 10),
+            time: e.beginsOn.slice(11, 16) || null,
+            location: e.physicalAddress?.locality ?? null,
+            url: e.url,
+            source: "mobilizon",
+            description: null,
+          }));
+      } catch {
+        return [];
+      }
+    })
+  );
+
+  return deduplicateByUrl(results.flat());
 }
 
-// --- Meetup --- scraping + extraction Claude ---
+// --- Meetup — scraping HTML ---
 
 export const MEETUP_LOCATION: Record<string, string> = {
   paris: "fr--Paris", lyon: "fr--Lyon", bordeaux: "fr--Bordeaux", marseille: "fr--Marseille",
@@ -277,14 +303,14 @@ export const MEETUP_LOCATION: Record<string, string> = {
   london: "gb--London", berlin: "de--Berlin", amsterdam: "nl--Amsterdam",
 };
 
-export function buildMeetupUrl(ville: string, dateFrom: string, dateEnd: string, keywords: string): string {
+export function buildMeetupUrl(ville: string, dateFrom: string, dateEnd: string, keyword: string): string {
   const params = new URLSearchParams({
     location: MEETUP_LOCATION[ville.toLowerCase()] ?? `fr--${ville}`,
     source: "EVENTS",
     startDateRange: dateFrom,
     endDateRange: dateEnd,
   });
-  if (keywords) params.set("keywords", keywords);
+  if (keyword) params.set("keywords", keyword);
   return `https://www.meetup.com/find/events/?${params}`;
 }
 
