@@ -143,7 +143,7 @@ export default async function HelpPage() {
         <div className="flex flex-wrap justify-center gap-3 pt-2">
           <a
             href="#participant"
-            className="inline-flex items-center rounded-full border border-teal-400/20 bg-teal-400/12 px-4 py-1.5 text-sm font-semibold text-teal-400 transition-colors hover:bg-teal-400/20"
+            className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/20"
           >
             {t("hero.ctaParticipant")}
           </a>
@@ -165,7 +165,7 @@ export default async function HelpPage() {
           <section className="space-y-10">
             <div className="flex items-center gap-3">
               <SectionH2 id="participant">{t("participant.sectionTitle")}</SectionH2>
-              <span className="rounded-full border border-teal-400/20 bg-teal-400/12 px-2.5 py-0.5 text-xs font-semibold text-teal-400">
+              <span className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
                 {t("participant.badge")}
               </span>
             </div>
@@ -438,7 +438,7 @@ export default async function HelpPage() {
             {/* Le Radar */}
             <div className="space-y-4">
               <SectionH3 id="radar">{t("organizer.radar.title")}</SectionH3>
-              <div className="rounded-xl border border-primary/18 bg-gradient-to-br from-primary/7 to-teal-400/5 p-4 space-y-3">
+              <div className="rounded-xl border border-primary/18 bg-gradient-to-br from-primary/7 to-primary/5 p-4 space-y-3">
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {t.rich("organizer.radar.intro", rich)}
                 </p>
