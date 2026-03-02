@@ -662,7 +662,8 @@
       "explore": "Découvrir",
       "howItWorks": "Comment ça marche",
       "about": "À propos",
-      "changelog": "Changelog"
+      "changelog": "Changelog",
+      "help": "Aide"
     },
     "legal": {
       "title": "Légal",
@@ -854,6 +855,209 @@
       "newMomentInCircle": "Nouvel événement",
       "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté que vous suivez",
       "saved": "Préférences enregistrées"
+    }
+  },
+  "Help": {
+    "meta": {
+      "title": "Aide · The Playground",
+      "description": "Tout ce que vous devez savoir pour utiliser The Playground — inscription, création de communauté, gestion d'événements et plus."
+    },
+    "hero": {
+      "title": "Comment ça marche ?",
+      "subtitle": "The Playground est une plateforme gratuite pour créer et rejoindre des communautés. Organisateurs, gérez vos événements et votre réseau. Participants, découvrez des événements près de chez vous et rejoignez des communautés qui vous ressemblent.",
+      "ctaParticipant": "Je suis Participant",
+      "ctaOrganizer": "Je suis Organisateur"
+    },
+    "sidebar": {
+      "participant": "Participant",
+      "organizer": "Organisateur",
+      "faqLabel": "FAQ",
+      "contactLabel": "Contact",
+      "inscription": "S'inscrire à un événement",
+      "rejoindre": "Rejoindre une Communauté",
+      "waitlist": "Liste d'attente",
+      "cancel": "Annuler son inscription",
+      "comments": "Les commentaires",
+      "mySpace": "Mon espace",
+      "notifications": "Gérer ses notifications",
+      "leave": "Quitter une Communauté",
+      "createCommunity": "Créer sa Communauté",
+      "createEvent": "Créer un événement",
+      "manageRegistrations": "Gérer les inscriptions",
+      "contact": "Contacter vos participants",
+      "editCancel": "Modifier ou annuler",
+      "radar": "Le Radar",
+      "share": "Partager l'événement",
+      "members": "Gérer les membres"
+    },
+    "participant": {
+      "sectionTitle": "Participant",
+      "badge": "Participant",
+      "inscription": {
+        "title": "S'inscrire à un événement",
+        "intro": "La plupart du temps, vous arrivez sur The Playground via un <strong>lien partagé</strong> — par message, sur les réseaux sociaux, ou par email. Ce lien pointe directement vers la page de l'événement.",
+        "stepsLabel": "Sur la page de l'événement :",
+        "step1": "Lisez les informations : date, lieu, description, nombre de participants",
+        "step2": "Cliquez sur <strong>S'inscrire</strong>",
+        "step3": "Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google / GitHub) — aucun formulaire à remplir",
+        "step4": "Une fois inscrit, vous recevez un <strong>email de confirmation</strong> avec les détails et un lien pour ajouter l'événement à votre calendrier (Google Calendar, Apple Calendar, ou fichier .ics)",
+        "callout": "Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute."
+      },
+      "join": {
+        "title": "Rejoindre une Communauté",
+        "intro": "Quand vous vous inscrivez à un événement, vous devenez automatiquement membre de sa Communauté. Rien de plus à faire.",
+        "memberLabel": "En tant que membre, vous pouvez :",
+        "item1": "Voir les <strong>prochains événements</strong> de la Communauté",
+        "item2": "Consulter les <strong>événements passés</strong>",
+        "item3": "Voir les <strong>autres membres</strong>",
+        "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté."
+      },
+      "waitlist": {
+        "title": "La liste d'attente",
+        "intro": "Si un événement affiche <strong>complet</strong>, vous pouvez rejoindre la liste d'attente. Si une place se libère (suite à une annulation), vous êtes automatiquement inscrit et recevez un email de confirmation."
+      },
+      "cancel": {
+        "title": "Annuler son inscription",
+        "stepsLabel": "Depuis <strong>Mon espace</strong> :",
+        "step1": "Allez sur l'événement concerné",
+        "step2": "Cliquez sur <strong>Annuler mon inscription</strong>",
+        "outro": "Si vous étiez sur liste d'attente, votre place est simplement supprimée."
+      },
+      "comments": {
+        "title": "Les commentaires",
+        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'Organisateur."
+      },
+      "mySpace": {
+        "title": "Mon espace",
+        "intro": "<strong>Mon espace</strong> est votre tableau de bord personnel. Vous y retrouvez :",
+        "item1": "Vos <strong>prochains événements</strong> (ceux auxquels vous êtes inscrit)",
+        "item2": "Vos <strong>événements passés</strong>",
+        "item3": "Les <strong>Communautés</strong> dont vous êtes membre",
+        "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications)"
+      },
+      "notifications": {
+        "title": "Gérer ses notifications",
+        "intro": "Dans votre profil (<strong>Mon espace → Profil</strong>), vous pouvez activer ou désactiver les emails :",
+        "item1": "Confirmation d'inscription",
+        "item2": "Rappels avant l'événement",
+        "item3": "Modifications ou annulation d'événement",
+        "item4": "Nouveaux événements dans vos Communautés"
+      },
+      "leave": {
+        "title": "Quitter une Communauté",
+        "intro": "Depuis la page d'une Communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la Communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire."
+      }
+    },
+    "organizer": {
+      "sectionTitle": "Organisateur",
+      "badge": "Organisateur",
+      "createCommunity": {
+        "title": "Créer sa Communauté",
+        "intro": "La Communauté est votre espace central sur The Playground. C'est depuis là que vous gérez vos événements et votre réseau.",
+        "stepsLabel": "Pour créer votre Communauté :",
+        "step1": "Connectez-vous et accédez à <strong>Mon espace</strong>",
+        "step2": "Cliquez sur <strong>Créer une Communauté</strong>",
+        "step3": "Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)",
+        "step4": "Ajoutez une image de couverture (optionnel mais recommandé)",
+        "callout": "Une Communauté publique apparaît dans <strong>Découvrir</strong> et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct."
+      },
+      "createEvent": {
+        "title": "Créer un événement",
+        "intro": "Depuis votre Communauté, cliquez sur <strong>Créer un événement</strong>.",
+        "essentialLabel": "Les champs essentiels :",
+        "field1Title": "Titre",
+        "field1Desc": "court et clair",
+        "field2Title": "Date et heure",
+        "field2Desc": "début et fin",
+        "field3Title": "Lieu",
+        "field3Desc": "adresse (avec autocomplétion) ou \"En ligne\" + lien de connexion",
+        "field4Title": "Description",
+        "field4Desc": "contexte, programme, ce que les participants doivent savoir",
+        "advancedLabel": "Options avancées (accessibles via \"Plus d'options\") :",
+        "adv1": "<strong>Capacité</strong> — nombre maximum de participants (active la liste d'attente automatiquement)",
+        "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
+        "adv3": "<strong>Image de couverture</strong>",
+        "callout": "Conseil : un bon titre et une bonne description suffisent pour un événement réussi. Les participants voient cette page en premier — soignez-la."
+      },
+      "manageRegistrations": {
+        "title": "Gérer les inscriptions",
+        "intro": "Depuis le tableau de bord de votre événement, vous accédez à :",
+        "item1": "La <strong>liste des inscrits</strong> (avec leurs noms, emails, et statut)",
+        "item2": "La <strong>liste d'attente</strong>",
+        "item3": "La possibilité de <strong>cocher les présents</strong> (check-in) le jour J",
+        "item4": "L'<strong>export CSV</strong> de la liste complète"
+      },
+      "contact": {
+        "title": "Contacter vos participants",
+        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Envoyer un message</strong> vous permet d'envoyer un email à l'ensemble des inscrits actifs. Utile pour partager des informations de dernière minute, le programme détaillé, ou un lien de connexion."
+      },
+      "editCancel": {
+        "title": "Modifier ou annuler un événement",
+        "intro": "Depuis le tableau de bord de l'événement :",
+        "item1": "<strong>Modifier</strong> — modifiez les informations à tout moment. Les participants inscrits sont notifiés par email si des informations clés changent.",
+        "item2": "<strong>Annuler</strong> — annulez l'événement. Tous les participants reçoivent un email d'annulation.",
+        "callout": "Un événement annulé ne peut pas être réactivé. Si vous souhaitez simplement le reporter, modifiez la date plutôt que d'annuler."
+      },
+      "radar": {
+        "title": "Le Radar — trouver l'inspiration",
+        "intro": "Le <strong>Radar</strong> est un outil IA disponible dans le formulaire de création d'événement. Il analyse les tendances et événements similaires dans votre ville pour vous aider à trouver le bon sujet, le bon créneau, ou la bonne approche.",
+        "limit": "Vous avez <strong>25 analyses par jour</strong>."
+      },
+      "share": {
+        "title": "Partager votre événement",
+        "intro": "Chaque événement dispose d'une <strong>URL unique</strong> (format <code>the-playground.fr/m/votre-evenement</code>). Copiez ce lien depuis le tableau de bord de l'événement et partagez-le directement — via WhatsApp, Instagram, email, ou newsletter. Aucune installation ni compte préalable n'est requis pour les participants."
+      },
+      "members": {
+        "title": "Gérer les membres de votre Communauté",
+        "intro": "Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Vous pouvez supprimer un membre si nécessaire.",
+        "outro": "Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements."
+      }
+    },
+    "faq": {
+      "sectionTitle": "Questions fréquentes",
+      "q1": {
+        "question": "The Playground est-il gratuit ?",
+        "answer": "Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
+      },
+      "q2": {
+        "question": "Quelle est la différence entre une Communauté publique et privée ?",
+        "answer": "Une Communauté publique est visible dans Découvrir et accessible à tous. Une Communauté privée n'est accessible que via un lien direct — elle n'apparaît pas dans l'annuaire."
+      },
+      "q3": {
+        "question": "Puis-je organiser des événements sans créer de Communauté ?",
+        "answer": "Non. La Communauté est l'espace central de The Playground. Chaque événement appartient à une Communauté. Créer une Communauté ne prend que quelques minutes."
+      },
+      "q4": {
+        "question": "Que se passe-t-il si un événement est complet ?",
+        "answer": "Vous pouvez rejoindre la liste d'attente. Si une place se libère, vous êtes automatiquement inscrit et notifié par email."
+      },
+      "q5": {
+        "question": "Les participants ont-ils besoin d'un compte pour s'inscrire ?",
+        "answer": "Ils doivent créer un compte, mais le processus est très rapide : un email suffit (lien magique, sans mot de passe), ou une connexion Google / GitHub. Aucun formulaire long."
+      },
+      "q6": {
+        "question": "Comment récupérer mes données ?",
+        "answer": "Depuis Mon espace → Profil, les Organisateurs peuvent exporter leurs données. Pour toute demande spécifique (RGPD, suppression de compte), contactez-nous."
+      },
+      "q7": {
+        "question": "Comment signaler un contenu inapproprié ?",
+        "answer": "Utilisez le lien Signaler présent sur les pages d'événements et de Communautés, ou contactez-nous directement par email."
+      }
+    },
+    "contact": {
+      "title": "Une question ?",
+      "subtitle": "Notre équipe vous répond dans les meilleurs délais.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Votre nom",
+      "emailLabel": "Email",
+      "emailPlaceholder": "votre@email.com",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Décrivez votre question ou votre problème...",
+      "submit": "Envoyer",
+      "sending": "Envoi en cours...",
+      "success": "Message envoyé ! Nous vous répondrons dans les meilleurs délais.",
+      "error": "Une erreur est survenue. Veuillez réessayer ou nous contacter directement à hello@the-playground.fr"
     }
   }
 }

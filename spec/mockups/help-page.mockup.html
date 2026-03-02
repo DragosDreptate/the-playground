@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comment ça marche ? — The Playground</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CSS VARIABLES — DARK MODE DEFAULT
+   ============================================================ */
+:root {
+  --background: #0f0f14;
+  --foreground: #e8e8f0;
+  --card: #1a1b2e;
+  --card-foreground: #e8e8f0;
+  --muted: #1e1f32;
+  --muted-foreground: #8b8fa8;
+  --border: #2a2b3d;
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --accent-teal: #6ee7d0;
+  --header-bg: rgba(15,15,20,0.88);
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+}
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { display: block; }
+
+/* ============================================================
+   SITE HEADER
+   ============================================================ */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 58px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+/* Triangle logo SVG-like via CSS */
+.logo-icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.logo-wordmark {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+.logo-wordmark .logo-accent {
+  color: var(--primary);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.8625rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: var(--foreground);
+  background: rgba(255,255,255,0.05);
+  text-decoration: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.btn:hover { text-decoration: none; }
+.btn-outline-sm {
+  font-size: 0.8125rem;
+  padding: 5px 12px;
+  background: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+}
+.btn-outline-sm:hover { background: var(--muted); }
+
+/* ============================================================
+   PAGE LAYOUT
+   ============================================================ */
+.page-wrapper {
+  padding-top: 58px; /* header height */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero {
+  background: linear-gradient(160deg, rgba(232,69,122,0.07) 0%, rgba(110,231,208,0.04) 50%, transparent 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 64px 32px 56px;
+  text-align: center;
+}
+
+.hero-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--foreground);
+  margin-bottom: 16px;
+  letter-spacing: -0.03em;
+}
+
+.hero-chapeau {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  margin-bottom: 36px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-anchor {
+  font-size: 0.875rem;
+  padding: 9px 20px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-anchor:hover {
+  background: var(--muted);
+  border-color: rgba(255,255,255,0.15);
+  text-decoration: none;
+  color: var(--foreground);
+}
+.btn-anchor .icon-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-teal { background: var(--accent-teal); }
+.dot-primary { background: var(--primary); }
+
+/* ============================================================
+   MAIN CONTENT AREA (sidebar + content)
+   ============================================================ */
+.content-area {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 32px;
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  flex: 1;
+}
+
+/* ============================================================
+   STICKY SIDEBAR NAV
+   ============================================================ */
+.sidebar-nav {
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 78px; /* header + some offset */
+  padding: 32px 0 48px;
+  align-self: flex-start;
+}
+
+.sidebar-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  padding: 0 8px;
+  margin-bottom: 4px;
+  margin-top: 20px;
+}
+.sidebar-section-label:first-child { margin-top: 0; }
+
+.sidebar-link {
+  display: block;
+  font-size: 0.8375rem;
+  color: var(--muted-foreground);
+  padding: 5px 8px;
+  border-radius: 6px;
+  transition: color 0.13s, background 0.13s;
+  text-decoration: none;
+  margin-bottom: 1px;
+  line-height: 1.4;
+}
+.sidebar-link:hover {
+  color: var(--foreground);
+  background: rgba(255,255,255,0.05);
+  text-decoration: none;
+}
+.sidebar-link.active {
+  color: var(--primary);
+  background: rgba(232,69,122,0.08);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 16px 8px;
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+.main-content {
+  flex: 1;
+  padding: 40px 0 64px;
+  min-width: 0;
+}
+
+/* Section separator */
+.section-separator {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 48px 0;
+}
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.section-heading h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--foreground);
+}
+
+.badge-participant {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(110,231,208,0.12);
+  color: var(--accent-teal);
+  border: 1px solid rgba(110,231,208,0.2);
+  flex-shrink: 0;
+}
+
+.badge-organisateur {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(232,69,122,0.10);
+  color: var(--primary);
+  border: 1px solid rgba(232,69,122,0.2);
+  flex-shrink: 0;
+}
+
+/* Subsections */
+.subsection {
+  margin-bottom: 40px;
+}
+
+.subsection h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.body-text {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--muted-foreground);
+}
+
+.body-text p {
+  margin-bottom: 10px;
+}
+.body-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Bullet list */
+.content-list {
+  list-style: none;
+  margin: 10px 0;
+}
+.content-list li {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+  padding: 3px 0 3px 20px;
+  position: relative;
+}
+.content-list li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 12px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* Numbered steps */
+.steps-list {
+  list-style: none;
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.step-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.step-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.step-text {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+  padding-top: 2px;
+}
+.step-text strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Info / conseil encart */
+.info-block {
+  background: var(--muted);
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 14px 0;
+}
+.info-block p {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.info-block p:last-child { margin-bottom: 0; }
+
+/* Card component */
+.content-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+
+/* Two-column card grid */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.field-card {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.field-card-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  margin-bottom: 10px;
+}
+.field-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.field-item:last-child { margin-bottom: 0; }
+.field-bullet {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--muted-foreground);
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+.field-text {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.field-text strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+/* Radar encart */
+.ai-block {
+  background: linear-gradient(135deg, rgba(232,69,122,0.07) 0%, rgba(110,231,208,0.05) 100%);
+  border: 1px solid rgba(232,69,122,0.18);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.ai-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(232,69,122,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+.ai-content h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 6px;
+}
+.ai-content p {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+}
+
+/* ============================================================
+   FAQ SECTION
+   ============================================================ */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--card);
+  transition: border-color 0.15s;
+}
+
+.faq-item.open {
+  border-color: rgba(232,69,122,0.25);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.faq-question-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+.faq-item.open .faq-question-text {
+  color: var(--primary);
+}
+
+.faq-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+  transition: transform 0.2s;
+}
+.faq-item.open .faq-chevron {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.faq-answer {
+  padding: 0 20px 16px;
+  display: none;
+}
+.faq-item.open .faq-answer {
+  display: block;
+}
+.faq-answer p {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+.faq-answer p + p { margin-top: 8px; }
+
+/* Subtle divider inside faq open item */
+.faq-item.open .faq-question {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   CONTACT SECTION
+   ============================================================ */
+.contact-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 36px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.contact-card-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.contact-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(232,69,122,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 22px;
+}
+.contact-card h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 6px;
+}
+.contact-card .contact-subtitle {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.form-group input,
+.form-group textarea {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: none;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--muted-foreground);
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--primary);
+}
+.contact-submit {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+.btn-submit {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-submit:hover { opacity: 0.9; }
+
+/* ============================================================
+   SITE FOOTER
+   ============================================================ */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px 32px;
+  text-align: center;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.footer-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+.footer-link {
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  text-decoration: none;
+}
+.footer-link:hover {
+  color: var(--foreground);
+  text-decoration: none;
+}
+.footer-sep {
+  color: var(--border);
+  font-size: 0.8rem;
+  user-select: none;
+}
+.footer-copy {
+  font-size: 0.78rem;
+  color: var(--muted-foreground);
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+.subsection-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 32px 0;
+  opacity: 0.6;
+}
+
+/* Strong inside body */
+.body-text strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SITE HEADER
+     ============================================================ -->
+<header class="site-header">
+  <!-- Logo -->
+  <a href="#" class="header-logo">
+    <svg class="logo-icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="logo-gradient" x1="0" y1="0" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e8457a"/>
+          <stop offset="100%" stop-color="#7c3aed"/>
+        </linearGradient>
+      </defs>
+      <polygon points="14,2 26,24 2,24" fill="url(#logo-gradient)" opacity="0.95"/>
+    </svg>
+    <span class="logo-wordmark">the <span class="logo-accent">playground</span></span>
+  </a>
+
+  <!-- Nav -->
+  <nav class="header-nav">
+    <a href="#" class="nav-link">Découvrir</a>
+    <a href="#" class="nav-link">Mon espace</a>
+  </nav>
+
+  <!-- Actions -->
+  <div class="header-actions">
+    <a href="#" class="btn btn-outline-sm">Créer une Communauté</a>
+  </div>
+</header>
+
+<!-- ============================================================
+     PAGE WRAPPER
+     ============================================================ -->
+<div class="page-wrapper">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <h1>Comment ça marche&nbsp;?</h1>
+      <p class="hero-chapeau">
+        The Playground est une plateforme gratuite pour créer et rejoindre des communautés. Organisateurs, gérez vos événements et votre réseau. Participants, découvrez des événements près de chez vous et rejoignez des communautés qui vous ressemblent.
+      </p>
+      <div class="hero-actions">
+        <a href="#participant" class="btn-anchor">
+          <span class="icon-dot dot-teal"></span>
+          Je suis Participant
+        </a>
+        <a href="#organisateur" class="btn-anchor">
+          <span class="icon-dot dot-primary"></span>
+          Je suis Organisateur
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="content-area">
+
+    <!-- SIDEBAR NAV -->
+    <aside class="sidebar-nav">
+      <div class="sidebar-section-label">Participant</div>
+      <a href="#inscription" class="sidebar-link active">S'inscrire à un événement</a>
+      <a href="#rejoindre-communaute" class="sidebar-link">Rejoindre une Communauté</a>
+      <a href="#liste-attente" class="sidebar-link">La liste d'attente</a>
+      <a href="#annuler-inscription" class="sidebar-link">Annuler son inscription</a>
+      <a href="#commentaires" class="sidebar-link">Les commentaires</a>
+      <a href="#mon-espace" class="sidebar-link">Mon espace</a>
+      <a href="#notifications" class="sidebar-link">Gérer ses notifications</a>
+      <a href="#quitter-communaute" class="sidebar-link">Quitter une Communauté</a>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section-label">Organisateur</div>
+      <a href="#creer-communaute" class="sidebar-link">Créer sa Communauté</a>
+      <a href="#creer-evenement" class="sidebar-link">Créer un événement</a>
+      <a href="#gerer-inscriptions" class="sidebar-link">Gérer les inscriptions</a>
+      <a href="#contacter-participants" class="sidebar-link">Contacter les participants</a>
+      <a href="#modifier-annuler" class="sidebar-link">Modifier ou annuler</a>
+      <a href="#radar" class="sidebar-link">Le Radar</a>
+      <a href="#partager" class="sidebar-link">Partager votre événement</a>
+      <a href="#gerer-membres" class="sidebar-link">Gérer les membres</a>
+
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-section-label">FAQ</div>
+      <a href="#faq" class="sidebar-link">Questions fréquentes</a>
+      <a href="#contact" class="sidebar-link">Nous contacter</a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- ========================================================
+           SECTION PARTICIPANT
+           ======================================================== -->
+      <section id="participant">
+        <div class="section-heading">
+          <h2>Pour les Participants</h2>
+          <span class="badge-participant">Participant</span>
+        </div>
+
+        <!-- S'inscrire à un événement -->
+        <div class="subsection" id="inscription">
+          <h3>S'inscrire à un événement</h3>
+          <div class="body-text">
+            <p>La plupart du temps, vous arrivez sur The Playground via un <strong>lien partagé</strong> — par message, sur les réseaux sociaux, ou par email. Ce lien pointe directement vers la page de l'événement.</p>
+            <p>Sur la page de l'événement :</p>
+          </div>
+          <ol class="steps-list">
+            <li class="step-item">
+              <span class="step-number">1</span>
+              <span class="step-text">Lisez les informations : date, lieu, description, nombre de participants</span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">2</span>
+              <span class="step-text">Cliquez sur <strong>S'inscrire</strong></span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">3</span>
+              <span class="step-text">Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google / GitHub) — aucun formulaire à remplir</span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">4</span>
+              <span class="step-text">Une fois inscrit, vous recevez un <strong>email de confirmation</strong> avec les détails et un lien pour ajouter l'événement à votre calendrier (Google Calendar, Apple Calendar, ou fichier .ics)</span>
+            </li>
+          </ol>
+          <div class="info-block">
+            <p>Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Rejoindre une Communauté -->
+        <div class="subsection" id="rejoindre-communaute">
+          <h3>Rejoindre une Communauté</h3>
+          <div class="body-text">
+            <p>Quand vous vous inscrivez à un événement, vous devenez automatiquement membre de sa Communauté. Rien de plus à faire.</p>
+            <p>En tant que membre, vous pouvez :</p>
+          </div>
+          <ul class="content-list">
+            <li>Voir les <strong>prochains événements</strong> de la Communauté</li>
+            <li>Consulter les <strong>événements passés</strong></li>
+            <li>Voir les <strong>autres membres</strong></li>
+            <li>Être notifié des nouveaux événements par email (selon vos préférences)</li>
+          </ul>
+          <div class="body-text" style="margin-top: 10px;">
+            <p>Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Liste d'attente -->
+        <div class="subsection" id="liste-attente">
+          <h3>La liste d'attente</h3>
+          <div class="body-text">
+            <p>Si un événement affiche <strong>complet</strong>, vous pouvez rejoindre la liste d'attente. Si une place se libère (suite à une annulation), vous êtes automatiquement inscrit et recevez un email de confirmation.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Annuler son inscription -->
+        <div class="subsection" id="annuler-inscription">
+          <h3>Annuler son inscription</h3>
+          <div class="body-text">
+            <p>Depuis <strong>Mon espace</strong> :</p>
+          </div>
+          <ol class="steps-list">
+            <li class="step-item">
+              <span class="step-number">1</span>
+              <span class="step-text">Allez sur l'événement concerné</span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">2</span>
+              <span class="step-text">Cliquez sur <strong>Annuler mon inscription</strong></span>
+            </li>
+          </ol>
+          <div class="body-text" style="margin-top: 10px;">
+            <p>Si vous étiez sur liste d'attente, votre place est simplement supprimée.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Les commentaires -->
+        <div class="subsection" id="commentaires">
+          <h3>Les commentaires</h3>
+          <div class="body-text">
+            <p>Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'Organisateur.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Mon espace -->
+        <div class="subsection" id="mon-espace">
+          <h3>Mon espace</h3>
+          <div class="body-text">
+            <p><strong>Mon espace</strong> est votre tableau de bord personnel. Vous y retrouvez :</p>
+          </div>
+          <ul class="content-list">
+            <li>Vos <strong>prochains événements</strong> (ceux auxquels vous êtes inscrit)</li>
+            <li>Vos <strong>événements passés</strong></li>
+            <li>Les <strong>Communautés</strong> dont vous êtes membre</li>
+            <li>Votre <strong>profil</strong> (nom, avatar, préférences de notifications)</li>
+          </ul>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Notifications -->
+        <div class="subsection" id="notifications">
+          <h3>Gérer ses notifications</h3>
+          <div class="body-text">
+            <p>Dans votre profil (<strong>Mon espace → Profil</strong>), vous pouvez activer ou désactiver les emails :</p>
+          </div>
+          <ul class="content-list">
+            <li>Confirmation d'inscription</li>
+            <li>Rappels avant l'événement</li>
+            <li>Modifications ou annulation d'événement</li>
+            <li>Nouveaux événements dans vos Communautés</li>
+          </ul>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Quitter une Communauté -->
+        <div class="subsection" id="quitter-communaute">
+          <h3>Quitter une Communauté</h3>
+          <div class="body-text">
+            <p>Depuis la page d'une Communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la Communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-separator">
+
+      <!-- ========================================================
+           SECTION ORGANISATEUR
+           ======================================================== -->
+      <section id="organisateur">
+        <div class="section-heading">
+          <h2>Pour les Organisateurs</h2>
+          <span class="badge-organisateur">Organisateur</span>
+        </div>
+
+        <!-- Créer sa Communauté -->
+        <div class="subsection" id="creer-communaute">
+          <h3>Créer sa Communauté</h3>
+          <div class="body-text">
+            <p>La Communauté est votre espace central sur The Playground. C'est depuis là que vous gérez vos événements et votre réseau.</p>
+            <p>Pour créer votre Communauté :</p>
+          </div>
+          <ol class="steps-list">
+            <li class="step-item">
+              <span class="step-number">1</span>
+              <span class="step-text">Connectez-vous et accédez à <strong>Mon espace</strong></span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">2</span>
+              <span class="step-text">Cliquez sur <strong>Créer une Communauté</strong></span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">3</span>
+              <span class="step-text">Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)</span>
+            </li>
+            <li class="step-item">
+              <span class="step-number">4</span>
+              <span class="step-text">Ajoutez une image de couverture (optionnel mais recommandé)</span>
+            </li>
+          </ol>
+          <div class="info-block">
+            <p>Une Communauté publique apparaît dans <strong>Découvrir</strong> et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Créer un événement -->
+        <div class="subsection" id="creer-evenement">
+          <h3>Créer un événement</h3>
+          <div class="body-text">
+            <p>Depuis votre Communauté, cliquez sur <strong>Créer un événement</strong>.</p>
+          </div>
+          <div class="two-col-grid">
+            <div class="field-card">
+              <div class="field-card-label">Champs essentiels</div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Titre</strong> — court et clair</span>
+              </div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Date et heure</strong> — début et fin</span>
+              </div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Lieu</strong> — adresse avec autocomplétion ou "En ligne" + lien</span>
+              </div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Description</strong> — contexte, programme, infos pratiques</span>
+              </div>
+            </div>
+            <div class="field-card">
+              <div class="field-card-label">Options avancées</div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Capacité</strong> — active la liste d'attente automatiquement</span>
+              </div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Prix</strong> — paiement Stripe, sans commission plateforme</span>
+              </div>
+              <div class="field-item">
+                <div class="field-bullet"></div>
+                <span class="field-text"><strong>Image de couverture</strong></span>
+              </div>
+            </div>
+          </div>
+          <div class="info-block" style="margin-top: 14px;">
+            <p>Un bon titre et une bonne description suffisent pour un événement réussi. Les participants voient cette page en premier — soignez-la.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Gérer les inscriptions -->
+        <div class="subsection" id="gerer-inscriptions">
+          <h3>Gérer les inscriptions</h3>
+          <div class="body-text">
+            <p>Depuis le tableau de bord de votre événement, vous accédez à :</p>
+          </div>
+          <ul class="content-list">
+            <li>La <strong>liste des inscrits</strong> (avec leurs noms, emails, et statut)</li>
+            <li>La <strong>liste d'attente</strong></li>
+            <li>La possibilité de <strong>cocher les présents</strong> (check-in) le jour J</li>
+            <li>L'<strong>export CSV</strong> de la liste complète</li>
+          </ul>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Contacter vos participants -->
+        <div class="subsection" id="contacter-participants">
+          <h3>Contacter vos participants</h3>
+          <div class="body-text">
+            <p>Depuis le tableau de bord de l'événement, le bouton <strong>Envoyer un message</strong> vous permet d'envoyer un email à l'ensemble des inscrits actifs. Utile pour partager des informations de dernière minute, le programme détaillé, ou un lien de connexion.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Modifier ou annuler -->
+        <div class="subsection" id="modifier-annuler">
+          <h3>Modifier ou annuler un événement</h3>
+          <div class="body-text">
+            <p>Depuis le tableau de bord de l'événement :</p>
+          </div>
+          <ul class="content-list">
+            <li><strong>Modifier</strong> — modifiez les informations à tout moment. Les participants inscrits sont notifiés par email si des informations clés changent.</li>
+            <li><strong>Annuler</strong> — annulez l'événement. Tous les participants reçoivent un email d'annulation.</li>
+          </ul>
+          <div class="info-block">
+            <p>Un événement annulé ne peut pas être réactivé. Si vous souhaitez simplement le reporter, modifiez la date plutôt que d'annuler.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Le Radar -->
+        <div class="subsection" id="radar">
+          <h3>Le Radar — trouver l'inspiration</h3>
+          <div class="ai-block">
+            <div class="ai-icon">📡</div>
+            <div class="ai-content">
+              <h3>Analyses de tendances par IA</h3>
+              <p>Le <strong>Radar</strong> est un outil IA disponible dans le formulaire de création d'événement. Il analyse les tendances et événements similaires dans votre ville pour vous aider à trouver le bon sujet, le bon créneau, ou la bonne approche. Vous avez <strong>25 analyses par jour</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Partager votre événement -->
+        <div class="subsection" id="partager">
+          <h3>Partager votre événement</h3>
+          <div class="body-text">
+            <p>Chaque événement dispose d'une <strong>URL unique</strong> (format <code style="font-family: monospace; font-size: 0.82em; background: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; color: var(--accent-teal);">the-playground.fr/m/votre-evenement</code>). Copiez ce lien depuis le tableau de bord de l'événement et partagez-le directement — via WhatsApp, Instagram, email, ou newsletter. Aucune installation ni compte préalable n'est requis pour les participants.</p>
+          </div>
+        </div>
+
+        <hr class="subsection-divider">
+
+        <!-- Gérer les membres -->
+        <div class="subsection" id="gerer-membres">
+          <h3>Gérer les membres de votre Communauté</h3>
+          <div class="body-text">
+            <p>Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Vous pouvez supprimer un membre si nécessaire.</p>
+            <p>Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements.</p>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-separator">
+
+      <!-- ========================================================
+           SECTION FAQ
+           ======================================================== -->
+      <section id="faq">
+        <div class="section-heading">
+          <h2>Questions fréquentes</h2>
+        </div>
+
+        <div class="faq-list">
+
+          <!-- Open item 1 -->
+          <div class="faq-item open">
+            <div class="faq-question">
+              <span class="faq-question-text">The Playground est-il gratuit ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9&nbsp;% + 0,30&nbsp;€) sur les événements payants, prélevés directement par Stripe.</p>
+            </div>
+          </div>
+
+          <!-- Open item 2 -->
+          <div class="faq-item open">
+            <div class="faq-question">
+              <span class="faq-question-text">Quelle est la différence entre une Communauté publique et privée ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Une Communauté publique est visible dans <strong>Découvrir</strong> et accessible à tous. Une Communauté privée n'est accessible que via un lien direct — elle n'apparaît pas dans l'annuaire.</p>
+            </div>
+          </div>
+
+          <!-- Open item 3 -->
+          <div class="faq-item open">
+            <div class="faq-question">
+              <span class="faq-question-text">Puis-je organiser des événements sans créer de Communauté ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Non. La Communauté est l'espace central de The Playground. Chaque événement appartient à une Communauté. Créer une Communauté ne prend que quelques minutes.</p>
+            </div>
+          </div>
+
+          <!-- Closed item 4 -->
+          <div class="faq-item">
+            <div class="faq-question">
+              <span class="faq-question-text">Que se passe-t-il si un événement est complet ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Vous pouvez rejoindre la liste d'attente. Si une place se libère, vous êtes automatiquement inscrit et notifié par email.</p>
+            </div>
+          </div>
+
+          <!-- Closed item 5 -->
+          <div class="faq-item">
+            <div class="faq-question">
+              <span class="faq-question-text">Les participants ont-ils besoin d'un compte pour s'inscrire ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Ils doivent créer un compte, mais le processus est très rapide : un email suffit (lien magique, sans mot de passe), ou une connexion Google / GitHub. Aucun formulaire long.</p>
+            </div>
+          </div>
+
+          <!-- Closed item 6 -->
+          <div class="faq-item">
+            <div class="faq-question">
+              <span class="faq-question-text">Comment récupérer mes données ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Depuis <strong>Mon espace → Profil</strong>, les Organisateurs peuvent exporter leurs données. Pour toute demande spécifique (RGPD, suppression de compte), contactez-nous.</p>
+            </div>
+          </div>
+
+          <!-- Closed item 7 -->
+          <div class="faq-item">
+            <div class="faq-question">
+              <span class="faq-question-text">Comment signaler un contenu inapproprié ?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>Utilisez le lien <strong>Signaler</strong> présent sur les pages d'événements et de Communautés, ou contactez-nous directement par email.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <hr class="section-separator">
+
+      <!-- ========================================================
+           SECTION CONTACT
+           ======================================================== -->
+      <section id="contact" style="padding-bottom: 16px;">
+        <div class="contact-card">
+          <div class="contact-card-header">
+            <div class="contact-card-icon">✉️</div>
+            <h3>Une question non couverte ici ?</h3>
+            <p class="contact-subtitle">Notre équipe vous répond dans les meilleurs délais — question sur la plateforme, signalement de contenu, ou rapport de bug.</p>
+          </div>
+          <form class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" placeholder="Votre nom" />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" placeholder="vous@exemple.fr" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea rows="5" placeholder="Décrivez votre question ou votre problème…"></textarea>
+            </div>
+            <div class="contact-submit">
+              <button type="submit" class="btn-submit">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ============================================================
+       SITE FOOTER
+       ============================================================ -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <nav class="footer-links">
+        <span class="footer-copy">© 2026 The Spark</span>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">À propos</a>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">Changelog</a>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">Aide</a>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">Mentions légales</a>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">Confidentialité</a>
+        <span class="footer-sep">·</span>
+        <a href="#" class="footer-link">CGU</a>
+      </nav>
+    </div>
+  </footer>
+
+</div>
+<!-- end .page-wrapper -->
+
+</body>
+</html>

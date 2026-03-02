@@ -19,16 +19,7 @@ export async function SiteFooter() {
             <span className="text-[13px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
           </Link>
           <span className="text-muted-foreground text-xs">
-            © 2026{" "}
-            <a
-              href="http://thespark.fr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
-            >
-              The Spark
-            </a>
-            . {t("brand.allRightsReserved")} · v{version}
+            © 2026 · v{version}
           </span>
         </div>
 
@@ -36,6 +27,9 @@ export async function SiteFooter() {
         <nav className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
           <Link href="/about" className="hover:text-foreground transition-colors">
             {t("product.about")}
+          </Link>
+          <Link href="/help" className="hover:text-foreground transition-colors">
+            {t("product.help")}
           </Link>
           <Link href="/changelog" className="hover:text-foreground transition-colors">
             {t("product.changelog")}
