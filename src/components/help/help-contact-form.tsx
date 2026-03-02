@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,21 @@ type FormState = "idle" | "sending" | "success" | "error";
 
 export function HelpContactForm({ strings }: HelpContactFormProps) {
   const [state, setState] = useState<FormState>("idle");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Honeypot ajouté dynamiquement via JS — le navigateur ne peut pas l'autofiller
+  // car il n'existe pas dans le HTML rendu côté serveur
+  useEffect(() => {
+    if (!formRef.current) return;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = "_info";
+    input.setAttribute("aria-hidden", "true");
+    input.tabIndex = -1;
+    input.style.cssText =
+      "position:absolute;left:-9999px;top:-9999px;opacity:0;pointer-events:none";
+    formRef.current.appendChild(input);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -44,16 +59,7 @@ export function HelpContactForm({ strings }: HelpContactFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Honeypot — invisible pour les humains, les bots le remplissent */}
-      <input
-        type="text"
-        name="_info"
-        aria-hidden="true"
-        tabIndex={-1}
-        autoComplete="new-password"
-        style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, pointerEvents: "none" }}
-      />
+    <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="contact-name">{strings.nameLabel}</Label>
