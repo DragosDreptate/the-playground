@@ -53,8 +53,11 @@ export type CircleFollowerInfo = {
 
 export interface CircleRepository {
   create(input: CreateCircleInput): Promise<Circle>;
-  /** Crée un Circle et ajoute le créateur comme HOST en une seule transaction atomique. */
-  createWithHostMembership(input: CreateCircleInput, userId: string): Promise<Circle>;
+  /**
+   * Crée un Circle et sa CircleMembership HOST dans une seule transaction atomique.
+   * Garantit qu'un Circle ne peut pas exister sans Organisateur.
+   */
+  createWithHostMembership(input: CreateCircleInput, hostUserId: string): Promise<Circle>;
   findById(id: string): Promise<Circle | null>;
   findBySlug(slug: string): Promise<Circle | null>;
   findByUserId(userId: string, role: CircleMemberRole): Promise<Circle[]>;

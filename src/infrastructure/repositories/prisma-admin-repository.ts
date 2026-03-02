@@ -180,7 +180,7 @@ export const prismaAdminRepository: AdminRepository = {
       if (hostMemberships.length > 0) {
         const circleIds = hostMemberships.map((m) => m.circleId);
 
-        // Compter les co-Hosts restants pour chaque Circle en une seule requête GROUP BY
+        // Une seule requête GROUP BY pour compter les autres Hosts (évite le N+1)
         const otherHostCounts = await tx.circleMembership.groupBy({
           by: ["circleId"],
           where: { circleId: { in: circleIds }, role: "HOST", userId: { not: id } },
@@ -190,12 +190,14 @@ export const prismaAdminRepository: AdminRepository = {
           otherHostCounts.map((r) => [r.circleId, r._count._all])
         );
 
-        // Sole Host → delete the entire Circle (cascades to Moments, Registrations, Comments, Memberships)
-        const circleIdsToDelete = circleIds.filter(
+        // Supprimer uniquement les Circles sans autre Host
+        const circlesWithNoOtherHost = circleIds.filter(
           (cid) => (otherHostCountMap.get(cid) ?? 0) === 0
         );
-        for (const circleId of circleIdsToDelete) {
-          await tx.circle.delete({ where: { id: circleId } });
+        if (circlesWithNoOtherHost.length > 0) {
+          await tx.circle.deleteMany({
+            where: { id: { in: circlesWithNoOtherHost } },
+          });
         }
       }
 
@@ -335,7 +337,7 @@ export const prismaAdminRepository: AdminRepository = {
             user: { select: { id: true, email: true, firstName: true, lastName: true } },
           },
           orderBy: { registeredAt: "desc" },
-          // Limite à 500 inscriptions pour éviter le sur-fetching sur les événements populaires
+          // Limite de sécurité pour les pages admin — un Moment avec +1000 inscrits resterait gérable
           take: 500,
         },
       },

@@ -215,16 +215,10 @@ async function sendRegistrationEmails(
   });
 
   // Send notification to each Host of the Circle (skip if host = player)
-  const hosts = await prismaCircleRepository.findMembersByRole(
-    moment.circleId,
-    "HOST"
-  );
-
-  const registeredCount =
-    await prismaRegistrationRepository.countByMomentIdAndStatus(
-      momentId,
-      "REGISTERED"
-    );
+  const [hosts, registeredCount] = await Promise.all([
+    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaRegistrationRepository.countByMomentIdAndStatus(momentId, "REGISTERED"),
+  ]);
 
   const registrationInfo = moment.capacity
     ? t("hostNotification.registrationInfo", {
@@ -235,7 +229,7 @@ async function sendRegistrationEmails(
         count: registeredCount,
       });
 
-  // Récupère toutes les préférences en une seule requête pour éviter le N+1
+  // Récupère les préférences de tous les Hosts en une seule requête pour éviter le N+1
   const filteredHosts = hosts.filter((host) => host.userId !== userId);
   const hostUserIds = filteredHosts.map((h) => h.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);

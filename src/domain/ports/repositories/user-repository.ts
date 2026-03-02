@@ -14,7 +14,10 @@ export interface UserRepository {
   updateProfile(id: string, input: UpdateProfileInput): Promise<User>;
   delete(id: string): Promise<void>;
   getNotificationPreferences(userId: string): Promise<NotificationPreferences>;
-  /** Récupère les préférences de notification pour plusieurs utilisateurs en une seule requête (évite le N+1). */
+  /**
+   * Récupère les préférences de notification de plusieurs utilisateurs en une seule requête.
+   * Évite le N+1 lors de l'envoi de notifications à plusieurs Hosts.
+   */
   findNotificationPreferencesByIds(userIds: string[]): Promise<Map<string, NotificationPreferences>>;
   updateNotificationPreferences(
     userId: string,

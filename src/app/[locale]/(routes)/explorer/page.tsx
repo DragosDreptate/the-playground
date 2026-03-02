@@ -1,11 +1,13 @@
 import { getTranslations } from "next-intl/server";
-
-export const revalidate = 300;
 import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
+
+// Revalide toutes les 5 minutes — la page Découvrir ne nécessite pas un temps réel strict.
+// Les filtres par catégorie + onglets sont gérés côté SSR via searchParams.
+export const revalidate = 300;
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";

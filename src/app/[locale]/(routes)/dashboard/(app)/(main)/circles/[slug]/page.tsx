@@ -95,6 +95,7 @@ export default async function CircleDetailPage({
   const [hosts, players, allMoments] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
+    // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
     getCircleMoments(
       circle.id,
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },

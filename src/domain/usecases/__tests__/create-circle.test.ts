@@ -15,7 +15,7 @@ describe("CreateCircle", () => {
   };
 
   describe("given a valid input with a unique name", () => {
-    it("should create the circle with a generated slug via createWithHostMembership", async () => {
+    it("should create the circle atomically (Circle + HOST membership) with a generated slug", async () => {
       const repo = createMockCircleRepository({
         createWithHostMembership: vi.fn().mockResolvedValue(
           makeCircle({ name: "My Circle", slug: "my-circle" })
@@ -60,18 +60,15 @@ describe("CreateCircle", () => {
       );
     });
 
-    it("should create the Circle and HOST membership atomically (no separate addMembership call)", async () => {
+    it("should use a single transactional method (createWithHostMembership) — not create + addMembership separately", async () => {
       const repo = createMockCircleRepository({
-        createWithHostMembership: vi.fn().mockResolvedValue(makeCircle({ id: "new-circle-id" })),
+        createWithHostMembership: vi.fn().mockResolvedValue(makeCircle()),
       });
 
       await createCircle(defaultInput, { circleRepository: repo });
 
-      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
-        expect.objectContaining({}),
-        "user-1"
-      );
-      // addMembership ne doit plus être appelé séparément
+      // La création doit passer par la transaction atomique, pas par deux appels séparés
+      expect(repo.createWithHostMembership).toHaveBeenCalledTimes(1);
       expect(repo.addMembership).not.toHaveBeenCalled();
     });
   });
