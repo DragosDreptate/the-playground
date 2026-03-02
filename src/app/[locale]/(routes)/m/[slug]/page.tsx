@@ -18,6 +18,7 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
+import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 
 // Deduplicate DB calls between generateMetadata and the page
@@ -154,6 +155,13 @@ export default async function PublicMomentPage({
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
+      <MomentViewTracker
+        momentId={moment.id}
+        momentSlug={moment.slug}
+        circleId={moment.circleId}
+        circleName={circle.name}
+        status={moment.status}
+      />
       <MomentDetailView
         variant="public"
         moment={moment}

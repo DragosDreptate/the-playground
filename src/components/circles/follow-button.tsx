@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import posthog from "posthog-js";
 import { Bell, BellOff, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ export function FollowButton({ circleId, initialFollowing }: Props) {
         setFollowing(false);
       } else {
         await followCircleAction(circleId);
+        posthog.capture("circle_followed", { circle_id: circleId });
         setFollowing(true);
       }
     });

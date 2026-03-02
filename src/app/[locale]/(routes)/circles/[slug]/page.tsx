@@ -9,6 +9,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleNotFoundError } from "@/domain/errors";
+import { CircleViewTracker } from "@/components/circles/circle-view-tracker";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -165,6 +166,13 @@ export default async function PublicCirclePage({
 
   return (
     <div className="space-y-8">
+      <CircleViewTracker
+        circleId={circle.id}
+        circleSlug={circle.slug}
+        circleName={circle.name}
+        visibility={circle.visibility}
+        memberCount={memberCount}
+      />
       {/* Breadcrumb */}
       <div className="text-muted-foreground flex items-center gap-1 text-sm">
         <Link href="/explorer" className="hover:text-foreground transition-colors">

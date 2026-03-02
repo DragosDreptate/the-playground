@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, MapPin, Globe, Lock, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -83,6 +84,12 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     const result = await action(formData);
 
     if (result.success) {
+      posthog.capture("circle_created", {
+        circle_id: result.data.id,
+        circle_slug: result.data.slug,
+        visibility: result.data.visibility,
+        is_edit: !!circle,
+      });
       router.push(`/dashboard/circles/${result.data.slug}`);
       return {};
     }

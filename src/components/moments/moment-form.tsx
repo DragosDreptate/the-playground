@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -124,6 +125,15 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     const result = await action(formData);
 
     if (result.success) {
+      posthog.capture("moment_created", {
+        moment_id: result.data.id,
+        moment_slug: result.data.slug,
+        circle_slug: circleSlug,
+        is_edit: !!moment,
+        location_type: result.data.locationType,
+        has_capacity: result.data.capacity !== null,
+        is_paid: result.data.price > 0,
+      });
       router.push(
         `/dashboard/circles/${circleSlug}/moments/${result.data.slug}`
       );

@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { EventResult } from "@/lib/events-radar";
+import posthog from "posthog-js";
 
 // --- Types SSE ---
 
@@ -259,6 +260,10 @@ export function MomentFormRadar({
     const ctrl = new AbortController();
     abortRef.current = ctrl;
 
+    let localEvents: EventResult[] = [];
+    let localCity: string | null = null;
+    let localTargetDate: string | null = null;
+
     try {
       const res = await fetch("/api/moments/radar", {
         method: "POST",
@@ -295,11 +300,14 @@ export function MomentFormRadar({
           try {
             const msg = JSON.parse(line.slice(6)) as RadarSSEEvent;
             if (msg.type === "keywords") {
+              localCity = msg.city;
               if (!kw) setKeywords(msg.keywords);
               setCity(msg.city);
               if (msg.city) setLastCity(msg.city);
               if (!kw && msg.keywords.length > 0) setLastKeywords(msg.keywords);
             } else if (msg.type === "events") {
+              localEvents = msg.events;
+              localTargetDate = msg.targetDate;
               setEvents(msg.events);
               setTargetDate(msg.targetDate);
             } else if (msg.type === "error_no_city") {
@@ -310,6 +318,14 @@ export function MomentFormRadar({
               setError(msg.message);
             } else if (msg.type === "done") {
               setLoading(false);
+              posthog.capture("radar_searched", {
+                city: localCity,
+                events_found: localEvents.length,
+                target_date: localTargetDate,
+                day_events_count: localTargetDate
+                  ? localEvents.filter((e) => e.date === localTargetDate).length
+                  : 0,
+              });
             }
           } catch { /* ignore parse error */ }
         }

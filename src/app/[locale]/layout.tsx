@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { PostHogIdentity } from "@/components/providers/posthog-identity";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "sonner";
@@ -90,7 +92,12 @@ export default async function LocaleLayout({
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SessionProvider>
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <PostHogProvider>
+              <NextIntlClientProvider>
+                <PostHogIdentity />
+                {children}
+              </NextIntlClientProvider>
+            </PostHogProvider>
           </SessionProvider>
         </ThemeProvider>
         <Toaster richColors position="bottom-right" />

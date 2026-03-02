@@ -41,7 +41,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
       "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
-      // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API
+      // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API + PostHog (tunnel via /ingest)
       "connect-src 'self' *.sentry.io api.stripe.com api-adresse.data.gouv.fr",
       // Service Worker PWA
       "worker-src 'self'",
@@ -61,6 +61,18 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "4mb",
     },
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://eu-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://eu.i.posthog.com/:path*",
+      },
+    ];
   },
   images: {
     remotePatterns: [
