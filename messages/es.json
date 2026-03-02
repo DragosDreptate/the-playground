@@ -855,5 +855,208 @@
       "newMomentInCircleDesc": "Cuando se crea un evento en una Comunidad que sigues",
       "saved": "Preferencias guardadas"
     }
+  },
+  "Help": {
+    "meta": {
+      "title": "Help · The Playground",
+      "description": "Everything you need to know to use The Playground — registration, community creation, event management and more."
+    },
+    "hero": {
+      "title": "How does it work?",
+      "subtitle": "The Playground is a free platform to create and join communities. Organizers, manage your events and your network. Members, discover events near you and join communities that match your interests.",
+      "ctaParticipant": "I'm a Member",
+      "ctaOrganizer": "I'm an Organizer"
+    },
+    "sidebar": {
+      "participant": "Member",
+      "organizer": "Organizer",
+      "faqLabel": "FAQ",
+      "contactLabel": "Contact",
+      "inscription": "Join an event",
+      "rejoindre": "Join a Community",
+      "waitlist": "Waitlist",
+      "cancel": "Cancel registration",
+      "comments": "Comments",
+      "mySpace": "My Dashboard",
+      "notifications": "Manage notifications",
+      "leave": "Leave a Community",
+      "createCommunity": "Create your Community",
+      "createEvent": "Create an event",
+      "manageRegistrations": "Manage registrations",
+      "contact": "Contact your members",
+      "editCancel": "Edit or cancel",
+      "radar": "The Radar",
+      "share": "Share your event",
+      "members": "Manage members"
+    },
+    "participant": {
+      "sectionTitle": "Member",
+      "badge": "Member",
+      "inscription": {
+        "title": "Join an event",
+        "intro": "Most of the time, you arrive on The Playground via a <strong>shared link</strong> — via message, social media, or email. This link points directly to the event page.",
+        "stepsLabel": "On the event page:",
+        "step1": "Read the details: date, location, description, number of attendees",
+        "step2": "Click <strong>Join</strong>",
+        "step3": "If you don't have an account yet, you can sign in in seconds (magic link by email or via Google / GitHub) — no form to fill out",
+        "step4": "Once registered, you receive a <strong>confirmation email</strong> with the details and a link to add the event to your calendar (Google Calendar, Apple Calendar, or .ics file)",
+        "callout": "No prior account is needed to view an event page. Registration takes less than a minute."
+      },
+      "join": {
+        "title": "Join a Community",
+        "intro": "When you register for an event, you automatically become a member of its Community. Nothing else to do.",
+        "memberLabel": "As a member, you can:",
+        "item1": "See <strong>upcoming events</strong> from the Community",
+        "item2": "Browse <strong>past events</strong>",
+        "item3": "See <strong>other members</strong>",
+        "item4": "Be notified of new events by email (based on your preferences)",
+        "outro": "You can also join a Community without registering for an event, from the <strong>Explore</strong> page or from a Community page."
+      },
+      "waitlist": {
+        "title": "Waitlist",
+        "intro": "If an event shows as <strong>full</strong>, you can join the waitlist. If a spot opens up (after a cancellation), you are automatically registered and receive a confirmation email."
+      },
+      "cancel": {
+        "title": "Cancel your registration",
+        "stepsLabel": "From <strong>Dashboard</strong>:",
+        "step1": "Go to the event in question",
+        "step2": "Click <strong>Cancel my registration</strong>",
+        "outro": "If you were on the waitlist, your spot is simply removed."
+      },
+      "comments": {
+        "title": "Comments",
+        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the Organizer."
+      },
+      "mySpace": {
+        "title": "My Dashboard",
+        "intro": "<strong>Dashboard</strong> is your personal hub. You'll find there:",
+        "item1": "Your <strong>upcoming events</strong> (those you're registered for)",
+        "item2": "Your <strong>past events</strong>",
+        "item3": "The <strong>Communities</strong> you belong to",
+        "item4": "Your <strong>profile</strong> (name, avatar, notification preferences)"
+      },
+      "notifications": {
+        "title": "Manage notifications",
+        "intro": "In your profile (<strong>Dashboard → Profile</strong>), you can enable or disable emails:",
+        "item1": "Registration confirmation",
+        "item2": "Event reminders",
+        "item3": "Event changes or cancellations",
+        "item4": "New events in your Communities"
+      },
+      "leave": {
+        "title": "Leave a Community",
+        "intro": "From a Community page in <strong>Dashboard</strong>, click <strong>Leave Community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed."
+      }
+    },
+    "organizer": {
+      "sectionTitle": "Organizer",
+      "badge": "Organizer",
+      "createCommunity": {
+        "title": "Create your Community",
+        "intro": "Your Community is your central space on The Playground. It's from here that you manage your events and your network.",
+        "stepsLabel": "To create your Community:",
+        "step1": "Sign in and go to <strong>Dashboard</strong>",
+        "step2": "Click <strong>Create a Community</strong>",
+        "step3": "Fill in: name, description, topic, city, visibility (public or private)",
+        "step4": "Add a cover image (optional but recommended)",
+        "callout": "A public Community appears in <strong>Explore</strong> and is accessible to everyone. A private Community is only accessible via direct link."
+      },
+      "createEvent": {
+        "title": "Create an event",
+        "intro": "From your Community, click <strong>Create an event</strong>.",
+        "essentialLabel": "Essential fields:",
+        "field1Title": "Title",
+        "field1Desc": "short and clear",
+        "field2Title": "Date and time",
+        "field2Desc": "start and end",
+        "field3Title": "Location",
+        "field3Desc": "address (with autocomplete) or \"Online\" + connection link",
+        "field4Title": "Description",
+        "field4Desc": "context, agenda, what attendees need to know",
+        "advancedLabel": "Advanced options (accessible via \"More options\"):",
+        "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist)",
+        "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
+        "adv3": "<strong>Cover image</strong>",
+        "callout": "Tip: a good title and description are enough for a successful event. Attendees see this page first — make it count."
+      },
+      "manageRegistrations": {
+        "title": "Manage registrations",
+        "intro": "From the event dashboard, you can access:",
+        "item1": "The <strong>registrant list</strong> (with names, emails, and status)",
+        "item2": "The <strong>waitlist</strong>",
+        "item3": "The ability to <strong>check in</strong> attendees on the day",
+        "item4": "<strong>CSV export</strong> of the full list"
+      },
+      "contact": {
+        "title": "Contact your members",
+        "intro": "From the event dashboard, the <strong>Send a message</strong> button lets you send an email to all active registrants. Useful for sharing last-minute information, the detailed agenda, or a connection link."
+      },
+      "editCancel": {
+        "title": "Edit or cancel an event",
+        "intro": "From the event dashboard:",
+        "item1": "<strong>Edit</strong> — update information at any time. Registered attendees are notified by email if key details change.",
+        "item2": "<strong>Cancel</strong> — cancel the event. All attendees receive a cancellation email.",
+        "callout": "A cancelled event cannot be reactivated. If you simply want to reschedule, edit the date rather than cancelling."
+      },
+      "radar": {
+        "title": "The Radar — find inspiration",
+        "intro": "The <strong>Radar</strong> is an AI tool available in the event creation form. It analyzes trends and similar events in your city to help you find the right topic, timing, or approach.",
+        "limit": "You have <strong>25 analyses per day</strong>."
+      },
+      "share": {
+        "title": "Share your event",
+        "intro": "Every event has a <strong>unique URL</strong> (format <code>the-playground.fr/m/your-event</code>). Copy this link from the event dashboard and share it directly — via WhatsApp, Instagram, email, or newsletter. No installation or prior account is required for attendees."
+      },
+      "members": {
+        "title": "Manage Community members",
+        "intro": "From your Community page, you can see the full member list with their emails. You can remove a member if needed.",
+        "outro": "Members automatically join your Community when they register for one of your events."
+      }
+    },
+    "faq": {
+      "sectionTitle": "Frequently asked questions",
+      "q1": {
+        "question": "Is The Playground free?",
+        "answer": "Yes, completely free for Organizers and Members. The Playground takes no commission. The only applicable fees are Stripe fees (~2.9% + $0.30) on paid events, charged directly by Stripe."
+      },
+      "q2": {
+        "question": "What's the difference between a public and private Community?",
+        "answer": "A public Community is visible in Explore and accessible to everyone. A private Community is only accessible via a direct link — it doesn't appear in the directory."
+      },
+      "q3": {
+        "question": "Can I organize events without creating a Community?",
+        "answer": "No. The Community is the central space on The Playground. Every event belongs to a Community. Creating a Community only takes a few minutes."
+      },
+      "q4": {
+        "question": "What happens if an event is full?",
+        "answer": "You can join the waitlist. If a spot opens up, you are automatically registered and notified by email."
+      },
+      "q5": {
+        "question": "Do attendees need an account to register?",
+        "answer": "They need to create an account, but the process is very quick: an email is enough (magic link, no password), or sign in with Google / GitHub. No long forms."
+      },
+      "q6": {
+        "question": "How do I get my data back?",
+        "answer": "From Dashboard → Profile, Organizers can export their data. For any specific request (GDPR, account deletion), contact us."
+      },
+      "q7": {
+        "question": "How do I report inappropriate content?",
+        "answer": "Use the Report link on event and Community pages, or contact us directly by email."
+      }
+    },
+    "contact": {
+      "title": "A question?",
+      "subtitle": "Our team will get back to you as soon as possible.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Describe your question or issue...",
+      "submit": "Send",
+      "sending": "Sending...",
+      "success": "Message sent! We'll get back to you as soon as possible.",
+      "error": "An error occurred. Please try again or contact us directly at hello@the-playground.fr"
+    }
   }
 }
