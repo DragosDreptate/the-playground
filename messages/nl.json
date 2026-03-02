@@ -222,6 +222,13 @@
       "manageCircle": "Beheer deze Community",
       "shareableLink": "Deelbare link"
     },
+    "removeMember": {
+      "action": "Verwijderen uit Community",
+      "title": "{name} verwijderen?",
+      "description": "{name} verliest toegang tot deze Community. Hun inschrijvingen voor aankomende evenementen worden automatisch geannuleerd.",
+      "confirm": "Verwijderen",
+      "cancel": "Annuleren"
+    },
     "errors": {
       "notFound": "Community niet gevonden",
       "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren",

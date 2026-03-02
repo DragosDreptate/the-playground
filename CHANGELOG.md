@@ -8,6 +8,10 @@ Les évolutions du Playground, jour après jour.
 
 ## [Unreleased]
 
+### Ajouté
+
+- **Retirer un membre** : l'Organisateur peut retirer un Participant de sa Communauté depuis la liste des membres — bouton ⋮ par ligne Participant, dropdown, AlertDialog de confirmation
+
 ---
 
 ## [1.9.0] — 2026-03-02 — Broadcast, Radar amélioré & page Communauté
