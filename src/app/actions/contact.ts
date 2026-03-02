@@ -7,7 +7,7 @@ export async function sendContactMessageAction(
   formData: FormData
 ): Promise<ActionResult<void>> {
   // Honeypot : un bot remplit ce champ, un humain ne le voit pas
-  const honeypot = (formData.get("website") as string | null) ?? "";
+  const honeypot = (formData.get("_info") as string | null) ?? "";
   if (honeypot) {
     return { success: true, data: undefined };
   }

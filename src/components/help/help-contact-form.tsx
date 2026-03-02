@@ -48,11 +48,11 @@ export function HelpContactForm({ strings }: HelpContactFormProps) {
       {/* Honeypot — invisible pour les humains, les bots le remplissent */}
       <input
         type="text"
-        name="website"
+        name="_info"
         aria-hidden="true"
         tabIndex={-1}
-        autoComplete="off"
-        style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
+        autoComplete="new-password"
+        style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, pointerEvents: "none" }}
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
