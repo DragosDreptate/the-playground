@@ -648,7 +648,7 @@
   "Footer": {
     "brand": {
       "tagline": "Lansează-ți comunitatea, gratuit.",
-      "copyright": "© 2026 The Playground. Toate drepturile rezervate."
+      "allRightsReserved": "Toate drepturile rezervate."
     },
     "product": {
       "title": "Produs",

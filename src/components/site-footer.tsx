@@ -18,7 +18,18 @@ export async function SiteFooter() {
             </div>
             <span className="text-[13px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
           </Link>
-          <span className="text-muted-foreground text-xs">{t("brand.copyright")} · v{version}</span>
+          <span className="text-muted-foreground text-xs">
+            © 2026{" "}
+            <a
+              href="http://thespark.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              The Spark
+            </a>
+            . {t("brand.allRightsReserved")} · v{version}
+          </span>
         </div>
 
         {/* Liens */}
