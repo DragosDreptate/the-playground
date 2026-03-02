@@ -222,6 +222,13 @@
       "manageCircle": "Gérer cette Communauté",
       "shareableLink": "Lien partageable"
     },
+    "removeMember": {
+      "action": "Retirer de la Communauté",
+      "title": "Retirer {name} ?",
+      "description": "{name} perdra l'accès à cette Communauté. Ses inscriptions aux événements à venir seront annulées automatiquement.",
+      "confirm": "Retirer",
+      "cancel": "Annuler"
+    },
     "errors": {
       "notFound": "Communauté introuvable",
       "unauthorized": "Vous n'avez pas la permission d'effectuer cette action",

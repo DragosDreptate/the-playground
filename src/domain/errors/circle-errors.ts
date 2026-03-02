@@ -57,3 +57,19 @@ export class NotMemberOfCircleError extends DomainError {
     super(`User is not a member of circle ${circleId}`);
   }
 }
+
+export class CannotRemoveHostError extends DomainError {
+  readonly code = "CANNOT_REMOVE_HOST";
+
+  constructor() {
+    super("A host cannot be removed via this action");
+  }
+}
+
+export class CannotRemoveSelfError extends DomainError {
+  readonly code = "CANNOT_REMOVE_SELF";
+
+  constructor() {
+    super("A host cannot remove themselves; use LeaveCircle or transfer the role");
+  }
+}

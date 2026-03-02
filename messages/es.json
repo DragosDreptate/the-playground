@@ -222,6 +222,13 @@
       "manageCircle": "Gestionar esta Comunidad",
       "shareableLink": "Enlace compartible"
     },
+    "removeMember": {
+      "action": "Eliminar de la Comunidad",
+      "title": "¿Eliminar a {name}?",
+      "description": "{name} perderá el acceso a esta Comunidad. Sus inscripciones a próximos eventos serán canceladas automáticamente.",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    },
     "errors": {
       "notFound": "Comunidad no encontrada",
       "unauthorized": "No tienes permiso para realizar esta acción",

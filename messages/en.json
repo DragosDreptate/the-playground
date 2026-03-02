@@ -222,6 +222,13 @@
       "manageCircle": "Manage this Community",
       "shareableLink": "Shareable link"
     },
+    "removeMember": {
+      "action": "Remove from Community",
+      "title": "Remove {name}?",
+      "description": "{name} will lose access to this Community. Their registrations for upcoming events will be automatically cancelled.",
+      "confirm": "Remove",
+      "cancel": "Cancel"
+    },
     "errors": {
       "notFound": "Community not found",
       "unauthorized": "You don't have permission to perform this action",

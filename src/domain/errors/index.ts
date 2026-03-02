@@ -7,6 +7,8 @@ export {
   NotFollowingCircleError,
   CannotLeaveAsHostError,
   NotMemberOfCircleError,
+  CannotRemoveHostError,
+  CannotRemoveSelfError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,

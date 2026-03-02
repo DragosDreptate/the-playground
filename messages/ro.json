@@ -222,6 +222,13 @@
       "manageCircle": "Gestionează această Comunitate",
       "shareableLink": "Link partajabil"
     },
+    "removeMember": {
+      "action": "Elimină din Comunitate",
+      "title": "Elimini {name}?",
+      "description": "{name} va pierde accesul la această Comunitate. Înscrierile sale la evenimentele viitoare vor fi anulate automat.",
+      "confirm": "Elimină",
+      "cancel": "Anulează"
+    },
     "errors": {
       "notFound": "Comunitatea nu a fost găsită",
       "unauthorized": "Nu ai permisiunea să efectuezi această acțiune",
