@@ -86,9 +86,9 @@ export default withSentryConfig(withPWA(withNextIntl(nextConfig)), {
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
   tunnelRoute: "/monitoring",
-  widenClientFileUpload: true,
+  widenClientFileUpload: false,
   sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
+    disable: true,
   },
   silent: !process.env.CI,
 });
