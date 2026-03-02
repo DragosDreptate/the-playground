@@ -159,8 +159,8 @@ Contient :
 - Voir les Participants inscrits ✅
 - Gestion de la liste d'attente ✅
 - Export CSV des inscrits ✅ (colonnes : prénom, nom, email, statut, date)
-- Export données Communauté (membres, historique) *(pas encore implémenté)*
-- Communiquer avec les Participants inscrits (email direct) *(pas encore implémenté)*
+- Export données Communauté (membres, historique) — *pas encore implémenté*
+- Communiquer avec les Participants inscrits (email direct groupé) — *pas encore implémenté* *(l'invitation Communauté "Broadcast" sur un événement est implémentée — bouton "Inviter ma Communauté" — mais pas l'email groupé libre Organisateur → Participants)*
 - Assistant IA basique *(pas encore implémenté)*
 
 ## Côté Participant
