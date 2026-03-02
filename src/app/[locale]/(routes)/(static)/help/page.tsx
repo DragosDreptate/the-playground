@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { HelpSidebar } from "@/components/help/help-sidebar";
 import { HelpFaqAccordion } from "@/components/help/help-faq-accordion";
-import { HelpContactForm } from "@/components/help/help-contact-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Help");
@@ -99,7 +98,6 @@ export default async function HelpPage() {
       ],
     },
     { id: "faq", label: t("sidebar.faqLabel"), children: [] },
-    { id: "contact", label: t("sidebar.contactLabel"), children: [] },
   ];
 
   const faqItems = [
@@ -111,19 +109,6 @@ export default async function HelpPage() {
     { question: t("faq.q6.question"), answer: t("faq.q6.answer") },
     { question: t("faq.q7.question"), answer: t("faq.q7.answer") },
   ];
-
-  const contactStrings = {
-    nameLabel: t("contact.nameLabel"),
-    namePlaceholder: t("contact.namePlaceholder"),
-    emailLabel: t("contact.emailLabel"),
-    emailPlaceholder: t("contact.emailPlaceholder"),
-    messageLabel: t("contact.messageLabel"),
-    messagePlaceholder: t("contact.messagePlaceholder"),
-    submit: t("contact.submit"),
-    sending: t("contact.sending"),
-    success: t("contact.success"),
-    error: t("contact.error"),
-  };
 
   const rich = {
     strong: (chunks: React.ReactNode) => <Strong>{chunks}</Strong>,
@@ -478,14 +463,6 @@ export default async function HelpPage() {
             <HelpFaqAccordion items={faqItems} />
           </section>
 
-          {/* ── Contact ── */}
-          <section className="space-y-6">
-            <div className="space-y-1">
-              <SectionH2 id="contact">{t("contact.title")}</SectionH2>
-              <p className="text-sm text-muted-foreground">{t("contact.subtitle")}</p>
-            </div>
-            <HelpContactForm strings={contactStrings} />
-          </section>
         </div>
       </div>
     </div>
