@@ -76,6 +76,7 @@
 | **Refonte dashboard "Mon espace"** : tab Événements (`DashboardMomentCard` redesigné — cover 64 px à gauche, titre line-clamp-2, badge aligné à droite) + tab Communautés (nouveau `DashboardCircleCard` style Explorer — cover 1:1, stats membres/événements, prochain événement, bouton "Créer un événement" Organisateur-only). Nouveau type domaine `DashboardCircle` (`CircleWithRole` + `memberCount` + `upcomingMomentCount` + `nextMoment`). Nouveau usecase `getUserDashboardCircles`. Nouvelle méthode repository `findAllByUserIdWithStats` (requête unique, pas de N+1). Grille Communautés `sm:grid-cols-2`. 9 nouveaux tests unitaires (`get-user-dashboard-circles.test.ts`). | 2026-02-24 | `6a912a2` |
 | **Emails transactionnels supplémentaires** : notification de mise à jour d'événement (`momentUpdate` / `hostMomentUpdate` — envoyés aux inscrits et à l'Organisateur quand date ou lieu change) + notification d'annulation d'événement (`momentCancelled` — envoyé à tous les inscrits REGISTERED quand un événement est annulé) + notification Organisateur à la création d'événement (`hostMomentCreated` — confirmation par email au créateur). Port `EmailService` étendu avec `sendMomentUpdate`, `sendMomentCancelled`, `sendHostMomentCreated`. Fire-and-forget depuis `updateMomentAction` et `cancelMomentAction`. i18n FR/EN complet dans `messages/*.json`. | 2026-02-24 | — |
 | **Email alerte Organisateur : nouveau follower** : `host-new-follower` template, `sendHostNewFollower` sur `EmailService`, déclenché depuis `followCircleAction`, respecte la préférence `notifyNewFollower`, fire-and-forget. | 2026-02-24 | — |
+| **Broadcast "Inviter ma Communauté"** : bouton sur la vue Organisateur d'un événement — envoie un email à tous les membres et followers de la Communauté (envoi unique par événement, protégé par `broadcastSentAt`). `broadcastMomentAction` (`src/app/actions/broadcast-moment.ts`), usecase `broadcastMoment`, méthode `sendBroadcastMoment` sur `EmailService`, template `broadcast-moment` (react-email). Message personnalisable (`customMessage?`). i18n `Moment.broadcast.*` FR/EN complet. | 2026-02-28 | — |
 | **Préférences de notifications email** : 4 booléens sur `User` (`notifyNewRegistration`, `notifyNewComment`, `notifyNewFollower`, `notifyNewMomentInCircle`), usecase `updateNotificationPreferences`, server action dans `profile.ts`, section "Notifications" sur `/dashboard/profile` avec toggles `Switch`, i18n FR/EN `Profile.notifications.*`. | 2026-02-24 | — |
 | **Export CSV des inscrits** : bouton "Exporter CSV" sur la vue Organisateur d'un événement (`RegistrationsList`), client-side avec BOM UTF-8, colonnes prénom/nom/email/statut/date. i18n `Moment.registrations.exportCsv` + `Moment.registrations.csvHeaders.*`. | 2026-02-24 | — |
 | **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
@@ -122,7 +123,7 @@
   - Template : `host-new-follower` (react-email). Port `EmailService.sendHostNewFollower` + adapter `ResendEmailService`.
 
 - [x] **Architecture email multi-canal** (infrastructure) ✅
-  - Port `EmailService` (8 méthodes) + adapter `ResendEmailService`
+  - Port `EmailService` (11 méthodes) + adapter `ResendEmailService`
   - Templates React (react-email) : calendar badge gradient, layout blanc/gris
   - Fire-and-forget depuis server actions (pas de queue pour le MVP)
   - Clé API : `AUTH_RESEND_KEY` (partagée auth + transactionnel)
@@ -336,7 +337,7 @@
   - Solution : Upstash Rate Limit (Redis serverless, compatible Vercel Edge)
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
-- [x] **Tests unitaires complets** — 447 tests, 55 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
+- [x] **Tests unitaires complets** — 486 tests, 58 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (99 tests dédiés sécurité) ✅
 - [x] **Tests E2E Playwright** — 72 tests, 9 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
 - [ ] **Accessibilité axe-core** dans Playwright

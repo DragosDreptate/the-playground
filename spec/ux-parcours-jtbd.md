@@ -224,7 +224,7 @@
 | A1 | ~~Post-inscription : aucun CTA "Ajouter au calendrier"~~ ✅ **Résolu** — composant `AddToCalendarButtons` (Google Calendar + fichier .ics via `/api/moments/[slug]/calendar`) affiché après inscription confirmée | ~~Le Player risque d'oublier l'événement~~ | ~~Haute~~ ✅ |
 | A2 | Post-inscription : aucun lien visible vers le dashboard | Le Player ne sait pas qu'il a un espace personnel | Haute |
 | A3 | ~~Pas d'email de confirmation d'inscription~~ ✅ **Résolu** — email de confirmation implémenté (Resend + react-email) | ~~Pas de réassurance, pas de rappel~~ | ~~Bloquante~~ ✅ |
-| A4 | La page `/m/[slug]` ne propose pas d'autres événements de la Communauté (hors PAST) | Rétention Communauté manquée pour les événements actifs | Moyenne |
+| ~~A4~~ | ~~La page `/m/[slug]` ne propose pas d'autres événements de la Communauté (hors PAST)~~ ✅ **Résolu** — section "Prochains événements de la Communauté" ajoutée sur `/m/[slug]` (vue publique, prop `upcomingCircleMoments`) — PR #68 `70a51f5` | ~~Rétention Communauté manquée~~ | ~~Moyenne~~ ✅ |
 | A5 | L'onboarding ne distingue pas Organisateur et Participant | Un futur Organisateur n'est pas guidé vers la création de Communauté | Basse (post-MVP) |
 
 ---
@@ -396,13 +396,14 @@
 **État actuel (implémenté) :**
 - Indicateurs visuels PAST (cover grisée, badge, banner) ✓
 - Commentaires visibles en lecture ✓
+- Formulaire de commentaire activé sur PAST pour tous les utilisateurs connectés ✓ (PR #93)
 - Carte "Événement terminé" avec CTA vers la Communauté ✓
 
 **Gaps :**
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| F1 | Formulaire de commentaire masqué sur les événements PAST **même pour l'Organisateur** | L'Organisateur ne peut pas remercier sa communauté | Haute |
+| ~~F1~~ | ~~Formulaire de commentaire masqué sur les événements PAST même pour l'Organisateur~~ ✅ **Résolu** — PR #93 (`bf9b036`) : formulaire visible pour tous les utilisateurs connectés sur les événements PAST. Placeholder contextuel "Remerciements, photos, retours..." | ~~L'Organisateur ne peut pas remercier sa communauté~~ | ~~Haute~~ ✅ |
 | F2 | Pas de stats post-événement (taux d'inscription vs présence) | L'Organisateur ne peut pas mesurer l'efficacité | Moyenne |
 | F3 | Pas de CTA "Créer le prochain événement" depuis la page PAST | Le moment de rebond est manqué | Haute |
 | F4 | Pas de notification aux membres de la Communauté pour annoncer que le compte-rendu / les commentaires sont disponibles | Engagement post-événement faible | Moyenne |
@@ -462,7 +463,7 @@
 | Participant en liste d'attente | Tout + badge "Liste d'attente" | Annuler l'attente | Position dans la file, ETA estimation |
 | Participant non-inscrit (événement futur) | Tout le contenu | S'inscrire | Indication "X places restantes" plus visible |
 | Participant non-inscrit (événement PAST) | Tout + banner "Terminé" | Voir commentaires (lecture), Voir la Communauté | — |
-| Organisateur | Tout + boutons gestion | Modifier, Supprimer, Copier lien, Commenter | Commenter sur PAST (actuellement bloqué), Stats rapides |
+| Organisateur | Tout + boutons gestion | Modifier, Supprimer, Copier lien, Commenter, Commenter sur PAST ✅ | Stats rapides |
 
 ### `/dashboard` — Tableau de bord
 
@@ -486,7 +487,7 @@
 | Participant (événement futur) | Détails + inscrits + commentaires + CTA "Ajouter au calendrier" ✅ | Commenter, Annuler inscription, Ajouter au calendrier | Autres événements de la Communauté |
 | Participant (événement PAST) | Détails + commentaires | Voir commentaires (lecture) | — |
 | Organisateur (événement futur) | Tout + lien partageable + liste inscrits | Modifier, Supprimer, Copier lien, Commenter, Exporter CSV ✅ | Envoyer rappel, Filtrer inscriptions (REGISTERED/WAITLISTED) |
-| Organisateur (événement PAST) | Tout + stats basiques | Voir commentaires | Commenter sur PAST, CTA "Créer le prochain", Stats présence |
+| Organisateur (événement PAST) | Tout + stats basiques | Voir commentaires, Commenter ✅ | CTA "Créer le prochain", Stats présence |
 
 ---
 
@@ -505,7 +506,7 @@
 
 | # | Gap | Persona(s) impactée(s) | Parcours |
 |---|-----|------------------------|----------|
-| H-1 | **L'Organisateur peut commenter sur un événement PAST** | Organisateur post-événement | F |
+| ~~H-1~~ | ~~**L'Organisateur peut commenter sur un événement PAST**~~ ✅ **Résolu** — PR #93 (`bf9b036`) : commentaires activés pour tous les utilisateurs connectés sur les événements PAST | ~~Organisateur post-événement~~ | ~~F~~ ✅ |
 | H-2 | **CTA "Créer le prochain événement" depuis un événement PAST** | Organisateur post-événement | F |
 | ~~H-3~~ | ~~**Position dans la liste d'attente visible**~~ ✅ **Résolu** | ~~Participant en liste d'attente~~ | ~~C~~ |
 | H-4 | **Autres événements de la Communauté visibles sur page événement dashboard** | Participant récurrent | B |
@@ -598,9 +599,9 @@
 - **Fil de commentaires** : engagement post-événement, communauté vivante
 
 ### Talons d'Achille actuels
-- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, notification nouveau follower, notification de mise à jour d'événement, notification d'annulation, notification Organisateur à la création, notification membres/followers à la création d'un événement — 10 emails implémentés. Rappels 24h/1h restent à faire (Phase 2).
+- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Organisateur nouvelle inscription, notification tous inscrits nouveau commentaire, notification nouveau follower, notification de mise à jour d'événement, notification d'annulation, notification Organisateur à la création, notification membres à la création, notification followers à la création, invitation Communauté (Broadcast), magic link — 13 emails implémentés. Rappels 24h/1h restent à faire (Phase 2).
 - ~~**Pas de notification aux membres à la création d'un événement**~~ ✅ **Résolu** (B3, M-4) — email `notifyNewMoment` envoyé automatiquement à la création.
-- **Formulaire de commentaire masqué sur PAST** : y compris pour l'Organisateur, alors que c'est le pic d'engagement
+- ~~**Formulaire de commentaire masqué sur PAST**~~ ✅ **Résolu** — PR #93 : formulaire visible pour tous les utilisateurs connectés, incluant l'Organisateur, avec placeholder contextuel "Remerciements, photos, retours..."
 - **L'après-inscription est partiellement guidée** : CTA "Ajouter au calendrier" ✅ résolu, mais lien vers le dashboard encore absent (gap A2)
 - **L'onboarding Organisateur n'existe pas** : l'Organisateur débutant est livré à lui-même
 
