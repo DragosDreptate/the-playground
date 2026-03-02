@@ -79,7 +79,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const dotClass = isPast
     ? "bg-border"
-    : isOrganizer
+    : isOrganizer || isHost
       ? "bg-primary"
       : isRegistered
         ? "bg-primary"
