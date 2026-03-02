@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
@@ -138,6 +139,7 @@ export function CommentThread({
     startTransition(async () => {
       const result = await addCommentAction(momentId, content);
       if (result.success) {
+        posthog.capture("comment_posted", { moment_id: momentId });
         setContent("");
         router.refresh();
       } else {

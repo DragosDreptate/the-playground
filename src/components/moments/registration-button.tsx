@@ -208,6 +208,10 @@ export function RegistrationButton({
                         localRegistrationId
                       );
                       if (result.success) {
+                        posthog.capture("registration_cancelled", {
+                          moment_id: momentId,
+                          circle_id: circleId,
+                        });
                         setLocalStatus(null);
                         setLocalRegistrationId(null);
                         router.refresh();
