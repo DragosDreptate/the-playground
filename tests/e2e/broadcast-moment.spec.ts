@@ -123,24 +123,16 @@ test.describe("Broadcast — vue Host (page détail Moment)", () => {
     const textarea = dialog.locator("textarea");
     await textarea.fill("Message de test E2E — ne pas tenir compte.");
 
-    // Attendre la réponse POST avant de cliquer pour éviter les flaps React 19
-    const [response] = await Promise.all([
-      page.waitForResponse(
-        (r) =>
-          r.url().includes("_next/static") === false &&
-          r.request().method() === "POST",
-        { timeout: 15_000 }
-      ),
-      dialog
-        .locator("button")
-        .filter({ hasText: /^envoyer$/i })
-        .click(),
-    ]);
+    // Clic sur "Envoyer" dans la modale
+    await dialog
+      .locator("button")
+      .filter({ hasText: /^envoyer$/i })
+      .click();
 
-    // La réponse doit être 200
-    expect(response.status()).toBeLessThan(500);
+    // La modale se ferme quand result.success === true (broadcastSentAt est en DB)
+    await expect(dialog).not.toBeVisible({ timeout: 15_000 });
 
-    // Après envoi, le bouton doit passer en état "Envoyée" (désactivé)
+    // Recharger pour obtenir l'état frais du serveur
     await page.goto(HOST_MOMENT_URL);
     const sentButton = page
       .locator("button")
