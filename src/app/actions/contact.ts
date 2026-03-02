@@ -6,6 +6,12 @@ import type { ActionResult } from "./types";
 export async function sendContactMessageAction(
   formData: FormData
 ): Promise<ActionResult<void>> {
+  // Honeypot : un bot remplit ce champ, un humain ne le voit pas
+  const honeypot = (formData.get("website") as string | null) ?? "";
+  if (honeypot) {
+    return { success: true, data: undefined };
+  }
+
   const name = (formData.get("name") as string | null)?.trim() ?? "";
   const email = (formData.get("email") as string | null)?.trim() ?? "";
   const message = (formData.get("message") as string | null)?.trim() ?? "";

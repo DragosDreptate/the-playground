@@ -45,6 +45,15 @@ export function HelpContactForm({ strings }: HelpContactFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Honeypot — invisible pour les humains, les bots le remplissent */}
+      <input
+        type="text"
+        name="website"
+        aria-hidden="true"
+        tabIndex={-1}
+        autoComplete="off"
+        style={{ position: "absolute", left: "-9999px", top: "-9999px" }}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="contact-name">{strings.nameLabel}</Label>
