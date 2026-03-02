@@ -292,12 +292,15 @@ export default async function ExplorerPage({ searchParams }) {
 }
 ```
 
-**Metadata SEO** :
+**Metadata SEO** (générée dynamiquement via `generateMetadata` + `getTranslations("Explorer")`) :
 ```typescript
-export const metadata = {
-  title: "Explorer — The Playground",
-  description: "Des communautés qui partagent vos valeurs, des événements à ne pas manquer.",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("Explorer");
+  return {
+    title: t("title"),        // "Communautés & événements" (FR) / "Communities & events" (EN)
+    description: t("description"),
+  };
+}
 ```
 
 ### Composants
@@ -379,7 +382,7 @@ src/components/circles/circle-form.tsx
 ```json
 {
   "Explorer": {
-    "title": "Découvrir",
+    "title": "Communautés & événements",
     "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
     "navLink": "Découvrir",
     "tabs": {

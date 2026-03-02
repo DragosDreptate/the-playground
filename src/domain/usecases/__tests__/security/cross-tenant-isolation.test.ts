@@ -24,6 +24,8 @@ import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { deleteComment } from "@/domain/usecases/delete-comment";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
+import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
+import { leaveCircle } from "@/domain/usecases/leave-circle";
 
 // Erreurs domaine
 import {
@@ -32,6 +34,7 @@ import {
   UnauthorizedRegistrationActionError,
   UnauthorizedCommentDeletionError,
   MomentNotOpenForRegistrationError,
+  NotMemberOfCircleError,
 } from "@/domain/errors";
 
 // Types domaine
@@ -592,6 +595,134 @@ describe("Security — Cross-Tenant Isolation (IDOR)", () => {
       expect(registrationRepo.findActiveWithUserByMomentId).not.toHaveBeenCalled();
       // Vérifie que le check a bien été fait sur circle-a (le Circle du Moment)
       expect(circleRepo.findMembership).toHaveBeenCalledWith("circle-a", "host-of-circle-b");
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// IDOR — removeCircleMember : HOST d'un autre Circle tente de
+// supprimer un membre d'un Circle dont il n'est pas HOST.
+// ─────────────────────────────────────────────────────────────
+
+describe("Security — Cross-Tenant Isolation (IDOR) — removeCircleMember", () => {
+  describe("removeCircleMember — IDOR : HOST d'un autre Circle tente de retirer un membre", () => {
+    it("should throw UnauthorizedCircleActionError when a HOST of Circle B tries to remove a member from Circle A", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(null),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await expect(
+        removeCircleMember(
+          { circleId: "circle-a", hostUserId: "user-attacker", targetUserId: "victim-player" },
+          { circleRepository: circleRepo, registrationRepository: registrationRepo }
+        )
+      ).rejects.toThrow(UnauthorizedCircleActionError);
+
+      // Le check est bien fait sur circle-a (le Circle ciblé), pas circle-b
+      expect(circleRepo.findMembership).toHaveBeenCalledWith("circle-a", "user-attacker");
+      expect(circleRepo.removeMembership).not.toHaveBeenCalled();
+    });
+
+    it("should NOT remove a member even if the attacker is HOST of another Circle", async () => {
+      // Cas IDOR subtil : findMembership retourne HOST pour circle-b mais null pour circle-a
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockImplementation((circleId: string) => {
+          if (circleId === "circle-b") {
+            return Promise.resolve(
+              makeMembership({ userId: "user-attacker", circleId: "circle-b", role: "HOST" })
+            );
+          }
+          return Promise.resolve(null); // pas membre de circle-a
+        }),
+        removeMembership: vi.fn().mockResolvedValue(undefined),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await expect(
+        removeCircleMember(
+          { circleId: "circle-a", hostUserId: "user-attacker", targetUserId: "victim-player" },
+          { circleRepository: circleRepo, registrationRepository: registrationRepo }
+        )
+      ).rejects.toThrow(UnauthorizedCircleActionError);
+
+      expect(circleRepo.removeMembership).not.toHaveBeenCalled();
+    });
+
+    it("should allow a legitimate HOST of Circle A to remove a PLAYER from Circle A (positive case)", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi
+          .fn()
+          .mockResolvedValueOnce(
+            makeMembership({ userId: "legit-host", circleId: "circle-a", role: "HOST" })
+          )
+          .mockResolvedValueOnce(
+            makeMembership({ userId: "target-player", circleId: "circle-a", role: "PLAYER" })
+          ),
+        removeMembership: vi.fn().mockResolvedValue(undefined),
+        unfollowCircle: vi.fn().mockResolvedValue(undefined),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findFutureActiveByUserAndCircle: vi.fn().mockResolvedValue([]),
+      });
+
+      const result = await removeCircleMember(
+        { circleId: "circle-a", hostUserId: "legit-host", targetUserId: "target-player" },
+        { circleRepository: circleRepo, registrationRepository: registrationRepo }
+      );
+
+      expect(circleRepo.removeMembership).toHaveBeenCalledWith("circle-a", "target-player");
+      expect(result.cancelledRegistrations).toBe(0);
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// IDOR — leaveCircle : isolation userId, user ne peut pas
+// quitter un Circle auquel il n'appartient pas.
+// ─────────────────────────────────────────────────────────────
+
+describe("Security — Cross-Tenant Isolation (IDOR) — leaveCircle", () => {
+  describe("leaveCircle — IDOR : user non-membre tente de quitter un Circle", () => {
+    it("should throw NotMemberOfCircleError when userId is not a member of the target Circle", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(null),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await expect(
+        leaveCircle(
+          { circleId: "circle-a", userId: "user-attacker" },
+          { circleRepository: circleRepo, registrationRepository: registrationRepo }
+        )
+      ).rejects.toThrow(NotMemberOfCircleError);
+
+      expect(circleRepo.removeMembership).not.toHaveBeenCalled();
+    });
+
+    it("should only remove membership for the exact userId provided — no cross-user contamination", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi
+          .fn()
+          .mockResolvedValue(
+            makeMembership({ userId: "user-alice", circleId: "circle-1", role: "PLAYER" })
+          ),
+        removeMembership: vi.fn().mockResolvedValue(undefined),
+        unfollowCircle: vi.fn().mockResolvedValue(undefined),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findFutureActiveByUserAndCircle: vi.fn().mockResolvedValue([]),
+      });
+
+      await leaveCircle(
+        { circleId: "circle-1", userId: "user-alice" },
+        { circleRepository: circleRepo, registrationRepository: registrationRepo }
+      );
+
+      // Seul user-alice est retiré — jamais un autre userId
+      expect(circleRepo.removeMembership).toHaveBeenCalledWith("circle-1", "user-alice");
+      expect(circleRepo.removeMembership).not.toHaveBeenCalledWith("circle-1", "user-bob");
+      expect(circleRepo.removeMembership).toHaveBeenCalledTimes(1);
     });
   });
 });

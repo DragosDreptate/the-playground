@@ -284,7 +284,7 @@ export default async function AboutPage() {
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {[
-            { name: "Next.js 15", desc: isFr ? "App Router, SSR/ISR" : "App Router, SSR/ISR" },
+            { name: "Next.js 16", desc: isFr ? "App Router, SSR/ISR" : "App Router, SSR/ISR" },
             { name: "TypeScript", desc: isFr ? "Strict, full-stack" : "Strict, full-stack" },
             { name: "PostgreSQL", desc: isFr ? "Neon serverless (EU)" : "Neon serverless (EU)" },
             { name: "Prisma", desc: isFr ? "ORM + migrations" : "ORM + migrations" },
@@ -293,6 +293,7 @@ export default async function AboutPage() {
             { name: "Resend", desc: isFr ? "Emails transactionnels" : "Transactional emails" },
             { name: "Vercel", desc: isFr ? "Déploiement EU" : "Edge deployment (EU)" },
             { name: "Claude Code", desc: isFr ? "Propulsé par l'IA" : "AI-powered dev" },
+            { name: "Anthropic SDK", desc: isFr ? "IA embarquée (Claude)" : "Embedded AI (Claude)" },
           ].map(({ name, desc }) => (
             <div
               key={name}
