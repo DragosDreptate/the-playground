@@ -10,6 +10,32 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.9.0] — 2026-03-02 — Broadcast, Radar amélioré & page Communauté
+
+### Ajouté
+
+- **Broadcast moment** : envoi d'un email groupé à tous les participants d'un événement depuis le dashboard Organisateur — éditeur inline sujet + corps, confirmation avant envoi, feedback succès/erreur
+- **Quitter la Communauté** : bouton disponible sur la page publique d'une Communauté (en plus du dashboard membre)
+- **Radar — recherche OR par mot-clé** : chaque source (Luma, Eventbrite, Meetup) lance un appel API par mot-clé en parallèle et fusionne les résultats avec déduplication par URL — meilleure couverture, plus de résultats
+- **Radar — 3 mots-clés max** : extraction pondérée (titre prioritaire > lieu > description) pour des termes plus précis et distinctifs
+- **Radar — redesign interface** : header avec pills ville + date, barre latérale colorée sur les sections, compteur de résultats en footer
+
+### Amélioré
+
+- **Radar** : source Mobilizon retirée — full-text search trop permissif (faux positifs sur les mots français contenant « ai »)
+- **Radar** : limite quotidienne augmentée de 10 à 25 analyses par utilisateur
+- **Page publique événement** : lien Communauté pointe vers `/circles/[slug]` (accessible sans authentification) au lieu de `/dashboard/circles/[slug]`
+- **Dashboard** : dot rose pour les événements organisés dans la timeline Participant
+- **Timelines Circle** : composant `MomentTimelineItem` unifié entre dashboard et page publique via prop `variant`
+
+### Corrigé
+
+- **Commentaires** : suppression du mismatch d'hydratation sur les temps relatifs (date calculée côté client uniquement)
+- **Page publique Communauté** : dot gris pour les événements passés (au lieu de rose)
+- **Landing** : mise à jour des textes des piliers 2 et 3
+
+---
+
 ## [1.8.1] — 2026-03-01 — Correctifs CSP & stabilité CI
 
 ### Corrigé
