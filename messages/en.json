@@ -648,7 +648,7 @@
   "Footer": {
     "brand": {
       "tagline": "Launch your community, for free.",
-      "copyright": "© 2026 The Playground. All rights reserved."
+      "allRightsReserved": "All rights reserved."
     },
     "product": {
       "title": "Product",
