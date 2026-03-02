@@ -161,6 +161,7 @@
     "greetingSubtitle": "Vos Communautés et vos prochains événements, au même endroit.",
     "greetingSubtitleOrganizer": "Gérez vos Communautés et vos événements.",
     "memberCount": "{count} membres",
+    "modeLabel": "Vue",
     "modeParticipant": "Participant",
     "modeOrganizer": "Organisateur",
     "modeBadgeParticipant": "Vue Participant",

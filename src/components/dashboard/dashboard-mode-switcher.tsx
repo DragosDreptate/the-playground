@@ -26,31 +26,34 @@ export function DashboardModeSwitcher({ currentMode, activeTab }: DashboardModeS
   }
 
   return (
-    <div className="flex items-center gap-1 rounded-full border p-1">
-      <button
-        type="button"
-        onClick={() => handleSwitch("PARTICIPANT")}
-        className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-          currentMode === "PARTICIPANT" || currentMode === null
-            ? "bg-foreground text-background"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-      >
-        <User className="size-3" />
-        {t("modeParticipant")}
-      </button>
-      <button
-        type="button"
-        onClick={() => handleSwitch("ORGANIZER")}
-        className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-          currentMode === "ORGANIZER"
-            ? "bg-foreground text-background"
-            : "text-muted-foreground hover:text-foreground"
-        }`}
-      >
-        <Crown className="size-3" />
-        {t("modeOrganizer")}
-      </button>
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-muted-foreground">{t("modeLabel")} :</span>
+      <div className="flex items-center gap-1 rounded-full border p-1">
+        <button
+          type="button"
+          onClick={() => handleSwitch("PARTICIPANT")}
+          className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            currentMode === "PARTICIPANT" || currentMode === null
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <User className="size-3" />
+          {t("modeParticipant")}
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSwitch("ORGANIZER")}
+          className={`flex items-center gap-1.5 rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+            currentMode === "ORGANIZER"
+              ? "bg-foreground text-background"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Crown className="size-3" />
+          {t("modeOrganizer")}
+        </button>
+      </div>
     </div>
   );
 }
