@@ -47,7 +47,7 @@ export async function MomentTimelineItem({
       ? "bg-border"
       : variant === "public"
         ? "bg-primary"
-        : isRegistered
+        : isHost || isRegistered
           ? "bg-primary"
           : isWaitlisted
             ? "bg-amber-400"
