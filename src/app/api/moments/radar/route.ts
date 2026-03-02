@@ -8,7 +8,6 @@ const DAILY_LIMIT = 25;
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
-  fetchAndFilterMobilizonEvents,
   fetchMeetupData,
   buildMeetupUrl,
   deduplicateByUrl,
@@ -199,10 +198,9 @@ export async function POST(request: NextRequest) {
 
         // Étape 3 : fetches parallèles sur la semaine complète — un appel par mot-clé (OR)
         const meetupKws = keywords.length > 0 ? keywords : [""];
-        const [lumaEvents, eventbriteEvents, mobilizonEvents, meetupResults] = await Promise.all([
+        const [lumaEvents, eventbriteEvents, meetupResults] = await Promise.all([
           fetchAndFilterLumaEvents(city, keywords, weekFrom, weekTo),
           fetchAndFilterEventbriteEvents(city, weekFrom, weekTo, locationTerms, expectedCountry, keywords),
-          fetchAndFilterMobilizonEvents(city, keywords, weekFrom, weekTo),
           Promise.all(
             meetupKws.map(async (kw) => {
               const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
@@ -213,7 +211,7 @@ export async function POST(request: NextRequest) {
 
         const meetupEvents = deduplicateByUrl(meetupResults.flat());
 
-        const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents, ...mobilizonEvents]);
+        const allEvents = deduplicateByUrl([...lumaEvents, ...eventbriteEvents, ...meetupEvents]);
 
         // Trier par date
         allEvents.sort((a, b) => (a.date + (a.time ?? "")).localeCompare(b.date + (b.time ?? "")));
