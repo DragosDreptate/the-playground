@@ -22,3 +22,4 @@ export function getMomentGradient(seed: string): string {
   if (!seed) return GRADIENTS[0];
   return GRADIENTS[hashString(seed) % GRADIENTS.length];
 }
+
