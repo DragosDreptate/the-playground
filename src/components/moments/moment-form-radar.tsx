@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useMemo } from "react";
-import { Radar, Search, X, ExternalLink, Clock, MapPin, Calendar } from "lucide-react";
+import { Radar, Search, X, ExternalLink, Clock, MapPin, Calendar, Pencil } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,8 +40,6 @@ function getWeekBounds(dateStr: string): { weekFrom: string; weekTo: string } {
 
 function formatShortDate(isoString: string, locale: string): string {
   try {
-    // Passer le string ISO complet (pas dateOnly) pour que toLocaleDateString
-    // applique la timezone locale — évite le décalage UTC → date J-1
     const d = new Date(isoString);
     return d.toLocaleDateString(locale, { day: "numeric", month: "long" });
   } catch {
@@ -49,15 +47,15 @@ function formatShortDate(isoString: string, locale: string): string {
   }
 }
 
-function formatWeekSubtitle(city: string, from: string, to: string, locale: string): string {
+function formatWeekPillDate(from: string, to: string, locale: string): string {
   try {
     const df = new Date(from + "T12:00:00Z");
     const dt = new Date(to + "T12:00:00Z");
     const month = dt.toLocaleDateString(locale, { month: "long" });
     const year = dt.getUTCFullYear();
-    return `${city} · ${df.getUTCDate()}–${dt.getUTCDate()} ${month} ${year}`;
+    return `${df.getUTCDate()}–${dt.getUTCDate()} ${month} ${year}`;
   } catch {
-    return city;
+    return "";
   }
 }
 
@@ -97,7 +95,6 @@ const SOURCE_ICONS: Record<string, string> = {
   luma: "/favicons/luma.png",
   eventbrite: "/favicons/eventbrite.png",
   meetup: "/favicons/meetup.png",
-  mobilizon: "/favicons/mobilizon.png",
 };
 
 function SourceBadge({ source }: { source: string }) {
@@ -113,9 +110,9 @@ function SourceBadge({ source }: { source: string }) {
     <img
       src={icon}
       alt={source}
-      width={20}
-      height={20}
-      className="shrink-0 rounded"
+      width={22}
+      height={22}
+      className="shrink-0 rounded-md"
     />
   );
 }
@@ -136,7 +133,7 @@ function EventCard({
       href={event.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="hover:bg-muted/40 flex items-center gap-3 rounded-lg border p-3 transition-colors"
+      className="bg-muted hover:bg-card border-border flex items-center gap-3 rounded-lg border p-3 transition-colors"
     >
       <SourceBadge source={event.source} />
       <div className="min-w-0 flex-1">
@@ -162,7 +159,7 @@ function EventCard({
           )}
         </div>
       </div>
-      <ExternalLink className="text-muted-foreground size-3.5 shrink-0" />
+      <ExternalLink className="text-muted-foreground size-3.5 shrink-0 opacity-60" />
     </a>
   );
 }
@@ -182,12 +179,20 @@ function SectionHeader({
 }) {
   return (
     <div className="flex items-center gap-2">
-      <span
-        className={`size-2 shrink-0 rounded-full ${dotColor === "red" ? "bg-red-500" : "bg-orange-400"}`}
+      <div
+        className={`w-0.5 min-h-[18px] shrink-0 self-stretch rounded-full ${
+          dotColor === "red" ? "bg-red-400" : "bg-orange-400"
+        }`}
       />
-      <span className="text-xs font-bold uppercase tracking-wide">{label}</span>
+      <span className="text-xs font-bold uppercase tracking-wide flex-1">{label}</span>
       {count > 0 && (
-        <span className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-xs">
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+            dotColor === "red"
+              ? "bg-red-500/10 text-red-400"
+              : "bg-orange-500/10 text-orange-400"
+          }`}
+        >
           {countLabel}
         </span>
       )}
@@ -225,13 +230,11 @@ export function MomentFormRadar({
   const [noCity, setNoCity] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Persistent across modal close — used to enrich the trigger hint
   const [lastCity, setLastCity] = useState<string | null>(null);
   const [lastKeywords, setLastKeywords] = useState<string[]>([]);
 
   const abortRef = useRef<AbortController | null>(null);
 
-  // Week bounds computed from startsAt (known upfront, not from SSE)
   const { weekFrom, weekTo } = useMemo(
     () => (startsAt ? getWeekBounds(startsAt.slice(0, 10)) : { weekFrom: "", weekTo: "" }),
     [startsAt]
@@ -343,78 +346,86 @@ export function MomentFormRadar({
   const dayEvents = events?.filter((e) => e.date === targetDate) ?? [];
   const weekEvents = events?.filter((e) => e.date !== targetDate) ?? [];
 
-  // Subtitle: "Paris · 10–16 mars 2026" (computed as soon as city is known)
-  const subtitle = city
-    ? formatWeekSubtitle(city, weekFrom, weekTo, locale)
-    : null;
-
   return (
     <>
       {/* Trigger section */}
       <div className="flex items-center gap-3">
-          <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-            <Radar className="text-primary size-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-2 text-sm font-semibold">
-              {t("title")}
-              <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                {t("badgeNew")}
-              </span>
-            </p>
-            <p className="text-muted-foreground text-xs leading-relaxed">
-              {lastCity || startsAt ? (
-                <>
-                  {t("hint")}
-                  {lastCity && (
-                    <> à <strong className="text-foreground">{lastCity}</strong></>
-                  )}
-                  {startsAt && (
-                    <> autour du <strong className="text-foreground">{formatShortDate(startsAt, locale)}</strong></>
-                  )}
-                  {lastKeywords.length > 0 && (
-                    <> — {lastKeywords.join(", ")}</>
-                  )}
-                </>
-              ) : (
-                t("hint")
-              )}
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!canActivate}
-            onClick={handleOpen}
-            className="shrink-0"
-          >
-            <Search className="mr-1.5 size-3.5" />
-            {t("analyzeShort")}
-          </Button>
+        <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+          <Radar className="text-primary size-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            {t("title")}
+            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              {t("badgeNew")}
+            </span>
+          </p>
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            {lastCity || startsAt ? (
+              <>
+                {t("hint")}
+                {lastCity && (
+                  <> à <strong className="text-foreground">{lastCity}</strong></>
+                )}
+                {startsAt && (
+                  <> autour du <strong className="text-foreground">{formatShortDate(startsAt, locale)}</strong></>
+                )}
+                {lastKeywords.length > 0 && (
+                  <> — {lastKeywords.join(", ")}</>
+                )}
+              </>
+            ) : (
+              t("hint")
+            )}
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!canActivate}
+          onClick={handleOpen}
+          className="shrink-0"
+        >
+          <Search className="mr-1.5 size-3.5" />
+          {t("analyzeShort")}
+        </Button>
       </div>
 
       {/* Modal */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
         <DialogContent className="flex max-h-[85vh] flex-col gap-0 p-0 sm:max-w-lg">
 
-          {/* Header */}
-          <DialogHeader className="px-5 pt-5 pb-3">
-            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <Radar className="text-primary size-5 shrink-0" />
+          {/* Header — gradient subtil + pills ville/date */}
+          <DialogHeader className="border-border border-b bg-gradient-to-br from-primary/5 to-transparent px-5 pt-5 pb-4">
+            <DialogTitle className="flex items-center gap-2.5 text-base font-bold">
+              <div className="bg-primary/10 border-primary/20 flex size-[34px] shrink-0 items-center justify-center rounded-[9px] border">
+                <Radar className="text-primary size-[18px]" />
+              </div>
               {t("modalTitle")}
             </DialogTitle>
-            {subtitle && (
-              <p className="text-muted-foreground text-sm">{subtitle}</p>
+            {weekFrom && weekTo && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                {city && (
+                  <span className="bg-muted border-border text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium">
+                    <MapPin className="size-3 opacity-70" />
+                    {city}
+                  </span>
+                )}
+                <span className="bg-muted border-border text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium">
+                  <Calendar className="size-3 opacity-70" />
+                  {formatWeekPillDate(weekFrom, weekTo, locale)}
+                </span>
+              </div>
             )}
           </DialogHeader>
 
-          {/* Keywords — inline, séparés du header par un border-b */}
+          {/* Keywords — label uppercase + icône Pencil sur Modifier */}
           {!loading && keywords.length > 0 && (
-            <div className="border-border border-b px-5 pb-3">
+            <div className="border-border border-b px-5 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-muted-foreground shrink-0 text-xs font-medium">
-                  {t("keywords")} :
+                <span className="text-muted-foreground mr-0.5 shrink-0 text-[11px] font-semibold uppercase tracking-wider">
+                  {t("keywords")}
                 </span>
                 {keywords.map((kw) => (
                   <span
@@ -438,8 +449,9 @@ export function MomentFormRadar({
                   <button
                     type="button"
                     onClick={() => setEditingKeywords(true)}
-                    className="border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
+                    className="border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
                   >
+                    <Pencil className="size-3" />
                     {t("editKeywords")}
                   </button>
                 ) : (
@@ -527,8 +539,17 @@ export function MomentFormRadar({
             )}
           </div>
 
-          {/* Footer */}
-          <div className="border-border flex items-center justify-end border-t px-5 py-3">
+          {/* Footer — compteur à gauche + Fermer à droite */}
+          <div className="border-border flex items-center justify-between border-t px-5 py-3">
+            <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              {events !== null && !noCity && !loading && (
+                <>
+                  <Search className="size-3.5" />
+                  <strong className="text-foreground font-semibold">{events.length}</strong>
+                  {" "}événement{events.length > 1 ? "s" : ""} trouvé{events.length > 1 ? "s" : ""}
+                </>
+              )}
+            </span>
             <Button type="button" variant="outline" size="sm" onClick={handleClose}>
               {t("close")}
             </Button>

@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar de planification — Propositions redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens dark mode ─────────────────────────── */
+:root {
+  --primary:         #e8457a;
+  --primary-fg:      #ffffff;
+  --bg:              #1a1b2e;
+  --fg:              #f0f0f5;
+  --card:            #252638;
+  --card-2:          #2d2f47;   /* légèrement plus clair */
+  --border:          #383a55;
+  --muted:           #222336;
+  --muted-fg:        #8385a0;
+  --radius:          10px;
+  --radius-sm:       6px;
+  --radius-lg:       14px;
+  --primary-10:      rgba(232,69,122,0.10);
+  --primary-20:      rgba(232,69,122,0.20);
+  --red-dot:         #f87171;
+  --orange-dot:      #fb923c;
+  --shadow-modal:    0 24px 60px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100vh;
+  padding: 40px 24px 80px;
+}
+
+/* ── Page layout ──────────────────────────────────────── */
+.page-title {
+  text-align: center;
+  margin-bottom: 56px;
+}
+.page-title h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+.page-title p {
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+
+.proposals {
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.proposal-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 440px;
+}
+.proposal-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-fg);
+}
+.proposal-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-top: 2px;
+}
+.proposal-desc {
+  font-size: 12px;
+  color: var(--muted-fg);
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.6;
+  margin-top: 2px;
+}
+
+/* ── Shared modal shell ───────────────────────────────── */
+.modal {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Shared icon helpers ─────────────────────────────── */
+svg { display: inline-block; vertical-align: middle; }
+.icon-sm  { width: 14px; height: 14px; }
+.icon-md  { width: 16px; height: 16px; }
+.icon-lg  { width: 20px; height: 20px; }
+
+/* ── Source badges ────────────────────────────────────── */
+.source-img {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.source-fallback {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--muted-fg);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════
+   PROPOSITION A — "Contextuelle & Structurée"
+   ═══════════════════════════════════════════════════════ */
+
+/* Header A */
+.modal-a .header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(160deg, rgba(232,69,122,0.06) 0%, transparent 60%);
+}
+.modal-a .header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.modal-a .header-icon {
+  width: 34px; height: 34px;
+  background: var(--primary-10);
+  border: 1px solid var(--primary-20);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.modal-a .header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  flex: 1;
+}
+.modal-a .header-close {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted-fg);
+}
+
+/* Méta-infos : ville + semaine en pills */
+.modal-a .header-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.pill-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-fg);
+}
+.pill-meta svg { color: var(--muted-fg); opacity: 0.7; }
+.pill-sep { color: var(--border); font-size: 12px; }
+
+/* Keywords A */
+.modal-a .keywords {
+  padding: 10px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.kw-label-a {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 2px;
+}
+.kw-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--primary-10);
+  border: 1px solid var(--primary-20);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.kw-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-fg);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Scrollable body A */
+.modal-a .body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Section header A */
+.section-head-a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.section-bar {
+  width: 3px;
+  border-radius: 2px;
+  align-self: stretch;
+  flex-shrink: 0;
+  min-height: 18px;
+}
+.section-bar.red    { background: var(--red-dot); }
+.section-bar.orange { background: var(--orange-dot); }
+
+.section-title-a {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  flex: 1;
+}
+.section-badge-a {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.section-badge-a.red {
+  background: rgba(248,113,113,0.12);
+  color: var(--red-dot);
+}
+.section-badge-a.orange {
+  background: rgba(251,146,60,0.12);
+  color: var(--orange-dot);
+}
+
+/* Event card A */
+.event-card-a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.event-card-a:hover { background: var(--card-2); }
+.event-card-a + .event-card-a { margin-top: 6px; }
+
+.event-content-a { flex: 1; min-width: 0; }
+.event-title-a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.35;
+  margin-bottom: 5px;
+  /* truncate at 2 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.event-meta-a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.meta-item-a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted-fg);
+}
+.event-ext-a {
+  color: var(--muted-fg);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* Footer A */
+.modal-a .footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-count-a {
+  font-size: 12px;
+  color: var(--muted-fg);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.footer-count-a strong { color: var(--fg); font-weight: 600; }
+.btn-outline-sm {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.btn-primary-sm {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-fg);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   PROPOSITION B — "Timeline épurée"
+   ═══════════════════════════════════════════════════════ */
+
+/* Header B */
+.modal-b .header {
+  padding: 20px 20px 0;
+}
+.modal-b .header-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 14px;
+}
+.modal-b .header-icon {
+  width: 36px; height: 36px;
+  background: var(--primary-10);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.modal-b .header-text { flex: 1; }
+.modal-b .header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1.3;
+}
+.modal-b .header-subtitle {
+  font-size: 12px;
+  color: var(--muted-fg);
+  margin-top: 3px;
+}
+.modal-b .header-close {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted-fg);
+  flex-shrink: 0;
+}
+
+/* Keywords B — intégrés dans le header, pas de section séparée */
+.modal-b .keywords-b {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 0 0 16px 47px; /* aligné sous l'icône */
+}
+.kw-pill-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--primary-10);
+  border: 1px solid var(--primary-20);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.kw-edit-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  border-radius: 20px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted-fg);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.kw-edit-b:hover { color: var(--fg); }
+
+/* Divider */
+.modal-b .header-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* Body B */
+.modal-b .body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 16px;
+}
+
+/* Date group B */
+.date-group-b {
+  margin-top: 18px;
+}
+.date-row-b {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.date-pill-b {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.date-pill-b.today {
+  background: rgba(248,113,113,0.13);
+  color: var(--red-dot);
+  border: 1px solid rgba(248,113,113,0.25);
+}
+.date-pill-b.week {
+  background: rgba(251,146,60,0.10);
+  color: var(--orange-dot);
+  border: 1px solid rgba(251,146,60,0.22);
+}
+.date-line-b {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.date-count-b {
+  font-size: 11px;
+  color: var(--muted-fg);
+  flex-shrink: 0;
+}
+
+/* Event rows B — style "list" sans card border */
+.events-list-b {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.event-row-b {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.12s;
+  cursor: pointer;
+}
+.event-row-b + .event-row-b {
+  border-top: 1px solid var(--border);
+}
+.event-row-b:hover { background: var(--muted); }
+
+/* Source dot coloré */
+.source-dot-b {
+  width: 3px;
+  align-self: stretch;
+  border-radius: 2px;
+  flex-shrink: 0;
+  min-height: 16px;
+}
+.source-dot-b.luma     { background: #f43f8e; }
+.source-dot-b.meetup   { background: #f64060; }
+.source-dot-b.eventbrite { background: #f05537; }
+
+.event-row-content-b { flex: 1; min-width: 0; }
+.event-row-title-b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.3;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.event-row-meta-b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.meta-chip-b {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--muted-fg);
+}
+
+/* Source logo row B (droit) */
+.event-row-right-b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.event-row-source-b {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-fg);
+  opacity: 0.7;
+}
+
+/* Footer B */
+.modal-b .footer {
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-hint-b {
+  font-size: 12px;
+  color: var(--muted-fg);
+}
+.footer-hint-b strong { color: var(--primary); font-weight: 600; }
+
+/* ── Source favicon helpers ───────────────────────────── */
+.favicon {
+  width: 22px; height: 22px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+}
+.favicon.luma        { background: linear-gradient(135deg,#f43f8e,#9333ea); color:#fff; }
+.favicon.meetup      { background: #f64060; color: #fff; }
+.favicon.eventbrite  { background: #f05537; color: #fff; }
+.favicon.luma-b      { background: rgba(244,63,142,0.15); color: #f43f8e; font-size:8px; border: 1px solid rgba(244,63,142,0.25); }
+
+/* ── SVG icons inline (lucide-style) ─────────────────── */
+.i-radar { color: var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>Radar de planification — Propositions redesign</h1>
+  <p>Dark mode · Design system The Playground · 440px wide</p>
+</div>
+
+<div class="proposals">
+
+  <!-- ══════════════════════════════════════════════════
+       PROPOSITION A — Contextuelle & Structurée
+       ══════════════════════════════════════════════════ -->
+  <div class="proposal-wrap">
+    <div style="text-align:center">
+      <div class="proposal-label">Proposition A</div>
+      <div class="proposal-name">Contextuelle &amp; Structurée</div>
+      <div class="proposal-desc">Hiérarchie renforcée : pills ville/date dans le header, section headers colorés avec barre latérale, compteur de résultats en footer.</div>
+    </div>
+
+    <div class="modal modal-a">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="header-top">
+          <div class="header-icon">
+            <!-- Radar icon -->
+            <svg class="icon-lg i-radar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/>
+              <path d="M4 6h.01"/>
+              <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/>
+              <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/>
+              <path d="M12 18h.01"/>
+              <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/>
+              <circle cx="12" cy="12" r="2"/>
+              <path d="m13.41 10.59 5.66-5.66"/>
+            </svg>
+          </div>
+          <span class="header-title">Radar de planification</span>
+          <button class="header-close">
+            <svg class="icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        <!-- Ville + semaine en pills -->
+        <div class="header-meta">
+          <span class="pill-meta">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            Paris
+          </span>
+          <span class="pill-sep">·</span>
+          <span class="pill-meta">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            2–8 mars 2026
+          </span>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="keywords">
+        <span class="kw-label-a">Mots-clés</span>
+        <span class="kw-pill">product vision</span>
+        <span class="kw-pill">AI</span>
+        <button class="kw-edit-btn">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+          Modifier
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="body">
+
+        <!-- Section: ce jour-là -->
+        <div>
+          <div class="section-head-a">
+            <div class="section-bar red"></div>
+            <span class="section-title-a">Ce jour-là — Jeudi 5 mars</span>
+            <span class="section-badge-a red">1 événement</span>
+          </div>
+
+          <a class="event-card-a" href="#" onclick="return false">
+            <div class="favicon luma">m</div>
+            <div class="event-content-a">
+              <div class="event-title-a">Agentic AI Meetup with Google Cloud - Paris</div>
+              <div class="event-meta-a">
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  18:00
+                </span>
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Ecole 42, 96 Bd Bessières
+                </span>
+              </div>
+            </div>
+            <svg class="event-ext-a icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          </a>
+        </div>
+
+        <!-- Section: cette semaine -->
+        <div>
+          <div class="section-head-a">
+            <div class="section-bar orange"></div>
+            <span class="section-title-a">Cette semaine — 2–8 mars</span>
+            <span class="section-badge-a orange">2 autres</span>
+          </div>
+
+          <a class="event-card-a" href="#" onclick="return false">
+            <div class="favicon luma">m</div>
+            <div class="event-content-a">
+              <div class="event-title-a">Conscious Reverie for PFW — with Tree® &amp; ASK Scandinavia</div>
+              <div class="event-meta-a">
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  mer. 4
+                </span>
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  09:00
+                </span>
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  Paris, Île-de-France
+                </span>
+              </div>
+            </div>
+            <svg class="event-ext-a icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          </a>
+
+          <a class="event-card-a" href="#" onclick="return false">
+            <div class="favicon meetup">m</div>
+            <div class="event-content-a">
+              <div class="event-title-a">Boostez vos webinaires avec l'intelligence artificielle</div>
+              <div class="event-meta-a">
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                  mer. 4
+                </span>
+                <span class="meta-item-a">
+                  <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  10:00
+                </span>
+              </div>
+            </div>
+            <svg class="event-ext-a icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <span class="footer-count-a">
+          <svg class="icon-sm" style="color:var(--muted-fg)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <strong>3</strong> événements trouvés
+        </span>
+        <button class="btn-outline-sm">Fermer</button>
+      </div>
+    </div><!-- /modal-a -->
+  </div><!-- /proposal-wrap A -->
+
+
+  <!-- ══════════════════════════════════════════════════
+       PROPOSITION B — Timeline épurée
+       ══════════════════════════════════════════════════ -->
+  <div class="proposal-wrap">
+    <div style="text-align:center">
+      <div class="proposal-label">Proposition B</div>
+      <div class="proposal-name">Timeline épurée</div>
+      <div class="proposal-desc">Keywords dans le header, liste sans bordures de cards, groups de dates en pills flottantes, barre colorée par source à gauche de chaque événement.</div>
+    </div>
+
+    <div class="modal modal-b">
+
+      <!-- Header -->
+      <div class="header">
+        <div class="header-top">
+          <div class="header-icon">
+            <svg class="icon-lg i-radar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/>
+              <path d="M4 6h.01"/>
+              <path d="M2.29 9.62A10 10 0 1 0 21.31 8.35"/>
+              <path d="M16.24 7.76A6 6 0 1 0 8.23 16.67"/>
+              <path d="M12 18h.01"/>
+              <path d="M17.99 11.66A6 6 0 0 1 15.77 16.67"/>
+              <circle cx="12" cy="12" r="2"/>
+              <path d="m13.41 10.59 5.66-5.66"/>
+            </svg>
+          </div>
+          <div class="header-text">
+            <div class="header-title">Radar de planification</div>
+            <div class="header-subtitle">Paris · 2–8 mars 2026</div>
+          </div>
+          <button class="header-close">
+            <svg class="icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Keywords inline, alignés sous l'icône -->
+        <div class="keywords-b">
+          <span class="kw-pill-b">product vision</span>
+          <span class="kw-pill-b">AI</span>
+          <button class="kw-edit-b">
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+            Modifier
+          </button>
+        </div>
+      </div>
+      <div class="header-divider"></div>
+
+      <!-- Body -->
+      <div class="body">
+
+        <!-- Group: ce jour-là -->
+        <div class="date-group-b">
+          <div class="date-row-b">
+            <span class="date-pill-b today">
+              <svg style="width:10px;height:10px" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" opacity="0.8"/></svg>
+              Ce jour-là — jeu. 5 mars
+            </span>
+            <div class="date-line-b"></div>
+            <span class="date-count-b">1</span>
+          </div>
+          <div class="events-list-b">
+            <a class="event-row-b" href="#" onclick="return false">
+              <div class="source-dot-b luma"></div>
+              <div class="event-row-content-b">
+                <div class="event-row-title-b">Agentic AI Meetup with Google Cloud - Paris</div>
+                <div class="event-row-meta-b">
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    18:00
+                  </span>
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Ecole 42, Paris
+                  </span>
+                </div>
+              </div>
+              <div class="event-row-right-b">
+                <span class="event-row-source-b">Luma</span>
+                <svg class="icon-sm" style="color:var(--muted-fg);opacity:0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Group: cette semaine -->
+        <div class="date-group-b">
+          <div class="date-row-b">
+            <span class="date-pill-b week">
+              <svg style="width:10px;height:10px" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="currentColor" opacity="0.7"/></svg>
+              Cette semaine — 2–8 mars
+            </span>
+            <div class="date-line-b"></div>
+            <span class="date-count-b">2</span>
+          </div>
+          <div class="events-list-b">
+            <a class="event-row-b" href="#" onclick="return false">
+              <div class="source-dot-b luma"></div>
+              <div class="event-row-content-b">
+                <div class="event-row-title-b">Conscious Reverie for PFW — with Tree® &amp; ASK Scandinavia</div>
+                <div class="event-row-meta-b">
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    mer. 4
+                  </span>
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    09:00
+                  </span>
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    Paris, Île-de-France
+                  </span>
+                </div>
+              </div>
+              <div class="event-row-right-b">
+                <span class="event-row-source-b">Luma</span>
+                <svg class="icon-sm" style="color:var(--muted-fg);opacity:0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+              </div>
+            </a>
+            <a class="event-row-b" href="#" onclick="return false">
+              <div class="source-dot-b meetup"></div>
+              <div class="event-row-content-b">
+                <div class="event-row-title-b">Boostez vos webinaires avec l'intelligence artificielle</div>
+                <div class="event-row-meta-b">
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                    mer. 4
+                  </span>
+                  <span class="meta-chip-b">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    10:00
+                  </span>
+                </div>
+              </div>
+              <div class="event-row-right-b">
+                <span class="event-row-source-b">Meetup</span>
+                <svg class="icon-sm" style="color:var(--muted-fg);opacity:0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /body B -->
+
+      <!-- Footer -->
+      <div class="footer">
+        <span class="footer-hint-b"><strong>3 événements</strong> · Luma, Meetup</span>
+        <button class="btn-outline-sm">Fermer</button>
+      </div>
+
+    </div><!-- /modal-b -->
+  </div><!-- /proposal-wrap B -->
+
+</div><!-- /proposals -->
+
+</body>
+</html>
