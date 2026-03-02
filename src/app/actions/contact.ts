@@ -23,7 +23,7 @@ export async function sendContactMessageAction(
 
   const { error } = await resend.emails.send({
     from: process.env.EMAIL_FROM ?? process.env.AUTH_EMAIL_FROM ?? "onboarding@resend.dev",
-    to: "hello@the-playground.fr",
+    to: "ddreptate@gmail.com",
     replyTo: email,
     subject: `[Contact] Message de ${name}`,
     text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
