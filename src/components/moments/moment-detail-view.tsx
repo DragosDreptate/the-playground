@@ -518,6 +518,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="border-border bg-card rounded-2xl border p-6">
                 <RegistrationButton
                   momentId={moment.id}
+                  circleId={circle.id}
+                  circleName={circle.name}
                   price={moment.price}
                   isAuthenticated={props.isAuthenticated}
                   existingRegistration={props.existingRegistration}

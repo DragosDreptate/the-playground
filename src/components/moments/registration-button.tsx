@@ -22,9 +22,12 @@ import {
 } from "@/app/actions/registration";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
+import posthog from "posthog-js";
 
 type RegistrationButtonProps = {
   momentId: string;
+  circleId: string;
+  circleName: string;
   price: number;
   isAuthenticated: boolean;
   existingRegistration: Registration | null;
@@ -69,6 +72,8 @@ function StatsColumn({
 
 export function RegistrationButton({
   momentId,
+  circleId,
+  circleName,
   price,
   isAuthenticated,
   existingRegistration,
@@ -236,6 +241,12 @@ export function RegistrationButton({
               if (result.success) {
                 setLocalStatus(result.data.status);
                 setLocalRegistrationId(result.data.id);
+                posthog.capture("moment_joined", {
+                  moment_id: momentId,
+                  circle_id: circleId,
+                  circle_name: circleName,
+                  registration_status: result.data.status,
+                });
                 router.refresh();
               } else {
                 setError(result.error);
