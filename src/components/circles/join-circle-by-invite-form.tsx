@@ -16,7 +16,6 @@ type Props = {
     joinButton: string;
     joinSignIn: string;
     alreadyMember: string;
-    joined: string;
     viewCircle: string;
   };
 };
@@ -30,7 +29,6 @@ export function JoinCircleByInviteForm({
 }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [joined, setJoined] = useState(false);
   const [alreadyMember] = useState(initialAlreadyMember);
 
   if (!isAuthenticated) {
@@ -59,32 +57,12 @@ export function JoinCircleByInviteForm({
     );
   }
 
-  if (joined) {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
-          <CheckCircle className="size-4 shrink-0" />
-          <span>{t.joined}</span>
-        </div>
-        <Button asChild size="lg" className="w-full">
-          <Link href={`/dashboard/circles/${circleSlug}`}>
-            {t.viewCircle}
-          </Link>
-        </Button>
-      </div>
-    );
-  }
-
   async function handleJoin() {
     setLoading(true);
     try {
       const result = await joinCircleByInviteAction(token);
       if (result.success) {
-        if (result.data.alreadyMember) {
-          router.push(`/dashboard/circles/${circleSlug}`);
-        } else {
-          setJoined(true);
-        }
+        router.push(`/dashboard/circles/${circleSlug}`);
       }
     } finally {
       setLoading(false);

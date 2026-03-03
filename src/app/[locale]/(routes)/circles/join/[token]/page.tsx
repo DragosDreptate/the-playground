@@ -190,7 +190,6 @@ export default async function JoinCircleByInvitePage({
                 joinButton: t("invite.joinButton"),
                 joinSignIn: t("invite.joinSignIn"),
                 alreadyMember: t("invite.alreadyMember"),
-                joined: t("invite.joined"),
                 viewCircle: t("invite.viewCircle"),
               }}
             />
