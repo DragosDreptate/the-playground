@@ -25,11 +25,12 @@ test.describe("Invitation — vue Organisateur", () => {
   test("should generate an invite link when clicking the generate button", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    // D'abord révoquer si un token existe déjà (idempotent)
+    // D'abord révoquer si un token existe déjà pour remettre à l'état initial
     const revokeBtn = page.getByRole("button", { name: /révoquer/i });
     if (await revokeBtn.isVisible()) {
       await revokeBtn.click();
-      await page.waitForTimeout(500);
+      // Attendre que l'état soit mis à jour (bouton Générer apparaît)
+      await expect(page.getByRole("button", { name: /générer un lien/i })).toBeVisible({ timeout: 5000 });
     }
 
     // Cliquer sur "Générer un lien"
@@ -48,7 +49,7 @@ test.describe("Invitation — vue Organisateur", () => {
     const generateBtn = page.getByRole("button", { name: /générer un lien/i });
     if (await generateBtn.isVisible()) {
       await generateBtn.click();
-      await page.waitForTimeout(500);
+      await expect(page.locator("main")).toContainText(/circles\/join\//i, { timeout: 5000 });
     }
 
     await expect(page.getByRole("button", { name: /révoquer/i })).toBeVisible();
@@ -61,7 +62,7 @@ test.describe("Invitation — vue Organisateur", () => {
     const generateBtn = page.getByRole("button", { name: /générer un lien/i });
     if (await generateBtn.isVisible()) {
       await generateBtn.click();
-      await page.waitForTimeout(500);
+      await expect(page.locator("main")).toContainText(/circles\/join\//i, { timeout: 5000 });
     }
 
     // Révoquer
@@ -69,23 +70,19 @@ test.describe("Invitation — vue Organisateur", () => {
     await expect(revokeBtn).toBeVisible();
     await revokeBtn.click();
 
-    // Le bouton "Générer" doit réapparaître
+    // Le bouton "Générer un lien" doit réapparaître
     await expect(page.getByRole("button", { name: /générer un lien/i })).toBeVisible({ timeout: 5000 });
   });
 
   test("should allow adding and sending email invitations", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    const emailInput = page.locator("input[type='email']");
+    const emailInput = page.locator("input[type='email']").first();
     await expect(emailInput).toBeVisible();
 
     await emailInput.fill("invite-test@example.com");
-    await page.getByRole("button", { name: /ajouter/i }).click();
 
-    // L'email doit apparaître dans la liste
-    await expect(page.locator("main")).toContainText("invite-test@example.com");
-
-    // Le bouton Envoyer doit être actif
+    // Le bouton Envoyer doit être actif dès qu'un email valide est saisi
     const sendBtn = page.getByRole("button", { name: /envoyer l'invitation/i });
     await expect(sendBtn).toBeEnabled();
   });

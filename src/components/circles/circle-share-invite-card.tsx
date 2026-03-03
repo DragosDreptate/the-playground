@@ -58,6 +58,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
       : null
   );
 
+  const [isPendingGenerate, startGenerate] = useTransition();
   const [isPendingRevoke, startRevoke] = useTransition();
   const [isPendingEmail, startEmail] = useTransition();
 
@@ -95,15 +96,21 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
   }
 
   // ── Invite link handlers ──
-  // Révoquer et générer un nouveau lien immédiatement (conforme au mockup)
-  function handleRevoke() {
-    startRevoke(async () => {
-      await revokeCircleInviteTokenAction(circle.id);
+  function handleGenerate() {
+    startGenerate(async () => {
       const result = await generateCircleInviteTokenAction(circle.id);
       if (result.success) {
         setInviteUrl(result.data.inviteUrl);
         router.refresh();
       }
+    });
+  }
+
+  function handleRevoke() {
+    startRevoke(async () => {
+      await revokeCircleInviteTokenAction(circle.id);
+      setInviteUrl(null);
+      router.refresh();
     });
   }
 
@@ -228,7 +235,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
             {t.linkDescription}
           </p>
 
-          {inviteUrl && (
+          {inviteUrl ? (
             <>
               <div className="flex items-center gap-2">
                 <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
@@ -242,9 +249,20 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
                 disabled={isPendingRevoke}
                 className="text-muted-foreground hover:text-foreground mt-1.5 block text-[11px] underline underline-offset-2 disabled:cursor-wait"
               >
-                {isPendingRevoke ? "..." : "Révoquer et générer un nouveau lien"}
+                {isPendingRevoke ? "..." : t.linkRevoke}
               </button>
             </>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleGenerate}
+              disabled={isPendingGenerate}
+              className="w-full text-[13px]"
+            >
+              {isPendingGenerate ? "..." : t.linkGenerate}
+            </Button>
           )}
         </div>
       </div>
