@@ -161,6 +161,10 @@ export async function updateCircleAction(
       await vercelBlobStorageService.delete(oldCoverImage);
     }
 
+    // Invalide le cache Next.js pour que la page détail reflète les changements
+    const { revalidatePath } = await import("next/cache");
+    revalidatePath(`/dashboard/circles/${result.circle.slug}`);
+
     return { success: true, data: result.circle };
   } catch (error) {
     if (error instanceof DomainError) {
