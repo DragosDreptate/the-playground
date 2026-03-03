@@ -413,7 +413,8 @@
       "alreadySentError": "L'invitation a déjà été envoyée",
       "notHostError": "Seul l'organisateur peut inviter la Communauté",
       "hint": "Envoyez un email d'invitation à tous les membres et followers",
-      "alreadySentShort": "Envoyée"
+      "alreadySentShort": "Envoyée",
+      "cooldownHint": "Prochain envoi disponible dans {time}"
     },
     "errors": {
       "notFound": "Événement introuvable",

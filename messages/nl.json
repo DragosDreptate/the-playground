@@ -413,7 +413,8 @@
       "alreadySentError": "De uitnodiging is al verzonden",
       "notHostError": "Alleen de organisator kan de Community uitnodigen",
       "hint": "Stuur een uitnodigingsmail naar alle leden en volgers",
-      "alreadySentShort": "Verzonden"
+      "alreadySentShort": "Verzonden",
+      "cooldownHint": "Volgende verzending beschikbaar over {time}"
     },
     "errors": {
       "notFound": "Evenement niet gevonden",

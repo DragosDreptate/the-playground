@@ -413,7 +413,8 @@
       "alreadySentError": "La invitación ya ha sido enviada",
       "notHostError": "Solo el organizador puede invitar a la Comunidad",
       "hint": "Envía un correo de invitación a todos los miembros y seguidores",
-      "alreadySentShort": "Enviada"
+      "alreadySentShort": "Enviada",
+      "cooldownHint": "Próximo envío disponible en {time}"
     },
     "errors": {
       "notFound": "Evento no encontrado",

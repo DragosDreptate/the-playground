@@ -45,15 +45,19 @@ export async function broadcastMomentAction(
     };
   }
 
-  if (moment.broadcastSentAt !== null) {
+  const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+  if (
+    moment.broadcastSentAt !== null &&
+    Date.now() - moment.broadcastSentAt.getTime() < COOLDOWN_MS
+  ) {
     return {
       success: false,
-      error: "Cet événement a déjà été diffusé",
-      code: "ALREADY_SENT",
+      error: "L'invitation a déjà été envoyée. Vous pourrez renvoyer dans 24h.",
+      code: "COOLDOWN",
     };
   }
 
-  // Mark before send — anti race condition
+  // Mark before send — anti race condition (écrase le timestamp à chaque envoi)
   await prismaMomentRepository.markBroadcastSent(momentId);
 
   const circle = await prismaCircleRepository.findById(moment.circleId);
