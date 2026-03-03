@@ -259,7 +259,8 @@
       "joinSignIn": "Inloggen om te joinen",
       "alreadyMember": "Je bent al lid",
       "invalidToken": "Deze uitnodigingslink is niet meer geldig",
-      "joined": "Welkom bij de Community!"
+      "joined": "Welkom bij de Community!",
+      "viewCircle": "Community bekijken"
     }
   },
   "Moment": {

@@ -259,7 +259,8 @@
       "joinSignIn": "Iniciar sesión para unirse",
       "alreadyMember": "Ya eres miembro",
       "invalidToken": "Este enlace de invitación ya no es válido",
-      "joined": "¡Bienvenido/a a la Comunidad!"
+      "joined": "¡Bienvenido/a a la Comunidad!",
+      "viewCircle": "Ver la Comunidad"
     }
   },
   "Moment": {

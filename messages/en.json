@@ -259,7 +259,8 @@
       "joinSignIn": "Sign in to join",
       "alreadyMember": "You are already a member",
       "invalidToken": "This invite link is no longer valid",
-      "joined": "Welcome to the Community!"
+      "joined": "Welcome to the Community!",
+      "viewCircle": "View Community"
     }
   },
   "Moment": {

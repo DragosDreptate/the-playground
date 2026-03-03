@@ -259,7 +259,8 @@
       "joinSignIn": "Autentifică-te pentru a te alătura",
       "alreadyMember": "Ești deja membru",
       "invalidToken": "Acest link de invitație nu mai este valid",
-      "joined": "Bun venit în Comunitate!"
+      "joined": "Bun venit în Comunitate!",
+      "viewCircle": "Vezi Comunitatea"
     }
   },
   "Moment": {
