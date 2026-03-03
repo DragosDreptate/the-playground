@@ -314,6 +314,7 @@ async function main() {
           endsAt: momentData.endsAt ?? null,
           status: momentData.status,
           capacity: momentData.capacity,
+          broadcastSentAt: null,
         },
       });
       console.log(`  📅 ${momentData.status === "PAST" ? "↩" : "→"} ${momentData.title}`);
