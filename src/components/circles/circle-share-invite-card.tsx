@@ -280,17 +280,19 @@ function InlineCopyButton({ value }: { value: string }) {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
+      className="h-8 shrink-0 gap-1.5 px-3"
       onClick={handleCopy}
-      className="border-border text-foreground hover:bg-muted flex h-[30px] shrink-0 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs font-medium transition-colors"
     >
       {copied ? (
-        <Check className="size-3 text-green-500" />
+        <Check className="size-3.5 text-green-500" />
       ) : (
-        <Copy className="size-3" />
+        <Copy className="size-3.5" />
       )}
       {copied ? "Copié !" : "Copier le lien"}
-    </button>
+    </Button>
   );
 }
