@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, MapPin, Globe, Lock, Tag } from "lucide-react";
@@ -50,6 +50,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     circle?.category ?? ""
   );
   const [circleName, setCircleName] = useState(circle?.name ?? "");
+  const [localError, setLocalError] = useState<string | undefined>();
 
   const previewImage =
     coverSelection?.type === "upload"
@@ -99,11 +100,16 @@ export function CircleForm({ circle, action }: CircleFormProps) {
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
 
+  // Sync l'erreur de l'action vers l'état local (pour pouvoir la vider indépendamment)
+  useEffect(() => {
+    setLocalError(state.error);
+  }, [state.error]);
+
   return (
     <form action={formAction} className="mx-auto max-w-5xl">
-      {state.error && (
+      {localError && (
         <div className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
-          {state.error}
+          {localError}
         </div>
       )}
 
@@ -165,7 +171,10 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                 <Select
                   name="category"
                   defaultValue={circle?.category ?? ""}
-                  onValueChange={(value) => setSelectedCategory(value as CircleCategory | "")}
+                  onValueChange={(value) => {
+                    setSelectedCategory(value as CircleCategory | "");
+                    setLocalError(undefined);
+                  }}
                 >
                   <SelectTrigger className="h-9">
                     <SelectValue placeholder={t("form.categoryPlaceholder")} />
@@ -193,6 +202,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                     defaultValue={circle?.customCategory ?? ""}
                     maxLength={100}
                     className="h-9"
+                    required
                   />
                 </div>
               </div>
