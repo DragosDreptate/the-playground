@@ -1,7 +1,9 @@
 "use server";
 
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
+
+const PLATFORM_TIMEZONE = "Europe/Paris";
 import { prismaCircleRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { Moment } from "@/domain/models/moment";
@@ -10,7 +12,7 @@ import type { NewMomentNotificationStrings } from "@/domain/ports/services/email
 const emailService = createResendEmailService();
 
 function formatMomentDate(moment: Moment): string {
-  return format(moment.startsAt, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
 }
 
 function formatMomentLocation(moment: Moment): string {

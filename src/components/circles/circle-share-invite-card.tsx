@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { Link as NextIntlLink } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import {
   generateCircleInviteTokenAction,
@@ -121,12 +120,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
       {/* Card title */}
       <div className="mb-4 flex items-center gap-2">
         <p className="text-[17px] font-semibold">{t.cardTitle}</p>
-        <Badge
-          variant="outline"
-          className="border-primary/30 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide px-2 py-0.5"
-        >
-          Nouveau
-        </Badge>
       </div>
 
       {/* ── Row 1 : Lien partageable ── */}
@@ -270,7 +263,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
   );
 }
 
-// Bouton copier compact — label court "Copier" (vs "Copier le lien" dans CopyLinkButton)
 function InlineCopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -281,17 +273,19 @@ function InlineCopyButton({ value }: { value: string }) {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
+      size="sm"
+      className="h-8 shrink-0 gap-1.5 px-3"
       onClick={handleCopy}
-      className="border-border text-foreground hover:bg-muted flex h-[30px] shrink-0 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs font-medium transition-colors"
     >
       {copied ? (
-        <Check className="size-3 text-green-500" />
+        <Check className="size-3.5 text-green-500" />
       ) : (
-        <Copy className="size-3" />
+        <Copy className="size-3.5" />
       )}
-      {copied ? "Copié !" : "Copier"}
-    </button>
+      {copied ? "Copié !" : "Copier le lien"}
+    </Button>
   );
 }
