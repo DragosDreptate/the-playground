@@ -21,6 +21,7 @@ import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
+import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 
 export async function createCircleAction(
   formData: FormData
@@ -62,6 +63,24 @@ export async function createCircleAction(
       },
       { circleRepository: prismaCircleRepository }
     );
+
+    // Fire-and-forget : notifier les admins de la nouvelle Communauté
+    after(async () => {
+      try {
+        const creator = await prismaUserRepository.findById(session.user.id);
+        await notifyAdminEntityCreated({
+          entityType: "circle",
+          entityName: result.circle.name,
+          entitySlug: result.circle.slug,
+          creatorId: session.user.id,
+          creatorName: creator?.name ?? creator?.email ?? session.user.email ?? "",
+          creatorEmail: creator?.email ?? session.user.email ?? "",
+        });
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
+
     return { success: true, data: result.circle };
   } catch (error) {
     if (error instanceof DomainError) {
