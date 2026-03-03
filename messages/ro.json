@@ -250,7 +250,7 @@
       "emailSent": "Invitație/invitații trimise",
       "emailInvalid": "Adresă de email invalidă",
       "linkTitle": "Link de invitație",
-      "linkDescription": "Orice persoană cu acest link poate intra în Comunitate",
+      "linkDescription": "Orice persoană cu acest link poate intra în Comunitate — trimite-l prin WhatsApp, Slack sau email.",
       "linkGenerate": "Generează un link",
       "linkRevoke": "Revocă",
       "linkRevoked": "Link revocat",

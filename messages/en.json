@@ -250,7 +250,7 @@
       "emailSent": "Invitation(s) sent",
       "emailInvalid": "Invalid email address",
       "linkTitle": "Invite link",
-      "linkDescription": "Anyone with this link can join the Community",
+      "linkDescription": "Anyone with this link can join the Community — share it via WhatsApp, Slack or email.",
       "linkGenerate": "Generate a link",
       "linkRevoke": "Revoke",
       "linkRevoked": "Link revoked",

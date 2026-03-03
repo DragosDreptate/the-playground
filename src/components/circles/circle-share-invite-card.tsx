@@ -232,24 +232,24 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
           <Copy className="size-[15px]" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="mb-1 text-[13px] font-medium">{t.linkTitle}</p>
-          <p className="text-muted-foreground mb-2 text-xs leading-relaxed">
+          <p className="mb-1.5 text-[13px] font-medium">{t.linkTitle}</p>
+          <p className="text-muted-foreground mb-2 text-xs leading-[1.5]">
             {t.linkDescription}
           </p>
 
           {inviteUrl ? (
             <>
-              <div className="mb-1.5 flex items-center gap-2">
-                <div className="border-border bg-muted/50 min-w-0 flex-1 truncate rounded-lg border px-3 py-1.5 font-mono text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
                   {inviteUrl.replace(/^https?:\/\//, "")}
                 </div>
-                <CopyLinkButton value={inviteUrl} />
+                <InlineCopyButton value={inviteUrl} />
               </div>
               <button
                 type="button"
                 onClick={handleRevoke}
                 disabled={isPendingRevoke}
-                className="text-muted-foreground hover:text-foreground text-[11px] underline underline-offset-2 disabled:cursor-wait"
+                className="text-muted-foreground hover:text-foreground mt-1.5 block text-[11px] underline underline-offset-2 disabled:cursor-wait"
               >
                 {isPendingRevoke ? "..." : "Révoquer et générer un nouveau lien"}
               </button>
@@ -269,5 +269,31 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
         </div>
       </div>
     </div>
+  );
+}
+
+// Bouton copier compact — label court "Copier" (vs "Copier le lien" dans CopyLinkButton)
+function InlineCopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="border-border text-foreground hover:bg-muted flex h-[30px] shrink-0 items-center gap-1.5 rounded-md border bg-transparent px-2.5 text-xs font-medium transition-colors"
+    >
+      {copied ? (
+        <Check className="size-3 text-green-500" />
+      ) : (
+        <Copy className="size-3" />
+      )}
+      {copied ? "Copié !" : "Copier"}
+    </button>
   );
 }
