@@ -167,6 +167,10 @@ test.describe("Invitation — page join (Participant authentifié non membre)", 
     await generateBtn.click();
     await expect(hostPage.locator("main")).toContainText(/circles\/join\//i, { timeout: 5_000 });
 
+    // Reload to confirm token is persisted server-side (not just React state)
+    await hostPage.reload();
+    await expect(hostPage.locator("main")).toContainText(/circles\/join\//i, { timeout: 5_000 });
+
     const inviteToken = await extractInviteToken(hostPage);
     await hostContext.close();
 
@@ -208,6 +212,9 @@ test.describe("Invitation — page join (Participant déjà membre)", () => {
     const generateBtn = hostPage.getByRole("button", { name: /générer un lien/i });
     if (await generateBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
       await generateBtn.click();
+      await expect(hostPage.locator("main")).toContainText(/circles\/join\//i, { timeout: 5_000 });
+      // Reload to confirm token is persisted server-side (not just React state)
+      await hostPage.reload();
       await expect(hostPage.locator("main")).toContainText(/circles\/join\//i, { timeout: 5_000 });
     }
 
