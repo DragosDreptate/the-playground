@@ -35,7 +35,9 @@ export async function createCircleAction(
   const description = formData.get("description") as string;
   const visibility = (formData.get("visibility") as CircleVisibility) ?? "PUBLIC";
   const category = (formData.get("category") as CircleCategory) || undefined;
-  const customCategory = category === "OTHER" ? ((formData.get("customCategory") as string)?.trim() || null) : null;
+  const customCategory = category === "OTHER"
+    ? ((formData.get("customCategory") as string)?.trim() || null)
+    : undefined;
   const city = (formData.get("city") as string)?.trim() || undefined;
 
   if (!name?.trim()) {
@@ -58,7 +60,7 @@ export async function createCircleAction(
         description: description.trim(),
         visibility,
         category,
-        customCategory,
+        ...(customCategory !== undefined && { customCategory }),
         city,
         userId: session.user.id,
         ...coverData,
@@ -107,7 +109,6 @@ export async function updateCircleAction(
   const visibility = formData.get("visibility") as CircleVisibility | null;
   const categoryRaw = formData.get("category") as string | null;
   const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
-  const customCategory = category === "OTHER" ? ((formData.get("customCategory") as string)?.trim() || null) : null;
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
 
@@ -120,6 +121,20 @@ export async function updateCircleAction(
     const existingCircle = await prismaCircleRepository.findById(circleId);
     const oldCoverImage = existingCircle?.coverImage ?? null;
 
+    // Calcul conditionnel de customCategory :
+    // - Si nouvelle catégorie = "OTHER" → on prend la valeur saisie (ou null si vide)
+    // - Si ancienne catégorie était "OTHER" et qu'on change → on remet à null pour effacer
+    // - Sinon → undefined (on ne touche pas au champ, Prisma l'ignore)
+    const existingCategory = existingCircle?.category ?? null;
+    let customCategory: string | null | undefined;
+    if (category === "OTHER") {
+      customCategory = (formData.get("customCategory") as string)?.trim() || null;
+    } else if (existingCategory === "OTHER") {
+      customCategory = null;
+    } else {
+      customCategory = undefined;
+    }
+
     const coverData = await processCoverImage(formData);
 
     const result = await updateCircle(
@@ -130,7 +145,7 @@ export async function updateCircleAction(
         ...(description !== null && { description: description.trim() }),
         ...(visibility && { visibility }),
         category,
-        customCategory,
+        ...(customCategory !== undefined && { customCategory }),
         city,
         ...coverData,
       },
