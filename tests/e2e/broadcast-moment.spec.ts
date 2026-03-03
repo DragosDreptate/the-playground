@@ -113,36 +113,58 @@ test.describe("Broadcast — vue Host (page détail Moment)", () => {
       .locator("button")
       .filter({ hasText: /^envoyer$/i })
       .first();
-    await expect(broadcastButton).toBeEnabled({ timeout: 10_000 });
-    await broadcastButton.click();
 
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible({ timeout: 5_000 });
-
-    // Saisir un message personnalisé
-    const textarea = dialog.locator("textarea");
-    await textarea.fill("Message de test E2E — ne pas tenir compte.");
-
-    // Clic sur "Envoyer" dans la modale
-    await dialog
+    // Si le bouton est déjà en cooldown (retry ou run précédent), on saute l'envoi
+    const alreadySent = await page
       .locator("button")
-      .filter({ hasText: /^envoyer$/i })
-      .click();
+      .filter({ hasText: /envoyée/i })
+      .first()
+      .isVisible()
+      .catch(() => false);
 
-    // La modale se ferme quand result.success === true (broadcastSentAt est en DB)
-    await expect(dialog).not.toBeVisible({ timeout: 15_000 });
+    if (!alreadySent) {
+      await expect(broadcastButton).toBeEnabled({ timeout: 10_000 });
+      await broadcastButton.click();
 
-    // Recharger pour obtenir l'état frais du serveur
-    await page.goto(HOST_MOMENT_URL);
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+      const textarea = dialog.locator("textarea");
+      await textarea.fill("Message de test E2E — ne pas tenir compte.");
+
+      await dialog
+        .locator("button")
+        .filter({ hasText: /^envoyer$/i })
+        .click();
+
+      await expect(dialog).not.toBeVisible({ timeout: 15_000 });
+
+      await page.goto(HOST_MOMENT_URL);
+    }
+
+    // Dans tous les cas : le bouton doit être en état "Envoyée" + disabled
     const sentButton = page
       .locator("button")
       .filter({ hasText: /envoyée/i })
       .first();
     await expect(sentButton).toBeVisible({ timeout: 10_000 });
     await expect(sentButton).toBeDisabled();
+  });
 
-    // Tooltip au survol du bouton grisé : le wrapper <span> capture les events souris
-    await sentButton.hover();
+  test("should show cooldown tooltip when hovering the disabled broadcast button", async ({
+    page,
+  }) => {
+    // Ce test tourne après "should send" — le bouton est en cooldown
+    await page.goto(HOST_MOMENT_URL);
+
+    const sentButton = page
+      .locator("button")
+      .filter({ hasText: /envoyée/i })
+      .first();
+    await expect(sentButton).toBeVisible({ timeout: 10_000 });
+
+    // Hover sur le <span> parent (TooltipTrigger) — le bouton disabled ne reçoit pas les events souris
+    await sentButton.locator("xpath=..").hover();
     await expect(page.getByRole("tooltip")).toContainText(
       /prochain envoi disponible dans/i,
       { timeout: 3_000 }
