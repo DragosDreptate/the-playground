@@ -140,9 +140,11 @@ test.describe("Invitation — page join (non authentifié)", () => {
 });
 
 // ─────────────────────────────────────────────────────────────
-// Page join — Participant authentifié (Player3 = non membre de paris-creative-tech)
+// Page join — Participant authentifié (Player3 = non membre de yoga-montmartre)
 // ─────────────────────────────────────────────────────────────
 
+// Note: PLAYER3 est membre de paris-creative-tech (inscrit à des moments)
+// → on utilise PUBLIC_CIRCLE (yoga-montmartre) dont PLAYER3 n'est pas membre
 test.describe("Invitation — page join (Participant authentifié non membre)", () => {
   test.use({ storageState: AUTH.PLAYER3 });
 
@@ -152,10 +154,10 @@ test.describe("Invitation — page join (Participant authentifié non membre)", 
   });
 
   test("should show a join button when accessing a valid invite URL", async ({ browser }) => {
-    // Étape 1 : HOST génère un token
+    // Étape 1 : HOST génère un token pour yoga-montmartre (PLAYER3 n'en est pas membre)
     const hostContext = await browser.newContext({ storageState: AUTH.HOST });
     const hostPage = await hostContext.newPage();
-    await hostPage.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
+    await hostPage.goto(`/fr/dashboard/circles/${SLUGS.PUBLIC_CIRCLE}`);
 
     const revokeBtn = hostPage.getByRole("button", { name: /révoquer/i });
     if (await revokeBtn.isVisible({ timeout: 2_000 }).catch(() => false)) {
@@ -179,17 +181,14 @@ test.describe("Invitation — page join (Participant authentifié non membre)", 
       return;
     }
 
-    // Étape 2 : PLAYER3 accède à la page join
+    // Étape 2 : PLAYER3 accède à la page join (non membre de yoga-montmartre)
     const playerContext = await browser.newContext({ storageState: AUTH.PLAYER3 });
     const playerPage = await playerContext.newPage();
     await playerPage.goto(`/fr/circles/join/${inviteToken}`);
 
-    await expect(playerPage.locator("main")).toContainText(/Paris Creative Tech/i, { timeout: 5_000 });
+    await expect(playerPage.locator("main")).toContainText(/Yoga Montmartre/i, { timeout: 5_000 });
 
-    const joinBtn = playerPage
-      .getByRole("button", { name: /rejoindre/i })
-      .or(playerPage.getByRole("link", { name: /rejoindre/i }))
-      .first();
+    const joinBtn = playerPage.getByRole("button", { name: /rejoindre/i }).first();
     await expect(joinBtn).toBeVisible({ timeout: 5_000 });
 
     await playerContext.close();
