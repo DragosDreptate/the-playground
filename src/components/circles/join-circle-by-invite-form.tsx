@@ -34,7 +34,7 @@ export function JoinCircleByInviteForm({
   if (!isAuthenticated) {
     return (
       <Button asChild size="lg" className="w-full">
-        <Link href={`/auth/signin?callbackUrl=/circles/join/${token}`}>
+        <Link href={`/auth/sign-in?callbackUrl=/circles/join/${token}`}>
           {t.joinSignIn}
         </Link>
       </Button>
