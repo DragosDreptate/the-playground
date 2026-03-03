@@ -58,7 +58,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
       : null
   );
 
-  const [isPendingGenerate, startGenerate] = useTransition();
   const [isPendingRevoke, startRevoke] = useTransition();
   const [isPendingEmail, startEmail] = useTransition();
 
@@ -96,21 +95,13 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
   }
 
   // ── Invite link handlers ──
-  function handleGenerate() {
-    startGenerate(async () => {
+  // Révoquer et générer un nouveau lien immédiatement (conforme au mockup)
+  function handleRevoke() {
+    startRevoke(async () => {
+      await revokeCircleInviteTokenAction(circle.id);
       const result = await generateCircleInviteTokenAction(circle.id);
       if (result.success) {
         setInviteUrl(result.data.inviteUrl);
-        router.refresh();
-      }
-    });
-  }
-
-  function handleRevoke() {
-    startRevoke(async () => {
-      const result = await revokeCircleInviteTokenAction(circle.id);
-      if (result.success) {
-        setInviteUrl(null);
         router.refresh();
       }
     });
@@ -237,7 +228,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
             {t.linkDescription}
           </p>
 
-          {inviteUrl ? (
+          {inviteUrl && (
             <>
               <div className="flex items-center gap-2">
                 <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
@@ -254,17 +245,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
                 {isPendingRevoke ? "..." : "Révoquer et générer un nouveau lien"}
               </button>
             </>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGenerate}
-              disabled={isPendingGenerate}
-              className="text-[13px]"
-            >
-              {isPendingGenerate ? "..." : t.linkGenerate}
-            </Button>
           )}
         </div>
       </div>

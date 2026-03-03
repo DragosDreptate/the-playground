@@ -18,6 +18,7 @@ import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
+import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -90,6 +91,16 @@ export default async function CircleDetailPage({
   if (!membership) notFound();
 
   const isHost = membership.role === "HOST";
+
+  // Auto-génère le token d'invitation pour l'Organisateur si absent
+  // Le lien est toujours affiché (pas de bouton "Générer" — conforme au mockup)
+  if (isHost && !circle.inviteToken) {
+    const result = await generateCircleInviteToken(
+      { circleId: circle.id, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    circle = result.circle;
+  }
 
   const [hosts, players, allMoments] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
