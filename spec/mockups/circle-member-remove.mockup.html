@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supprimer un membre — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 12px -2px rgba(26,27,46,0.1), 0 2px 6px -2px rgba(26,27,46,0.06);
+  --shadow-xl: 0 20px 60px -10px rgba(26,27,46,0.22);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--foreground); background: var(--background); min-height: 100vh; }
+
+/* ── SiteHeader ── */
+.site-header {
+  height: 56px; background: var(--card); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 24px;
+  position: sticky; top: 0; z-index: 10;
+}
+.site-logo { font-size: 16px; font-weight: 800; color: var(--primary); margin-right: auto; }
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 12px; font-weight: 600;
+}
+
+/* ── Layout ── */
+.dashboard { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px;
+}
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb .sep { font-size: 11px; }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500;
+}
+.badge-host { border: 1px solid rgba(232,69,122,0.4); color: var(--primary); }
+.badge-outline { border: 1px solid var(--border); color: var(--foreground); }
+
+/* ── State toggle (mockup only) ── */
+.state-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 20px; padding: 12px 16px;
+  background: var(--foreground); border-radius: 10px;
+}
+.state-bar-label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
+.state-btn {
+  padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
+  background: transparent; color: rgba(255,255,255,0.7); transition: all 0.15s;
+}
+.state-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+.state-btn.active { background: white; color: var(--foreground); border-color: white; }
+
+/* ── Contexte page (grisé) ── */
+.page-context { opacity: 0.3; pointer-events: none; margin-bottom: 24px; }
+.ctx-title { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.ctx-desc { font-size: 14px; color: var(--muted-foreground); margin-bottom: 16px; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.ctx-event-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+}
+.ctx-event-cover { width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg,#e8457a,#9333ea); flex-shrink: 0; }
+.ctx-event-title { font-size: 14px; font-weight: 600; }
+.ctx-event-meta { font-size: 12px; color: var(--muted-foreground); }
+
+/* ── Members card ── */
+.members-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px;
+}
+.members-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin-bottom: 16px;
+}
+.members-title { font-size: 17px; font-weight: 600; }
+
+/* Section labels within list */
+.section-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--muted-foreground);
+  padding: 6px 0 4px; border-bottom: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+/* ── Member row ── */
+.member-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.member-row:last-of-type { border-bottom: none; }
+
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: white; flex-shrink: 0;
+}
+.member-info { flex: 1; min-width: 0; }
+.member-name { font-size: 14px; font-weight: 500; line-height: 1.3; }
+.member-email { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+
+/* ── Three-dot button (NEW) ── */
+.more-btn {
+  width: 28px; height: 28px; border-radius: 6px;
+  border: none; background: transparent; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--muted-foreground);
+  transition: background 0.15s, color 0.15s;
+}
+.more-btn:hover, .more-btn.open { background: var(--muted); color: var(--foreground); }
+
+/* ── Dropdown menu ── */
+.dropdown {
+  position: absolute; right: -4px; top: calc(100% - 6px);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--shadow-md);
+  min-width: 210px; padding: 4px; z-index: 50;
+  display: none;
+}
+.dropdown.open { display: block; }
+.dropdown-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  width: 100%; text-align: left; background: none; border: none;
+  color: var(--foreground); transition: background 0.1s;
+}
+.dropdown-item:hover { background: var(--muted); }
+.dropdown-item.danger { color: var(--primary); }
+.dropdown-item.danger:hover { background: rgba(232,69,122,0.08); }
+
+/* ── Show more ── */
+.show-more {
+  width: 100%; margin-top: 16px; padding: 8px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  font-size: 13px; font-weight: 500; color: var(--muted-foreground); cursor: pointer;
+}
+
+/* ── AlertDialog ── */
+.dialog-backdrop {
+  position: fixed; inset: 0; background: rgba(26,27,46,0.48);
+  backdrop-filter: blur(3px);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+}
+.dialog-backdrop.open { display: flex; }
+
+.dialog-card {
+  background: var(--card); border-radius: 18px;
+  padding: 28px; max-width: 420px; width: calc(100vw - 48px);
+  box-shadow: var(--shadow-xl);
+  animation: dialog-in 0.18s ease;
+}
+@keyframes dialog-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dialog-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(232,69,122,0.1);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-bottom: 16px;
+}
+
+.dialog-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+.dialog-desc { font-size: 14px; color: var(--muted-foreground); line-height: 1.65; margin-bottom: 24px; }
+.dialog-desc strong { color: var(--foreground); }
+
+.dialog-footer { display: flex; gap: 10px; justify-content: flex-end; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px; border-radius: 8px; font-size: 14px;
+  font-weight: 500; cursor: pointer; border: none; transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--foreground); }
+.btn-cancel:hover { background: var(--muted); }
+.btn-destructive { background: var(--primary); color: white; }
+.btn-destructive:hover { opacity: 0.88; }
+
+/* ── Legend note ── */
+.legend {
+  margin-top: 16px; padding: 12px 16px;
+  background: var(--muted); border-radius: 8px;
+  font-size: 12px; color: var(--muted-foreground); line-height: 1.6;
+}
+.legend strong { color: var(--foreground); }
+</style>
+</head>
+<body>
+
+<!-- SiteHeader -->
+<header class="site-header">
+  <div class="site-logo">The Playground</div>
+  <div class="nav-avatar">D</div>
+</header>
+
+<main class="dashboard">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="sep">›</span>
+    <span class="current">Paris AI Builders</span>
+  </div>
+  <div style="margin-bottom: 24px;">
+    <span class="badge badge-host">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+      Organisateur
+    </span>
+  </div>
+
+  <!-- Contexte page (grisé) -->
+  <div class="page-context">
+    <div class="ctx-title">Paris AI Builders</div>
+    <div class="ctx-desc">La communauté des builders IA à Paris — meetups mensuels, projets collectifs, entraide.</div>
+    <div class="divider"></div>
+    <div style="font-size:12px;color:var(--muted-foreground);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">À venir</div>
+    <div class="ctx-event-card">
+      <div class="ctx-event-cover"></div>
+      <div>
+        <div class="ctx-event-title">AI Product Night #7</div>
+        <div class="ctx-event-meta">Jeudi 20 mars 2026 · Station F, Paris</div>
+      </div>
+    </div>
+    <div class="divider" style="margin-top: 20px;"></div>
+  </div>
+
+  <!-- State toggle (mockup only) -->
+  <div class="state-bar">
+    <span class="state-bar-label">État</span>
+    <button class="state-btn active" onclick="showState('normal', this)">Liste</button>
+    <button class="state-btn" onclick="showState('dropdown', this)">Menu ouvert</button>
+    <button class="state-btn" onclick="showState('dialog', this)">Confirmation</button>
+  </div>
+
+  <!-- ── Members card ── -->
+  <div class="members-card">
+    <div class="members-header">
+      <h2 class="members-title">Membres</h2>
+      <span class="badge badge-outline">6 membres</span>
+    </div>
+
+    <!-- Organisateurs — pas de bouton ⋮ -->
+    <div class="section-label" style="margin-top:0;">Organisateurs</div>
+
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#e8457a,#9333ea);">DD</div>
+      <div class="member-info">
+        <div class="member-name">Dragos Dreptate</div>
+        <div class="member-email">dragos@example.com</div>
+      </div>
+      <span class="badge badge-host" style="font-size:11px;">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);">AL</div>
+      <div class="member-info">
+        <div class="member-name">Alice Laurent</div>
+        <div class="member-email">alice.laurent@example.com</div>
+      </div>
+      <span class="badge badge-host" style="font-size:11px;">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+    </div>
+
+    <!-- Participants — bouton ⋮ sur chaque ligne -->
+    <div class="section-label">Participants</div>
+
+    <!-- Ligne 1 — cible des états "dropdown" et "dialog" -->
+    <div class="member-row" id="row-marie" style="z-index: 10;">
+      <div class="avatar" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">MS</div>
+      <div class="member-info">
+        <div class="member-name">Marie Simon</div>
+        <div class="member-email">marie.simon@example.com</div>
+      </div>
+      <button
+        class="more-btn"
+        id="more-marie"
+        title="Actions"
+        onclick="toggleDropdown('marie')"
+      >
+        <!-- MoreVertical icon -->
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
+      <!-- Dropdown -->
+      <div class="dropdown" id="dropdown-marie">
+        <button class="dropdown-item danger" onclick="openDialog('Marie Simon')">
+          <!-- UserMinus icon -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="22" x2="16" y1="11" y2="17"/>
+            <line x1="16" x2="22" y1="11" y2="17"/>
+          </svg>
+          Retirer de la Communauté
+        </button>
+      </div>
+    </div>
+
+    <!-- Ligne 2 -->
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#10b981,#3b82f6);">TB</div>
+      <div class="member-info">
+        <div class="member-name">Thomas Bernard</div>
+        <div class="member-email">thomas.bernard@example.com</div>
+      </div>
+      <button class="more-btn" title="Actions">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Ligne 3 -->
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">CF</div>
+      <div class="member-info">
+        <div class="member-name">Camille Fontaine</div>
+        <div class="member-email">camille.fontaine@example.com</div>
+      </div>
+      <button class="more-btn" title="Actions">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Ligne 4 -->
+    <div class="member-row">
+      <div class="avatar" style="background:linear-gradient(135deg,#e8457a,#9333ea);">RD</div>
+      <div class="member-info">
+        <div class="member-name">Rémi Dupont</div>
+        <div class="member-email">remi.dupont@example.com</div>
+      </div>
+      <button class="more-btn" title="Actions">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="show-more">Voir plus (2)</button>
+  </div>
+
+  <!-- Note explicative -->
+  <div class="legend">
+    <strong>Changements vs. l'existant :</strong>
+    Le bouton <strong>⋮</strong> (actions) apparaît uniquement sur les lignes Participants — jamais sur les Organisateurs.
+    Il ouvre un menu contextuel avec « Retirer de la Communauté ». L'action déclenche une modale de confirmation
+    avant toute suppression. La suppression annule les inscriptions aux événements futurs du membre retiré.
+  </div>
+
+</main>
+
+<!-- ── AlertDialog ── -->
+<div class="dialog-backdrop" id="dialog-backdrop" onclick="handleBackdropClick(event)">
+  <div class="dialog-card">
+    <div class="dialog-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e8457a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <line x1="22" x2="16" y1="11" y2="17"/>
+        <line x1="16" x2="22" y1="11" y2="17"/>
+      </svg>
+    </div>
+    <div class="dialog-title" id="dialog-title">Retirer Marie Simon ?</div>
+    <p class="dialog-desc">
+      <strong id="dialog-name">Marie Simon</strong> perdra l'accès à cette Communauté.
+      Ses inscriptions aux événements à venir seront <strong>annulées automatiquement</strong>.
+      <br><br>
+      Cette action est irréversible. L'Organisateur peut réinviter le membre ultérieurement.
+    </p>
+    <div class="dialog-footer">
+      <button class="btn btn-cancel" onclick="closeDialog()">Annuler</button>
+      <button class="btn btn-destructive">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <line x1="22" x2="16" y1="11" y2="17"/>
+          <line x1="16" x2="22" y1="11" y2="17"/>
+        </svg>
+        Retirer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── State management ──────────────────────────────────────
+
+  function resetAll() {
+    document.getElementById('dropdown-marie').classList.remove('open');
+    document.getElementById('more-marie').classList.remove('open');
+    document.getElementById('dialog-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function showState(state, btn) {
+    resetAll();
+    document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    if (state === 'dropdown') {
+      document.getElementById('dropdown-marie').classList.add('open');
+      document.getElementById('more-marie').classList.add('open');
+    } else if (state === 'dialog') {
+      document.getElementById('dialog-backdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function toggleDropdown(id) {
+    const dropdown = document.getElementById('dropdown-' + id);
+    const btn = document.getElementById('more-' + id);
+    const isOpen = dropdown.classList.contains('open');
+    resetAll();
+    if (!isOpen) {
+      dropdown.classList.add('open');
+      btn.classList.add('open');
+      document.querySelectorAll('.state-btn')[1].classList.add('active');
+      document.querySelectorAll('.state-btn')[0].classList.remove('active');
+    } else {
+      document.querySelectorAll('.state-btn')[0].classList.add('active');
+    }
+  }
+
+  function openDialog(name) {
+    resetAll();
+    document.getElementById('dialog-title').textContent = 'Retirer ' + name + ' ?';
+    document.getElementById('dialog-name').textContent = name;
+    document.getElementById('dialog-backdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.state-btn')[2].classList.add('active');
+  }
+
+  function closeDialog() {
+    document.getElementById('dialog-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+    document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.state-btn')[0].classList.add('active');
+  }
+
+  function handleBackdropClick(e) {
+    if (e.target === document.getElementById('dialog-backdrop')) closeDialog();
+  }
+
+  // Ferme le dropdown en cliquant ailleurs
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#row-marie')) {
+      document.getElementById('dropdown-marie').classList.remove('open');
+      document.getElementById('more-marie').classList.remove('open');
+      if (!document.getElementById('dialog-backdrop').classList.contains('open')) {
+        document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.state-btn')[0].classList.add('active');
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
