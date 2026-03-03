@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
@@ -70,13 +70,6 @@ export default async function JoinCircleByInvitePage({
     ),
     prismaCircleRepository.countMembers(circle.id),
   ]);
-
-  // Si l'utilisateur est connecté mais n'a pas complété son profil,
-  // le rediriger vers le setup — le cookie auth-callback-url pointe déjà
-  // sur cette page, donc après le setup il reviendra ici automatiquement.
-  if (session?.user?.id && !session.user.onboardingCompleted) {
-    redirect("/dashboard/profile/setup");
-  }
 
   let alreadyMember = false;
   if (session?.user?.id) {
