@@ -292,6 +292,7 @@ export default async function AboutPage() {
             { name: "Tailwind + shadcn", desc: isFr ? "Design system" : "Design system" },
             { name: "Resend", desc: isFr ? "Emails transactionnels" : "Transactional emails" },
             { name: "Vercel", desc: isFr ? "Déploiement EU" : "Edge deployment (EU)" },
+            { name: "PostHog", desc: isFr ? "Product analytics" : "Product analytics" },
             { name: "Claude Code", desc: isFr ? "Propulsé par l'IA" : "AI-powered dev" },
             { name: "Anthropic SDK", desc: isFr ? "IA embarquée (Claude)" : "Embedded AI (Claude)" },
           ].map(({ name, desc }) => (
