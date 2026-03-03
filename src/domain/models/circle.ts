@@ -27,6 +27,7 @@ export type Circle = {
   coverImageAttribution: CoverImageAttribution | null;
   visibility: CircleVisibility;
   category: CircleCategory | null;
+  customCategory: string | null;
   city: string | null;
   stripeConnectAccountId: string | null;
   createdAt: Date;

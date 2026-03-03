@@ -188,7 +188,9 @@
       "category": "Categoría",
       "categoryPlaceholder": "Elige una categoría",
       "city": "Ciudad",
-      "cityPlaceholder": "Madrid, Barcelona, Remoto..."
+      "cityPlaceholder": "Madrid, Barcelona, Remoto...",
+      "customCategoryPlaceholder": "Especifica tu temática",
+      "customCategoryRequired": "Por favor, especifica tu temática"
     },
     "delete": {
       "title": "Eliminar Comunidad",

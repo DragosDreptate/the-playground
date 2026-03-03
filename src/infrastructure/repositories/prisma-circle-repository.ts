@@ -23,6 +23,7 @@ function toDomainCircle(record: PrismaCircle): Circle {
       : null,
     visibility: record.visibility,
     category: record.category ?? null,
+    customCategory: record.customCategory ?? null,
     city: record.city ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
     createdAt: record.createdAt,
@@ -49,6 +50,7 @@ export const prismaCircleRepository: CircleRepository = {
         description: input.description,
         visibility: input.visibility,
         ...(input.category !== undefined && { category: input.category }),
+        ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
@@ -75,6 +77,7 @@ export const prismaCircleRepository: CircleRepository = {
           description: input.description,
           visibility: input.visibility,
           ...(input.category !== undefined && { category: input.category }),
+          ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
           ...(input.city !== undefined && { city: input.city }),
           ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
           ...(input.coverImageAttribution !== undefined && {
@@ -119,6 +122,7 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.description !== undefined && { description: input.description }),
         ...(input.visibility !== undefined && { visibility: input.visibility }),
         ...(input.category !== undefined && { category: input.category }),
+        ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
@@ -284,6 +288,7 @@ export const prismaCircleRepository: CircleRepository = {
       name: c.name,
       description: c.description,
       category: c.category ?? null,
+      customCategory: c.customCategory ?? null,
       city: c.city ?? null,
       coverImage: c.coverImage ?? null,
       coverImageAttribution: c.coverImageAttribution

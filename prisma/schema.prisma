@@ -161,6 +161,7 @@ model Circle {
   coverImageAttribution Json?            @db.JsonB
   visibility            CircleVisibility @default(PUBLIC)
   category              CircleCategory?
+  customCategory        String?          @map("custom_category")
   city                  String?
   stripeConnectAccountId String?
 

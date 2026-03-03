@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, MapPin, Globe, Lock, Tag } from "lucide-react";
@@ -50,6 +50,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     circle?.category ?? ""
   );
   const [circleName, setCircleName] = useState(circle?.name ?? "");
+  const [localError, setLocalError] = useState<string | undefined>();
 
   const previewImage =
     coverSelection?.type === "upload"
@@ -71,6 +72,14 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     _prev: FormState,
     formData: FormData
   ): Promise<FormState> {
+    // Validation client : customCategory obligatoire quand la catégorie est "Autre"
+    if (selectedCategory === "OTHER") {
+      const customCategoryValue = (formData.get("customCategory") as string | null)?.trim();
+      if (!customCategoryValue) {
+        return { error: t("form.customCategoryRequired") };
+      }
+    }
+
     if (coverSelection?.type === "upload") {
       formData.set("coverImageFile", coverSelection.file);
     } else if (coverSelection?.type === "unsplash") {
@@ -99,11 +108,16 @@ export function CircleForm({ circle, action }: CircleFormProps) {
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
 
+  // Sync l'erreur de l'action vers l'état local (pour pouvoir la vider indépendamment)
+  useEffect(() => {
+    setLocalError(state.error);
+  }, [state.error]);
+
   return (
     <form action={formAction} className="mx-auto max-w-5xl">
-      {state.error && (
+      {localError && (
         <div className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
-          {state.error}
+          {localError}
         </div>
       )}
 
@@ -165,7 +179,10 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                 <Select
                   name="category"
                   defaultValue={circle?.category ?? ""}
-                  onValueChange={(value) => setSelectedCategory(value as CircleCategory | "")}
+                  onValueChange={(value) => {
+                    setSelectedCategory(value as CircleCategory | "");
+                    setLocalError(undefined);
+                  }}
                 >
                   <SelectTrigger className="h-9">
                     <SelectValue placeholder={t("form.categoryPlaceholder")} />
@@ -180,6 +197,23 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                 </Select>
               </div>
             </div>
+
+            {/* Thématique libre — visible uniquement si "Autre" est sélectionné */}
+            {selectedCategory === "OTHER" && (
+              <div className="flex items-center gap-3">
+                <div className="size-9 shrink-0" />
+                <span className="w-28 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <Input
+                    name="customCategory"
+                    placeholder={t("form.customCategoryPlaceholder")}
+                    defaultValue={circle?.customCategory ?? ""}
+                    maxLength={100}
+                    className="h-9"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Ville */}
             <div className="flex items-center gap-3">

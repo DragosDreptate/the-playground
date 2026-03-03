@@ -177,4 +177,50 @@ describe("UpdateCircle", () => {
       });
     });
   });
+
+  describe("given category OTHER with a customCategory", () => {
+    it("should pass customCategory to the repository when provided", async () => {
+      const updated = makeCircle({ name: "Updated Name", category: "OTHER", customCategory: "Jeux de société" });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      const result = await updateCircle(
+        { ...defaultInput, category: "OTHER", customCategory: "Jeux de société" },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith(
+        "circle-1",
+        expect.objectContaining({
+          category: "OTHER",
+          customCategory: "Jeux de société",
+        })
+      );
+      expect(result.circle.customCategory).toBe("Jeux de société");
+    });
+
+    it("should pass null customCategory when cleared", async () => {
+      const updated = makeCircle({ name: "Updated Name", category: "OTHER", customCategory: null });
+      const repo = createMockCircleRepository({
+        findById: vi.fn().mockResolvedValue(makeCircle()),
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+
+      await updateCircle(
+        { ...defaultInput, category: "OTHER", customCategory: null },
+        { circleRepository: repo }
+      );
+
+      expect(repo.update).toHaveBeenCalledWith(
+        "circle-1",
+        expect.objectContaining({
+          customCategory: null,
+        })
+      );
+    });
+  });
 });

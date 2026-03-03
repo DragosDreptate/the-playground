@@ -10,6 +10,7 @@ function makePublicCircle(overrides: Partial<PublicCircle> = {}): PublicCircle {
     name: "Tech Paris",
     description: "Tech community in Paris",
     category: "TECH",
+    customCategory: null,
     city: "Paris",
     coverImage: null,
     coverImageAttribution: null,

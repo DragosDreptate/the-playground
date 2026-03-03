@@ -6,6 +6,7 @@ export type CreateCircleInput = {
   description: string;
   visibility: Circle["visibility"];
   category?: CircleCategory;
+  customCategory?: string | null;
   city?: string;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
@@ -16,6 +17,7 @@ export type UpdateCircleInput = {
   description?: string;
   visibility?: Circle["visibility"];
   category?: CircleCategory | null;
+  customCategory?: string | null;
   city?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
@@ -33,6 +35,7 @@ export type PublicCircle = {
   name: string;
   description: string;
   category: CircleCategory | null;
+  customCategory: string | null;
   city: string | null;
   coverImage: string | null;
   coverImageAttribution: CoverImageAttribution | null;

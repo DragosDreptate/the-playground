@@ -25,9 +25,16 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
     ? formatDayMonth(new Date(circle.nextMoment.startsAt), locale)
     : null;
 
-  const categoryBadge = circle.category && (
+  const categoryLabel =
+    circle.category === "OTHER" && circle.customCategory
+      ? circle.customCategory
+      : circle.category
+        ? tCategory(circle.category)
+        : null;
+
+  const categoryBadge = categoryLabel && (
     <span className="text-foreground text-xs font-semibold">
-      {tCategory(circle.category)}
+      {categoryLabel}
     </span>
   );
 
