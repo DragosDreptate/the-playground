@@ -366,7 +366,7 @@
       "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cet événement ?",
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",
-      "signInToRegister": "S'inscrire",
+      "signInToRegister": "Se connecter pour s'inscrire",
       "registrantsCount": "{count} inscrits",
       "eventFull": "Complet",
       "attendeesCount": "{count} participant(s)",

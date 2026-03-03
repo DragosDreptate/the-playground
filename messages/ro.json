@@ -366,7 +366,7 @@
       "cancelConfirmDescription": "Ești sigur că vrei să-ți anulezi înscrierea la acest Eveniment?",
       "confirmCancel": "Da, anulează",
       "spotsRemaining": "{count} locuri disponibile",
-      "signInToRegister": "Înscrie-te",
+      "signInToRegister": "Autentifică-te pentru a te înscrie",
       "registrantsCount": "{count} înscriși",
       "eventFull": "Complet",
       "attendeesCount": "{count} participant(i)",

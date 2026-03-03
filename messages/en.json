@@ -366,7 +366,7 @@
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
-      "signInToRegister": "Join",
+      "signInToRegister": "Sign in to join",
       "registrantsCount": "{count} joined",
       "eventFull": "Full",
       "attendeesCount": "{count} member(s)",
