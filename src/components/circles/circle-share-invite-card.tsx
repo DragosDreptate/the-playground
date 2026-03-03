@@ -4,7 +4,6 @@ import { useState, useTransition } from "react";
 import { Link as NextIntlLink } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import {
   generateCircleInviteTokenAction,
@@ -121,12 +120,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
       {/* Card title */}
       <div className="mb-4 flex items-center gap-2">
         <p className="text-[17px] font-semibold">{t.cardTitle}</p>
-        <Badge
-          variant="outline"
-          className="border-primary/30 bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide px-2 py-0.5"
-        >
-          Nouveau
-        </Badge>
       </div>
 
       {/* ── Row 1 : Lien partageable ── */}
