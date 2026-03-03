@@ -17,7 +17,7 @@ import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
-import { CopyLinkButton } from "@/components/moments/copy-link-button";
+import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { getMomentGradient } from "@/lib/gradient";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -27,7 +27,6 @@ import {
   Users,
   CalendarIcon,
   ChevronRight,
-  Link as LinkIcon,
   MapPin,
 } from "lucide-react";
 
@@ -393,26 +392,30 @@ export default async function CircleDetailPage({
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Lien partageable — visible Organisateurs uniquement */}
+          {/* Partager & Inviter — visible Organisateurs uniquement */}
           {isHost && (
-            <div className="border-border bg-card rounded-xl border p-4 flex flex-col gap-3 lg:grid lg:grid-cols-[1fr_auto] lg:gap-x-3 lg:gap-y-2">
-              <div className="flex items-center gap-2 lg:col-span-2">
-                <LinkIcon className="text-muted-foreground size-4 shrink-0" />
-                <span className="text-sm font-medium">{t("detail.shareableLink")}</span>
-              </div>
-              <Link
-                href={`/circles/${circle.slug}`}
-                target="_blank"
-                className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 rounded-lg border px-3 py-2 transition-colors min-w-0"
-              >
-                <span className="text-muted-foreground block truncate font-mono text-sm">
-                  {publicUrl.replace(/^https?:\/\//, "")}
-                </span>
-              </Link>
-              <div className="flex items-center gap-2">
-                <CopyLinkButton value={publicUrl} />
-              </div>
-            </div>
+            <CircleShareInviteCard
+              circle={circle}
+              publicUrl={publicUrl}
+              t={{
+                cardTitle: t("invite.cardTitle"),
+                shareableLink: t("invite.shareableLink"),
+                emailTitle: t("invite.emailTitle"),
+                emailPlaceholder: t("invite.emailPlaceholder"),
+                emailAdd: t("invite.emailAdd"),
+                emailSend: t("invite.emailSend"),
+                emailSendMultiple: t("invite.emailSendMultiple"),
+                emailSent: t("invite.emailSent"),
+                emailInvalid: t("invite.emailInvalid"),
+                linkTitle: t("invite.linkTitle"),
+                linkDescription: t("invite.linkDescription"),
+                linkGenerate: t("invite.linkGenerate"),
+                linkRevoke: t("invite.linkRevoke"),
+                linkRevoked: t("invite.linkRevoked"),
+                copyLink: "Copier le lien",
+                copied: "Copié !",
+              }}
+            />
           )}
 
           {/* Séparateur */}

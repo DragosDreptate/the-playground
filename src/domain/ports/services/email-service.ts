@@ -213,6 +213,21 @@ export type HostMomentCreatedEmailData = {
   };
 };
 
+export type CircleInvitationEmailData = {
+  to: string;
+  inviterName: string;
+  circleName: string;
+  circleDescription: string;
+  inviteUrl: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 export type AdminEntityCreatedEmailData = {
   to: string;
   entityType: "circle" | "moment";
@@ -247,4 +262,5 @@ export interface EmailService {
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
   sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
+  sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
 }

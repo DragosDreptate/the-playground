@@ -164,6 +164,7 @@ model Circle {
   customCategory        String?          @map("custom_category")
   city                  String?
   stripeConnectAccountId String?
+  inviteToken           String?          @unique @map("invite_token")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

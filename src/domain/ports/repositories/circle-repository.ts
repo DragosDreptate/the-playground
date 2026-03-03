@@ -21,6 +21,7 @@ export type UpdateCircleInput = {
   city?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
+  inviteToken?: string | null;
 };
 
 export type PublicCircleFilters = {
@@ -56,6 +57,7 @@ export type CircleFollowerInfo = {
 
 export interface CircleRepository {
   create(input: CreateCircleInput): Promise<Circle>;
+  findByInviteToken(token: string): Promise<Circle | null>;
   /**
    * Crée un Circle et sa CircleMembership HOST dans une seule transaction atomique.
    * Garantit qu'un Circle ne peut pas exister sans Organisateur.

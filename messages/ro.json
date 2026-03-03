@@ -238,6 +238,28 @@
       "createFailed": "Eroare la crearea Comunității",
       "updateFailed": "Eroare la actualizarea Comunității",
       "deleteFailed": "Eroare la ștergerea Comunității"
+    },
+    "invite": {
+      "cardTitle": "Partajează & Invită",
+      "shareableLink": "Link partajabil",
+      "emailTitle": "Invită prin email",
+      "emailPlaceholder": "adresa@email.com",
+      "emailAdd": "Adaugă",
+      "emailSend": "Trimite invitația",
+      "emailSendMultiple": "Trimite invitațiile",
+      "emailSent": "Invitație/invitații trimise",
+      "emailInvalid": "Adresă de email invalidă",
+      "linkTitle": "Link de invitație",
+      "linkDescription": "Orice persoană cu acest link poate intra în Comunitate",
+      "linkGenerate": "Generează un link",
+      "linkRevoke": "Revocă",
+      "linkRevoked": "Link revocat",
+      "joinTitle": "Alătură-te la {circleName}",
+      "joinButton": "Alătură-te acestei Comunități",
+      "joinSignIn": "Autentifică-te pentru a te alătura",
+      "alreadyMember": "Ești deja membru",
+      "invalidToken": "Acest link de invitație nu mai este valid",
+      "joined": "Bun venit în Comunitate!"
     }
   },
   "Moment": {

@@ -28,6 +28,7 @@ export function createMockCircleRepository(
     getFollowStatus: vi.fn<CircleRepository["getFollowStatus"]>().mockResolvedValue(false),
     findFollowers: vi.fn<CircleRepository["findFollowers"]>().mockResolvedValue([]),
     findPlayersForNewMomentNotification: vi.fn<CircleRepository["findPlayersForNewMomentNotification"]>().mockResolvedValue([]),
+    findByInviteToken: vi.fn<CircleRepository["findByInviteToken"]>().mockResolvedValue(null),
     ...overrides,
   };
 }
@@ -58,6 +59,7 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     customCategory: null,
     city: null,
     stripeConnectAccountId: null,
+    inviteToken: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,

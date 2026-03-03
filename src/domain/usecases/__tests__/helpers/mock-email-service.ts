@@ -17,6 +17,7 @@ export function createMockEmailService(
     sendHostMomentCreated: vi.fn().mockResolvedValue(undefined),
     sendBroadcastMoment: vi.fn().mockResolvedValue(undefined),
     sendAdminEntityCreated: vi.fn().mockResolvedValue(undefined),
+    sendCircleInvitation: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

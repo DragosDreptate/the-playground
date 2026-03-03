@@ -238,6 +238,28 @@
       "createFailed": "Échec de la création de la Communauté",
       "updateFailed": "Échec de la mise à jour de la Communauté",
       "deleteFailed": "Échec de la suppression de la Communauté"
+    },
+    "invite": {
+      "cardTitle": "Partager & Inviter",
+      "shareableLink": "Lien partageable",
+      "emailTitle": "Inviter par email",
+      "emailPlaceholder": "adresse@email.com",
+      "emailAdd": "Ajouter",
+      "emailSend": "Envoyer l'invitation",
+      "emailSendMultiple": "Envoyer les invitations",
+      "emailSent": "Invitation(s) envoyée(s)",
+      "emailInvalid": "Adresse email invalide",
+      "linkTitle": "Lien d'invitation",
+      "linkDescription": "Toute personne ayant ce lien peut rejoindre la Communauté",
+      "linkGenerate": "Générer un lien",
+      "linkRevoke": "Révoquer",
+      "linkRevoked": "Lien révoqué",
+      "joinTitle": "Rejoindre {circleName}",
+      "joinButton": "Rejoindre cette Communauté",
+      "joinSignIn": "Se connecter pour rejoindre",
+      "alreadyMember": "Vous êtes déjà membre",
+      "invalidToken": "Ce lien d'invitation n'est plus valide",
+      "joined": "Bienvenue dans la Communauté !"
     }
   },
   "Moment": {

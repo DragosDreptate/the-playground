@@ -238,6 +238,28 @@
       "createFailed": "Error al crear la Comunidad",
       "updateFailed": "Error al actualizar la Comunidad",
       "deleteFailed": "Error al eliminar la Comunidad"
+    },
+    "invite": {
+      "cardTitle": "Compartir e Invitar",
+      "shareableLink": "Enlace compartible",
+      "emailTitle": "Invitar por email",
+      "emailPlaceholder": "direccion@email.com",
+      "emailAdd": "Añadir",
+      "emailSend": "Enviar invitación",
+      "emailSendMultiple": "Enviar invitaciones",
+      "emailSent": "Invitación(es) enviada(s)",
+      "emailInvalid": "Dirección de email inválida",
+      "linkTitle": "Enlace de invitación",
+      "linkDescription": "Cualquier persona con este enlace puede unirse a la Comunidad",
+      "linkGenerate": "Generar un enlace",
+      "linkRevoke": "Revocar",
+      "linkRevoked": "Enlace revocado",
+      "joinTitle": "Unirse a {circleName}",
+      "joinButton": "Unirse a esta Comunidad",
+      "joinSignIn": "Iniciar sesión para unirse",
+      "alreadyMember": "Ya eres miembro",
+      "invalidToken": "Este enlace de invitación ya no es válido",
+      "joined": "¡Bienvenido/a a la Comunidad!"
     }
   },
   "Moment": {
