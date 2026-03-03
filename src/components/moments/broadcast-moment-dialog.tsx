@@ -17,6 +17,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { broadcastMomentAction } from "@/app/actions/broadcast-moment";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const COOLDOWN_MS = 24 * 60 * 60 * 1000;
 
@@ -74,20 +80,34 @@ export function BroadcastMomentDialog({
     }
   }
 
+  const trigger = (
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={inCooldown}
+      className="shrink-0 gap-1.5"
+    >
+      <Mail className="size-4" />
+      {inCooldown ? t("alreadySentShort") : t("sendButton")}
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={inCooldown}
-          className="shrink-0 gap-1.5"
-          title={cooldownHint}
-        >
-          <Mail className="size-4" />
-          {inCooldown ? t("alreadySentShort") : t("sendButton")}
-        </Button>
-      </DialogTrigger>
+      {inCooldown ? (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0">{trigger}</span>
+            </TooltipTrigger>
+            {cooldownHint && (
+              <TooltipContent side="top">{cooldownHint}</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
