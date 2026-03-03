@@ -226,6 +226,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 
 ### Services
 - **Email** : Resend + react-email (templates React)
+- **Analytics** : PostHog — product analytics, event tracking
 - **IA** : SDK Anthropic (Claude) — appels API directs
 - **File storage** : Uploadthing ou S3-compatible
 
