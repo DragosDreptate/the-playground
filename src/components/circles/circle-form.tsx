@@ -181,6 +181,23 @@ export function CircleForm({ circle, action }: CircleFormProps) {
               </div>
             </div>
 
+            {/* Thématique libre — visible uniquement si "Autre" est sélectionné */}
+            {selectedCategory === "OTHER" && (
+              <div className="flex items-center gap-3">
+                <div className="size-9 shrink-0" />
+                <span className="w-28 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <Input
+                    name="customCategory"
+                    placeholder={t("form.customCategoryPlaceholder")}
+                    defaultValue={circle?.customCategory ?? ""}
+                    maxLength={100}
+                    className="h-9"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Ville */}
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">

@@ -9,6 +9,7 @@ type UpdateCircleInput = {
   description?: string;
   visibility?: CircleVisibility;
   category?: CircleCategory | null;
+  customCategory?: string | null;
   city?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
@@ -46,6 +47,7 @@ export async function updateCircle(
     description: input.description,
     visibility: input.visibility,
     category: input.category,
+    customCategory: input.customCategory,
     city: input.city,
     ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
     ...(input.coverImageAttribution !== undefined && {

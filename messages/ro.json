@@ -188,7 +188,8 @@
       "category": "Categorie",
       "categoryPlaceholder": "Alege o categorie",
       "city": "Oraș",
-      "cityPlaceholder": "București, Cluj, Remote..."
+      "cityPlaceholder": "București, Cluj, Remote...",
+      "customCategoryPlaceholder": "Specificați tema dvs."
     },
     "delete": {
       "title": "Șterge Comunitatea",

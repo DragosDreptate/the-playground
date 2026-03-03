@@ -62,7 +62,9 @@ export async function DashboardCircleCard({ circle }: Props) {
           <div className="flex flex-wrap items-center gap-1.5">
             {circle.category && (
               <span className="text-xs font-semibold text-foreground">
-                {tCategory(circle.category)}
+                {circle.category === "OTHER" && circle.customCategory
+                  ? circle.customCategory
+                  : tCategory(circle.category)}
               </span>
             )}
             <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">

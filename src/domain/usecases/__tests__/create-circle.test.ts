@@ -108,6 +108,40 @@ describe("CreateCircle", () => {
     });
   });
 
+  describe("given a valid input with category OTHER and a customCategory", () => {
+    it("should pass customCategory to the repository", async () => {
+      const repo = createMockCircleRepository({
+        createWithHostMembership: vi.fn().mockImplementation((input) =>
+          Promise.resolve(makeCircle({ ...input }))
+        ),
+      });
+
+      await createCircle(
+        { ...defaultInput, category: "OTHER", customCategory: "Jeux de société" },
+        { circleRepository: repo }
+      );
+
+      expect(repo.createWithHostMembership).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: "OTHER",
+          customCategory: "Jeux de société",
+        }),
+        "user-1"
+      );
+    });
+
+    it("should not include customCategory when not provided", async () => {
+      const repo = createMockCircleRepository({
+        createWithHostMembership: vi.fn().mockResolvedValue(makeCircle()),
+      });
+
+      await createCircle(defaultInput, { circleRepository: repo });
+
+      const [callArg] = (repo.createWithHostMembership as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(callArg).not.toHaveProperty("customCategory");
+    });
+  });
+
   describe("given a name whose slug already exists", () => {
     it("should append a suffix to make the slug unique", async () => {
       const repo = createMockCircleRepository({

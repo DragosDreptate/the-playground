@@ -188,7 +188,8 @@
       "category": "Category",
       "categoryPlaceholder": "Choose a category",
       "city": "City",
-      "cityPlaceholder": "Paris, London, Remote..."
+      "cityPlaceholder": "Paris, London, Remote...",
+      "customCategoryPlaceholder": "Specify your theme"
     },
     "delete": {
       "title": "Delete Community",

@@ -188,7 +188,8 @@
       "category": "Thématique",
       "categoryPlaceholder": "Choisir une thématique",
       "city": "Ville",
-      "cityPlaceholder": "Paris, Lyon, Remote..."
+      "cityPlaceholder": "Paris, Lyon, Remote...",
+      "customCategoryPlaceholder": "Précisez votre thématique"
     },
     "delete": {
       "title": "Supprimer la Communauté",

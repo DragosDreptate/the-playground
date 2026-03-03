@@ -369,7 +369,9 @@ export default async function PublicCirclePage({
                   </p>
                   <p className="text-sm font-medium">
                     <Badge variant="secondary" className="text-xs">
-                      {tCategory(circle.category)}
+                      {circle.category === "OTHER" && circle.customCategory
+                        ? circle.customCategory
+                        : tCategory(circle.category)}
                     </Badge>
                   </p>
                 </div>

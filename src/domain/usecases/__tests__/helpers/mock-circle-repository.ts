@@ -55,6 +55,7 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     coverImageAttribution: null,
     visibility: "PUBLIC",
     category: null,
+    customCategory: null,
     city: null,
     stripeConnectAccountId: null,
     createdAt: new Date("2026-01-01"),
