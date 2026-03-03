@@ -49,7 +49,7 @@ export function JoinCircleByInviteForm({
           <span>{t.alreadyMember}</span>
         </div>
         <Button asChild size="lg" className="w-full" variant="outline">
-          <Link href={`/dashboard/circles/${circleSlug}`}>
+          <Link href={`/circles/${circleSlug}`}>
             {t.viewCircle}
           </Link>
         </Button>
@@ -62,7 +62,7 @@ export function JoinCircleByInviteForm({
     try {
       const result = await joinCircleByInviteAction(token);
       if (result.success) {
-        router.push(`/dashboard/circles/${circleSlug}`);
+        router.push(`/circles/${circleSlug}`);
       }
     } finally {
       setLoading(false);
