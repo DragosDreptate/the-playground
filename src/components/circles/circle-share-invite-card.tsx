@@ -270,7 +270,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
   );
 }
 
-// Bouton copier compact — label court "Copier" (vs "Copier le lien" dans CopyLinkButton)
 function InlineCopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -291,7 +290,7 @@ function InlineCopyButton({ value }: { value: string }) {
       ) : (
         <Copy className="size-3" />
       )}
-      {copied ? "Copié !" : "Copier"}
+      {copied ? "Copié !" : "Copier le lien"}
     </button>
   );
 }
