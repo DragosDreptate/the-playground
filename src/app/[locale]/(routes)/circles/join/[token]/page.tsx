@@ -197,7 +197,7 @@ export default async function JoinCircleByInvitePage({
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
-        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2 lg:pt-2">
 
           {/* "Organisé par" */}
           {hosts.length > 0 && (
