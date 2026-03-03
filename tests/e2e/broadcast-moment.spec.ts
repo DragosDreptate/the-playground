@@ -140,6 +140,13 @@ test.describe("Broadcast — vue Host (page détail Moment)", () => {
       .first();
     await expect(sentButton).toBeVisible({ timeout: 10_000 });
     await expect(sentButton).toBeDisabled();
+
+    // Tooltip au survol du bouton grisé : le wrapper <span> capture les events souris
+    await sentButton.hover();
+    await expect(page.getByRole("tooltip")).toContainText(
+      /prochain envoi disponible dans/i,
+      { timeout: 3_000 }
+    );
   });
 });
 
