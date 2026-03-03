@@ -189,7 +189,8 @@
       "categoryPlaceholder": "Kies een categorie",
       "city": "Stad",
       "cityPlaceholder": "Amsterdam, Brussel, Op afstand...",
-      "customCategoryPlaceholder": "Geef uw thema op"
+      "customCategoryPlaceholder": "Geef uw thema op",
+      "customCategoryRequired": "Geef uw thema op"
     },
     "delete": {
       "title": "Community verwijderen",

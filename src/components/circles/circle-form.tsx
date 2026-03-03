@@ -72,6 +72,14 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     _prev: FormState,
     formData: FormData
   ): Promise<FormState> {
+    // Validation client : customCategory obligatoire quand la catégorie est "Autre"
+    if (selectedCategory === "OTHER") {
+      const customCategoryValue = (formData.get("customCategory") as string | null)?.trim();
+      if (!customCategoryValue) {
+        return { error: t("form.customCategoryRequired") };
+      }
+    }
+
     if (coverSelection?.type === "upload") {
       formData.set("coverImageFile", coverSelection.file);
     } else if (coverSelection?.type === "unsplash") {
@@ -202,7 +210,6 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                     defaultValue={circle?.customCategory ?? ""}
                     maxLength={100}
                     className="h-9"
-                    required
                   />
                 </div>
               </div>
