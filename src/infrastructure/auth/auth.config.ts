@@ -7,6 +7,7 @@ import { prisma } from "@/infrastructure/db/prisma";
 import { Resend } from "resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
+import { captureServerEvent } from "@/lib/posthog-server";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -78,6 +79,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       } catch (err) {
         console.error("[AUTH] OAuth image sync failed (non-blocking):", err);
       }
+
+      // Tracking nouvel utilisateur — createdAt dans les 30 dernières secondes
+      try {
+        if (user.id) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { createdAt: true },
+          });
+          if (dbUser) {
+            const ageMs = Date.now() - dbUser.createdAt.getTime();
+            if (ageMs < 30_000) {
+              await captureServerEvent(user.id, "user_signed_up", {
+                provider: profile ? "oauth" : "email",
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("[AUTH] PostHog user_signed_up tracking failed (non-blocking):", err);
+      }
+
       return true;
     },
     session({ session, user }) {
