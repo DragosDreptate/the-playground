@@ -1,8 +1,10 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
+
+const PLATFORM_TIMEZONE = "Europe/Paris";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
@@ -16,7 +18,7 @@ import type { ActionResult } from "./types";
 const emailService = createResendEmailService();
 
 function formatMomentDate(startsAt: Date): string {
-  return format(startsAt, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
 }
 
 export async function broadcastMomentAction(

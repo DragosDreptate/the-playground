@@ -1,9 +1,11 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { format } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
 import { enUS } from "date-fns/locale/en-US";
+
+const PLATFORM_TIMEZONE = "Europe/Paris";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
@@ -145,9 +147,9 @@ export async function createMomentAction(
       if (!host?.email) return;
 
       const dateFnsLocale = getDateFnsLocale(locale);
-      const momentDate = format(result.moment.startsAt, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-      const momentDateMonth = format(result.moment.startsAt, "MMM", { locale: dateFnsLocale }).toUpperCase();
-      const momentDateDay = format(result.moment.startsAt, "d");
+      const momentDate = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+      const momentDateMonth = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
+      const momentDateDay = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "d");
       const locationText = formatLocationText(
         result.moment.locationType,
         result.moment.locationName,
@@ -335,13 +337,13 @@ async function sendMomentUpdateEmails(
   if (confirmed.length === 0) return;
 
   const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = format(moment.startsAt, "EEEE d MMMM yyyy, HH:mm", {
+  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
     locale: dateFnsLocale,
   });
-  const momentDateMonth = format(moment.startsAt, "MMM", {
+  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
     locale: dateFnsLocale,
   });
-  const momentDateDay = format(moment.startsAt, "d");
+  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
   const locationText = formatLocationText(
     moment.locationType,
     moment.locationName,
@@ -490,9 +492,9 @@ async function sendMomentCancelledEmails(
   const t = await getTranslations({ locale, namespace: "Email" });
   const dateFnsLocale = getDateFnsLocale(locale);
 
-  const momentDate = format(moment.startsAt, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-  const momentDateMonth = format(moment.startsAt, "MMM", { locale: dateFnsLocale }).toUpperCase();
-  const momentDateDay = format(moment.startsAt, "d");
+  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
+  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
   const locationText = formatLocationText(
     moment.locationType,
     moment.locationName,
