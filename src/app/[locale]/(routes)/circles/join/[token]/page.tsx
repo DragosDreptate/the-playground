@@ -3,23 +3,15 @@ import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
-  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
-import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
-import { CircleNotFoundError } from "@/domain/errors";
-import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
-import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
-import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
-import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
-import { CircleMembersList } from "@/components/circles/circle-members-list";
-import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
-import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
+import { formatLongDate } from "@/lib/format-date";
+import { Link } from "@/i18n/navigation";
+import { Badge } from "@/components/ui/badge";
+import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
+import { JoinCircleByInviteForm } from "@/components/circles/join-circle-by-invite-form";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
 import {
@@ -27,8 +19,8 @@ import {
   Lock,
   Users,
   CalendarIcon,
-  ChevronRight,
   MapPin,
+  Crown,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -53,82 +45,39 @@ function formatHostNames(hosts: CircleMemberWithUser[]): string {
 
 // ── Page ──────────────────────────────────────────────────────
 
-export default async function CircleDetailPage({
+export default async function JoinCircleByInvitePage({
   params,
-  searchParams,
 }: {
-  params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  params: Promise<{ locale: string; token: string }>;
 }) {
-  const [{ slug }, { tab }, t, tCommon, tDashboard, tCategory, session] = await Promise.all([
-    params,
-    searchParams,
+  const { locale, token } = await params;
+
+  const circle = await prismaCircleRepository.findByInviteToken(token);
+  if (!circle) notFound();
+
+  const [t, tCategory, session] = await Promise.all([
     getTranslations("Circle"),
-    getTranslations("Common"),
-    getTranslations("Dashboard"),
     getTranslations("CircleCategory"),
     auth(),
   ]);
 
-  const activeTab = tab === "past" ? "past" : "upcoming";
-
-  if (!session?.user?.id) notFound();
-
-  let circle;
-  try {
-    circle = await getCircleBySlug(slug, {
-      circleRepository: prismaCircleRepository,
-    });
-  } catch (error) {
-    if (error instanceof CircleNotFoundError) notFound();
-    throw error;
-  }
-
-  const membership = await prismaCircleRepository.findMembership(
-    circle.id,
-    session.user.id
-  );
-  if (!membership) notFound();
-
-  const isHost = membership.role === "HOST";
-
-  // Auto-génère le token d'invitation pour l'Organisateur si absent
-  // Le lien est toujours affiché (pas de bouton "Générer" — conforme au mockup)
-  if (isHost && !circle.inviteToken) {
-    const result = await generateCircleInviteToken(
-      { circleId: circle.id, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
-    );
-    circle = result.circle;
-  }
-
-  const [hosts, players, allMoments] = await Promise.all([
+  const [hosts, allMoments, memberCount] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
-    prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
-    // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
     getCircleMoments(
       circle.id,
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
+    prismaCircleRepository.countMembers(circle.id),
   ]);
 
-  const totalMembers = hosts.length + players.length;
+  let alreadyMember = false;
+  if (session?.user?.id) {
+    const membership = await prismaCircleRepository.findMembership(circle.id, session.user.id);
+    alreadyMember = !!membership;
+  }
+
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
-  const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
-  const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
-
-  // Récupère compteurs + inscriptions utilisateur en deux requêtes GROUP BY (évite le N+1)
-  const momentIds = displayedMoments.map((m) => m.id);
-  const [countByMomentId, userRegistrationsByMomentId] = await Promise.all([
-    prismaRegistrationRepository.findRegisteredCountsByMomentIds(momentIds),
-    prismaRegistrationRepository.findByMomentIdsAndUser(momentIds, session.user.id!),
-  ]);
-  const userStatusByMomentId = new Map(
-    [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
-  );
-
-  const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/circles/${circle.slug}`;
 
   const gradient = getMomentGradient(circle.name);
   const hostNames = formatHostNames(hosts);
@@ -136,32 +85,10 @@ export default async function CircleDetailPage({
   return (
     <div className="space-y-8">
 
-      {/* Breadcrumb + role badge */}
-      <div className="space-y-1">
-        <div className="text-muted-foreground flex items-center gap-1 text-sm">
-          <Link
-            href="/dashboard"
-            className="hover:text-foreground transition-colors"
-          >
-            {tDashboard("title")}
-          </Link>
-          <ChevronRight className="size-3.5" />
-          <span className="text-foreground truncate font-medium">
-            {circle.name}
-          </span>
-        </div>
-        <Badge
-          variant={isHost ? "outline" : "secondary"}
-          className={isHost ? "border-primary/40 text-primary" : ""}
-        >
-          {isHost ? tDashboard("role.host") : tDashboard("role.player")}
-        </Badge>
-      </div>
-
       {/* ── Two-column layout ─────────────────────────────────── */}
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
-        {/* ─── LEFT column : cover + hosts + stats ────────────── */}
+        {/* ─── LEFT column ─────────────────────────────────────── */}
         <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
 
           {/* Cover — carré, glow blur */}
@@ -213,7 +140,7 @@ export default async function CircleDetailPage({
             </p>
           )}
 
-          {/* Hosts bloc */}
+          {/* Hosts */}
           {hosts.length > 0 && (
             <div className="space-y-2 px-1">
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
@@ -243,49 +170,42 @@ export default async function CircleDetailPage({
           {/* Stats */}
           <div className="flex gap-6 px-1">
             <div>
-              <p className="text-2xl font-bold">{totalMembers}</p>
-              <p className="text-muted-foreground text-xs">
-                {t("detail.members")}
-              </p>
+              <p className="text-2xl font-bold">{memberCount}</p>
+              <p className="text-muted-foreground text-xs">{t("detail.members")}</p>
             </div>
             <div className="border-l pl-6">
               <p className="text-2xl font-bold">{allMoments.length}</p>
-              <p className="text-muted-foreground text-xs">
-                {t("detail.moments")}
-              </p>
+              <p className="text-muted-foreground text-xs">{t("detail.moments")}</p>
             </div>
           </div>
 
-          {/* Quitter la Communauté — Participant uniquement */}
-          {!isHost && (
-            <div className="px-1">
-              <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
-            </div>
-          )}
+          {/* CTA Rejoindre — zone d'action principale */}
+          <div className="px-1">
+            <JoinCircleByInviteForm
+              token={token}
+              isAuthenticated={!!session?.user?.id}
+              alreadyMember={alreadyMember}
+              circleSlug={circle.slug}
+              t={{
+                joinButton: t("invite.joinButton"),
+                joinSignIn: t("invite.joinSignIn"),
+                alreadyMember: t("invite.alreadyMember"),
+                viewCircle: t("invite.viewCircle"),
+              }}
+            />
+          </div>
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
-        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2 lg:pt-2">
 
-          {/* "Organisé par" + actions Host */}
-          <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
-              <p className="text-muted-foreground text-sm">
-                {t("detail.hostedBy")}{" "}
-                <span className="text-foreground font-medium">{hostNames}</span>
-              </p>
-            )}
-            {isHost && (
-              <div className="flex shrink-0 gap-2">
-                <Button asChild size="sm">
-                  <Link href={`/dashboard/circles/${circle.slug}/edit`}>
-                    {tCommon("edit")}
-                  </Link>
-                </Button>
-                <DeleteCircleDialog circleId={circle.id} />
-              </div>
-            )}
-          </div>
+          {/* "Organisé par" */}
+          {hosts.length > 0 && (
+            <p className="text-muted-foreground text-sm">
+              {t("detail.hostedBy")}{" "}
+              <span className="text-foreground font-medium">{hostNames}</span>
+            </p>
+          )}
 
           {/* Titre */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
@@ -315,9 +235,7 @@ export default async function CircleDetailPage({
                   <span className="text-primary text-base">🏷</span>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
-                    {t("form.category")}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t("form.category")}</p>
                   <p className="text-sm font-medium">
                     <Badge variant="secondary" className="text-xs">
                       {circle.category === "OTHER" && circle.customCategory
@@ -336,9 +254,7 @@ export default async function CircleDetailPage({
                   <MapPin className="text-primary size-4" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
-                    {t("form.city")}
-                  </p>
+                  <p className="text-muted-foreground text-xs">{t("form.city")}</p>
                   <p className="text-sm font-medium">{circle.city}</p>
                 </div>
               </div>
@@ -354,9 +270,7 @@ export default async function CircleDetailPage({
                 )}
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("detail.visibility")}
-                </p>
+                <p className="text-muted-foreground text-xs">{t("detail.visibility")}</p>
                 <p className="text-sm font-medium">
                   {circle.visibility === "PUBLIC"
                     ? t("detail.publicCircle")
@@ -371,11 +285,9 @@ export default async function CircleDetailPage({
                 <Users className="text-primary size-4" />
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("detail.members")}
-                </p>
+                <p className="text-muted-foreground text-xs">{t("detail.members")}</p>
                 <p className="text-sm font-medium">
-                  {t("detail.memberCount", { count: totalMembers })}
+                  {t("detail.memberCount", { count: memberCount })}
                 </p>
               </div>
             </div>
@@ -386,15 +298,9 @@ export default async function CircleDetailPage({
                 <CalendarIcon className="text-primary size-4" />
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("detail.created")}
-                </p>
+                <p className="text-muted-foreground text-xs">{t("detail.created")}</p>
                 <p className="text-sm font-medium">
-                  {circle.createdAt.toLocaleDateString(undefined, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {formatLongDate(circle.createdAt, locale)}
                 </p>
               </div>
             </div>
@@ -403,74 +309,36 @@ export default async function CircleDetailPage({
           {/* Séparateur */}
           <div className="border-border border-t" />
 
-          {/* Partager & Inviter — visible Organisateurs uniquement */}
-          {isHost && (
-            <CircleShareInviteCard
-              circle={circle}
-              publicUrl={publicUrl}
-              t={{
-                cardTitle: t("invite.cardTitle"),
-                shareableLink: t("invite.shareableLink"),
-                emailTitle: t("invite.emailTitle"),
-                emailPlaceholder: t("invite.emailPlaceholder"),
-                emailAdd: t("invite.emailAdd"),
-                emailSend: t("invite.emailSend"),
-                emailSendMultiple: t("invite.emailSendMultiple"),
-                emailSent: t("invite.emailSent"),
-                emailInvalid: t("invite.emailInvalid"),
-                linkTitle: t("invite.linkTitle"),
-                linkDescription: t("invite.linkDescription"),
-                linkGenerate: t("invite.linkGenerate"),
-                linkRevoke: t("invite.linkRevoke"),
-                linkRevoked: t("invite.linkRevoked"),
-                copyLink: "Copier le lien",
-                copied: "Copié !",
-              }}
-            />
-          )}
-
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
-          {/* Moments — toggle + timeline */}
+          {/* Prochains événements — aperçu */}
           <div className="space-y-6">
-            <MomentsTabSelector
-              activeTab={activeTab}
-              isHost={isHost}
-              circleSlug={circle.slug}
-            />
+            <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+              <span className="whitespace-nowrap rounded-full bg-foreground px-4 py-1 text-sm font-medium text-background">
+                {t("detail.upcomingMoments")}
+              </span>
+            </div>
 
-            {displayedMoments.length === 0 ? (
+            {upcomingMoments.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
                 <p className="text-muted-foreground text-sm">
-                  {activeTab === "upcoming"
-                    ? t("detail.noUpcomingMoments")
-                    : t("detail.noPastMoments")}
+                  {t("detail.noUpcomingMoments")}
                 </p>
               </div>
             ) : (
               <div>
-                {displayedMoments.map((moment, i) => (
+                {upcomingMoments.map((moment, i) => (
                   <MomentTimelineItem
                     key={moment.id}
                     moment={moment}
                     circleSlug={circle.slug}
-                    registrationCount={countByMomentId.get(moment.id) ?? 0}
-                    userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                    isHost={isHost}
-                    isLast={i === displayedMoments.length - 1}
+                    registrationCount={0}
+                    userRegistrationStatus={null}
+                    isHost={false}
+                    isLast={i === upcomingMoments.length - 1}
+                    variant="public"
                   />
                 ))}
               </div>
             )}
-          </div>
-
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
-          {/* Membres */}
-          <div className="border-border bg-card rounded-2xl border p-6">
-            <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} circleId={circle.id} />
           </div>
         </div>
       </div>

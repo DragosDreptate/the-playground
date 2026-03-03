@@ -238,6 +238,29 @@
       "createFailed": "Aanmaken van Community mislukt",
       "updateFailed": "Bijwerken van Community mislukt",
       "deleteFailed": "Verwijderen van Community mislukt"
+    },
+    "invite": {
+      "cardTitle": "Delen & Uitnodigen",
+      "shareableLink": "Deelbare link",
+      "emailTitle": "Uitnodigen per email",
+      "emailPlaceholder": "adres@email.com",
+      "emailAdd": "Toevoegen",
+      "emailSend": "Uitnodiging versturen",
+      "emailSendMultiple": "Uitnodigingen versturen",
+      "emailSent": "Uitnodiging(en) verstuurd",
+      "emailInvalid": "Ongeldig e-mailadres",
+      "linkTitle": "Uitnodigingslink",
+      "linkDescription": "Iedereen met deze link kan de Community joinen — deel hem via WhatsApp, Slack of email.",
+      "linkGenerate": "Link genereren",
+      "linkRevoke": "Intrekken",
+      "linkRevoked": "Link ingetrokken",
+      "joinTitle": "Doe mee met {circleName}",
+      "joinButton": "Deze Community joinen",
+      "joinSignIn": "Inloggen om te joinen",
+      "alreadyMember": "Je bent al lid",
+      "invalidToken": "Deze uitnodigingslink is niet meer geldig",
+      "joined": "Welkom bij de Community!",
+      "viewCircle": "Community bekijken"
     }
   },
   "Moment": {
@@ -343,7 +366,7 @@
       "cancelConfirmDescription": "Weet je zeker dat je jouw inschrijving voor dit Evenement wilt annuleren?",
       "confirmCancel": "Ja, annuleren",
       "spotsRemaining": "{count} plaatsen over",
-      "signInToRegister": "Aanmelden",
+      "signInToRegister": "Inloggen om aan te melden",
       "registrantsCount": "{count} aangemeld",
       "eventFull": "Vol",
       "attendeesCount": "{count} lid(leden)",

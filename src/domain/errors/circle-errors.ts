@@ -73,3 +73,11 @@ export class CannotRemoveSelfError extends DomainError {
     super("A host cannot remove themselves; use LeaveCircle or transfer the role");
   }
 }
+
+export class InvalidInviteTokenError extends DomainError {
+  readonly code = "INVALID_INVITE_TOKEN";
+
+  constructor() {
+    super("This invite link is invalid or has been revoked");
+  }
+}

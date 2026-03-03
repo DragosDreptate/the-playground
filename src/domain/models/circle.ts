@@ -30,6 +30,7 @@ export type Circle = {
   customCategory: string | null;
   city: string | null;
   stripeConnectAccountId: string | null;
+  inviteToken: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

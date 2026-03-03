@@ -118,7 +118,10 @@ export async function createMomentAction(
 
       // Notifier les followers et membres du Circle
       notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
-        console.error
+        (err) => {
+          console.error("[notifyNewMoment] Erreur:", err);
+          Sentry.captureException(err);
+        }
       );
 
       // Notifier les admins de la nouvelle création

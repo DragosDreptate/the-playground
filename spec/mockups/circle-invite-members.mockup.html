@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inviter des membres — Mockup — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── Dark tokens ── */
+:root {
+  --primary: #e8457a;
+  --primary-hover: #d63d6e;
+  --primary-foreground: #ffffff;
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --border: #383a55;
+  --radius: 0.5rem;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+}
+svg { display: block; }
+
+/* ── Header ── */
+.site-header {
+  height: 56px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 24px; gap: 20px;
+  position: sticky; top: 0; z-index: 10;
+}
+.logo { font-size: 15px; font-weight: 800; color: var(--primary); margin-right: auto; }
+.nav-link { font-size: 13px; font-weight: 500; color: var(--muted-foreground); text-decoration: none; }
+.avatar-sm {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: white; flex-shrink: 0;
+}
+
+/* ── Page ── */
+.page { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+.two-col { display: flex; gap: 48px; align-items: flex-start; }
+
+/* ── Left col stub ── */
+.col-left { width: 300px; flex-shrink: 0; position: sticky; top: 72px; display: flex; flex-direction: column; gap: 16px; }
+.cover {
+  width: 100%; aspect-ratio: 1/1; border-radius: 20px;
+  background: linear-gradient(135deg, #e8457a, #9333ea);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.cover::after { content:''; position:absolute; inset:0; background:rgba(0,0,0,0.15); }
+.cover-icon-wrap {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 1;
+}
+.left-section { padding: 0 4px; }
+.micro-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); margin-bottom: 6px; }
+.host-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.host-avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #e8457a, #9333ea); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; }
+.host-name { font-size: 13px; font-weight: 500; }
+.stats-row { display: flex; gap: 24px; padding: 0 4px; }
+.stat p:first-child { font-size: 22px; font-weight: 700; }
+.stat p:last-child { font-size: 11px; color: var(--muted-foreground); }
+
+/* ── Right col ── */
+.col-right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+
+/* breadcrumb */
+.breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted-foreground); }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb .cur { color: var(--foreground); font-weight: 500; }
+
+/* badge */
+.badge-host { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid rgba(232,69,122,0.4); color: var(--primary); margin-top: 6px; }
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 14px; height: 34px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500; font-family: 'Inter', sans-serif;
+  cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-outline { background: transparent; color: var(--foreground); border: 1px solid var(--border); }
+.btn-outline:hover { background: var(--muted); }
+.btn-destructive-outline { background: transparent; color: var(--primary); border: 1px solid rgba(232,69,122,0.4); }
+.btn-sm { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+
+/* top section */
+.top-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hosted-by { font-size: 13px; color: var(--muted-foreground); }
+.hosted-by strong { color: var(--foreground); font-weight: 600; }
+.h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.2; }
+.about-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); margin-bottom: 4px; }
+.about-text { font-size: 14px; line-height: 1.6; }
+.sep { border: none; border-top: 1px solid var(--border); }
+
+/* meta rows */
+.meta-list { display: flex; flex-direction: column; gap: 12px; }
+.meta-row { display: flex; align-items: center; gap: 12px; }
+.meta-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(232,69,122,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary); }
+
+/* ── CARD BLOCK (exact match moment-detail pattern) ── */
+.card-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+.card-title { font-size: 17px; font-weight: 600; margin-bottom: 16px; }
+
+/* Row pattern: flex items-start gap-3 py-3 */
+.share-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; }
+.share-row-inline { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+
+/* Icon: bg-primary/10, size-8, rounded-lg */
+.row-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(232,69,122,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  color: var(--primary);
+}
+.row-icon-inline { margin-top: 0; }
+
+/* Content */
+.row-content { min-width: 0; flex: 1; }
+.row-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.row-hint { font-size: 12px; color: var(--muted-foreground); line-height: 1.5; }
+
+/* Divider: border-t ml-11 (= 32px icon + 12px gap = 44px) */
+.row-divider { border: none; border-top: 1px solid var(--border); margin-left: 44px; }
+
+/* Link pill (readonly) */
+.link-pill {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  color: var(--muted-foreground);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  cursor: default;
+  transition: border-color 0.15s;
+}
+.link-pill:hover { border-color: var(--primary); }
+
+/* Email input */
+.email-input {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  outline: none;
+}
+.email-input::placeholder { color: var(--muted-foreground); }
+.email-input:focus { border-color: var(--primary); }
+.email-input.focused { border-color: var(--primary); }
+
+/* Email rows */
+.email-field-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.email-field-row:last-of-type { margin-bottom: 12px; }
+.remove-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted-foreground); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; line-height: 1; }
+.remove-btn:hover { background: var(--muted); color: var(--foreground); }
+.add-more { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--primary); background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; padding: 0; margin-bottom: 14px; }
+.add-more:hover { opacity: 0.8; }
+
+/* Revoke */
+.revoke-btn { font-size: 11px; color: var(--muted-foreground); background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; text-decoration: underline; text-underline-offset: 2px; padding: 0; margin-top: 6px; display: block; }
+.revoke-btn:hover { color: var(--foreground); }
+
+/* Moments tab stub */
+.tab-pills { display: inline-flex; background: var(--muted); border-radius: 8px; padding: 3px; gap: 2px; }
+.tab-pill { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; font-family: 'Inter', sans-serif; color: var(--muted-foreground); background: transparent; }
+.tab-pill.active { background: var(--card); color: var(--foreground); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+
+/* NEW badge */
+.new-chip { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; background: rgba(232,69,122,0.15); color: var(--primary); border: 1px solid rgba(232,69,122,0.3); }
+
+/* Annotation border (dashed pink) */
+.annotate { position: relative; border: 1.5px dashed rgba(232,69,122,0.45); border-radius: 18px; padding: 3px; }
+.annotate-label { position: absolute; top: -11px; left: 14px; background: var(--background); padding: 0 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--primary); text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <span class="logo">The Playground</span>
+  <a href="#" class="nav-link">Découvrir</a>
+  <a href="#" class="nav-link">Mon espace</a>
+  <div class="avatar-sm">DD</div>
+</header>
+
+<main class="page">
+  <div class="two-col">
+
+    <!-- Left col -->
+    <div class="col-left">
+      <div class="cover">
+        <div class="cover-icon-wrap">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="1.8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.768-.231-1.48-.627-2.07M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.768.231-1.48.627-2.07m0 0a5.002 5.002 0 019.746 0"/>
+          </svg>
+        </div>
+      </div>
+      <div class="left-section">
+        <p class="micro-label">Organisateurs</p>
+        <div class="host-row">
+          <div class="host-avatar">DD</div>
+          <span class="host-name">Dragos Dreptate</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat"><p>12</p><p>Membres</p></div>
+        <div class="stat"><p>4</p><p>Événements</p></div>
+      </div>
+    </div>
+
+    <!-- Right col -->
+    <div class="col-right">
+
+      <!-- Breadcrumb + badge -->
+      <div>
+        <div class="breadcrumb">
+          <a href="#">Mon espace</a>&nbsp;›&nbsp;<span class="cur">Les sportifs du dimanche</span>
+        </div>
+        <div class="badge-host">Organisateur</div>
+      </div>
+
+      <!-- Top actions -->
+      <div class="top-actions">
+        <p class="hosted-by">Organisé par <strong>Dragos Dreptate</strong></p>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary">Modifier</button>
+          <button class="btn btn-destructive-outline">Supprimer</button>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="h1">Les sportifs du dimanche</div>
+
+      <!-- About -->
+      <div>
+        <p class="about-label">À propos</p>
+        <p class="about-text">Chaque dimanche matin, on se retrouve pour un footing collectif suivi d'un brunch. Tous niveaux bienvenus, l'essentiel c'est de bouger et de se retrouver ensemble.</p>
+      </div>
+
+      <hr class="sep">
+
+      <!-- Meta -->
+      <div class="meta-list">
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+          </div>
+          <div>
+            <p style="font-size:11px;color:var(--muted-foreground)">Thématique</p>
+            <p style="font-size:13px;font-weight:500"><span style="background:rgba(255,255,255,0.08);padding:2px 8px;border-radius:6px;font-size:12px;">Sport &amp; Bien-être</span></p>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"/></svg>
+          </div>
+          <div>
+            <p style="font-size:11px;color:var(--muted-foreground)">Visibilité</p>
+            <p style="font-size:13px;font-weight:500">Communauté publique</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep">
+
+      <!-- ── PARTAGER / INVITER — même card, même pattern que la page événement ── -->
+      <div class="annotate">
+        <span class="annotate-label">Inspiré du pattern page événement</span>
+
+        <div class="card-block">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <p class="card-title" style="margin-bottom:0">Partager &amp; Inviter</p>
+            <span class="new-chip">Nouveau</span>
+          </div>
+
+          <!-- ── Row 1 : Lien partageable (existant) ── -->
+          <div class="share-row" style="padding-top:0">
+            <div class="row-icon row-icon-inline" style="margin-top:0">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            </div>
+            <div class="row-content">
+              <p class="row-title">Lien partageable</p>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="link-pill">the-playground.fr/circles/les-sportifs-du-dimanche</div>
+                <button class="btn btn-outline btn-sm" style="flex-shrink:0">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  Copier
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Divider ml-44 -->
+          <hr class="row-divider">
+
+          <!-- ── Row 2 : Inviter par email (NOUVEAU) ── -->
+          <div class="share-row">
+            <div class="row-icon">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+            <div class="row-content">
+              <p class="row-title">Inviter par email</p>
+
+              <!-- Champ 1 (actif) -->
+              <div class="email-field-row">
+                <input class="email-input focused" type="email" placeholder="email@exemple.com" value="sophie.martin@gmail.com">
+                <button class="remove-btn">×</button>
+              </div>
+
+              <!-- Champ 2 (vide) -->
+              <div class="email-field-row">
+                <input class="email-input" type="email" placeholder="Ajouter un email…">
+                <button class="remove-btn" style="opacity:0.3;cursor:default">×</button>
+              </div>
+
+              <!-- Ajouter -->
+              <button class="add-more">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                Ajouter une adresse
+              </button>
+
+              <!-- CTA -->
+              <button class="btn btn-primary" style="width:100%;justify-content:center;height:36px;font-size:13px">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Envoyer l'invitation
+              </button>
+
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <hr class="row-divider">
+
+          <!-- ── Row 3 : Lien d'invitation (NOUVEAU) ── -->
+          <div class="share-row" style="padding-bottom:0">
+            <div class="row-icon">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="row-content">
+              <p class="row-title">Lien d'invitation</p>
+              <p class="row-hint" style="margin-bottom:8px">Toute personne ayant ce lien peut rejoindre la Communauté — partagez-le via WhatsApp, Slack ou email.</p>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="link-pill">the-playground.fr/circles/join/a7f3k9x2</div>
+                <button class="btn btn-outline btn-sm" style="flex-shrink:0">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  Copier
+                </button>
+              </div>
+              <button class="revoke-btn">Révoquer et générer un nouveau lien</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- fin annotation -->
+
+      <hr class="sep">
+
+      <!-- Moments stub -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div class="tab-pills">
+          <button class="tab-pill active">Prochains événements</button>
+          <button class="tab-pill">Événements passés</button>
+        </div>
+        <button class="btn btn-primary btn-sm">Créer un événement</button>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

@@ -26,6 +26,7 @@ function toDomainCircle(record: PrismaCircle): Circle {
     customCategory: record.customCategory ?? null,
     city: record.city ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
+    inviteToken: record.inviteToken ?? null,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -96,6 +97,11 @@ export const prismaCircleRepository: CircleRepository = {
     return toDomainCircle(record);
   },
 
+  async findByInviteToken(token: string): Promise<Circle | null> {
+    const record = await prisma.circle.findUnique({ where: { inviteToken: token } });
+    return record ? toDomainCircle(record) : null;
+  },
+
   async findById(id: string): Promise<Circle | null> {
     const record = await prisma.circle.findUnique({ where: { id } });
     return record ? toDomainCircle(record) : null;
@@ -131,6 +137,7 @@ export const prismaCircleRepository: CircleRepository = {
               ? Prisma.DbNull
               : input.coverImageAttribution,
         }),
+        ...(input.inviteToken !== undefined && { inviteToken: input.inviteToken }),
       },
     });
     return toDomainCircle(record);

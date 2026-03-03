@@ -15,20 +15,22 @@ async function setCallbackCookie(callbackUrl: string) {
 export async function signInWithGitHub(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn("github", { redirectTo: callbackUrl ?? "/dashboard" });
+  // Toujours passer par le setup : la page setup redirige vers callbackUrl
+  // si le profil est déjà complété, sinon affiche le formulaire.
+  await signIn("github", { redirectTo: "/dashboard/profile/setup" });
 }
 
 export async function signInWithGoogle(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn("google", { redirectTo: callbackUrl ?? "/dashboard" });
+  await signIn("google", { redirectTo: "/dashboard/profile/setup" });
 }
 
 export async function signInWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn("resend", { email, redirectTo: callbackUrl ?? "/dashboard" });
+  await signIn("resend", { email, redirectTo: "/dashboard/profile/setup" });
 }
 
 export async function signOutAction() {

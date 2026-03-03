@@ -15,6 +15,9 @@ import { followCircle } from "@/domain/usecases/follow-circle";
 import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
 import { leaveCircle } from "@/domain/usecases/leave-circle";
 import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
+import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
+import { revokeCircleInviteToken } from "@/domain/usecases/revoke-circle-invite-token";
+import { joinCircleByInvite } from "@/domain/usecases/join-circle-by-invite";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { DomainError } from "@/domain/errors";
 import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
@@ -321,6 +324,133 @@ export async function removeCircleMemberAction(
     );
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/dashboard/circles");
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function generateCircleInviteTokenAction(
+  circleId: string
+): Promise<ActionResult<{ inviteUrl: string }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const { token } = await generateCircleInviteToken(
+      { circleId, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    return { success: true, data: { inviteUrl: `${baseUrl}/circles/join/${token}` } };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function revokeCircleInviteTokenAction(
+  circleId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await revokeCircleInviteToken(
+      { circleId, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    const { revalidatePath } = await import("next/cache");
+    const circle = await prismaCircleRepository.findById(circleId);
+    if (circle) revalidatePath(`/dashboard/circles/${circle.slug}`);
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function joinCircleByInviteAction(
+  token: string
+): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean }>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const { circle, alreadyMember } = await joinCircleByInvite(
+      { token, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+    return { success: true, data: { circleSlug: circle.slug, alreadyMember } };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function inviteToCircleByEmailAction(
+  circleId: string,
+  emails: string[]
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const { token, circle } = await generateCircleInviteToken(
+      { circleId, userId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
+    const inviteUrl = `${baseUrl}/circles/join/${token}`;
+    const inviterName = session.user.name ?? session.user.email ?? "";
+
+    after(async () => {
+      try {
+        await Promise.allSettled(
+          emails.map((email) =>
+            emailService.sendCircleInvitation({
+              to: email,
+              inviterName,
+              circleName: circle.name,
+              circleDescription: circle.description,
+              inviteUrl,
+              strings: {
+                subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
+                heading: `Vous avez été invité·e à rejoindre ${circle.name}`,
+                message: `${inviterName} vous invite à rejoindre sa Communauté sur The Playground.`,
+                ctaLabel: "Rejoindre la Communauté",
+                footer: `Vous recevez cet email car ${inviterName} vous a invité·e à rejoindre ${circle.name} sur The Playground.`,
+              },
+            })
+          )
+        );
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
+
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
