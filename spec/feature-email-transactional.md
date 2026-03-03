@@ -62,7 +62,7 @@ Server Action (joinMomentAction)
 | Confirmation création d'événement | `host-moment-created` | `createMomentAction` | Organisateur créateur | Non |
 | Nouvel événement (membre) | `new-moment-notification` | `createMomentAction` (via `notify-new-moment.ts`) | Membres PLAYER de la Communauté (sauf créateur) | Non |
 | Nouvel événement (follower) | `new-moment-notification` | `createMomentAction` (via `notify-new-moment.ts`) | Followers de la Communauté (dédupliqués avec membres) | Non |
-| Invitation Communauté (Broadcast) | `broadcast-moment` | `broadcastMomentAction` | Membres + followers de la Communauté (envoi unique par événement) | Non |
+| Invitation Communauté (Broadcast) | `broadcast-moment` | `broadcastMomentAction` | Membres + followers de la Communauté (cooldown 24h entre envois, renvoi possible après expiration) | Non |
 
 **Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n. Les notifications membres et followers utilisent le même template `new-moment-notification`, différenciées par le texte d'introduction.
 
@@ -391,7 +391,7 @@ Quand un Organisateur crée un événement, il est automatiquement inscrit (REGI
 | `src/app/actions/moment.ts` | Ajout notifications mise à jour, annulation et confirmation création |
 | `src/app/actions/circle.ts` | Ajout notification Organisateur après `followCircle` |
 | `src/app/actions/notify-new-moment.ts` | Notifications membres (`sendNewMomentToMember`) et followers (`sendNewMomentToFollower`) à la création d'un événement |
-| `src/app/actions/broadcast-moment.ts` | Nouveau — envoi email d'invitation Communauté (`sendBroadcastMoment`), envoi unique par événement |
+| `src/app/actions/broadcast-moment.ts` | Nouveau — envoi email d'invitation Communauté (`sendBroadcastMoment`), cooldown 24h entre envois (renvoi possible après expiration) |
 | `messages/fr.json` | Namespace `"Email"` étendu (broadcast, mise à jour, annulation, création, follower) + namespace `"Moment.broadcast"` |
 | `messages/en.json` | Namespace `"Email"` étendu (broadcast, mise à jour, annulation, création, follower) + namespace `"Moment.broadcast"` |
 

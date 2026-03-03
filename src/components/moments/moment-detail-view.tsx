@@ -469,14 +469,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       momentId={moment.id}
                       circleId={circle.id}
                       circleName={circle.name}
-                      broadcastSentAtLabel={
-                        moment.broadcastSentAt
-                          ? moment.broadcastSentAt.toLocaleDateString(
-                              locale === "fr" ? "fr-FR" : "en-US",
-                              { day: "numeric", month: "long", year: "numeric" }
-                            )
-                          : null
-                      }
+                      broadcastSentAt={moment.broadcastSentAt?.toISOString() ?? null}
                     />
                   </div>
                 </>

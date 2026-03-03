@@ -413,7 +413,8 @@
       "alreadySentError": "The invitation has already been sent",
       "notHostError": "Only the organizer can invite the Community",
       "hint": "Send an invitation email to all members and followers",
-      "alreadySentShort": "Sent"
+      "alreadySentShort": "Sent",
+      "cooldownHint": "Next send available in {time}"
     },
     "errors": {
       "notFound": "Event not found",

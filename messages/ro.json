@@ -413,7 +413,8 @@
       "alreadySentError": "Invitația a fost deja trimisă",
       "notHostError": "Doar organizatorul poate invita Comunitatea",
       "hint": "Trimiteți un email de invitație tuturor membrilor și urmăritorilor",
-      "alreadySentShort": "Trimisă"
+      "alreadySentShort": "Trimisă",
+      "cooldownHint": "Următoarea trimitere disponibilă în {time}"
     },
     "errors": {
       "notFound": "Evenimentul nu a fost găsit",

@@ -25,6 +25,7 @@ import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
+import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 
 const emailService = createResendEmailService();
 
@@ -119,6 +120,19 @@ export async function createMomentAction(
       notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
         console.error
       );
+
+      // Notifier les admins de la nouvelle création
+      const creator = await prismaUserRepository.findById(session.user.id);
+      notifyAdminEntityCreated({
+        entityType: "moment",
+        entityName: result.moment.title,
+        entitySlug: result.moment.slug,
+        creatorId: session.user.id,
+        creatorName: creator?.name ?? creator?.email ?? session.user.email ?? "",
+        creatorEmail: creator?.email ?? session.user.email ?? "",
+        circleName: circle.name,
+        circleSlug: circle.slug,
+      }).catch(console.error);
 
       // Email de confirmation à l'organisateur avec ICS
       const [host, locale] = await Promise.all([

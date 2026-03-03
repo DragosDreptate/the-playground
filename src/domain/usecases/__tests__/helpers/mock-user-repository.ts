@@ -21,6 +21,7 @@ export function createMockUserRepository(
       .fn<UserRepository["updateNotificationPreferences"]>()
       .mockResolvedValue(makeNotificationPreferences()),
     updateDashboardMode: vi.fn<UserRepository["updateDashboardMode"]>().mockResolvedValue(undefined),
+    findAdminEmails: vi.fn<UserRepository["findAdminEmails"]>().mockResolvedValue([]),
     ...overrides,
   };
 }

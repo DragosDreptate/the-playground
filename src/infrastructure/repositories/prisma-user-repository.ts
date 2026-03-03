@@ -158,4 +158,12 @@ export const prismaUserRepository: UserRepository = {
       data: { dashboardMode: mode },
     });
   },
+
+  async findAdminEmails(): Promise<string[]> {
+    const records = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { email: true },
+    });
+    return records.map((r) => r.email).filter(Boolean) as string[];
+  },
 };

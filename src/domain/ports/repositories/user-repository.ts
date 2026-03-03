@@ -24,4 +24,5 @@ export interface UserRepository {
     input: UpdateNotificationPreferencesInput
   ): Promise<NotificationPreferences>;
   updateDashboardMode(userId: string, mode: DashboardMode): Promise<void>;
+  findAdminEmails(): Promise<string[]>;
 }

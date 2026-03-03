@@ -17,26 +17,47 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { broadcastMomentAction } from "@/app/actions/broadcast-moment";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+
+function formatTimeRemaining(until: Date): string {
+  const diffMs = until.getTime() - Date.now();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMin = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  if (diffHours > 0) return diffMin > 0 ? `${diffHours}h ${diffMin}min` : `${diffHours}h`;
+  return `${Math.max(1, diffMin)}min`;
+}
 
 type Props = {
   momentId: string;
   circleId: string;
   circleName: string;
-  /** Chaîne pré-formatée côté serveur. null = pas encore envoyé. */
-  broadcastSentAtLabel: string | null;
+  /** ISO string du dernier envoi. null = jamais envoyé. */
+  broadcastSentAt: string | null;
 };
 
 export function BroadcastMomentDialog({
   momentId,
   circleName,
-  broadcastSentAtLabel,
+  broadcastSentAt,
 }: Props) {
   const t = useTranslations("Moment.broadcast");
   const [open, setOpen] = React.useState(false);
   const [customMessage, setCustomMessage] = React.useState("");
   const [isPending, setIsPending] = React.useState(false);
 
-  const alreadySent = broadcastSentAtLabel !== null;
+  const lastSentAt = broadcastSentAt ? new Date(broadcastSentAt) : null;
+  const nextAvailableAt = lastSentAt ? new Date(lastSentAt.getTime() + COOLDOWN_MS) : null;
+  const inCooldown = nextAvailableAt !== null && nextAvailableAt > new Date();
+  const cooldownHint = inCooldown && nextAvailableAt
+    ? t("cooldownHint", { time: formatTimeRemaining(nextAvailableAt) })
+    : undefined;
 
   async function handleSend() {
     setIsPending(true);
@@ -59,20 +80,34 @@ export function BroadcastMomentDialog({
     }
   }
 
+  const trigger = (
+    <Button
+      variant="outline"
+      size="sm"
+      disabled={inCooldown}
+      className="shrink-0 gap-1.5"
+    >
+      <Mail className="size-4" />
+      {inCooldown ? t("alreadySentShort") : t("sendButton")}
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={alreadySent}
-          className="shrink-0 gap-1.5"
-          title={alreadySent ? t("alreadySent", { date: broadcastSentAtLabel }) : undefined}
-        >
-          <Mail className="size-4" />
-          {alreadySent ? t("alreadySentShort") : t("sendButton")}
-        </Button>
-      </DialogTrigger>
+      {inCooldown ? (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="shrink-0">{trigger}</span>
+            </TooltipTrigger>
+            {cooldownHint && (
+              <TooltipContent side="top">{cooldownHint}</TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+      ) : (
+        <DialogTrigger asChild>{trigger}</DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

@@ -213,6 +213,23 @@ export type HostMomentCreatedEmailData = {
   };
 };
 
+export type AdminEntityCreatedEmailData = {
+  to: string;
+  entityType: "circle" | "moment";
+  entityName: string;
+  creatorName: string;
+  creatorEmail: string;
+  circleName?: string; // Pour les moments : nom de la Communauté
+  entityUrl: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -229,4 +246,5 @@ export interface EmailService {
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
   sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
+  sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
 }
