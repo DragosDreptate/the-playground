@@ -68,14 +68,20 @@ export async function notifyNewMoment(
 
   // Déduplication : un follower qui est aussi membre ne doit recevoir qu'un seul email (le mail membre)
   const memberUserIds = new Set(members.map((m) => m.userId));
-
   const followersToNotify = followers.filter((f) => !memberUserIds.has(f.userId));
 
+  // Batch : une seule requête pour toutes les préférences (évite le N+1 et les timeouts Neon)
+  const allUserIds = [
+    ...followersToNotify.map((f) => f.userId),
+    ...members.map((m) => m.userId),
+  ];
+  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
+
   // Notifier les followers (non-membres) qui ont activé les notifications
-  await Promise.allSettled(
+  const followerResults = await Promise.allSettled(
     followersToNotify.map(async (f) => {
-      const prefs = await prismaUserRepository.getNotificationPreferences(f.userId);
-      if (!prefs.notifyNewMomentInCircle) return;
+      const prefs = prefsMap.get(f.userId);
+      if (!prefs?.notifyNewMomentInCircle) return;
 
       return emailService.sendNewMomentToFollower({
         to: f.email,
@@ -91,11 +97,20 @@ export async function notifyNewMoment(
     })
   );
 
+  followerResults.forEach((result, i) => {
+    if (result.status === "rejected") {
+      console.error(
+        `[notifyNewMoment] Échec envoi email follower ${followersToNotify[i]?.email}:`,
+        result.reason
+      );
+    }
+  });
+
   // Notifier les membres (excluant déjà le créateur via findPlayersForNewMomentNotification) qui ont activé les notifications
-  await Promise.allSettled(
+  const memberResults = await Promise.allSettled(
     members.map(async (m) => {
-      const prefs = await prismaUserRepository.getNotificationPreferences(m.userId);
-      if (!prefs.notifyNewMomentInCircle) return;
+      const prefs = prefsMap.get(m.userId);
+      if (!prefs?.notifyNewMomentInCircle) return;
 
       return emailService.sendNewMomentToMember({
         to: m.email,
@@ -110,4 +125,13 @@ export async function notifyNewMoment(
       });
     })
   );
+
+  memberResults.forEach((result, i) => {
+    if (result.status === "rejected") {
+      console.error(
+        `[notifyNewMoment] Échec envoi email membre ${members[i]?.email}:`,
+        result.reason
+      );
+    }
+  });
 }
