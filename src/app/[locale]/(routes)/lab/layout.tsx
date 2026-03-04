@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 
 export default async function LabLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user || session.user.role !== "ADMIN") {
     redirect("/");

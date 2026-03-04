@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getProfile } from "@/domain/usecases/get-profile";
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { shouldRedirectFromSetup } from "@/lib/onboarding";
@@ -21,7 +21,7 @@ function parseName(name: string | null): { firstName: string; lastName: string }
 }
 
 export default async function ProfileSetupPage() {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");

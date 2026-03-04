@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
 
@@ -8,7 +8,7 @@ export default async function OnboardingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user) {
     redirect("/auth/sign-in");

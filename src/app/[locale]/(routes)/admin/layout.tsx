@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 
 export default async function AdminLayout({
@@ -7,7 +7,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user || session.user.role !== "ADMIN") {
     redirect("/");

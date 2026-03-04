@@ -13,7 +13,7 @@ import {
   prismaRegistrationRepository,
   prismaCommentRepository,
 } from "@/infrastructure/repositories";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
@@ -102,7 +102,7 @@ export default async function PublicMomentPage({
 
   if (!circle) notFound();
 
-  const session = await auth();
+  const session = await getCachedSession();
   const isAuthenticated = !!session?.user?.id;
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 

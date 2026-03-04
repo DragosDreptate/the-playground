@@ -8,7 +8,7 @@ import {
 // Revalide toutes les 5 minutes — la page Découvrir ne nécessite pas un temps réel strict.
 // Les filtres par catégorie + onglets sont gérés côté SSR via searchParams.
 export const revalidate = 300;
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
@@ -46,7 +46,7 @@ export default async function ExplorerPage({
   const category = categoryParam as CircleCategory | undefined;
 
   const t = await getTranslations("Explorer");
-  const session = await auth();
+  const session = await getCachedSession();
 
   // Fetch only the active tab to avoid over-fetching
   const [circlesRaw, momentsRaw, userCircles] = await Promise.all([
