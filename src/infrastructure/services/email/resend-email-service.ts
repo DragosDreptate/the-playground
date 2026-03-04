@@ -40,6 +40,10 @@ function getSender(): string {
   );
 }
 
+function isDemoEmail(email: string): boolean {
+  return email.toLowerCase().endsWith("@demo.playground");
+}
+
 export function createResendEmailService(): EmailService {
   // Utiliser un placeholder si la clé est absente pour éviter de crasher au chargement
   // du module (notify-new-moment.ts l'appelle au top-level). Les envois échoueront
@@ -48,11 +52,19 @@ export function createResendEmailService(): EmailService {
   const from = getSender();
   const baseUrl = getBaseUrl();
 
+  async function send(
+    params: Parameters<typeof resend.emails.send>[0]
+  ): Promise<void> {
+    const to = Array.isArray(params.to) ? params.to : [params.to];
+    if (to.every(isDemoEmail)) return;
+    await resend.emails.send(params);
+  }
+
   return {
     async sendRegistrationConfirmation(
       data: RegistrationConfirmationEmailData
     ): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -72,7 +84,7 @@ export function createResendEmailService(): EmailService {
     async sendWaitlistPromotion(
       data: WaitlistPromotionEmailData
     ): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -92,7 +104,7 @@ export function createResendEmailService(): EmailService {
     async sendHostNewRegistration(
       data: HostNewRegistrationEmailData
     ): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -101,7 +113,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendNewComment(data: NewCommentEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -112,7 +124,7 @@ export function createResendEmailService(): EmailService {
     async sendNewMomentToFollower(
       data: NewMomentFollowerEmailData
     ): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -123,7 +135,7 @@ export function createResendEmailService(): EmailService {
     async sendNewMomentToMember(
       data: NewMomentMemberEmailData
     ): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -132,7 +144,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendHostNewFollower(data: HostNewFollowerEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -141,7 +153,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendMomentUpdate(data: MomentUpdateEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -159,7 +171,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendMomentCancelled(data: MomentCancelledEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -168,7 +180,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -186,7 +198,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -195,7 +207,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
@@ -204,7 +216,7 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendCircleInvitation(data: CircleInvitationEmailData): Promise<void> {
-      await resend.emails.send({
+      await send({
         from,
         to: data.to,
         subject: data.strings.subject,
