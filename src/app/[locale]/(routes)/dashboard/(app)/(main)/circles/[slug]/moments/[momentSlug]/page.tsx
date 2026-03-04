@@ -5,7 +5,7 @@ import {
   prismaRegistrationRepository,
   prismaCommentRepository,
 } from "@/infrastructure/repositories";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
@@ -19,7 +19,7 @@ export default async function MomentDetailPage({
 }) {
   const { slug, momentSlug } = await params;
 
-  const session = await auth();
+  const session = await getCachedSession();
   if (!session?.user?.id) notFound();
 
   // Parallélise Circle + Moment (les deux dépendent uniquement du slug)

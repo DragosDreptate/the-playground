@@ -1,4 +1,4 @@
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { getUserCircles } from "@/domain/usecases/get-user-circles";
 import { getTranslations } from "next-intl/server";
@@ -9,7 +9,7 @@ import { CircleCard } from "@/components/circles/circle-card";
 import { ChevronRight } from "lucide-react";
 
 export default async function NewMomentPage() {
-  const session = await auth();
+  const session = await getCachedSession();
   const t = await getTranslations("Dashboard");
 
   if (!session?.user?.id) {

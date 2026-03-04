@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Link } from "@/i18n/navigation";
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const session = await auth();
+  const session = await getCachedSession();
   const t = await getTranslations("HomePage");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { safeCallbackUrl } from "@/lib/url";
 
@@ -9,7 +9,7 @@ export default async function SignInPage({
 }: {
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
-  const session = await auth();
+  const session = await getCachedSession();
   const params = await searchParams;
   const callbackUrl = safeCallbackUrl(params.callbackUrl);
 

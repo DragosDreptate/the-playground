@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import {
   prismaCircleRepository,
   prismaRegistrationRepository,
@@ -12,7 +12,7 @@ import { setDashboardMode } from "@/domain/usecases/set-dashboard-mode";
 import { WelcomeModeChoice } from "./_components/welcome-mode-choice";
 
 export default async function WelcomePage() {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");

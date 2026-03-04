@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getProfile } from "@/domain/usecases/get-profile";
 import {
   prismaCircleRepository,
@@ -20,7 +20,7 @@ export default async function ProfilePage({
 }: {
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const session = await auth();
+  const session = await getCachedSession();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");
