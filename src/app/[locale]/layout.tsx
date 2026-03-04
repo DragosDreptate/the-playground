@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
@@ -71,7 +72,7 @@ export default async function LocaleLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
+  const [{ locale }, session] = await Promise.all([params, auth()]);
 
   if (!hasLocale(routing.locales, locale)) {
     notFound();
@@ -96,7 +97,7 @@ export default async function LocaleLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <SessionProvider>
+          <SessionProvider session={session}>
             <PostHogProvider>
               <NextIntlClientProvider>
                 <PostHogIdentity />
