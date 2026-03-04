@@ -55,7 +55,8 @@
     "public": "Public",
     "private": "Private",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "you": "You"
   },
   "Auth": {
     "signIn": {
