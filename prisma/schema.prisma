@@ -173,6 +173,10 @@ model Circle {
   moments       Moment[]
   circleFollows CircleFollow[]
 
+  // Index composite (visibility, category) : utilisé dans getPublicCircles (explorer)
+  // WHERE visibility = 'PUBLIC' — couvert par le préfixe visibility
+  // WHERE visibility = 'PUBLIC' AND category = ? — couvert par l'index complet
+  @@index([visibility, category])
   @@map("circles")
 }
 
@@ -252,6 +256,8 @@ model Registration {
   @@index([momentId, status])
   // Index sur userId : utilisé dans findUpcomingByUserId, findPastByUserId
   @@index([userId])
+  // Index composite (userId, status) : utilisé dans findAllForUserDashboard — WHERE userId = ? AND status IN [...]
+  @@index([userId, status])
   @@map("registrations")
 }
 
