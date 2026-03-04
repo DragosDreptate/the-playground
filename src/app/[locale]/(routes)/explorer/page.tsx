@@ -4,6 +4,7 @@ import {
   prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
+import { measureTime } from "@/lib/perf-logger";
 
 // Revalide toutes les 5 minutes — la page Découvrir ne nécessite pas un temps réel strict.
 // Les filtres par catégorie + onglets sont gérés côté SSR via searchParams.
@@ -49,23 +50,27 @@ export default async function ExplorerPage({
   const session = await getCachedSession();
 
   // Fetch only the active tab to avoid over-fetching
-  const [circlesRaw, momentsRaw, userCircles] = await Promise.all([
-    activeTab === "circles"
-      ? getPublicCircles(
-          { category, limit: FETCH_SIZE },
-          { circleRepository: prismaCircleRepository }
-        )
-      : Promise.resolve([]),
-    activeTab === "moments"
-      ? getPublicUpcomingMoments(
-          { category, limit: FETCH_SIZE },
-          { momentRepository: prismaMomentRepository }
-        )
-      : Promise.resolve([]),
-    session?.user?.id
-      ? prismaCircleRepository.findAllByUserId(session.user.id)
-      : Promise.resolve([]),
-  ]);
+  const [circlesRaw, momentsRaw, userCircles] = await measureTime(
+    "explorer:data",
+    () =>
+      Promise.all([
+        activeTab === "circles"
+          ? getPublicCircles(
+              { category, limit: FETCH_SIZE },
+              { circleRepository: prismaCircleRepository }
+            )
+          : Promise.resolve([]),
+        activeTab === "moments"
+          ? getPublicUpcomingMoments(
+              { category, limit: FETCH_SIZE },
+              { momentRepository: prismaMomentRepository }
+            )
+          : Promise.resolve([]),
+        session?.user?.id
+          ? prismaCircleRepository.findAllByUserId(session.user.id)
+          : Promise.resolve([]),
+      ])
+  );
 
   // Over-fetch pattern: fetch FETCH_SIZE, display PAGE_SIZE
   const circlesHasMore = circlesRaw.length > PAGE_SIZE;

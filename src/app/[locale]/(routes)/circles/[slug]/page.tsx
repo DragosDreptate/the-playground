@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { measureTime } from "@/lib/perf-logger";
 import type { Metadata } from "next";
 import {
   prismaCircleRepository,
@@ -144,7 +145,7 @@ export default async function PublicCirclePage({
   ];
 
   const [hosts, allMoments, memberCount, isMemberResult, isFollowingResult] =
-    await Promise.all(parallelQueries);
+    await measureTime("circle-page:data", () => Promise.all(parallelQueries));
 
   const isMember = isMemberResult === true;
   const isFollowing = isFollowingResult === true;
