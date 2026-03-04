@@ -8,9 +8,37 @@ Les évolutions du Playground, jour après jour.
 
 ## [Unreleased]
 
+---
+
+## [2.0.0] — 2026-03-04 — Invitation membres, Analytics & Google Places
+
 ### Ajouté
 
-- **Retirer un membre** : l'Organisateur peut retirer un Participant de sa Communauté depuis la liste des membres — bouton ⋮ par ligne Participant, dropdown, AlertDialog de confirmation
+- **Invitation par lien** : l'Organisateur peut inviter des membres via un lien privé avec token depuis la page de gestion de sa Communauté — génération/révocation du token, page de bienvenue dédiée, email d'invitation envoyé automatiquement à l'inscription
+- **Catégorie personnalisée** : les Communautés de type « Autre » peuvent saisir une catégorie libre (champ `customCategory`)
+- **Google Places API** : autocomplétion d'adresse alimentée par Google Places (New) en remplacement de l'API BAN — couverture mondiale (plus uniquement France)
+- **Analytics PostHog** : suivi des événements clés (inscription, création Communauté/événement, page vues, sign-up) — reverse proxy EU, désactivé hors production
+- **Notifications admin** : les admins de la plateforme reçoivent un email lors de la création d'une nouvelle Communauté ou d'un événement
+- **Retirer un membre** : l'Organisateur peut retirer un Participant de sa Communauté depuis la liste des membres — bouton ⋮ par ligne, dropdown, AlertDialog de confirmation
+- **Page Aide** : nouvelle page `/aide` avec FAQ accordion et formulaire de contact protégé contre les bots (honeypot), lien dans le footer
+- **Broadcast — cooldown 24h** : délai de 24h entre deux broadcasts avec indication visuelle sur le bouton grisé (remplace le verrou permanent)
+
+### Amélioré
+
+- **CTA « Gérer cet événement »** : bouton plus visible (variant rose) sur la page publique d'un événement pour l'Organisateur connecté
+- **Badge « Vous »** : affiché après le nom de l'Organisateur sur la page événement publique
+- **Dashboard** : libellé « Vue : » ajouté devant le sélecteur de mode Organisateur/Participant
+- **Onglet Participant** : renommé « Mes inscriptions » (plus précis que « Mes événements »)
+- **Page Découvrir** : titre H1 « Communautés & événements » / « Communities & events »
+- **Footer** : lien vers The Spark (thespark.fr)
+
+### Corrigé
+
+- **Performance** : N+1 queries sur `auth()` éliminées via `React.cache()` — une seule requête DB par render au lieu d'une par composant
+- **Emails** : heure affichée correctement en timezone Europe/Paris (Europe/Paris)
+- **Localisation événement** : l'adresse s'affiche toujours sous le nom de lieu dans le pin « Où »
+- **Favicon** : ICO malformé corrigé, `apple-touch-icon` déclaré explicitement
+- **Onboarding** : setup profil déclenché systématiquement après chaque sign-in OAuth/email
 
 ---
 
