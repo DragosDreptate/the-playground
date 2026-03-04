@@ -71,6 +71,7 @@ export type UpcomingCircleMoment = {
   startsAt: Date;
   locationType: LocationType;
   locationName: string | null;
+  locationAddress: string | null;
   registrationCount: number;
 };
 

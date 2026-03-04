@@ -193,6 +193,7 @@ export const prismaMomentRepository: MomentRepository = {
         startsAt: true,
         locationType: true,
         locationName: true,
+        locationAddress: true,
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
       },
       orderBy: { startsAt: "asc" },
@@ -207,6 +208,7 @@ export const prismaMomentRepository: MomentRepository = {
       startsAt: m.startsAt,
       locationType: m.locationType,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       registrationCount: m._count.registrations,
     }));
   },

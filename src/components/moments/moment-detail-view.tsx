@@ -335,6 +335,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="min-w-0">
                 <p className="text-muted-foreground text-xs">{t("detail.where")}</p>
                 <p className="text-sm font-medium">{locationLabel}</p>
+                {moment.locationAddress && (
+                  <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                    {moment.locationAddress}
+                  </p>
+                )}
                 {moment.videoLink && (
                   <a
                     href={moment.videoLink}
@@ -564,7 +569,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   const locationLabel =
                     upcoming.locationType === "ONLINE"
                       ? t("form.locationOnline")
-                      : upcoming.locationName ?? t("form.locationInPerson");
+                      : upcoming.locationName ?? upcoming.locationAddress ?? t("form.locationInPerson");
                   return (
                     <Link
                       key={upcoming.id}
