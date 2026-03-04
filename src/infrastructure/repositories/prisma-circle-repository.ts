@@ -7,7 +7,7 @@ import type {
   PublicCircle,
   CircleFollowerInfo,
 } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -176,40 +176,92 @@ export const prismaCircleRepository: CircleRepository = {
   },
 
   async findAllByUserIdWithStats(userId: string): Promise<DashboardCircle[]> {
-    const now = new Date();
-    const memberships = await prisma.circleMembership.findMany({
-      where: { userId },
-      include: {
-        circle: {
-          include: {
-            // Compte SQL précis — ne charge aucun enregistrement Moment en mémoire
-            _count: {
-              select: {
-                memberships: true,
-                moments: {
-                  where: { status: "PUBLISHED", startsAt: { gte: now } },
-                },
-              },
-            },
-            // Un seul Moment chargé — uniquement les 2 champs nécessaires pour nextMoment
-            moments: {
-              where: { status: "PUBLISHED", startsAt: { gte: now } },
-              orderBy: { startsAt: "asc" },
-              take: 1,
-              select: { title: true, startsAt: true },
-            },
-          },
-        },
-      },
-      orderBy: { joinedAt: "desc" },
-    });
-    return memberships.map((m) => ({
-      ...toDomainCircle(m.circle),
-      memberRole: m.role,
-      memberCount: m.circle._count.memberships,
-      // upcomingMomentCount issu du _count SQL, pas de moments.length
-      upcomingMomentCount: m.circle._count.moments,
-      nextMoment: m.circle.moments[0] ?? null,
+    // $queryRaw : 1 seul round-trip HTTP Neon au lieu de 3 (include Prisma = N requêtes séparées)
+    // Les correlated subqueries s'appuient sur les index (circleId, status) existants
+    type Row = {
+      membershipId: string;
+      role: CircleMemberRole;
+      joinedAt: Date;
+      id: string;
+      slug: string;
+      name: string;
+      description: string;
+      logo: string | null;
+      coverImage: string | null;
+      coverImageAttribution: CoverImageAttribution | null;
+      visibility: "PUBLIC" | "PRIVATE";
+      category: string | null;
+      customCategory: string | null;
+      city: string | null;
+      stripeConnectAccountId: string | null;
+      inviteToken: string | null;
+      createdAt: Date;
+      updatedAt: Date;
+      memberCount: number;
+      upcomingMomentCount: number;
+      nextMoment: { title: string; startsAt: string } | null;
+    };
+
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        cm.id                     AS "membershipId",
+        cm.role                   AS "role",
+        cm."joinedAt"             AS "joinedAt",
+        c.id                      AS "id",
+        c.slug                    AS "slug",
+        c.name                    AS "name",
+        c.description             AS "description",
+        c.logo                    AS "logo",
+        c."coverImage"            AS "coverImage",
+        c."coverImageAttribution" AS "coverImageAttribution",
+        c.visibility              AS "visibility",
+        c.category                AS "category",
+        c.custom_category         AS "customCategory",
+        c.city                    AS "city",
+        c."stripeConnectAccountId" AS "stripeConnectAccountId",
+        c.invite_token            AS "inviteToken",
+        c."createdAt"             AS "createdAt",
+        c."updatedAt"             AS "updatedAt",
+        (SELECT COUNT(*)::int FROM circle_memberships WHERE "circleId" = c.id)
+          AS "memberCount",
+        (SELECT COUNT(*)::int FROM moments
+          WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW())
+          AS "upcomingMomentCount",
+        (SELECT row_to_json(x) FROM (
+          SELECT title, "startsAt"
+          FROM moments
+          WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW()
+          ORDER BY "startsAt" ASC
+          LIMIT 1
+        ) x) AS "nextMoment"
+      FROM circle_memberships cm
+      JOIN circles c ON c.id = cm."circleId"
+      WHERE cm."userId" = ${userId}
+      ORDER BY cm."joinedAt" DESC
+    `;
+
+    return rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      description: row.description,
+      logo: row.logo,
+      coverImage: row.coverImage,
+      coverImageAttribution: row.coverImageAttribution,
+      visibility: row.visibility,
+      category: (row.category as CircleCategory | null) ?? null,
+      customCategory: row.customCategory,
+      city: row.city,
+      stripeConnectAccountId: row.stripeConnectAccountId,
+      inviteToken: row.inviteToken,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      memberRole: row.role,
+      memberCount: row.memberCount,
+      upcomingMomentCount: row.upcomingMomentCount,
+      nextMoment: row.nextMoment
+        ? { title: row.nextMoment.title, startsAt: new Date(row.nextMoment.startsAt) }
+        : null,
     }));
   },
 

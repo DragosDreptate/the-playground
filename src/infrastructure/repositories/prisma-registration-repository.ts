@@ -6,10 +6,12 @@ import type {
 } from "@/domain/ports/repositories/registration-repository";
 import type {
   Registration,
+  PaymentStatus,
   RegistrationStatus,
   RegistrationWithMoment,
   RegistrationWithUser,
 } from "@/domain/models/registration";
+import type { LocationType } from "@/domain/models/moment";
 import type { Registration as PrismaRegistration } from "@prisma/client";
 
 function toDomainRegistration(record: PrismaRegistration): Registration {
@@ -262,61 +264,98 @@ export const prismaRegistrationRepository: RegistrationRepository = {
   async findAllForUserDashboard(
     userId: string
   ): Promise<{ upcoming: RegistrationWithMoment[]; past: RegistrationWithMoment[] }> {
-    const momentSelect = {
-      id: true,
-      slug: true,
-      title: true,
-      coverImage: true,
-      startsAt: true,
-      endsAt: true,
-      locationType: true,
-      locationName: true,
-      status: true,
-      circle: { select: { name: true, slug: true, coverImage: true } },
-    } as const;
+    // $queryRaw : 1 seul round-trip HTTP Neon au lieu de 3 (registrations → moments → circles)
+    type Row = {
+      id: string;
+      momentId: string;
+      userId: string;
+      status: string;
+      paymentStatus: string;
+      stripePaymentIntentId: string | null;
+      registeredAt: Date;
+      cancelledAt: Date | null;
+      checkedInAt: Date | null;
+      mId: string;
+      mSlug: string;
+      mTitle: string;
+      mCoverImage: string | null;
+      mStartsAt: Date;
+      mEndsAt: Date | null;
+      mLocationType: string;
+      mLocationName: string | null;
+      mStatus: string;
+      cName: string;
+      cSlug: string;
+      cCoverImage: string | null;
+    };
 
-    const records = await prisma.registration.findMany({
-      where: {
-        userId,
-        OR: [
-          {
-            status: { in: ["REGISTERED", "WAITLISTED"] },
-            moment: { status: "PUBLISHED", startsAt: { gt: new Date() } },
-          },
-          {
-            status: { in: ["REGISTERED", "CHECKED_IN"] },
-            moment: { status: "PAST" },
-          },
-        ],
-      },
-      include: { moment: { select: momentSelect } },
-      orderBy: { moment: { startsAt: "asc" } },
-    });
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        r.id,
+        r."momentId",
+        r."userId",
+        r.status,
+        r."paymentStatus",
+        r."stripePaymentIntentId",
+        r."registeredAt",
+        r."cancelledAt",
+        r."checkedInAt",
+        m.id                    AS "mId",
+        m.slug                  AS "mSlug",
+        m.title                 AS "mTitle",
+        m."coverImage"          AS "mCoverImage",
+        m."startsAt"            AS "mStartsAt",
+        m."endsAt"              AS "mEndsAt",
+        m."locationType"        AS "mLocationType",
+        m."locationName"        AS "mLocationName",
+        m.status                AS "mStatus",
+        c.name                  AS "cName",
+        c.slug                  AS "cSlug",
+        c."coverImage"          AS "cCoverImage"
+      FROM registrations r
+      JOIN moments m ON m.id = r."momentId"
+      JOIN circles c ON c.id = m."circleId"
+      WHERE r."userId" = ${userId}
+        AND (
+          (r.status IN ('REGISTERED', 'WAITLISTED') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
+          OR
+          (r.status IN ('REGISTERED', 'CHECKED_IN') AND m.status = 'PAST')
+        )
+      ORDER BY m."startsAt" ASC
+    `;
 
-    const toItem = (r: (typeof records)[number]): RegistrationWithMoment => ({
-      ...toDomainRegistration(r),
+    const toItem = (row: Row): RegistrationWithMoment => ({
+      id: row.id,
+      momentId: row.momentId,
+      userId: row.userId,
+      status: row.status as RegistrationStatus,
+      paymentStatus: row.paymentStatus as PaymentStatus,
+      stripePaymentIntentId: row.stripePaymentIntentId,
+      registeredAt: row.registeredAt,
+      cancelledAt: row.cancelledAt,
+      checkedInAt: row.checkedInAt,
       moment: {
-        id: r.moment.id,
-        slug: r.moment.slug,
-        title: r.moment.title,
-        coverImage: r.moment.coverImage ?? null,
-        startsAt: r.moment.startsAt,
-        endsAt: r.moment.endsAt,
-        locationType: r.moment.locationType,
-        locationName: r.moment.locationName,
-        circleName: r.moment.circle.name,
-        circleSlug: r.moment.circle.slug,
-        circleCoverImage: r.moment.circle.coverImage ?? null,
+        id: row.mId,
+        slug: row.mSlug,
+        title: row.mTitle,
+        coverImage: row.mCoverImage,
+        startsAt: row.mStartsAt,
+        endsAt: row.mEndsAt,
+        locationType: row.mLocationType as LocationType,
+        locationName: row.mLocationName,
+        circleName: row.cName,
+        circleSlug: row.cSlug,
+        circleCoverImage: row.cCoverImage,
       },
     });
 
     const upcoming: RegistrationWithMoment[] = [];
     const past: RegistrationWithMoment[] = [];
-    for (const r of records) {
-      if (r.moment.status === "PAST") past.push(toItem(r));
-      else upcoming.push(toItem(r));
+    for (const row of rows) {
+      if (row.mStatus === "PAST") past.push(toItem(row));
+      else upcoming.push(toItem(row));
     }
-    // Les moments passés doivent être triés par date décroissante
+    // Les moments passés triés par date décroissante
     past.sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
 
     return { upcoming, past };
