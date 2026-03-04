@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { getTranslations } from "next-intl/server";
+import { measureTime } from "@/lib/perf-logger";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -24,12 +25,15 @@ export async function DashboardContent({
   after(() => prismaMomentRepository.transitionPastMoments());
 
   // Requête fusionnée : upcoming + past en un seul round-trip Neon (au lieu de 2)
-  const [{ upcoming: upcomingRegistrations, past: pastRegistrations }, circles] = await Promise.all([
-    prismaRegistrationRepository.findAllForUserDashboard(userId),
-    getUserDashboardCircles(userId, {
-      circleRepository: prismaCircleRepository,
-    }),
-  ]);
+  const [{ upcoming: upcomingRegistrations, past: pastRegistrations }, circles] =
+    await measureTime("dashboard-content:phase1", () =>
+      Promise.all([
+        prismaRegistrationRepository.findAllForUserDashboard(userId),
+        getUserDashboardCircles(userId, {
+          circleRepository: prismaCircleRepository,
+        }),
+      ])
+    );
 
   const t = await getTranslations("Dashboard");
 
@@ -37,7 +41,9 @@ export async function DashboardContent({
   if (mode === "ORGANIZER") {
     // Requête fusionnée : upcoming + past en un seul round-trip Neon (au lieu de 2)
     const { upcoming: hostUpcoming, past: hostPast } =
-      await prismaMomentRepository.findAllByHostUserId(userId);
+      await measureTime("dashboard-content:phase2-organizer", () =>
+        prismaMomentRepository.findAllByHostUserId(userId)
+      );
 
     const hostCircles = circles.filter((c) => c.memberRole === "HOST");
     const hasHostMoments = hostUpcoming.length > 0 || hostPast.length > 0;

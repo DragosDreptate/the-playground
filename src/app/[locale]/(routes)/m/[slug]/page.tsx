@@ -92,7 +92,7 @@ export default async function PublicMomentPage({
   // Transition PUBLISHED → PAST for ended Moments — fire-and-forget après la réponse
   after(() => prismaMomentRepository.transitionPastMoments());
 
-  const moment = await getMoment(slug);
+  const moment = await measureTime("moment-page:moment", () => getMoment(slug));
   if (!moment) notFound();
 
   if (moment.status === "CANCELLED") notFound();
@@ -106,7 +106,7 @@ export default async function PublicMomentPage({
 
   if (!circle) notFound();
 
-  const session = await getCachedSession();
+  const session = await measureTime("moment-page:auth", () => getCachedSession());
   const isAuthenticated = !!session?.user?.id;
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
@@ -135,7 +135,9 @@ export default async function PublicMomentPage({
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =
     existingRegistration?.status === "WAITLISTED" && session?.user?.id
-      ? await prismaRegistrationRepository.countWaitlistPosition(moment.id, session.user.id)
+      ? await measureTime("moment-page:waitlist", () =>
+          prismaRegistrationRepository.countWaitlistPosition(moment.id, session!.user!.id!)
+        )
       : 0;
 
   const isFull =
