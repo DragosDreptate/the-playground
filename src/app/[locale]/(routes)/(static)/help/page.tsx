@@ -95,6 +95,7 @@ export default async function HelpPage() {
         { id: "radar", label: t("sidebar.radar") },
         { id: "share", label: t("sidebar.share") },
         { id: "members", label: t("sidebar.members") },
+        { id: "inviteMembers", label: t("sidebar.inviteMembers") },
       ],
     },
     { id: "faq", label: t("sidebar.faqLabel"), children: [] },
@@ -454,6 +455,27 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t("organizer.members.outro")}
               </p>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Inviter des membres */}
+            <div className="space-y-4">
+              <SectionH3 id="inviteMembers">{t("organizer.inviteMembers.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.inviteMembers.intro", rich)}
+              </p>
+              <ol className="space-y-3">
+                {(["step1", "step2", "step3", "step4"] as const).map((step, i) => (
+                  <li key={step} className="flex items-start gap-3">
+                    <StepNumber n={i + 1} />
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      {t.rich(`organizer.inviteMembers.${step}`, rich)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <Callout>{t.rich("organizer.inviteMembers.callout", rich)}</Callout>
             </div>
           </section>
 

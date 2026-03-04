@@ -916,7 +916,8 @@
       "editCancel": "Modifier ou annuler",
       "radar": "Le Radar",
       "share": "Partager l'événement",
-      "members": "Gérer les membres"
+      "members": "Gérer les membres",
+      "inviteMembers": "Inviter des membres"
     },
     "participant": {
       "sectionTitle": "Participant",
@@ -939,7 +940,7 @@
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong>",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté."
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1040,6 +1041,15 @@
         "title": "Gérer les membres de votre Communauté",
         "intro": "Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Vous pouvez supprimer un membre si nécessaire.",
         "outro": "Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements."
+      },
+      "inviteMembers": {
+        "title": "Inviter des membres par lien",
+        "intro": "Vous pouvez inviter quelqu'un directement dans votre Communauté sans qu'il ait besoin de s'inscrire à un événement. Depuis la page de votre Communauté, générez un <strong>lien d'invitation privé</strong> et partagez-le — par email, WhatsApp, ou tout autre canal.",
+        "step1": "Rendez-vous sur la page de votre Communauté",
+        "step2": "Dans la section Membres, cliquez sur <strong>Générer un lien d'invitation</strong>",
+        "step3": "Copiez le lien et partagez-le avec les personnes à inviter",
+        "step4": "La personne clique, se connecte, et rejoint instantanément votre Communauté",
+        "callout": "Ce lien est <strong>révocable à tout moment</strong> — cliquez sur Révoquer pour le désactiver. Les membres déjà rejoints ne sont pas affectés. Un même lien peut être utilisé par plusieurs personnes."
       }
     },
     "faq": {
@@ -1050,7 +1060,7 @@
       },
       "q2": {
         "question": "Quelle est la différence entre une Communauté publique et privée ?",
-        "answer": "Une Communauté publique est visible dans Découvrir et accessible à tous. Une Communauté privée n'est accessible que via un lien direct — elle n'apparaît pas dans l'annuaire."
+        "answer": "Une Communauté publique est visible dans Découvrir et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
       },
       "q3": {
         "question": "Puis-je organiser des événements sans créer de Communauté ?",
