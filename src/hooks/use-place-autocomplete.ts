@@ -10,18 +10,12 @@ export type PlaceSuggestionItem = {
   longitude: number;
 };
 
-const BAN_BASE = "https://api-adresse.data.gouv.fr/search";
 const MIN_QUERY_LENGTH = 3;
 const DEBOUNCE_MS = 300;
 
-type BanFeature = {
-  geometry: { coordinates: [number, number] };
-  properties: {
-    id: string;
-    label: string;
-    name: string;
-  };
-};
+function generateSessionToken(): string {
+  return crypto.randomUUID();
+}
 
 export function usePlaceAutocomplete() {
   const [suggestions, setSuggestions] = useState<PlaceSuggestionItem[]>([]);
@@ -29,6 +23,7 @@ export function usePlaceAutocomplete() {
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const sessionTokenRef = useRef<string>(generateSessionToken());
 
   const suggest = useCallback((query: string) => {
     // Cancel pending debounce
@@ -56,28 +51,19 @@ export function usePlaceAutocomplete() {
       try {
         const params = new URLSearchParams({
           q: query,
-          limit: "5",
-          autocomplete: "1",
+          sessionToken: sessionTokenRef.current,
         });
 
-        const res = await fetch(`${BAN_BASE}?${params}`, {
+        const res = await fetch(`/api/places/autocomplete?${params}`, {
           signal: controller.signal,
         });
 
-        if (!res.ok) throw new Error("BAN API error");
+        if (!res.ok) throw new Error("Places API error");
 
-        const data: { features: BanFeature[] } = await res.json();
+        const data: PlaceSuggestionItem[] = await res.json();
 
         if (!controller.signal.aborted) {
-          setSuggestions(
-            data.features.map((f) => ({
-              id: f.properties.id,
-              name: f.properties.name,
-              fullAddress: f.properties.label,
-              latitude: f.geometry.coordinates[1],
-              longitude: f.geometry.coordinates[0],
-            }))
-          );
+          setSuggestions(data);
           setIsLoading(false);
         }
       } catch {
@@ -100,5 +86,10 @@ export function usePlaceAutocomplete() {
     setIsLoading(false);
   }, []);
 
-  return { suggestions, isLoading, suggest, clear };
+  // Reset session token après sélection (économie de quota Google)
+  const resetSession = useCallback(() => {
+    sessionTokenRef.current = generateSessionToken();
+  }, []);
+
+  return { suggestions, isLoading, suggest, clear, resetSession };
 }
