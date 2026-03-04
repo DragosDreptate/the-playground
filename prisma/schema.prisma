@@ -195,6 +195,8 @@ model CircleMembership {
   @@index([circleId, role])
   // Index sur userId : utilisé dans findByUserId, findAllByUserId, delete (user)
   @@index([userId])
+  // Index composite (userId, role) : utilisé dans findAllByHostUserId — WHERE userId = ? AND role = 'HOST'
+  @@index([userId, role])
   @@map("circle_memberships")
 }
 

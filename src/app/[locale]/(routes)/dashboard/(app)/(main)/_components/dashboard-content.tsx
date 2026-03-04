@@ -28,10 +28,14 @@ export async function DashboardContent({
   const [{ upcoming: upcomingRegistrations, past: pastRegistrations }, circles] =
     await measureTime("dashboard-content:phase1", () =>
       Promise.all([
-        prismaRegistrationRepository.findAllForUserDashboard(userId),
-        getUserDashboardCircles(userId, {
-          circleRepository: prismaCircleRepository,
-        }),
+        measureTime("dashboard-content:registrations", () =>
+          prismaRegistrationRepository.findAllForUserDashboard(userId)
+        ),
+        measureTime("dashboard-content:circles", () =>
+          getUserDashboardCircles(userId, {
+            circleRepository: prismaCircleRepository,
+          })
+        ),
       ])
     );
 
