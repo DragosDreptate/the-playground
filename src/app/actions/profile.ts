@@ -7,7 +7,7 @@ import { updateProfile } from "@/domain/usecases/update-profile";
 import { deleteAccount } from "@/domain/usecases/delete-account";
 import { updateNotificationPreferences } from "@/domain/usecases/update-notification-preferences";
 import { DomainError } from "@/domain/errors";
-import { signOut } from "@/infrastructure/auth/auth.config";
+import { signOut, update } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
 import type { User, NotificationPreferences } from "@/domain/models/user";
@@ -43,6 +43,10 @@ export async function updateProfileAction(
       },
       { userRepository: prismaUserRepository }
     );
+    // Rafraîchit le JWT si onboardingCompleted a changé (premier setup profil)
+    if (user.onboardingCompleted !== session.user.onboardingCompleted) {
+      await update({ user: { onboardingCompleted: user.onboardingCompleted } });
+    }
     return { success: true, data: user };
   } catch (error) {
     if (error instanceof DomainError) {
