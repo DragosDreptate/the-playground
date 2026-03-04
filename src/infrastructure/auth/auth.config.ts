@@ -9,15 +9,12 @@ import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-
 import { isUploadedUrl } from "@/lib/blob";
 import { captureServerEvent } from "@/lib/posthog-server";
 
-export const { handlers, auth, signIn, signOut, unstable_update: update } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
   // Nécessaire sur Vercel (preview + prod) : fait confiance au header X-Forwarded-Host
   // du proxy Vercel, ce qui évite l'erreur "UntrustedHost" sur les URLs preview dynamiques.
   trustHost: true,
   adapter: PrismaAdapter(prisma),
-  // JWT : session encodée dans un cookie signé — élimine Session.findUnique (~300ms)
-  // sur chaque requête (strategy "database" par défaut avec PrismaAdapter).
-  session: { strategy: "jwt" },
   providers: [
     GitHub,
     Google,
@@ -105,41 +102,16 @@ export const { handlers, auth, signIn, signOut, unstable_update: update } = Next
 
       return true;
     },
-
-    // Encode les champs custom dans le JWT au sign-in,
-    // puis les relit depuis le token sur chaque requête (pas de DB).
-    async jwt({ token, user, trigger, session: sessionUpdate }) {
-      // Au sign-in : peupler le token avec les données DB de l'utilisateur
-      if (user) {
-        token.id = user.id;
-        const dbUser = user as unknown as {
-          onboardingCompleted: boolean;
-          role: "USER" | "ADMIN";
-          dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
-        };
-        token.onboardingCompleted = dbUser.onboardingCompleted;
-        token.role = dbUser.role;
-        token.dashboardMode = dbUser.dashboardMode ?? null;
-      }
-      // Sur appel update() depuis une Server Action : appliquer les nouvelles valeurs
-      // sessionUpdate suit la structure Session (champs sous .user)
-      if (trigger === "update" && sessionUpdate?.user) {
-        const u = sessionUpdate.user as Partial<{
-          onboardingCompleted: boolean;
-          dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
-        }>;
-        if (u.onboardingCompleted !== undefined) token.onboardingCompleted = u.onboardingCompleted;
-        if (u.dashboardMode !== undefined) token.dashboardMode = u.dashboardMode;
-      }
-      return token;
-    },
-
-    // Expose les champs du JWT dans la session (zéro DB lookup)
-    session({ session, token }) {
-      session.user.id = token.sub ?? (token.id as string);
-      session.user.onboardingCompleted = token.onboardingCompleted as boolean;
-      session.user.role = token.role as "USER" | "ADMIN";
-      session.user.dashboardMode = token.dashboardMode as "PARTICIPANT" | "ORGANIZER" | null;
+    session({ session, user }) {
+      session.user.id = user.id;
+      const dbUser = user as unknown as {
+        onboardingCompleted: boolean;
+        role: "USER" | "ADMIN";
+        dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+      };
+      session.user.onboardingCompleted = dbUser.onboardingCompleted;
+      session.user.role = dbUser.role;
+      session.user.dashboardMode = dbUser.dashboardMode ?? null;
       return session;
     },
   },
