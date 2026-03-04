@@ -286,13 +286,15 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:cleanup-demo-data:prod` | Supprime les données démo en production (avec double confirmation) |
 | `pnpm db:backfill-notification-prefs` | Backfill des préférences de notifications (dev) — met à true pour les utilisateurs existants |
 | `pnpm db:backfill-notification-prefs:prod` | Backfill des préférences de notifications en production (avec confirmation) |
+| `pnpm db:backfill-dashboard-mode` | Backfill du mode dashboard (dev) — met `PARTICIPANT` pour les utilisateurs sans mode défini |
+| `pnpm db:backfill-dashboard-mode:prod` | Backfill du mode dashboard en production (avec confirmation) |
 | `pnpm db:export-brevo-contacts` | Exporte les utilisateurs réels vers un CSV prêt à importer dans Brevo (exclut test/démo) |
 | `pnpm db:export-brevo-contacts:prod` | Exporte les contacts Brevo depuis la production (avec confirmation) |
 | `pnpm db:seed-covers` | Dry-run : affiche les images de couverture à injecter |
 | `pnpm db:seed-covers:execute` | Injecte les images de couverture en base |
 | `pnpm db:seed-covers:prod` | Injecte les images de couverture en production (avec confirmation) |
+| `pnpm db:subscribe-demo-to-the-spark:prod` | Inscrit les utilisateurs démo à la Communauté The Spark en production (avec confirmation) |
 | `pnpm test:e2e` | Lance les tests E2E Playwright |
-| `pnpm test:e2e:setup-onboarding` | Génère le storage state d'auth pour l'onboarding E2E |
 | `pnpm test:mobile` | Lance les tests mobile Playwright (config dédiée) |
 | `pnpm test:mobile:setup` | Génère le storage state d'auth pour les tests mobile |
 

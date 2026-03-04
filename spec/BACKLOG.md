@@ -84,6 +84,8 @@
 | **Page Aide `/help`** : page statique avec sidebar de navigation (ancres), FAQ accordion, sections Participant et Organisateur, i18n FR/EN/RO/NL/ES (namespace `Help`). Lien "Aide" ajouté dans le footer (`Footer.product.help`). | 2026-03-02 | — |
 | **Page Découvrir : H1 "Communautés & événements"** (FR) / "Communities & events" (EN) — mise à jour de la clé i18n `Explorer.title`. | 2026-03-02 | — |
 | **Suppression membre d'une Communauté** : usecase `removeCircleMember`, contrôle Organisateur, annulation automatique des inscriptions à venir, i18n FR/EN. | 2026-03-01 | `706cf9b` |
+| **Invitation Communauté par lien** : usecases `generateCircleInviteToken` / `joinCircleByInvite` / `revokeCircleInviteToken`, token unique sur `Circle` (`inviteToken`), page publique `/circles/join/[token]` (rejoint la Communauté sans passer par un événement), bouton génération/révocation sur la page Communauté Organisateur, i18n FR/EN, tests unitaires + tests de sécurité (`circle-invite-security.test.ts`) + spec E2E (`circle-invite.spec.ts`). | 2026-03-04 | `ef288f7` |
+| **Catégorie personnalisée sur Communauté** : champ `customCategory` (string, max 100 chars) sur `Circle` (DB + domaine + repository). Activé uniquement quand la catégorie choisie est `OTHER`. Validé côté client dans `CircleForm` + géré dans les usecases `createCircle`/`updateCircle` via helper `resolveCustomCategoryForCreate`/`resolveCustomCategoryForUpdate` (`src/lib/circle-category-helpers.ts`). Affiché à la place du label "Autre" sur les cards et pages Communauté. | — | — |
 
 ---
 
@@ -268,7 +270,7 @@
 - [ ] **Outils Organisateur enrichis** *(partiellement implémenté)*
   - Co-Organisateurs (plusieurs Organisateurs par Communauté)
   - [x] Retirer un membre d'une Communauté ✅ — usecase `removeCircleMember`, PR #123
-  - Inviter un membre (lien direct ou email)
+  - [x] Inviter par lien privé ✅ — token d'invitation unique sur la Communauté, page `/circles/join/[token]`, génération/révocation depuis la page Communauté Organisateur
   - Stats Communauté basiques
 
 - [ ] **Paiement Stripe Connect**
@@ -342,9 +344,9 @@
   - Solution : Upstash Rate Limit (Redis serverless, compatible Vercel Edge)
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
-- [x] **Tests unitaires complets** — 495 tests, 59 fichiers, tous usecases couverts (33 racine + 11 admin) ✅
-- [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards (99 tests dédiés sécurité) ✅
-- [x] **Tests E2E Playwright** — 10 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher, broadcast-moment). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
+- [x] **Tests unitaires complets** — 580 tests, 64 fichiers, tous usecases couverts (33 racine + 11 admin + 3 invite) ✅
+- [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards, invite token (99+ tests dédiés sécurité) ✅
+- [x] **Tests E2E Playwright** — 11 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher, broadcast-moment, circle-invite). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
 - [ ] **Accessibilité axe-core** dans Playwright
 
 - [ ] **Bundle analyzer** (`@next/bundle-analyzer`)
@@ -375,15 +377,12 @@
   - Contraintes : formats JPEG/PNG/WebP, taille max (resize côté client), N photos max par événement
   - Option modération : l'Organisateur peut supprimer une photo
   - Viralité : lien partageable vers la galerie, CTA "Voir les photos" dans l'email post-événement
-- [x] **Radar concurrentiel à la création d'événement** ✅ — PRs #95 #96 #97
-  - Lors de la création d'un événement (step date/lieu), afficher les événements publiés sur les plateformes concurrentes (Meetup, Luma, Eventbrite…) dans la même ville, au même créneau
-  - **Objectif** : permettre à l'Organisateur d'identifier les conflits potentiels avec des événements qui ciblent la même audience, avant de publier
-  - **Affichage** : section "Événements le même jour dans ta ville" dans le formulaire — liste compacte (titre, plateforme source, heure, nombre d'inscrits si disponible)
-  - **Sources** : APIs publiques Meetup (`/find/events`), Eventbrite (`/events/search`), Luma (scraping ou API si disponible) — requêtes filtrées par `location` + `date range`
-  - **Périmètre** : rayon configurable (ex: 20 km), même catégorie en priorité
-  - **IA** : scoring de "risque de conflit" basé sur similarité de catégorie, audience cible, créneau horaire — suggestion de créneaux alternatifs moins concurrentiels
-  - **Privacy** : données affichées en lecture seule, pas stockées — requêtes live à la saisie (debounce)
-  - **Contraintes** : rate limits APIs tierces, certaines nécessitent une clé (Eventbrite), Luma sans API officielle
+- [x] **Radar concurrentiel** ✅ — PRs #95 #96 #97
+  - POC isolé accessible en interne sous `/lab/events-radar` (pas intégré au formulaire de création d'événement)
+  - Agent IA (Claude) qui scrape Luma, Meetup, Eventbrite pour trouver les événements concurrents dans une ville et un créneau donnés
+  - Interface : sélecteur de ville (11 villes FR/EU), date de début/fin, mots-clés, streaming des résultats en temps réel
+  - Table `RadarUsage` en DB pour le suivi d'usage par utilisateur et par jour
+  - **Note** : l'intégration dans le formulaire de création d'événement (objectif initial) reste à faire
 
 - [ ] Plan Pro (analytics, branding, IA avancée, API, multi-canal)
 - [ ] **Emails de rappel pré-événement** (24h + 1h avant) — jobs planifiés Vercel Cron ou Upstash QStash, flags `reminder24hSentAt` / `reminder1hSentAt` sur `Moment`
