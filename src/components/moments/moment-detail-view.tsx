@@ -272,7 +272,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
             )}
             {!isHostView && props.isHost && (
-              <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
+              <Button asChild size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
                   <ExternalLink className="size-3.5" />
                   {tCircle("detail.manageMoment")}
