@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { encode } from "next-auth/jwt";
 import { prisma } from "@/infrastructure/db/prisma";
 import { cookies } from "next/headers";
 
 /**
- * Dev/E2E-only: impersonate a user by creating a session and setting the Auth.js cookie.
+ * Dev/E2E-only: impersonate a user by creating a JWT session cookie.
  *
  * GET /api/dev/impersonate?email=host@test.playground
- *   → Creates DB session → Sets cookie → 302 /dashboard
+ *   → Encode JWT (strategy "jwt") → Sets cookie → 302 /dashboard
+ *
+ * Note : l'ancien endpoint créait une session en DB (strategy "database").
+ * Avec strategy "jwt", Auth.js attend un JWT signé dans le cookie — plus de DB session.
  */
 export async function GET(request: NextRequest) {
   const isDevMode = process.env.NODE_ENV !== "production";
@@ -28,21 +32,28 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "user not found" }, { status: 404 });
   }
 
-  // Create a session in DB (same table Auth.js uses)
-  const sessionToken = crypto.randomUUID();
-  const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  const maxAge = 30 * 24 * 60 * 60; // 30 jours
+  const expires = new Date(Date.now() + maxAge * 1000);
 
-  await prisma.session.create({
-    data: {
-      userId: user.id,
-      sessionToken,
-      expires,
+  // Encode un JWT compatible Auth.js (strategy "jwt") avec les champs custom de session
+  const token = await encode({
+    token: {
+      sub: user.id,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      image: user.image,
+      onboardingCompleted: user.onboardingCompleted,
+      role: user.role,
+      dashboardMode: user.dashboardMode,
     },
+    secret: process.env.AUTH_SECRET!,
+    maxAge,
+    salt: "authjs.session-token",
   });
 
-  // Set the Auth.js session cookie (HTTP local = "authjs.session-token", not "__Secure-" prefix)
   const cookieStore = await cookies();
-  cookieStore.set("authjs.session-token", sessionToken, {
+  cookieStore.set("authjs.session-token", token, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
