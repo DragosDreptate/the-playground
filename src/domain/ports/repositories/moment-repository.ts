@@ -91,6 +91,11 @@ export interface MomentRepository {
   findUpcomingByHostUserId(hostUserId: string): Promise<HostMomentSummary[]>;
   /** Moments passés dans les Circles dont l'utilisateur est HOST. */
   findPastByHostUserId(hostUserId: string): Promise<HostMomentSummary[]>;
+  /**
+   * Renvoie les moments upcoming + past du Host en une seule requête (évite 2 round-trips Neon).
+   * Upcoming : status PUBLISHED. Past : status PAST.
+   */
+  findAllByHostUserId(hostUserId: string): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }>;
   /** Marque un Moment comme ayant été diffusé (broadcast email envoyé). */
   markBroadcastSent(momentId: string): Promise<void>;
 }

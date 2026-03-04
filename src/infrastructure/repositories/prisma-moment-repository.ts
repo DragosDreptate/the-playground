@@ -258,6 +258,58 @@ export const prismaMomentRepository: MomentRepository = {
     }));
   },
 
+  async findAllByHostUserId(
+    hostUserId: string
+  ): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }> {
+    const records = await prisma.moment.findMany({
+      where: {
+        status: { in: ["PUBLISHED", "PAST"] },
+        circle: {
+          memberships: { some: { userId: hostUserId, role: "HOST" } },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        coverImage: true,
+        startsAt: true,
+        endsAt: true,
+        locationType: true,
+        locationName: true,
+        status: true,
+        circle: { select: { slug: true, name: true, coverImage: true } },
+        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+      },
+      orderBy: { startsAt: "asc" },
+    });
+
+    const toItem = (m: (typeof records)[number]): HostMomentSummary => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      coverImage: m.coverImage ?? null,
+      startsAt: m.startsAt,
+      endsAt: m.endsAt,
+      locationType: m.locationType,
+      locationName: m.locationName,
+      status: m.status,
+      registrationCount: m._count.registrations,
+      circle: { slug: m.circle.slug, name: m.circle.name, coverImage: m.circle.coverImage ?? null },
+    });
+
+    const upcoming: HostMomentSummary[] = [];
+    const past: HostMomentSummary[] = [];
+    for (const m of records) {
+      if (m.status === "PAST") past.push(toItem(m));
+      else upcoming.push(toItem(m));
+    }
+    // Les moments passés doivent être triés par date décroissante
+    past.sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
+
+    return { upcoming, past };
+  },
+
   async markBroadcastSent(momentId: string): Promise<void> {
     await prisma.moment.update({
       where: { id: momentId },

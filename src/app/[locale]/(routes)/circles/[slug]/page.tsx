@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
@@ -9,7 +10,6 @@ import {
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
-import { CircleNotFoundError } from "@/domain/errors";
 import { CircleViewTracker } from "@/components/circles/circle-view-tracker";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,15 @@ import {
 } from "lucide-react";
 
 export const revalidate = 60;
+
+// Deduplicate DB call between generateMetadata and the page (identique au pattern /m/[slug])
+const getCachedCircle = cache(async (slug: string) => {
+  try {
+    return await getCircleBySlug(slug, { circleRepository: prismaCircleRepository });
+  } catch {
+    return null;
+  }
+});
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -63,9 +72,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   try {
-    const circle = await getCircleBySlug(slug, {
-      circleRepository: prismaCircleRepository,
-    });
+    const circle = await getCachedCircle(slug);
+    if (!circle) return {};
     const isPrivate = circle.visibility !== "PUBLIC";
     return {
       title: circle.name,
@@ -110,15 +118,9 @@ export default async function PublicCirclePage({
 
   const activeTab = tab === "past" ? "past" : "upcoming";
 
-  let circle;
-  try {
-    circle = await getCircleBySlug(slug, {
-      circleRepository: prismaCircleRepository,
-    });
-  } catch (error) {
-    if (error instanceof CircleNotFoundError) notFound();
-    throw error;
-  }
+  // getCachedCircle déduplique la requête avec generateMetadata (React cache)
+  const circle = await getCachedCircle(slug);
+  if (!circle) notFound();
 
   // Parallélise les requêtes indépendantes
   const parallelQueries: [
