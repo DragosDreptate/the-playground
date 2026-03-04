@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
@@ -23,8 +24,8 @@ export async function DashboardContent({
   activeTab: "moments" | "circles";
   mode: DashboardMode | null;
 }) {
-  // Transition PUBLISHED → PAST pour les Moments terminés
-  await prismaMomentRepository.transitionPastMoments();
+  // Transition PUBLISHED → PAST pour les Moments terminés — fire-and-forget après la réponse
+  after(() => prismaMomentRepository.transitionPastMoments());
 
   const [upcomingRegistrations, pastRegistrations, circles] = await Promise.all([
     getUserUpcomingMoments(userId, {

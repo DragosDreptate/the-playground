@@ -200,7 +200,8 @@ export async function createMomentAction(
       Sentry.captureException(err);
     });
 
-    revalidatePath("/", "layout");
+    // Pas de revalidatePath : la page est nouvelle (aucun cache stale), le dashboard est dynamique.
+    // La page Circle publique se rafraîchit via son ISR (60s).
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -307,7 +308,9 @@ export async function updateMomentAction(
       }
     }
 
-    revalidatePath("/", "layout");
+    // Invalide uniquement la page de cet événement (les deux locales)
+    revalidatePath(`/m/${result.moment.slug}`);
+    revalidatePath(`/en/m/${result.moment.slug}`);
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -470,7 +473,12 @@ export async function deleteMomentAction(
       );
     }
 
-    revalidatePath("/", "layout");
+    // Invalide uniquement la page de l'événement annulé (les deux locales) — critique
+    // pour que les visiteurs voient immédiatement le statut CANCELLED / 404.
+    if (momentToDelete) {
+      revalidatePath(`/m/${momentToDelete.slug}`);
+      revalidatePath(`/en/m/${momentToDelete.slug}`);
+    }
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
