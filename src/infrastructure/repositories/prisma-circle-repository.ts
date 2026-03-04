@@ -204,40 +204,40 @@ export const prismaCircleRepository: CircleRepository = {
 
     const rows = await prisma.$queryRaw<Row[]>`
       SELECT
-        cm.id               AS "membershipId",
-        cm.role             AS "role",
-        cm.joined_at        AS "joinedAt",
-        c.id                AS "id",
-        c.slug              AS "slug",
-        c.name              AS "name",
-        c.description       AS "description",
-        c.logo              AS "logo",
-        c.cover_image       AS "coverImage",
-        c.cover_image_attribution AS "coverImageAttribution",
-        c.visibility        AS "visibility",
-        c.category          AS "category",
-        c.custom_category   AS "customCategory",
-        c.city              AS "city",
-        c.stripe_connect_account_id AS "stripeConnectAccountId",
-        c.invite_token      AS "inviteToken",
-        c.created_at        AS "createdAt",
-        c.updated_at        AS "updatedAt",
-        (SELECT COUNT(*)::int FROM circle_memberships WHERE circle_id = c.id)
+        cm.id                     AS "membershipId",
+        cm.role                   AS "role",
+        cm."joinedAt"             AS "joinedAt",
+        c.id                      AS "id",
+        c.slug                    AS "slug",
+        c.name                    AS "name",
+        c.description             AS "description",
+        c.logo                    AS "logo",
+        c."coverImage"            AS "coverImage",
+        c."coverImageAttribution" AS "coverImageAttribution",
+        c.visibility              AS "visibility",
+        c.category                AS "category",
+        c.custom_category         AS "customCategory",
+        c.city                    AS "city",
+        c."stripeConnectAccountId" AS "stripeConnectAccountId",
+        c.invite_token            AS "inviteToken",
+        c."createdAt"             AS "createdAt",
+        c."updatedAt"             AS "updatedAt",
+        (SELECT COUNT(*)::int FROM circle_memberships WHERE "circleId" = c.id)
           AS "memberCount",
         (SELECT COUNT(*)::int FROM moments
-          WHERE circle_id = c.id AND status = 'PUBLISHED' AND starts_at >= NOW())
+          WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW())
           AS "upcomingMomentCount",
         (SELECT row_to_json(x) FROM (
-          SELECT title, starts_at AS "startsAt"
+          SELECT title, "startsAt"
           FROM moments
-          WHERE circle_id = c.id AND status = 'PUBLISHED' AND starts_at >= NOW()
-          ORDER BY starts_at ASC
+          WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW()
+          ORDER BY "startsAt" ASC
           LIMIT 1
         ) x) AS "nextMoment"
       FROM circle_memberships cm
-      JOIN circles c ON c.id = cm.circle_id
-      WHERE cm.user_id = ${userId}
-      ORDER BY cm.joined_at DESC
+      JOIN circles c ON c.id = cm."circleId"
+      WHERE cm."userId" = ${userId}
+      ORDER BY cm."joinedAt" DESC
     `;
 
     return rows.map((row) => ({

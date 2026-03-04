@@ -292,36 +292,36 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     const rows = await prisma.$queryRaw<Row[]>`
       SELECT
         r.id,
-        r.moment_id            AS "momentId",
-        r.user_id              AS "userId",
+        r."momentId",
+        r."userId",
         r.status,
-        r.payment_status       AS "paymentStatus",
-        r.stripe_payment_intent_id AS "stripePaymentIntentId",
-        r.registered_at        AS "registeredAt",
-        r.cancelled_at         AS "cancelledAt",
-        r.checked_in_at        AS "checkedInAt",
-        m.id                   AS "mId",
-        m.slug                 AS "mSlug",
-        m.title                AS "mTitle",
-        m.cover_image          AS "mCoverImage",
-        m.starts_at            AS "mStartsAt",
-        m.ends_at              AS "mEndsAt",
-        m.location_type        AS "mLocationType",
-        m.location_name        AS "mLocationName",
-        m.status               AS "mStatus",
-        c.name                 AS "cName",
-        c.slug                 AS "cSlug",
-        c.cover_image          AS "cCoverImage"
+        r."paymentStatus",
+        r."stripePaymentIntentId",
+        r."registeredAt",
+        r."cancelledAt",
+        r."checkedInAt",
+        m.id                    AS "mId",
+        m.slug                  AS "mSlug",
+        m.title                 AS "mTitle",
+        m."coverImage"          AS "mCoverImage",
+        m."startsAt"            AS "mStartsAt",
+        m."endsAt"              AS "mEndsAt",
+        m."locationType"        AS "mLocationType",
+        m."locationName"        AS "mLocationName",
+        m.status                AS "mStatus",
+        c.name                  AS "cName",
+        c.slug                  AS "cSlug",
+        c."coverImage"          AS "cCoverImage"
       FROM registrations r
-      JOIN moments m ON m.id = r.moment_id
-      JOIN circles c ON c.id = m.circle_id
-      WHERE r.user_id = ${userId}
+      JOIN moments m ON m.id = r."momentId"
+      JOIN circles c ON c.id = m."circleId"
+      WHERE r."userId" = ${userId}
         AND (
-          (r.status IN ('REGISTERED', 'WAITLISTED') AND m.status = 'PUBLISHED' AND m.starts_at > NOW())
+          (r.status IN ('REGISTERED', 'WAITLISTED') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
           OR
           (r.status IN ('REGISTERED', 'CHECKED_IN') AND m.status = 'PAST')
         )
-      ORDER BY m.starts_at ASC
+      ORDER BY m."startsAt" ASC
     `;
 
     const toItem = (row: Row): RegistrationWithMoment => ({
