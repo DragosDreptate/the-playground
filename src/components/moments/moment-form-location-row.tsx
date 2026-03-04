@@ -237,6 +237,7 @@ export function MomentFormLocationRow({
                     setLocationAddress(s.fullAddress);
                     onLocationAddressChange?.(s.fullAddress);
                     addressAutocomplete.clear();
+                    addressAutocomplete.resetSession();
                   }}
                   onClear={addressAutocomplete.clear}
                 />
