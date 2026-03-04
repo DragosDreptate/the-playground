@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getTranslations } from "next-intl/server";
+import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,7 +19,10 @@ export default async function DashboardPage({
   const { tab, mode: modeParam } = await searchParams;
   const activeTab = tab === "circles" ? "circles" : "moments";
 
-  const [session, t] = await Promise.all([auth(), getTranslations("Dashboard")]);
+  const [session, t] = await Promise.all([
+    measureTime("dashboard:auth", () => auth()),
+    getTranslations("Dashboard"),
+  ]);
 
   if (!session?.user?.id) {
     return null;

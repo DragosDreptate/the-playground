@@ -113,13 +113,13 @@ export default async function PublicCirclePage({
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
-      auth(),
+      measureTime("circle-page:auth", () => auth()),
     ]);
 
   const activeTab = tab === "past" ? "past" : "upcoming";
 
   // getCachedCircle déduplique la requête avec generateMetadata (React cache)
-  const circle = await getCachedCircle(slug);
+  const circle = await measureTime("circle-page:circle", () => getCachedCircle(slug));
   if (!circle) notFound();
 
   // Parallélise les requêtes indépendantes
