@@ -111,7 +111,8 @@ export default async function PublicMomentPage({
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   // Parallélise : inscription existante + données publiques en une seule vague
-  const [existingRegistration, registeredCount, allAttendees, comments, upcomingCircleMoments] =
+  // registeredCount est dérivé de allAttendees en JS (évite un round-trip Neon supplémentaire)
+  const [existingRegistration, allAttendees, comments, upcomingCircleMoments] =
     await measureTime("moment-page:data", () =>
       Promise.all([
         isAuthenticated
@@ -120,10 +121,6 @@ export default async function PublicMomentPage({
               { registrationRepository: prismaRegistrationRepository }
             )
           : Promise.resolve(null),
-        prismaRegistrationRepository.countByMomentIdAndStatus(
-          moment.id,
-          "REGISTERED"
-        ),
         prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
         getMomentComments(
           { momentId: moment.id },
@@ -132,6 +129,8 @@ export default async function PublicMomentPage({
         prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
       ])
     );
+
+  const registeredCount = allAttendees.filter((r) => r.status === "REGISTERED").length;
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =

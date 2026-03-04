@@ -259,6 +259,69 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     }));
   },
 
+  async findAllForUserDashboard(
+    userId: string
+  ): Promise<{ upcoming: RegistrationWithMoment[]; past: RegistrationWithMoment[] }> {
+    const momentSelect = {
+      id: true,
+      slug: true,
+      title: true,
+      coverImage: true,
+      startsAt: true,
+      endsAt: true,
+      locationType: true,
+      locationName: true,
+      status: true,
+      circle: { select: { name: true, slug: true, coverImage: true } },
+    } as const;
+
+    const records = await prisma.registration.findMany({
+      where: {
+        userId,
+        OR: [
+          {
+            status: { in: ["REGISTERED", "WAITLISTED"] },
+            moment: { status: "PUBLISHED", startsAt: { gt: new Date() } },
+          },
+          {
+            status: { in: ["REGISTERED", "CHECKED_IN"] },
+            moment: { status: "PAST" },
+          },
+        ],
+      },
+      include: { moment: { select: momentSelect } },
+      orderBy: { moment: { startsAt: "asc" } },
+    });
+
+    const toItem = (r: (typeof records)[number]): RegistrationWithMoment => ({
+      ...toDomainRegistration(r),
+      moment: {
+        id: r.moment.id,
+        slug: r.moment.slug,
+        title: r.moment.title,
+        coverImage: r.moment.coverImage ?? null,
+        startsAt: r.moment.startsAt,
+        endsAt: r.moment.endsAt,
+        locationType: r.moment.locationType,
+        locationName: r.moment.locationName,
+        circleName: r.moment.circle.name,
+        circleSlug: r.moment.circle.slug,
+        circleCoverImage: r.moment.circle.coverImage ?? null,
+      },
+    });
+
+    const upcoming: RegistrationWithMoment[] = [];
+    const past: RegistrationWithMoment[] = [];
+    for (const r of records) {
+      if (r.moment.status === "PAST") past.push(toItem(r));
+      else upcoming.push(toItem(r));
+    }
+    // Les moments passés doivent être triés par date décroissante
+    past.sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
+
+    return { upcoming, past };
+  },
+
   async findFirstWaitlisted(momentId: string): Promise<Registration | null> {
     const record = await prisma.registration.findFirst({
       where: { momentId, status: "WAITLISTED" },

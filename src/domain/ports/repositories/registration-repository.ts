@@ -45,6 +45,12 @@ export interface RegistrationRepository {
   update(id: string, input: UpdateRegistrationInput): Promise<Registration>;
   findUpcomingByUserId(userId: string): Promise<RegistrationWithMoment[]>;
   findPastByUserId(userId: string): Promise<RegistrationWithMoment[]>;
+  /**
+   * Renvoie les inscriptions upcoming + past en une seule requête (évite 2 round-trips Neon).
+   * Upcoming : status REGISTERED/WAITLISTED + moment PUBLISHED à venir.
+   * Past : status REGISTERED/CHECKED_IN + moment PAST.
+   */
+  findAllForUserDashboard(userId: string): Promise<{ upcoming: RegistrationWithMoment[]; past: RegistrationWithMoment[] }>;
   findFirstWaitlisted(momentId: string): Promise<Registration | null>;
   countWaitlistPosition(momentId: string, userId: string): Promise<number>;
   /** Renvoie les inscriptions actives (REGISTERED ou WAITLIST) à venir pour un User dans un Circle. */

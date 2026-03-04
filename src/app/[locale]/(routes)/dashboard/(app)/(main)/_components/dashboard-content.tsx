@@ -6,10 +6,6 @@ import {
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
-import { getUserUpcomingMoments } from "@/domain/usecases/get-user-upcoming-moments";
-import { getUserPastMoments } from "@/domain/usecases/get-user-past-moments";
-import { getHostUpcomingMoments } from "@/domain/usecases/get-host-upcoming-moments";
-import { getHostPastMoments } from "@/domain/usecases/get-host-past-moments";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import type { DashboardMode } from "@/domain/models/user";
@@ -27,13 +23,9 @@ export async function DashboardContent({
   // Transition PUBLISHED → PAST pour les Moments terminés — fire-and-forget après la réponse
   after(() => prismaMomentRepository.transitionPastMoments());
 
-  const [upcomingRegistrations, pastRegistrations, circles] = await Promise.all([
-    getUserUpcomingMoments(userId, {
-      registrationRepository: prismaRegistrationRepository,
-    }),
-    getUserPastMoments(userId, {
-      registrationRepository: prismaRegistrationRepository,
-    }),
+  // Requête fusionnée : upcoming + past en un seul round-trip Neon (au lieu de 2)
+  const [{ upcoming: upcomingRegistrations, past: pastRegistrations }, circles] = await Promise.all([
+    prismaRegistrationRepository.findAllForUserDashboard(userId),
     getUserDashboardCircles(userId, {
       circleRepository: prismaCircleRepository,
     }),
@@ -43,10 +35,9 @@ export async function DashboardContent({
 
   // ─── Mode ORGANIZER ──────────────────────────────────────────────────────────
   if (mode === "ORGANIZER") {
-    const [hostUpcoming, hostPast] = await Promise.all([
-      getHostUpcomingMoments(userId, { momentRepository: prismaMomentRepository }),
-      getHostPastMoments(userId, { momentRepository: prismaMomentRepository }),
-    ]);
+    // Requête fusionnée : upcoming + past en un seul round-trip Neon (au lieu de 2)
+    const { upcoming: hostUpcoming, past: hostPast } =
+      await prismaMomentRepository.findAllByHostUserId(userId);
 
     const hostCircles = circles.filter((c) => c.memberRole === "HOST");
     const hasHostMoments = hostUpcoming.length > 0 || hostPast.length > 0;
