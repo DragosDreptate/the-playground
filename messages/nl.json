@@ -55,7 +55,8 @@
     "public": "Openbaar",
     "private": "Privé",
     "showMore": "Meer tonen",
-    "showLess": "Minder tonen"
+    "showLess": "Minder tonen",
+    "you": "Jij"
   },
   "Auth": {
     "signIn": {

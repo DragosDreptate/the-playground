@@ -84,15 +84,11 @@ const statusClassName = {
   PAST: "",
 } as const;
 
-function formatHostNames(hosts: CircleMemberWithUser[]): string {
-  return hosts
-    .map((h) => {
-      if (h.user.firstName && h.user.lastName)
-        return `${h.user.firstName} ${h.user.lastName}`;
-      if (h.user.firstName) return h.user.firstName;
-      return h.user.email;
-    })
-    .join(", ");
+function hostDisplayName(h: CircleMemberWithUser): string {
+  if (h.user.firstName && h.user.lastName)
+    return `${h.user.firstName} ${h.user.lastName}`;
+  if (h.user.firstName) return h.user.firstName;
+  return h.user.email;
 }
 
 // ── Component ────────────────────────────────────────────────
@@ -254,11 +250,21 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* "Organisé par" + actions Host */}
           <div className="flex items-center justify-between gap-4">
             {hosts.length > 0 && (
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
                 {t("public.hostedBy")}{" "}
-                <span className="text-foreground font-medium">
-                  {formatHostNames(hosts)}
-                </span>
+                {hosts.map((h, i) => (
+                  <span key={h.user.id} className="flex items-center gap-1">
+                    <span className="text-foreground font-medium">
+                      {hostDisplayName(h)}
+                    </span>
+                    {h.user.id === props.currentUserId && (
+                      <Badge variant="secondary" className="px-1.5 py-0 text-xs">
+                        {tCommon("you")}
+                      </Badge>
+                    )}
+                    {i < hosts.length - 1 && <span>,</span>}
+                  </span>
+                ))}
               </p>
             )}
             {isHostView && (
