@@ -485,7 +485,7 @@
 
 | Persona | Voit | Peut faire | Manque |
 |---------|------|------------|--------|
-| Participant (événement futur) | Détails + inscrits + commentaires + CTA "Ajouter au calendrier" ✅ | Commenter, Annuler inscription, Ajouter au calendrier | Autres événements de la Communauté |
+| Participant (événement futur) | Détails + inscrits + commentaires + CTA "Ajouter au calendrier" ✅ + prochains événements de la Communauté ✅ | Commenter, Annuler inscription, Ajouter au calendrier | — |
 | Participant (événement PAST) | Détails + commentaires | Voir commentaires (lecture) | — |
 | Organisateur (événement futur) | Tout + lien partageable + liste inscrits | Modifier, Supprimer, Copier lien, Commenter, Exporter CSV ✅ | Envoyer rappel, Filtrer inscriptions (REGISTERED/WAITLISTED) |
 | Organisateur (événement PAST) | Tout + stats basiques | Voir commentaires, Commenter ✅ | CTA "Créer le prochain", Stats présence |
@@ -510,7 +510,7 @@
 | ~~H-1~~ | ~~**L'Organisateur peut commenter sur un événement PAST**~~ ✅ **Résolu** — PR #93 (`bf9b036`) : commentaires activés pour tous les utilisateurs connectés sur les événements PAST | ~~Organisateur post-événement~~ | ~~F~~ ✅ |
 | H-2 | **CTA "Créer le prochain événement" depuis un événement PAST** | Organisateur post-événement | F |
 | ~~H-3~~ | ~~**Position dans la liste d'attente visible**~~ ✅ **Résolu** | ~~Participant en liste d'attente~~ | ~~C~~ |
-| H-4 | **Autres événements de la Communauté visibles sur page événement dashboard** | Participant récurrent | B |
+| ~~H-4~~ | ~~**Autres événements de la Communauté visibles sur page événement dashboard**~~ ✅ **Résolu** — `findUpcomingByCircleId` + prop `upcomingCircleMoments` dans `MomentDetailView` (vue Participant) | ~~Participant récurrent~~ | ~~B~~ |
 | ~~H-5~~ | ~~**CTA "Devenir organisateur" pour Participants sans Communauté**~~ ✅ **Résolu** — Dashboard Mode Switcher : le pill "Organisateur" est visible pour tous. En mode Organisateur sans Communauté : CTA "Créer une Communauté d'abord" → `/dashboard/circles/new`. | ~~Organisateur débutant~~ | ~~G~~ |
 | ~~H-6~~ | ~~**Export CSV des inscrits**~~ ✅ **Résolu** — bouton "Exporter CSV" sur vue Organisateur, client-side avec BOM UTF-8 | ~~Organisateur pré-événement~~ | ~~E~~ |
 | H-7 | **Guide onboarding Organisateur** ("3 étapes pour lancer votre communauté") | Organisateur débutant | G |
@@ -522,7 +522,7 @@
 |---|-----|------------------------|----------|
 | ~~M-1~~ | ~~CTA "Ajouter au calendrier" post-inscription (Google, Apple, ICS)~~ ✅ **Résolu** | ~~Participant fraîchement inscrit~~ | ~~A~~ |
 | M-2 | Lien vers dashboard visible depuis `/m/[slug]` après auth | Participant fraîchement inscrit | A |
-| M-3 | Autres événements de la Communauté en section "Vous aimerez aussi" sur page événement publique (hors PAST) | Visiteur anonyme, Participant non-inscrit | A |
+| ~~M-3~~ | ~~Autres événements de la Communauté en section "Prochains événements de la Communauté" sur page événement publique~~ ✅ **Résolu** — PR #68 `70a51f5` : prop `upcomingCircleMoments` dans `MomentDetailView` (vue publique uniquement) | ~~Visiteur anonyme, Participant non-inscrit~~ | ~~A~~ |
 | ~~M-4~~ | ~~Notification aux membres quand un nouvel événement est créé dans leur Communauté~~ ✅ **Résolu** — email `notifyNewMoment` implémenté (voir gap B3 résolu) | ~~Participant récurrent~~ | ~~B~~ |
 | M-5 | Liste des inscrits segmentée REGISTERED / WAITLISTED sur vue Organisateur | Organisateur pré-événement | E |
 | M-6 | Stats post-événement (taux de présence, engagement) | Organisateur post-événement | F |

@@ -129,7 +129,7 @@
   - Template : `host-new-follower` (react-email). Port `EmailService.sendHostNewFollower` + adapter `ResendEmailService`.
 
 - [x] **Architecture email multi-canal** (infrastructure) ✅
-  - Port `EmailService` (11 méthodes) + adapter `ResendEmailService`
+  - Port `EmailService` (13 méthodes) + adapter `ResendEmailService`
   - Templates React (react-email) : calendar badge gradient, layout blanc/gris
   - Fire-and-forget depuis server actions (pas de queue pour le MVP)
   - Clé API : `AUTH_RESEND_KEY` (partagée auth + transactionnel)
@@ -344,7 +344,7 @@
   - Solution : Upstash Rate Limit (Redis serverless, compatible Vercel Edge)
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
-- [x] **Tests unitaires complets** — 580 tests, 64 fichiers, tous usecases couverts (33 racine + 11 admin + 3 invite) ✅
+- [x] **Tests unitaires complets** — 690 tests, 68 fichiers, tous usecases couverts (37 racine + 11 admin) ✅
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards, invite token (99+ tests dédiés sécurité) ✅
 - [x] **Tests E2E Playwright** — 11 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher, broadcast-moment, circle-invite). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
 - [ ] **Accessibilité axe-core** dans Playwright

@@ -46,7 +46,7 @@ Server Action (joinMomentAction)
 
 ---
 
-## 13 emails implémentés
+## 15 emails implémentés
 
 | Email | Template | Déclencheur | Destinataire | Pièce jointe .ics |
 |-------|----------|-------------|--------------|---------------------|
@@ -63,6 +63,8 @@ Server Action (joinMomentAction)
 | Nouvel événement (membre) | `new-moment-notification` | `createMomentAction` (via `notify-new-moment.ts`) | Membres PLAYER de la Communauté (sauf créateur) | Non |
 | Nouvel événement (follower) | `new-moment-notification` | `createMomentAction` (via `notify-new-moment.ts`) | Followers de la Communauté (dédupliqués avec membres) | Non |
 | Invitation Communauté (Broadcast) | `broadcast-moment` | `broadcastMomentAction` | Membres + followers de la Communauté (cooldown 24h entre envois, renvoi possible après expiration) | Non |
+| Invitation par lien privé | `circle-invitation` | `joinCircleByInviteAction` (via `circle.ts`) | Utilisateur invité | Non |
+| Alerte admin : entité créée | `admin-entity-created` | `notifyAdminEntityCreatedAction` (`notify-admin-entity-created.ts`) | Équipe admin (`ADMIN_NOTIFICATION_EMAIL`) | Non |
 
 **Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n. Les notifications membres et followers utilisent le même template `new-moment-notification`, différenciées par le texte d'introduction.
 
@@ -89,10 +91,12 @@ export interface EmailService {
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
   sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
+  sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
+  sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
 }
 ```
 
-> **Note** : `sendHostNewComment` a été renommé `sendNewComment` et étendu aux inscrits actifs lors du PR #93 (2026-02-28). Les méthodes `sendNewMomentToFollower`, `sendNewMomentToMember` et `sendBroadcastMoment` ont été ajoutées progressivement avec les features Follow et Broadcast.
+> **Note** : `sendHostNewComment` a été renommé `sendNewComment` et étendu aux inscrits actifs lors du PR #93 (2026-02-28). Les méthodes `sendNewMomentToFollower`, `sendNewMomentToMember` et `sendBroadcastMoment` ont été ajoutées progressivement avec les features Follow et Broadcast. `sendCircleInvitation` a été ajoutée avec la feature Invitation par lien privé (PR #134). `sendAdminEntityCreated` a été ajoutée pour les alertes admin à la création de Communautés/événements.
 
 **Types des payloads** :
 
@@ -362,7 +366,7 @@ Quand un Organisateur crée un événement, il est automatiquement inscrit (REGI
 
 | Fichier | Rôle |
 |---------|------|
-| `src/domain/ports/services/email-service.ts` | Port EmailService (interface + 11 méthodes + types) |
+| `src/domain/ports/services/email-service.ts` | Port EmailService (interface + 13 méthodes + types) |
 | `src/infrastructure/services/email/resend-email-service.ts` | Adapter Resend |
 | `src/infrastructure/services/email/generate-ics.ts` | Générateur iCalendar (.ics) |
 | `src/infrastructure/services/email/templates/components/email-layout.tsx` | Layout de base |
