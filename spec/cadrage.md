@@ -161,6 +161,8 @@ Contient :
 - Export CSV des inscrits ✅ (colonnes : prénom, nom, email, statut, date)
 - Export données Communauté (membres, historique) — *pas encore implémenté*
 - Communiquer avec les Participants inscrits (email direct groupé) — *pas encore implémenté* *(l'invitation Communauté "Broadcast" sur un événement est implémentée — bouton "Inviter ma Communauté" — mais pas l'email groupé libre Organisateur → Participants)*
+- Retirer un membre de la Communauté ✅ (avec annulation automatique des inscriptions à venir)
+- Inviter par lien privé ✅ (token d'invitation unique sur la Communauté, page `/circles/join/[token]`)
 - Assistant IA basique *(pas encore implémenté)*
 
 ## Côté Participant
@@ -251,11 +253,15 @@ La page Communauté montre les prochains événements, les événements passés,
 - Statistiques cumulées
 - Gestion centralisée
 
-## 5. IA intégrée (Phase 2 — pas encore implémentée)
+## 5. IA intégrée (Phase 2 — partiellement implémentée)
 
-> **Note** : L'IA a été déprioritisée pour le MVP. Elle reste dans la roadmap Phase 2.
+> **Note** : L'IA pour l'assistant Organisateur a été déprioritisée pour le MVP. Le SDK Anthropic est intégré à la stack. Un premier usage IA a été implémenté en Phase 2 (Radar concurrentiel — POC lab).
 
-Assistant Organisateur prévu pour :
+Premier usage IA implémenté :
+
+- **Radar concurrentiel** ✅ (POC `/lab/events-radar`) — agent Claude qui analyse les événements concurrents (Luma, Meetup, Eventbrite) pour une ville et un créneau donnés
+
+Assistant Organisateur prévu (pas encore implémenté) :
 
 - Génération description événement
 - Génération email d'invitation
@@ -291,17 +297,20 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Pages événement autonomes et partageables ✅
 - Inscriptions (avec inscription automatique à la Communauté) ✅
 - Liste d'attente avec promotion automatique ✅
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, notification Organisateur nouveau follower, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux participants) ✅
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, notification Organisateur nouveau follower, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux participants, broadcast "Inviter ma Communauté") ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Découvrir (répertoire public de Communautés + événements) ✅
-- Export données (CSV) — pas encore implémenté
+- Export données (CSV inscrits) ✅ — export membres Communauté et export historique pas encore implémentés
 - Admin plateforme (dashboard stats, listes paginées, modération) ✅
+- Gestion membres Communauté : retrait de membre ✅, invitation par lien privé (token) ✅
 
 ## Phase 2 – Engagement
 
 - Tracks (séries d'événements récurrents)
 - Check-in le jour J
+- [x] **Suivre une Communauté (Follow)** ✅ — table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` (cloche), email aux followers à chaque nouvel événement
+- [x] **Radar concurrentiel** ✅ — POC `/lab/events-radar` : agent IA (Claude) qui scrape Luma, Meetup, Eventbrite pour trouver les événements concurrents dans une ville et un créneau donnés. `RadarUsage` en DB pour le rate-limiting.
 - Dashboard analytics simple
 - Fil de commentaires enrichi
 - Notifications multi-canal (SMS, push)

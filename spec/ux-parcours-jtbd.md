@@ -364,12 +364,13 @@
 - Liste des inscrits avec avatars ✓
 - Bouton Modifier ✓
 - Lien partageable avec Copier ✓
+- Broadcast "Inviter ma Communauté" ✓ — notifie membres + followers (cooldown 24h, message personnalisable)
 
 **Gaps :**
 
 | # | Gap | Impact | Priorité |
 |---|-----|--------|----------|
-| E1 | Pas de communication directe avec les inscrits depuis la plateforme | Le Host doit utiliser d'autres canaux pour les rappels | Bloquante (MVP) |
+| E1 | ~~Pas de communication directe avec les inscrits depuis la plateforme~~ ✅ **Partiellement résolu** — Broadcast implémenté (notifie toute la Communauté). L'email groupé libre ciblant uniquement les inscrits d'un événement reste à faire (Phase 2) | Le Host doit utiliser d'autres canaux pour les rappels ciblés | Phase 2 |
 | E2 | La liste des inscrits ne distingue pas REGISTERED / WAITLISTED / CHECKED_IN | Vue incomplète | Haute |
 | ~~E3~~ | ~~Pas d'export CSV des inscrits~~ ✅ **Résolu** — bouton "Exporter CSV" implémenté dans `RegistrationsList` (colonnes : prénom, nom, email, statut, date) | ~~Besoin logistique~~ | ~~Haute~~ ✅ |
 | E4 | Pas de compteur "X inscrits confirmés / Y en attente / Z places restantes" affiché en un coup d'œil | Doit calculer mentalement | Moyenne |
