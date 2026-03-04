@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { auth } from "@/infrastructure/auth/auth.config";
+import { getCachedSession } from "@/lib/auth-cache";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
@@ -20,7 +20,7 @@ export default async function DashboardPage({
   const activeTab = tab === "circles" ? "circles" : "moments";
 
   const [session, t] = await Promise.all([
-    measureTime("dashboard:auth", () => auth()),
+    measureTime("dashboard:auth", () => getCachedSession()),
     getTranslations("Dashboard"),
   ]);
 
