@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { after } from "next/server";
 import { notFound } from "next/navigation";
+import { measureTime } from "@/lib/perf-logger";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -96,10 +97,12 @@ export default async function PublicMomentPage({
 
   if (moment.status === "CANCELLED") notFound();
 
-  const [circle, hosts] = await Promise.all([
-    getCircle(moment.circleId),
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
-  ]);
+  const [circle, hosts] = await measureTime("moment-page:initial", () =>
+    Promise.all([
+      getCircle(moment.circleId),
+      prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    ])
+  );
 
   if (!circle) notFound();
 
@@ -108,24 +111,27 @@ export default async function PublicMomentPage({
   const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   // Parallélise : inscription existante + données publiques en une seule vague
-  const [existingRegistration, registeredCount, allAttendees, comments, upcomingCircleMoments] = await Promise.all([
-    isAuthenticated
-      ? getUserRegistration(
-          { momentId: moment.id, userId: session!.user!.id! },
-          { registrationRepository: prismaRegistrationRepository }
-        )
-      : Promise.resolve(null),
-    prismaRegistrationRepository.countByMomentIdAndStatus(
-      moment.id,
-      "REGISTERED"
-    ),
-    prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
-    getMomentComments(
-      { momentId: moment.id },
-      { commentRepository: prismaCommentRepository }
-    ),
-    prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
-  ]);
+  const [existingRegistration, registeredCount, allAttendees, comments, upcomingCircleMoments] =
+    await measureTime("moment-page:data", () =>
+      Promise.all([
+        isAuthenticated
+          ? getUserRegistration(
+              { momentId: moment.id, userId: session!.user!.id! },
+              { registrationRepository: prismaRegistrationRepository }
+            )
+          : Promise.resolve(null),
+        prismaRegistrationRepository.countByMomentIdAndStatus(
+          moment.id,
+          "REGISTERED"
+        ),
+        prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+        getMomentComments(
+          { momentId: moment.id },
+          { commentRepository: prismaCommentRepository }
+        ),
+        prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
+      ])
+    );
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =
