@@ -2,11 +2,10 @@ import { after } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import {
-  prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
-import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
+import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import type { DashboardMode } from "@/domain/models/user";
@@ -34,9 +33,7 @@ export async function DashboardContent({
           prismaRegistrationRepository.findAllForUserDashboard(userId)
         ),
         measureTime("dashboard-content:circles", () =>
-          getUserDashboardCircles(userId, {
-            circleRepository: prismaCircleRepository,
-          })
+          getCachedDashboardCircles(userId)
         ),
       ])
     );
@@ -48,7 +45,7 @@ export async function DashboardContent({
     // Requête fusionnée : upcoming + past en un seul round-trip Neon (au lieu de 2)
     const { upcoming: hostUpcoming, past: hostPast } =
       await measureTime("dashboard-content:phase2-organizer", () =>
-        prismaMomentRepository.findAllByHostUserId(userId)
+        getCachedHostMoments(userId)
       );
 
     const hostCircles = circles.filter((c) => c.memberRole === "HOST");
