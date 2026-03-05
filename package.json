@@ -86,6 +86,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^7.4.1",
+    "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.0",
     "@prisma/client-runtime-utils": "^7.4.1",
     "@react-email/components": "^1.0.8",

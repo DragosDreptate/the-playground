@@ -1,20 +1,36 @@
 import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 export { Prisma };
-import { PrismaNeon } from "@prisma/adapter-neon";
+
+/**
+ * Protocole de connexion à Neon :
+ *
+ *   PRISMA_USE_HTTP_ADAPTER=true  → HTTP (@prisma/adapter-neon)
+ *                                   Requis sur Vercel Edge (V8 isolates, pas de TCP)
+ *                                   Rollback immédiat : ajouter cette var dans Vercel
+ *
+ *   (non défini, défaut)          → TCP standard via pooler Neon
+ *                                   Connexion persistante sur les fonctions Vercel Serverless
+ *                                   ~15ms/query vs ~120ms/query en HTTP
+ */
+function createClient(): PrismaClient {
+  if (process.env.PRISMA_USE_HTTP_ADAPTER === "true") {
+    const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
+    return new PrismaClient({ adapter });
+  }
+  // TCP standard via pooler Neon — @prisma/adapter-pg (Prisma 7 requiert un adapter)
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  return new PrismaClient({ adapter });
+}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const adapter = new PrismaNeon({
-  connectionString: process.env.DATABASE_URL!,
-});
-
-// Singleton du client de base (déduplication HMR en dev)
-const _baseClient: PrismaClient =
-  globalForPrisma.prisma ?? new PrismaClient({ adapter });
-
+// Singleton — déduplication HMR en dev
+const _baseClient: PrismaClient = globalForPrisma.prisma ?? createClient();
 globalForPrisma.prisma = _baseClient;
 
 // Extension : log structuré JSON de chaque query >100ms → Vercel Function Logs
