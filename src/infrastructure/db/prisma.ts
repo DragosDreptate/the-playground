@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 export { Prisma };
 
@@ -19,8 +20,9 @@ function createClient(): PrismaClient {
     const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
     return new PrismaClient({ adapter });
   }
-  // TCP standard via pooler Neon — Prisma 7 lit DATABASE_URL automatiquement
-  return new PrismaClient();
+  // TCP standard via pooler Neon — @prisma/adapter-pg (Prisma 7 requiert un adapter)
+  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  return new PrismaClient({ adapter });
 }
 
 const globalForPrisma = globalThis as unknown as {
