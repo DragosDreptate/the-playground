@@ -145,6 +145,20 @@
     "emptyCirclesHint": "Creează o Comunitate sau alătură-te unui Eveniment pentru a deveni membru.",
     "noCirclesOrganizer": "Nu organizezi nicio Comunitate încă.",
     "noCirclesOrganizerHint": "Creează-ți prima Comunitate pentru a începe.",
+    "onboarding": {
+      "emptyTitle": "Nicio comunitate deocamdată",
+      "emptyHint": "Creează-ți una sau alătură-te unei comunități printr-un eveniment.",
+      "label": "Pentru a organiza evenimente",
+      "heading": "3 pași pentru a lansa Comunitatea ta",
+      "sub": "Durează mai puțin de 5 minute.",
+      "step1Title": "Creează-ți Comunitatea",
+      "step1Desc": "Un nume, o descriere, o fotografie — spațiul tău este gata.",
+      "step2Title": "Creează primul tău eveniment",
+      "step2Desc": "Un titlu, o dată, o locație — asta e tot ce-ți trebuie.",
+      "step3Title": "Distribuie linkul",
+      "step3Desc": "Trimite-l pe WhatsApp, Slack sau Instagram.",
+      "cta": "Creează-mi Comunitatea"
+    },
     "noCirclesMember": "Nu ești încă membru al niciunei Comunități.",
     "role": {
       "host": "Organizator",

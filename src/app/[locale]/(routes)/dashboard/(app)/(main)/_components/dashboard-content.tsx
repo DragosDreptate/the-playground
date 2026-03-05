@@ -11,6 +11,7 @@ import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card"
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import type { DashboardMode } from "@/domain/models/user";
 import { Link } from "@/i18n/navigation";
+import { OrganizerOnboardingGuide } from "./organizer-onboarding-guide";
 
 export async function DashboardContent({
   userId,
@@ -111,10 +112,7 @@ export async function DashboardContent({
     return (
       <section>
         {hostCircles.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-            <p className="text-muted-foreground text-sm">{t("noCirclesOrganizer")}</p>
-            <p className="text-muted-foreground mt-1 text-xs">{t("noCirclesOrganizerHint")}</p>
-          </div>
+          <OrganizerOnboardingGuide />
         ) : (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {hostCircles.map((circle) => (
