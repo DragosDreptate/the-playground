@@ -1,27 +1,40 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { PrismaPg } from "@prisma/adapter-pg";
 
 export { Prisma };
 
 /**
- * Protocole de connexion à Neon :
+ * Driver WebSocket Pool (PrismaNeon / @neondatabase/serverless)
  *
- *   PRISMA_USE_HTTP_ADAPTER=true  → HTTP (@prisma/adapter-neon)
- *                                   Requis sur Vercel Edge (V8 isolates, pas de TCP)
- *                                   Rollback immédiat : ajouter cette var dans Vercel
+ * PrismaNeon utilise @neondatabase/serverless en mode Pool (WebSocket persistant),
+ * compatible Vercel Serverless (Node.js) et Vercel Edge.
+ * Supporte $transaction interactif, $queryRaw et $executeRaw.
  *
- *   (non défini, défaut)          → TCP standard via pooler Neon
- *                                   Connexion persistante sur les fonctions Vercel Serverless
- *                                   ~15ms/query vs ~120ms/query en HTTP
+ * pipelineConnect="password" est le défaut de @neondatabase/serverless — pipeline
+ * le handshake auth WebSocket (2 round-trips → 1), déjà actif sans configuration.
+ *
+ * Rollback : réactiver PrismaPg (TCP) via @prisma/adapter-pg si nécessaire.
  */
 function createClient(): PrismaClient {
-  if (process.env.PRISMA_USE_HTTP_ADAPTER === "true") {
-    const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
-    return new PrismaClient({ adapter });
-  }
-  // TCP standard via pooler Neon — @prisma/adapter-pg (Prisma 7 requiert un adapter)
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+  const adapter = new PrismaNeon(
+    {
+      connectionString: process.env.DATABASE_URL!,
+      max: 5,                         // ≤ 10 recommandé par Neon pour les fonctions serverless
+      idleTimeoutMillis: 30_000,      // Ferme les connexions idle avant l'idle timeout Neon (~5min)
+      connectionTimeoutMillis: 5_000, // Fail fast si le Pool ne peut pas allouer une connexion
+    },
+    {
+      onPoolError: (err) => {
+        console.error(
+          JSON.stringify({
+            level: "error",
+            type: "pool_error",
+            message: err.message,
+          })
+        );
+      },
+    }
+  );
   return new PrismaClient({ adapter });
 }
 
