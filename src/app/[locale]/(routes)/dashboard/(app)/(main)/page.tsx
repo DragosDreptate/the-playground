@@ -4,11 +4,11 @@ import { getCachedSession } from "@/lib/auth-cache";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardContent } from "./_components/dashboard-content";
 import { DashboardModeSwitcher } from "@/components/dashboard/dashboard-mode-switcher";
 import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
+import { CreateCircleButton } from "@/components/dashboard/create-circle-button";
 import type { DashboardMode } from "@/domain/models/user";
 
 export default async function DashboardPage({
@@ -95,9 +95,7 @@ export default async function DashboardPage({
             {activeTab === "moments" ? (
               <CreateMomentButton />
             ) : (
-              <Button asChild size="sm" className="w-full sm:w-auto">
-                <Link href="/dashboard/circles/new">{t("createCircle")}</Link>
-              </Button>
+              <CreateCircleButton />
             )}
           </div>
         )}

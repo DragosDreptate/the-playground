@@ -12,6 +12,7 @@ import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card"
 import type { DashboardMode } from "@/domain/models/user";
 import { Link } from "@/i18n/navigation";
 import { OrganizerOnboardingGuide } from "./organizer-onboarding-guide";
+import { OrganizerMomentsOnboardingGuide } from "./organizer-moments-onboarding-guide";
 
 export async function DashboardContent({
   userId,
@@ -57,10 +58,9 @@ export async function DashboardContent({
       return (
         <section>
           {!hasHostMoments ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-              <p className="text-muted-foreground text-sm">{t("noMomentsOrganizer")}</p>
-              <p className="text-muted-foreground mt-1 text-xs">{t("noMomentsOrganizerHint")}</p>
-            </div>
+            <OrganizerMomentsOnboardingGuide
+              hostCircles={hostCircles.map((c) => ({ slug: c.slug, name: c.name, logo: c.logo }))}
+            />
           ) : (
             <div>
               {hostUpcoming.map((moment, i) => (

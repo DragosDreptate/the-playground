@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Onglet Mes événements | Guide onboarding | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ─── Design tokens ─── */
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --green: #22c55e;
+      --green-bg: #dcfce7;
+      --green-muted: #bbf7d0;
+    }
+    html.dark {
+      --background: #1a1b2e;
+      --foreground: #f0f0f5;
+      --card: #252638;
+      --muted: #222336;
+      --muted-foreground: #8385a0;
+      --border: #383a55;
+      --green-bg: #14532d;
+      --green-muted: #166534;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background); color: var(--foreground);
+      font-size: 14px; line-height: 1.5;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ─── Toolbar ─── */
+    .toolbar {
+      position: fixed; bottom: 16px; right: 16px; z-index: 100;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+    }
+    .toolbar label { color: var(--muted-foreground); font-weight: 500; }
+    .toolbar select, .toolbar button {
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 10px; cursor: pointer;
+      background: var(--muted); color: var(--foreground);
+    }
+
+    /* ─── SiteHeader ─── */
+    .site-header {
+      border-bottom: 1px solid var(--border); background: var(--card);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-weight: 800; font-size: 16px; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-nav { display: flex; gap: 2px; }
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--muted-foreground);
+      padding: 6px 12px; border-radius: 8px; text-decoration: none;
+    }
+    .nav-link.active { color: var(--foreground); background: var(--muted); }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white;
+    }
+
+    /* ─── Page ─── */
+    .page { max-width: 672px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ─── Greeting ─── */
+    .greeting { margin-bottom: 32px; }
+    .greeting-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .greeting h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+    .mode-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600; border-radius: 99px;
+      padding: 4px 10px; border: 1px solid var(--border);
+      color: var(--muted-foreground); background: var(--muted); white-space: nowrap;
+      margin-top: 4px;
+    }
+    .mode-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); }
+    .greeting p { color: var(--muted-foreground); font-size: 14px; }
+
+    /* ─── Tabs row ─── */
+    .tabs-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px;
+    }
+    .tab-pills {
+      display: flex; gap: 1px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 4px;
+    }
+    .tab-pill {
+      font-size: 13px; font-weight: 500; border-radius: 99px;
+      padding: 6px 16px; cursor: pointer;
+      color: var(--muted-foreground); background: none; border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab-pill.active { background: var(--foreground); color: var(--background); }
+
+    /* ─── Empty state card ─── */
+    .empty-state {
+      border: 1.5px dashed var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .empty-top {
+      padding: 32px 24px 24px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; gap: 4px;
+    }
+    .empty-icon {
+      width: 40px; height: 40px; border-radius: 12px; background: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px;
+    }
+    .empty-icon svg { width: 20px; height: 20px; color: var(--muted-foreground); }
+    .empty-title { font-size: 13px; font-weight: 500; color: var(--muted-foreground); }
+    .empty-hint { font-size: 12px; color: var(--muted-foreground); opacity: 0.7; }
+    .empty-divider { border: none; border-top: 1px dashed var(--border); margin: 0 24px; }
+
+    /* ─── Guide 3 étapes ─── */
+    .getting-started { padding: 20px 24px 24px; }
+    .gs-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+      color: var(--primary); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .gs-heading { font-size: 15px; font-weight: 700; color: var(--foreground); margin-bottom: 4px; }
+    .gs-sub { font-size: 12px; color: var(--muted-foreground); margin-bottom: 20px; }
+
+    .steps { display: flex; flex-direction: column; gap: 0; margin-bottom: 20px; }
+    .step-row {
+      display: flex; align-items: flex-start; gap: 10px; padding: 10px 0;
+    }
+    .step-row + .step-row { border-top: 1px solid var(--border); }
+
+    /* Cercle numéroté — état actif (rose) */
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; margin-top: 1px;
+    }
+    .step-num.active { background: var(--primary); color: white; }
+    .step-num.pending {
+      background: var(--muted); color: var(--muted-foreground);
+      border: 1.5px solid var(--border);
+    }
+    /* Cercle coché — état complété (vert) */
+    .step-num.done {
+      background: var(--green); color: white;
+    }
+
+    .step-text { flex: 1; }
+    .step-name { font-size: 13px; font-weight: 600; color: var(--foreground); }
+    .step-name.muted { color: var(--muted-foreground); font-weight: 500; }
+    /* Texte barré pour l'étape complétée */
+    .step-name.done { color: var(--muted-foreground); font-weight: 500; text-decoration: line-through; text-decoration-thickness: 1.5px; }
+    .step-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; line-height: 1.4; }
+    .step-desc.faded { opacity: 0.6; }
+    .step-desc.done { opacity: 0.5; text-decoration: line-through; text-decoration-thickness: 1px; }
+
+    /* ─── CTA principal ─── */
+    .btn-start {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 10px 24px; border-radius: 10px; cursor: pointer; border: none;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; transition: opacity 0.15s;
+    }
+    .btn-start:hover { opacity: 0.88; }
+
+    /* ─── CTA avec dropdown (État B) ─── */
+    .cta-wrapper { position: relative; }
+
+    .btn-dropdown {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 10px 20px; border-radius: 10px; cursor: pointer; border: none;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; transition: opacity 0.15s;
+    }
+    .btn-dropdown:hover { opacity: 0.88; }
+    .chevron { transition: transform 0.15s; }
+    .chevron.open { transform: rotate(180deg); }
+
+    /* Popover */
+    .popover {
+      position: absolute; bottom: calc(100% + 8px); left: 0; right: 0;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 4px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      z-index: 10;
+      display: none;
+    }
+    .popover.visible { display: block; }
+    .popover-label {
+      font-size: 11px; font-weight: 500; color: var(--muted-foreground);
+      padding: 6px 8px 4px;
+    }
+    .popover-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 8px; border-radius: 8px; cursor: pointer;
+      transition: background 0.1s;
+    }
+    .popover-item:hover { background: var(--muted); }
+    .circle-avatar {
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: white;
+    }
+    .popover-item-name { font-size: 13px; font-weight: 500; color: var(--foreground); }
+
+    /* ─── Annotation badge (mockup only) ─── */
+    .annotation {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      color: #7c3aed; background: #f5f3ff;
+      border: 1px solid #ddd6fe; border-radius: 99px;
+      padding: 3px 10px; margin-bottom: 16px;
+    }
+    html.dark .annotation { background: #2e1065; color: #c4b5fd; border-color: #4c1d95; }
+    .annotation-dot { width: 6px; height: 6px; border-radius: 50%; background: #7c3aed; }
+
+    /* ─── Légende des états ─── */
+    .legend {
+      display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500; color: var(--muted-foreground);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .legend-dot.active-dot { background: var(--primary); }
+    .legend-dot.done-dot { background: var(--green); }
+    .legend-dot.pending-dot { background: var(--border); border: 1.5px solid var(--muted-foreground); }
+  </style>
+</head>
+<body>
+
+<div class="toolbar">
+  <label>État :</label>
+  <select onchange="applyState(this.value)">
+    <option value="no-circles">A — Aucune communauté</option>
+    <option value="has-circles">B — A des communautés</option>
+  </select>
+  <button onclick="toggleDark()">☀️ Light</button>
+</div>
+
+<!-- ─── Header ─── -->
+<header class="site-header">
+  <div class="header-inner">
+    <span class="logo">The Playground</span>
+    <nav class="header-nav">
+      <a href="#" class="nav-link active">Mon espace</a>
+      <a href="#" class="nav-link">Découvrir</a>
+    </nav>
+    <div class="header-avatar">S</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- Greeting -->
+  <div class="greeting">
+    <div class="greeting-top">
+      <h1>Bonjour, Sophie 👋</h1>
+      <span class="mode-badge">
+        <span class="mode-dot"></span>
+        Organisatrice
+      </span>
+    </div>
+    <p>Voici ce qui se passe dans tes communautés.</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ÉTAT A — Aucune communauté
+       · Onglet "Mes événements" actif
+       · Step 1 actif (rose), steps 2 & 3 pending
+       · CTA → Créer ma Communauté
+  ══════════════════════════════════════════════ -->
+  <div id="state-no-circles">
+
+    <div class="annotation"><span class="annotation-dot"></span>État A — Aucune communauté</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot active-dot"></div> Étape active</div>
+      <div class="legend-item"><div class="legend-dot pending-dot"></div> En attente</div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab-pills">
+        <button class="tab-pill active">Mes événements</button>
+        <button class="tab-pill">Mes Communautés</button>
+      </div>
+      <!-- Pas de CTA dans le header : le seul CTA est dans le guide -->
+    </div>
+
+    <div class="empty-state">
+      <!-- Icône + titre + hint -->
+      <div class="empty-top">
+        <div class="empty-icon">
+          <!-- Calendar icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <p class="empty-title">Aucun événement pour l'instant</p>
+        <p class="empty-hint">Crée ta Communauté et lance ton premier événement.</p>
+      </div>
+
+      <hr class="empty-divider">
+
+      <!-- Guide 3 étapes -->
+      <div class="getting-started">
+        <div class="gs-label">Pour organiser des événements</div>
+        <div class="gs-heading">3 étapes pour lancer ta Communauté</div>
+        <div class="gs-sub">Ça prend moins de 5 minutes.</div>
+
+        <div class="steps">
+          <!-- Étape 1 — active -->
+          <div class="step-row">
+            <div class="step-num active">1</div>
+            <div class="step-text">
+              <div class="step-name">Créer ta Communauté</div>
+              <div class="step-desc">Un nom, une description, une photo — ton espace est prêt.</div>
+            </div>
+          </div>
+          <!-- Étape 2 — pending -->
+          <div class="step-row">
+            <div class="step-num pending">2</div>
+            <div class="step-text">
+              <div class="step-name muted">Créer ton premier événement</div>
+              <div class="step-desc faded">Un titre, une date, un lieu — c'est tout ce qu'il faut.</div>
+            </div>
+          </div>
+          <!-- Étape 3 — pending -->
+          <div class="step-row">
+            <div class="step-num pending">3</div>
+            <div class="step-text">
+              <div class="step-name muted">Partager le lien</div>
+              <div class="step-desc faded">Envoie-le sur WhatsApp, Slack ou Instagram.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA unique -->
+        <button class="btn-start">
+          Créer ma Communauté
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ÉTAT B — A des communautés, aucun événement
+       · Onglet "Mes événements" actif
+       · Step 1 coché vert + texte barré
+       · Step 2 actif (rose)
+       · Step 3 pending
+       · CTA → Créer un événement + dropdown sélection communauté
+  ══════════════════════════════════════════════ -->
+  <div id="state-has-circles" style="display:none">
+
+    <div class="annotation"><span class="annotation-dot"></span>État B — A des communautés, aucun événement</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot done-dot"></div> Complété</div>
+      <div class="legend-item"><div class="legend-dot active-dot"></div> Étape active</div>
+      <div class="legend-item"><div class="legend-dot pending-dot"></div> En attente</div>
+    </div>
+
+    <div class="tabs-row">
+      <div class="tab-pills">
+        <button class="tab-pill active">Mes événements</button>
+        <button class="tab-pill">Mes Communautés</button>
+      </div>
+      <!-- Pas de CTA dans le header non plus : le seul CTA reste dans le guide -->
+    </div>
+
+    <div class="empty-state">
+      <!-- Icône + titre + hint -->
+      <div class="empty-top">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <p class="empty-title">Aucun événement pour l'instant</p>
+        <p class="empty-hint">Ta communauté est prête — crée ton premier événement.</p>
+      </div>
+
+      <hr class="empty-divider">
+
+      <!-- Guide 3 étapes -->
+      <div class="getting-started">
+        <div class="gs-label">Pour organiser des événements</div>
+        <div class="gs-heading">3 étapes pour lancer ta Communauté</div>
+        <div class="gs-sub">Tu y es presque.</div>
+
+        <div class="steps">
+          <!-- Étape 1 — complétée (vert + barré) -->
+          <div class="step-row">
+            <div class="step-num done">
+              <!-- checkmark -->
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="step-text">
+              <div class="step-name done">Créer ta Communauté</div>
+              <div class="step-desc done">Un nom, une description, une photo — ton espace est prêt.</div>
+            </div>
+          </div>
+          <!-- Étape 2 — active (rose) -->
+          <div class="step-row">
+            <div class="step-num active">2</div>
+            <div class="step-text">
+              <div class="step-name">Créer ton premier événement</div>
+              <div class="step-desc">Un titre, une date, un lieu — c'est tout ce qu'il faut.</div>
+            </div>
+          </div>
+          <!-- Étape 3 — pending -->
+          <div class="step-row">
+            <div class="step-num pending">3</div>
+            <div class="step-text">
+              <div class="step-name muted">Partager le lien</div>
+              <div class="step-desc faded">Envoie-le sur WhatsApp, Slack ou Instagram.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA avec dropdown communauté -->
+        <div class="cta-wrapper">
+          <button class="btn-dropdown" onclick="togglePopover()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 2v10M2 7h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Créer un événement
+            <svg class="chevron" id="chevron-icon" width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M3 5l3.5 3.5L10 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <!-- Popover sélection communauté -->
+          <div class="popover" id="circle-popover">
+            <p class="popover-label">Choisir une communauté</p>
+            <div class="popover-item">
+              <div class="circle-avatar" style="background: linear-gradient(135deg, #e8457a, #9333ea)">D</div>
+              <span class="popover-item-name">Design & Craft Paris</span>
+            </div>
+            <div class="popover-item">
+              <div class="circle-avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4)">P</div>
+              <span class="popover-item-name">Paris JS</span>
+            </div>
+            <div class="popover-item">
+              <div class="circle-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6)">P</div>
+              <span class="popover-item-name">Product & IA</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  function applyState(v) {
+    document.getElementById('state-no-circles').style.display = v === 'no-circles' ? 'block' : 'none';
+    document.getElementById('state-has-circles').style.display = v === 'has-circles' ? 'block' : 'none';
+    // Fermer le popover quand on change d'état
+    document.getElementById('circle-popover').classList.remove('visible');
+    document.getElementById('chevron-icon').classList.remove('open');
+  }
+
+  function toggleDark() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.querySelector('.toolbar button').textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  }
+
+  function togglePopover() {
+    const pop = document.getElementById('circle-popover');
+    const chev = document.getElementById('chevron-icon');
+    pop.classList.toggle('visible');
+    chev.classList.toggle('open');
+  }
+
+  // Fermer le popover en cliquant ailleurs
+  document.addEventListener('click', function(e) {
+    const wrapper = document.querySelector('.cta-wrapper');
+    if (wrapper && !wrapper.contains(e.target)) {
+      document.getElementById('circle-popover').classList.remove('visible');
+      document.getElementById('chevron-icon').classList.remove('open');
+    }
+  });
+</script>
+</body>
+</html>

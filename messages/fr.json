@@ -145,6 +145,13 @@
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
     "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
     "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
+    "onboardingMoments": {
+      "emptyTitle": "Aucun événement pour l'instant",
+      "emptyHintNoCircles": "Crée ta Communauté et lance ton premier événement.",
+      "emptyHintHasCircles": "Ta communauté est prête — crée ton premier événement.",
+      "subHasCircles": "Tu y es presque.",
+      "ctaEvent": "Créer un événement"
+    },
     "onboarding": {
       "emptyTitle": "Aucune communauté pour l'instant",
       "emptyHint": "Crée la tienne ou rejoins une communauté via un événement.",

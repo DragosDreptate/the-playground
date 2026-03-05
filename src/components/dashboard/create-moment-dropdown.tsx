@@ -20,9 +20,11 @@ type HostCircle = {
 
 type CreateMomentDropdownProps = {
   circles: HostCircle[];
+  buttonSize?: "sm" | "lg";
+  buttonClassName?: string;
 };
 
-export function CreateMomentDropdown({ circles }: CreateMomentDropdownProps) {
+export function CreateMomentDropdown({ circles, buttonSize = "sm", buttonClassName }: CreateMomentDropdownProps) {
   const t = useTranslations("Dashboard");
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -30,7 +32,7 @@ export function CreateMomentDropdown({ circles }: CreateMomentDropdownProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="sm" className="w-full sm:w-auto gap-1.5">
+        <Button size={buttonSize} className={buttonClassName ?? "w-full sm:w-auto gap-1.5"}>
           <Plus className="size-3.5" />
           {t("createMoment")}
           <ChevronDown className="size-3.5 opacity-70" />
