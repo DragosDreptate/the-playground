@@ -145,6 +145,20 @@
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
     "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
     "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
+    "onboarding": {
+      "emptyTitle": "Aucune communauté pour l'instant",
+      "emptyHint": "Crée la tienne ou rejoins une communauté via un événement.",
+      "label": "Pour organiser des événements",
+      "heading": "3 étapes pour lancer ta Communauté",
+      "sub": "Ça prend moins de 5 minutes.",
+      "step1Title": "Créer ta Communauté",
+      "step1Desc": "Un nom, une description, une photo — ton espace est prêt.",
+      "step2Title": "Créer ton premier événement",
+      "step2Desc": "Un titre, une date, un lieu — c'est tout ce qu'il faut.",
+      "step3Title": "Partager le lien",
+      "step3Desc": "Envoie-le sur WhatsApp, Slack ou Instagram.",
+      "cta": "Créer ma Communauté"
+    },
     "noCirclesMember": "Vous n'êtes membre d'aucune Communauté.",
     "role": {
       "host": "Organisateur",

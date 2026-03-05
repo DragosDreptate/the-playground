@@ -145,6 +145,20 @@
     "emptyCirclesHint": "Maak een Community aan of neem deel aan een Evenement om lid te worden.",
     "noCirclesOrganizer": "Je organiseert nog geen Community.",
     "noCirclesOrganizerHint": "Maak jouw eerste Community aan om te beginnen.",
+    "onboarding": {
+      "emptyTitle": "Nog geen community",
+      "emptyHint": "Maak de jouwe aan of word lid van een community via een evenement.",
+      "label": "Om evenementen te organiseren",
+      "heading": "3 stappen om je Community te lanceren",
+      "sub": "Het duurt minder dan 5 minuten.",
+      "step1Title": "Maak je Community aan",
+      "step1Desc": "Een naam, een beschrijving, een foto — je ruimte is klaar.",
+      "step2Title": "Maak je eerste evenement aan",
+      "step2Desc": "Een titel, een datum, een locatie — dat is alles wat je nodig hebt.",
+      "step3Title": "Deel de link",
+      "step3Desc": "Stuur hem via WhatsApp, Slack of Instagram.",
+      "cta": "Mijn Community aanmaken"
+    },
     "noCirclesMember": "Je bent nog geen lid van een Community.",
     "role": {
       "host": "Organisator",

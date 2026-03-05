@@ -145,6 +145,20 @@
     "emptyCirclesHint": "Crea una Comunidad o únete a un Evento para ser miembro de una.",
     "noCirclesOrganizer": "Aún no organizas ninguna Comunidad.",
     "noCirclesOrganizerHint": "Crea tu primera Comunidad para empezar.",
+    "onboarding": {
+      "emptyTitle": "Ninguna comunidad por ahora",
+      "emptyHint": "Crea la tuya o únete a una comunidad a través de un evento.",
+      "label": "Para organizar eventos",
+      "heading": "3 pasos para lanzar tu Comunidad",
+      "sub": "Tarda menos de 5 minutos.",
+      "step1Title": "Crear tu Comunidad",
+      "step1Desc": "Un nombre, una descripción, una foto — tu espacio está listo.",
+      "step2Title": "Crear tu primer evento",
+      "step2Desc": "Un título, una fecha, un lugar — eso es todo lo que necesitas.",
+      "step3Title": "Compartir el enlace",
+      "step3Desc": "Envíalo por WhatsApp, Slack o Instagram.",
+      "cta": "Crear mi Comunidad"
+    },
     "noCirclesMember": "Aún no eres miembro de ninguna Comunidad.",
     "role": {
       "host": "Organizador",
