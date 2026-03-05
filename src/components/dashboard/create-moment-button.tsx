@@ -1,6 +1,5 @@
 import { auth } from "@/infrastructure/auth/auth.config";
-import { prismaCircleRepository, prismaMomentRepository } from "@/infrastructure/repositories";
-import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
+import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -21,8 +20,8 @@ export async function CreateMomentButton() {
   if (!session?.user?.id) return null;
 
   const [allCircles, { upcoming, past }] = await Promise.all([
-    getUserDashboardCircles(session.user.id, { circleRepository: prismaCircleRepository }),
-    prismaMomentRepository.findAllByHostUserId(session.user.id),
+    getCachedDashboardCircles(session.user.id),
+    getCachedHostMoments(session.user.id),
   ]);
 
   // 0 événement → le guide affiche son propre CTA, pas de doublon dans le header

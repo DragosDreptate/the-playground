@@ -1,6 +1,5 @@
 import { auth } from "@/infrastructure/auth/auth.config";
-import { prismaCircleRepository } from "@/infrastructure/repositories";
-import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
+import { getCachedDashboardCircles } from "@/lib/dashboard-cache";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -14,9 +13,7 @@ export async function CreateCircleButton() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const allCircles = await getUserDashboardCircles(session.user.id, {
-    circleRepository: prismaCircleRepository,
-  });
+  const allCircles = await getCachedDashboardCircles(session.user.id);
 
   const hostCircles = allCircles.filter((c) => c.memberRole === "HOST");
 
