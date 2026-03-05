@@ -143,8 +143,16 @@
     "noMomentsOrganizerHint": "Create your first Event from a Community.",
     "emptyCircles": "You're not a member of any Community.",
     "emptyCirclesHint": "Create a Community or join an Event to become a member of one.",
+    "emptyCirclesHintExplore": "Explore communities →",
     "noCirclesOrganizer": "You don't organize any Community yet.",
     "noCirclesOrganizerHint": "Create your first Community to get started.",
+    "onboardingMoments": {
+      "emptyTitle": "No events yet",
+      "emptyHintNoCircles": "Create your Community and launch your first event.",
+      "emptyHintHasCircles": "Your community is ready — create your first event.",
+      "subHasCircles": "You're almost there.",
+      "ctaEvent": "Create an event"
+    },
     "onboarding": {
       "emptyTitle": "No community yet",
       "emptyHint": "Create yours or join a community through an event.",

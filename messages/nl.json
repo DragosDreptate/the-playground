@@ -143,8 +143,16 @@
     "noMomentsOrganizerHint": "Maak jouw eerste Evenement aan vanuit een Community.",
     "emptyCircles": "Je bent geen lid van een Community.",
     "emptyCirclesHint": "Maak een Community aan of neem deel aan een Evenement om lid te worden.",
+    "emptyCirclesHintExplore": "Communities ontdekken →",
     "noCirclesOrganizer": "Je organiseert nog geen Community.",
     "noCirclesOrganizerHint": "Maak jouw eerste Community aan om te beginnen.",
+    "onboardingMoments": {
+      "emptyTitle": "Nog geen evenementen",
+      "emptyHintNoCircles": "Maak je Community aan en lanceer je eerste evenement.",
+      "emptyHintHasCircles": "Je community is klaar — maak je eerste evenement aan.",
+      "subHasCircles": "Je bent er bijna.",
+      "ctaEvent": "Evenement aanmaken"
+    },
     "onboarding": {
       "emptyTitle": "Nog geen community",
       "emptyHint": "Maak de jouwe aan of word lid van een community via een evenement.",

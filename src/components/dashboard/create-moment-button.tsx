@@ -1,5 +1,5 @@
 import { auth } from "@/infrastructure/auth/auth.config";
-import { prismaCircleRepository } from "@/infrastructure/repositories";
+import { prismaCircleRepository, prismaMomentRepository } from "@/infrastructure/repositories";
 import { getUserDashboardCircles } from "@/domain/usecases/get-user-dashboard-circles";
 import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { CreateMomentDropdown } from "./create-moment-dropdown";
 /**
  * CTA "Créer un événement" adaptatif selon le nombre de communautés hébergées :
  *
+ *   0 événement   → null (le guide OrganizerMomentsOnboardingGuide affiche son propre CTA)
  *   0 communauté  → redirect /dashboard/circles/new (créer une communauté d'abord)
  *   1 communauté  → redirect direct /dashboard/circles/[slug]/moments/new
  *   2+ communautés → Popover dropdown de sélection de la communauté cible
@@ -19,9 +20,13 @@ export async function CreateMomentButton() {
 
   if (!session?.user?.id) return null;
 
-  const allCircles = await getUserDashboardCircles(session.user.id, {
-    circleRepository: prismaCircleRepository,
-  });
+  const [allCircles, { upcoming, past }] = await Promise.all([
+    getUserDashboardCircles(session.user.id, { circleRepository: prismaCircleRepository }),
+    prismaMomentRepository.findAllByHostUserId(session.user.id),
+  ]);
+
+  // 0 événement → le guide affiche son propre CTA, pas de doublon dans le header
+  if (upcoming.length === 0 && past.length === 0) return null;
 
   const hostCircles = allCircles.filter((c) => c.memberRole === "HOST");
 
