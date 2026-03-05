@@ -146,7 +146,7 @@ export async function DashboardContent({
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
             <p className="text-muted-foreground text-sm">{t("noMoments")}</p>
             <p className="text-muted-foreground mt-1 text-xs">
-              <Link href="/explorer" className="hover:text-foreground underline underline-offset-4">
+              <Link href="/explorer?tab=moments" className="hover:text-foreground underline underline-offset-4">
                 {t("noMomentsHintExplore")}
               </Link>
             </p>
