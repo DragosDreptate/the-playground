@@ -143,6 +143,7 @@
     "noMomentsOrganizerHint": "Creează primul tău Eveniment dintr-o Comunitate.",
     "emptyCircles": "Nu ești membru al niciunei Comunități.",
     "emptyCirclesHint": "Creează o Comunitate sau alătură-te unui Eveniment pentru a deveni membru.",
+    "emptyCirclesHintExplore": "Explorează comunități →",
     "noCirclesOrganizer": "Nu organizezi nicio Comunitate încă.",
     "noCirclesOrganizerHint": "Creează-ți prima Comunitate pentru a începe.",
     "onboardingMoments": {

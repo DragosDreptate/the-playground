@@ -143,6 +143,7 @@
     "noMomentsOrganizerHint": "Créez votre premier événement depuis une Communauté.",
     "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
+    "emptyCirclesHintExplore": "Découvrir des communautés →",
     "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
     "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
     "onboardingMoments": {

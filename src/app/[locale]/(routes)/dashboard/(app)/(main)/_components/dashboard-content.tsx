@@ -206,7 +206,11 @@ export async function DashboardContent({
       {participantCircles.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
           <p className="text-muted-foreground text-sm">{t("emptyCircles")}</p>
-          <p className="text-muted-foreground mt-1 text-xs">{t("emptyCirclesHint")}</p>
+          <p className="text-muted-foreground mt-1 text-xs">
+            <Link href="/explorer" className="hover:text-foreground underline underline-offset-4">
+              {t("emptyCirclesHintExplore")}
+            </Link>
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
