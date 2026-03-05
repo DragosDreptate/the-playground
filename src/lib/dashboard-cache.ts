@@ -1,5 +1,8 @@
 import { cache } from "react";
-import { prismaCircleRepository, prismaMomentRepository } from "@/infrastructure/repositories";
+import {
+  prismaCircleRepository,
+  prismaMomentRepository,
+} from "@/infrastructure/repositories";
 
 /**
  * Versions mises en cache des requêtes dashboard pour les React Server Components.
