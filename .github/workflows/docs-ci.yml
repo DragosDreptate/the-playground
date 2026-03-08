@@ -1,0 +1,39 @@
+name: docs-ci
+
+# Ce workflow s'exécute uniquement quand une PR ne touche que des fichiers docs
+# (spec/**, *.md, .github/ISSUE_TEMPLATE/**) — les mêmes chemins ignorés par ci.yml.
+#
+# Objectif : satisfaire les required status checks (typecheck, test-unit, test-e2e)
+# sans lancer les vraies suites de tests, puisque les fichiers docs ne sont jamais buildés.
+#
+# Quand des fichiers de code changent (avec ou sans docs), ci.yml tourne et fournit
+# les vrais résultats — docs-ci.yml peut aussi tourner, mais les checks de ci.yml
+# font foi (un check en échec bloque la PR indépendamment des autres).
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "spec/**"
+      - "**.md"
+      - ".github/ISSUE_TEMPLATE/**"
+
+jobs:
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Docs-only change — typecheck skipped ✓"
+
+  test-unit:
+    name: test-unit
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Docs-only change — test-unit skipped ✓"
+
+  test-e2e:
+    name: test-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Docs-only change — test-e2e skipped ✓"
