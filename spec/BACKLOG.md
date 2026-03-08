@@ -309,6 +309,9 @@
 
 ### Infrastructure / Qualité
 
+- [x] **Perf dashboard : React.cache() pour getUserDashboardCircles** ✅ — PR #160, 2026-03-05
+  - `dashboard-content:circles` : **754ms → 192ms (-75%)**. `src/lib/dashboard-cache.ts` avec `getCachedDashboardCircles` + `getCachedHostMoments`.
+
 - [ ] **Stratégie migrations DB + rollback production** — voir `spec/db-migration-rollback-strategy.md`
   - Baseline migrations Prisma (passer de `db:push` à `prisma migrate`)
   - Scripts `db:migrate`, `db:migrate:prod`, `db:migrate:status`, `db:snapshot`
@@ -361,6 +364,17 @@
 ---
 
 ## Phase 2 (post-MVP)
+
+- [ ] **Perf DB : migrer vers le driver WebSocket Neon (`@neondatabase/serverless` Pool mode)**
+  - **Contexte** : suite à la migration TCP (`@prisma/adapter-pg`, PR #157), on observe que les connexions TCP concurrentes sur cold start Vercel causent 650-750ms d'attente (Neon queue les connexions). Le fix immédiat (React.cache()) réduit les connexions concurrentes. La solution structurelle est le **driver WebSocket Neon**.
+  - **Pourquoi WebSocket** : `@neondatabase/serverless` en mode `Pool` maintient des connexions WebSocket persistantes. Avantages vs TCP brut :
+    - Pas de TCP+TLS handshake sur cold start (WebSocket = HTTP upgrade, plus rapide)
+    - Conçu spécifiquement pour Vercel Serverless + Neon
+    - Meilleure gestion du multiplexage de connexions
+    - Compatible Vercel Edge (contrairement à TCP)
+  - **Pré-requis** : valider d'abord le fix React.cache() pour mesurer la baseline propre
+  - **Migration** : remplacer `@prisma/adapter-pg` + `PrismaPg` par `@neondatabase/serverless` Pool + `PrismaNeon` en mode Pool. Garder `PRISMA_USE_HTTP_ADAPTER=true` comme rollback. Mesurer l'impact en prod.
+  - **Risque** : migration plus complexe, à planifier après stabilisation des performances post React.cache()
 
 - [x] **Suivre une Communauté (Follow)** ✅ — implémenté en 2026-02-24 (commit `80a1390`)
   - Table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` avec 3 états (cloche/abonné·e/hover se désabonner)
