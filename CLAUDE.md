@@ -227,8 +227,9 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 ### Services
 - **Email** : Resend + react-email (templates React)
 - **Analytics** : PostHog — product analytics, event tracking
+- **Error monitoring** : Sentry (`@sentry/nextjs`) — error capture in server actions + global error boundary
 - **IA** : SDK Anthropic (Claude) — appels API directs
-- **File storage** : Uploadthing ou S3-compatible
+- **File storage** : Vercel Blob
 
 ### Infrastructure
 - **Hosting app** : Vercel (région EU)
