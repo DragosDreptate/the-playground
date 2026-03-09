@@ -14,6 +14,8 @@ import { AvatarUpload } from "@/components/profile/avatar-upload";
 import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, Mail, CalendarIcon } from "lucide-react";
+import { AdminHostModeToggle } from "@/components/profile/admin-host-mode-toggle";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 
 export default async function ProfilePage({
   searchParams,
@@ -31,12 +33,13 @@ export default async function ProfilePage({
 
   const userId = session.user.id;
 
-  const [user, circles, momentCount] = await Promise.all([
+  const [user, circles, momentCount, adminHostModeEnabled] = await Promise.all([
     getProfile({ userId }, { userRepository: prismaUserRepository }),
     prismaCircleRepository.findAllByUserId(userId),
     prisma.registration.count({
       where: { userId, status: "REGISTERED" },
     }),
+    isAdminInHostMode(session),
   ]);
 
   const t = await getTranslations("Profile");
@@ -167,6 +170,19 @@ export default async function ProfilePage({
             </p>
             <DeleteAccountDialog />
           </div>
+
+          {/* Section admin — visible uniquement pour les admins plateforme */}
+          {user.role === "ADMIN" && (
+            <>
+              <div className="border-border border-t" />
+              <div className="space-y-3">
+                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                  Administration
+                </p>
+                <AdminHostModeToggle enabled={adminHostModeEnabled} />
+              </div>
+            </>
+          )}
         </>
       ) : (
         <NotificationPreferencesForm

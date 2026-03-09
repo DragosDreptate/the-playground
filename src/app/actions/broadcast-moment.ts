@@ -14,6 +14,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
@@ -35,16 +36,18 @@ export async function broadcastMomentAction(
     return { success: false, error: "Événement introuvable", code: "NOT_FOUND" };
   }
 
-  const membership = await prismaCircleRepository.findMembership(
-    moment.circleId,
-    session.user.id
-  );
-  if (!membership || membership.role !== "HOST") {
-    return {
-      success: false,
-      error: "Seul l'organisateur peut diffuser",
-      code: "FORBIDDEN",
-    };
+  if (!(await isAdminInHostMode(session))) {
+    const membership = await prismaCircleRepository.findMembership(
+      moment.circleId,
+      session.user.id
+    );
+    if (!membership || membership.role !== "HOST") {
+      return {
+        success: false,
+        error: "Seul l'organisateur peut diffuser",
+        code: "FORBIDDEN",
+      };
+    }
   }
 
   const COOLDOWN_MS = 24 * 60 * 60 * 1000;

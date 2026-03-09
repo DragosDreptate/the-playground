@@ -28,6 +28,7 @@ import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
@@ -89,6 +90,7 @@ export async function createMomentAction(
 
   try {
     const coverData = await processCoverImage(formData);
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await createMoment(
       {
@@ -109,7 +111,7 @@ export async function createMomentAction(
       },
       {
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
       }
     );
@@ -247,6 +249,7 @@ export async function updateMomentAction(
     const oldCoverImage = existingMoment?.coverImage ?? null;
 
     const coverData = await processCoverImage(formData);
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await updateMoment(
       {
@@ -268,7 +271,7 @@ export async function updateMomentAction(
       },
       {
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
       }
     );
 
@@ -453,16 +456,17 @@ export async function deleteMomentAction(
 
   try {
     // Fetch data before deletion — needed for email notifications
-    const [momentToDelete, registrationsToNotify] = await Promise.all([
+    const [momentToDelete, registrationsToNotify, circleRepo] = await Promise.all([
       prismaMomentRepository.findById(momentId),
       prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
+      resolveCircleRepository(session, prismaCircleRepository),
     ]);
 
     await deleteMoment(
       { momentId, userId: session.user.id },
       {
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
       }
     );
 
