@@ -13,14 +13,9 @@ import {
 import { Globe } from "lucide-react";
 import { useTransition } from "react";
 
-const localeShort: Record<string, string> = {
-  fr: "FR",
-  en: "EN",
-};
-
-const localeFull: Record<string, string> = {
-  fr: "Français",
-  en: "English",
+const localeLabels: Record<string, { short: string; full: string }> = {
+  fr: { short: "FR", full: "Français" },
+  en: { short: "EN", full: "English" },
 };
 
 export function LocaleToggle() {
@@ -40,7 +35,7 @@ export function LocaleToggle() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" disabled={isPending} className="text-xs font-medium">
           <Globe className="size-3.5" />
-          {localeShort[locale] ?? locale.toUpperCase()}
+          {localeLabels[locale]?.short ?? locale.toUpperCase()}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -50,7 +45,7 @@ export function LocaleToggle() {
             onClick={() => switchLocale(l)}
             className={l === locale ? "font-semibold" : ""}
           >
-            {localeFull[l] ?? l.toUpperCase()}
+            {localeLabels[l]?.full ?? l.toUpperCase()}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
