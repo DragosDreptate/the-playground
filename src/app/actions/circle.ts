@@ -29,6 +29,7 @@ import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
 } from "@/lib/circle-category-helpers";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 
 export async function createCircleAction(
   formData: FormData
@@ -125,6 +126,8 @@ export async function updateCircleAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
     // Récupère l'ancienne cover pour cleanup si besoin
     const existingCircle = await prismaCircleRepository.findById(circleId);
     const oldCoverImage = existingCircle?.coverImage ?? null;
@@ -149,7 +152,7 @@ export async function updateCircleAction(
         city,
         ...coverData,
       },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
 
     // Cleanup ancien blob si une nouvelle image a été uploadée
@@ -184,9 +187,10 @@ export async function deleteCircleAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     await deleteCircle(
       { circleId, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
     return { success: true, data: undefined };
   } catch (error) {
@@ -315,10 +319,11 @@ export async function removeCircleMemberAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     await removeCircleMember(
       { circleId, hostUserId: session.user.id, targetUserId },
       {
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
       }
     );
@@ -343,9 +348,10 @@ export async function generateCircleInviteTokenAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const { token } = await generateCircleInviteToken(
       { circleId, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     return { success: true, data: { inviteUrl: `${baseUrl}/circles/join/${token}` } };
@@ -367,9 +373,10 @@ export async function revokeCircleInviteTokenAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     await revokeCircleInviteToken(
       { circleId, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
     const { revalidatePath } = await import("next/cache");
     const circle = await prismaCircleRepository.findById(circleId);
@@ -417,9 +424,10 @@ export async function inviteToCircleByEmailAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const { token, circle } = await generateCircleInviteToken(
       { circleId, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";

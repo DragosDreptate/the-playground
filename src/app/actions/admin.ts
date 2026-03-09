@@ -16,6 +16,8 @@ import { getAdminMoment } from "@/domain/usecases/admin/get-admin-moment";
 import { adminDeleteMoment } from "@/domain/usecases/admin/admin-delete-moment";
 import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-moment-status";
 import { DomainError } from "@/domain/errors";
+import { cookies } from "next/headers";
+import { ADMIN_HOST_MODE_COOKIE } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
 import type { AdminStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
@@ -188,4 +190,29 @@ export async function adminCancelMomentAction(
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
+}
+
+// ─────────────────────────────────────────────
+// Admin Host Mode
+// ─────────────────────────────────────────────
+
+export async function toggleAdminHostModeAction(
+  enabled: boolean
+): Promise<ActionResult<{ enabled: boolean }>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  const cookieStore = await cookies();
+  if (enabled) {
+    cookieStore.set(ADMIN_HOST_MODE_COOKIE, "true", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+  } else {
+    cookieStore.delete(ADMIN_HOST_MODE_COOKIE);
+  }
+
+  return { success: true, data: { enabled } };
 }
