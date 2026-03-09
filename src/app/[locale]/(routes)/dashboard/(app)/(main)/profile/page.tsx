@@ -15,7 +15,7 @@ import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog"
 import { Link } from "@/i18n/navigation";
 import { ChevronRight, Mail, CalendarIcon } from "lucide-react";
 import { AdminHostModeToggle } from "@/components/profile/admin-host-mode-toggle";
-import { isAdminHostModeEnabled } from "@/lib/admin-host-mode";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 
 export default async function ProfilePage({
   searchParams,
@@ -39,7 +39,7 @@ export default async function ProfilePage({
     prisma.registration.count({
       where: { userId, status: "REGISTERED" },
     }),
-    isAdminHostModeEnabled(),
+    isAdminInHostMode(session),
   ]);
 
   const t = await getTranslations("Profile");

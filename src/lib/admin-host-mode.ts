@@ -2,11 +2,31 @@ import { cookies } from "next/headers";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMembership } from "@/domain/models/circle";
 
-export const ADMIN_HOST_MODE_COOKIE = "admin_host_mode";
+const ADMIN_HOST_MODE_COOKIE = "admin_host_mode";
 
-export async function isAdminHostModeEnabled(): Promise<boolean> {
+async function isAdminHostModeEnabled(): Promise<boolean> {
   const cookieStore = await cookies();
   return cookieStore.get(ADMIN_HOST_MODE_COOKIE)?.value === "true";
+}
+
+export async function setAdminHostMode(enabled: boolean): Promise<void> {
+  const cookieStore = await cookies();
+  if (enabled) {
+    cookieStore.set(ADMIN_HOST_MODE_COOKIE, "true", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+  } else {
+    cookieStore.delete(ADMIN_HOST_MODE_COOKIE);
+  }
+}
+
+export async function isAdminInHostMode(
+  session: { user: { role?: string | null } } | null
+): Promise<boolean> {
+  return session?.user?.role === "ADMIN" && (await isAdminHostModeEnabled());
 }
 
 /**
@@ -25,13 +45,7 @@ function withAdminHostMode(
           userId: string
         ): Promise<CircleMembership | null> => {
           if (userId === adminUserId) {
-            return {
-              id: "admin-override",
-              userId,
-              circleId,
-              role: "HOST",
-              joinedAt: new Date(),
-            };
+            return { id: "admin-override", userId, circleId, role: "HOST", joinedAt: new Date() };
           }
           return target.findMembership(circleId, userId);
         };
@@ -42,20 +56,12 @@ function withAdminHostMode(
   });
 }
 
-/**
- * Résout le CircleRepository à utiliser dans une server action.
- * Si l'utilisateur est ADMIN et que le mode host admin est activé,
- * retourne un repository qui accorde un accès HOST universel.
- */
 export async function resolveCircleRepository(
   session: { user: { id: string; role?: string | null } } | null,
   baseRepo: CircleRepository
 ): Promise<CircleRepository> {
-  if (
-    session?.user?.role === "ADMIN" &&
-    (await isAdminHostModeEnabled())
-  ) {
-    return withAdminHostMode(baseRepo, session.user.id);
+  if (await isAdminInHostMode(session)) {
+    return withAdminHostMode(baseRepo, session!.user.id);
   }
   return baseRepo;
 }

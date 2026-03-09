@@ -14,7 +14,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
-import { isAdminHostModeEnabled } from "@/lib/admin-host-mode";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
@@ -36,9 +36,7 @@ export async function broadcastMomentAction(
     return { success: false, error: "Événement introuvable", code: "NOT_FOUND" };
   }
 
-  const isAdminOverride =
-    session.user.role === "ADMIN" && (await isAdminHostModeEnabled());
-  if (!isAdminOverride) {
+  if (!(await isAdminInHostMode(session))) {
     const membership = await prismaCircleRepository.findMembership(
       moment.circleId,
       session.user.id
