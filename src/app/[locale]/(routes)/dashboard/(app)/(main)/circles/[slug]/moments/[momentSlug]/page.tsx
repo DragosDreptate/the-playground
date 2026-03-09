@@ -11,6 +11,7 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 
 export default async function MomentDetailPage({
   params,
@@ -37,9 +38,11 @@ export default async function MomentDetailPage({
 
   if (moment.circleId !== circle.id) notFound();
 
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
   // Parallélise membership + hosts (dépendent tous deux de circle.id)
   const [membership, hosts] = await Promise.all([
-    prismaCircleRepository.findMembership(circle.id, session.user.id),
+    circleRepo.findMembership(circle.id, session.user.id),
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
   ]);
 

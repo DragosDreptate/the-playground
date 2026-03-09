@@ -20,6 +20,7 @@ import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
 import {
@@ -84,10 +85,9 @@ export default async function CircleDetailPage({
     throw error;
   }
 
-  const membership = await prismaCircleRepository.findMembership(
-    circle.id,
-    session.user.id
-  );
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
+  const membership = await circleRepo.findMembership(circle.id, session.user.id);
   if (!membership) notFound();
 
   const isHost = membership.role === "HOST";
@@ -97,7 +97,7 @@ export default async function CircleDetailPage({
   if (isHost && !circle.inviteToken) {
     const result = await generateCircleInviteToken(
       { circleId: circle.id, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
+      { circleRepository: circleRepo }
     );
     circle = result.circle;
   }
