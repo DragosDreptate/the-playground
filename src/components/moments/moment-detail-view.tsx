@@ -551,6 +551,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 variant={isHostView ? "host" : "public"}
                 hostUserIds={new Set(hosts.map((h) => h.user.id))}
                 momentSlug={isHostView ? moment.slug : undefined}
+                isConnected={props.isAuthenticated}
               />
             </div>
           )}

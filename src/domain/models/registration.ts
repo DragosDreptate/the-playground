@@ -27,6 +27,7 @@ export type RegistrationWithUser = Registration & {
     lastName: string | null;
     email: string;
     image: string | null;
+    publicId: string | null;
   };
 };
 
