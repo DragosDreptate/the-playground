@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Dashboard Profil — F8 : lien « Voir mon profil public »</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1c1929;
+      color: #f0eff6;
+      min-height: 100vh;
+    }
+
+    /* ── Barre de titre mockup ── */
+    .mockup-bar {
+      width: 100%;
+      background: #252235;
+      border-bottom: 1px solid #3d3850;
+      padding: 10px 24px;
+      color: #8885a0;
+      font-size: 13px;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky;
+      top: 0;
+      height: 56px;
+      background: rgba(28, 25, 41, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid #3d3850;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+    }
+    .header-inner {
+      max-width: 1024px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #f0eff6;
+    }
+    .logo-text span { color: #e8437d; }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .nav-item.muted { color: #8885a0; }
+    .nav-item.active { color: #f0eff6; }
+
+    /* Actions droite */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #8885a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── Contenu principal ── */
+    .main {
+      padding-top: 32px;
+      padding-bottom: 48px;
+    }
+    .main-inner {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    .profile-wrapper {
+      max-width: 512px;
+      margin: 0 auto;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      font-size: 14px;
+      margin-bottom: 24px;
+      color: #8885a0;
+    }
+    .breadcrumb .current {
+      color: #f0eff6;
+      font-weight: 500;
+    }
+
+    /* Header profil */
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+    .avatar-wrap {
+      position: relative;
+      width: 96px;
+      height: 96px;
+    }
+    .avatar-lg {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #252235;
+      border: 1px solid #3d3850;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .profile-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f0eff6;
+    }
+    .profile-email {
+      font-size: 14px;
+      color: #8885a0;
+    }
+    .profile-stats {
+      font-size: 12px;
+      color: #8885a0;
+    }
+
+    /* Lien profil public — modifié */
+    .public-profile-link-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+      position: relative;
+    }
+    .public-profile-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #e8437d;
+      font-size: 14px;
+      text-decoration: underline dotted;
+      cursor: pointer;
+    }
+    /* Séparateur */
+    .divider {
+      border: none;
+      border-top: 1px solid #3d3850;
+      margin: 24px 0;
+    }
+    .divider-sm {
+      border: none;
+      border-top: 1px solid #3d3850;
+      margin: 20px 0;
+    }
+
+    /* Pill tabs */
+    .pill-tabs {
+      display: inline-flex;
+      border: 1px solid #3d3850;
+      border-radius: 9999px;
+      padding: 4px;
+      gap: 0;
+    }
+    .pill-tab {
+      padding: 4px 16px;
+      font-size: 14px;
+      border-radius: 9999px;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    .pill-tab.active {
+      background: #f0eff6;
+      color: #1c1929;
+      font-weight: 500;
+    }
+    .pill-tab.inactive {
+      color: #8885a0;
+    }
+
+    /* Card formulaire */
+    .form-card {
+      background: #252235;
+      border: 1px solid #3d3850;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .section-label {
+      font-size: 11px;
+      color: #8885a0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      color: #8885a0;
+      margin-bottom: 4px;
+    }
+    .form-input {
+      width: 100%;
+      background: #1c1929;
+      border: 1px solid #3d3850;
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: #f0eff6;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn-save {
+      width: 100%;
+      margin-top: 16px;
+      background: #e8437d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Info rows */
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .info-icon-wrap {
+      width: 36px;
+      height: 36px;
+      background: rgba(232, 67, 125, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-content .info-label {
+      font-size: 12px;
+      color: #8885a0;
+    }
+    .info-content .info-value {
+      font-size: 14px;
+      color: #f0eff6;
+    }
+
+    /* Zone de danger */
+    .danger-desc {
+      font-size: 14px;
+      color: #8885a0;
+      margin-bottom: 12px;
+    }
+    .btn-danger {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #ef4444;
+      border-radius: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barre de titre mockup -->
+  <div class="mockup-bar">
+    Mockup — Dashboard Profil — F8 : lien « Voir mon profil public »
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <a class="logo" href="#">
+        <div class="logo-icon">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <polygon points="3,2 10,6 3,10" fill="white"/>
+          </svg>
+        </div>
+        <span class="logo-text">the <span>playground</span></span>
+      </a>
+
+      <!-- Nav -->
+      <nav class="nav">
+        <a class="nav-item muted" href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="16.24,7.76 14.12,14.12 7.76,16.24 9.88,9.88"/>
+          </svg>
+          Découvrir
+        </a>
+        <a class="nav-item active" href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Mon espace
+        </a>
+      </nav>
+
+      <!-- Actions droite -->
+      <div class="header-actions">
+        <button class="icon-btn" title="Thème">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </button>
+        <div class="avatar-sm">JD</div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Contenu principal -->
+  <main class="main">
+    <div class="main-inner">
+      <div class="profile-wrapper">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <span>Mon espace</span>
+          <span style="margin: 0 4px;">›</span>
+          <span class="current">Mon profil</span>
+        </div>
+
+        <!-- Header profil -->
+        <div class="profile-header">
+
+          <div class="avatar-wrap">
+            <div class="avatar-lg">JD</div>
+            <div class="avatar-edit-btn">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8885a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="profile-name">Jean Dupont</div>
+          <div class="profile-email">jean@example.com</div>
+          <div class="profile-stats">3 communautés · 12 événements</div>
+
+          <!-- Lien profil public -->
+          <div class="public-profile-link-wrap">
+            <a class="public-profile-link" href="#">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+              Voir mon profil public
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Séparateur -->
+        <hr class="divider" />
+
+        <!-- Pill tabs -->
+        <div class="pill-tabs">
+          <button class="pill-tab active">Mon profil</button>
+          <button class="pill-tab inactive">Notifications</button>
+        </div>
+
+        <!-- Formulaire -->
+        <div class="form-card">
+          <div class="section-label">Informations personnelles</div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Prénom</label>
+              <input class="form-input" type="text" value="Jean" readonly />
+            </div>
+            <div class="form-field">
+              <label>Nom</label>
+              <input class="form-input" type="text" value="Dupont" readonly />
+            </div>
+          </div>
+
+          <button class="btn-save">Enregistrer</button>
+
+          <hr class="divider-sm" />
+
+          <div class="section-label">Informations du compte</div>
+
+          <div class="info-row">
+            <div class="info-icon-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8437d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Email</div>
+              <div class="info-value">jean@example.com</div>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <div class="info-icon-wrap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e8437d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Membre depuis</div>
+              <div class="info-value">Février 2026</div>
+            </div>
+          </div>
+
+          <hr class="divider-sm" />
+
+          <div class="section-label">Zone de danger</div>
+          <p class="danger-desc">La suppression de votre compte est irréversible. Toutes vos données seront effacées.</p>
+          <button class="btn-danger">Supprimer mon compte</button>
+
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>
