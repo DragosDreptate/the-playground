@@ -54,7 +54,7 @@ Augmenter la conversion en rendant visibles les membres d'une communauté à **t
 - Informations masquées : email, date d'adhésion, rôle détaillé (sauf badge Organisateur)
 - Badge "Organisateur" visible sur les Hosts
 - Ordre d'affichage : Organisateurs d'abord, puis membres triés par date d'adhésion ascendante (les membres les plus anciens apparaissent en premier)
-- Pagination : afficher les 12 premiers membres, bouton "Voir tous les membres" pour la liste complète
+- Pagination : afficher les 10 premiers membres, bouton "Voir tous les membres" pour la liste complète
 - Compteur total de membres visible par tous (connecté ou non) — comportement inchangé
 - **Le compteur de membres est cliquable** pour les utilisateurs connectés → scroll/ancre vers la section membres
 - Pour les visiteurs non connectés : compteur non cliquable + message "Connecte-toi pour voir les membres"
@@ -276,7 +276,7 @@ Redirige vers `/u/[publicId]` de l'utilisateur connecté.
 | Zone | Modification | Détail |
 | --- | --- | --- |
 | **Données chargées** | Conditionner le fetch des membres à la session | Connecté : fetch membres (nom, avatar, rôle). Non connecté : compteur seul (déjà chargé) |
-| **Compteur membres** | Cliquable si connecté | Rendu comme `<a href="#members-section">` pour les connectés. Non cliquable (`<span>`) sinon |
+| **Compteur membres** | Cliquable si connecté | Rendu comme `<a href="``#members``-section">` pour les connectés. Non cliquable (`<span>`) sinon |
 | **Nouvelle section "Membres"** | Après la section événements, avec `id="members-section"` | Connecté : `CircleMembersList variant="member-view"` + noms → `/u/[publicId]`. Non connecté : placeholder |
 | **Guard communauté privée** | Masquer même pour connecté non-membre | `isPrivate && !isMember` → ne pas afficher la liste |
 
@@ -395,7 +395,7 @@ type PublicMomentRegistration = {
 }
 ```
 
-**Flux du usecase `GetUserPublicProfile` :**
+**Flux du usecase ****`GetUserPublicProfile`**** :**
 1. `UserRepository.getUserPublicProfile(publicId)` → résout le `userId` + données de base (`hostedMomentsCount` inclus)
 2. Si `null` → retourner `null` (la page affichera un 404)
 3. `CircleRepository.getPublicCirclesForUser(userId)` → communautés publiques
