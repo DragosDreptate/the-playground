@@ -10,9 +10,13 @@ import { DomainError } from "@/domain/errors";
 import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
+import { after } from "next/server";
 import { createResendEmailService } from "@/infrastructure/services";
+import { formatLongDate } from "@/lib/format-date";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
+
+const emailService = createResendEmailService();
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mo — filet de sécurité (le resize côté client ramène à ~50 Ko)
@@ -61,50 +65,52 @@ export async function completeOnboardingAction(
 
   if (result.success) {
     // Fire-and-forget : notifier les admins du nouvel utilisateur
-    void notifyAdminNewUser(result.data);
+    after(async () => {
+      try {
+        await notifyAdminNewUser(result.data);
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
   }
 
   return result;
 }
 
 async function notifyAdminNewUser(user: User): Promise<void> {
-  try {
-    const adminEmails = await prismaUserRepository.findAdminEmails();
-    const recipients = adminEmails.filter((email) => email !== user.email);
-    if (recipients.length === 0) return;
+  const adminEmails = await prismaUserRepository.findAdminEmails();
+  const recipients = adminEmails.filter((email) => email !== user.email);
+  if (recipients.length === 0) return;
 
-    const emailService = createResendEmailService();
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const adminUsersUrl = `${appUrl}/admin/users`;
-    const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-    const registeredAt = new Date().toLocaleDateString("fr-FR", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const adminUsersUrl = `${appUrl}/admin/users`;
+  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const registeredAt = formatLongDate(new Date(), "fr");
 
-    await Promise.allSettled(
-      recipients.map((to) =>
-        emailService.sendAdminNewUser({
-          to,
-          userName,
-          userEmail: user.email,
-          registeredAt,
-          adminUsersUrl,
-          strings: {
-            subject: `[Admin] Nouvel utilisateur — ${userName}`,
-            heading: "Nouvel utilisateur sur The Playground",
-            message: `${userName} vient de compléter son inscription.`,
-            ctaLabel: "Voir les utilisateurs dans l'admin",
-            footer:
-              "Vous recevez cet email car vous êtes administrateur de The Playground.",
-          },
-        })
-      )
-    );
-  } catch (error) {
-    console.error("[notifyAdminNewUser] Échec :", error);
-  }
+  const results = await Promise.allSettled(
+    recipients.map((to) =>
+      emailService.sendAdminNewUser({
+        to,
+        userName,
+        userEmail: user.email,
+        registeredAt,
+        adminUsersUrl,
+        strings: {
+          subject: `[Admin] Nouvel utilisateur — ${userName}`,
+          heading: "Nouvel utilisateur sur The Playground",
+          message: `${userName} vient de compléter son inscription.`,
+          ctaLabel: "Voir les utilisateurs dans l'admin",
+          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+        },
+      })
+    )
+  );
+
+  results.forEach((result, i) => {
+    if (result.status === "rejected") {
+      console.error(`[notifyAdminNewUser] Échec envoi email admin ${recipients[i]}:`, result.reason);
+    }
+  });
 }
 
 export async function deleteAccountAction(): Promise<ActionResult> {
