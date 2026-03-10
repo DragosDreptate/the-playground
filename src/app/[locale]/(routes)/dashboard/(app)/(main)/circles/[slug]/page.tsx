@@ -298,7 +298,7 @@ export default async function CircleDetailPage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <p className="text-sm leading-relaxed">{circle.description}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-wrap">{circle.description}</p>
             </div>
           )}
 
