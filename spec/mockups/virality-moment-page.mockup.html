@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Page Événement publique — Viralité : participants</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --background: #1c1929;
+      --card: #252235;
+      --border: #3d3850;
+      --foreground: #f0eff6;
+      --muted-foreground: #8885a0;
+      --primary: #e8437d;
+      --primary-10: rgba(232, 67, 125, 0.1);
+      --radius: 0.5rem;
+    }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 0 0 48px 0;
+    }
+
+    /* ── Bandeau ── */
+    .banner {
+      background: linear-gradient(90deg, #2a1f3d 0%, #1c1929 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .banner span {
+      color: var(--primary);
+    }
+
+    /* ── Layout principal ── */
+    .page-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 0;
+    }
+
+    /* ── En-tête événement (décoratif, réduit) ── */
+    .event-header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .event-cover {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #e8437d 0%, #7c3aed 100%);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .event-meta { flex: 1; }
+    .event-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 6px;
+    }
+    .event-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted-foreground);
+    }
+    .event-details span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .event-community {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-10);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    /* ── Titre de la section de comparaison ── */
+    .comparison-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    /* ── Colonnes côte à côte ── */
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0;
+      align-items: start;
+    }
+    .column-divider {
+      background: var(--border);
+      align-self: stretch;
+      margin: 0 32px;
+    }
+
+    /* ── Label de colonne ── */
+    .column-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .column-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .column-badge.unauthenticated {
+      background: rgba(136, 133, 160, 0.15);
+      color: var(--muted-foreground);
+      border: 1px solid rgba(136, 133, 160, 0.3);
+    }
+    .column-badge.authenticated {
+      background: rgba(232, 67, 125, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(232, 67, 125, 0.35);
+    }
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+    .badge-dot.grey { background: var(--muted-foreground); }
+    .badge-dot.pink { background: var(--primary); }
+
+    /* ── Card participants ── */
+    .participants-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+    .participants-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-right: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 9px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-primary {
+      background: var(--primary-10);
+      color: var(--primary);
+      border: 1px solid rgba(232, 67, 125, 0.25);
+    }
+    .badge-secondary {
+      background: rgba(136, 133, 160, 0.15);
+      color: var(--muted-foreground);
+      border: 1px solid rgba(136, 133, 160, 0.2);
+    }
+    .badge-outline {
+      background: transparent;
+      color: var(--muted-foreground);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Liste participants ── */
+    .participants-list {
+      padding: 8px 0;
+    }
+    .participant-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 20px;
+      transition: background 0.15s;
+    }
+    .participant-row.hover-demo {
+      background: var(--primary-10);
+      border-radius: 0;
+    }
+
+    /* Avatar */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      letter-spacing: 0.02em;
+    }
+    .avatar-ab { background: linear-gradient(135deg, #e8437d, #c0255f); color: #fff; }
+    .avatar-tc { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; }
+    .avatar-ml { background: linear-gradient(135deg, #0891b2, #0e7490); color: #fff; }
+    .avatar-jd { background: linear-gradient(135deg, #059669, #047857); color: #fff; }
+    .avatar-sc { background: linear-gradient(135deg, #d97706, #b45309); color: #fff; }
+
+    /* Crown icon */
+    .crown {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-right: -4px;
+    }
+
+    /* Noms — état non connecté */
+    .name-plain {
+      font-size: 14px;
+      color: var(--foreground);
+      font-weight: 500;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Noms — état connecté */
+    .name-link {
+      font-size: 14px;
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Badge organisateur */
+    .badge-organizer {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--primary-10);
+      color: var(--primary);
+      border: 1px solid rgba(232, 67, 125, 0.25);
+      border-radius: 999px;
+      padding: 1px 7px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Bouton voir plus */
+    .btn-see-more {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 4px 20px 12px;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* ── Légende hover ── */
+    .hover-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: var(--primary-10);
+      border: 1px solid rgba(232, 67, 125, 0.2);
+      border-radius: var(--radius);
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .hover-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      flex-shrink: 0;
+    }
+
+    /* ── Footer ── */
+    .footer-note {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 11px;
+      color: #4a4560;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── SVG icons inline ── */
+    .icon {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Bandeau -->
+  <div class="banner">
+    Mockup — Page Événement publique —
+    <span>Viralité : section Participants (non-connecté vs connecté)</span>
+  </div>
+
+  <div class="page-wrapper">
+
+    <!-- En-tête événement décoratif -->
+    <div class="event-header">
+      <div class="event-cover">🍕</div>
+      <div class="event-meta">
+        <div class="event-title">Soirée JS &amp; Pizza</div>
+        <div class="event-details">
+          <span>
+            <!-- Calendar icon -->
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Samedi 15 mars · 19h00 → 22h00
+          </span>
+          <span>
+            <!-- Pin icon -->
+            <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Station F, Paris
+          </span>
+          <a href="#" class="event-community">
+            <!-- Users icon -->
+            <svg class="icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Tech Paris
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Titre comparaison -->
+    <div class="comparison-title">Section « Participants » — 2 états</div>
+
+    <!-- Colonnes côte à côte -->
+    <div class="columns">
+
+      <!-- ── COLONNE GAUCHE : non connecté ── -->
+      <div>
+        <div class="column-label">
+          <span class="column-badge unauthenticated">
+            <span class="badge-dot grey"></span>
+            Visiteur non connecté
+          </span>
+        </div>
+
+        <div class="participants-card">
+          <!-- Header -->
+          <div class="participants-card-header">
+            <span class="section-title">Participants</span>
+            <span class="badge badge-primary">32 inscrits</span>
+            <span class="badge badge-secondary">5 en attente</span>
+            <span class="badge badge-outline">Capacité : 50</span>
+          </div>
+
+          <!-- Liste -->
+          <div class="participants-list">
+
+            <div class="participant-row">
+              <div class="avatar avatar-ab">AB</div>
+              <div class="name-plain">Alice Bernard</div>
+            </div>
+
+            <div class="participant-row">
+              <div class="avatar avatar-tc">TC</div>
+              <div class="name-plain">Thomas Chen</div>
+            </div>
+
+            <div class="participant-row">
+              <div class="avatar avatar-ml">ML</div>
+              <div class="name-plain">Marie Leroy</div>
+            </div>
+
+            <div class="participant-row">
+              <div class="avatar avatar-jd">JD</div>
+              <div class="name-plain">Jean Dupont</div>
+            </div>
+
+            <div class="participant-row">
+              <div class="avatar avatar-sc">SC</div>
+              <div class="name-plain">Sophie Cazal</div>
+            </div>
+
+          </div>
+
+          <button class="btn-see-more">
+            <!-- ChevronDown icon -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            Voir plus (27)
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ── Séparateur vertical ── -->
+      <div class="column-divider"></div>
+
+      <!-- ── COLONNE DROITE : connecté ── -->
+      <div style="position: relative;">
+        <div class="column-label">
+          <span class="column-badge authenticated">
+            <span class="badge-dot pink"></span>
+            Utilisateur connecté
+          </span>
+        </div>
+
+        <div class="participants-card" style="position: relative;">
+
+          <!-- Header (identique) -->
+          <div class="participants-card-header">
+            <span class="section-title">Participants</span>
+            <span class="badge badge-primary">32 inscrits</span>
+            <span class="badge badge-secondary">5 en attente</span>
+            <span class="badge badge-outline">Capacité : 50</span>
+          </div>
+
+          <!-- Liste avec liens -->
+          <div class="participants-list">
+
+            <!-- Alice Bernard — Organisatrice -->
+            <div class="participant-row">
+              <!-- Crown icon -->
+              <span class="crown">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h20v2H2zM2 17l4-8 6 4 6-9 4 8H2z"/></svg>
+              </span>
+              <div class="avatar avatar-ab">AB</div>
+              <a href="#" class="name-link">
+                Alice Bernard
+                <span class="badge-organizer">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h20v2H2zM2 17l4-8 6 4 6-9 4 8H2z"/></svg>
+                  Organisatrice
+                </span>
+              </a>
+            </div>
+
+            <!-- Thomas Chen — hover simulé -->
+            <div class="participant-row hover-demo">
+              <div class="avatar avatar-tc">TC</div>
+              <a href="#" class="name-link">Thomas Chen</a>
+            </div>
+
+            <!-- Marie Leroy -->
+            <div class="participant-row">
+              <div class="avatar avatar-ml">ML</div>
+              <a href="#" class="name-link">Marie Leroy</a>
+            </div>
+
+            <!-- Jean Dupont -->
+            <div class="participant-row">
+              <div class="avatar avatar-jd">JD</div>
+              <a href="#" class="name-link">Jean Dupont</a>
+            </div>
+
+            <!-- Sophie Cazal -->
+            <div class="participant-row">
+              <div class="avatar avatar-sc">SC</div>
+              <a href="#" class="name-link">Sophie Cazal</a>
+            </div>
+
+          </div>
+
+          <button class="btn-see-more">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            Voir plus (27)
+          </button>
+        </div>
+
+        <!-- Légende hover -->
+        <div class="hover-note">
+          <div class="hover-indicator"></div>
+          Hover simulé sur Thomas Chen — fond <code style="font-size:10px; opacity:0.8;">primary/10</code> arrondi
+        </div>
+
+      </div>
+
+    </div><!-- /columns -->
+
+    <div class="footer-note">
+      The Playground · spec/mockups/virality-moment-page.mockup.html · 2026-03-10
+    </div>
+
+  </div><!-- /page-wrapper -->
+
+</body>
+</html>
