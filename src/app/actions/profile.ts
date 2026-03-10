@@ -10,6 +10,7 @@ import { DomainError } from "@/domain/errors";
 import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
+import { createResendEmailService } from "@/infrastructure/services";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 
@@ -50,6 +51,59 @@ export async function updateProfileAction(
     }
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function completeOnboardingAction(
+  formData: FormData
+): Promise<ActionResult<User>> {
+  const result = await updateProfileAction(formData);
+
+  if (result.success) {
+    // Fire-and-forget : notifier les admins du nouvel utilisateur
+    void notifyAdminNewUser(result.data);
+  }
+
+  return result;
+}
+
+async function notifyAdminNewUser(user: User): Promise<void> {
+  try {
+    const adminEmails = await prismaUserRepository.findAdminEmails();
+    const recipients = adminEmails.filter((email) => email !== user.email);
+    if (recipients.length === 0) return;
+
+    const emailService = createResendEmailService();
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const adminUsersUrl = `${appUrl}/admin/users`;
+    const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+    const registeredAt = new Date().toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    await Promise.allSettled(
+      recipients.map((to) =>
+        emailService.sendAdminNewUser({
+          to,
+          userName,
+          userEmail: user.email,
+          registeredAt,
+          adminUsersUrl,
+          strings: {
+            subject: `[Admin] Nouvel utilisateur — ${userName}`,
+            heading: "Nouvel utilisateur sur The Playground",
+            message: `${userName} vient de compléter son inscription.`,
+            ctaLabel: "Voir les utilisateurs dans l'admin",
+            footer:
+              "Vous recevez cet email car vous êtes administrateur de The Playground.",
+          },
+        })
+      )
+    );
+  } catch (error) {
+    console.error("[notifyAdminNewUser] Échec :", error);
   }
 }
 
