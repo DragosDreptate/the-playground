@@ -13,6 +13,7 @@ import { isUploadedUrl } from "@/lib/blob";
 import { after } from "next/server";
 import { createResendEmailService } from "@/infrastructure/services";
 import { formatLongDate } from "@/lib/format-date";
+import { getDisplayName } from "@/lib/display-name";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 
@@ -84,7 +85,7 @@ async function notifyAdminNewUser(user: User): Promise<void> {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const adminUsersUrl = `${appUrl}/admin/users`;
-  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const userName = getDisplayName(user.firstName, user.lastName, user.email);
   const registeredAt = formatLongDate(new Date(), "fr");
 
   const results = await Promise.allSettled(
