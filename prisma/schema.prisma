@@ -136,6 +136,7 @@ model User {
   notifyNewFollower         Boolean   @default(true)
   notifyNewMomentInCircle   Boolean   @default(true)
   dashboardMode             DashboardMode?
+  publicId                  String?   @unique @map("public_id")
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @updatedAt
 

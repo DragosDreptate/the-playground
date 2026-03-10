@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Page Communauté publique — Viralité membres</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --background: #1c1929;
+      --card: #252235;
+      --border: #3d3850;
+      --foreground: #f0eff6;
+      --muted-foreground: #8885a0;
+      --primary: #e8437d;
+      --primary-10: rgba(232,67,125,0.1);
+      --primary-5: rgba(232,67,125,0.05);
+      --primary-40: rgba(232,67,125,0.4);
+      --radius: 0.5rem;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+    }
+
+    /* ─── Bandeau mockup ─── */
+    .mockup-banner {
+      background: #0f0c1a;
+      border-bottom: 2px solid var(--primary-40);
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.03em;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .mockup-banner span {
+      color: var(--primary);
+    }
+
+    /* ─── Fake Nav ─── */
+    .fake-nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fake-nav .logo {
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+    }
+    .fake-nav .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+    .fake-nav .nav-links span { cursor: pointer; }
+    .fake-nav .nav-links span:hover { color: var(--foreground); }
+    .fake-nav .nav-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-sm {
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--foreground);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* ─── Layout principal ─── */
+    .page-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 32px 80px;
+    }
+
+    /* ─── Breadcrumb ─── */
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .breadcrumb a {
+      color: var(--muted-foreground);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { color: var(--foreground); }
+    .breadcrumb .sep { color: var(--border); }
+    .breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+    /* ─── Two-col layout ─── */
+    .two-col {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+
+    /* ─── Colonne gauche ─── */
+    .sidebar {
+      width: 340px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+    }
+
+    .cover-square {
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #e8437d 0%, #9b59b6 50%, #3498db 100%);
+      margin-bottom: 20px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-square .cover-label {
+      font-size: 40px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: -0.02em;
+    }
+
+    .sidebar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 14px;
+    }
+
+    .hosts-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .hosts-avatars {
+      display: flex;
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      border: 2px solid var(--card);
+      flex-shrink: 0;
+    }
+    .avatar-green  { background: linear-gradient(135deg, #27ae60, #1abc9c); }
+    .avatar-blue   { background: linear-gradient(135deg, #2980b9, #3498db); }
+    .avatar-orange { background: linear-gradient(135deg, #e67e22, #f39c12); }
+    .avatar-violet { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+    .avatar-red    { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+    .avatar-pink   { background: linear-gradient(135deg, #e8437d, #c0325d); }
+
+    .hosts-avatars .avatar:not(:first-child) { margin-left: -10px; }
+    .hosts-info { font-size: 13px; color: var(--muted-foreground); }
+    .hosts-info strong { color: var(--foreground); font-weight: 600; display: block; font-size: 14px; }
+
+    /* ─── Stats ─── */
+    .stats-row {
+      display: flex;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .stat-box {
+      flex: 1;
+      padding: 14px 10px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-box:last-child { border-right: none; }
+    .stat-number {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--foreground);
+      line-height: 1;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    /* ─── NOUVEAU : stat membre cliquable ─── */
+    .stat-number-link {
+      color: var(--primary);
+      text-decoration: underline dotted;
+      cursor: pointer;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+    .stat-arrow {
+      font-size: 14px;
+      color: var(--primary);
+      opacity: 0.8;
+    }
+
+    /* ─── Badges ─── */
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-outline-primary {
+      border: 1px solid var(--primary-40);
+      color: var(--primary);
+      background: var(--primary-5);
+    }
+    .badge-outline-muted {
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: transparent;
+    }
+
+    /* ─── Boutons sidebar ─── */
+    .btn-sidebar {
+      width: 100%;
+      padding: 10px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      display: block;
+    }
+    .btn-sidebar-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      margin-bottom: 8px;
+    }
+    .btn-sidebar-outline {
+      background: transparent;
+      color: var(--muted-foreground);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Colonne droite ─── */
+    .main-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .orga-line {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+    .orga-line a { color: var(--primary); text-decoration: none; }
+
+    .circle-title {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--foreground);
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+
+    .description {
+      font-size: 15px;
+      color: var(--muted-foreground);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .sep { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    /* ─── Meta rows ─── */
+    .meta-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .meta-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .meta-label { color: var(--muted-foreground); font-size: 13px; }
+    .meta-value { color: var(--foreground); font-weight: 500; }
+
+    /* ─── Onglets ─── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tab.active {
+      color: var(--foreground);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ─── Cartes événement ─── */
+    .event-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .event-card:hover { border-color: var(--primary-40); }
+
+    .event-date-badge {
+      background: var(--primary-10);
+      border: 1px solid var(--primary-40);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 52px;
+    }
+    .event-date-badge .month {
+      font-size: 11px;
+      color: var(--primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .event-date-badge .day {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--foreground);
+      line-height: 1.1;
+    }
+
+    .event-info { flex: 1; min-width: 0; }
+    .event-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin-bottom: 4px;
+    }
+    .event-meta {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      display: flex;
+      gap: 14px;
+    }
+
+    .event-arrow {
+      color: var(--muted-foreground);
+      font-size: 18px;
+    }
+
+    /* ─── Section membres ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--foreground);
+    }
+    .badge-count {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: transparent;
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .member-row:last-child { border-bottom: none; }
+
+    .crown-icon {
+      color: var(--primary);
+      font-size: 14px;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .crown-placeholder { width: 18px; flex-shrink: 0; }
+
+    .member-name-link {
+      color: var(--primary);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .member-name-link:hover { opacity: 0.85; }
+
+    .member-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+
+    .more-members {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      padding: 12px 0 0;
+      font-style: italic;
+    }
+
+    .btn-full-outline {
+      width: 100%;
+      padding: 11px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--foreground);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: border-color 0.15s;
+    }
+    .btn-full-outline:hover { border-color: var(--primary-40); color: var(--primary); }
+
+    /* ─── État non-connecté membres ─── */
+    .locked-state {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .lock-icon {
+      font-size: 28px;
+      color: var(--muted-foreground);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .locked-text {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 16px;
+    }
+
+    /* ─── Séparateur de vue mockup ─── */
+    .mockup-view-sep {
+      border: none;
+      border-top: 2px dashed #e8437d55;
+      margin: 48px 0 32px;
+      position: relative;
+    }
+    .mockup-view-sep::after {
+      content: '— Vue non-connecté —';
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--background);
+      padding: 0 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ─── Bandeau mockup ─── -->
+<div class="mockup-banner">
+  Mockup —
+  <span>Page Communauté publique</span>
+  — Viralité : membres visibles (connecté &amp; non-connecté)
+</div>
+
+<!-- ─── Fausse nav ─── -->
+<nav class="fake-nav">
+  <div class="logo">The Playground</div>
+  <div class="nav-links">
+    <span>Mon espace</span>
+    <span>Découvrir</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-sm btn-primary">Marie D.</button>
+  </div>
+</nav>
+
+<!-- ─── Contenu principal ─── -->
+<div class="page-container">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Découvrir</a>
+    <span class="sep">›</span>
+    <span class="current">Tech Paris</span>
+  </div>
+
+  <div class="two-col">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- COLONNE GAUCHE                          -->
+    <!-- ═══════════════════════════════════════ -->
+    <aside class="sidebar">
+
+      <!-- Cover carré -->
+      <div class="cover-square">
+        <span class="cover-label">TP</span>
+      </div>
+
+      <!-- Card principale sidebar -->
+      <div class="sidebar-card">
+
+        <!-- Hosts -->
+        <div class="hosts-section">
+          <div class="hosts-avatars">
+            <div class="avatar avatar-green">MD</div>
+            <div class="avatar avatar-blue">TB</div>
+          </div>
+          <div class="hosts-info">
+            <strong>Tech Paris</strong>
+            Organisé par Marie D. &amp; Thomas B.
+          </div>
+        </div>
+
+        <!-- Stats avec compteur membre cliquable -->
+        <div class="stats-row">
+            <!-- Stat membres — cliquable -->
+            <div class="stat-box">
+              <a class="stat-number-link" href="#members-section" title="Voir les membres">
+                42
+                <span class="stat-arrow">→</span>
+              </a>
+              <div class="stat-label">Membres</div>
+            </div>
+            <!-- Stat événements -->
+            <div class="stat-box">
+              <span class="stat-number">18</span>
+              <div class="stat-label">Événements</div>
+            </div>
+        </div>
+
+        <!-- Badges statut -->
+        <div class="badge-row" style="margin-top: 14px;">
+          <span class="badge badge-outline-primary">👑 Organisateur</span>
+          <span class="badge badge-outline-primary">✓ Membre</span>
+        </div>
+
+        <!-- Boutons -->
+        <button class="btn-sidebar btn-sidebar-outline">Quitter la communauté</button>
+
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- COLONNE DROITE                          -->
+    <!-- ═══════════════════════════════════════ -->
+    <main class="main-col">
+
+      <!-- Organisé par -->
+      <div class="orga-line">
+        Organisé par <a href="#">Marie Dupont</a> &amp; <a href="#">Thomas Bernard</a>
+      </div>
+
+      <!-- Titre -->
+      <h1 class="circle-title">Tech Paris</h1>
+
+      <!-- Description -->
+      <p class="description">
+        La communauté tech parisienne pour les développeurs, designers et entrepreneurs.
+        Rejoignez-nous pour des soirées networking, workshops pratiques et talks d'experts.
+        Plus de 40 membres actifs depuis janvier 2025.
+      </p>
+
+      <hr class="sep" />
+
+      <!-- Meta rows -->
+      <div class="meta-grid">
+        <div class="meta-row">
+          <div class="meta-icon">🏷️</div>
+          <div>
+            <div class="meta-label">Catégorie</div>
+            <div class="meta-value">Tech &amp; Développement</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">📍</div>
+          <div>
+            <div class="meta-label">Ville</div>
+            <div class="meta-value">Paris, France</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">🔓</div>
+          <div>
+            <div class="meta-label">Visibilité</div>
+            <div class="meta-value">Publique</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">👥</div>
+          <div>
+            <div class="meta-label">Membres</div>
+            <div class="meta-value">42 membres</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">📅</div>
+          <div>
+            <div class="meta-label">Créée le</div>
+            <div class="meta-value">15 jan. 2025</div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="sep" />
+
+      <!-- Onglets événements -->
+      <div class="tabs">
+        <div class="tab active">À venir</div>
+        <div class="tab">Passés</div>
+      </div>
+
+      <!-- Événements -->
+      <div class="event-card">
+        <div class="event-date-badge">
+          <div class="month">Mar</div>
+          <div class="day">15</div>
+        </div>
+        <div class="event-info">
+          <div class="event-title">Soirée JS &amp; Pizza</div>
+          <div class="event-meta">
+            <span>🕖 19h00</span>
+            <span>📍 Station F, Paris</span>
+            <span>👥 28 inscrits</span>
+          </div>
+        </div>
+        <div class="event-arrow">›</div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-date-badge">
+          <div class="month">Mar</div>
+          <div class="day">22</div>
+        </div>
+        <div class="event-info">
+          <div class="event-title">Workshop React 19 — Nouveautés &amp; Server Components</div>
+          <div class="event-meta">
+            <span>🕑 14h00</span>
+            <span>📍 Le Wagon, Paris</span>
+            <span>👥 12 inscrits</span>
+          </div>
+        </div>
+        <div class="event-arrow">›</div>
+      </div>
+
+      <!-- ─────────────────────────────────────────── -->
+      <!-- SECTION MEMBRES — Vue connectée            -->
+      <!-- ─────────────────────────────────────────── -->
+      <hr class="sep" />
+
+      <div id="members-section">
+
+          <div class="section-header">
+            <span class="section-title">Membres</span>
+            <span class="badge-count">42</span>
+          </div>
+
+          <!-- Ligne 1 — Organisateur -->
+          <div class="member-row">
+            <span class="crown-icon" title="Organisateur">♛</span>
+            <div class="avatar avatar-green" style="width:32px;height:32px;font-size:12px;">MD</div>
+            <a class="member-name-link" href="#">Marie Dupont</a>
+            <span class="badge badge-outline-primary" style="margin-left: auto; font-size:11px;">Organisateur</span>
+          </div>
+
+          <!-- Ligne 2 — Organisateur -->
+          <div class="member-row">
+            <span class="crown-icon" title="Organisateur">♛</span>
+            <div class="avatar avatar-blue" style="width:32px;height:32px;font-size:12px;">TB</div>
+            <a class="member-name-link" href="#">Thomas Bernard</a>
+            <span class="badge badge-outline-primary" style="margin-left: auto; font-size:11px;">Organisateur</span>
+          </div>
+
+          <!-- Ligne 3 — Membre -->
+          <div class="member-row">
+            <span class="crown-placeholder"></span>
+            <div class="avatar avatar-orange" style="width:32px;height:32px;font-size:12px;">AL</div>
+            <a class="member-name-link" href="#">Alice Leroy</a>
+          </div>
+
+          <!-- Ligne 4 — Membre -->
+          <div class="member-row">
+            <span class="crown-placeholder"></span>
+            <div class="avatar avatar-violet" style="width:32px;height:32px;font-size:12px;">JM</div>
+            <a class="member-name-link" href="#">Jean Martin</a>
+          </div>
+
+          <!-- Ligne 5 — Membre -->
+          <div class="member-row">
+            <span class="crown-placeholder"></span>
+            <div class="avatar avatar-red" style="width:32px;height:32px;font-size:12px;">SC</div>
+            <a class="member-name-link" href="#">Sophie Chen</a>
+          </div>
+
+          <!-- More -->
+          <div class="more-members">
+            + 37 autres membres
+          </div>
+
+          <!-- CTA -->
+          <button class="btn-full-outline">
+            Voir tous les membres →
+          </button>
+
+      </div>
+
+      <!-- ─────────────────────────────────────────── -->
+      <!-- SÉPARATEUR VUE NON-CONNECTÉ                -->
+      <!-- ─────────────────────────────────────────── -->
+      <hr class="mockup-view-sep" />
+
+      <!-- ─────────────────────────────────────────── -->
+      <!-- SECTION MEMBRES — Vue non-connectée        -->
+      <!-- ─────────────────────────────────────────── -->
+      <div>
+
+          <div class="section-header">
+            <span class="section-title">Membres</span>
+            <span class="badge-count">42</span>
+          </div>
+
+          <!-- État verrouillé -->
+          <div class="locked-state">
+            <span class="lock-icon">🔒</span>
+            <p class="locked-text">
+              Connecte-toi pour voir les membres de cette communauté.
+            </p>
+            <button class="btn-full-outline" style="margin-top: 0;">
+              Se connecter
+            </button>
+          </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,5 +1,28 @@
 export type UserRole = "USER" | "ADMIN";
 
+export type PublicUser = {
+  publicId: string;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  memberSince: Date;
+  hostedMomentsCount: number;
+};
+
+export type PublicCircleMembership = {
+  circleSlug: string;
+  circleName: string;
+  circleCover: string | null;
+  role: "HOST" | "PLAYER";
+};
+
+export type PublicMomentRegistration = {
+  momentSlug: string;
+  momentTitle: string;
+  momentDate: Date;
+  circleName: string;
+};
+
 export type DashboardMode = "PARTICIPANT" | "ORGANIZER";
 
 export type NotificationPreferences = {
@@ -24,6 +47,7 @@ export type User = {
   notifyNewFollower: boolean;
   notifyNewMomentInCircle: boolean;
   dashboardMode: DashboardMode | null;
+  publicId: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

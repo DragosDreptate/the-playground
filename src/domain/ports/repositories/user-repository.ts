@@ -1,4 +1,4 @@
-import type { User, NotificationPreferences, DashboardMode } from "@/domain/models/user";
+import type { User, NotificationPreferences, DashboardMode, PublicUser } from "@/domain/models/user";
 
 export type UpdateProfileInput = {
   firstName: string;
@@ -25,4 +25,10 @@ export interface UserRepository {
   ): Promise<NotificationPreferences>;
   updateDashboardMode(userId: string, mode: DashboardMode): Promise<void>;
   findAdminEmails(): Promise<string[]>;
+  /** Lookup par publicId — retourne les données publiques de l'utilisateur (jamais l'email). */
+  getPublicUserByPublicId(publicId: string): Promise<PublicUser | null>;
+  /** Retourne l'id interne de l'utilisateur à partir de son publicId (pour les jointures internes). */
+  findUserIdByPublicId(publicId: string): Promise<string | null>;
+  /** Génère et persiste un publicId pour l'utilisateur (si absent). */
+  ensurePublicId(userId: string, firstName: string | null, lastName: string | null): Promise<string>;
 }

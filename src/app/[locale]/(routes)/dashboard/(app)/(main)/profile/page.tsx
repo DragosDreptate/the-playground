@@ -77,6 +77,14 @@ export default async function ProfilePage({
         <p className="text-muted-foreground text-xs">
           {circles.length} {t("edit.circles")} · {momentCount} {t("edit.moments")}
         </p>
+        {user.publicId && (
+          <Link
+            href={`/u/${user.publicId}`}
+            className="text-xs text-primary underline-offset-4 hover:underline"
+          >
+            ↗ {t("publicProfile.viewMyProfile")}
+          </Link>
+        )}
       </div>
 
       {/* Separator */}

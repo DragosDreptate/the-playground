@@ -1,5 +1,6 @@
 import type { Moment, LocationType, MomentStatus, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
 import type { CircleCategory } from "@/domain/models/circle";
+import type { PublicMomentRegistration } from "@/domain/models/user";
 
 export type CreateMomentInput = {
   slug: string;
@@ -98,4 +99,6 @@ export interface MomentRepository {
   findAllByHostUserId(hostUserId: string): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }>;
   /** Marque un Moment comme ayant été diffusé (broadcast email envoyé). */
   markBroadcastSent(momentId: string): Promise<void>;
+  /** Événements à venir dans des Circles publics auxquels l'utilisateur est inscrit (REGISTERED) — pour la page profil public. */
+  getUpcomingPublicMomentsForUser(userId: string): Promise<PublicMomentRegistration[]>;
 }

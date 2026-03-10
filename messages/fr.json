@@ -905,6 +905,21 @@
       "newMomentInCircle": "Nouvel événement",
       "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté que vous suivez",
       "saved": "Préférences enregistrées"
+    },
+    "publicProfile": {
+      "memberSince": "Membre depuis {date}",
+      "communities": "Communautés ({count})",
+      "upcomingEvents": "Prochains événements ({count})",
+      "noUpcomingEvents": "Aucun événement à venir",
+      "noCommunities": "Aucune communauté publique",
+      "viewMyProfile": "Voir mon profil public",
+      "itsYourProfile": "C'est votre profil",
+      "editMyProfile": "Modifier mon profil",
+      "hostedEvents": "{count, plural, one {# événement organisé} other {# événements organisés}}",
+      "notFound": "Profil introuvable",
+      "signInToView": "Connecte-toi pour voir ce profil",
+      "roleHost": "Organisateur",
+      "rolePlayer": "Participant"
     }
   },
   "Help": {

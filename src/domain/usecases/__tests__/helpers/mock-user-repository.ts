@@ -1,5 +1,5 @@
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
-import type { User, NotificationPreferences } from "@/domain/models/user";
+import type { User, NotificationPreferences, PublicUser } from "@/domain/models/user";
 import { vi } from "vitest";
 
 export function createMockUserRepository(
@@ -22,6 +22,15 @@ export function createMockUserRepository(
       .mockResolvedValue(makeNotificationPreferences()),
     updateDashboardMode: vi.fn<UserRepository["updateDashboardMode"]>().mockResolvedValue(undefined),
     findAdminEmails: vi.fn<UserRepository["findAdminEmails"]>().mockResolvedValue([]),
+    getPublicUserByPublicId: vi
+      .fn<UserRepository["getPublicUserByPublicId"]>()
+      .mockResolvedValue(null),
+    findUserIdByPublicId: vi
+      .fn<UserRepository["findUserIdByPublicId"]>()
+      .mockResolvedValue(null),
+    ensurePublicId: vi
+      .fn<UserRepository["ensurePublicId"]>()
+      .mockResolvedValue("test-user-1234"),
     ...overrides,
   };
 }
@@ -42,8 +51,21 @@ export function makeUser(overrides: Partial<User> = {}): User {
     notifyNewFollower: true,
     notifyNewMomentInCircle: true,
     dashboardMode: null,
+    publicId: "test-user-1234",
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
+    ...overrides,
+  };
+}
+
+export function makePublicUser(overrides: Partial<PublicUser> = {}): PublicUser {
+  return {
+    publicId: "jean-dupont-4821",
+    firstName: "Jean",
+    lastName: "Dupont",
+    image: null,
+    memberSince: new Date("2026-01-01"),
+    hostedMomentsCount: 0,
     ...overrides,
   };
 }
