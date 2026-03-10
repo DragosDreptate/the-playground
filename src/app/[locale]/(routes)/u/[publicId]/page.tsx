@@ -73,10 +73,7 @@ export default async function UserPublicProfilePage({
           </AvatarFallback>
         </Avatar>
 
-        <div className="space-y-0.5">
-          <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
-          <p className="text-xs text-muted-foreground font-mono">/u/{publicId}</p>
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
 
         <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
           <span>{t("memberSince", { date: memberSince })}</span>
