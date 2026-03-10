@@ -13,6 +13,7 @@ import {
 import { Crown, MoreVertical } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
+import { Link } from "@/i18n/navigation";
 import { getDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
@@ -21,7 +22,7 @@ const PAGE_SIZE = 10;
 type CircleMembersListProps = {
   hosts: CircleMemberWithUser[];
   players: CircleMemberWithUser[];
-  variant?: "host" | "player";
+  variant?: "host" | "player" | "member-view";
   circleId?: string;
 };
 
@@ -61,6 +62,7 @@ export function CircleMembersList({
             isHost={member.isHost}
             showEmail={variant === "host"}
             canRemove={variant === "host" && !member.isHost}
+            showLink={variant === "member-view"}
             circleId={circleId}
           />
         ))}
@@ -85,12 +87,14 @@ function MemberRow({
   isHost = false,
   showEmail = false,
   canRemove = false,
+  showLink = false,
   circleId,
 }: {
   member: CircleMemberWithUser;
   isHost?: boolean;
   showEmail?: boolean;
   canRemove?: boolean;
+  showLink?: boolean;
   circleId?: string;
 }) {
   const t = useTranslations("Dashboard");
@@ -110,7 +114,16 @@ function MemberRow({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-snug">{displayName}</p>
+          {showLink && user.publicId ? (
+            <Link
+              href={`/u/${user.publicId}`}
+              className="text-sm font-medium leading-snug hover:underline underline-offset-2"
+            >
+              {displayName}
+            </Link>
+          ) : (
+            <p className="text-sm font-medium leading-snug">{displayName}</p>
+          )}
           {showEmail && (
             <p className="text-muted-foreground truncate text-xs">{user.email}</p>
           )}

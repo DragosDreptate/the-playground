@@ -246,7 +246,8 @@
       "isMember": "You are a member",
       "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community",
-      "shareableLink": "Shareable link"
+      "shareableLink": "Shareable link",
+      "signInToSeeMembers": "Sign in to see the members of this community"
     },
     "removeMember": {
       "action": "Remove from Community",

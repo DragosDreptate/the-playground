@@ -11,6 +11,7 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleViewTracker } from "@/components/circles/circle-view-tracker";
+import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -129,6 +130,7 @@ export default async function PublicCirclePage({
     ReturnType<typeof prismaCircleRepository.countMembers>,
     Promise<boolean | null>,
     Promise<boolean | null>,
+    ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
@@ -144,9 +146,13 @@ export default async function PublicCirclePage({
     session?.user?.id
       ? prismaCircleRepository.getFollowStatus(session.user.id, circle.id)
       : Promise.resolve(null),
+    // Players chargés uniquement pour les connectés (section membres)
+    session?.user?.id
+      ? prismaCircleRepository.findMembersByRole(circle.id, "PLAYER")
+      : Promise.resolve([]),
   ];
 
-  const [hosts, allMoments, memberCount, isMemberResult, isFollowingResult] =
+  const [hosts, allMoments, memberCount, isMemberResult, isFollowingResult, players] =
     await measureTime("circle-page:data", () => Promise.all(parallelQueries));
 
   const isMember = isMemberResult === true;
@@ -154,6 +160,9 @@ export default async function PublicCirclePage({
   const isHost = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;
+  const isConnected = !!session?.user?.id;
+  // Membres visibles : connecté + (circle public OU membre/organisateur)
+  const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
   const showFollowButton = !!session?.user?.id && !isMember;
   const showMemberBadge = isMember && !isHost;
 
@@ -270,7 +279,13 @@ export default async function PublicCirclePage({
           {/* Stats */}
           <div className="flex gap-6 px-1">
             <div>
-              <p className="text-2xl font-bold">{memberCount}</p>
+              {isConnected ? (
+                <a href="#members-section" className="text-2xl font-bold hover:underline underline-offset-2">
+                  {memberCount}
+                </a>
+              ) : (
+                <p className="text-2xl font-bold">{memberCount}</p>
+              )}
               <p className="text-muted-foreground text-xs">{t("detail.members")}</p>
             </div>
             <div className="border-l pl-6">
@@ -501,6 +516,21 @@ export default async function PublicCirclePage({
                 ))}
               </div>
             )}
+          </div>
+
+          {/* Section Membres */}
+          <div id="members-section" className="border-border border-t pt-5">
+            {canSeeMembers ? (
+              <CircleMembersList
+                hosts={hosts}
+                players={players}
+                variant="member-view"
+              />
+            ) : !isConnected ? (
+              <p className="text-muted-foreground text-center text-sm py-4">
+                {t("detail.signInToSeeMembers")}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

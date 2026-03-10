@@ -246,7 +246,8 @@
       "isMember": "Vous êtes membre",
       "isHost": "Vous êtes Organisateur",
       "manageCircle": "Gérer cette Communauté",
-      "shareableLink": "Lien partageable"
+      "shareableLink": "Lien partageable",
+      "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté"
     },
     "removeMember": {
       "action": "Retirer de la Communauté",

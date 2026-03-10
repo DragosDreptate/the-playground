@@ -286,7 +286,7 @@ export const prismaCircleRepository: CircleRepository = {
       where: { circleId, role },
       include: {
         user: {
-          select: { id: true, firstName: true, lastName: true, email: true, image: true },
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
         },
       },
       orderBy: { joinedAt: "asc" },
