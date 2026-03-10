@@ -10,8 +10,7 @@ import { getUserPublicProfile } from "@/domain/usecases/get-user-public-profile"
 import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Crown } from "lucide-react";
+import { ChevronRight, Crown } from "lucide-react";
 import { formatLongDate } from "@/lib/format-date";
 
 export default async function UserPublicProfilePage({
@@ -27,6 +26,7 @@ export default async function UserPublicProfilePage({
   }
 
   const t = await getTranslations("Profile.publicProfile");
+  const tDashboard = await getTranslations("Dashboard");
 
   const result = await getUserPublicProfile(
     { publicId },
@@ -57,13 +57,14 @@ export default async function UserPublicProfilePage({
 
   return (
     <div className="mx-auto max-w-lg space-y-8">
-      {/* Bandeau profil propre */}
+      {/* Fil d'ariane — uniquement pour son propre profil */}
       {isOwnProfile && (
-        <div className="rounded-lg border bg-primary/5 px-4 py-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">{t("itsYourProfile")}</p>
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/dashboard/profile">{t("editMyProfile")}</Link>
-          </Button>
+        <div className="text-muted-foreground flex items-center gap-1 text-sm">
+          <Link href="/dashboard/profile" className="hover:text-foreground transition-colors">
+            {tDashboard("title")}
+          </Link>
+          <ChevronRight className="size-3.5" />
+          <span className="text-foreground font-medium">{t("itsYourProfile")}</span>
         </div>
       )}
 
