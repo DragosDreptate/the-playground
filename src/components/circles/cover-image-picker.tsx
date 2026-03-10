@@ -293,7 +293,7 @@ export function CoverImagePicker({
           // Mobile : w-screen = 100vw (toujours viewport, même avec le bug iOS Safari fixed→absolute)
           "top-0 left-0 w-screen h-dvh max-w-none translate-x-0 translate-y-0 rounded-none overflow-x-hidden overflow-y-auto",
           // Desktop sm+ : dialog centré normal
-          "sm:top-[50%] sm:left-[50%] sm:w-auto sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
+          "sm:top-[50%] sm:left-[50%] sm:w-full sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
         ].join(" ")}>
           <DialogHeader>
             <DialogTitle>Image de couverture</DialogTitle>
