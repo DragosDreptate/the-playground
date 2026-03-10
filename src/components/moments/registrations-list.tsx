@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Clock, Crown, Download } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { Link } from "@/i18n/navigation";
+import { getDisplayName } from "@/lib/display-name";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
 const PAGE_SIZE = 10;
@@ -21,12 +22,6 @@ type RegistrationsListProps = {
   momentSlug?: string;
   isConnected?: boolean;
 };
-
-function getDisplayName(firstName: string | null, lastName: string | null, email: string): string {
-  if (firstName && lastName) return `${firstName} ${lastName}`;
-  if (firstName) return firstName;
-  return email;
-}
 
 export function RegistrationsList({
   registrations,

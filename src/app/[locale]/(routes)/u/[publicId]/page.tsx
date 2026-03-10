@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Crown } from "lucide-react";
 import { formatLongDate, formatMonthYear } from "@/lib/format-date";
+import { getMomentGradient } from "@/lib/gradient";
 
 export default async function UserPublicProfilePage({
   params,
@@ -29,7 +30,7 @@ export default async function UserPublicProfilePage({
   const tDashboard = await getTranslations("Dashboard");
 
   const result = await getUserPublicProfile(
-    { publicId },
+    { publicId, viewerUserId: session.user.id },
     {
       userRepository: prismaUserRepository,
       circleRepository: prismaCircleRepository,
@@ -39,9 +40,7 @@ export default async function UserPublicProfilePage({
 
   if (!result) notFound();
 
-  const { user, internalUserId, publicCircles, upcomingPublicMoments } = result;
-
-  const isOwnProfile = internalUserId === session.user.id;
+  const { user, isOwnProfile, publicCircles, upcomingPublicMoments } = result;
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
   const initials = [user.firstName?.[0], user.lastName?.[0]]
@@ -68,7 +67,10 @@ export default async function UserPublicProfilePage({
       <div className="flex flex-col items-center gap-3 text-center">
         <Avatar className="size-20">
           {user.image && <AvatarImage src={user.image} alt={fullName} />}
-          <AvatarFallback className="text-2xl font-semibold bg-gradient-to-br from-pink-500 to-violet-500 text-white">
+          <AvatarFallback
+            className="text-2xl font-semibold text-white"
+            style={{ background: getMomentGradient(user.publicId) }}
+          >
             {initials || "?"}
           </AvatarFallback>
         </Avatar>
@@ -102,7 +104,10 @@ export default async function UserPublicProfilePage({
                     style={{ backgroundImage: `url(${membership.circleCover})` }}
                   />
                 ) : (
-                  <div className="size-10 shrink-0 rounded-md bg-gradient-to-br from-pink-500 to-violet-500" />
+                  <div
+                    className="size-10 shrink-0 rounded-md"
+                    style={{ background: getMomentGradient(membership.circleSlug) }}
+                  />
                 )}
 
                 <p className="flex-1 min-w-0 text-sm font-medium truncate">

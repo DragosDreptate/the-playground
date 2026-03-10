@@ -13,6 +13,7 @@ import {
 import { Crown, MoreVertical } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
+import { getDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
 const PAGE_SIZE = 10;
@@ -23,16 +24,6 @@ type CircleMembersListProps = {
   variant?: "host" | "player";
   circleId?: string;
 };
-
-function getDisplayName(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName) return `${firstName} ${lastName}`;
-  if (firstName) return firstName;
-  return email;
-}
 
 export function CircleMembersList({
   hosts,

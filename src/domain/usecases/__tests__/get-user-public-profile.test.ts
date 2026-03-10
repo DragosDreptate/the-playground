@@ -94,6 +94,42 @@ describe("GetUserPublicProfile", () => {
       expect(result).not.toBeNull();
       expect(result!.user).not.toHaveProperty("email");
     });
+
+    it("should not expose internalUserId in the returned profile", async () => {
+      const deps = makeDeps();
+      const result = await getUserPublicProfile({ publicId: PUBLIC_ID }, deps);
+
+      expect(result).not.toHaveProperty("internalUserId");
+    });
+  });
+
+  describe("given isOwnProfile detection", () => {
+    it("should return isOwnProfile=true when viewerUserId matches the profile owner", async () => {
+      const deps = makeDeps();
+      const result = await getUserPublicProfile(
+        { publicId: PUBLIC_ID, viewerUserId: INTERNAL_USER_ID },
+        deps
+      );
+
+      expect(result!.isOwnProfile).toBe(true);
+    });
+
+    it("should return isOwnProfile=false when viewerUserId is a different user", async () => {
+      const deps = makeDeps();
+      const result = await getUserPublicProfile(
+        { publicId: PUBLIC_ID, viewerUserId: "other-user-456" },
+        deps
+      );
+
+      expect(result!.isOwnProfile).toBe(false);
+    });
+
+    it("should return isOwnProfile=false when viewerUserId is not provided", async () => {
+      const deps = makeDeps();
+      const result = await getUserPublicProfile({ publicId: PUBLIC_ID }, deps);
+
+      expect(result!.isOwnProfile).toBe(false);
+    });
   });
 
   describe("given a publicId that does not exist", () => {
@@ -116,8 +152,6 @@ describe("GetUserPublicProfile", () => {
 
   describe("given user with private circles only", () => {
     it("should return empty circles array (filtering is done in the repository)", async () => {
-      // Le filtrage public/privé est la responsabilité du repository (getPublicCirclesForUser).
-      // Le usecase reçoit déjà la liste filtrée — on vérifie que le usecase retourne ce qu'il reçoit.
       const deps = makeDeps({ circles: [] });
       const result = await getUserPublicProfile({ publicId: PUBLIC_ID }, deps);
 

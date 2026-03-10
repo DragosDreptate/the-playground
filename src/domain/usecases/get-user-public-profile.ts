@@ -5,6 +5,7 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 
 type GetUserPublicProfileInput = {
   publicId: string;
+  viewerUserId?: string;
 };
 
 type GetUserPublicProfileDeps = {
@@ -15,8 +16,7 @@ type GetUserPublicProfileDeps = {
 
 export type UserPublicProfile = {
   user: PublicUser;
-  /** Id interne — fourni à la couche app pour le contrôle isOwnProfile, ne pas exposer au client. */
-  internalUserId: string;
+  isOwnProfile: boolean;
   publicCircles: PublicCircleMembership[];
   upcomingPublicMoments: PublicMomentRegistration[];
 };
@@ -37,5 +37,10 @@ export async function getUserPublicProfile(
     momentRepository.getUpcomingPublicMomentsForUser(internalUserId),
   ]);
 
-  return { user, internalUserId, publicCircles, upcomingPublicMoments };
+  return {
+    user,
+    isOwnProfile: input.viewerUserId === internalUserId,
+    publicCircles,
+    upcomingPublicMoments,
+  };
 }

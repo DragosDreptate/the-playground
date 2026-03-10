@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
+import { getDisplayName } from "@/lib/display-name";
 import type { CommentWithUser } from "@/domain/models/comment";
 
 const MAX_CONTENT_LENGTH = 2000;
@@ -30,16 +31,6 @@ type CommentThreadProps = {
   isPastMoment: boolean;
   signInUrl: string;
 };
-
-function getDisplayName(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName) return `${firstName} ${lastName}`;
-  if (firstName) return firstName;
-  return email;
-}
 
 function useRelativeTime(t: ReturnType<typeof useTranslations>) {
   return function formatRelativeTime(date: Date): string {

@@ -431,32 +431,26 @@ export const prismaCircleRepository: CircleRepository = {
 
   async getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]> {
     const memberships = await prisma.circleMembership.findMany({
-      where: { userId },
+      where: { userId, circle: { visibility: "PUBLIC" } },
       include: {
         circle: {
           select: {
             slug: true,
             name: true,
             coverImage: true,
-            visibility: true,
           },
         },
       },
       orderBy: { joinedAt: "asc" },
     });
 
-    // Filtre : uniquement les Circles publics
-    const publicMemberships = memberships.filter(
-      (m) => m.circle.visibility === "PUBLIC"
-    );
-
     // Tri : HOSTs d'abord, puis PLAYERs — alpha dans chaque groupe
-    publicMemberships.sort((a, b) => {
+    memberships.sort((a, b) => {
       if (a.role !== b.role) return a.role === "HOST" ? -1 : 1;
       return a.circle.name.localeCompare(b.circle.name);
     });
 
-    return publicMemberships.map((m) => ({
+    return memberships.map((m) => ({
       circleSlug: m.circle.slug,
       circleName: m.circle.name,
       circleCover: m.circle.coverImage,
