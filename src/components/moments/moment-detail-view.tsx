@@ -97,6 +97,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const { moment, circle, hosts, registrations, registeredCount, waitlistedCount } =
     props;
   const isHostView = props.variant === "host";
+  // Le host est toujours connecté — l'accès au dashboard nécessite une session
+  const isAuthenticated = isHostView || (props as PublicViewProps).isAuthenticated;
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
@@ -551,7 +553,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 variant={isHostView ? "host" : "public"}
                 hostUserIds={new Set(hosts.map((h) => h.user.id))}
                 momentSlug={isHostView ? moment.slug : undefined}
-                isConnected={props.isAuthenticated}
+                isConnected={isAuthenticated}
               />
             </div>
           )}

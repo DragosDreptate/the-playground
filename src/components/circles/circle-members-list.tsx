@@ -62,7 +62,7 @@ export function CircleMembersList({
             isHost={member.isHost}
             showEmail={variant === "host"}
             canRemove={variant === "host" && !member.isHost}
-            showLink={variant === "member-view"}
+            showLink
             circleId={circleId}
           />
         ))}
