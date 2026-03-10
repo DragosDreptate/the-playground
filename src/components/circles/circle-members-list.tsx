@@ -62,7 +62,6 @@ export function CircleMembersList({
             isHost={member.isHost}
             showEmail={variant === "host"}
             canRemove={variant === "host" && !member.isHost}
-            showLink
             circleId={circleId}
           />
         ))}
@@ -87,14 +86,12 @@ function MemberRow({
   isHost = false,
   showEmail = false,
   canRemove = false,
-  showLink = false,
   circleId,
 }: {
   member: CircleMemberWithUser;
   isHost?: boolean;
   showEmail?: boolean;
   canRemove?: boolean;
-  showLink?: boolean;
   circleId?: string;
 }) {
   const t = useTranslations("Dashboard");
@@ -114,7 +111,7 @@ function MemberRow({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          {showLink && user.publicId ? (
+          {user.publicId ? (
             <Link
               href={`/u/${user.publicId}`}
               className="text-sm font-medium leading-snug hover:underline underline-offset-2"

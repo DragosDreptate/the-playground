@@ -190,37 +190,29 @@ test.describe("Page profil public /u/[publicId]", () => {
 });
 
 test.describe("F6 — Noms cliquables dans le dashboard Circle (host)", () => {
-  test("given a host, member names in the dashboard circle should be links to public profiles", async ({
-    browser,
-  }) => {
-    const context = await browser.newContext({ storageState: AUTH.HOST });
-    const page = await context.newPage();
+  test.use({ storageState: AUTH.HOST });
 
+  test("given a host, member names in the dashboard circle should be links to public profiles", async ({
+    page,
+  }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    // Des liens vers /u/ doivent exister dans la liste des membres
     const profileLinks = page.locator("a[href*='/u/']");
     await expect(profileLinks.first()).toBeVisible();
-
-    await context.close();
   });
 });
 
 test.describe("F7 — Noms cliquables dans le dashboard Moment (host)", () => {
-  test("given a host, participant names in the dashboard moment should be links to public profiles", async ({
-    browser,
-  }) => {
-    const context = await browser.newContext({ storageState: AUTH.HOST });
-    const page = await context.newPage();
+  test.use({ storageState: AUTH.HOST });
 
+  test("given a host, participant names in the dashboard moment should be links to public profiles", async ({
+    page,
+  }) => {
     await page.goto(
       `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${SLUGS.PUBLISHED_MOMENT}`
     );
 
-    // Des liens vers /u/ doivent exister dans la liste des participants
     const profileLinks = page.locator("a[href*='/u/']");
     await expect(profileLinks.first()).toBeVisible();
-
-    await context.close();
   });
 });
