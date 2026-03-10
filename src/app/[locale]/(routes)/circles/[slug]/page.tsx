@@ -519,19 +519,21 @@ export default async function PublicCirclePage({
           </div>
 
           {/* Section Membres */}
-          <div id="members-section" className="border-border border-t pt-5">
-            {canSeeMembers ? (
-              <CircleMembersList
-                hosts={hosts}
-                players={players}
-                variant="member-view"
-              />
-            ) : !isConnected ? (
-              <p className="text-muted-foreground text-center text-sm py-4">
-                {t("detail.signInToSeeMembers")}
-              </p>
-            ) : null}
-          </div>
+          {(canSeeMembers || !isConnected) && (
+            <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
+              {canSeeMembers ? (
+                <CircleMembersList
+                  hosts={hosts}
+                  players={players}
+                  variant="member-view"
+                />
+              ) : (
+                <p className="text-muted-foreground text-center text-sm py-4">
+                  {t("detail.signInToSeeMembers")}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
