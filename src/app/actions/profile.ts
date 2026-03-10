@@ -10,8 +10,13 @@ import { DomainError } from "@/domain/errors";
 import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
+import { after } from "next/server";
+import { createResendEmailService } from "@/infrastructure/services";
+import { formatLongDate } from "@/lib/format-date";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
+
+const emailService = createResendEmailService();
 
 const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 Mo — filet de sécurité (le resize côté client ramène à ~50 Ko)
@@ -51,6 +56,61 @@ export async function updateProfileAction(
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
+}
+
+export async function completeOnboardingAction(
+  formData: FormData
+): Promise<ActionResult<User>> {
+  const result = await updateProfileAction(formData);
+
+  if (result.success) {
+    // Fire-and-forget : notifier les admins du nouvel utilisateur
+    after(async () => {
+      try {
+        await notifyAdminNewUser(result.data);
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+    });
+  }
+
+  return result;
+}
+
+async function notifyAdminNewUser(user: User): Promise<void> {
+  const adminEmails = await prismaUserRepository.findAdminEmails();
+  const recipients = adminEmails.filter((email) => email !== user.email);
+  if (recipients.length === 0) return;
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const adminUsersUrl = `${appUrl}/admin/users`;
+  const userName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  const registeredAt = formatLongDate(new Date(), "fr");
+
+  const results = await Promise.allSettled(
+    recipients.map((to) =>
+      emailService.sendAdminNewUser({
+        to,
+        userName,
+        userEmail: user.email,
+        registeredAt,
+        adminUsersUrl,
+        strings: {
+          subject: `[Admin] Nouvel utilisateur — ${userName}`,
+          heading: "Nouvel utilisateur sur The Playground",
+          message: `${userName} vient de compléter son inscription.`,
+          ctaLabel: "Voir les utilisateurs dans l'admin",
+          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+        },
+      })
+    )
+  );
+
+  results.forEach((result, i) => {
+    if (result.status === "rejected") {
+      console.error(`[notifyAdminNewUser] Échec envoi email admin ${recipients[i]}:`, result.reason);
+    }
+  });
 }
 
 export async function deleteAccountAction(): Promise<ActionResult> {

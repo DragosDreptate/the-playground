@@ -7,7 +7,7 @@ import { shouldRedirectFromSetup } from "@/lib/onboarding";
 import { safeCallbackUrl } from "@/lib/url";
 import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
-import { updateProfileAction } from "@/app/actions/profile";
+import { completeOnboardingAction } from "@/app/actions/profile";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
 
 function parseName(name: string | null): { firstName: string; lastName: string } {
@@ -67,7 +67,7 @@ export default async function ProfileSetupPage() {
       <ProfileForm
         user={{ firstName, lastName }}
         mode="setup"
-        action={updateProfileAction}
+        action={completeOnboardingAction}
         callbackUrl={callbackUrl}
       />
     </div>

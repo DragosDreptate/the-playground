@@ -14,6 +14,7 @@ import type {
   BroadcastMomentEmailData,
   AdminEntityCreatedEmailData,
   CircleInvitationEmailData,
+  AdminNewUserEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -27,6 +28,7 @@ import { HostMomentCreatedEmail } from "./templates/host-moment-created";
 import { BroadcastMomentEmail } from "./templates/broadcast-moment";
 import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
+import { AdminNewUserEmail } from "./templates/admin-new-user";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -221,6 +223,15 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: CircleInvitationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendAdminNewUser(data: AdminNewUserEmailData): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: AdminNewUserEmail({ ...data, baseUrl }),
       });
     },
   };
