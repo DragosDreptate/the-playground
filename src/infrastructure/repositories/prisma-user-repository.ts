@@ -169,10 +169,13 @@ export const prismaUserRepository: UserRepository = {
     return records.map((r) => r.email).filter(Boolean) as string[];
   },
 
-  async getPublicUserByPublicId(publicId: string): Promise<PublicUser | null> {
+  async resolvePublicProfile(
+    publicId: string
+  ): Promise<{ user: PublicUser; internalUserId: string } | null> {
     const record = await prisma.user.findUnique({
       where: { publicId },
       select: {
+        id: true,
         publicId: true,
         firstName: true,
         lastName: true,
@@ -182,11 +185,7 @@ export const prismaUserRepository: UserRepository = {
           where: { role: "HOST" },
           select: {
             circle: {
-              select: {
-                _count: {
-                  select: { moments: true },
-                },
-              },
+              select: { _count: { select: { moments: true } } },
             },
           },
         },
@@ -201,21 +200,16 @@ export const prismaUserRepository: UserRepository = {
     );
 
     return {
-      publicId: record.publicId,
-      firstName: record.firstName ?? "",
-      lastName: record.lastName ?? "",
-      image: record.image,
-      memberSince: record.createdAt,
-      hostedMomentsCount,
+      user: {
+        publicId: record.publicId,
+        firstName: record.firstName ?? "",
+        lastName: record.lastName ?? "",
+        image: record.image,
+        memberSince: record.createdAt,
+        hostedMomentsCount,
+      },
+      internalUserId: record.id,
     };
-  },
-
-  async findUserIdByPublicId(publicId: string): Promise<string | null> {
-    const record = await prisma.user.findUnique({
-      where: { publicId },
-      select: { id: true },
-    });
-    return record?.id ?? null;
   },
 
   async ensurePublicId(

@@ -15,6 +15,7 @@ config({ path: ".env.local" });
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { generatePublicId } from "@/lib/public-id";
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL non défini.");
@@ -24,24 +25,6 @@ if (!process.env.DATABASE_URL) {
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });
-
-function slugify(str: string): string {
-  return str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-}
-
-function generatePublicId(firstName: string | null, lastName: string | null): string {
-  const random = Math.floor(1000 + Math.random() * 9000);
-  const base = [firstName, lastName].filter(Boolean).join(" ").trim();
-  if (!base) return `user-${Math.floor(10000 + Math.random() * 90000)}`;
-  return `${slugify(base)}-${random}`;
-}
 
 async function main() {
   const totalNull = await prisma.user.count({ where: { publicId: null } });

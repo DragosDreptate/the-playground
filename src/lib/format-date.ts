@@ -86,6 +86,15 @@ export function isSameDayInParis(a: Date, b: Date): boolean {
   return fmt.format(a) === fmt.format(b);
 }
 
+/** "mars 2025" / "March 2025" — utilisé pour les dates de type "Membre depuis" */
+export function formatMonthYear(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 /** "25 février 2026" / "25 February 2026" */
 export function formatLongDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {

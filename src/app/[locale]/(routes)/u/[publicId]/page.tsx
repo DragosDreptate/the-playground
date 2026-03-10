@@ -11,7 +11,7 @@ import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Crown } from "lucide-react";
-import { formatLongDate } from "@/lib/format-date";
+import { formatLongDate, formatMonthYear } from "@/lib/format-date";
 
 export default async function UserPublicProfilePage({
   params,
@@ -39,9 +39,8 @@ export default async function UserPublicProfilePage({
 
   if (!result) notFound();
 
-  const { user, publicCircles, upcomingPublicMoments } = result;
+  const { user, internalUserId, publicCircles, upcomingPublicMoments } = result;
 
-  const internalUserId = await prismaUserRepository.findUserIdByPublicId(publicId);
   const isOwnProfile = internalUserId === session.user.id;
 
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
@@ -50,10 +49,7 @@ export default async function UserPublicProfilePage({
     .join("")
     .toUpperCase();
 
-  const memberSince = new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-GB", {
-    month: "long",
-    year: "numeric",
-  }).format(user.memberSince);
+  const memberSince = formatMonthYear(user.memberSince, locale);
 
   return (
     <div className="mx-auto max-w-lg space-y-8">

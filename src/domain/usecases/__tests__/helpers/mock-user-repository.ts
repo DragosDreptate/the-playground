@@ -22,11 +22,8 @@ export function createMockUserRepository(
       .mockResolvedValue(makeNotificationPreferences()),
     updateDashboardMode: vi.fn<UserRepository["updateDashboardMode"]>().mockResolvedValue(undefined),
     findAdminEmails: vi.fn<UserRepository["findAdminEmails"]>().mockResolvedValue([]),
-    getPublicUserByPublicId: vi
-      .fn<UserRepository["getPublicUserByPublicId"]>()
-      .mockResolvedValue(null),
-    findUserIdByPublicId: vi
-      .fn<UserRepository["findUserIdByPublicId"]>()
+    resolvePublicProfile: vi
+      .fn<UserRepository["resolvePublicProfile"]>()
       .mockResolvedValue(null),
     ensurePublicId: vi
       .fn<UserRepository["ensurePublicId"]>()

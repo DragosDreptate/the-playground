@@ -15,6 +15,8 @@ type GetUserPublicProfileDeps = {
 
 export type UserPublicProfile = {
   user: PublicUser;
+  /** Id interne — fourni à la couche app pour le contrôle isOwnProfile, ne pas exposer au client. */
+  internalUserId: string;
   publicCircles: PublicCircleMembership[];
   upcomingPublicMoments: PublicMomentRegistration[];
 };
@@ -25,20 +27,15 @@ export async function getUserPublicProfile(
 ): Promise<UserPublicProfile | null> {
   const { userRepository, circleRepository, momentRepository } = deps;
 
-  const user = await userRepository.getPublicUserByPublicId(input.publicId);
-  if (!user) return null;
+  const resolved = await userRepository.resolvePublicProfile(input.publicId);
+  if (!resolved) return null;
 
-  // userId n'est pas dans PublicUser — on doit le résoudre via le publicId
-  // Le repository getPublicUserByPublicId retourne les données publiques,
-  // mais les requêtes suivantes ont besoin de l'userId interne.
-  // On le récupère via une méthode dédiée sur le UserRepository.
-  const internalUserId = await userRepository.findUserIdByPublicId(input.publicId);
-  if (!internalUserId) return null;
+  const { user, internalUserId } = resolved;
 
   const [publicCircles, upcomingPublicMoments] = await Promise.all([
     circleRepository.getPublicCirclesForUser(internalUserId),
     momentRepository.getUpcomingPublicMomentsForUser(internalUserId),
   ]);
 
-  return { user, publicCircles, upcomingPublicMoments };
+  return { user, internalUserId, publicCircles, upcomingPublicMoments };
 }

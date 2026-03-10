@@ -22,10 +22,11 @@ function makeDeps(
   const publicUser = overrides.publicUser !== undefined ? overrides.publicUser : makePublicUser();
   const internalUserId = overrides.internalUserId !== undefined ? overrides.internalUserId : INTERNAL_USER_ID;
 
+  const resolved = publicUser && internalUserId ? { user: publicUser, internalUserId } : null;
+
   return {
     userRepository: createMockUserRepository({
-      getPublicUserByPublicId: vi.fn().mockResolvedValue(publicUser),
-      findUserIdByPublicId: vi.fn().mockResolvedValue(internalUserId),
+      resolvePublicProfile: vi.fn().mockResolvedValue(resolved),
     }),
     circleRepository: createMockCircleRepository({
       getPublicCirclesForUser: vi.fn().mockResolvedValue(overrides.circles ?? []),
@@ -104,9 +105,9 @@ describe("GetUserPublicProfile", () => {
     });
   });
 
-  describe("given a valid publicId but userId resolution fails", () => {
-    it("should return null when findUserIdByPublicId returns null", async () => {
-      const deps = makeDeps({ internalUserId: null });
+  describe("given a valid publicId but resolvePublicProfile returns null", () => {
+    it("should return null", async () => {
+      const deps = makeDeps({ publicUser: null, internalUserId: null });
       const result = await getUserPublicProfile({ publicId: PUBLIC_ID }, deps);
 
       expect(result).toBeNull();
