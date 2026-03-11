@@ -14,6 +14,7 @@ import type {
   BroadcastMomentEmailData,
   AdminEntityCreatedEmailData,
   CircleInvitationEmailData,
+  CircleInvitationsBatchEmailData,
   AdminNewUserEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
@@ -224,6 +225,22 @@ export function createResendEmailService(): EmailService {
         subject: data.strings.subject,
         react: CircleInvitationEmail({ ...data, baseUrl }),
       });
+    },
+
+    async sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void> {
+      const { recipients, ...emailData } = data;
+      const realRecipients = recipients.filter((email) => !isDemoEmail(email));
+      if (realRecipients.length === 0) return;
+
+      // Resend batch.send() accepts up to 100 emails per call
+      const batch = realRecipients.map((email) => ({
+        from,
+        to: email,
+        subject: emailData.strings.subject,
+        react: CircleInvitationEmail({ ...emailData, to: email, baseUrl }),
+      }));
+
+      await resend.batch.send(batch);
     },
 
     async sendAdminNewUser(data: AdminNewUserEmailData): Promise<void> {

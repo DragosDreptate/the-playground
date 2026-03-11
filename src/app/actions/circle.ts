@@ -436,24 +436,20 @@ export async function inviteToCircleByEmailAction(
 
     after(async () => {
       try {
-        await Promise.allSettled(
-          emails.map((email) =>
-            emailService.sendCircleInvitation({
-              to: email,
-              inviterName,
-              circleName: circle.name,
-              circleDescription: circle.description,
-              inviteUrl,
-              strings: {
-                subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
-                heading: `Vous avez été invité·e à rejoindre ${circle.name}`,
-                message: `${inviterName} vous invite à rejoindre sa Communauté sur The Playground.`,
-                ctaLabel: "Rejoindre la Communauté",
-                footer: `Vous recevez cet email car ${inviterName} vous a invité·e à rejoindre ${circle.name} sur The Playground.`,
-              },
-            })
-          )
-        );
+        await emailService.sendCircleInvitations({
+          recipients: emails,
+          inviterName,
+          circleName: circle.name,
+          circleDescription: circle.description,
+          inviteUrl,
+          strings: {
+            subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
+            heading: `Vous avez été invité·e à rejoindre ${circle.name}`,
+            message: `${inviterName} vous invite à rejoindre sa Communauté sur The Playground.`,
+            ctaLabel: "Rejoindre la Communauté",
+            footer: `Vous recevez cet email car ${inviterName} vous a invité·e à rejoindre ${circle.name} sur The Playground.`,
+          },
+        });
       } catch (e) {
         Sentry.captureException(e);
       }
