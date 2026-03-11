@@ -232,6 +232,10 @@ export type CircleInvitationsBatchEmailData = Omit<CircleInvitationEmailData, "t
   recipients: string[];
 };
 
+export type BroadcastMomentsBatchEmailData = Omit<BroadcastMomentEmailData, "to"> & {
+  recipients: string[];
+};
+
 export type AdminEntityCreatedEmailData = {
   to: string;
   entityType: "circle" | "moment";
@@ -279,7 +283,7 @@ export interface EmailService {
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
-  sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
+  sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
