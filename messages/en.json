@@ -246,7 +246,8 @@
       "isMember": "You are a member",
       "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community",
-      "shareableLink": "Shareable link"
+      "shareableLink": "Shareable link",
+      "signInToSeeMembers": "Sign in to see the members of this community"
     },
     "removeMember": {
       "action": "Remove from Community",
@@ -905,6 +906,21 @@
       "newMomentInCircle": "New event",
       "newMomentInCircleDesc": "When an event is created in a Community you follow",
       "saved": "Preferences saved"
+    },
+    "publicProfile": {
+      "memberSince": "Member since {date}",
+      "communities": "Communities ({count})",
+      "upcomingEvents": "Upcoming events ({count})",
+      "noUpcomingEvents": "No upcoming events",
+      "noCommunities": "No public community",
+      "viewMyProfile": "View my public profile",
+      "itsYourProfile": "This is your profile",
+      "editMyProfile": "Edit my profile",
+      "hostedEvents": "{count, plural, one {# event organized} other {# events organized}}",
+      "notFound": "Profile not found",
+      "signInToView": "Sign in to view this profile",
+      "roleHost": "Organizer",
+      "rolePlayer": "Member"
     }
   },
   "Help": {

@@ -13,6 +13,8 @@ import {
 import { Crown, MoreVertical } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
+import { Link } from "@/i18n/navigation";
+import { getDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
 const PAGE_SIZE = 10;
@@ -20,19 +22,9 @@ const PAGE_SIZE = 10;
 type CircleMembersListProps = {
   hosts: CircleMemberWithUser[];
   players: CircleMemberWithUser[];
-  variant?: "host" | "player";
+  variant?: "host" | "player" | "member-view";
   circleId?: string;
 };
-
-function getDisplayName(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  if (firstName && lastName) return `${firstName} ${lastName}`;
-  if (firstName) return firstName;
-  return email;
-}
 
 export function CircleMembersList({
   hosts,
@@ -119,7 +111,16 @@ function MemberRow({
           size="sm"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-snug">{displayName}</p>
+          {user.publicId ? (
+            <Link
+              href={`/u/${user.publicId}`}
+              className="text-sm font-medium leading-snug hover:underline underline-offset-2"
+            >
+              {displayName}
+            </Link>
+          ) : (
+            <p className="text-sm font-medium leading-snug">{displayName}</p>
+          )}
           {showEmail && (
             <p className="text-muted-foreground truncate text-xs">{user.email}</p>
           )}

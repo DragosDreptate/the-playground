@@ -243,7 +243,9 @@ export default async function CircleDetailPage({
           {/* Stats */}
           <div className="flex gap-6 px-1">
             <div>
-              <p className="text-2xl font-bold">{totalMembers}</p>
+              <a href="#members-section" className="text-2xl font-bold hover:underline underline-offset-2">
+                {totalMembers}
+              </a>
               <p className="text-muted-foreground text-xs">
                 {t("detail.members")}
               </p>
@@ -469,7 +471,7 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Membres */}
-          <div className="border-border bg-card rounded-2xl border p-6">
+          <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
             <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} circleId={circle.id} />
           </div>
         </div>

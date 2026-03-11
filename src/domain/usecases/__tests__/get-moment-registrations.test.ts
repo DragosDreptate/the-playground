@@ -29,6 +29,7 @@ function makeRegistrationWithUser(
       lastName: "Dupont",
       email: "alice@example.com",
       image: null,
+      publicId: null,
     },
     ...overrides,
   };

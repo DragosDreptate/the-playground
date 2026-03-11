@@ -245,6 +245,21 @@ export type AdminEntityCreatedEmailData = {
   };
 };
 
+export type AdminNewUserEmailData = {
+  to: string;
+  userName: string;
+  userEmail: string;
+  registeredAt: string; // Date pré-formatée
+  adminUsersUrl: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -263,4 +278,5 @@ export interface EmailService {
   sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
+  sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;
 }

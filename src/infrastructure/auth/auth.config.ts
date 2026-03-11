@@ -8,6 +8,7 @@ import { Resend } from "resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
 import { captureServerEvent } from "@/lib/posthog-server";
+import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -98,6 +99,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       } catch (err) {
         console.error("[AUTH] PostHog user_signed_up tracking failed (non-blocking):", err);
+      }
+
+      // Génération du publicId si absent — non bloquant
+      try {
+        if (user.id) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { publicId: true, firstName: true, lastName: true },
+          });
+          if (dbUser && !dbUser.publicId) {
+            await prismaUserRepository.ensurePublicId(
+              user.id,
+              dbUser.firstName,
+              dbUser.lastName
+            );
+          }
+        }
+      } catch (err) {
+        console.error("[AUTH] publicId generation failed (non-blocking):", err);
       }
 
       return true;

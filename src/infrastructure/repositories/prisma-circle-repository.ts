@@ -8,6 +8,7 @@ import type {
   CircleFollowerInfo,
 } from "@/domain/ports/repositories/circle-repository";
 import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
+import type { PublicCircleMembership } from "@/domain/models/user";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
@@ -285,7 +286,7 @@ export const prismaCircleRepository: CircleRepository = {
       where: { circleId, role },
       include: {
         user: {
-          select: { id: true, firstName: true, lastName: true, email: true, image: true },
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
         },
       },
       orderBy: { joinedAt: "asc" },
@@ -425,6 +426,35 @@ export const prismaCircleRepository: CircleRepository = {
       email: r.user.email,
       firstName: r.user.firstName,
       lastName: r.user.lastName,
+    }));
+  },
+
+  async getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]> {
+    const memberships = await prisma.circleMembership.findMany({
+      where: { userId, circle: { visibility: "PUBLIC" } },
+      include: {
+        circle: {
+          select: {
+            slug: true,
+            name: true,
+            coverImage: true,
+          },
+        },
+      },
+      orderBy: { joinedAt: "asc" },
+    });
+
+    // Tri : HOSTs d'abord, puis PLAYERs — alpha dans chaque groupe
+    memberships.sort((a, b) => {
+      if (a.role !== b.role) return a.role === "HOST" ? -1 : 1;
+      return a.circle.name.localeCompare(b.circle.name);
+    });
+
+    return memberships.map((m) => ({
+      circleSlug: m.circle.slug,
+      circleName: m.circle.name,
+      circleCover: m.circle.coverImage,
+      role: m.role as "HOST" | "PLAYER",
     }));
   },
 };

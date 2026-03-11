@@ -20,6 +20,7 @@ export function createMockMomentRepository(
     findPastByHostUserId: vi.fn<MomentRepository["findPastByHostUserId"]>().mockResolvedValue([]),
     findAllByHostUserId: vi.fn<MomentRepository["findAllByHostUserId"]>().mockResolvedValue({ upcoming: [], past: [] }),
     markBroadcastSent: vi.fn<MomentRepository["markBroadcastSent"]>().mockResolvedValue(undefined),
+    getUpcomingPublicMomentsForUser: vi.fn<MomentRepository["getUpcomingPublicMomentsForUser"]>().mockResolvedValue([]),
     ...overrides,
   };
 }

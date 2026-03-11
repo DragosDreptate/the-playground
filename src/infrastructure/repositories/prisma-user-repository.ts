@@ -4,7 +4,8 @@ import type {
   UpdateProfileInput,
   UpdateNotificationPreferencesInput,
 } from "@/domain/ports/repositories/user-repository";
-import type { User, NotificationPreferences, DashboardMode } from "@/domain/models/user";
+import type { User, NotificationPreferences, DashboardMode, PublicUser } from "@/domain/models/user";
+import { generatePublicId } from "@/lib/public-id";
 import type { User as PrismaUser } from "@prisma/client";
 
 function toDomainUser(record: PrismaUser): User {
@@ -23,6 +24,7 @@ function toDomainUser(record: PrismaUser): User {
     notifyNewFollower: record.notifyNewFollower,
     notifyNewMomentInCircle: record.notifyNewMomentInCircle,
     dashboardMode: record.dashboardMode as DashboardMode | null,
+    publicId: record.publicId ?? null,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -165,5 +167,79 @@ export const prismaUserRepository: UserRepository = {
       select: { email: true },
     });
     return records.map((r) => r.email).filter(Boolean) as string[];
+  },
+
+  async resolvePublicProfile(
+    publicId: string
+  ): Promise<{ user: PublicUser; internalUserId: string } | null> {
+    const record = await prisma.user.findUnique({
+      where: { publicId },
+      select: {
+        id: true,
+        publicId: true,
+        firstName: true,
+        lastName: true,
+        image: true,
+        createdAt: true,
+        memberships: {
+          where: { role: "HOST" },
+          select: {
+            circle: {
+              select: { _count: { select: { moments: true } } },
+            },
+          },
+        },
+      },
+    });
+
+    if (!record || !record.publicId) return null;
+
+    const hostedMomentsCount = record.memberships.reduce(
+      (sum, m) => sum + m.circle._count.moments,
+      0
+    );
+
+    return {
+      user: {
+        publicId: record.publicId,
+        firstName: record.firstName ?? "",
+        lastName: record.lastName ?? "",
+        image: record.image,
+        memberSince: record.createdAt,
+        hostedMomentsCount,
+      },
+      internalUserId: record.id,
+    };
+  },
+
+  async ensurePublicId(
+    userId: string,
+    firstName: string | null,
+    lastName: string | null
+  ): Promise<string> {
+    const existing = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { publicId: true },
+    });
+
+    if (existing?.publicId) return existing.publicId;
+
+    // Générer avec retry jusqu'à 10 fois en cas de collision
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const candidate = generatePublicId(firstName, lastName);
+      const conflict = await prisma.user.findUnique({
+        where: { publicId: candidate },
+        select: { id: true },
+      });
+      if (!conflict) {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { publicId: candidate },
+        });
+        return candidate;
+      }
+    }
+
+    throw new Error(`[ensurePublicId] Impossible de générer un publicId unique pour l'utilisateur ${userId}`);
   },
 };

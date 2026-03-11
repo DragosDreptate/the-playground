@@ -27,11 +27,11 @@ const prisma = new PrismaClient({
 // ── Utilisateurs test ────────────────────────────────────────────────────────
 
 const USERS = [
-  { key: "host",    email: "host@test.playground",    firstName: "Alice",   lastName: "Martin",   dashboardMode: "ORGANIZER" as const },
-  { key: "player1", email: "player1@test.playground", firstName: "Thomas",  lastName: "Dubois",   dashboardMode: "PARTICIPANT" as const },
-  { key: "player2", email: "player2@test.playground", firstName: "Camille", lastName: "Bernard",  dashboardMode: "PARTICIPANT" as const },
-  { key: "player3", email: "player3@test.playground", firstName: "Lucas",   lastName: "Petit",    dashboardMode: "PARTICIPANT" as const },
-  { key: "player4", email: "player4@test.playground", firstName: "Manon",   lastName: "Rousseau", dashboardMode: "PARTICIPANT" as const },
+  { key: "host",    email: "host@test.playground",    firstName: "Alice",   lastName: "Martin",   dashboardMode: "ORGANIZER" as const,   publicId: "alice-martin-1001" },
+  { key: "player1", email: "player1@test.playground", firstName: "Thomas",  lastName: "Dubois",   dashboardMode: "PARTICIPANT" as const, publicId: "thomas-dubois-1002" },
+  { key: "player2", email: "player2@test.playground", firstName: "Camille", lastName: "Bernard",  dashboardMode: "PARTICIPANT" as const, publicId: "camille-bernard-1003" },
+  { key: "player3", email: "player3@test.playground", firstName: "Lucas",   lastName: "Petit",    dashboardMode: "PARTICIPANT" as const, publicId: "lucas-petit-1004" },
+  { key: "player4", email: "player4@test.playground", firstName: "Manon",   lastName: "Rousseau", dashboardMode: "PARTICIPANT" as const, publicId: "manon-rousseau-1005" },
 ];
 
 // ── Données réalistes ────────────────────────────────────────────────────────
@@ -235,7 +235,7 @@ async function main() {
   console.log("👤 Utilisateurs...");
   const userMap: Record<string, string> = {};
 
-  for (const { key, email, firstName, lastName, dashboardMode } of USERS) {
+  for (const { key, email, firstName, lastName, dashboardMode, publicId } of USERS) {
     const user = await prisma.user.upsert({
       where: { email },
       create: {
@@ -243,6 +243,7 @@ async function main() {
         name: `${firstName} ${lastName}`,
         firstName,
         lastName,
+        publicId,
         onboardingCompleted: true,
         emailVerified: new Date(),
         dashboardMode,
@@ -251,6 +252,7 @@ async function main() {
         name: `${firstName} ${lastName}`,
         firstName,
         lastName,
+        publicId,
         onboardingCompleted: true,
         emailVerified: new Date(),
         dashboardMode,

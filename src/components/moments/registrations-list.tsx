@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Crown, Download } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
+import { Link } from "@/i18n/navigation";
+import { getDisplayName } from "@/lib/display-name";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
 const PAGE_SIZE = 10;
@@ -18,13 +20,8 @@ type RegistrationsListProps = {
   variant?: "host" | "public";
   hostUserIds?: Set<string>;
   momentSlug?: string;
+  isConnected?: boolean;
 };
-
-function getDisplayName(firstName: string | null, lastName: string | null, email: string): string {
-  if (firstName && lastName) return `${firstName} ${lastName}`;
-  if (firstName) return firstName;
-  return email;
-}
 
 export function RegistrationsList({
   registrations,
@@ -34,6 +31,7 @@ export function RegistrationsList({
   variant = "host",
   hostUserIds = new Set(),
   momentSlug,
+  isConnected = false,
 }: RegistrationsListProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -126,7 +124,16 @@ export function RegistrationsList({
                     size="sm"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium leading-snug">{displayName}</p>
+                    {isConnected && reg.user.publicId ? (
+                      <Link
+                        href={`/u/${reg.user.publicId}`}
+                        className="text-sm font-medium leading-snug hover:underline underline-offset-2"
+                      >
+                        {displayName}
+                      </Link>
+                    ) : (
+                      <p className="text-sm font-medium leading-snug">{displayName}</p>
+                    )}
                     {variant === "host" && (
                       <p className="text-muted-foreground truncate text-xs">
                         {reg.user.email}

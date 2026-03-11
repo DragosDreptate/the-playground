@@ -8,6 +8,7 @@ import type {
   UpcomingCircleMoment,
 } from "@/domain/ports/repositories/moment-repository";
 import type { Moment, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
+import type { PublicMomentRegistration } from "@/domain/models/user";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -357,6 +358,39 @@ export const prismaMomentRepository: MomentRepository = {
         name: m.circle.name,
         coverImage: m.circle.coverImage ?? null,
       },
+    }));
+  },
+
+  async getUpcomingPublicMomentsForUser(userId: string): Promise<PublicMomentRegistration[]> {
+    const now = new Date();
+    const registrations = await prisma.registration.findMany({
+      where: {
+        userId,
+        status: "REGISTERED",
+        moment: {
+          status: "PUBLISHED",
+          startsAt: { gt: now },
+          circle: { visibility: "PUBLIC" },
+        },
+      },
+      include: {
+        moment: {
+          select: {
+            slug: true,
+            title: true,
+            startsAt: true,
+            circle: { select: { name: true } },
+          },
+        },
+      },
+      orderBy: { moment: { startsAt: "asc" } },
+    });
+
+    return registrations.map((r) => ({
+      momentSlug: r.moment.slug,
+      momentTitle: r.moment.title,
+      momentDate: r.moment.startsAt,
+      circleName: r.moment.circle.name,
     }));
   },
 };

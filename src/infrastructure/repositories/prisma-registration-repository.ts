@@ -35,6 +35,7 @@ type PrismaRegistrationWithUser = PrismaRegistration & {
     lastName: string | null;
     email: string;
     image: string | null;
+    publicId: string | null;
   };
 };
 
@@ -49,6 +50,7 @@ function toDomainRegistrationWithUser(
       lastName: record.user.lastName,
       email: record.user.email,
       image: record.user.image,
+      publicId: record.user.publicId,
     },
   };
 }
@@ -107,6 +109,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             lastName: true,
             email: true,
             image: true,
+            publicId: true,
           },
         },
       },
