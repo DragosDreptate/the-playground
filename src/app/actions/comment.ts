@@ -3,6 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
+import { isAdminUser } from "@/lib/admin-host-mode";
 import {
   prismaCommentRepository,
   prismaMomentRepository,
@@ -41,8 +42,8 @@ export async function addCommentAction(
     const locale = await getLocale();
     const t = await getTranslations("Email");
 
-    // Fire-and-forget: notify all registrants without blocking the response
-    sendCommentNotifications(
+    // Fire-and-forget: notify all registrants without blocking the response (sauf si admin)
+    if (!isAdminUser(session)) sendCommentNotifications(
       momentId,
       session.user.id,
       content,

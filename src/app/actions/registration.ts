@@ -8,6 +8,7 @@ import { enUS } from "date-fns/locale/en-US";
 const PLATFORM_TIMEZONE = "Europe/Paris";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
+import { isAdminUser } from "@/lib/admin-host-mode";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -66,8 +67,8 @@ export async function joinMomentAction(
     const locale = await getLocale();
     const t = await getTranslations("Email");
 
-    // Fire-and-forget: send emails without blocking the response
-    sendRegistrationEmails(
+    // Fire-and-forget: send emails without blocking the response (sauf si admin)
+    if (!isAdminUser(session)) sendRegistrationEmails(
       momentId,
       session.user.id,
       result.registration,

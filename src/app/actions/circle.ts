@@ -30,7 +30,7 @@ import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
 } from "@/lib/circle-category-helpers";
-import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 
 export async function createCircleAction(
   formData: FormData
@@ -217,8 +217,9 @@ export async function followCircleAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Notifier les HOSTs après la réponse (after garantit l'exécution en serverless)
+    // Notifier les HOSTs après la réponse (sauf si admin)
     const followerName = session.user.name ?? session.user.email;
+    if (isAdminUser(session)) return { success: true, data: { following: true } };
     after(async () => {
       try {
         const circle = await prismaCircleRepository.findById(circleId);
@@ -435,6 +436,7 @@ export async function inviteToCircleByEmailAction(
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
     // Résoudre la locale dans le contexte de la request (avant after())
+    if (isAdminUser(session)) return { success: true, data: undefined };
     const t = await getTranslations("Email.circleInvitation");
 
     after(async () => {

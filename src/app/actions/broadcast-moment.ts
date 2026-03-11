@@ -16,7 +16,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
-import { isAdminInHostMode } from "@/lib/admin-host-mode";
+import { isAdminInHostMode, isAdminUser } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
@@ -114,7 +114,11 @@ export async function broadcastMomentAction(
     return prefs?.notifyNewMomentInCircle !== false;
   });
 
-  // Fire-and-forget — ne bloque pas le retour de l'action
+  // Fire-and-forget — ne bloque pas le retour de l'action (sauf si admin)
+  if (isAdminUser(session)) {
+    revalidatePath(`/dashboard/circles/${circle?.slug}/moments/${moment.slug}`);
+    return { success: true, data: { recipientCount: 0 } };
+  }
   emailService.sendBroadcastMoments({
     recipients: recipientsToEmail.map((r) => r.email),
     strings: {

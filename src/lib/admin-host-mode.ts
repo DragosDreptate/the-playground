@@ -23,6 +23,12 @@ export async function setAdminHostMode(enabled: boolean): Promise<void> {
   }
 }
 
+export function isAdminUser(
+  session: { user: { role?: string | null } } | null
+): boolean {
+  return session?.user?.role === "ADMIN";
+}
+
 export async function isAdminInHostMode(
   session: { user: { role?: string | null } } | null
 ): Promise<boolean> {
