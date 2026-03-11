@@ -21,7 +21,7 @@ import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName } from "@/lib/display-name";
-import { ExpandableDescription } from "@/components/circles/expandable-description";
+import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -323,11 +323,7 @@ export default async function CircleDetailPage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <ExpandableDescription
-                description={circle.description}
-                seeMoreLabel={tCommon("showMore")}
-                seeLessLabel={tCommon("showLess")}
-              />
+              <CollapsibleDescription text={circle.description} maxLines={10} />
             </div>
           )}
 
