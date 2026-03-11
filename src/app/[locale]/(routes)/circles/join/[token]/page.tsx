@@ -12,6 +12,9 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { JoinCircleByInviteForm } from "@/components/circles/join-circle-by-invite-form";
+import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { HostLink } from "@/components/circles/host-link";
+import { getCircleUserInitials } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
 import {
@@ -24,24 +27,6 @@ import {
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
-
-function getInitials(user: CircleMemberWithUser["user"]): string {
-  if (user.firstName && user.lastName)
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  if (user.firstName) return user.firstName[0].toUpperCase();
-  return user.email[0].toUpperCase();
-}
-
-function formatHostNames(hosts: CircleMemberWithUser[]): string {
-  return hosts
-    .map((h) => {
-      if (h.user.firstName && h.user.lastName)
-        return `${h.user.firstName} ${h.user.lastName}`;
-      if (h.user.firstName) return h.user.firstName;
-      return h.user.email;
-    })
-    .join(", ");
-}
 
 // ── Page ──────────────────────────────────────────────────────
 
@@ -80,7 +65,6 @@ export default async function JoinCircleByInvitePage({
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
 
   const gradient = getMomentGradient(circle.name);
-  const hostNames = formatHostNames(hosts);
 
   return (
     <div className="space-y-8">
@@ -154,7 +138,7 @@ export default async function JoinCircleByInvitePage({
                     style={{ background: getMomentGradient(host.user.email) }}
                     title={host.user.firstName ?? host.user.email}
                   >
-                    {getInitials(host.user)}
+                    {getCircleUserInitials(host.user)}
                   </div>
                 ))}
                 {hosts.length > 5 && (
@@ -163,7 +147,14 @@ export default async function JoinCircleByInvitePage({
                   </span>
                 )}
               </div>
-              <p className="text-sm font-medium leading-snug">{hostNames}</p>
+              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
+                {hosts.map((h, i) => (
+                  <span key={h.user.id}>
+                    <HostLink user={h.user} />
+                    {i < hosts.length - 1 && ", "}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
 
@@ -201,9 +192,14 @@ export default async function JoinCircleByInvitePage({
 
           {/* "Organisé par" */}
           {hosts.length > 0 && (
-            <p className="text-muted-foreground text-sm">
-              {t("detail.hostedBy")}{" "}
-              <span className="text-foreground font-medium">{hostNames}</span>
+            <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+              {t("detail.hostedBy")}
+              {hosts.map((h, i) => (
+                <span key={h.user.id} className="flex items-center gap-1">
+                  <HostLink user={h.user} className="text-foreground font-medium" />
+                  {i < hosts.length - 1 && <span>,</span>}
+                </span>
+              ))}
             </p>
           )}
 
@@ -218,7 +214,7 @@ export default async function JoinCircleByInvitePage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <p className="text-sm leading-relaxed">{circle.description}</p>
+              <CollapsibleDescription text={circle.description} />
             </div>
           )}
 

@@ -20,8 +20,9 @@ import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName } from "@/lib/display-name";
+import { getCircleUserInitials } from "@/lib/display-name";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -35,30 +36,6 @@ import {
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
-
-function getInitials(user: CircleMemberWithUser["user"]): string {
-  if (user.firstName && user.lastName)
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  if (user.firstName) return user.firstName[0].toUpperCase();
-  return user.email[0].toUpperCase();
-}
-
-type HostUser = CircleMemberWithUser["user"];
-
-function HostLink({ user, className }: { user: HostUser; className?: string }) {
-  const name = getDisplayName(user.firstName, user.lastName, user.email);
-  if (user.publicId) {
-    return (
-      <Link
-        href={`/u/${user.publicId}`}
-        className={`hover:underline underline-offset-2${className ? ` ${className}` : ""}`}
-      >
-        {name}
-      </Link>
-    );
-  }
-  return className ? <span className={className}>{name}</span> : <>{name}</>;
-}
 
 
 // ── Page ──────────────────────────────────────────────────────
@@ -235,7 +212,7 @@ export default async function CircleDetailPage({
                     style={{ background: getMomentGradient(host.user.email) }}
                     title={host.user.firstName ?? host.user.email}
                   >
-                    {getInitials(host.user)}
+                    {getCircleUserInitials(host.user)}
                   </div>
                 ))}
                 {hosts.length > 5 && (
