@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
@@ -433,6 +434,9 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
+    // Résoudre la locale dans le contexte de la request (avant after())
+    const t = await getTranslations("Email.circleInvitation");
+
     after(async () => {
       try {
         const [memberCount, momentCount] = await Promise.all([
@@ -450,8 +454,8 @@ export async function inviteToCircleByEmailAction(
           momentCount,
           inviteUrl,
           strings: {
-            subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
-            ctaLabel: "Rejoindre la Communauté",
+            subject: t("subject", { inviterName, circleName: circle.name }),
+            ctaLabel: t("ctaLabel"),
           },
         });
       } catch (e) {

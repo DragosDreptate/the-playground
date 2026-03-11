@@ -674,6 +674,10 @@
       "unsubscribeText": "Vous recevez cet email car vous suivez {circleName}.",
       "unsubscribeLabel": "Gérer mes notifications"
     },
+    "circleInvitation": {
+      "subject": "{inviterName} vous invite à rejoindre {circleName}",
+      "ctaLabel": "Rejoindre la Communauté"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",
