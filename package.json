@@ -1,6 +1,6 @@
 {
   "name": "the-playground",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "",
   "scripts": {
     "dev": "next dev",
@@ -12,6 +12,7 @@
     "test:integration": "vitest run --project integration",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
+    "version:sync": "tsx scripts/sync-version.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
