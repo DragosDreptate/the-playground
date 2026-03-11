@@ -228,14 +228,16 @@ export function createResendEmailService(): EmailService {
     },
 
     async sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void> {
-      const realRecipients = data.recipients.filter((email) => !isDemoEmail(email));
+      const { recipients, ...emailData } = data;
+      const realRecipients = recipients.filter((email) => !isDemoEmail(email));
       if (realRecipients.length === 0) return;
 
+      // Resend batch.send() accepts up to 100 emails per call
       const batch = realRecipients.map((email) => ({
         from,
         to: email,
-        subject: data.strings.subject,
-        react: CircleInvitationEmail({ ...data, to: email, baseUrl }),
+        subject: emailData.strings.subject,
+        react: CircleInvitationEmail({ ...emailData, to: email, baseUrl }),
       }));
 
       await resend.batch.send(batch);
