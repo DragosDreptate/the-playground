@@ -21,6 +21,24 @@ import { Prisma } from "@prisma/client";
 const DEFAULT_LIMIT = 20;
 
 // ─────────────────────────────────────────────
+// Exclusion users démo/test
+// ─────────────────────────────────────────────
+
+const DEMO_EMAIL_SUFFIXES = ["@demo.playground", "@test.playground"] as const;
+
+function realUserWhere(): Prisma.UserWhereInput {
+  return {
+    NOT: DEMO_EMAIL_SUFFIXES.map((suffix) => ({ email: { endsWith: suffix } })),
+  };
+}
+
+function realCircleWhere(): Prisma.CircleWhereInput {
+  return {
+    memberships: { some: { role: "HOST", user: realUserWhere() } },
+  };
+}
+
+// ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
 
@@ -31,7 +49,7 @@ function sevenDaysAgo(): Date {
 }
 
 function userWhere(filters: AdminUserFilters): Prisma.UserWhereInput {
-  const where: Prisma.UserWhereInput = {};
+  const where: Prisma.UserWhereInput = realUserWhere();
   if (filters.role) where.role = filters.role;
   if (filters.search) {
     where.OR = [
@@ -44,7 +62,7 @@ function userWhere(filters: AdminUserFilters): Prisma.UserWhereInput {
 }
 
 function circleWhere(filters: AdminCircleFilters): Prisma.CircleWhereInput {
-  const where: Prisma.CircleWhereInput = {};
+  const where: Prisma.CircleWhereInput = realCircleWhere();
   if (filters.visibility) where.visibility = filters.visibility;
   if (filters.category) where.category = filters.category;
   if (filters.search) {
@@ -57,7 +75,7 @@ function circleWhere(filters: AdminCircleFilters): Prisma.CircleWhereInput {
 }
 
 function momentWhere(filters: AdminMomentFilters): Prisma.MomentWhereInput {
-  const where: Prisma.MomentWhereInput = {};
+  const where: Prisma.MomentWhereInput = { circle: realCircleWhere() };
   if (filters.status) where.status = filters.status;
   if (filters.search) {
     where.OR = [
@@ -108,6 +126,8 @@ export const prismaAdminRepository: AdminRepository = {
 
   async getStats(): Promise<AdminStats> {
     const since = sevenDaysAgo();
+    const realUser = realUserWhere();
+    const realCircle = realCircleWhere();
     const [
       totalUsers,
       totalCircles,
@@ -119,15 +139,15 @@ export const prismaAdminRepository: AdminRepository = {
       recentMoments,
       recentComments,
     ] = await Promise.all([
-      prisma.user.count(),
-      prisma.circle.count(),
-      prisma.moment.count(),
-      prisma.registration.count({ where: { status: { not: "CANCELLED" } } }),
-      prisma.comment.count(),
-      prisma.user.count({ where: { createdAt: { gte: since } } }),
-      prisma.circle.count({ where: { createdAt: { gte: since } } }),
-      prisma.moment.count({ where: { createdAt: { gte: since } } }),
-      prisma.comment.count({ where: { createdAt: { gte: since } } }),
+      prisma.user.count({ where: realUser }),
+      prisma.circle.count({ where: realCircle }),
+      prisma.moment.count({ where: { circle: realCircle } }),
+      prisma.registration.count({ where: { status: { not: "CANCELLED" }, user: realUser } }),
+      prisma.comment.count({ where: { user: realUser } }),
+      prisma.user.count({ where: { ...realUser, createdAt: { gte: since } } }),
+      prisma.circle.count({ where: { ...realCircle, createdAt: { gte: since } } }),
+      prisma.moment.count({ where: { circle: realCircle, createdAt: { gte: since } } }),
+      prisma.comment.count({ where: { user: realUser, createdAt: { gte: since } } }),
     ]);
     return {
       totalUsers,
@@ -149,21 +169,32 @@ export const prismaAdminRepository: AdminRepository = {
         SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
         FROM users
         WHERE "createdAt" >= ${since}
+          AND email NOT LIKE '%@demo.playground'
+          AND email NOT LIKE '%@test.playground'
         GROUP BY DATE_TRUNC('day', "createdAt")
         ORDER BY date ASC
       `,
       prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-        SELECT DATE_TRUNC('day', "registeredAt")::date AS date, COUNT(*)::bigint AS count
-        FROM registrations
-        WHERE status != 'CANCELLED' AND "registeredAt" >= ${since}
-        GROUP BY DATE_TRUNC('day', "registeredAt")
+        SELECT DATE_TRUNC('day', r."registeredAt")::date AS date, COUNT(*)::bigint AS count
+        FROM registrations r
+        JOIN users u ON u.id = r."userId"
+        WHERE r.status != 'CANCELLED'
+          AND r."registeredAt" >= ${since}
+          AND u.email NOT LIKE '%@demo.playground'
+          AND u.email NOT LIKE '%@test.playground'
+        GROUP BY DATE_TRUNC('day', r."registeredAt")
         ORDER BY date ASC
       `,
       prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-        SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
-        FROM moments
-        WHERE "createdAt" >= ${since}
-        GROUP BY DATE_TRUNC('day', "createdAt")
+        SELECT DATE_TRUNC('day', m."createdAt")::date AS date, COUNT(*)::bigint AS count
+        FROM moments m
+        WHERE m."createdAt" >= ${since}
+          AND m."createdById" IN (
+            SELECT id FROM users
+            WHERE email NOT LIKE '%@demo.playground'
+              AND email NOT LIKE '%@test.playground'
+          )
+        GROUP BY DATE_TRUNC('day', m."createdAt")
         ORDER BY date ASC
       `,
     ]);
@@ -176,19 +207,25 @@ export const prismaAdminRepository: AdminRepository = {
 
   async getActivationStats(): Promise<AdminActivationStats> {
     const [totalUsers, activatedRows, retainedRows] = await Promise.all([
-      prisma.user.count(),
+      prisma.user.count({ where: realUserWhere() }),
       prisma.$queryRaw<Array<{ count: bigint }>>`
-        SELECT COUNT(DISTINCT "userId")::bigint AS count
-        FROM registrations
-        WHERE status != 'CANCELLED'
+        SELECT COUNT(DISTINCT r."userId")::bigint AS count
+        FROM registrations r
+        JOIN users u ON u.id = r."userId"
+        WHERE r.status != 'CANCELLED'
+          AND u.email NOT LIKE '%@demo.playground'
+          AND u.email NOT LIKE '%@test.playground'
       `,
       prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*)::bigint AS count FROM (
-          SELECT "userId"
-          FROM registrations
-          WHERE status != 'CANCELLED'
-          GROUP BY "userId"
-          HAVING COUNT(DISTINCT "momentId") >= 2
+          SELECT r."userId"
+          FROM registrations r
+          JOIN users u ON u.id = r."userId"
+          WHERE r.status != 'CANCELLED'
+            AND u.email NOT LIKE '%@demo.playground'
+            AND u.email NOT LIKE '%@test.playground'
+          GROUP BY r."userId"
+          HAVING COUNT(DISTINCT r."momentId") >= 2
         ) sub
       `,
     ]);
