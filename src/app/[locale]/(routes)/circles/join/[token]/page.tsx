@@ -12,6 +12,7 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { JoinCircleByInviteForm } from "@/components/circles/join-circle-by-invite-form";
+import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
 import {
@@ -218,7 +219,7 @@ export default async function JoinCircleByInvitePage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <p className="text-sm leading-relaxed">{circle.description}</p>
+              <CollapsibleDescription text={circle.description} />
             </div>
           )}
 
