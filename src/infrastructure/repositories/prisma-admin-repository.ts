@@ -153,10 +153,10 @@ export const prismaAdminRepository: AdminRepository = {
         ORDER BY date ASC
       `,
       prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-        SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
+        SELECT DATE_TRUNC('day', "registeredAt")::date AS date, COUNT(*)::bigint AS count
         FROM registrations
-        WHERE status != 'CANCELLED' AND "createdAt" >= ${since}
-        GROUP BY DATE_TRUNC('day', "createdAt")
+        WHERE status != 'CANCELLED' AND "registeredAt" >= ${since}
+        GROUP BY DATE_TRUNC('day', "registeredAt")
         ORDER BY date ASC
       `,
       prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
