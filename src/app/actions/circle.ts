@@ -443,6 +443,7 @@ export async function inviteToCircleByEmailAction(
           circleName: circle.name,
           circleDescription: circle.description,
           circleSlug: circle.slug,
+          coverImageUrl: circle.coverImage,
           memberCount,
           inviteUrl,
           strings: {

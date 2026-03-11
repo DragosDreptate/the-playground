@@ -53,6 +53,7 @@ export function CircleInvitationEmail({
   circleName,
   circleDescription,
   circleSlug,
+  coverImageUrl,
   memberCount,
   inviteUrl,
   strings,
@@ -98,14 +99,28 @@ export function CircleInvitationEmail({
                 </td>
               </tr>
 
-              {/* ── 2. Hero gradient band ── */}
-              <tr>
-                <td style={{ height: "96px", backgroundImage: grad, display: "block" }} />
-              </tr>
+              {/* ── 2. Hero : bandeau dégradé + cover (si disponible) ── */}
+              {coverImageUrl ? (
+                <tr>
+                  <td style={{ backgroundImage: grad, height: "80px", textAlign: "center", verticalAlign: "bottom", padding: "0" }}>
+                    <Img
+                      src={coverImageUrl}
+                      width="88"
+                      height="88"
+                      alt={circleName}
+                      style={{ borderRadius: "14px", border: "3px solid #ffffff", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", display: "inline-block", marginBottom: "-44px" }}
+                    />
+                  </td>
+                </tr>
+              ) : (
+                <tr>
+                  <td style={{ height: "96px", backgroundImage: grad }} />
+                </tr>
+              )}
 
               {/* ── 3. Content ── */}
               <tr>
-                <td style={contentTd}>
+                <td style={coverImageUrl ? contentTdWithCover : contentTd}>
 
                   {/* Inviter */}
                   <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "14px" }}>
@@ -227,5 +242,6 @@ const card: React.CSSProperties = { backgroundColor: "#ffffff", borderRadius: "1
 const topbarTd: React.CSSProperties = { padding: "16px 28px", borderBottom: "1px solid #f0f0f4" };
 const badgeStyle: React.CSSProperties = { fontSize: "11px", fontWeight: 600, color: "#ec4899", backgroundColor: "#fde8f0", padding: "3px 10px", borderRadius: "20px" };
 const contentTd: React.CSSProperties = { padding: "24px 28px 28px" };
+const contentTdWithCover: React.CSSProperties = { padding: "60px 28px 28px" };
 const circleNameStyle: React.CSSProperties = { fontSize: "22px", fontWeight: 800, color: "#0f0f1a", letterSpacing: "-0.03em", lineHeight: "1.2", margin: "0 0 18px 0", textAlign: "center" };
 const ctaStyle: React.CSSProperties = { backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", color: "#ffffff", fontSize: "15px", fontWeight: 700, borderRadius: "10px", padding: "13px 32px", textDecoration: "none", display: "block", width: "100%", textAlign: "center", boxSizing: "border-box" };
