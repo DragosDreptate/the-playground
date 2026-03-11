@@ -2,6 +2,7 @@
 
 import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
@@ -29,7 +30,7 @@ import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
 } from "@/lib/circle-category-helpers";
-import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 
 export async function createCircleAction(
   formData: FormData
@@ -216,8 +217,9 @@ export async function followCircleAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Notifier les HOSTs après la réponse (after garantit l'exécution en serverless)
+    // Notifier les HOSTs après la réponse (sauf si admin)
     const followerName = session.user.name ?? session.user.email;
+    if (isAdminUser(session)) return { success: true, data: { following: true } };
     after(async () => {
       try {
         const circle = await prismaCircleRepository.findById(circleId);
@@ -433,21 +435,29 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
+    // Résoudre la locale dans le contexte de la request (avant after())
+    if (isAdminUser(session)) return { success: true, data: undefined };
+    const t = await getTranslations("Email.circleInvitation");
 
     after(async () => {
       try {
+        const [memberCount, momentCount] = await Promise.all([
+          circleRepo.countMembers(circleId),
+          circleRepo.countMoments(circleId),
+        ]);
         await emailService.sendCircleInvitations({
           recipients: emails,
           inviterName,
           circleName: circle.name,
           circleDescription: circle.description,
+          circleSlug: circle.slug,
+          coverImageUrl: circle.coverImage,
+          memberCount,
+          momentCount,
           inviteUrl,
           strings: {
-            subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
-            heading: `Vous avez été invité·e à rejoindre ${circle.name}`,
-            message: `${inviterName} vous invite à rejoindre sa Communauté sur The Playground.`,
-            ctaLabel: "Rejoindre la Communauté",
-            footer: `Vous recevez cet email car ${inviterName} vous a invité·e à rejoindre ${circle.name} sur The Playground.`,
+            subject: t("subject", { inviterName, circleName: circle.name }),
+            ctaLabel: t("ctaLabel"),
           },
         });
       } catch (e) {

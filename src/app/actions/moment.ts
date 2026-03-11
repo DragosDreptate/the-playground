@@ -28,7 +28,7 @@ import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
-import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
@@ -120,7 +120,8 @@ export async function createMomentAction(
     prismaCircleRepository.findById(circleId).then(async (circle) => {
       if (!circle) return;
 
-      // Notifier les followers et membres du Circle
+      // Notifier les followers et membres du Circle (sauf si admin)
+      if (isAdminUser(session)) return;
       notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
         (err) => {
           console.error("[notifyNewMoment] Erreur:", err);
@@ -298,7 +299,7 @@ export async function updateMomentAction(
         (locationName !== null && locationName !== existingMoment.locationName) ||
         (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
 
-      if (dateChanged || locationChanged) {
+      if ((dateChanged || locationChanged) && !isAdminUser(session)) {
         const locale = await getLocale();
         const t = await getTranslations("Email");
         sendMomentUpdateEmails(
@@ -470,8 +471,8 @@ export async function deleteMomentAction(
       }
     );
 
-    // Fire-and-forget : notifier les participants de l'annulation
-    if (momentToDelete && registrationsToNotify.length > 0) {
+    // Fire-and-forget : notifier les participants de l'annulation (sauf si admin)
+    if (momentToDelete && registrationsToNotify.length > 0 && !isAdminUser(session)) {
       sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
         (err) => Sentry.captureException(err)
       );

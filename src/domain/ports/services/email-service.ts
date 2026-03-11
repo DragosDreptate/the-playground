@@ -218,13 +218,14 @@ export type CircleInvitationEmailData = {
   inviterName: string;
   circleName: string;
   circleDescription: string;
+  circleSlug?: string;
+  coverImageUrl?: string | null;
+  memberCount?: number;
+  momentCount?: number;
   inviteUrl: string;
   strings: {
     subject: string;
-    heading: string;
-    message: string;
     ctaLabel: string;
-    footer: string;
   };
 };
 

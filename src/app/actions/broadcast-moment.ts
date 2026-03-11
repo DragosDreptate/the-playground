@@ -3,6 +3,8 @@
 import * as Sentry from "@sentry/nextjs";
 import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
+import { enUS } from "date-fns/locale/en-US";
+import { getLocale, getTranslations } from "next-intl/server";
 
 const PLATFORM_TIMEZONE = "Europe/Paris";
 import { revalidatePath } from "next/cache";
@@ -14,12 +16,16 @@ import {
 } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
-import { isAdminInHostMode } from "@/lib/admin-host-mode";
+import { isAdminInHostMode, isAdminUser } from "@/lib/admin-host-mode";
 
 const emailService = createResendEmailService();
 
-function formatMomentDate(startsAt: Date): string {
-  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+function formatMomentDate(startsAt: Date, locale: string): string {
+  const dateFnsLocale = locale === "fr" ? fr : enUS;
+  const pattern = locale === "fr"
+    ? "EEEE d MMMM yyyy 'à' HH:mm"
+    : "EEEE, MMMM d yyyy 'at' h:mm a";
+  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, pattern, { locale: dateFnsLocale });
 }
 
 export async function broadcastMomentAction(
@@ -88,33 +94,42 @@ export async function broadcastMomentAction(
   const allUserIds = allRecipients.map((r) => r.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
 
-  const momentDate = formatMomentDate(moment.startsAt);
+  // Résoudre la locale dans le contexte de la request
+  const locale = await getLocale();
+  const t = await getTranslations("Email.broadcastMoment");
+
+  const momentDate = formatMomentDate(moment.startsAt, locale);
   const momentLocation =
     moment.locationType === "ONLINE"
-      ? "En ligne"
+      ? (locale === "fr" ? "En ligne" : "Online")
       : moment.locationType === "HYBRID"
-        ? "Hybride"
+        ? (locale === "fr" ? "Hybride" : "Hybrid")
         : [moment.locationName, moment.locationAddress].filter(Boolean).join(", ") || null;
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const hostName = session.user.name ?? session.user.email ?? "";
 
   const recipientsToEmail = allRecipients.filter((r) => {
     const prefs = prefsMap.get(r.userId);
     return prefs?.notifyNewMomentInCircle !== false;
   });
 
-  // Fire-and-forget — ne bloque pas le retour de l'action
+  // Fire-and-forget — ne bloque pas le retour de l'action (sauf si admin)
+  if (isAdminUser(session)) {
+    revalidatePath(`/dashboard/circles/${circle?.slug}/moments/${moment.slug}`);
+    return { success: true, data: { recipientCount: 0 } };
+  }
   emailService.sendBroadcastMoments({
     recipients: recipientsToEmail.map((r) => r.email),
     strings: {
-      subject: `Vous êtes invité(e) : ${moment.title}`,
-      preheader: `${circleName} vous invite à rejoindre cet événement`,
-      heading: `${circleName} vous invite`,
-      intro: `${circleName} partage un événement avec vous :`,
+      subject: t("subject", { momentTitle: moment.title }),
+      preheader: t("preheader", { circleName }),
+      heading: t("heading", { circleName }),
+      intro: t("intro", { hostName }),
       customMessage: customMessage?.trim() || undefined,
-      ctaLabel: "Voir l'événement",
-      unsubscribeText: `Vous recevez cet email car vous suivez ${circleName} sur The Playground.`,
-      unsubscribeLabel: "Gérer mes notifications",
+      ctaLabel: t("ctaLabel"),
+      unsubscribeText: t("unsubscribeText", { circleName }),
+      unsubscribeLabel: t("unsubscribeLabel"),
     },
     momentTitle: moment.title,
     momentDate,
