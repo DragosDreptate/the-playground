@@ -32,6 +32,8 @@ export function createMockAdminRepository(
     findMomentById: vi.fn().mockResolvedValue(null),
     deleteMoment: vi.fn().mockResolvedValue(undefined),
     updateMomentStatus: vi.fn().mockResolvedValue(undefined),
+    getRegistrationsInsight: vi.fn().mockResolvedValue({ registrations: [], total: 0 }),
+    getUsersByActivation: vi.fn().mockResolvedValue({ users: [], total: 0 }),
     ...overrides,
   };
 }

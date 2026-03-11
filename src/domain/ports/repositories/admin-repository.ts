@@ -163,6 +163,22 @@ export type AdminActivationStats = {
 };
 
 // ─────────────────────────────────────────────
+// Insight — Registrations
+// ─────────────────────────────────────────────
+
+export type AdminInsightRegistration = {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string | null;
+  momentTitle: string;
+  momentSlug: string;
+  circleName: string;
+  status: string;
+  registeredAt: Date;
+};
+
+// ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
 
@@ -190,4 +206,16 @@ export interface AdminRepository {
   findMomentById(id: string): Promise<AdminMomentDetail | null>;
   deleteMoment(id: string): Promise<void>;
   updateMomentStatus(id: string, status: MomentStatus): Promise<void>;
+
+  // Insights
+  getRegistrationsInsight(
+    days: number,
+    limit: number,
+    offset: number
+  ): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
+  getUsersByActivation(
+    segment: "never" | "once" | "retained",
+    limit: number,
+    offset: number
+  ): Promise<{ users: Array<AdminUserRow & { registrationCount: number }>; total: number }>;
 }

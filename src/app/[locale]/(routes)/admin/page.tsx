@@ -65,7 +65,7 @@ export default async function AdminDashboardPage() {
       <section className="space-y-4">
         <h2 className="text-base font-semibold">{t("activation.title")}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Link href="/admin/users" className="block group">
+          <Link href="/admin/insights/activation?segment=once" className="block group">
             <Card className="transition-colors group-hover:border-primary/50">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
             </Card>
           </Link>
 
-          <Link href="/admin/users" className="block group">
+          <Link href="/admin/insights/activation?segment=retained" className="block group">
             <Card className="transition-colors group-hover:border-primary/50">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -116,21 +116,21 @@ export default async function AdminDashboardPage() {
             data={timeSeries.users}
             id="users"
             icon={Users}
-            href="/admin/users"
+            href="/admin/insights/users"
           />
           <ChartCard
             title={t("timeSeries.registrations")}
             data={timeSeries.registrations}
             id="registrations"
             icon={TicketCheck}
-            href="/admin/moments"
+            href="/admin/insights/registrations"
           />
           <ChartCard
             title={t("timeSeries.moments")}
             data={timeSeries.moments}
             id="moments"
             icon={CalendarDays}
-            href="/admin/moments"
+            href="/admin/insights/moments"
           />
         </div>
       </section>

@@ -14,6 +14,7 @@ import type {
   AdminMomentFilters,
   AdminMomentRow,
   AdminMomentDetail,
+  AdminInsightRegistration,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 import { Prisma } from "@prisma/client";
@@ -512,5 +513,162 @@ export const prismaAdminRepository: AdminRepository = {
 
   async updateMomentStatus(id: string, status: MomentStatus): Promise<void> {
     await prisma.moment.update({ where: { id }, data: { status } });
+  },
+
+  // ── Insights ─────────────────────────────
+
+  async getRegistrationsInsight(
+    days: number,
+    limit: number,
+    offset: number
+  ): Promise<{ registrations: AdminInsightRegistration[]; total: number }> {
+    const since = daysAgo(days);
+    const [registrations, total] = await Promise.all([
+      prisma.registration.findMany({
+        where: {
+          registeredAt: { gte: since },
+          status: { not: "CANCELLED" },
+          user: realUserWhere(),
+        },
+        include: {
+          user: { select: { email: true, firstName: true, lastName: true } },
+          moment: {
+            select: { title: true, slug: true, circle: { select: { name: true } } },
+          },
+        },
+        orderBy: { registeredAt: "desc" },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.registration.count({
+        where: {
+          registeredAt: { gte: since },
+          status: { not: "CANCELLED" },
+          user: realUserWhere(),
+        },
+      }),
+    ]);
+    return {
+      registrations: registrations.map((r) => ({
+        id: r.id,
+        userId: r.userId,
+        userEmail: r.user.email,
+        userName: [r.user.firstName, r.user.lastName].filter(Boolean).join(" ") || null,
+        momentTitle: r.moment.title,
+        momentSlug: r.moment.slug,
+        circleName: r.moment.circle.name,
+        status: r.status,
+        registeredAt: r.registeredAt,
+      })),
+      total,
+    };
+  },
+
+  async getUsersByActivation(
+    segment: "never" | "once" | "retained",
+    limit: number,
+    offset: number
+  ): Promise<{ users: Array<AdminUserRow & { registrationCount: number }>; total: number }> {
+    if (segment === "never") {
+      const [records, total] = await Promise.all([
+        prisma.user.findMany({
+          where: {
+            ...realUserWhere(),
+            registrations: { none: { status: { not: "CANCELLED" } } },
+          },
+          include: { _count: { select: { memberships: true, registrations: true } } },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+          skip: offset,
+        }),
+        prisma.user.count({
+          where: {
+            ...realUserWhere(),
+            registrations: { none: { status: { not: "CANCELLED" } } },
+          },
+        }),
+      ]);
+      return {
+        users: records.map((r) => ({
+          id: r.id,
+          email: r.email,
+          firstName: r.firstName,
+          lastName: r.lastName,
+          role: r.role,
+          circleCount: r._count.memberships,
+          momentCount: r._count.registrations,
+          registrationCount: r._count.registrations,
+          createdAt: r.createdAt,
+        })),
+        total,
+      };
+    }
+
+    const havingClause =
+      segment === "once"
+        ? Prisma.sql`HAVING COUNT(DISTINCT r."momentId") = 1`
+        : Prisma.sql`HAVING COUNT(DISTINCT r."momentId") >= 2`;
+
+    const [rows, countRows] = await Promise.all([
+      prisma.$queryRaw<
+        Array<{
+          id: string;
+          email: string;
+          firstName: string | null;
+          lastName: string | null;
+          role: string;
+          createdAt: Date;
+          registrationCount: bigint;
+          circleCount: bigint;
+        }>
+      >`
+        SELECT
+          u.id,
+          u.email,
+          u."firstName",
+          u."lastName",
+          u.role,
+          u."createdAt",
+          COUNT(DISTINCT r."momentId")::bigint AS "registrationCount",
+          COUNT(DISTINCT cm."circleId")::bigint AS "circleCount"
+        FROM users u
+        JOIN registrations r ON r."userId" = u.id
+        LEFT JOIN circle_memberships cm ON cm."userId" = u.id
+        WHERE r.status != 'CANCELLED'
+          AND u.email NOT LIKE '%@demo.playground'
+          AND u.email NOT LIKE '%@test.playground'
+        GROUP BY u.id
+        ${havingClause}
+        ORDER BY u."createdAt" DESC
+        LIMIT ${limit} OFFSET ${offset}
+      `,
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::bigint AS count FROM (
+          SELECT u.id
+          FROM users u
+          JOIN registrations r ON r."userId" = u.id
+          WHERE r.status != 'CANCELLED'
+            AND u.email NOT LIKE '%@demo.playground'
+            AND u.email NOT LIKE '%@test.playground'
+          GROUP BY u.id
+          ${havingClause}
+        ) sub
+      `,
+    ]);
+
+    return {
+      users: rows.map((r) => ({
+        id: r.id,
+        email: r.email,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        role: r.role as AdminUserRow["role"],
+        circleCount: Number(r.circleCount),
+        momentCount: Number(r.registrationCount),
+        registrationCount: Number(r.registrationCount),
+        createdAt: r.createdAt,
+      })),
+      total: Number(countRows[0]?.count ?? 0),
+    };
   },
 };

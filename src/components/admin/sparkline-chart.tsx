@@ -1,11 +1,9 @@
 import type { AdminTimeSeriesPoint } from "@/domain/ports/repositories/admin-repository";
 
 const W = 300;
-const H = 72;
 const PAD_X = 4;
 const PAD_Y = 8;
 const PLOT_W = W - PAD_X * 2;
-const PLOT_H = H - PAD_Y * 2;
 
 function formatAxisDate(iso: string): string {
   const d = new Date(iso);
@@ -15,10 +13,14 @@ function formatAxisDate(iso: string): string {
 type SparklineChartProps = {
   data: AdminTimeSeriesPoint[];
   id: string; // unique ID pour le gradient SVG
+  height?: number;
 };
 
-export function SparklineChart({ data, id }: SparklineChartProps) {
+export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
   if (data.length < 2) return null;
+
+  const H = height;
+  const PLOT_H = H - PAD_Y * 2;
 
   const max = Math.max(...data.map((d) => d.count), 1);
   const n = data.length;
