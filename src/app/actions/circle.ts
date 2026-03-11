@@ -433,7 +433,10 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
-    const memberCount = await circleRepo.countMembers(circleId);
+    const [memberCount, momentCount] = await Promise.all([
+      circleRepo.countMembers(circleId),
+      circleRepo.countMoments(circleId),
+    ]);
 
     after(async () => {
       try {
@@ -445,6 +448,7 @@ export async function inviteToCircleByEmailAction(
           circleSlug: circle.slug,
           coverImageUrl: circle.coverImage,
           memberCount,
+          momentCount,
           inviteUrl,
           strings: {
             subject: `${inviterName} vous invite à rejoindre ${circle.name}`,

@@ -301,6 +301,10 @@ export const prismaCircleRepository: CircleRepository = {
     return prisma.circleMembership.count({ where: { circleId } });
   },
 
+  async countMoments(circleId: string): Promise<number> {
+    return prisma.moment.count({ where: { circleId } });
+  },
+
   async findMemberCountsByCircleIds(circleIds: string[]): Promise<Map<string, number>> {
     if (circleIds.length === 0) return new Map();
     // Requête GROUP BY : une seule requête pour N Circles (évite le N+1 du dashboard)

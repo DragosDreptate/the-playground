@@ -221,6 +221,7 @@ export type CircleInvitationEmailData = {
   circleSlug?: string;
   coverImageUrl?: string | null;
   memberCount?: number;
+  momentCount?: number;
   inviteUrl: string;
   strings: {
     subject: string;

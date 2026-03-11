@@ -55,6 +55,7 @@ export function CircleInvitationEmail({
   circleSlug,
   coverImageUrl,
   memberCount,
+  momentCount,
   inviteUrl,
   strings,
   baseUrl,
@@ -84,7 +85,7 @@ export function CircleInvitationEmail({
                       <td style={{ verticalAlign: "middle" }}>
                         <table cellPadding="0" cellSpacing="0" role="presentation"><tbody><tr>
                           <td style={{ width: "22px", height: "22px", verticalAlign: "middle" }}>
-                            <Img src={`${baseUrl}/icon-192.png`} width="22" height="22" alt="The Playground" style={{ borderRadius: "6px", display: "block" }} />
+                            <Img src="https://the-playground.fr/icon-192.png" width="22" height="22" alt="The Playground" style={{ borderRadius: "6px", display: "block" }} />
                           </td>
                           <td style={{ paddingLeft: "8px", verticalAlign: "middle", fontSize: "13px", fontWeight: 700, color: "#1a1b2e", letterSpacing: "-0.01em" }}>
                             The Playground
@@ -100,9 +101,9 @@ export function CircleInvitationEmail({
               </tr>
 
               {/* ── 2. Hero : bandeau dégradé + cover (si disponible) ── */}
-              {coverImageUrl ? (
-                <tr>
-                  <td style={{ backgroundImage: grad, height: "80px", textAlign: "center", verticalAlign: "bottom", padding: "0" }}>
+              <tr>
+                <td style={{ height: "120px", backgroundImage: grad, textAlign: "center", verticalAlign: "bottom", padding: "0" }}>
+                  {coverImageUrl && (
                     <Img
                       src={coverImageUrl}
                       width="88"
@@ -110,13 +111,9 @@ export function CircleInvitationEmail({
                       alt={circleName}
                       style={{ borderRadius: "14px", border: "3px solid #ffffff", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", display: "inline-block", marginBottom: "-44px" }}
                     />
-                  </td>
-                </tr>
-              ) : (
-                <tr>
-                  <td style={{ height: "96px", backgroundImage: grad }} />
-                </tr>
-              )}
+                  )}
+                </td>
+              </tr>
 
               {/* ── 3. Content ── */}
               <tr>
@@ -158,14 +155,26 @@ export function CircleInvitationEmail({
                     </tr></tbody>
                   </table>
 
-                  {/* Stats */}
+                  {/* Stats : membres + événements */}
                   {showSocial && (
                     <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "16px" }}>
                       <tbody><tr>
                         <td style={{ backgroundColor: "#f9f9fb", border: "1px solid #f0f0f2", borderRadius: "8px", padding: "10px 14px", textAlign: "center" }}>
-                          <Text style={{ fontSize: "13px", color: "#374151", fontWeight: 500, margin: "0" }}>
-                            👥&nbsp;<strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
-                          </Text>
+                          <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
+                            <tbody><tr>
+                              <td style={{ fontSize: "13px", color: "#374151", fontWeight: 500, whiteSpace: "nowrap" }}>
+                                👥&nbsp;<strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
+                              </td>
+                              {(momentCount ?? 0) > 0 && (
+                                <>
+                                  <td style={{ padding: "0 10px", color: "#d1d5db", fontSize: "13px" }}>|</td>
+                                  <td style={{ fontSize: "13px", color: "#374151", fontWeight: 500, whiteSpace: "nowrap" }}>
+                                    📅&nbsp;<strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
+                                  </td>
+                                </>
+                              )}
+                            </tr></tbody>
+                          </table>
                         </td>
                       </tr></tbody>
                     </table>
