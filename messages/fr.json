@@ -976,7 +976,7 @@
         "memberLabel": "En tant que membre, vous pouvez :",
         "item1": "Voir les <strong>prochains événements</strong> de la Communauté",
         "item2": "Consulter les <strong>événements passés</strong>",
-        "item3": "Voir les <strong>autres membres</strong>",
+        "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
         "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
@@ -1001,7 +1001,7 @@
         "item1": "Vos <strong>prochains événements</strong> (ceux auxquels vous êtes inscrit)",
         "item2": "Vos <strong>événements passés</strong>",
         "item3": "Les <strong>Communautés</strong> dont vous êtes membre",
-        "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications)"
+        "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications) — avec un lien vers votre profil public, visible par les autres membres"
       },
       "notifications": {
         "title": "Gérer ses notifications",
@@ -1077,7 +1077,7 @@
       },
       "members": {
         "title": "Gérer les membres de votre Communauté",
-        "intro": "Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Vous pouvez supprimer un membre si nécessaire.",
+        "intro": "Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
         "outro": "Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements."
       },
       "inviteMembers": {

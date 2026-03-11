@@ -976,7 +976,7 @@
         "memberLabel": "As a member, you can:",
         "item1": "See <strong>upcoming events</strong> from the Community",
         "item2": "Browse <strong>past events</strong>",
-        "item3": "See <strong>other members</strong>",
+        "item3": "See <strong>other members</strong> and visit their public profile",
         "item4": "Be notified of new events by email (based on your preferences)",
         "outro": "You can also join a Community without registering for an event, from the <strong>Explore</strong> page or from a Community page. If the Community is private, the Organizer can send you a <strong>private invite link</strong> — click it to join directly, no event registration required."
       },
@@ -1001,7 +1001,7 @@
         "item1": "Your <strong>upcoming events</strong> (those you're registered for)",
         "item2": "Your <strong>past events</strong>",
         "item3": "The <strong>Communities</strong> you belong to",
-        "item4": "Your <strong>profile</strong> (name, avatar, notification preferences)"
+        "item4": "Your <strong>profile</strong> (name, avatar, notification preferences) — including a link to your public profile, visible to other members"
       },
       "notifications": {
         "title": "Manage notifications",
@@ -1077,7 +1077,7 @@
       },
       "members": {
         "title": "Manage Community members",
-        "intro": "From your Community page, you can see the full member list with their emails. You can remove a member if needed.",
+        "intro": "From your Community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
         "outro": "Members automatically join your Community when they register for one of your events."
       },
       "inviteMembers": {
