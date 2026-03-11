@@ -20,6 +20,7 @@ import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
+import { getDisplayName } from "@/lib/display-name";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import Image from "next/image";
@@ -41,16 +42,6 @@ function getInitials(user: CircleMemberWithUser["user"]): string {
   return user.email[0].toUpperCase();
 }
 
-function formatHostNames(hosts: CircleMemberWithUser[]): string {
-  return hosts
-    .map((h) => {
-      if (h.user.firstName && h.user.lastName)
-        return `${h.user.firstName} ${h.user.lastName}`;
-      if (h.user.firstName) return h.user.firstName;
-      return h.user.email;
-    })
-    .join(", ");
-}
 
 // ── Page ──────────────────────────────────────────────────────
 
@@ -131,7 +122,6 @@ export default async function CircleDetailPage({
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/circles/${circle.slug}`;
 
   const gradient = getMomentGradient(circle.name);
-  const hostNames = formatHostNames(hosts);
 
   return (
     <div className="space-y-8">
@@ -236,7 +226,23 @@ export default async function CircleDetailPage({
                   </span>
                 )}
               </div>
-              <p className="text-sm font-medium leading-snug">{hostNames}</p>
+              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
+                {hosts.map((h, i) => (
+                  <span key={h.user.id}>
+                    {h.user.publicId ? (
+                      <Link
+                        href={`/u/${h.user.publicId}`}
+                        className="hover:underline underline-offset-2"
+                      >
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
+                      </Link>
+                    ) : (
+                      getDisplayName(h.user.firstName, h.user.lastName, h.user.email)
+                    )}
+                    {i < hosts.length - 1 && ", "}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
 
@@ -272,9 +278,25 @@ export default async function CircleDetailPage({
           {/* "Organisé par" + actions Host */}
           <div className="flex items-center justify-between gap-4">
             {hosts.length > 0 && (
-              <p className="text-muted-foreground text-sm">
-                {t("detail.hostedBy")}{" "}
-                <span className="text-foreground font-medium">{hostNames}</span>
+              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                {t("detail.hostedBy")}
+                {hosts.map((h, i) => (
+                  <span key={h.user.id} className="flex items-center gap-1">
+                    {h.user.publicId ? (
+                      <Link
+                        href={`/u/${h.user.publicId}`}
+                        className="text-foreground font-medium hover:underline underline-offset-2"
+                      >
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
+                      </Link>
+                    ) : (
+                      <span className="text-foreground font-medium">
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
+                      </span>
+                    )}
+                    {i < hosts.length - 1 && <span>,</span>}
+                  </span>
+                ))}
               </p>
             )}
             {isHost && (
