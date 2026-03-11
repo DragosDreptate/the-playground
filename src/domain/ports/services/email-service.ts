@@ -218,6 +218,8 @@ export type CircleInvitationEmailData = {
   inviterName: string;
   circleName: string;
   circleDescription: string;
+  circleSlug?: string;
+  memberCount?: number;
   inviteUrl: string;
   strings: {
     subject: string;
