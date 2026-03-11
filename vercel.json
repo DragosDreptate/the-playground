@@ -1,3 +1,3 @@
 {
-  "ignoreCommand": "if [ \"$VERCEL_ENV\" != \"production\" ]; then exit 0; fi; CHANGED=$(git diff HEAD^ HEAD --name-only 2>/dev/null); [ -z \"$CHANGED\" ] && exit 1; echo \"$CHANGED\" | grep -qvE '(^spec/|\\.md$|^\\.github/ISSUE_TEMPLATE/)' && exit 1 || exit 0"
+  "ignoreCommand": "exit 0"
 }
