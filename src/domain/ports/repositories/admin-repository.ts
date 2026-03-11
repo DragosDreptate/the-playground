@@ -136,12 +136,41 @@ export type AdminMomentDetail = AdminMomentRow & {
 };
 
 // ─────────────────────────────────────────────
+// Time series
+// ─────────────────────────────────────────────
+
+export type AdminTimeSeriesPoint = {
+  date: string; // ISO date "YYYY-MM-DD"
+  count: number;
+};
+
+export type AdminTimeSeries = {
+  users: AdminTimeSeriesPoint[];
+  registrations: AdminTimeSeriesPoint[];
+  moments: AdminTimeSeriesPoint[];
+};
+
+// ─────────────────────────────────────────────
+// Activation
+// ─────────────────────────────────────────────
+
+export type AdminActivationStats = {
+  totalUsers: number;
+  activatedUsers: number; // ≥1 inscription non-annulée
+  retainedUsers: number;  // ≥2 inscriptions dans ≥2 événements différents
+  activationRate: number; // pourcentage (0-100)
+  retentionRate: number;  // pourcentage (0-100)
+};
+
+// ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
 
 export interface AdminRepository {
   // Stats
   getStats(): Promise<AdminStats>;
+  getTimeSeries(days: number): Promise<AdminTimeSeries>;
+  getActivationStats(): Promise<AdminActivationStats>;
 
   // Users
   findAllUsers(filters: AdminUserFilters): Promise<AdminUserRow[]>;

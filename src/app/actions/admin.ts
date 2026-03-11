@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { getAdminStats } from "@/domain/usecases/admin/get-admin-stats";
+import { getAdminTimeSeries } from "@/domain/usecases/admin/get-admin-time-series";
+import { getAdminActivationStats } from "@/domain/usecases/admin/get-admin-activation-stats";
 import { getAdminUsers } from "@/domain/usecases/admin/get-admin-users";
 import { getAdminUser } from "@/domain/usecases/admin/get-admin-user";
 import { adminDeleteUser } from "@/domain/usecases/admin/admin-delete-user";
@@ -18,7 +20,7 @@ import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-mo
 import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
-import type { AdminStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
+import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 
 const deps = { adminRepository: prismaAdminRepository };
@@ -41,6 +43,24 @@ export async function getAdminStatsAction(): Promise<ActionResult<AdminStats>> {
 
   const stats = await getAdminStats(check.data.role, deps);
   return { success: true, data: stats };
+}
+
+export async function getAdminTimeSeriesAction(
+  days = 30
+): Promise<ActionResult<AdminTimeSeries>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  const timeSeries = await getAdminTimeSeries(check.data.role, days, deps);
+  return { success: true, data: timeSeries };
+}
+
+export async function getAdminActivationStatsAction(): Promise<ActionResult<AdminActivationStats>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  const activation = await getAdminActivationStats(check.data.role, deps);
+  return { success: true, data: activation };
 }
 
 // ─────────────────────────────────────────────

@@ -2,6 +2,9 @@ import { prisma } from "@/infrastructure/db/prisma";
 import type {
   AdminRepository,
   AdminStats,
+  AdminTimeSeries,
+  AdminTimeSeriesPoint,
+  AdminActivationStats,
   AdminUserFilters,
   AdminUserRow,
   AdminUserDetail,
@@ -66,6 +69,37 @@ function momentWhere(filters: AdminMomentFilters): Prisma.MomentWhereInput {
 }
 
 // ─────────────────────────────────────────────
+// Time series helpers
+// ─────────────────────────────────────────────
+
+function daysAgo(n: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function fillDays(
+  rows: Array<{ date: Date; count: bigint }>,
+  days: number
+): AdminTimeSeriesPoint[] {
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    const key = row.date.toISOString().slice(0, 10);
+    map.set(key, Number(row.count));
+  }
+
+  const result: AdminTimeSeriesPoint[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    result.push({ date: key, count: map.get(key) ?? 0 });
+  }
+  return result;
+}
+
+// ─────────────────────────────────────────────
 // Implementation
 // ─────────────────────────────────────────────
 
@@ -105,6 +139,67 @@ export const prismaAdminRepository: AdminRepository = {
       recentCircles,
       recentMoments,
       recentComments,
+    };
+  },
+
+  async getTimeSeries(days: number): Promise<AdminTimeSeries> {
+    const since = daysAgo(days);
+    const [userRows, registrationRows, momentRows] = await Promise.all([
+      prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
+        SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
+        FROM users
+        WHERE "createdAt" >= ${since}
+        GROUP BY DATE_TRUNC('day', "createdAt")
+        ORDER BY date ASC
+      `,
+      prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
+        SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
+        FROM registrations
+        WHERE status != 'CANCELLED' AND "createdAt" >= ${since}
+        GROUP BY DATE_TRUNC('day', "createdAt")
+        ORDER BY date ASC
+      `,
+      prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
+        SELECT DATE_TRUNC('day', "createdAt")::date AS date, COUNT(*)::bigint AS count
+        FROM moments
+        WHERE "createdAt" >= ${since}
+        GROUP BY DATE_TRUNC('day', "createdAt")
+        ORDER BY date ASC
+      `,
+    ]);
+    return {
+      users: fillDays(userRows, days),
+      registrations: fillDays(registrationRows, days),
+      moments: fillDays(momentRows, days),
+    };
+  },
+
+  async getActivationStats(): Promise<AdminActivationStats> {
+    const [totalUsers, activatedRows, retainedRows] = await Promise.all([
+      prisma.user.count(),
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(DISTINCT "userId")::bigint AS count
+        FROM registrations
+        WHERE status != 'CANCELLED'
+      `,
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::bigint AS count FROM (
+          SELECT "userId"
+          FROM registrations
+          WHERE status != 'CANCELLED'
+          GROUP BY "userId"
+          HAVING COUNT(DISTINCT "momentId") >= 2
+        ) sub
+      `,
+    ]);
+    const activatedUsers = Number(activatedRows[0]?.count ?? 0);
+    const retainedUsers = Number(retainedRows[0]?.count ?? 0);
+    return {
+      totalUsers,
+      activatedUsers,
+      retainedUsers,
+      activationRate: totalUsers > 0 ? Math.round((activatedUsers / totalUsers) * 100) : 0,
+      retentionRate: totalUsers > 0 ? Math.round((retainedUsers / totalUsers) * 100) : 0,
     };
   },
 

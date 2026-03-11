@@ -2,6 +2,8 @@ import { vi } from "vitest";
 import type {
   AdminRepository,
   AdminStats,
+  AdminTimeSeries,
+  AdminActivationStats,
   AdminUserRow,
   AdminUserDetail,
   AdminCircleRow,
@@ -15,6 +17,8 @@ export function createMockAdminRepository(
 ): AdminRepository {
   return {
     getStats: vi.fn().mockResolvedValue(makeAdminStats()),
+    getTimeSeries: vi.fn().mockResolvedValue(makeAdminTimeSeries()),
+    getActivationStats: vi.fn().mockResolvedValue(makeAdminActivationStats()),
     findAllUsers: vi.fn().mockResolvedValue([]),
     countUsers: vi.fn().mockResolvedValue(0),
     findUserById: vi.fn().mockResolvedValue(null),
@@ -28,6 +32,33 @@ export function createMockAdminRepository(
     findMomentById: vi.fn().mockResolvedValue(null),
     deleteMoment: vi.fn().mockResolvedValue(undefined),
     updateMomentStatus: vi.fn().mockResolvedValue(undefined),
+    ...overrides,
+  };
+}
+
+export function makeAdminTimeSeries(overrides: Partial<AdminTimeSeries> = {}): AdminTimeSeries {
+  const empty = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (29 - i));
+    return { date: d.toISOString().slice(0, 10), count: 0 };
+  });
+  return {
+    users: empty,
+    registrations: empty,
+    moments: empty,
+    ...overrides,
+  };
+}
+
+export function makeAdminActivationStats(
+  overrides: Partial<AdminActivationStats> = {}
+): AdminActivationStats {
+  return {
+    totalUsers: 42,
+    activatedUsers: 28,
+    retainedUsers: 10,
+    activationRate: 67,
+    retentionRate: 24,
     ...overrides,
   };
 }
