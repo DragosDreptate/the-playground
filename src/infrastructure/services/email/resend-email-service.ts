@@ -11,7 +11,7 @@ import type {
   MomentUpdateEmailData,
   MomentCancelledEmailData,
   HostMomentCreatedEmailData,
-  BroadcastMomentEmailData,
+  BroadcastMomentsBatchEmailData,
   AdminEntityCreatedEmailData,
   CircleInvitationEmailData,
   CircleInvitationsBatchEmailData,
@@ -61,6 +61,22 @@ export function createResendEmailService(): EmailService {
     const to = Array.isArray(params.to) ? params.to : [params.to];
     if (to.every(isDemoEmail)) return;
     await resend.emails.send(params);
+  }
+
+  // Envoie un batch en respectant la limite de 100 emails par appel Resend.
+  // Filtre les emails de démo et découpe en chunks si nécessaire.
+  async function sendBatch(
+    emails: Parameters<typeof resend.batch.send>[0]
+  ): Promise<void> {
+    const real = emails.filter((e) => {
+      const to = Array.isArray(e.to) ? e.to[0] : e.to;
+      return !isDemoEmail(to as string);
+    });
+    if (real.length === 0) return;
+    const CHUNK_SIZE = 100;
+    for (let i = 0; i < real.length; i += CHUNK_SIZE) {
+      await resend.batch.send(real.slice(i, i + CHUNK_SIZE));
+    }
   }
 
   return {
@@ -200,13 +216,16 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendBroadcastMoment(data: BroadcastMomentEmailData): Promise<void> {
-      await send({
-        from,
-        to: data.to,
-        subject: data.strings.subject,
-        react: BroadcastMomentEmail(data),
-      });
+    async sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void> {
+      const { recipients, ...emailData } = data;
+      await sendBatch(
+        recipients.map((to) => ({
+          from,
+          to,
+          subject: emailData.strings.subject,
+          react: BroadcastMomentEmail({ ...emailData, to }),
+        }))
+      );
     },
 
     async sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void> {
@@ -229,18 +248,14 @@ export function createResendEmailService(): EmailService {
 
     async sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void> {
       const { recipients, ...emailData } = data;
-      const realRecipients = recipients.filter((email) => !isDemoEmail(email));
-      if (realRecipients.length === 0) return;
-
-      // Resend batch.send() accepts up to 100 emails per call
-      const batch = realRecipients.map((email) => ({
-        from,
-        to: email,
-        subject: emailData.strings.subject,
-        react: CircleInvitationEmail({ ...emailData, to: email, baseUrl }),
-      }));
-
-      await resend.batch.send(batch);
+      await sendBatch(
+        recipients.map((to) => ({
+          from,
+          to,
+          subject: emailData.strings.subject,
+          react: CircleInvitationEmail({ ...emailData, to, baseUrl }),
+        }))
+      );
     },
 
     async sendAdminNewUser(data: AdminNewUserEmailData): Promise<void> {

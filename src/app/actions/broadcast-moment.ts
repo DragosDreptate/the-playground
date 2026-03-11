@@ -104,29 +104,25 @@ export async function broadcastMomentAction(
   });
 
   // Fire-and-forget — ne bloque pas le retour de l'action
-  Promise.allSettled(
-    recipientsToEmail.map((recipient) =>
-      emailService.sendBroadcastMoment({
-        to: recipient.email,
-        strings: {
-          subject: `Vous êtes invité(e) : ${moment.title}`,
-          preheader: `${circleName} vous invite à rejoindre cet événement`,
-          heading: `${circleName} vous invite`,
-          intro: `${circleName} partage un événement avec vous :`,
-          customMessage: customMessage?.trim() || undefined,
-          ctaLabel: "Voir l'événement",
-          unsubscribeText: `Vous recevez cet email car vous suivez ${circleName} sur The Playground.`,
-          unsubscribeLabel: "Gérer mes notifications",
-        },
-        momentTitle: moment.title,
-        momentDate,
-        momentLocation,
-        circleName,
-        momentSlug: moment.slug,
-        appUrl,
-      })
-    )
-  ).catch((err) => {
+  emailService.sendBroadcastMoments({
+    recipients: recipientsToEmail.map((r) => r.email),
+    strings: {
+      subject: `Vous êtes invité(e) : ${moment.title}`,
+      preheader: `${circleName} vous invite à rejoindre cet événement`,
+      heading: `${circleName} vous invite`,
+      intro: `${circleName} partage un événement avec vous :`,
+      customMessage: customMessage?.trim() || undefined,
+      ctaLabel: "Voir l'événement",
+      unsubscribeText: `Vous recevez cet email car vous suivez ${circleName} sur The Playground.`,
+      unsubscribeLabel: "Gérer mes notifications",
+    },
+    momentTitle: moment.title,
+    momentDate,
+    momentLocation,
+    circleName,
+    momentSlug: moment.slug,
+    appUrl,
+  }).catch((err) => {
     Sentry.captureException(err);
   });
 
