@@ -35,7 +35,7 @@ export function CollapsibleDescription({ text, maxLines = 10 }: Props) {
     const observer = new ResizeObserver(checkClamped);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [text, maxLines]);
+  }, [text, maxLines, checkClamped]);
 
   return (
     <div>
