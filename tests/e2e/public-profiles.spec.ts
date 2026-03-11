@@ -121,7 +121,8 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
     // La section membres doit être présente
-    const membersSection = page.locator("#members-section");
+    // .first() — la page peut rendre 2 éléments #members-section (mobile + desktop)
+    const membersSection = page.locator("#members-section").first();
     await expect(membersSection).toBeVisible();
 
     await context.close();
@@ -133,7 +134,8 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
     await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
 
     // Le placeholder "Connecte-toi" doit être visible
-    await expect(page.locator("#members-section")).toContainText(
+    // .first() — la page peut rendre 2 éléments #members-section (mobile + desktop)
+    await expect(page.locator("#members-section").first()).toContainText(
       /connecte-toi|sign in/i
     );
     // Aucun lien vers /u/ dans la section membres
