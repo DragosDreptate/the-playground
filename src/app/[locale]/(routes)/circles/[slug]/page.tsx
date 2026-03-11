@@ -341,7 +341,7 @@ export default async function PublicCirclePage({
           <div className="flex items-center justify-between gap-4">
             {hosts.length > 0 && (
               <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}{" "}
+                {t("detail.hostedBy")}
                 {hosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
                     {isConnected && h.user.publicId ? (

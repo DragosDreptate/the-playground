@@ -9,6 +9,7 @@ import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
+import { getDisplayName } from "@/lib/display-name";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
@@ -84,12 +85,6 @@ const statusClassName = {
   PAST: "",
 } as const;
 
-function hostDisplayName(h: CircleMemberWithUser): string {
-  if (h.user.firstName && h.user.lastName)
-    return `${h.user.firstName} ${h.user.lastName}`;
-  if (h.user.firstName) return h.user.firstName;
-  return h.user.email;
-}
 
 // ── Component ────────────────────────────────────────────────
 
@@ -261,11 +256,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                         href={`/u/${h.user.publicId}`}
                         className="text-foreground font-medium hover:underline underline-offset-2"
                       >
-                        {hostDisplayName(h)}
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
                       </Link>
                     ) : (
                       <span className="text-foreground font-medium">
-                        {hostDisplayName(h)}
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
                       </span>
                     )}
                     {h.user.id === props.currentUserId && (
