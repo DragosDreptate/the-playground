@@ -17,9 +17,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
-import { getDisplayName } from "@/lib/display-name";
+import { getCircleUserInitials } from "@/lib/display-name";
 import { FollowButton } from "@/components/circles/follow-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
@@ -47,24 +48,6 @@ const getCachedCircle = cache(async (slug: string) => {
 });
 
 // ── Helpers ───────────────────────────────────────────────────
-
-function getInitials(user: CircleMemberWithUser["user"]): string {
-  if (user.firstName && user.lastName)
-    return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-  if (user.firstName) return user.firstName[0].toUpperCase();
-  return user.email[0].toUpperCase();
-}
-
-function formatHostNames(hosts: CircleMemberWithUser[]): string {
-  return hosts
-    .map((h) => {
-      if (h.user.firstName && h.user.lastName)
-        return `${h.user.firstName} ${h.user.lastName}`;
-      if (h.user.firstName) return h.user.firstName;
-      return h.user.email;
-    })
-    .join(", ");
-}
 
 // ── Metadata ──────────────────────────────────────────────────
 
@@ -176,7 +159,6 @@ export default async function PublicCirclePage({
     activeTab === "past" ? pastMoments : upcomingMoments;
 
   const gradient = getMomentGradient(circle.name);
-  const hostNames = formatHostNames(hosts);
 
   return (
     <div className="space-y-8">
@@ -265,7 +247,7 @@ export default async function PublicCirclePage({
                     style={{ background: getMomentGradient(host.user.email) }}
                     title={host.user.firstName ?? host.user.email}
                   >
-                    {getInitials(host.user)}
+                    {getCircleUserInitials(host.user)}
                   </div>
                 ))}
                 {hosts.length > 5 && (
@@ -274,7 +256,14 @@ export default async function PublicCirclePage({
                   </span>
                 )}
               </div>
-              <p className="text-sm font-medium leading-snug">{hostNames}</p>
+              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
+                {hosts.map((h, i) => (
+                  <span key={h.user.id}>
+                    <HostLink user={h.user} linkDisabled={!isConnected} />
+                    {i < hosts.length - 1 && ", "}
+                  </span>
+                ))}
+              </p>
             </div>
           )}
 
@@ -345,18 +334,7 @@ export default async function PublicCirclePage({
                 {t("detail.hostedBy")}
                 {hosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
-                    {isConnected && h.user.publicId ? (
-                      <Link
-                        href={`/u/${h.user.publicId}`}
-                        className="text-foreground font-medium hover:underline underline-offset-2"
-                      >
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </Link>
-                    ) : (
-                      <span className="text-foreground font-medium">
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </span>
-                    )}
+                    <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
                     {i < hosts.length - 1 && <span>,</span>}
                   </span>
                 ))}
