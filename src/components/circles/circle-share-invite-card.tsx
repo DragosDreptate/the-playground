@@ -37,6 +37,8 @@ type Props = {
   };
 };
 
+const MAX_EMAIL_FIELDS = 10;
+
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
@@ -68,6 +70,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
   }
 
   function handleAddField() {
+    if (emailFields.length >= MAX_EMAIL_FIELDS) return;
     setEmailFields((prev) => [...prev, ""]);
   }
 
@@ -181,14 +184,20 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
           )}
 
           {/* Ajouter une adresse */}
-          <button
-            type="button"
-            onClick={handleAddField}
-            className="text-primary mb-3 inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80"
-          >
-            <Plus className="size-3" />
-            Ajouter une adresse
-          </button>
+          {emailFields.length < MAX_EMAIL_FIELDS ? (
+            <button
+              type="button"
+              onClick={handleAddField}
+              className="text-primary mb-3 inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80"
+            >
+              <Plus className="size-3" />
+              Ajouter une adresse
+            </button>
+          ) : (
+            <p className="text-muted-foreground mb-3 text-xs">
+              Maximum {MAX_EMAIL_FIELDS} adresses par envoi.
+            </p>
+          )}
 
           {/* CTA */}
           {emailSent ? (
