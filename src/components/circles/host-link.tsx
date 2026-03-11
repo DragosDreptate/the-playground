@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { getDisplayName } from "@/lib/display-name";
+import { cn } from "@/lib/utils";
 
 type HostUser = {
   id: string;
@@ -23,7 +24,7 @@ export function HostLink({ user, className, linkDisabled }: Props) {
     return (
       <Link
         href={`/u/${user.publicId}`}
-        className={`hover:underline underline-offset-2${className ? ` ${className}` : ""}`}
+        className={cn("hover:underline underline-offset-2", className)}
       >
         {name}
       </Link>
