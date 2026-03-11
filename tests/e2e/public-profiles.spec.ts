@@ -24,8 +24,8 @@ test.describe("F2/F7 — Noms cliquables dans la liste des participants", () => 
 
     await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
 
-    // La liste des participants doit être visible
-    const attendeesList = page.locator(".divide-y");
+    // La liste des participants doit être visible (.first() — la page Moment a plusieurs .divide-y)
+    const attendeesList = page.locator(".divide-y").first();
     await expect(attendeesList).toBeVisible();
 
     // Au moins un lien vers /u/ doit exister dans la liste
