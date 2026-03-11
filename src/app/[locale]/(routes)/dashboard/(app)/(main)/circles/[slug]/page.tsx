@@ -320,7 +320,7 @@ export default async function CircleDetailPage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <CollapsibleDescription text={circle.description} maxLines={10} />
+              <CollapsibleDescription text={circle.description} />
             </div>
           )}
 

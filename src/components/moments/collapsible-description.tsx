@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 
 type Props = {
   text: string;
-  /** Max visible lines before collapsing (default 5) */
+  /** Max visible lines before collapsing (default 10) */
   maxLines?: number;
 };
 
@@ -16,7 +16,7 @@ const clampBase = {
   overflow: "hidden",
 };
 
-export function CollapsibleDescription({ text, maxLines = 5 }: Props) {
+export function CollapsibleDescription({ text, maxLines = 10 }: Props) {
   const t = useTranslations("Common");
   const ref = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
@@ -35,7 +35,7 @@ export function CollapsibleDescription({ text, maxLines = 5 }: Props) {
     const observer = new ResizeObserver(checkClamped);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [text, maxLines, checkClamped]);
+  }, [text, maxLines]);
 
   return (
     <div>
