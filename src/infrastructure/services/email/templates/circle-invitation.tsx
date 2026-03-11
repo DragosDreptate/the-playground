@@ -12,29 +12,17 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 import type { CircleInvitationEmailData } from "@/domain/ports/services/email-service";
+import { getMomentGradient } from "@/lib/gradient";
 
 const DESC_MAX_CHARS = 200;
 
-const PLACEHOLDER_AVATARS = [
-  { bg: "linear-gradient(135deg,#ec4899,#f97316)", initials: "MR" },
-  { bg: "linear-gradient(135deg,#8b5cf6,#06b6d4)", initials: "SL" },
-  { bg: "linear-gradient(135deg,#10b981,#3b82f6)", initials: "AB" },
-  { bg: "linear-gradient(135deg,#f59e0b,#ef4444)", initials: "CK" },
-  { bg: "linear-gradient(135deg,#6366f1,#8b5cf6)", initials: "JD" },
+const PLACEHOLDER_AVATAR_COLORS = [
+  "linear-gradient(135deg,#ec4899,#f97316)",
+  "linear-gradient(135deg,#8b5cf6,#06b6d4)",
+  "linear-gradient(135deg,#10b981,#3b82f6)",
+  "linear-gradient(135deg,#f59e0b,#ef4444)",
+  "linear-gradient(135deg,#6366f1,#8b5cf6)",
 ];
-
-const GRADIENTS = [
-  { grad: "linear-gradient(135deg,#e8457a,#9333ea)", end: "#9333ea" },
-  { grad: "linear-gradient(135deg,#3b82f6,#06b6d4)", end: "#06b6d4" },
-  { grad: "linear-gradient(135deg,#f59e0b,#ef4444)", end: "#ef4444" },
-  { grad: "linear-gradient(135deg,#10b981,#3b82f6)", end: "#3b82f6" },
-  { grad: "linear-gradient(135deg,#8b5cf6,#ec4899)", end: "#ec4899" },
-];
-
-function circleGradient(name: string) {
-  const base = name.replace(/^(communauté|community|cercle|circle)\s+/i, "").trim();
-  return GRADIENTS[(base.charCodeAt(0) ?? 0) % GRADIENTS.length];
-}
 
 function truncate(desc: string): { text: string; truncated: boolean } {
   const s = desc.trim();
@@ -60,13 +48,13 @@ export function CircleInvitationEmail({
   strings,
   baseUrl,
 }: Props) {
-  const { grad } = circleGradient(circleName);
+  const grad = getMomentGradient(circleName);
   const { text, truncated } = truncate(circleDescription);
   const paras = paragraphs(text);
   const circleUrl = circleSlug ? `${baseUrl}/circles/${circleSlug}` : inviteUrl;
   const initials = inviterName.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
   const showSocial = (memberCount ?? 0) > 0;
-  const avatarSlice = PLACEHOLDER_AVATARS.slice(0, Math.min(5, memberCount ?? 0));
+  const avatarCount = Math.min(5, memberCount ?? 0);
 
   return (
     <Html>
@@ -114,7 +102,7 @@ export function CircleInvitationEmail({
                   ) : (
                     <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
                       <tbody><tr>
-                        <td style={{ width: "88px", height: "88px", borderRadius: "14px", backgroundImage: grad, border: "3px solid #f0f0f4" }} />
+                        <td style={{ width: "88px", height: "88px", borderRadius: "14px", background: grad, border: "3px solid #f0f0f4" }} />
                       </tr></tbody>
                     </table>
                   )}
@@ -130,7 +118,7 @@ export function CircleInvitationEmail({
                     <tbody><tr><td style={{ textAlign: "center" }}>
                       <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
                         <tbody><tr>
-                          <td style={{ width: "30px", height: "30px", borderRadius: "50%", backgroundImage: grad, fontSize: "10px", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: "30px", verticalAlign: "middle" }}>
+                          <td style={{ width: "30px", height: "30px", borderRadius: "50%", background: grad, fontSize: "10px", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: "30px", verticalAlign: "middle" }}>
                             {initials}
                           </td>
                           <td style={{ paddingLeft: "8px", verticalAlign: "middle", fontSize: "13px", color: "#6b7280" }}>
@@ -186,22 +174,20 @@ export function CircleInvitationEmail({
                     </table>
                   )}
 
-                  {/* Members avatars */}
-                  {showSocial && avatarSlice.length > 0 && (
+                  {/* Members avatars (cercles colorés anonymes) */}
+                  {showSocial && avatarCount > 0 && (
                     <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "20px" }}>
                       <tbody><tr><td style={{ textAlign: "center" }}>
-                        {avatarSlice.map((av, i) => (
+                        {PLACEHOLDER_AVATAR_COLORS.slice(0, avatarCount).map((bg, i) => (
                           <span key={i} style={{
                             display: "inline-block",
                             width: "26px", height: "26px",
                             borderRadius: "50%",
-                            backgroundImage: av.bg,
+                            background: bg,
                             border: "2px solid #fff",
-                            fontSize: "9px", fontWeight: 700, color: "#fff",
-                            textAlign: "center", lineHeight: "22px",
                             marginLeft: i === 0 ? "0" : "-7px",
                             verticalAlign: "middle",
-                          }}>{av.initials}</span>
+                          }} />
                         ))}
                         <span style={{ fontSize: "12px", color: "#6b7280", verticalAlign: "middle", marginLeft: "8px" }}>
                           Rejoignez&nbsp;<strong style={{ color: "#374151" }}>{memberCount}</strong>&nbsp;membres
@@ -227,7 +213,7 @@ export function CircleInvitationEmail({
                       <td style={{ textAlign: "right", verticalAlign: "middle", whiteSpace: "nowrap", paddingLeft: "12px" }}>
                         <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
                           <tbody><tr>
-                            <td style={{ width: "10px", height: "10px", borderRadius: "3px", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }} />
+                            <td style={{ width: "10px", height: "10px", borderRadius: "3px", background: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }} />
                             <td style={{ paddingLeft: "5px", verticalAlign: "middle", fontSize: "10px", color: "#d1d5db", fontWeight: 500 }}>
                               the-playground.fr
                             </td>

@@ -225,10 +225,7 @@ export type CircleInvitationEmailData = {
   inviteUrl: string;
   strings: {
     subject: string;
-    heading: string;
-    message: string;
     ctaLabel: string;
-    footer: string;
   };
 };
 

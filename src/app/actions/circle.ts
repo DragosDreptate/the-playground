@@ -433,13 +433,12 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
-    const [memberCount, momentCount] = await Promise.all([
-      circleRepo.countMembers(circleId),
-      circleRepo.countMoments(circleId),
-    ]);
-
     after(async () => {
       try {
+        const [memberCount, momentCount] = await Promise.all([
+          circleRepo.countMembers(circleId),
+          circleRepo.countMoments(circleId),
+        ]);
         await emailService.sendCircleInvitations({
           recipients: emails,
           inviterName,
@@ -452,10 +451,7 @@ export async function inviteToCircleByEmailAction(
           inviteUrl,
           strings: {
             subject: `${inviterName} vous invite à rejoindre ${circle.name}`,
-            heading: "",
-            message: "",
             ctaLabel: "Rejoindre la Communauté",
-            footer: "",
           },
         });
       } catch (e) {
