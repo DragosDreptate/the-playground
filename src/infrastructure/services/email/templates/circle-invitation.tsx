@@ -24,11 +24,11 @@ const PLACEHOLDER_AVATARS = [
 ];
 
 const GRADIENTS = [
-  "linear-gradient(135deg,#e8457a,#9333ea)",
-  "linear-gradient(135deg,#3b82f6,#06b6d4)",
-  "linear-gradient(135deg,#f59e0b,#ef4444)",
-  "linear-gradient(135deg,#10b981,#3b82f6)",
-  "linear-gradient(135deg,#8b5cf6,#ec4899)",
+  { grad: "linear-gradient(135deg,#e8457a,#9333ea)", end: "#9333ea" },
+  { grad: "linear-gradient(135deg,#3b82f6,#06b6d4)", end: "#06b6d4" },
+  { grad: "linear-gradient(135deg,#f59e0b,#ef4444)", end: "#ef4444" },
+  { grad: "linear-gradient(135deg,#10b981,#3b82f6)", end: "#3b82f6" },
+  { grad: "linear-gradient(135deg,#8b5cf6,#ec4899)", end: "#ec4899" },
 ];
 
 function circleGradient(name: string) {
@@ -60,7 +60,7 @@ export function CircleInvitationEmail({
   strings,
   baseUrl,
 }: Props) {
-  const grad = circleGradient(circleName);
+  const { grad, end: gradEnd } = circleGradient(circleName);
   const { text, truncated } = truncate(circleDescription);
   const paras = paragraphs(text);
   const circleUrl = circleSlug ? `${baseUrl}/circles/${circleSlug}` : inviteUrl;
@@ -100,22 +100,27 @@ export function CircleInvitationEmail({
                 </td>
               </tr>
 
-              {/* ── 2. Hero : bandeau dégradé + cover (si disponible) ── */}
+              {/* ── 2. Hero : bandeau dégradé ── */}
               <tr>
-                <td style={{ height: "120px", backgroundImage: grad, textAlign: "center", verticalAlign: "bottom", padding: "0" }}>
-                  {coverImageUrl && (
+                <td style={{ height: "96px", backgroundImage: grad }} />
+              </tr>
+
+              {/* ── 3. Cover : split background (moitié grad / moitié blanc) ── */}
+              {coverImageUrl && (
+                <tr>
+                  <td style={{ textAlign: "center", padding: "0", backgroundImage: `linear-gradient(to bottom, ${gradEnd} 44px, #ffffff 44px)` }}>
                     <Img
                       src={coverImageUrl}
                       width="88"
                       height="88"
                       alt={circleName}
-                      style={{ borderRadius: "14px", border: "3px solid #ffffff", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", display: "inline-block", marginBottom: "-44px" }}
+                      style={{ borderRadius: "14px", border: "3px solid #ffffff", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", display: "block", margin: "0 auto" }}
                     />
-                  )}
-                </td>
-              </tr>
+                  </td>
+                </tr>
+              )}
 
-              {/* ── 3. Content ── */}
+              {/* ── 4. Content ── */}
               <tr>
                 <td style={coverImageUrl ? contentTdWithCover : contentTd}>
 
@@ -206,7 +211,7 @@ export function CircleInvitationEmail({
 
                   {/* CTA */}
                   <Button style={ctaStyle} href={inviteUrl}>
-                    {strings.ctaLabel} →
+                    {strings.ctaLabel}
                   </Button>
 
                   {/* Footer */}
@@ -251,6 +256,6 @@ const card: React.CSSProperties = { backgroundColor: "#ffffff", borderRadius: "1
 const topbarTd: React.CSSProperties = { padding: "16px 28px", borderBottom: "1px solid #f0f0f4" };
 const badgeStyle: React.CSSProperties = { fontSize: "11px", fontWeight: 600, color: "#ec4899", backgroundColor: "#fde8f0", padding: "3px 10px", borderRadius: "20px" };
 const contentTd: React.CSSProperties = { padding: "24px 28px 28px" };
-const contentTdWithCover: React.CSSProperties = { padding: "60px 28px 28px" };
+const contentTdWithCover: React.CSSProperties = { padding: "20px 28px 28px" };
 const circleNameStyle: React.CSSProperties = { fontSize: "22px", fontWeight: 800, color: "#0f0f1a", letterSpacing: "-0.03em", lineHeight: "1.2", margin: "0 0 18px 0", textAlign: "center" };
 const ctaStyle: React.CSSProperties = { backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", color: "#ffffff", fontSize: "15px", fontWeight: 700, borderRadius: "10px", padding: "13px 32px", textDecoration: "none", display: "block", width: "100%", textAlign: "center", boxSizing: "border-box" };
