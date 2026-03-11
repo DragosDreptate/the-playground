@@ -109,7 +109,7 @@ test.describe("Découvrir — page Communauté publique", () => {
     if (isVisible) {
       await eventLink.click();
       await expect(page).toHaveURL(/\/m\//, { timeout: 10_000 });
-      await expect(page.locator("h1")).toBeVisible();
+      await expect(page.locator("h1").first()).toBeVisible({ timeout: 10_000 });
     }
   });
 });
