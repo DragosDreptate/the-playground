@@ -62,9 +62,25 @@ export async function updateProfileAction(
 export async function completeOnboardingAction(
   formData: FormData
 ): Promise<ActionResult<User>> {
+  const session = await auth();
   const result = await updateProfileAction(formData);
 
   if (result.success) {
+    // Filet de sécurité : générer le publicId si le callback signIn a échoué silencieusement
+    after(async () => {
+      try {
+        if (session?.user?.id) {
+          await prismaUserRepository.ensurePublicId(
+            session.user.id,
+            result.data.firstName,
+            result.data.lastName
+          );
+        }
+      } catch (e) {
+        Sentry.captureException(e, { tags: { context: "publicId_generation_onboarding" } });
+      }
+    });
+
     // Fire-and-forget : notifier les admins du nouvel utilisateur
     after(async () => {
       try {

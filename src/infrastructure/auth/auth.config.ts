@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -118,6 +119,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       } catch (err) {
         console.error("[AUTH] publicId generation failed (non-blocking):", err);
+        Sentry.captureException(err, { tags: { context: "publicId_generation" } });
       }
 
       return true;

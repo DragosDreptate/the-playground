@@ -101,6 +101,9 @@ test.describe("F8 — Lien 'Voir mon profil public' depuis la page profil dashbo
     const viewProfileLink = page.locator("a[href*='/u/']").first();
     await viewProfileLink.click();
 
+    // Attendre la navigation vers /u/[publicId]
+    await expect(page).toHaveURL(/\/u\//);
+
     // Le fil d'ariane "C'est votre profil" doit être affiché (profil propre)
     await expect(page.locator("main")).toContainText(/votre profil|your profile/i);
 
@@ -162,7 +165,8 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
     // Le compteur de membres doit être un lien ancre pour les connectés
-    const memberCountLink = page.locator("a[href='#members-section']");
+    // .first() — la page peut avoir plusieurs liens vers #members-section (mobile + desktop)
+    const memberCountLink = page.locator("a[href='#members-section']").first();
     await expect(memberCountLink).toBeVisible();
 
     await context.close();
