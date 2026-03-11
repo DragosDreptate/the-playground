@@ -1,18 +1,25 @@
 import type { AdminTimeSeriesPoint } from "@/domain/ports/repositories/admin-repository";
 
 const W = 300;
-const PAD_X = 4;
+const PAD_LEFT = 34; // espace pour les labels Y
+const PAD_RIGHT = 4;
 const PAD_Y = 8;
-const PLOT_W = W - PAD_X * 2;
+const PLOT_W = W - PAD_LEFT - PAD_RIGHT;
 
 function formatAxisDate(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
+function formatY(v: number): string {
+  if (v >= 10000) return `${Math.round(v / 1000)}k`;
+  if (v >= 1000) return `${(v / 1000).toFixed(1)}k`;
+  return String(Math.round(v));
+}
+
 type SparklineChartProps = {
   data: AdminTimeSeriesPoint[];
-  id: string; // unique ID pour le gradient SVG
+  id: string;
   height?: number;
 };
 
@@ -23,9 +30,10 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
   const PLOT_H = H - PAD_Y * 2;
 
   const max = Math.max(...data.map((d) => d.count), 1);
+  const mid = Math.ceil(max / 2);
   const n = data.length;
 
-  const toX = (i: number) => PAD_X + (i / (n - 1)) * PLOT_W;
+  const toX = (i: number) => PAD_LEFT + (i / (n - 1)) * PLOT_W;
   const toY = (v: number) => PAD_Y + (1 - v / max) * PLOT_H;
 
   const linePath = data
@@ -39,6 +47,12 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
 
   const gradId = `grad-${id}`;
   const total = data.reduce((sum, d) => sum + d.count, 0);
+
+  const yTicks = [
+    { value: max, y: toY(max) },
+    { value: mid, y: toY(mid) },
+    { value: 0, y: toY(0) },
+  ];
 
   return (
     <div className="space-y-1">
@@ -54,6 +68,38 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
             <stop offset="100%" stopColor="currentColor" stopOpacity="0.02" />
           </linearGradient>
         </defs>
+
+        {/* Lignes de grille horizontales */}
+        {yTicks.map(({ value, y }) => (
+          <line
+            key={value}
+            x1={PAD_LEFT}
+            y1={y.toFixed(1)}
+            x2={W - PAD_RIGHT}
+            y2={y.toFixed(1)}
+            stroke="currentColor"
+            strokeOpacity="0.08"
+            strokeWidth="1"
+          />
+        ))}
+
+        {/* Labels axe Y */}
+        {yTicks.map(({ value, y }) => (
+          <text
+            key={value}
+            x={PAD_LEFT - 5}
+            y={y.toFixed(1)}
+            textAnchor="end"
+            dominantBaseline="middle"
+            fontSize="9"
+            fill="currentColor"
+            fillOpacity="0.45"
+          >
+            {formatY(value)}
+          </text>
+        ))}
+
+        {/* Aire et ligne */}
         <path d={areaPath} fill={`url(#${gradId})`} />
         <path
           d={linePath}
