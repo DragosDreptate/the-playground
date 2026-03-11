@@ -10,70 +10,75 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
-## [1.10.0] — 2026-03-04 — Invitation membres, Analytics & Google Places
+## [1.11.0] — 2026-03-11 — Profils publics & viralité
 
 ### Ajouté
 
-- **Invitation par lien** : l'Organisateur peut inviter des membres via un lien privé avec token depuis la page de gestion de sa Communauté — génération/révocation du token, page de bienvenue dédiée, email d'invitation envoyé automatiquement à l'inscription
-- **Catégorie personnalisée** : les Communautés de type « Autre » peuvent saisir une catégorie libre (champ `customCategory`)
-- **Google Places API** : autocomplétion d'adresse alimentée par Google Places (New) en remplacement de l'API BAN — couverture mondiale (plus uniquement France)
-- **Analytics PostHog** : suivi des événements clés (inscription, création Communauté/événement, page vues, sign-up) — reverse proxy EU, désactivé hors production
-- **Notifications admin** : les admins de la plateforme reçoivent un email lors de la création d'une nouvelle Communauté ou d'un événement
-- **Retirer un membre** : l'Organisateur peut retirer un Participant de sa Communauté depuis la liste des membres — bouton ⋮ par ligne, dropdown, AlertDialog de confirmation
-- **Page Aide** : nouvelle page `/aide` avec FAQ accordion et formulaire de contact protégé contre les bots (honeypot), lien dans le footer
-- **Broadcast — cooldown 24h** : délai de 24h entre deux broadcasts avec indication visuelle sur le bouton grisé (remplace le verrou permanent)
+- **Profil public** : chaque membre a désormais une page de profil publique accessible via un lien unique (`/u/[identifiant]`) — partageable, visible uniquement par les membres connectés
+- **Noms cliquables** : les noms des participants sur une page événement, dans la liste des membres d'une Communauté et dans votre espace de gestion sont des liens vers leur profil public
+- **Section membres sur la page Communauté** : les membres connectés voient la liste complète des membres d'une Communauté, avec lien vers chaque profil
+- **"Voir mon profil public"** : depuis votre page profil, un lien direct vous permet de voir comment les autres membres vous voient
+- **Compteur membres cliquable** : sur la page de gestion d'une Communauté, cliquer sur le nombre de membres fait défiler la page jusqu'à la liste
 
 ### Amélioré
 
-- **CTA « Gérer cet événement »** : bouton plus visible (variant rose) sur la page publique d'un événement pour l'Organisateur connecté
-- **Badge « Vous »** : affiché après le nom de l'Organisateur sur la page événement publique
-- **Dashboard** : libellé « Vue : » ajouté devant le sélecteur de mode Organisateur/Participant
-- **Onglet Participant** : renommé « Mes inscriptions » (plus précis que « Mes événements »)
-- **Page Découvrir** : titre H1 « Communautés & événements » / « Communities & events »
-- **Footer** : lien vers The Spark (thespark.fr)
-
-### Corrigé
-
-- **Performance** : N+1 queries sur `auth()` éliminées via `React.cache()` — une seule requête DB par render au lieu d'une par composant
-- **Emails** : heure affichée correctement en timezone Europe/Paris (Europe/Paris)
-- **Localisation événement** : l'adresse s'affiche toujours sous le nom de lieu dans le pin « Où »
-- **Favicon** : ICO malformé corrigé, `apple-touch-icon` déclaré explicitement
-- **Onboarding** : setup profil déclenché systématiquement après chaque sign-in OAuth/email
+- **Notification admin** : l'équipe The Playground est notifiée par email à chaque premier login d'un nouvel utilisateur
 
 ---
 
-## [1.9.0] — 2026-03-02 — Broadcast, Radar amélioré & page Communauté
+## [1.10.0] — 2026-03-04 — Invitation membres, Google Places & Aide
 
 ### Ajouté
 
-- **Broadcast moment** : envoi d'un email groupé à tous les participants d'un événement depuis le dashboard Organisateur — éditeur inline sujet + corps, confirmation avant envoi, feedback succès/erreur
-- **Quitter la Communauté** : bouton disponible sur la page publique d'une Communauté (en plus du dashboard membre)
-- **Radar — recherche OR par mot-clé** : chaque source (Luma, Eventbrite, Meetup) lance un appel API par mot-clé en parallèle et fusionne les résultats avec déduplication par URL — meilleure couverture, plus de résultats
-- **Radar — 3 mots-clés max** : extraction pondérée (titre prioritaire > lieu > description) pour des termes plus précis et distinctifs
-- **Radar — redesign interface** : header avec pills ville + date, barre latérale colorée sur les sections, compteur de résultats en footer
+- **Invitation par lien privé** : en tant qu'Organisateur, invitez des personnes à rejoindre votre Communauté via un lien unique — générez-le, partagez-le, révoquez-le à tout moment depuis votre espace de gestion. Les personnes invitées reçoivent un email de bienvenue à leur inscription
+- **Autocomplétion d'adresse mondiale** : la recherche d'adresse lors de la création d'un événement est désormais alimentée par Google Places — fonctionne dans le monde entier, pas uniquement en France
+- **Retirer un membre** : l'Organisateur peut retirer un Participant de sa Communauté depuis la liste des membres
+- **Page Aide** : une page dédiée répond aux questions fréquentes et permet de contacter l'équipe directement depuis l'application
+- **Broadcast — délai de 24h** : après avoir envoyé un email groupé à vos participants, vous pouvez en renvoyer un nouveau au bout de 24h (plus de verrou permanent)
 
 ### Amélioré
 
-- **Radar** : source Mobilizon retirée — full-text search trop permissif (faux positifs sur les mots français contenant « ai »)
-- **Radar** : limite quotidienne augmentée de 10 à 25 analyses par utilisateur
-- **Page publique événement** : lien Communauté pointe vers `/circles/[slug]` (accessible sans authentification) au lieu de `/dashboard/circles/[slug]`
-- **Dashboard** : dot rose pour les événements organisés dans la timeline Participant
-- **Timelines Circle** : composant `MomentTimelineItem` unifié entre dashboard et page publique via prop `variant`
+- **Page événement** : bouton "Gérer cet événement" plus visible pour l'Organisateur connecté
+- **Badge "Vous"** : votre nom est mis en évidence sur la page publique d'un événement que vous organisez
+- **Mon espace** : libellé plus clair devant le sélecteur de vue Organisateur / Participant
+- **Mes inscriptions** : l'onglet s'appelle désormais "Mes inscriptions" (plus précis)
+- **Page Découvrir** : titre plus clair et adapté FR / EN
 
 ### Corrigé
 
-- **Commentaires** : suppression du mismatch d'hydratation sur les temps relatifs (date calculée côté client uniquement)
-- **Page publique Communauté** : dot gris pour les événements passés (au lieu de rose)
-- **Landing** : mise à jour des textes des piliers 2 et 3
+- **Emails** : l'heure affichée dans les emails est toujours en heure de Paris
+- **Adresse événement** : l'adresse complète s'affiche désormais correctement sous le nom du lieu
+- **Favicon** : l'icône de l'application s'affiche correctement sur tous les navigateurs et appareils
+- **Connexion** : le formulaire de complétion du profil se déclenche systématiquement à chaque premier login OAuth
 
 ---
 
-## [1.8.1] — 2026-03-01 — Correctifs CSP & stabilité CI
+## [1.9.0] — 2026-03-02 — Broadcast, Radar amélioré & Communauté
+
+### Ajouté
+
+- **Email groupé (Broadcast)** : en tant qu'Organisateur, envoyez un email personnalisé à tous les participants d'un événement en un clic depuis votre espace de gestion — sujet, corps du message, confirmation avant envoi
+- **Quitter une Communauté** : les membres peuvent quitter une Communauté directement depuis sa page publique, sans passer par leur espace
+- **Radar — recherche élargie** : le Radar cherche maintenant vos mots-clés sur chaque source (Luma, Eventbrite, Meetup) en parallèle et regroupe les résultats sans doublons — plus de résultats, meilleure couverture
+- **Radar — interface repensée** : ville et date affichés en haut, compteur de résultats en bas, sections plus lisibles
+
+### Amélioré
+
+- **Radar** : jusqu'à 25 analyses par jour (au lieu de 10)
+- **Page Communauté** : le lien depuis une page événement pointe désormais vers la page publique de la Communauté, accessible sans connexion
 
 ### Corrigé
 
-- **CSP** : autoriser `api-adresse.data.gouv.fr` dans `connect-src` — résout le blocage de l'autocomplétion d'adresse dans le formulaire de création d'événement
-- **Tests E2E** : test d'annulation d'inscription corrigé — stratégie `waitForResponse` + rechargement page pour éviter les aléas des transitions React 19 en CI
+- **Commentaires** : l'heure d'un commentaire ne "saute" plus au chargement de la page
+- **Page Communauté** : les événements passés sont affichés avec un indicateur visuel distinct (gris) des événements à venir
+
+---
+
+## [1.8.1] — 2026-03-01 — Correctifs
+
+### Corrigé
+
+- **Autocomplétion d'adresse** : la saisie d'adresse fonctionne à nouveau correctement dans le formulaire de création d'événement
 
 ---
 
@@ -81,110 +86,77 @@ Les évolutions du Playground, jour après jour.
 
 ### Ajouté
 
-- **Radar de planification** : outil IA intégré dans le formulaire de création d'événement
-  - Analyse le titre, la description et le lieu via Claude Haiku pour extraire mots-clés et ville
-  - Recherche d'événements similaires en parallèle sur Luma, Eventbrite, Meetup et Mobilizon
-  - Résultats streamés en temps réel (SSE) avec liens vers les événements concurrents
-  - Mots-clés éditables et relançables après modification
-  - Badge « NOUVEAU » inline, icône Radar lucide, bouton outline sans conteneur
-- **Rate limiting Radar** : 10 analyses par utilisateur par jour (illimité pour les admins)
-  - Message d'erreur clair à l'atteinte de la limite
-  - Table `radar_usage` en base pour le tracking quotidien
+- **Radar de planification** : outil intégré au formulaire de création d'événement — analysez votre titre et votre description pour détecter automatiquement les événements similaires déjà prévus sur Luma, Eventbrite et Meetup. Évitez les conflits de dates avant même de publier
+  - Résultats en temps réel avec lien vers chaque événement concurrent
+  - Mots-clés éditables pour affiner la recherche à la volée
+- **Limite d'utilisation** : 10 analyses Radar par jour pour garder le service performant pour tous
 
 ---
 
-## [1.7.0] — 2026-02-28 — Support multilingue ES / RO / NL
+## [1.7.0] — 2026-02-28 — Espagnol, Roumain & Néerlandais
 
 ### Ajouté
 
-- **Espagnol (ES)** : traduction complète de l'interface (576 clés)
-- **Roumain (RO)** : traduction complète de l'interface (576 clés)
-- **Néerlandais (NL)** : traduction complète de l'interface (576 clés)
-- Le sélecteur de langue propose désormais 5 langues : FR, EN, ES, RO, NL
-
-### Corrigé
-
-- **Hero roumain** : texte ajusté — « Organizează evenimente. » et « Animă colectivul. »
-- **Dashboard roumain** : « Panou » remplacé par « Tablou de bord » (4 occurrences)
-- **Page À propos** : mise à jour des types d'événements organisés (produit, agile)
+- **3 nouvelles langues** : l'interface est désormais disponible en espagnol, roumain et néerlandais — soit 5 langues au total (FR, EN, ES, RO, NL)
 
 ---
 
-## [1.6.0] — 2026-02-28 — Mode switcher Participant / Organisateur
+## [1.6.0] — 2026-02-28 — Vue Participant / Organisateur
 
 ### Ajouté
 
-- **Mode switcher dashboard** : pill switcher Participant / Organisateur dans « Mon espace »
-  - Mode Participant : événements auxquels on est inscrit, toutes ses Communautés
-  - Mode Organisateur : événements organisés (badge 👑 + compteur d'inscrits), Communautés hostées, CTAs création
-  - Le mode est persisté en base et mémorisé entre les sessions
-- **Page welcome** : choix du mode au premier accès (« Je participe » / « J'organise »)
-- **Backfill production** : migration des utilisateurs existants (22 organisateurs → ORGANIZER, 26 → PARTICIPANT)
+- **Deux vues dans Mon espace** : choisissez d'afficher votre tableau de bord en tant que Participant (événements auxquels vous êtes inscrit, toutes vos Communautés) ou en tant qu'Organisateur (événements que vous organisez avec le nombre d'inscrits, Communautés que vous gérez, raccourcis de création). Votre choix est mémorisé entre les sessions
+- **Page de bienvenue** : à votre première connexion, choisissez votre profil d'usage ("Je participe" ou "J'organise") pour démarrer directement dans la bonne vue
 
 ### Corrigé
 
-- **Auth OAuth Vercel preview** : `trustHost: true` dans la config Auth.js v5 — résout l'erreur « Authentication error » sur les URLs preview dynamiques
-- **Badge Organisateur** : en mode Participant, les événements des Communautés hostées affichent désormais le badge 👑 Organisateur au lieu de « Inscrit »
+- **Connexion sur les liens de prévisualisation** : les liens de preview Vercel ne génèrent plus d'erreur d'authentification
 
 ---
 
-## [1.5.0] — 2026-02-26 — Notifications & qualité
+## [1.5.0] — 2026-02-26 — Notifications & outils Organisateur
 
 ### Ajouté
 
-- **Email Organisateur** : confirmation à la création d'un événement (avec ICS en pièce jointe)
-- **Email Organisateur** : notification lors d'un nouveau follower de la Communauté
-- **Email participants** : notification d'annulation lors de la suppression d'un événement
-- **Boutons calendrier** : "Ajouter au calendrier" disponible pour l'Organisateur (Google, Apple, ICS)
-- **Export CSV** : export des inscrits depuis la vue Organisateur (colonnes prénom, nom, email, statut, date)
-- **Commentaires** : formulaire activé sur les événements passés (pic d'engagement post-event)
-- **Page événement** : prochains événements du Circle affichés en bas de page (rétention)
-- **Lien Mon espace** : ajouté dans l'email de confirmation d'inscription pour guider les nouveaux membres
+- **Email de confirmation Organisateur** : recevez un email récapitulatif (avec fichier .ics) à chaque fois que vous créez un événement
+- **Notification nouveau follower** : recevez un email quand quelqu'un rejoint votre Communauté
+- **Notification d'annulation aux participants** : si vous supprimez un événement, tous les participants reçoivent automatiquement un email d'annulation
+- **Calendrier Organisateur** : les boutons "Ajouter à mon calendrier" (Google, Apple, .ics) sont disponibles pour l'Organisateur également
+- **Export CSV** : téléchargez la liste complète des inscrits à un événement (prénom, nom, email, statut, date d'inscription) depuis votre espace de gestion
+- **Commentaires sur les événements passés** : les participants peuvent toujours commenter après la fin d'un événement — idéal pour les retours et la discussion post-événement
+- **Prochains événements** : en bas de chaque page événement, les prochains événements de la Communauté sont affichés pour encourager les participants à revenir
 
 ### Corrigé
 
-- **ICS — date invalide** : validation côté formulaire empêchant une date de fin antérieure à la date de début
-- **ICS — cache** : `revalidatePath` ajouté après create/update/delete — la page publique se rafraîchit immédiatement
-- **Erreurs email** : capturées dans Sentry (permet d'alerter en cas de quota Resend dépassé)
-- **iOS Chrome** : `RangeError: Invalid Date` sur la création d'événement à minuit — guard ajouté dans `combineDateAndTime`
-- **Page d'erreur globale** : amélioration du rendu et du message
+- **Pièce jointe calendrier** : il n'est plus possible de créer un événement avec une date de fin antérieure à la date de début
+- **iOS Chrome** : correction d'une erreur qui bloquait la création d'événement à minuit sur certains appareils Apple
 
 ---
 
-## [1.4.0] — 2026-02-26 — Performance & Admin enrichi
+## [1.4.0] — 2026-02-26 — Chargement instantané
 
 ### Amélioré
 
-- **Dashboard** : streaming Suspense — FCP réduit de ~3.5 s à <0.5 s grâce à `loading.tsx` + `<Suspense>` interne
-  - Squelette instantané à la navigation, données streamées en arrière-plan
-  - `shouldRedirectToWelcome` extrait en fonction pure (testable, 10 cas couverts)
-- **Audit perf** : corrections N+1, transactions atomiques, ISR et parallélisation des requêtes
+- **Mon espace se charge instantanément** : l'affichage du squelette de la page est immédiat, les données se chargent ensuite en arrière-plan — fini l'écran blanc pendant le chargement
 
 ### Ajouté
 
-- **Admin — Commentaires** : compteur global (stats dashboard) + détail par événement (liste + fiche)
+- **Admin — suivi des commentaires** : statistiques globales et détail par événement dans l'espace d'administration
 
 ---
 
-## [1.3.0] — 2026-02-26 — PWA & Notifications événement
+## [1.3.0] — 2026-02-26 — Application installable & notifications de changement
 
 ### Ajouté
 
-- Support **Progressive Web App** : installable sur iOS (Safari) et Android (Chrome)
-  - Icônes haute résolution (192×512px), manifest, service worker
-  - Landing page : section « Télécharger l'app » avec badges iOS/Android et instructions pas-à-pas
-  - Mode standalone : redirection automatique vers le dashboard, logo adapté (plus de flash landing)
-- Notifications email aux participants en cas de **changement de date, heure ou lieu** d'un événement
-  - Email avec les modifications mises en évidence + nouvelle invitation calendrier (ICS)
-- Footer : affichage de la **version de l'app** à côté du copyright
+- **Installable sur votre téléphone** : The Playground peut s'installer comme une application sur iOS (Safari) et Android (Chrome) — icône sur l'écran d'accueil, expérience plein écran
+- **Notifications de modification** : si l'Organisateur modifie la date, l'heure ou le lieu d'un événement, tous les participants inscrits reçoivent un email avec les nouvelles informations et une invitation calendrier mise à jour
+- **Version affichée** : le numéro de version de l'application est visible dans le footer
 
 ### Corrigé
 
-- ICS : décalage horaire corrigé dans `combineDateAndTime` (heure locale → UTC)
-- Formatage des dates : centralisation via `Intl` + fuseau `Europe/Paris` (supprime les erreurs SSR/hydration)
-- Sentry : capture des erreurs inattendues côté serveur (unexpected response + hydration)
-- Config : `bodySizeLimit` des Server Actions augmenté à 4 Mo
-- i18n : bouton « Publier » sur le formulaire événement (était « Submit »)
+- **Dates dans les emails** : l'heure affichée dans les invitations calendrier (.ics) est désormais correcte
+- **Affichage des dates** : les dates ne "sautent" plus au chargement de la page entre le rendu serveur et côté navigateur
 
 ---
 
@@ -192,138 +164,109 @@ Les évolutions du Playground, jour après jour.
 
 ### Ajouté
 
-- Page Profil : tab **Notifications** avec 4 toggles opt-out (tout activé par défaut)
-  - En tant qu'Organisateur : nouvelle inscription, nouveau commentaire, nouveau follower
-  - En tant que Participant : nouvel événement dans une Communauté suivie
-- Guards email : les notifications respectent les préférences de chaque destinataire
-- Script `pnpm db:backfill-notification-prefs` — correction des valeurs pour les users existants
+- **Gérez vos notifications** : depuis votre profil, choisissez quels emails vous souhaitez recevoir — 4 options indépendantes (nouvelle inscription, nouveau commentaire, nouveau follower, nouvel événement dans une Communauté suivie). Tout est activé par défaut, désactivez ce dont vous n'avez pas besoin
 
 ---
 
-## [1.1.0] — 2026-02-25 — Polish & sécurité
+## [1.1.0] — 2026-02-25 — Navigation & partage
 
 ### Ajouté
 
-- Explorer : pagination "Voir plus" — chargement par batch de 12 Communautés ou événements
-- Page Communauté dashboard : section lien partageable pour les Organisateurs (avec copie en un clic)
-- Liste des membres et des inscrits : vue verticale 1 par ligne, badge Organisateur avec couronne, "Voir plus" à partir de 10
-- Navigation : mise en évidence de la page active dans le header et le menu mobile
-- Authentification : icônes Google et GitHub sur les boutons OAuth
-- Page À propos : section "Le code" avec lien vers le dépôt GitHub
+- **Découvrir — "Voir plus"** : les Communautés et événements se chargent par lots sur la page Découvrir, plus de page unique interminable
+- **Lien de partage** : sur la page de gestion de votre Communauté, retrouvez le lien public à partager, avec copie en un clic
+- **Liste des membres améliorée** : vue verticale une ligne par membre, badge Organisateur avec couronne, bouton "Voir plus" au-delà de 10 membres
+- **Navigation active** : la page en cours est mise en évidence dans le menu de navigation
+- **Connexion Google / GitHub** : les boutons OAuth affichent maintenant le logo du service
 
 ### Corrigé
 
-- Covers des événements absentes de la timeline publique d'une Communauté
-- Hydration error sur les dates du dashboard
-- NotFoundError iOS Safari sur les menus déroulants (Select)
-- Layout mobile Explorer et Dashboard
-- Google Maps : migration vers Embed API v1
-
-### Sécurité
-
-- Corrections SAST : SSRF, auth guard, CSP, HSTS
-- CSP : autorisation des sous-domaines Vercel Blob et Google Maps
-- DAST OWASP ZAP : scan baseline prod + scan full sur les previews PRs
+- **Images de couverture** : les covers des événements s'affichaient parfois absentes dans la timeline publique d'une Communauté — corrigé
+- **iOS Safari** : les menus déroulants (Select) ne provoquent plus d'erreur silencieuse sur iPhone
 
 ---
 
-## [1.0.0] — 2026-02-24 — Release majeure
+## [1.0.0] — 2026-02-24 — Tableau de bord Communautés
 
-### Ajouté
+### Amélioré
 
-- Dashboard "Mes Communautés" : cartes style Explorer — cover 1:1, catégorie, badge rôle, stats membres/événements, prochain événement, bouton "Créer un événement" pour les Organisateurs
-- Type domaine `DashboardCircle` + usecase `getUserDashboardCircles` + requête repository unique (sans N+1)
-
-### Modifié
-
-- Dashboard "Mes événements" : couverture déplacée à gauche (64px), titre sur 2 lignes, badge aligné à droite
-- Explorer : refonte cartes événement — cover 1:1, alignement sur les cartes Communauté, badges Organisateur / Inscrit / Liste d'attente, grille 3 colonnes
-- Sélecteur d'image de couverture : corrections mobiles iOS Safari (plein écran, grille 2 colonnes)
-
-### Corrigé
-
-- Optimisations SQL : count côté base + `take: 1` sur les moments à venir (suppression du sur-fetching)
+- **"Mes Communautés" repensé** : chaque Communauté est affichée sous forme de carte avec sa photo, sa catégorie, le nombre de membres et d'événements, le prochain événement à venir, et un bouton de création rapide d'événement pour les Organisateurs
 
 ---
 
-## [0.10.0] — 2026-02-23 — À propos & Changelog
+## [0.10.0] — 2026-02-23 — Pages institutionnelles
 
 ### Ajouté
 
-- Page À propos — histoire du projet, le problème, la réponse, où on en est
-- Page Changelog — timeline des versions, mise à jour automatique à chaque release
-- Automatisation des releases (release-please)
+- **Page À propos** : l'histoire du projet, le problème qu'il résout, et où on en est
+- **Page Changelog** : toutes les nouveautés du Playground, consultables depuis l'application
 
 ---
 
-## [0.9.0] — 2026-02-23 — Polish & terminologie
+## [0.9.0] — 2026-02-23 — Terminologie & expérience
 
 ### Ajouté
 
-- Page de bienvenue pour les nouveaux utilisateurs après onboarding
+- **Page de bienvenue** : les nouveaux membres arrivent sur une page dédiée après avoir créé leur profil
 
-### Modifié
+### Amélioré
 
-- Terminologie FR simplifiée : Cercle → Communauté, Escale → événement, Mon Playground → Mon espace
-- Section d'inscription repensée : bouton S'inscrire + compteur de places sur une même ligne
-- Badges de rôle et de statut harmonisés sur toutes les vues
+- **Terminologie simplifiée** : les termes "Cercle" et "Escale" sont devenus "Communauté" et "événement" — le vocabulaire est maintenant naturel et accessible
+- **Section inscription** : le bouton S'inscrire et le nombre de places restantes sont affichés sur la même ligne — plus lisible, surtout sur mobile
 
 ---
 
-## [0.8.0] — 2026-02-21 — Finition produit
+## [0.8.0] — 2026-02-21 — Profil complet & mobile
 
 ### Ajouté
 
-- Upload d'avatar sur le profil (avec protection OAuth)
-- Suppression de compte depuis la page profil
-- Boutons "Ajouter au calendrier" après inscription (Google Calendar + .ics)
-- Position dans la liste d'attente affichée sur la page événement
-- Pages légales (mentions légales, confidentialité, CGU)
-- SEO & OpenGraph — images dynamiques, sitemap, robots.txt
-- Design responsive mobile complet
+- **Photo de profil** : téléchargez votre propre avatar depuis votre page profil
+- **Suppression de compte** : vous pouvez supprimer votre compte à tout moment depuis votre profil
+- **Ajouter à mon calendrier** : boutons Google Calendar, Apple Calendar et .ics disponibles après inscription à un événement
+- **Position dans la liste d'attente** : voyez exactement à quelle position vous êtes dans la file d'attente d'un événement complet
+- **Pages légales** : mentions légales, politique de confidentialité et conditions générales d'utilisation disponibles
+- **Design mobile complet** : toutes les pages sont optimisées pour une utilisation sur smartphone
 
 ---
 
-## [0.7.0] — 2026-02-21 — Emails transactionnels
+## [0.7.0] — 2026-02-21 — Emails de confirmation
 
 ### Ajouté
 
-- Confirmation d'inscription par email
-- Email de confirmation liste d'attente
-- Email de promotion liste d'attente ("une place s'est libérée !")
-- Notification à l'organisateur à chaque nouvelle inscription
-- Pièce jointe .ics dans les emails de confirmation
+- **Confirmation d'inscription** : recevez un email avec les détails de l'événement et un fichier .ics pour l'ajouter à votre calendrier
+- **Liste d'attente** : email de confirmation quand vous rejoignez la liste d'attente
+- **Promotion automatique** : email de notification quand une place se libère et que vous êtes promu inscrit
+- **Notification Organisateur** : l'Organisateur reçoit un email à chaque nouvelle inscription
 
 ---
 
-## [0.6.0] — 2026-02-21 — Admin plateforme
+## [0.6.0] — 2026-02-21 — Espace d'administration
 
 ### Ajouté
 
-- Tableau de bord admin avec statistiques (utilisateurs, communautés, événements, inscriptions)
-- Gestion des utilisateurs, communautés et événements (recherche, détail, suppression)
-- Possibilité de forcer l'annulation d'un événement
+- **Tableau de bord admin** : statistiques globales de la plateforme (utilisateurs, Communautés, événements, inscriptions)
+- **Gestion de la plateforme** : recherche, consultation et suppression de comptes, Communautés et événements
+- **Annulation forcée** : possibilité d'annuler un événement depuis l'espace d'administration en cas de besoin
 
 ---
 
-## [0.5.0] — 2026-02-21 — Découverte publique
+## [0.5.0] — 2026-02-21 — Découvrir
 
 ### Ajouté
 
-- Page Découvrir — répertoire public de Communautés et d'événements, filtrable par catégorie
-- Pages Communauté publiques, accessibles sans compte
-- Page d'accueil avec présentation du produit
+- **Page Découvrir** : répertoire public de toutes les Communautés et événements, filtrable par catégorie — trouvez facilement une Communauté qui vous correspond
+- **Pages Communauté publiques** : chaque Communauté a une page accessible sans connexion — partageable, lisible par tous
+- **Page d'accueil** : présentation du produit pour les nouveaux visiteurs
 
 ---
 
 ## [0.4.0] — 2026-02-21 — Design premium
 
-### Modifié
+### Amélioré
 
-- Dashboard redesigné : timeline unifiée à venir / passés, états vides avec appel à l'action
-- Page Communauté redesignée : 2 colonnes, toggle À venir / Passés
-- Page Profil redesignée : avatar, stats, métadonnées
-- Liste des membres : Organisateurs en premier, emails visibles pour les Organisateurs uniquement
+- **Mon espace repensé** : timeline unifiée avec vos prochains événements et passés, états vides avec guides pour démarrer
+- **Page Communauté repensée** : deux colonnes, bascule À venir / Passés claire
+- **Page Profil repensée** : avatar, statistiques, informations d'un coup d'œil
+- **Liste des membres** : Organisateurs affichés en premier, emails visibles uniquement pour les Organisateurs
 
 ---
 
@@ -331,30 +274,30 @@ Les évolutions du Playground, jour après jour.
 
 ### Ajouté
 
-- Fil de commentaires sur chaque événement
-- Autocomplétion d'adresse (API BAN) dans le formulaire événement
-- Événements annulés visibles dans la timeline de la Communauté
+- **Commentaires** : chaque événement dispose d'un fil de discussion pour poser des questions, partager des infos ou réagir après l'événement
+- **Autocomplétion d'adresse** : commencez à taper une adresse lors de la création d'un événement, les suggestions apparaissent automatiquement
+- **Événements annulés** : visibles dans la timeline de la Communauté pour garder l'historique complet
 
 ---
 
-## [0.2.0] — 2026-02-20 — Parcours complet
+## [0.2.0] — 2026-02-20 — Inscriptions & Communauté
 
 ### Ajouté
 
-- Inscriptions : s'inscrire, annuler, consulter la liste des participants
-- Liste d'attente avec promotion automatique sur désistement
-- Rejoindre un événement inscrit automatiquement à la Communauté
-- Tableau de bord : "Mes prochains événements" et "Mes Communautés"
-- Profil utilisateur et onboarding au premier login
+- **S'inscrire à un événement** : inscription, annulation, et consultation de la liste des participants
+- **Liste d'attente** : si l'événement est complet, rejoignez la liste d'attente — votre place se libère automatiquement en cas de désistement
+- **Membre automatique** : s'inscrire à un événement vous rend automatiquement membre de la Communauté — sans étape supplémentaire
+- **Mon espace** : tableau de bord avec vos prochains événements et vos Communautés
+- **Profil utilisateur** : page de profil et formulaire d'onboarding au premier login
 
 ---
 
-## [0.1.0] — 2026-02-19 — Fondations
+## [0.1.0] — 2026-02-19 — Lancement
 
 ### Ajouté
 
-- Création et gestion de Communautés et d'événements
-- Page événement publique et partageable (`/m/[slug]`)
-- Authentification — Magic link + Google + GitHub
-- Interface bilingue FR / EN
-- Déploiement — Vercel (EU) + PostgreSQL serverless (Neon EU)
+- **La plateforme est en ligne** : créez votre Communauté, organisez vos événements, partagez le lien — c'est tout
+- **Page événement partageable** : chaque événement a une URL propre et autonome, parfaite pour être partagée via WhatsApp, Slack ou Instagram
+- **Connexion sans friction** : connectez-vous via Magic Link (email), Google ou GitHub — pas de mot de passe à retenir
+- **Interface bilingue** : disponible en français et en anglais dès le premier jour
+- **Hébergé en Europe** : application et base de données hébergées dans l'Union Européenne

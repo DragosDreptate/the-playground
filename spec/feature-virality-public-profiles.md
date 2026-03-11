@@ -54,7 +54,7 @@ Augmenter la conversion en rendant visibles les membres d'une communauté à **t
 - Informations masquées : email, date d'adhésion, rôle détaillé (sauf badge Organisateur)
 - Badge "Organisateur" visible sur les Hosts
 - Ordre d'affichage : Organisateurs d'abord, puis membres triés par date d'adhésion ascendante (les membres les plus anciens apparaissent en premier)
-- Pagination : afficher les 10 premiers membres, bouton "Voir tous les membres" pour la liste complète
+- Pagination : afficher les 12 premiers membres, bouton "Voir tous les membres" pour la liste complète
 - Compteur total de membres visible par tous (connecté ou non) — comportement inchangé
 - **Le compteur de membres est cliquable** pour les utilisateurs connectés → scroll/ancre vers la section membres
 - Pour les visiteurs non connectés : compteur non cliquable + message "Connecte-toi pour voir les membres"
