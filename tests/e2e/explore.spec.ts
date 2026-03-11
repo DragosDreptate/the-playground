@@ -48,15 +48,15 @@ test.describe("Découvrir — page Explorer", () => {
 
   test("should list public Circles", async ({ page }) => {
     const circleCards = page.locator("a[href*='/circles/']");
-    await expect(circleCards.first()).toBeVisible({ timeout: 10_000 });
+    await expect(circleCards.first()).toBeVisible();
   });
 
   test("should navigate to a Circle page when clicking a Circle card", async ({ page }) => {
     const circleLink = page.locator("a[href*='/circles/']").first();
-    await expect(circleLink).toBeVisible({ timeout: 10_000 });
+    await expect(circleLink).toBeVisible();
     await circleLink.click();
 
-    await expect(page).toHaveURL(/\/circles\//, { timeout: 10_000 });
+    await expect(page).toHaveURL(/\/circles\//);
     await expect(page.locator("h1")).toBeVisible();
   });
 
@@ -68,7 +68,7 @@ test.describe("Découvrir — page Explorer", () => {
     await momentsTab.click();
 
     const momentLinks = page.locator("a[href*='/m/']");
-    await expect(momentLinks.first()).toBeVisible({ timeout: 10_000 });
+    await expect(momentLinks.first()).toBeVisible();
   });
 });
 
@@ -108,8 +108,8 @@ test.describe("Découvrir — page Communauté publique", () => {
     const isVisible = await eventLink.isVisible().catch(() => false);
     if (isVisible) {
       await eventLink.click();
-      await expect(page).toHaveURL(/\/m\//, { timeout: 10_000 });
-      await expect(page.locator("h1").first()).toBeVisible({ timeout: 10_000 });
+      await expect(page).toHaveURL(/\/m\//);
+      await expect(page.locator("h1").first()).toBeVisible();
     }
   });
 });
@@ -128,6 +128,6 @@ test.describe("Découvrir — accès depuis le header (utilisateur connecté)", 
     await page.goto("/fr/dashboard");
     const exploreLink = page.locator("header a[href*='/explorer']").first();
     await exploreLink.click();
-    await expect(page).toHaveURL(/\/explorer/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/\/explorer/);
   });
 });

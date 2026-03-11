@@ -66,7 +66,7 @@ test.describe("Inscription à un Moment — utilisateur authentifié", () => {
       .locator("button, [data-testid='registration-status']")
       .filter({ hasText: /inscrit|registered|annuler|cancel/i })
       .first()
-      .isVisible({ timeout: 8_000 })
+      .isVisible()
       .catch(() => false);
 
     if (!isAlreadyRegistered) {
@@ -75,7 +75,7 @@ test.describe("Inscription à un Moment — utilisateur authentifié", () => {
         page.locator("button, [data-testid='registration-status']").filter({
           hasText: /inscrit|registered|annuler|cancel/i,
         }).first()
-      ).toBeVisible({ timeout: 10_000 });
+      ).toBeVisible();
     } else {
       // Déjà inscrit — le statut est bien affiché
       await expect(
