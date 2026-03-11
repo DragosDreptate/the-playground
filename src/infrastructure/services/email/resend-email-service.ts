@@ -14,6 +14,7 @@ import type {
   BroadcastMomentEmailData,
   AdminEntityCreatedEmailData,
   CircleInvitationEmailData,
+  CircleInvitationsBatchEmailData,
   AdminNewUserEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
@@ -224,6 +225,20 @@ export function createResendEmailService(): EmailService {
         subject: data.strings.subject,
         react: CircleInvitationEmail({ ...data, baseUrl }),
       });
+    },
+
+    async sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void> {
+      const realRecipients = data.recipients.filter((email) => !isDemoEmail(email));
+      if (realRecipients.length === 0) return;
+
+      const batch = realRecipients.map((email) => ({
+        from,
+        to: email,
+        subject: data.strings.subject,
+        react: CircleInvitationEmail({ ...data, to: email, baseUrl }),
+      }));
+
+      await resend.batch.send(batch);
     },
 
     async sendAdminNewUser(data: AdminNewUserEmailData): Promise<void> {
