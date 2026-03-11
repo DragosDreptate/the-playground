@@ -19,6 +19,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { getDisplayName } from "@/lib/display-name";
 import { FollowButton } from "@/components/circles/follow-button";
+import { ExpandableDescription } from "@/components/circles/expandable-description";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
@@ -107,13 +108,14 @@ export default async function PublicCirclePage({
   params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, session] =
+  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, tCommon, session] =
     await Promise.all([
       params,
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
+      getTranslations("Common"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
@@ -382,7 +384,11 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">{circle.description}</p>
+              <ExpandableDescription
+                description={circle.description}
+                seeMoreLabel={tCommon("showMore")}
+                seeLessLabel={tCommon("showLess")}
+              />
             </div>
           )}
 
