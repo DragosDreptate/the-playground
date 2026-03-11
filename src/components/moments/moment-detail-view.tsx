@@ -256,9 +256,18 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 {t("public.hostedBy")}{" "}
                 {hosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
-                    <span className="text-foreground font-medium">
-                      {hostDisplayName(h)}
-                    </span>
+                    {isAuthenticated && h.user.publicId ? (
+                      <Link
+                        href={`/u/${h.user.publicId}`}
+                        className="text-foreground font-medium hover:underline underline-offset-2"
+                      >
+                        {hostDisplayName(h)}
+                      </Link>
+                    ) : (
+                      <span className="text-foreground font-medium">
+                        {hostDisplayName(h)}
+                      </span>
+                    )}
                     {h.user.id === props.currentUserId && (
                       <Badge variant="secondary" className="px-1.5 py-0 text-xs">
                         {tCommon("you")}
