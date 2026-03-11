@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
+import { getDisplayName } from "@/lib/display-name";
 import { FollowButton } from "@/components/circles/follow-button";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
@@ -339,9 +340,25 @@ export default async function PublicCirclePage({
           {/* "Organisé par" + raccourci Organisateur */}
           <div className="flex items-center justify-between gap-4">
             {hosts.length > 0 && (
-              <p className="text-muted-foreground text-sm">
-                {t("detail.hostedBy")}{" "}
-                <span className="text-foreground font-medium">{hostNames}</span>
+              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                {t("detail.hostedBy")}
+                {hosts.map((h, i) => (
+                  <span key={h.user.id} className="flex items-center gap-1">
+                    {isConnected && h.user.publicId ? (
+                      <Link
+                        href={`/u/${h.user.publicId}`}
+                        className="text-foreground font-medium hover:underline underline-offset-2"
+                      >
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
+                      </Link>
+                    ) : (
+                      <span className="text-foreground font-medium">
+                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
+                      </span>
+                    )}
+                    {i < hosts.length - 1 && <span>,</span>}
+                  </span>
+                ))}
               </p>
             )}
             {isHost && (
