@@ -8,6 +8,7 @@ import {
   Button,
   Link,
   Hr,
+  Img,
 } from "@react-email/components";
 import * as React from "react";
 import type { CircleInvitationEmailData } from "@/domain/ports/services/email-service";
@@ -81,8 +82,8 @@ export function CircleInvitationEmail({
                     <tbody><tr>
                       <td style={{ verticalAlign: "middle" }}>
                         <table cellPadding="0" cellSpacing="0" role="presentation"><tbody><tr>
-                          <td style={{ width: "22px", height: "22px", borderRadius: "6px", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }}>
-                            {/* icon */}
+                          <td style={{ width: "22px", height: "22px", verticalAlign: "middle" }}>
+                            <Img src={`${baseUrl}/icon-192.png`} width="22" height="22" alt="The Playground" style={{ borderRadius: "6px", display: "block" }} />
                           </td>
                           <td style={{ paddingLeft: "8px", verticalAlign: "middle", fontSize: "13px", fontWeight: 700, color: "#1a1b2e", letterSpacing: "-0.01em" }}>
                             The Playground
