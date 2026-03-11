@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -10,25 +10,39 @@ type Props = {
   maxLines?: number;
 };
 
+const clampBase = {
+  display: "-webkit-box",
+  WebkitBoxOrient: "vertical" as const,
+  overflow: "hidden",
+};
+
 export function CollapsibleDescription({ text, maxLines = 5 }: Props) {
   const t = useTranslations("Common");
   const ref = useRef<HTMLParagraphElement>(null);
   const [isClamped, setIsClamped] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  useEffect(() => {
+  const checkClamped = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    // scrollHeight > clientHeight means the text is overflowing the clamp
     setIsClamped(el.scrollHeight > el.clientHeight + 1);
-  }, [text]);
+  }, []);
+
+  useEffect(() => {
+    checkClamped();
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver(checkClamped);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [text, maxLines, checkClamped]);
 
   return (
     <div>
       <p
         ref={ref}
-        className={`text-sm leading-relaxed whitespace-pre-wrap ${expanded ? "" : `line-clamp-${maxLines}`}`}
-        style={expanded ? undefined : { WebkitLineClamp: maxLines, display: "-webkit-box", WebkitBoxOrient: "vertical", overflow: "hidden" }}
+        className="text-sm leading-relaxed whitespace-pre-wrap"
+        style={expanded ? undefined : { ...clampBase, WebkitLineClamp: maxLines }}
       >
         {text}
       </p>

@@ -43,6 +43,23 @@ function getInitials(user: CircleMemberWithUser["user"]): string {
   return user.email[0].toUpperCase();
 }
 
+type HostUser = CircleMemberWithUser["user"];
+
+function HostLink({ user, className }: { user: HostUser; className?: string }) {
+  const name = getDisplayName(user.firstName, user.lastName, user.email);
+  if (user.publicId) {
+    return (
+      <Link
+        href={`/u/${user.publicId}`}
+        className={`hover:underline underline-offset-2${className ? ` ${className}` : ""}`}
+      >
+        {name}
+      </Link>
+    );
+  }
+  return className ? <span className={className}>{name}</span> : <>{name}</>;
+}
+
 
 // ── Page ──────────────────────────────────────────────────────
 
@@ -230,16 +247,7 @@ export default async function CircleDetailPage({
               <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
                 {hosts.map((h, i) => (
                   <span key={h.user.id}>
-                    {h.user.publicId ? (
-                      <Link
-                        href={`/u/${h.user.publicId}`}
-                        className="hover:underline underline-offset-2"
-                      >
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </Link>
-                    ) : (
-                      getDisplayName(h.user.firstName, h.user.lastName, h.user.email)
-                    )}
+                    <HostLink user={h.user} />
                     {i < hosts.length - 1 && ", "}
                   </span>
                 ))}
@@ -283,18 +291,7 @@ export default async function CircleDetailPage({
                 {t("detail.hostedBy")}
                 {hosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
-                    {h.user.publicId ? (
-                      <Link
-                        href={`/u/${h.user.publicId}`}
-                        className="text-foreground font-medium hover:underline underline-offset-2"
-                      >
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </Link>
-                    ) : (
-                      <span className="text-foreground font-medium">
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </span>
-                    )}
+                    <HostLink user={h.user} className="text-foreground font-medium" />
                     {i < hosts.length - 1 && <span>,</span>}
                   </span>
                 ))}
