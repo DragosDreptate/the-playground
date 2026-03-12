@@ -20,3 +20,8 @@ export const adminInsightItems = [
   { key: "insightComments", href: "/admin/insights/comments", icon: MessageSquare },
   { key: "insightActivation", href: "/admin/insights/activation", icon: TrendingUp },
 ] as const;
+
+export function isAdminPathActive(cleanPath: string, href: string): boolean {
+  if (href === "/admin") return cleanPath === "/admin";
+  return cleanPath.startsWith(href);
+}

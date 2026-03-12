@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { adminNavItems, adminInsightItems } from "./admin-nav";
+import { adminNavItems, adminInsightItems, isAdminPathActive } from "./admin-nav";
+import { AdminLogo } from "./admin-logo";
 
 export function AdminSidebar() {
   const t = useTranslations("Admin");
@@ -15,8 +16,7 @@ export function AdminSidebar() {
   const cleanPath = pathname.replace(/^\/(fr|en)/, "");
 
   function isActive(href: string) {
-    if (href === "/admin") return cleanPath === "/admin";
-    return cleanPath.startsWith(href);
+    return isAdminPathActive(cleanPath, href);
   }
 
   return (
@@ -24,11 +24,7 @@ export function AdminSidebar() {
       {/* Header */}
       <div className="flex h-14 items-center border-b border-border/40 px-4">
         <Link href="/admin" className="flex items-center gap-2">
-          <div className="flex size-6 items-center justify-center rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" className="ml-px">
-              <polygon points="0,0 0,12 10,6" fill="white" />
-            </svg>
-          </div>
+          <AdminLogo />
           <span className="text-sm font-semibold">{t("title")}</span>
         </Link>
       </div>

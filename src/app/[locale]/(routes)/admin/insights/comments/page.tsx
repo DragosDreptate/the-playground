@@ -30,7 +30,7 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
 
   const sortParams: Record<string, string> = { days: String(days) };
   const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
-    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
   const { comments, total } = await prismaAdminRepository.getCommentsInsight(
