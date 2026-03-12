@@ -112,7 +112,6 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
       </svg>
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>{formatAxisDate(data[0].date)}</span>
-        <span className="font-medium text-foreground">{total.toLocaleString("fr-FR")} total</span>
         <span>{formatAxisDate(data[data.length - 1].date)}</span>
       </div>
     </div>
