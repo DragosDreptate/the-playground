@@ -15,6 +15,7 @@ import type {
   AdminMomentRow,
   AdminMomentDetail,
   AdminInsightRegistration,
+  AdminInsightComment,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 import { Prisma } from "@prisma/client";
@@ -559,6 +560,43 @@ export const prismaAdminRepository: AdminRepository = {
         circleName: r.moment.circle.name,
         status: r.status,
         registeredAt: r.registeredAt,
+      })),
+      total,
+    };
+  },
+
+  async getCommentsInsight(
+    days: number,
+    limit: number,
+    offset: number
+  ): Promise<{ comments: AdminInsightComment[]; total: number }> {
+    const since = daysAgo(days);
+    const [comments, total] = await Promise.all([
+      prisma.comment.findMany({
+        where: { createdAt: { gte: since }, user: realUserWhere() },
+        include: {
+          user: { select: { email: true, firstName: true, lastName: true } },
+          moment: { select: { title: true, slug: true, circle: { select: { name: true } } } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.comment.count({
+        where: { createdAt: { gte: since }, user: realUserWhere() },
+      }),
+    ]);
+    return {
+      comments: comments.map((c) => ({
+        id: c.id,
+        userId: c.userId,
+        userEmail: c.user.email,
+        userName: [c.user.firstName, c.user.lastName].filter(Boolean).join(" ") || null,
+        content: c.content,
+        momentTitle: c.moment.title,
+        momentSlug: c.moment.slug,
+        circleName: c.moment.circle.name,
+        createdAt: c.createdAt,
       })),
       total,
     };

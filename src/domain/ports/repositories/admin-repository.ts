@@ -179,6 +179,22 @@ export type AdminInsightRegistration = {
 };
 
 // ─────────────────────────────────────────────
+// Insight — Comments
+// ─────────────────────────────────────────────
+
+export type AdminInsightComment = {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string | null;
+  content: string;
+  momentTitle: string;
+  momentSlug: string;
+  circleName: string;
+  createdAt: Date;
+};
+
+// ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
 
@@ -213,6 +229,11 @@ export interface AdminRepository {
     limit: number,
     offset: number
   ): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
+  getCommentsInsight(
+    days: number,
+    limit: number,
+    offset: number
+  ): Promise<{ comments: AdminInsightComment[]; total: number }>;
   getUsersByActivation(
     segment: "never" | "once" | "retained",
     limit: number,
