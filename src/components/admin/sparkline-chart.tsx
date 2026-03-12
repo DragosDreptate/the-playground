@@ -77,7 +77,7 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
             y1={y.toFixed(1)}
             x2={W - PAD_RIGHT}
             y2={y.toFixed(1)}
-            stroke="currentColor"
+            stroke="white"
             strokeOpacity="0.08"
             strokeWidth="1"
           />
@@ -92,8 +92,8 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
             textAnchor="end"
             dominantBaseline="middle"
             fontSize="9"
-            fill="currentColor"
-            fillOpacity="0.45"
+            fill="white"
+            fillOpacity="0.5"
           >
             {formatY(value)}
           </text>
