@@ -53,9 +53,9 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               <SH label={t("columns.name")} column="name" />
               <SH label={t("columns.email")} column="email" />
               <SH label={t("columns.role")} column="role" />
-              <SH label={t("columns.circles")} column="circleCount" className="text-right" />
-              <SH label={t("columns.moments")} column="momentCount" className="text-right" />
-              <SH label={t("columns.createdAt")} column="createdAt" />
+              <SH label={t("columns.circles")} column="circleCount" className="w-px text-right" />
+              <SH label={t("columns.moments")} column="momentCount" className="w-px text-right" />
+              <SH label={t("columns.createdAt")} column="createdAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>

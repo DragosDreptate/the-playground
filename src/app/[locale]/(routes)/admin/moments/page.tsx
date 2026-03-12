@@ -65,11 +65,11 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
             <TableRow>
               <SH label={t("columns.title")} column="title" />
               <SH label={t("columns.circle")} column="circleName" />
-              <SH label={t("columns.date")} column="startsAt" />
-              <SH label={t("columns.status")} column="status" />
-              <SH label={t("columns.registrations")} column="registrationCount" className="text-right" />
-              <SH label={t("columns.comments")} column="commentCount" className="text-right" />
-              <SH label={t("columns.createdAt")} column="createdAt" />
+              <SH label={t("columns.date")} column="startsAt" className="w-px" />
+              <SH label={t("columns.status")} column="status" className="w-px" />
+              <SH label={t("columns.registrations")} column="registrationCount" className="w-px text-right" />
+              <SH label={t("columns.comments")} column="commentCount" className="w-px text-right" />
+              <SH label={t("columns.createdAt")} column="createdAt" className="w-px" />
               <TableHead />
             </TableRow>
           </TableHeader>

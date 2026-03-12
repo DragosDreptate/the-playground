@@ -126,8 +126,8 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
             <TableRow>
               <SH label="Nom" column="name" />
               <SH label="Email" column="email" />
-              <SH label="Inscriptions" column="registrationCount" className="text-right" />
-              <SH label="Inscrit le" column="createdAt" />
+              <SH label="Inscriptions" column="registrationCount" className="w-px text-right" />
+              <SH label="Inscrit le" column="createdAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>
