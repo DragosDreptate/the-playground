@@ -604,6 +604,20 @@
       "registrations": "Inscrits",
       "comments": "Commentaires",
       "actions": "Actions"
+    },
+    "activation": {
+      "title": "Taux d'activation",
+      "activated": "Utilisateurs activés",
+      "retained": "Utilisateurs fidèles",
+      "activatedDesc": "≥ 1 inscription",
+      "retainedDesc": "≥ 2 événements différents",
+      "ofTotal": "sur {total} inscrits"
+    },
+    "timeSeries": {
+      "title": "30 derniers jours",
+      "users": "Nouveaux utilisateurs",
+      "registrations": "Inscriptions",
+      "moments": "Événements créés"
     }
   },
   "UserMenu": {

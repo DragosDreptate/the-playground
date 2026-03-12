@@ -136,12 +136,57 @@ export type AdminMomentDetail = AdminMomentRow & {
 };
 
 // ─────────────────────────────────────────────
+// Time series
+// ─────────────────────────────────────────────
+
+export type AdminTimeSeriesPoint = {
+  date: string; // ISO date "YYYY-MM-DD"
+  count: number;
+};
+
+export type AdminTimeSeries = {
+  users: AdminTimeSeriesPoint[];
+  registrations: AdminTimeSeriesPoint[];
+  moments: AdminTimeSeriesPoint[];
+};
+
+// ─────────────────────────────────────────────
+// Activation
+// ─────────────────────────────────────────────
+
+export type AdminActivationStats = {
+  totalUsers: number;
+  activatedUsers: number; // ≥1 inscription non-annulée
+  retainedUsers: number;  // ≥2 inscriptions dans ≥2 événements différents
+  activationRate: number; // pourcentage (0-100)
+  retentionRate: number;  // pourcentage (0-100)
+};
+
+// ─────────────────────────────────────────────
+// Insight — Registrations
+// ─────────────────────────────────────────────
+
+export type AdminInsightRegistration = {
+  id: string;
+  userId: string;
+  userEmail: string;
+  userName: string | null;
+  momentTitle: string;
+  momentSlug: string;
+  circleName: string;
+  status: string;
+  registeredAt: Date;
+};
+
+// ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
 
 export interface AdminRepository {
   // Stats
   getStats(): Promise<AdminStats>;
+  getTimeSeries(days: number): Promise<AdminTimeSeries>;
+  getActivationStats(): Promise<AdminActivationStats>;
 
   // Users
   findAllUsers(filters: AdminUserFilters): Promise<AdminUserRow[]>;
@@ -161,4 +206,16 @@ export interface AdminRepository {
   findMomentById(id: string): Promise<AdminMomentDetail | null>;
   deleteMoment(id: string): Promise<void>;
   updateMomentStatus(id: string, status: MomentStatus): Promise<void>;
+
+  // Insights
+  getRegistrationsInsight(
+    days: number,
+    limit: number,
+    offset: number
+  ): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
+  getUsersByActivation(
+    segment: "never" | "once" | "retained",
+    limit: number,
+    offset: number
+  ): Promise<{ users: Array<AdminUserRow & { registrationCount: number }>; total: number }>;
 }

@@ -604,6 +604,20 @@
       "registrations": "Registrations",
       "comments": "Comments",
       "actions": "Actions"
+    },
+    "activation": {
+      "title": "Activation rate",
+      "activated": "Activated users",
+      "retained": "Retained users",
+      "activatedDesc": "≥ 1 registration",
+      "retainedDesc": "≥ 2 different events",
+      "ofTotal": "of {total} registered"
+    },
+    "timeSeries": {
+      "title": "Last 30 days",
+      "users": "New users",
+      "registrations": "Registrations",
+      "moments": "Events created"
     }
   },
   "UserMenu": {
