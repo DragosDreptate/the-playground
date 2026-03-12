@@ -14,9 +14,10 @@ type ChartCardProps = {
 };
 
 export function ChartCard({ title, data, id, icon: Icon, href }: ChartCardProps) {
-  const latest = data[data.length - 1]?.count ?? 0;
+  const today = data[data.length - 1]?.count ?? 0;
+  const total30d = data.reduce((sum, d) => sum + d.count, 0);
   const prev = data[data.length - 8]?.count ?? 0; // il y a ~7 jours
-  const trend = latest - prev;
+  const trend = today - prev;
 
   return (
     <Link href={href} className="block group">
@@ -31,13 +32,20 @@ export function ChartCard({ title, data, id, icon: Icon, href }: ChartCardProps)
             </div>
             <ArrowRight className="size-4 text-muted-foreground/40 transition-colors group-hover:text-primary" />
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold tabular-nums">{latest.toLocaleString("fr-FR")}</span>
-            {trend !== 0 && (
-              <span className={`text-xs font-medium ${trend > 0 ? "text-primary" : "text-destructive"}`}>
-                {trend > 0 ? "+" : ""}{trend} vs j-7
-              </span>
-            )}
+          <div className="flex items-baseline gap-4">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold tabular-nums">{total30d.toLocaleString("fr-FR")}</span>
+              <span className="text-xs text-muted-foreground">30j</span>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold tabular-nums">{today.toLocaleString("fr-FR")}</span>
+              <span className="text-xs text-muted-foreground">auj.</span>
+              {trend !== 0 && (
+                <span className={`text-xs font-medium ${trend > 0 ? "text-primary" : "text-destructive"}`}>
+                  ({trend > 0 ? "+" : ""}{trend} vs j-7)
+                </span>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
