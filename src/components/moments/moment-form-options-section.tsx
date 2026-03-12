@@ -85,7 +85,7 @@ export function MomentFormOptionsSection({
             {!capacityOpen ? (
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition-colors"
+                className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1.5 text-sm transition-colors"
                 onClick={() => onCapacityOpenChange(true)}
               >
                 <span>{t("form.unlimited")}</span>
@@ -94,7 +94,7 @@ export function MomentFormOptionsSection({
             ) : (
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground text-xs transition-colors"
+                className="text-muted-foreground hover:text-foreground cursor-pointer text-xs transition-colors"
                 onClick={() => onCapacityOpenChange(false)}
               >
                 {t("form.unlimited")}

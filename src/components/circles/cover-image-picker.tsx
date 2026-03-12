@@ -52,7 +52,7 @@ function PhotoGrid({
             key={photo.id}
             type="button"
             onClick={() => onSelect(photo)}
-            className={`group relative aspect-square overflow-hidden rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`group relative aspect-square cursor-pointer overflow-hidden rounded-lg transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               isSelected ? "ring-2 ring-primary" : "hover:ring-2 hover:ring-primary/50"
             }`}
           >
@@ -263,7 +263,7 @@ export function CoverImagePicker({
       <button
         type="button"
         onClick={() => handleOpenChange(true)}
-        className="group relative w-full overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group relative w-full cursor-pointer overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         style={{ aspectRatio: "1 / 1" }}
         aria-label="Modifier l'image de couverture"
       >
@@ -415,7 +415,7 @@ export function CoverImagePicker({
                       setUploadPreview(null);
                       setPending(null);
                     }}
-                    className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white"
+                    className="absolute right-2 top-2 cursor-pointer rounded-full bg-black/60 p-1 text-white"
                     aria-label="Supprimer l'aperçu"
                   >
                     <X className="size-3.5" />
@@ -425,7 +425,7 @@ export function CoverImagePicker({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-border hover:border-primary/50 flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed py-10 transition-colors"
+                  className="border-border hover:border-primary/50 flex w-full cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed py-10 transition-colors"
                 >
                   <Upload className="text-muted-foreground size-8" />
                   <div className="space-y-1 text-center">
