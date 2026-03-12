@@ -49,7 +49,6 @@ export default async function AdminDashboardPage() {
           label={t("stats.totalRegistrations")}
           value={stats.totalRegistrations}
           icon={TicketCheck}
-          href="/admin/moments"
         />
         <StatsCard
           label={t("stats.totalComments")}
@@ -57,7 +56,6 @@ export default async function AdminDashboardPage() {
           delta={stats.recentComments}
           deltaLabel={t("stats.thisWeek")}
           icon={MessageSquare}
-          href="/admin/moments"
         />
       </div>
 
