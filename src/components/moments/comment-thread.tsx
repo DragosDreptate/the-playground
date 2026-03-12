@@ -73,7 +73,7 @@ function DeleteCommentButton({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button className="text-muted-foreground hover:text-destructive text-xs transition-colors">
+        <button className="text-muted-foreground hover:text-destructive cursor-pointer text-xs transition-colors">
           {tCommon("delete")}
         </button>
       </AlertDialogTrigger>
