@@ -1,5 +1,6 @@
 "use client";
 
+import { type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -19,31 +20,19 @@ function GoogleIcon() {
   );
 }
 
-function GoogleSubmitButton({ label }: { label: string }) {
+function SubmitButton({
+  label,
+  icon,
+  variant = "default",
+}: {
+  label: string;
+  icon?: ReactNode;
+  variant?: "default" | "outline";
+}) {
   const { pending } = useFormStatus();
   return (
-    <Button variant="outline" className="w-full" type="submit" disabled={pending}>
-      {pending ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
-      {label}
-    </Button>
-  );
-}
-
-function GitHubSubmitButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button variant="outline" className="w-full" type="submit" disabled={pending}>
-      {pending ? <Loader2 className="size-4 animate-spin" /> : <Github className="size-4" />}
-      {label}
-    </Button>
-  );
-}
-
-function MagicLinkSubmitButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button className="w-full" type="submit" disabled={pending}>
-      {pending && <Loader2 className="size-4 animate-spin" />}
+    <Button variant={variant} className="w-full" type="submit" disabled={pending}>
+      {pending ? <Loader2 className="size-4 animate-spin" /> : icon}
       {label}
     </Button>
   );
@@ -60,11 +49,11 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
     <div className="space-y-4">
       <form action={signInWithGoogle}>
         {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-        <GoogleSubmitButton label={t("signIn.google")} />
+        <SubmitButton label={t("signIn.google")} icon={<GoogleIcon />} variant="outline" />
       </form>
       <form action={signInWithGitHub}>
         {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-        <GitHubSubmitButton label={t("signIn.github")} />
+        <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
       </form>
 
       <div className="flex items-center gap-3">
@@ -81,7 +70,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
           placeholder={t("signIn.emailPlaceholder")}
           required
         />
-        <MagicLinkSubmitButton label={t("signIn.magicLink")} />
+        <SubmitButton label={t("signIn.magicLink")} />
       </form>
     </div>
   );
