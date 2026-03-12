@@ -10,6 +10,32 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
+## [1.12.0] — 2026-03-12 — Observabilité admin & qualité UX
+
+### Ajouté
+
+- **Dashboard admin enrichi** : nouvelles courbes d'activité sur 30 jours (inscriptions, événements, nouveaux membres) pour suivre la croissance de la plateforme au fil du temps
+- **Pages d'analyse détaillées** : en cliquant sur une carte du dashboard admin, accès à une vue approfondie avec graphique complet et métriques détaillées (utilisateurs, inscriptions, événements, taux d'activation)
+- **Taux d'activation** : nouvelle métrique admin qui mesure la part d'utilisateurs ayant rejoint au moins un événement
+- **Réécriture automatique du changelog** : à chaque nouvelle release, le changelog est automatiquement réécrit en langage utilisateur via Claude — plus de jargon technique
+
+### Amélioré
+
+- **Curseur au survol** : tous les boutons de l'application affichent maintenant le curseur pointeur au survol — comportement cohérent sur l'ensemble du site
+- **Page de connexion** : un spinner animé s'affiche pendant la connexion (Google, GitHub, lien magique) — plus d'ambiguïté sur le fait que l'action est bien en cours
+- **Dashboard admin** : toutes les cartes de statistiques sont cliquables avec un effet de survol visible
+- **Graphiques admin** : axe Y avec labels et lignes de grille pour une lecture plus facile des valeurs
+- **Descriptions longues** : le bouton "Voir plus" affiche maintenant davantage de texte avant de tronquer (10 lignes au lieu de 5)
+
+### Corrigé
+
+- **Emails** : les emails d'invitation et de broadcast s'affichent correctement en français ou en anglais selon la langue de l'expéditeur
+- **Emails** : la couverture de la Communauté s'affiche correctement dans les emails d'invitation, avec un dégradé en fallback si aucune image n'est définie
+- **Tableau de bord** : les noms des Organisateurs sont cliquables vers leur profil public depuis la page Communauté
+- **Connexion** : les nouveaux utilisateurs reçoivent bien leur identifiant public dès leur première connexion
+
+---
+
 ## [1.11.0] — 2026-03-11 — Profils publics & viralité
 
 ### Ajouté
