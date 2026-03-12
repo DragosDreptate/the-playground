@@ -26,7 +26,7 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border/40 bg-muted/30">
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-border/40 bg-muted/30 md:flex">
       {/* Header */}
       <div className="flex h-14 items-center border-b border-border/40 px-4">
         <Link href="/admin" className="flex items-center gap-2">
