@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "version:sync": "tsx scripts/sync-version.ts",
+    "changelog:humanize": "tsx scripts/humanize-changelog.ts",
     "db:validate": "prisma validate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

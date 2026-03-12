@@ -1,0 +1,53 @@
+name: Humanize Changelog
+
+# Se déclenche sur la PR Release Please (ouverte ou mise à jour)
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  humanize:
+    name: Réécriture changelog en langage utilisateur
+    # Ne tourne que sur les PRs de Release Please
+    if: startsWith(github.head_ref, 'release-please--')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Checkout de la branche PR (pas main) pour pouvoir modifier et pousser
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.30.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Réécrire la nouvelle section en langage utilisateur
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: pnpm tsx scripts/humanize-changelog.ts
+
+      - name: Committer si des changements ont eu lieu
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet && echo "Changelog déjà au format utilisateur — rien à committer." && exit 0
+          git add CHANGELOG.md
+          git commit -m "docs(changelog): réécriture automatique en langage utilisateur [skip ci]"
+          git push
