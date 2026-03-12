@@ -3,32 +3,37 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { SparklineChart } from "@/components/admin/sparkline-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/registrations";
 
 type Props = {
-  searchParams: Promise<{ days?: string; page?: string }>;
+  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightRegistrationsPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { days: String(days) };
 
   const [timeSeries, { registrations, total }] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.getRegistrationsInsight(days, PAGE_SIZE, offset),
+    prismaAdminRepository.getRegistrationsInsight(days, PAGE_SIZE, offset, sort, order),
   ]);
 
   return (
@@ -44,7 +49,7 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
           </Link>
           <h1 className="text-2xl font-bold">Inscriptions</h1>
         </div>
-        <PeriodSelector currentDays={days} basePath="/admin/insights/registrations" />
+        <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
 
       <Card>
@@ -66,11 +71,11 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Participant</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Événement</TableHead>
-              <TableHead>Communauté</TableHead>
-              <TableHead>Date inscription</TableHead>
+              <SortableTableHead label="Participant" column="userName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Email" column="userEmail" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Événement" column="momentTitle" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Communauté" column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Date inscription" column="registeredAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
             </TableRow>
           </TableHeader>
           <TableBody>

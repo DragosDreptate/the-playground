@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import {
   Table,
   TableBody,
@@ -13,21 +14,28 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/comments";
 
 type Props = {
-  searchParams: Promise<{ days?: string; page?: string }>;
+  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightCommentsPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { days: String(days) };
 
   const { comments, total } = await prismaAdminRepository.getCommentsInsight(
     days,
     PAGE_SIZE,
-    offset
+    offset,
+    sort,
+    order
   );
 
   return (
@@ -43,19 +51,19 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
           </Link>
           <h1 className="text-2xl font-bold">Commentaires</h1>
         </div>
-        <PeriodSelector currentDays={days} basePath="/admin/insights/comments" />
+        <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
 
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Auteur</TableHead>
-              <TableHead>Email</TableHead>
+              <SortableTableHead label="Auteur" column="userName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Email" column="userEmail" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
               <TableHead>Contenu</TableHead>
-              <TableHead>Événement</TableHead>
-              <TableHead>Communauté</TableHead>
-              <TableHead>Date</TableHead>
+              <SortableTableHead label="Événement" column="momentTitle" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Communauté" column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Date" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
             </TableRow>
           </TableHeader>
           <TableBody>

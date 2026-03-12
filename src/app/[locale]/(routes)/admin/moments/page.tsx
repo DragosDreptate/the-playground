@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/moments";
 
 function statusVariant(status: string) {
   switch (status) {
@@ -28,7 +30,7 @@ function statusVariant(status: string) {
 }
 
 type Props = {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminMomentsPage({ searchParams }: Props) {
@@ -37,10 +39,14 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
   const tStatus = await getTranslations("Moment.status");
   const search = params.search ?? undefined;
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
 
+  const sortParams: Record<string, string> = { ...(search ? { search } : {}) };
+
   const [moments, total] = await Promise.all([
-    prismaAdminRepository.findAllMoments({ search, limit: PAGE_SIZE, offset }),
+    prismaAdminRepository.findAllMoments({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
     prismaAdminRepository.countMoments({ search }),
   ]);
 
@@ -54,13 +60,13 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("columns.title")}</TableHead>
-              <TableHead>{t("columns.circle")}</TableHead>
-              <TableHead>{t("columns.date")}</TableHead>
-              <TableHead>{t("columns.status")}</TableHead>
-              <TableHead className="text-right">{t("columns.registrations")}</TableHead>
-              <TableHead className="text-right">{t("columns.comments")}</TableHead>
-              <TableHead>{t("columns.createdAt")}</TableHead>
+              <SortableTableHead label={t("columns.title")} column="title" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.circle")} column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.date")} column="startsAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.status")} column="status" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.registrations")} column="registrationCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
+              <SortableTableHead label={t("columns.comments")} column="commentCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
+              <SortableTableHead label={t("columns.createdAt")} column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
               <TableHead />
             </TableRow>
           </TableHeader>

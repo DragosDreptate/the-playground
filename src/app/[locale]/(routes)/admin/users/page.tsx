@@ -3,6 +3,7 @@ import Link from "next/link";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -14,9 +15,10 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/users";
 
 type Props = {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminUsersPage({ searchParams }: Props) {
@@ -24,10 +26,14 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const t = await getTranslations("Admin");
   const search = params.search ?? undefined;
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
 
+  const sortParams: Record<string, string> = { ...(search ? { search } : {}) };
+
   const [users, total] = await Promise.all([
-    prismaAdminRepository.findAllUsers({ search, limit: PAGE_SIZE, offset }),
+    prismaAdminRepository.findAllUsers({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
     prismaAdminRepository.countUsers({ search }),
   ]);
 
@@ -41,12 +47,12 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("columns.name")}</TableHead>
-              <TableHead>{t("columns.email")}</TableHead>
-              <TableHead>{t("columns.role")}</TableHead>
-              <TableHead className="text-right">{t("columns.circles")}</TableHead>
-              <TableHead className="text-right">{t("columns.moments")}</TableHead>
-              <TableHead>{t("columns.createdAt")}</TableHead>
+              <SortableTableHead label={t("columns.name")} column="name" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.email")} column="email" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.role")} column="role" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label={t("columns.circles")} column="circleCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
+              <SortableTableHead label={t("columns.moments")} column="momentCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
+              <SortableTableHead label={t("columns.createdAt")} column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
             </TableRow>
           </TableHeader>
           <TableBody>

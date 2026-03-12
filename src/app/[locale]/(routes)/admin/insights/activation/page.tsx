@@ -3,17 +3,18 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/activation";
 
 const SEGMENTS = [
   { key: "never", label: "Jamais inscrits" },
@@ -24,7 +25,7 @@ const SEGMENTS = [
 type Segment = (typeof SEGMENTS)[number]["key"];
 
 type Props = {
-  searchParams: Promise<{ segment?: string; page?: string }>;
+  searchParams: Promise<{ segment?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightActivationPage({ searchParams }: Props) {
@@ -33,11 +34,15 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
   const segment: Segment =
     rawSegment === "once" || rawSegment === "retained" ? rawSegment : "never";
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { segment };
 
   const [activation, { users, total }] = await Promise.all([
     prismaAdminRepository.getActivationStats(),
-    prismaAdminRepository.getUsersByActivation(segment, PAGE_SIZE, offset),
+    prismaAdminRepository.getUsersByActivation(segment, PAGE_SIZE, offset, sort, order),
   ]);
 
   return (
@@ -87,22 +92,26 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
         </Card>
       </div>
 
-      {/* Segment tabs */}
+      {/* Segment tabs — préservent sort/order */}
       <div className="flex items-center gap-1 rounded-lg border p-1 w-fit">
-        {SEGMENTS.map(({ key, label }) => (
-          <Link
-            key={key}
-            href={`/admin/insights/activation?segment=${key}`}
-            className={cn(
-              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-              segment === key
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {label}
-          </Link>
-        ))}
+        {SEGMENTS.map(({ key, label }) => {
+          const tabParams = new URLSearchParams({ segment: key });
+          if (sort) { tabParams.set("sort", sort); tabParams.set("order", order); }
+          return (
+            <Link
+              key={key}
+              href={`${BASE}?${tabParams.toString()}`}
+              className={cn(
+                "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                segment === key
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {label}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Table */}
@@ -110,10 +119,10 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-right">Inscriptions</TableHead>
-              <TableHead>Inscrit le</TableHead>
+              <SortableTableHead label="Nom" column="name" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Email" column="email" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SortableTableHead label="Inscriptions" column="registrationCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
+              <SortableTableHead label="Inscrit le" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -89,6 +89,92 @@ function momentWhere(filters: AdminMomentFilters): Prisma.MomentWhereInput {
 }
 
 // ─────────────────────────────────────────────
+// Sort helpers
+// ─────────────────────────────────────────────
+
+function dir(sortOrder?: string): "asc" | "desc" {
+  return sortOrder === "asc" ? "asc" : "desc";
+}
+
+function userOrderBy(sortBy?: string, sortOrder?: string): Prisma.UserOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "name": return { firstName: d };
+    case "email": return { email: d };
+    case "role": return { role: d };
+    case "circleCount": return { memberships: { _count: d } };
+    case "momentCount": return { registrations: { _count: d } };
+    case "createdAt": return { createdAt: d };
+    default: return { createdAt: "desc" };
+  }
+}
+
+function circleOrderBy(sortBy?: string, sortOrder?: string): Prisma.CircleOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "name": return { name: d };
+    case "memberCount": return { memberships: { _count: d } };
+    case "momentCount": return { moments: { _count: d } };
+    case "visibility": return { visibility: d };
+    case "category": return { category: d };
+    case "createdAt": return { createdAt: d };
+    default: return { createdAt: "desc" };
+  }
+}
+
+function momentOrderBy(sortBy?: string, sortOrder?: string): Prisma.MomentOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "title": return { title: d };
+    case "circleName": return { circle: { name: d } };
+    case "startsAt": return { startsAt: d };
+    case "status": return { status: d };
+    case "registrationCount": return { registrations: { _count: d } };
+    case "commentCount": return { comments: { _count: d } };
+    case "createdAt": return { createdAt: d };
+    default: return { createdAt: "desc" };
+  }
+}
+
+function registrationOrderBy(
+  sortBy?: string,
+  sortOrder?: string
+): Prisma.RegistrationOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "userName": return { user: { firstName: d } };
+    case "userEmail": return { user: { email: d } };
+    case "momentTitle": return { moment: { title: d } };
+    case "circleName": return { moment: { circle: { name: d } } };
+    case "registeredAt": return { registeredAt: d };
+    default: return { registeredAt: "desc" };
+  }
+}
+
+function commentOrderBy(
+  sortBy?: string,
+  sortOrder?: string
+): Prisma.CommentOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "userName": return { user: { firstName: d } };
+    case "userEmail": return { user: { email: d } };
+    case "momentTitle": return { moment: { title: d } };
+    case "circleName": return { moment: { circle: { name: d } } };
+    case "createdAt": return { createdAt: d };
+    default: return { createdAt: "desc" };
+  }
+}
+
+// Whitelist pour le tri raw SQL (activation once/retained)
+const ACTIVATION_SQL_SORT: Record<string, string> = {
+  name: 'u."firstName"',
+  email: "u.email",
+  registrationCount: 'COUNT(DISTINCT r."momentId")',
+  createdAt: 'u."createdAt"',
+};
+
+// ─────────────────────────────────────────────
 // Time series helpers
 // ─────────────────────────────────────────────
 
@@ -250,7 +336,7 @@ export const prismaAdminRepository: AdminRepository = {
       include: {
         _count: { select: { memberships: true, registrations: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: userOrderBy(filters.sortBy, filters.sortOrder),
       take: filters.limit ?? DEFAULT_LIMIT,
       skip: filters.offset ?? 0,
     });
@@ -353,7 +439,7 @@ export const prismaAdminRepository: AdminRepository = {
           include: { user: { select: { firstName: true, lastName: true, email: true } } },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: circleOrderBy(filters.sortBy, filters.sortOrder),
       take: filters.limit ?? DEFAULT_LIMIT,
       skip: filters.offset ?? 0,
     });
@@ -434,7 +520,7 @@ export const prismaAdminRepository: AdminRepository = {
         circle: { select: { name: true } },
         _count: { select: { registrations: true, comments: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: momentOrderBy(filters.sortBy, filters.sortOrder),
       take: filters.limit ?? DEFAULT_LIMIT,
       skip: filters.offset ?? 0,
     });
@@ -521,7 +607,9 @@ export const prismaAdminRepository: AdminRepository = {
   async getRegistrationsInsight(
     days: number,
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ registrations: AdminInsightRegistration[]; total: number }> {
     const since = daysAgo(days);
     const [registrations, total] = await Promise.all([
@@ -537,7 +625,7 @@ export const prismaAdminRepository: AdminRepository = {
             select: { title: true, slug: true, circle: { select: { name: true } } },
           },
         },
-        orderBy: { registeredAt: "desc" },
+        orderBy: registrationOrderBy(sortBy, sortOrder),
         take: limit,
         skip: offset,
       }),
@@ -568,7 +656,9 @@ export const prismaAdminRepository: AdminRepository = {
   async getCommentsInsight(
     days: number,
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ comments: AdminInsightComment[]; total: number }> {
     const since = daysAgo(days);
     const [comments, total] = await Promise.all([
@@ -578,7 +668,7 @@ export const prismaAdminRepository: AdminRepository = {
           user: { select: { email: true, firstName: true, lastName: true } },
           moment: { select: { title: true, slug: true, circle: { select: { name: true } } } },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: commentOrderBy(sortBy, sortOrder),
         take: limit,
         skip: offset,
       }),
@@ -605,7 +695,9 @@ export const prismaAdminRepository: AdminRepository = {
   async getUsersByActivation(
     segment: "never" | "once" | "retained",
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ users: Array<AdminUserRow & { registrationCount: number }>; total: number }> {
     if (segment === "never") {
       const [records, total] = await Promise.all([
@@ -615,7 +707,7 @@ export const prismaAdminRepository: AdminRepository = {
             registrations: { none: { status: { not: "CANCELLED" } } },
           },
           include: { _count: { select: { memberships: true, registrations: true } } },
-          orderBy: { createdAt: "desc" },
+          orderBy: userOrderBy(sortBy, sortOrder),
           take: limit,
           skip: offset,
         }),
@@ -647,6 +739,10 @@ export const prismaAdminRepository: AdminRepository = {
         ? Prisma.sql`HAVING COUNT(DISTINCT r."momentId") = 1`
         : Prisma.sql`HAVING COUNT(DISTINCT r."momentId") >= 2`;
 
+    const sortCol = ACTIVATION_SQL_SORT[sortBy ?? ""] ?? 'u."createdAt"';
+    const sortDir = sortOrder === "asc" ? "ASC" : "DESC";
+    const orderByClause = Prisma.sql`ORDER BY ${Prisma.raw(sortCol)} ${Prisma.raw(sortDir)}`;
+
     const [rows, countRows] = await Promise.all([
       prisma.$queryRaw<
         Array<{
@@ -677,7 +773,7 @@ export const prismaAdminRepository: AdminRepository = {
           AND u.email NOT LIKE '%@test.playground'
         GROUP BY u.id
         ${havingClause}
-        ORDER BY u."createdAt" DESC
+        ${orderByClause}
         LIMIT ${limit} OFFSET ${offset}
       `,
       prisma.$queryRaw<Array<{ count: bigint }>>`

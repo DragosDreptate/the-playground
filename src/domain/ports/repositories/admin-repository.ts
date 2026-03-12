@@ -27,6 +27,8 @@ export type AdminUserFilters = {
   role?: UserRole;
   limit?: number;
   offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
 
 export type AdminUserRow = {
@@ -63,6 +65,8 @@ export type AdminCircleFilters = {
   category?: CircleCategory;
   limit?: number;
   offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
 
 export type AdminCircleRow = {
@@ -104,6 +108,8 @@ export type AdminMomentFilters = {
   status?: MomentStatus;
   limit?: number;
   offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 };
 
 export type AdminMomentRow = {
@@ -227,16 +233,22 @@ export interface AdminRepository {
   getRegistrationsInsight(
     days: number,
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
   getCommentsInsight(
     days: number,
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ comments: AdminInsightComment[]; total: number }>;
   getUsersByActivation(
     segment: "never" | "once" | "retained",
     limit: number,
-    offset: number
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
   ): Promise<{ users: Array<AdminUserRow & { registrationCount: number }>; total: number }>;
 }
