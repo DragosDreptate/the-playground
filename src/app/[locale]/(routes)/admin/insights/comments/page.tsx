@@ -29,6 +29,9 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column }: { label: string; column: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+  );
 
   const { comments, total } = await prismaAdminRepository.getCommentsInsight(
     days,
@@ -58,12 +61,12 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label="Auteur" column="userName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Email" column="userEmail" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Auteur" column="userName" />
+              <SH label="Email" column="userEmail" />
               <TableHead>Contenu</TableHead>
-              <SortableTableHead label="Événement" column="momentTitle" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Communauté" column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Date" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Événement" column="momentTitle" />
+              <SH label="Communauté" column="circleName" />
+              <SH label="Date" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

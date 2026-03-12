@@ -30,6 +30,9 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column }: { label: string; column: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+  );
 
   const [timeSeries, { registrations, total }] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
@@ -71,11 +74,11 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label="Participant" column="userName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Email" column="userEmail" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Événement" column="momentTitle" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Communauté" column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Date inscription" column="registeredAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Participant" column="userName" />
+              <SH label="Email" column="userEmail" />
+              <SH label="Événement" column="momentTitle" />
+              <SH label="Communauté" column="circleName" />
+              <SH label="Date inscription" column="registeredAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

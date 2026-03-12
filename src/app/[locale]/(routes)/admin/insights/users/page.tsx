@@ -31,11 +31,16 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   const [timeSeries, users, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.findAllUsers({ limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
-    prismaAdminRepository.countUsers({}),
+    prismaAdminRepository.findAllUsers({ limit: PAGE_SIZE, offset, since, sortBy: sort, sortOrder: order }),
+    prismaAdminRepository.countUsers({ since }),
   ]);
 
   return (
@@ -69,12 +74,12 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label="Nom" column="name" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Email" column="email" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Rôle" column="role" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Communautés" column="circleCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label="Inscriptions" column="momentCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label="Inscrit le" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Nom" column="name" />
+              <SH label="Email" column="email" />
+              <SH label="Rôle" column="role" />
+              <SH label="Communautés" column="circleCount" className="text-right" />
+              <SH label="Inscriptions" column="momentCount" className="text-right" />
+              <SH label="Inscrit le" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

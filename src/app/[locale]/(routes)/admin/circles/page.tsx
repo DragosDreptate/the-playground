@@ -33,6 +33,9 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { ...(search ? { search } : {}) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
 
   const [circles, total] = await Promise.all([
     prismaAdminRepository.findAllCircles({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
@@ -49,13 +52,13 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label={t("columns.name")} column="name" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label={t("columns.name")} column="name" />
               <TableHead>{t("columns.host")}</TableHead>
-              <SortableTableHead label={t("columns.members")} column="memberCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label={t("columns.moments")} column="momentCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label={t("columns.visibility")} column="visibility" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.category")} column="category" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.createdAt")} column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label={t("columns.members")} column="memberCount" className="text-right" />
+              <SH label={t("columns.moments")} column="momentCount" className="text-right" />
+              <SH label={t("columns.visibility")} column="visibility" />
+              <SH label={t("columns.category")} column="category" />
+              <SH label={t("columns.createdAt")} column="createdAt" />
               <TableHead />
             </TableRow>
           </TableHeader>

@@ -44,6 +44,9 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { ...(search ? { search } : {}) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
 
   const [moments, total] = await Promise.all([
     prismaAdminRepository.findAllMoments({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
@@ -60,13 +63,13 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label={t("columns.title")} column="title" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.circle")} column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.date")} column="startsAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.status")} column="status" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label={t("columns.registrations")} column="registrationCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label={t("columns.comments")} column="commentCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label={t("columns.createdAt")} column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label={t("columns.title")} column="title" />
+              <SH label={t("columns.circle")} column="circleName" />
+              <SH label={t("columns.date")} column="startsAt" />
+              <SH label={t("columns.status")} column="status" />
+              <SH label={t("columns.registrations")} column="registrationCount" className="text-right" />
+              <SH label={t("columns.comments")} column="commentCount" className="text-right" />
+              <SH label={t("columns.createdAt")} column="createdAt" />
               <TableHead />
             </TableRow>
           </TableHeader>

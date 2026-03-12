@@ -52,11 +52,16 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   const [timeSeries, moments, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.findAllMoments({ limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
-    prismaAdminRepository.countMoments({}),
+    prismaAdminRepository.findAllMoments({ limit: PAGE_SIZE, offset, since, sortBy: sort, sortOrder: order }),
+    prismaAdminRepository.countMoments({ since }),
   ]);
 
   return (
@@ -90,11 +95,11 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label="Titre" column="title" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Communauté" column="circleName" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Statut" column="status" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Inscrits" column="registrationCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label="Créé le" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Titre" column="title" />
+              <SH label="Communauté" column="circleName" />
+              <SH label="Statut" column="status" />
+              <SH label="Inscrits" column="registrationCount" className="text-right" />
+              <SH label="Créé le" column="createdAt" />
               <TableHead />
             </TableRow>
           </TableHeader>

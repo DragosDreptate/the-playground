@@ -39,6 +39,15 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { segment };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const segmentTabs = SEGMENTS.map(({ key, label }) => {
+    const p = new URLSearchParams({ segment: key });
+    if (sort) { p.set("sort", sort); p.set("order", order); }
+    return { key, label, href: `${BASE}?${p.toString()}` };
+  });
 
   const [activation, { users, total }] = await Promise.all([
     prismaAdminRepository.getActivationStats(),
@@ -94,24 +103,20 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
 
       {/* Segment tabs — préservent sort/order */}
       <div className="flex items-center gap-1 rounded-lg border p-1 w-fit">
-        {SEGMENTS.map(({ key, label }) => {
-          const tabParams = new URLSearchParams({ segment: key });
-          if (sort) { tabParams.set("sort", sort); tabParams.set("order", order); }
-          return (
-            <Link
-              key={key}
-              href={`${BASE}?${tabParams.toString()}`}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                segment === key
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {label}
-            </Link>
-          );
-        })}
+        {segmentTabs.map(({ key, label, href }) => (
+          <Link
+            key={key}
+            href={href}
+            className={cn(
+              "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+              segment === key
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {label}
+          </Link>
+        ))}
       </div>
 
       {/* Table */}
@@ -119,10 +124,10 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableTableHead label="Nom" column="name" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Email" column="email" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
-              <SortableTableHead label="Inscriptions" column="registrationCount" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className="text-right" />
-              <SortableTableHead label="Inscrit le" column="createdAt" currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+              <SH label="Nom" column="name" />
+              <SH label="Email" column="email" />
+              <SH label="Inscriptions" column="registrationCount" className="text-right" />
+              <SH label="Inscrit le" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

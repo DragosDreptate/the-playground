@@ -27,6 +27,7 @@ export type AdminUserFilters = {
   role?: UserRole;
   limit?: number;
   offset?: number;
+  since?: Date;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 };
@@ -108,6 +109,7 @@ export type AdminMomentFilters = {
   status?: MomentStatus;
   limit?: number;
   offset?: number;
+  since?: Date;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 };

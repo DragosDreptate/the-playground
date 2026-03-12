@@ -53,6 +53,7 @@ function sevenDaysAgo(): Date {
 function userWhere(filters: AdminUserFilters): Prisma.UserWhereInput {
   const where: Prisma.UserWhereInput = realUserWhere();
   if (filters.role) where.role = filters.role;
+  if (filters.since) where.createdAt = { gte: filters.since };
   if (filters.search) {
     where.OR = [
       { email: { contains: filters.search, mode: "insensitive" } },
@@ -79,6 +80,7 @@ function circleWhere(filters: AdminCircleFilters): Prisma.CircleWhereInput {
 function momentWhere(filters: AdminMomentFilters): Prisma.MomentWhereInput {
   const where: Prisma.MomentWhereInput = { circle: realCircleWhere() };
   if (filters.status) where.status = filters.status;
+  if (filters.since) where.createdAt = { gte: filters.since };
   if (filters.search) {
     where.OR = [
       { title: { contains: filters.search, mode: "insensitive" } },
@@ -612,12 +614,13 @@ export const prismaAdminRepository: AdminRepository = {
     sortOrder?: "asc" | "desc"
   ): Promise<{ registrations: AdminInsightRegistration[]; total: number }> {
     const since = daysAgo(days);
+    const userFilter = realUserWhere();
     const [registrations, total] = await Promise.all([
       prisma.registration.findMany({
         where: {
           registeredAt: { gte: since },
           status: { not: "CANCELLED" },
-          user: realUserWhere(),
+          user: userFilter,
         },
         include: {
           user: { select: { email: true, firstName: true, lastName: true } },
@@ -633,7 +636,7 @@ export const prismaAdminRepository: AdminRepository = {
         where: {
           registeredAt: { gte: since },
           status: { not: "CANCELLED" },
-          user: realUserWhere(),
+          user: userFilter,
         },
       }),
     ]);
@@ -661,9 +664,10 @@ export const prismaAdminRepository: AdminRepository = {
     sortOrder?: "asc" | "desc"
   ): Promise<{ comments: AdminInsightComment[]; total: number }> {
     const since = daysAgo(days);
+    const userFilter = realUserWhere();
     const [comments, total] = await Promise.all([
       prisma.comment.findMany({
-        where: { createdAt: { gte: since }, user: realUserWhere() },
+        where: { createdAt: { gte: since }, user: userFilter },
         include: {
           user: { select: { email: true, firstName: true, lastName: true } },
           moment: { select: { title: true, slug: true, circle: { select: { name: true } } } },
@@ -673,7 +677,7 @@ export const prismaAdminRepository: AdminRepository = {
         skip: offset,
       }),
       prisma.comment.count({
-        where: { createdAt: { gte: since }, user: realUserWhere() },
+        where: { createdAt: { gte: since }, user: userFilter },
       }),
     ]);
     return {
