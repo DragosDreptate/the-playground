@@ -49,7 +49,7 @@ export default async function AdminDashboardPage() {
           label={t("stats.totalRegistrations")}
           value={stats.totalRegistrations}
           icon={TicketCheck}
-          href="/admin/moments"
+          href="/admin/insights/registrations"
         />
         <StatsCard
           label={t("stats.totalComments")}
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
           delta={stats.recentComments}
           deltaLabel={t("stats.thisWeek")}
           icon={MessageSquare}
-          href="/admin/moments"
+          href="/admin/insights/comments"
         />
       </div>
 
@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
         <h2 className="text-base font-semibold">{t("activation.title")}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Link href="/admin/insights/activation?segment=once" className="block group">
-            <Card className="transition-colors group-hover:border-primary/50">
+            <Card className="h-full transition-colors group-hover:border-primary/50">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <TrendingUp className="size-5" />
@@ -86,7 +86,7 @@ export default async function AdminDashboardPage() {
           </Link>
 
           <Link href="/admin/insights/activation?segment=retained" className="block group">
-            <Card className="transition-colors group-hover:border-primary/50">
+            <Card className="h-full transition-colors group-hover:border-primary/50">
               <CardContent className="flex items-center gap-4 p-5">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                   <Repeat2 className="size-5" />

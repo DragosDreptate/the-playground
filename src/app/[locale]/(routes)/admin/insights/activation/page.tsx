@@ -3,17 +3,18 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/activation";
 
 const SEGMENTS = [
   { key: "never", label: "Jamais inscrits" },
@@ -24,7 +25,7 @@ const SEGMENTS = [
 type Segment = (typeof SEGMENTS)[number]["key"];
 
 type Props = {
-  searchParams: Promise<{ segment?: string; page?: string }>;
+  searchParams: Promise<{ segment?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightActivationPage({ searchParams }: Props) {
@@ -33,11 +34,24 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
   const segment: Segment =
     rawSegment === "once" || rawSegment === "retained" ? rawSegment : "never";
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { segment };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const segmentTabs = SEGMENTS.map(({ key, label }) => {
+    const p = new URLSearchParams({ segment: key });
+    if (sort) { p.set("sort", sort); p.set("order", order); }
+    return { key, label, href: `${BASE}?${p.toString()}` };
+  });
 
   const [activation, { users, total }] = await Promise.all([
     prismaAdminRepository.getActivationStats(),
-    prismaAdminRepository.getUsersByActivation(segment, PAGE_SIZE, offset),
+    prismaAdminRepository.getUsersByActivation(segment, PAGE_SIZE, offset, sort, order),
   ]);
 
   return (
@@ -87,12 +101,12 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
         </Card>
       </div>
 
-      {/* Segment tabs */}
+      {/* Segment tabs — préservent sort/order */}
       <div className="flex items-center gap-1 rounded-lg border p-1 w-fit">
-        {SEGMENTS.map(({ key, label }) => (
+        {segmentTabs.map(({ key, label, href }) => (
           <Link
             key={key}
-            href={`/admin/insights/activation?segment=${key}`}
+            href={href}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
               segment === key
@@ -110,10 +124,10 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-right">Inscriptions</TableHead>
-              <TableHead>Inscrit le</TableHead>
+              <SH label="Nom" column="name" />
+              <SH label="Email" column="email" />
+              <SH label="Inscriptions" column="registrationCount" className="text-right" />
+              <SH label="Inscrit le" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -15,9 +16,10 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/circles";
 
 type Props = {
-  searchParams: Promise<{ search?: string; page?: string }>;
+  searchParams: Promise<{ search?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminCirclesPage({ searchParams }: Props) {
@@ -26,10 +28,17 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
   const tCat = await getTranslations("CircleCategory");
   const search = params.search ?? undefined;
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
 
+  const sortParams: Record<string, string> = { ...(search ? { search } : {}) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
   const [circles, total] = await Promise.all([
-    prismaAdminRepository.findAllCircles({ search, limit: PAGE_SIZE, offset }),
+    prismaAdminRepository.findAllCircles({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
     prismaAdminRepository.countCircles({ search }),
   ]);
 
@@ -43,13 +52,13 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>{t("columns.name")}</TableHead>
+              <SH label={t("columns.name")} column="name" />
               <TableHead>{t("columns.host")}</TableHead>
-              <TableHead className="text-right">{t("columns.members")}</TableHead>
-              <TableHead className="text-right">{t("columns.moments")}</TableHead>
-              <TableHead>{t("columns.visibility")}</TableHead>
-              <TableHead>{t("columns.category")}</TableHead>
-              <TableHead>{t("columns.createdAt")}</TableHead>
+              <SH label={t("columns.members")} column="memberCount" className="text-right" />
+              <SH label={t("columns.moments")} column="momentCount" className="text-right" />
+              <SH label={t("columns.visibility")} column="visibility" />
+              <SH label={t("columns.category")} column="category" />
+              <SH label={t("columns.createdAt")} column="createdAt" />
               <TableHead />
             </TableRow>
           </TableHeader>

@@ -3,6 +3,7 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { SparklineChart } from "@/components/admin/sparkline-chart";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/moments";
 
 function statusVariant(status: string) {
   switch (status) {
@@ -30,31 +32,36 @@ function statusVariant(status: string) {
 
 function statusLabel(status: string) {
   switch (status) {
-    case "PUBLISHED":
-      return "Publié";
-    case "CANCELLED":
-      return "Annulé";
-    case "PAST":
-      return "Passé";
-    default:
-      return status;
+    case "PUBLISHED": return "Publié";
+    case "CANCELLED": return "Annulé";
+    case "PAST": return "Passé";
+    default: return status;
   }
 }
 
 type Props = {
-  searchParams: Promise<{ days?: string; page?: string }>;
+  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightMomentsPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   const [timeSeries, moments, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.findAllMoments({ limit: PAGE_SIZE, offset }),
-    prismaAdminRepository.countMoments({}),
+    prismaAdminRepository.findAllMoments({ limit: PAGE_SIZE, offset, since, sortBy: sort, sortOrder: order }),
+    prismaAdminRepository.countMoments({ since }),
   ]);
 
   return (
@@ -70,7 +77,7 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
           </Link>
           <h1 className="text-2xl font-bold">Événements créés</h1>
         </div>
-        <PeriodSelector currentDays={days} basePath="/admin/insights/moments" />
+        <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
 
       <Card>
@@ -88,11 +95,11 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Titre</TableHead>
-              <TableHead>Communauté</TableHead>
-              <TableHead>Statut</TableHead>
-              <TableHead className="text-right">Inscrits</TableHead>
-              <TableHead>Créé le</TableHead>
+              <SH label="Titre" column="title" />
+              <SH label="Communauté" column="circleName" />
+              <SH label="Statut" column="status" />
+              <SH label="Inscrits" column="registrationCount" className="text-right" />
+              <SH label="Créé le" column="createdAt" />
               <TableHead />
             </TableRow>
           </TableHeader>

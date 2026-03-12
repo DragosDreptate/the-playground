@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
+import { SortableTableHead } from "@/components/admin/sortable-table-head";
 import { SparklineChart } from "@/components/admin/sparkline-chart";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,27 +11,36 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
+const BASE = "/admin/insights/users";
 
 type Props = {
-  searchParams: Promise<{ days?: string; page?: string }>;
+  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
 export default async function AdminInsightUsersPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
+  const sort = params.sort;
+  const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+
+  const sortParams: Record<string, string> = { days: String(days) };
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
+  );
+
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
   const [timeSeries, users, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.findAllUsers({ limit: PAGE_SIZE, offset }),
-    prismaAdminRepository.countUsers({}),
+    prismaAdminRepository.findAllUsers({ limit: PAGE_SIZE, offset, since, sortBy: sort, sortOrder: order }),
+    prismaAdminRepository.countUsers({ since }),
   ]);
 
   return (
@@ -46,7 +56,7 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
           </Link>
           <h1 className="text-2xl font-bold">Nouveaux utilisateurs</h1>
         </div>
-        <PeriodSelector currentDays={days} basePath="/admin/insights/users" />
+        <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
 
       <Card>
@@ -64,12 +74,12 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Rôle</TableHead>
-              <TableHead className="text-right">Communautés</TableHead>
-              <TableHead className="text-right">Inscriptions</TableHead>
-              <TableHead>Inscrit le</TableHead>
+              <SH label="Nom" column="name" />
+              <SH label="Email" column="email" />
+              <SH label="Rôle" column="role" />
+              <SH label="Communautés" column="circleCount" className="text-right" />
+              <SH label="Inscriptions" column="momentCount" className="text-right" />
+              <SH label="Inscrit le" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>

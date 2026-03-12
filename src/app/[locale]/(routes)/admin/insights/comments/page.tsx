@@ -4,24 +4,23 @@ import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
 import { SortableTableHead } from "@/components/admin/sortable-table-head";
-import { SparklineChart } from "@/components/admin/sparkline-chart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
-const BASE = "/admin/insights/registrations";
+const BASE = "/admin/insights/comments";
 
 type Props = {
   searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
-export default async function AdminInsightRegistrationsPage({ searchParams }: Props) {
+export default async function AdminInsightCommentsPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
@@ -34,10 +33,13 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
   );
 
-  const [timeSeries, { registrations, total }] = await Promise.all([
-    prismaAdminRepository.getTimeSeries(days),
-    prismaAdminRepository.getRegistrationsInsight(days, PAGE_SIZE, offset, sort, order),
-  ]);
+  const { comments, total } = await prismaAdminRepository.getCommentsInsight(
+    days,
+    PAGE_SIZE,
+    offset,
+    sort,
+    order
+  );
 
   return (
     <div className="space-y-6">
@@ -50,69 +52,58 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
             <ArrowLeft className="size-4" />
             Dashboard
           </Link>
-          <h1 className="text-2xl font-bold">Inscriptions</h1>
+          <h1 className="text-2xl font-bold">Commentaires</h1>
         </div>
         <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm font-medium text-muted-foreground">
-            Tendance — {days} derniers jours
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SparklineChart
-            data={timeSeries.registrations}
-            id="insight-registrations"
-            height={120}
-          />
-        </CardContent>
-      </Card>
 
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <SH label="Participant" column="userName" />
+              <SH label="Auteur" column="userName" />
               <SH label="Email" column="userEmail" />
+              <TableHead>Contenu</TableHead>
               <SH label="Événement" column="momentTitle" />
               <SH label="Communauté" column="circleName" />
-              <SH label="Date inscription" column="registeredAt" />
+              <SH label="Date" column="createdAt" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {registrations.length === 0 ? (
+            {comments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                  Aucune inscription sur cette période
+                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                  Aucun commentaire sur cette période
                 </TableCell>
               </TableRow>
             ) : (
-              registrations.map((reg) => (
-                <TableRow key={reg.id}>
+              comments.map((c) => (
+                <TableRow key={c.id}>
                   <TableCell>
                     <Link
-                      href={`/admin/users/${reg.userId}`}
+                      href={`/admin/users/${c.userId}`}
                       className="font-medium hover:underline"
                     >
-                      {reg.userName ?? "—"}
+                      {c.userName ?? "—"}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{reg.userEmail}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.userEmail}</TableCell>
+                  <TableCell className="max-w-xs truncate text-muted-foreground">
+                    {c.content}
+                  </TableCell>
                   <TableCell>
                     <Link
-                      href={`/m/${reg.momentSlug}`}
+                      href={`/m/${c.momentSlug}`}
                       target="_blank"
                       className="flex items-center gap-1 hover:underline"
                     >
-                      {reg.momentTitle}
+                      {c.momentTitle}
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />
                     </Link>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{reg.circleName}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.circleName}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {reg.registeredAt.toLocaleDateString("fr-FR")}
+                    {c.createdAt.toLocaleDateString("fr-FR")}
                   </TableCell>
                 </TableRow>
               ))
