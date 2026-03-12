@@ -30,8 +30,8 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
-  const SH = ({ label, column }: { label: string; column: string }) => (
-    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
   const [timeSeries, { registrations, total }] = await Promise.all([
@@ -77,8 +77,8 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
               <SH label="Participant" column="userName" />
               <SH label="Email" column="userEmail" />
               <SH label="Événement" column="momentTitle" />
-              <SH label="Communauté" column="circleName" />
-              <SH label="Date inscription" column="registeredAt" />
+              <SH label="Communauté" column="circleName" className="w-px" />
+              <SH label="Date inscription" column="registeredAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>

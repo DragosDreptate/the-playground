@@ -77,9 +77,9 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
               <SH label="Nom" column="name" />
               <SH label="Email" column="email" />
               <SH label="Rôle" column="role" />
-              <SH label="Communautés" column="circleCount" className="text-right" />
-              <SH label="Inscriptions" column="momentCount" className="text-right" />
-              <SH label="Inscrit le" column="createdAt" />
+              <SH label="Communautés" column="circleCount" className="w-px text-right" />
+              <SH label="Inscriptions" column="momentCount" className="w-px text-right" />
+              <SH label="Inscrit le" column="createdAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>

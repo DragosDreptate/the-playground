@@ -97,9 +97,9 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
             <TableRow>
               <SH label="Titre" column="title" />
               <SH label="Communauté" column="circleName" />
-              <SH label="Statut" column="status" />
-              <SH label="Inscrits" column="registrationCount" className="text-right" />
-              <SH label="Créé le" column="createdAt" />
+              <SH label="Statut" column="status" className="w-px" />
+              <SH label="Inscrits" column="registrationCount" className="w-px text-right" />
+              <SH label="Créé le" column="createdAt" className="w-px" />
               <TableHead />
             </TableRow>
           </TableHeader>

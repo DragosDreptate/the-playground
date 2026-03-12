@@ -29,8 +29,8 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
   const offset = (page - 1) * PAGE_SIZE;
 
   const sortParams: Record<string, string> = { days: String(days) };
-  const SH = ({ label, column }: { label: string; column: string }) => (
-    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} />
+  const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
+    <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
   const { comments, total } = await prismaAdminRepository.getCommentsInsight(
@@ -65,8 +65,8 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
               <SH label="Email" column="userEmail" />
               <TableHead>Contenu</TableHead>
               <SH label="Événement" column="momentTitle" />
-              <SH label="Communauté" column="circleName" />
-              <SH label="Date" column="createdAt" />
+              <SH label="Communauté" column="circleName" className="w-px" />
+              <SH label="Date" column="createdAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>

@@ -528,6 +528,10 @@
     "circles": "Communities",
     "moments": "Events",
     "backToSite": "Back to site",
+    "insights": "Insights",
+    "insightRegistrations": "Registrations",
+    "insightComments": "Comments",
+    "insightActivation": "Activation",
     "stats": {
       "totalUsers": "Users",
       "totalCircles": "Communities",

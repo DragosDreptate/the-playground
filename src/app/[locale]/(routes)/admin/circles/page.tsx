@@ -54,11 +54,11 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
             <TableRow>
               <SH label={t("columns.name")} column="name" />
               <TableHead>{t("columns.host")}</TableHead>
-              <SH label={t("columns.members")} column="memberCount" className="text-right" />
-              <SH label={t("columns.moments")} column="momentCount" className="text-right" />
-              <SH label={t("columns.visibility")} column="visibility" />
-              <SH label={t("columns.category")} column="category" />
-              <SH label={t("columns.createdAt")} column="createdAt" />
+              <SH label={t("columns.members")} column="memberCount" className="w-px text-right" />
+              <SH label={t("columns.moments")} column="momentCount" className="w-px text-right" />
+              <SH label={t("columns.visibility")} column="visibility" className="w-px" />
+              <SH label={t("columns.category")} column="category" className="w-px" />
+              <SH label={t("columns.createdAt")} column="createdAt" className="w-px" />
               <TableHead />
             </TableRow>
           </TableHeader>
