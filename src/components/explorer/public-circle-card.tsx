@@ -107,7 +107,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           </div>
 
           {/* Right column — desktop only */}
-          <div className="hidden sm:flex shrink-0 items-center ml-4">
+          <div className="hidden sm:flex shrink-0 items-center ml-6">
             {circle.nextMoment && nextMomentDate ? (
               <div className="flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground whitespace-nowrap max-w-[220px]">
                 <CalendarIcon className="size-3 shrink-0 text-primary" />
