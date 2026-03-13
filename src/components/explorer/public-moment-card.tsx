@@ -132,6 +132,11 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:underline">
               {moment.title}
             </h3>
+            {moment.description && (
+              <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
+                {moment.description}
+              </p>
+            )}
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
               <span suppressHydrationWarning>{dateStr} · {timeStr}</span>
               {locationLabel && (
