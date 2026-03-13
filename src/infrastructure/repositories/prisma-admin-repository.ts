@@ -630,12 +630,14 @@ export const prismaAdminRepository: AdminRepository = {
         { circle: { name: { contains: filters.search, mode: "insensitive" } } },
       ];
     }
+    const d = filters.sortOrder ?? "desc";
     const orderBy = (() => {
       switch (filters.sortBy) {
-        case "title": return { title: filters.sortOrder ?? "asc" } as Prisma.MomentOrderByWithRelationInput;
-        case "circleName": return { circle: { name: filters.sortOrder ?? "asc" } } as Prisma.MomentOrderByWithRelationInput;
-        case "startsAt": return { startsAt: filters.sortOrder ?? "desc" } as Prisma.MomentOrderByWithRelationInput;
-        case "registrationCount": return { registrations: { _count: filters.sortOrder ?? "desc" } } as Prisma.MomentOrderByWithRelationInput;
+        case "title": return { title: d } as Prisma.MomentOrderByWithRelationInput;
+        case "circleName": return { circle: { name: d } } as Prisma.MomentOrderByWithRelationInput;
+        case "startsAt": return { startsAt: d } as Prisma.MomentOrderByWithRelationInput;
+        case "registrationCount": return { registrations: { _count: d } } as Prisma.MomentOrderByWithRelationInput;
+        case "explorerScore": return { explorerScore: d } as Prisma.MomentOrderByWithRelationInput;
         default: return { explorerScore: "desc" } as Prisma.MomentOrderByWithRelationInput;
       }
     })();
