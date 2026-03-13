@@ -4,17 +4,6 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import type { CircleCategory } from "@/domain/models/circle";
 
-const CATEGORY_EMOJI: Record<CircleCategory, string> = {
-  TECH: "💻",
-  DESIGN: "🎨",
-  BUSINESS: "📈",
-  SPORT_WELLNESS: "🏃",
-  ART_CULTURE: "🎭",
-  SCIENCE_EDUCATION: "🔬",
-  SOCIAL: "🤝",
-  OTHER: "✨",
-};
-
 const CIRCLE_CATEGORIES: CircleCategory[] = [
   "TECH",
   "DESIGN",
@@ -46,10 +35,10 @@ export function ExplorerFilterBar({ selectedCategory, activeTab }: Props) {
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <div className="flex flex-wrap gap-2">
       <button
         onClick={() => handleCategoryClick(undefined)}
-        className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+        className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
           !selectedCategory
             ? "border-foreground bg-foreground text-background"
             : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
@@ -62,13 +51,12 @@ export function ExplorerFilterBar({ selectedCategory, activeTab }: Props) {
         <button
           key={cat}
           onClick={() => handleCategoryClick(cat)}
-          className={`shrink-0 flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
             selectedCategory === cat
               ? "border-foreground bg-foreground text-background"
               : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
           }`}
         >
-          <span>{CATEGORY_EMOJI[cat]}</span>
           {tCategory(cat)}
         </button>
       ))}
