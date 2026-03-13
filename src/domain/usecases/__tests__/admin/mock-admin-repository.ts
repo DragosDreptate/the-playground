@@ -73,10 +73,12 @@ export function makeAdminStats(overrides: Partial<AdminStats> = {}): AdminStats 
     totalMoments: 25,
     totalRegistrations: 150,
     totalComments: 87,
+    totalFollowers: 200,
     recentUsers: 5,
     recentCircles: 2,
     recentMoments: 4,
     recentComments: 12,
+    recentFollowers: 18,
     ...overrides,
   };
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Users, CircleDot, CalendarDays, TicketCheck, MessageSquare, TrendingUp, Repeat2, ArrowRight } from "lucide-react";
+import { Users, CircleDot, CalendarDays, TicketCheck, MessageSquare, TrendingUp, Repeat2, ArrowRight, UserPlus } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { StatsCard } from "@/components/admin/stats-card";
 import { ChartCard } from "@/components/admin/chart-card";
@@ -58,6 +58,13 @@ export default async function AdminDashboardPage() {
           deltaLabel={t("stats.thisWeek")}
           icon={MessageSquare}
           href="/admin/insights/comments"
+        />
+        <StatsCard
+          label={t("stats.totalFollowers")}
+          value={stats.totalFollowers}
+          delta={stats.recentFollowers}
+          deltaLabel={t("stats.thisWeek")}
+          icon={UserPlus}
         />
       </div>
 

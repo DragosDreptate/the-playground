@@ -218,26 +218,35 @@ export const prismaAdminRepository: AdminRepository = {
     const since = sevenDaysAgo();
     const realUser = realUserWhere();
     const realCircle = realCircleWhere();
+    const realMembership: Prisma.CircleMembershipWhereInput = {
+      role: "PLAYER",
+      user: realUser,
+      circle: realCircle,
+    };
     const [
       totalUsers,
       totalCircles,
       totalMoments,
       totalRegistrations,
       totalComments,
+      totalFollowers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
+      recentFollowers,
     ] = await Promise.all([
       prisma.user.count({ where: realUser }),
       prisma.circle.count({ where: realCircle }),
       prisma.moment.count({ where: { circle: realCircle } }),
       prisma.registration.count({ where: { status: { not: "CANCELLED" }, user: realUser } }),
       prisma.comment.count({ where: { user: realUser } }),
+      prisma.circleMembership.count({ where: realMembership }),
       prisma.user.count({ where: { ...realUser, createdAt: { gte: since } } }),
       prisma.circle.count({ where: { ...realCircle, createdAt: { gte: since } } }),
       prisma.moment.count({ where: { circle: realCircle, createdAt: { gte: since } } }),
       prisma.comment.count({ where: { user: realUser, createdAt: { gte: since } } }),
+      prisma.circleMembership.count({ where: { ...realMembership, joinedAt: { gte: since } } }),
     ]);
     return {
       totalUsers,
@@ -245,10 +254,12 @@ export const prismaAdminRepository: AdminRepository = {
       totalMoments,
       totalRegistrations,
       totalComments,
+      totalFollowers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
+      recentFollowers,
     };
   },
 

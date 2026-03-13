@@ -12,10 +12,12 @@ export type AdminStats = {
   totalMoments: number;
   totalRegistrations: number;
   totalComments: number;
+  totalFollowers: number; // abonnements PLAYER aux Communautés
   recentUsers: number; // derniers 7 jours
   recentCircles: number;
   recentMoments: number;
   recentComments: number;
+  recentFollowers: number;
 };
 
 // ─────────────────────────────────────────────
