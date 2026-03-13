@@ -106,15 +106,22 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
             )}
           </div>
 
-          {/* Right column — next event pill, desktop only */}
-          {circle.nextMoment && nextMomentDate && (
-            <div className="hidden sm:flex shrink-0 items-center">
+          {/* Right column — desktop only */}
+          <div className="hidden sm:flex shrink-0 items-center">
+            {circle.nextMoment && nextMomentDate ? (
               <div className="flex items-center gap-1.5 rounded-full border border-border bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground whitespace-nowrap max-w-[220px]">
                 <CalendarIcon className="size-3 shrink-0 text-primary" />
                 <span className="truncate">{circle.nextMoment.title} · {nextMomentDate}</span>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 px-3 py-2 text-center min-w-[52px]">
+                <span className="text-lg font-bold leading-none">{circle.memberCount}</span>
+                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {t("circleCard.membersShort")}
+                </span>
+              </div>
+            )}
+          </div>
 
         </div>
       </div>
