@@ -19,17 +19,21 @@ export function ExcludedToggle({
   circleId: string;
   excluded: boolean;
 }) {
+  const [localExcluded, setLocalExcluded] = useState(excluded);
   const [pending, startTransition] = useTransition();
 
   function handleChange(checked: boolean) {
+    const newExcluded = !checked;
+    setLocalExcluded(newExcluded);
     startTransition(async () => {
-      await adminUpdateCircleExcludedAction(circleId, !checked);
+      const result = await adminUpdateCircleExcludedAction(circleId, newExcluded);
+      if (!result.success) setLocalExcluded(excluded); // revert on error
     });
   }
 
   return (
     <Switch
-      checked={!excluded}
+      checked={!localExcluded}
       onCheckedChange={handleChange}
       disabled={pending}
       aria-label="Visible sur Explorer"
@@ -46,20 +50,24 @@ export function OverrideScoreInput({
   circleId: string;
   overrideScore: number | null;
 }) {
-  const [value, setValue] = useState(overrideScore !== null ? String(overrideScore) : "");
+  const committedValue = overrideScore !== null ? String(overrideScore) : "";
+  const [value, setValue] = useState(committedValue);
   const [pending, startTransition] = useTransition();
-  const isDirty = value !== (overrideScore !== null ? String(overrideScore) : "");
+  const isDirty = value !== committedValue;
+
+  const parsed = value.trim() === "" ? null : Number(value);
+  const isInvalid = parsed !== null && (isNaN(parsed) || parsed < 0 || parsed > 100);
 
   function handleSave() {
-    const parsed = value.trim() === "" ? null : Number(value);
-    if (parsed !== null && (isNaN(parsed) || parsed < 0 || parsed > 100)) return;
+    if (isInvalid) return;
     startTransition(async () => {
-      await adminUpdateCircleOverrideScoreAction(circleId, parsed);
+      const result = await adminUpdateCircleOverrideScoreAction(circleId, parsed);
+      if (result.success) setValue(parsed !== null ? String(parsed) : "");
     });
   }
 
   function handleReset() {
-    setValue(overrideScore !== null ? String(overrideScore) : "");
+    setValue(committedValue);
   }
 
   return (
@@ -71,7 +79,7 @@ export function OverrideScoreInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder="—"
-        className="h-7 w-16 text-xs tabular-nums"
+        className={`h-7 w-16 text-xs tabular-nums ${isInvalid ? "border-destructive" : ""}`}
         disabled={pending}
       />
       {isDirty && (
@@ -81,7 +89,7 @@ export function OverrideScoreInput({
             variant="ghost"
             className="size-7"
             onClick={handleSave}
-            disabled={pending}
+            disabled={pending || isInvalid}
           >
             <Check className="size-3" />
           </Button>

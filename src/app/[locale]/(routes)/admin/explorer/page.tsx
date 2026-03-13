@@ -14,12 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExcludedToggle, OverrideScoreInput } from "./explorer-controls";
+import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
+import type { ExplorerFilter } from "@/domain/ports/repositories/admin-repository";
 
 const PAGE_SIZE = 20;
 const BASE = "/admin/explorer";
-
-type Filter = "all" | "excluded" | "boosted";
 
 type Props = {
   searchParams: Promise<{
@@ -38,7 +37,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
   const page = Number(params.page ?? "1");
   const sort = params.sort;
   const order = params.order === "asc" ? "asc" : "desc";
-  const filter: Filter =
+  const filter: ExplorerFilter =
     params.filter === "excluded" || params.filter === "boosted" ? params.filter : "all";
   const offset = (page - 1) * PAGE_SIZE;
 
@@ -70,9 +69,9 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
     prismaAdminRepository.countExplorerCircles({ search, filter }),
   ]);
 
-  const filterHref = (f: Filter) => {
-    const base = f === "all" ? BASE : `${BASE}?filter=${f}`;
-    return search ? `${base}${f === "all" ? "?" : "&"}search=${search}` : base;
+  const filterHref = (f: ExplorerFilter) => {
+    const qs = new URLSearchParams({ ...(f !== "all" ? { filter: f } : {}), ...(search ? { search } : {}) });
+    return qs.size > 0 ? `${BASE}?${qs}` : BASE;
   };
 
   return (
@@ -81,7 +80,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
 
       {/* Filtres */}
       <div className="flex gap-2">
-        {(["all", "excluded", "boosted"] as const).map((f) => (
+        {(["all", "excluded", "boosted"] as ExplorerFilter[]).map((f) => (
           <Link
             key={f}
             href={filterHref(f)}
@@ -153,7 +152,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
                   </TableCell>
                   <TableCell className="text-center">
                     {circle.isDemo && (
-                      <Badge variant="secondary" className="text-xs">Démo</Badge>
+                      <Badge variant="secondary" className="text-xs">{t("explorer.columns.demo")}</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-right tabular-nums">{circle.memberCount}</TableCell>

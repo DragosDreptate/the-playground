@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminCircleDeleteButton } from "./delete-button";
-import { ExcludedToggle, OverrideScoreInput } from "../../explorer/explorer-controls";
+import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -117,7 +117,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
           {circle.isDemo && (
             <Row
               label={t("explorer.columns.demo")}
-              value={<Badge variant="secondary" className="text-xs">Démo</Badge>}
+              value={<Badge variant="secondary" className="text-xs">{t("explorer.columns.demo")}</Badge>}
             />
           )}
           <div className="flex items-center justify-between text-sm">

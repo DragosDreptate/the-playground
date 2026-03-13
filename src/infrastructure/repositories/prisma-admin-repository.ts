@@ -171,6 +171,19 @@ function commentOrderBy(
   }
 }
 
+function explorerCircleWhere(filters: AdminExplorerFilters): Prisma.CircleWhereInput {
+  const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
+  if (filters.filter === "excluded") where.excludedFromExplorer = true;
+  if (filters.filter === "boosted") where.overrideScore = { not: null };
+  if (filters.search) {
+    where.OR = [
+      { name: { contains: filters.search, mode: "insensitive" } },
+      { slug: { contains: filters.search, mode: "insensitive" } },
+    ];
+  }
+  return where;
+}
+
 function explorerOrderBy(sortBy?: string, sortOrder?: string): Prisma.CircleOrderByWithRelationInput {
   const d = dir(sortOrder);
   switch (sortBy) {
@@ -560,17 +573,8 @@ export const prismaAdminRepository: AdminRepository = {
   // ── Explorer ──────────────────────────────
 
   async findAllExplorerCircles(filters: AdminExplorerFilters): Promise<AdminExplorerCircleRow[]> {
-    const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
-    if (filters.filter === "excluded") where.excludedFromExplorer = true;
-    if (filters.filter === "boosted") where.overrideScore = { not: null };
-    if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: "insensitive" } },
-        { slug: { contains: filters.search, mode: "insensitive" } },
-      ];
-    }
     const records = await prisma.circle.findMany({
-      where,
+      where: explorerCircleWhere(filters),
       include: {
         _count: { select: { memberships: { where: { role: "PLAYER" } }, moments: true } },
         memberships: {
@@ -605,16 +609,7 @@ export const prismaAdminRepository: AdminRepository = {
   },
 
   async countExplorerCircles(filters: AdminExplorerFilters): Promise<number> {
-    const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
-    if (filters.filter === "excluded") where.excludedFromExplorer = true;
-    if (filters.filter === "boosted") where.overrideScore = { not: null };
-    if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: "insensitive" } },
-        { slug: { contains: filters.search, mode: "insensitive" } },
-      ];
-    }
-    return prisma.circle.count({ where });
+    return prisma.circle.count({ where: explorerCircleWhere(filters) });
   },
 
   async updateCircleExcluded(id: string, excluded: boolean): Promise<void> {

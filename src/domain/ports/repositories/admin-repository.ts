@@ -228,9 +228,11 @@ export type AdminInsightComment = {
 // Explorer
 // ─────────────────────────────────────────────
 
+export type ExplorerFilter = "all" | "excluded" | "boosted";
+
 export type AdminExplorerFilters = {
   search?: string;
-  filter?: "all" | "excluded" | "boosted";
+  filter?: ExplorerFilter;
   limit?: number;
   offset?: number;
   sortBy?: string;
