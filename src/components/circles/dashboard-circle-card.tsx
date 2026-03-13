@@ -11,15 +11,18 @@ type Props = {
 };
 
 export async function DashboardCircleCard({ circle }: Props) {
-  const t = await getTranslations("Explorer");
-  const tCategory = await getTranslations("CircleCategory");
-  const locale = await getLocale();
+  const [t, tCategory, locale] = await Promise.all([
+    getTranslations("Explorer"),
+    getTranslations("CircleCategory"),
+    getLocale(),
+  ]);
 
   const gradient = getMomentGradient(circle.name);
 
-  const nextMomentStart = circle.nextMoment ? new Date(circle.nextMoment.startsAt) : null;
+  const nextMomentStart = circle.nextMoment?.startsAt ?? null;
   const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
+  const hasNextMoment = !!(circle.nextMoment && nextMomentDate);
 
   const categoryLabel =
     circle.category === "OTHER" && circle.customCategory
@@ -84,18 +87,18 @@ export async function DashboardCircleCard({ circle }: Props) {
               )}
             </div>
             {/* Prochain événement — mobile uniquement */}
-            {circle.nextMoment && nextMomentDate && (
+            {hasNextMoment && (
               <div className="rounded-lg border border-border bg-muted/40 px-2 py-1.5 sm:hidden">
-                <p className="truncate text-xs font-medium">{circle.nextMoment.title}</p>
+                <p className="truncate text-xs font-medium">{circle.nextMoment!.title}</p>
               </div>
             )}
           </div>
 
           {/* Colonne droite — desktop uniquement */}
           <div className="hidden sm:flex shrink-0 items-center ml-4">
-            {circle.nextMoment && nextMomentDate ? (
+            {hasNextMoment ? (
               <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[200px]">
-                <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
+                <p className="truncate font-medium text-foreground">{circle.nextMoment!.title}</p>
                 <div className="flex items-center gap-1.5">
                   <CalendarIcon className="size-3 shrink-0 text-primary" />
                   <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
