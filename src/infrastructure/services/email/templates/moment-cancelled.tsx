@@ -68,7 +68,7 @@ const ctaSection: React.CSSProperties = {
 };
 
 const ctaButton: React.CSSProperties = {
-  background: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
   color: "#ffffff",
   fontSize: "14px",
   fontWeight: 600,
