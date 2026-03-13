@@ -436,7 +436,6 @@ export async function inviteToCircleByEmailAction(
     const inviteUrl = `${baseUrl}/circles/join/${token}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
     // Résoudre la locale dans le contexte de la request (avant after())
-    if (isAdminUser(session)) return { success: true, data: undefined };
     const t = await getTranslations("Email.circleInvitation");
 
     after(async () => {
