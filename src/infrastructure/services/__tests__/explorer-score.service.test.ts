@@ -59,7 +59,7 @@ describe("calculateCircleScore", () => {
         coverImage: "https://example.com/cover.jpg",
         hasUpcomingEvent: true,
         description: "Une communauté dédiée aux passionnés de tech parisiens.",
-        category: "tech",
+        category: "TECH",
         // createdAt = twoDaysAgo → ageInDays >= 1 ✓
         // raw = 18 + 15 + 10 + 7 + 5 = 55 → round(55/205*100) = 27
       });
@@ -74,7 +74,7 @@ describe("calculateCircleScore", () => {
         coverImage: "https://example.com/cover.jpg",
         hasPastEventWithRegistrant: true,
         hasUpcomingEvent: true,
-        category: "tech",
+        category: "TECH",
         // pas de description longue
         description: "Court.",
         memberCount: 3,
@@ -94,7 +94,7 @@ describe("calculateCircleScore", () => {
         hasPastEventWithRegistrant: true,
         hasUpcomingEvent: true,
         description: "Une communauté très active avec de nombreux événements.",
-        category: "sport",
+        category: "SPORT_WELLNESS",
         memberCount: 10,
         pastEventCount: 5,
         // raw = 20 + 18 + 15 + 10 + 7 + 5 + 80 + 50 = 205
@@ -141,7 +141,7 @@ describe("calculateCircleScore", () => {
         hasPastEventWithRegistrant: true,
         hasUpcomingEvent: true,
         description: "Une communauté démo bien remplie pour les tests.",
-        category: "design",
+        category: "DESIGN",
         memberCount: 8,
         pastEventCount: 4,
       });

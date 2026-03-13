@@ -1,4 +1,5 @@
 import { prisma, Prisma } from "@/infrastructure/db/prisma";
+import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   MomentRepository,
   CreateMomentInput,
@@ -147,14 +148,7 @@ export const prismaMomentRepository: MomentRepository = {
         circle: {
           visibility: "PUBLIC",
           excludedFromExplorer: false,
-          NOT: {
-            memberships: {
-              some: {
-                role: "HOST",
-                user: { email: { endsWith: "@test.playground" } },
-              },
-            },
-          },
+          NOT: excludeTestHostFilter(),
           ...(filters.category && { category: filters.category }),
         },
       },

@@ -1,4 +1,5 @@
 import { prisma, Prisma } from "@/infrastructure/db/prisma";
+import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   CircleRepository,
   CreateCircleInput,
@@ -326,15 +327,8 @@ export const prismaCircleRepository: CircleRepository = {
         ...(filters.category && { category: filters.category }),
         // Exclure les circles admin-exclus
         excludedFromExplorer: false,
-        // Exclure les circles dont le host a un email @test.playground
-        NOT: {
-          memberships: {
-            some: {
-              role: "HOST",
-              user: { email: { endsWith: "@test.playground" } },
-            },
-          },
-        },
+        // Exclure les circles dont le host est un compte de test
+        NOT: excludeTestHostFilter(),
         // Seuil d'affichage : ≥1 membre réel (PLAYER) OU ≥1 event publié à venir
         OR: [
           {
@@ -468,21 +462,30 @@ export const prismaCircleRepository: CircleRepository = {
   },
 
   async findFeatured(): Promise<FeaturedCircle[]> {
+    const featuredWhere = {
+      visibility: "PUBLIC" as const,
+      coverImage: { not: null as null },
+      excludedFromExplorer: false,
+      isDemo: false,
+      NOT: excludeTestHostFilter(),
+    };
+
+    // Charger uniquement les IDs pour le shuffle (évite de lire toutes les colonnes)
+    const rows = await prisma.circle.findMany({
+      where: featuredWhere,
+      select: { id: true },
+    });
+
+    if (rows.length === 0) return [];
+
+    // Seed = date du jour (YYYY-MM-DD) → sélection stable sur 24h
+    const today = new Date().toISOString().slice(0, 10);
+    const selectedIds = seededShuffle(rows, today).slice(0, 3).map((r) => r.id);
+
+    // Charger uniquement les 3 circles sélectionnés avec toutes leurs colonnes
+    const now = new Date();
     const circles = await prisma.circle.findMany({
-      where: {
-        visibility: "PUBLIC",
-        coverImage: { not: null },
-        excludedFromExplorer: false,
-        isDemo: false,
-        NOT: {
-          memberships: {
-            some: {
-              role: "HOST",
-              user: { email: { endsWith: "@test.playground" } },
-            },
-          },
-        },
-      },
+      where: { id: { in: selectedIds } },
       select: {
         id: true,
         slug: true,
@@ -497,33 +500,33 @@ export const prismaCircleRepository: CircleRepository = {
           select: {
             memberships: true,
             moments: {
-              where: {
-                status: "PUBLISHED",
-                startsAt: { gte: new Date() },
-              },
+              where: { status: "PUBLISHED", startsAt: { gte: now } },
             },
           },
         },
       },
     });
 
-    // Seed = date du jour (YYYY-MM-DD) → sélection stable sur 24h
-    const today = new Date().toISOString().slice(0, 10);
-    const shuffled = seededShuffle(circles, today);
+    // Conserver l'ordre du shuffle (WHERE id IN ne garantit pas l'ordre)
+    const byId = new Map(circles.map((c) => [c.id, c]));
 
-    return shuffled.slice(0, 3).map((c) => ({
-      id: c.id,
-      slug: c.slug,
-      name: c.name,
-      description: c.description,
-      category: c.category ?? null,
-      customCategory: c.customCategory ?? null,
-      city: c.city ?? null,
-      coverImage: c.coverImage!, // non-null garanti par le WHERE
-      coverImageAttribution: c.coverImageAttribution as CoverImageAttribution | null,
-      memberCount: c._count.memberships,
-      upcomingMomentCount: c._count.moments,
-    }));
+    return selectedIds.flatMap((id) => {
+      const c = byId.get(id);
+      if (!c) return [];
+      return [{
+        id: c.id,
+        slug: c.slug,
+        name: c.name,
+        description: c.description,
+        category: c.category ?? null,
+        customCategory: c.customCategory ?? null,
+        city: c.city ?? null,
+        coverImage: c.coverImage!, // non-null garanti par le WHERE
+        coverImageAttribution: c.coverImageAttribution as CoverImageAttribution | null,
+        memberCount: c._count.memberships,
+        upcomingMomentCount: c._count.moments,
+      }];
+    });
   },
 
   async getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]> {
