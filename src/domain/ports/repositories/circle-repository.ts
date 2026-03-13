@@ -50,6 +50,8 @@ export type PublicCircle = {
     title: string;
     startsAt: Date;
   } | null;
+  isDemo: boolean;
+  explorerScore: number;
 };
 
 export type CircleFollowerInfo = {
@@ -57,6 +59,20 @@ export type CircleFollowerInfo = {
   email: string;
   firstName: string | null;
   lastName: string | null;
+};
+
+export type FeaturedCircle = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  category: CircleCategory | null;
+  customCategory: string | null;
+  city: string | null;
+  coverImage: string; // non-null garanti (condition du pool)
+  coverImageAttribution: CoverImageAttribution | null;
+  memberCount: number;
+  upcomingMomentCount: number;
 };
 
 export interface CircleRepository {
@@ -93,4 +109,6 @@ export interface CircleRepository {
   findPlayersForNewMomentNotification(circleId: string, excludeUserId: string): Promise<CircleFollowerInfo[]>;
   /** Communautés publiques dont l'utilisateur est membre — pour la page profil public. */
   getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]>;
+  /** 3 communautés sélectionnées aléatoirement (seed = date du jour) pour la section "À la une". */
+  findFeatured(): Promise<FeaturedCircle[]>;
 }

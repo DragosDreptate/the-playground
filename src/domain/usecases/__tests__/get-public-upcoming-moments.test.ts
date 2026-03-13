@@ -21,7 +21,9 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
       name: "Tech Paris",
       category: "TECH",
       city: "Paris",
+      isDemo: false,
     },
+    explorerScore: 0,
     ...overrides,
   };
 }

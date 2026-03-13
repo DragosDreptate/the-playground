@@ -1,4 +1,5 @@
 import { prisma, Prisma } from "@/infrastructure/db/prisma";
+import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   MomentRepository,
   CreateMomentInput,
@@ -135,22 +136,27 @@ export const prismaMomentRepository: MomentRepository = {
 
   async findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]> {
     const now = new Date();
+    const orderBy =
+      filters.sortBy === "date"
+        ? { startsAt: "asc" as const }
+        : [{ explorerScore: "desc" as const }, { startsAt: "asc" as const }];
+
     const moments = await prisma.moment.findMany({
       where: {
         status: "PUBLISHED",
         startsAt: { gte: now },
         circle: {
           visibility: "PUBLIC",
+          excludedFromExplorer: false,
+          NOT: excludeTestHostFilter(),
           ...(filters.category && { category: filters.category }),
         },
       },
       include: {
-        circle: { select: { slug: true, name: true, category: true, city: true } },
+        circle: { select: { slug: true, name: true, category: true, city: true, isDemo: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
       },
-      orderBy: filters.sortBy === "popular"
-        ? { registrations: { _count: "desc" } }
-        : { startsAt: "asc" },
+      orderBy,
       take: filters.limit ?? 20,
       skip: filters.offset ?? 0,
     });
@@ -167,11 +173,13 @@ export const prismaMomentRepository: MomentRepository = {
       locationName: m.locationName,
       registrationCount: m._count.registrations,
       capacity: m.capacity,
+      explorerScore: m.explorerScore,
       circle: {
         slug: m.circle.slug,
         name: m.circle.name,
         category: m.circle.category ?? null,
         city: m.circle.city ?? null,
+        isDemo: m.circle.isDemo,
       },
     }));
   },

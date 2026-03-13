@@ -17,6 +17,8 @@ function makePublicCircle(overrides: Partial<PublicCircle> = {}): PublicCircle {
     memberCount: 42,
     upcomingMomentCount: 3,
     nextMoment: { title: "Meetup React", startsAt: new Date("2026-03-15T18:00:00Z") },
+    isDemo: false,
+    explorerScore: 0,
     ...overrides,
   };
 }

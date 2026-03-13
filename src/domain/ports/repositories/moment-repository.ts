@@ -59,11 +59,13 @@ export type PublicMoment = {
   locationName: string | null;
   registrationCount: number;
   capacity: number | null;
+  explorerScore: number;
   circle: {
     slug: string;
     name: string;
     category: CircleCategory | null;
     city: string | null;
+    isDemo: boolean;
   };
 };
 

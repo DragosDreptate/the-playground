@@ -166,6 +166,12 @@ model Circle {
   city                  String?
   stripeConnectAccountId String?
   inviteToken           String?          @unique @map("invite_token")
+  // Explorer scoring
+  isDemo               Boolean   @default(false)
+  excludedFromExplorer Boolean   @default(false)   @map("excluded_from_explorer")
+  overrideScore        Int?                         @map("override_score")
+  explorerScore        Int       @default(0)        @map("explorer_score")
+  scoreUpdatedAt       DateTime?                    @map("score_updated_at")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -178,6 +184,8 @@ model Circle {
   // WHERE visibility = 'PUBLIC' — couvert par le préfixe visibility
   // WHERE visibility = 'PUBLIC' AND category = ? — couvert par l'index complet
   @@index([visibility, category])
+  // Index sur explorerScore : utilisé dans ORDER BY explorer_score DESC (Explorer)
+  @@index([explorerScore])
   @@map("circles")
 }
 
@@ -222,6 +230,9 @@ model Moment {
   status                MomentStatus @default(PUBLISHED)
   broadcastSentAt       DateTime?
 
+  // Explorer scoring
+  explorerScore Int @default(0) @map("explorer_score")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -237,6 +248,8 @@ model Moment {
   @@index([status, startsAt])
   // Index sur (circleId, status) : utilisé dans findPublic (circles avec moments à venir)
   @@index([circleId, status])
+  // Index sur explorerScore : utilisé dans ORDER BY explorer_score DESC (Explorer)
+  @@index([explorerScore])
   @@map("moments")
 }
 

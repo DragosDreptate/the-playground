@@ -807,6 +807,7 @@ async function main() {
         visibility: circleData.visibility,
         category: circleData.category,
         city: circleData.city ?? null,
+        isDemo: true,
       },
       update: {
         name: circleData.name,
@@ -814,6 +815,7 @@ async function main() {
         visibility: circleData.visibility,
         category: circleData.category,
         city: circleData.city ?? null,
+        isDemo: true,
       },
     });
 
