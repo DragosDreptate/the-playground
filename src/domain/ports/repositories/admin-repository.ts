@@ -100,6 +100,11 @@ export type AdminCircleDetail = AdminCircleRow & {
     status: MomentStatus;
     startsAt: Date;
   }>;
+  isDemo: boolean;
+  explorerScore: number;
+  overrideScore: number | null;
+  excludedFromExplorer: boolean;
+  scoreUpdatedAt: Date | null;
 };
 
 // ─────────────────────────────────────────────
@@ -220,6 +225,33 @@ export type AdminInsightComment = {
 };
 
 // ─────────────────────────────────────────────
+// Explorer
+// ─────────────────────────────────────────────
+
+export type AdminExplorerFilters = {
+  search?: string;
+  filter?: "all" | "excluded" | "boosted";
+  limit?: number;
+  offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+};
+
+export type AdminExplorerCircleRow = {
+  id: string;
+  slug: string;
+  name: string;
+  isDemo: boolean;
+  explorerScore: number;
+  overrideScore: number | null;
+  excludedFromExplorer: boolean;
+  scoreUpdatedAt: Date | null;
+  memberCount: number;
+  momentCount: number;
+  hostName: string;
+};
+
+// ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
 
@@ -240,6 +272,12 @@ export interface AdminRepository {
   countCircles(filters: AdminCircleFilters): Promise<number>;
   findCircleById(id: string): Promise<AdminCircleDetail | null>;
   deleteCircle(id: string): Promise<void>;
+
+  // Explorer
+  findAllExplorerCircles(filters: AdminExplorerFilters): Promise<AdminExplorerCircleRow[]>;
+  countExplorerCircles(filters: AdminExplorerFilters): Promise<number>;
+  updateCircleExcluded(id: string, excluded: boolean): Promise<void>;
+  updateCircleOverrideScore(id: string, score: number | null): Promise<void>;
 
   // Moments
   findAllMoments(filters: AdminMomentFilters): Promise<AdminMomentRow[]>;

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminCircleDeleteButton } from "./delete-button";
+import { ExcludedToggle, OverrideScoreInput } from "../../explorer/explorer-controls";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -87,6 +88,48 @@ export default async function AdminCircleDetailPage({ params }: Props) {
           </CardContent>
         </Card>
       )}
+
+      {/* Explorer Visibility */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("circleDetail.explorerVisibility")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Row
+            label={t("explorer.columns.score")}
+            value={
+              <span className="tabular-nums font-mono">
+                {circle.overrideScore !== null ? (
+                  <span className="text-amber-600 font-semibold">{circle.overrideScore}</span>
+                ) : (
+                  circle.explorerScore
+                )}
+                {circle.scoreUpdatedAt && (
+                  <span className="ml-2 text-xs text-muted-foreground font-sans">
+                    {t("explorer.lastUpdated", {
+                      date: circle.scoreUpdatedAt.toLocaleDateString(),
+                    })}
+                  </span>
+                )}
+              </span>
+            }
+          />
+          {circle.isDemo && (
+            <Row
+              label={t("explorer.columns.demo")}
+              value={<Badge variant="secondary" className="text-xs">Démo</Badge>}
+            />
+          )}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">{t("explorer.columns.override")}</span>
+            <OverrideScoreInput circleId={circle.id} overrideScore={circle.overrideScore} />
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">{t("explorer.columns.visible")}</span>
+            <ExcludedToggle circleId={circle.id} excluded={circle.excludedFromExplorer} />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Recent Moments */}
       <Card>

@@ -11,6 +11,8 @@ import type {
   AdminCircleFilters,
   AdminCircleRow,
   AdminCircleDetail,
+  AdminExplorerFilters,
+  AdminExplorerCircleRow,
   AdminMomentFilters,
   AdminMomentRow,
   AdminMomentDetail,
@@ -166,6 +168,17 @@ function commentOrderBy(
     case "circleName": return { moment: { circle: { name: d } } };
     case "createdAt": return { createdAt: d };
     default: return { createdAt: "desc" };
+  }
+}
+
+function explorerOrderBy(sortBy?: string, sortOrder?: string): Prisma.CircleOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "name": return { name: d };
+    case "explorerScore": return { explorerScore: d };
+    case "memberCount": return { memberships: { _count: d } };
+    case "momentCount": return { moments: { _count: d } };
+    default: return { explorerScore: "desc" };
   }
 }
 
@@ -532,11 +545,84 @@ export const prismaAdminRepository: AdminRepository = {
       createdAt: record.createdAt,
       hosts: record.memberships.map((m) => m.user),
       recentMoments: record.moments,
+      isDemo: record.isDemo,
+      explorerScore: record.explorerScore,
+      overrideScore: record.overrideScore,
+      excludedFromExplorer: record.excludedFromExplorer,
+      scoreUpdatedAt: record.scoreUpdatedAt,
     };
   },
 
   async deleteCircle(id: string): Promise<void> {
     await prisma.circle.delete({ where: { id } });
+  },
+
+  // ── Explorer ──────────────────────────────
+
+  async findAllExplorerCircles(filters: AdminExplorerFilters): Promise<AdminExplorerCircleRow[]> {
+    const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
+    if (filters.filter === "excluded") where.excludedFromExplorer = true;
+    if (filters.filter === "boosted") where.overrideScore = { not: null };
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: "insensitive" } },
+        { slug: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+    const records = await prisma.circle.findMany({
+      where,
+      include: {
+        _count: { select: { memberships: { where: { role: "PLAYER" } }, moments: true } },
+        memberships: {
+          where: { role: "HOST" },
+          take: 1,
+          include: { user: { select: { firstName: true, lastName: true, email: true } } },
+        },
+      },
+      orderBy: explorerOrderBy(filters.sortBy, filters.sortOrder),
+      take: filters.limit ?? DEFAULT_LIMIT,
+      skip: filters.offset ?? 0,
+    });
+    return records.map((r) => {
+      const host = r.memberships[0]?.user;
+      const hostName = host
+        ? [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email
+        : "—";
+      return {
+        id: r.id,
+        slug: r.slug,
+        name: r.name,
+        isDemo: r.isDemo,
+        explorerScore: r.explorerScore,
+        overrideScore: r.overrideScore,
+        excludedFromExplorer: r.excludedFromExplorer,
+        scoreUpdatedAt: r.scoreUpdatedAt,
+        memberCount: r._count.memberships,
+        momentCount: r._count.moments,
+        hostName,
+      };
+    });
+  },
+
+  async countExplorerCircles(filters: AdminExplorerFilters): Promise<number> {
+    const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
+    if (filters.filter === "excluded") where.excludedFromExplorer = true;
+    if (filters.filter === "boosted") where.overrideScore = { not: null };
+    if (filters.search) {
+      where.OR = [
+        { name: { contains: filters.search, mode: "insensitive" } },
+        { slug: { contains: filters.search, mode: "insensitive" } },
+      ];
+    }
+    return prisma.circle.count({ where });
+  },
+
+  async updateCircleExcluded(id: string, excluded: boolean): Promise<void> {
+    await prisma.circle.update({ where: { id }, data: { excludedFromExplorer: excluded } });
+  },
+
+  async updateCircleOverrideScore(id: string, score: number | null): Promise<void> {
+    await prisma.circle.update({ where: { id }, data: { overrideScore: score } });
   },
 
   // ── Moments ──────────────────────────────

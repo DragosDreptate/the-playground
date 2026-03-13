@@ -27,6 +27,10 @@ export function createMockAdminRepository(
     countCircles: vi.fn().mockResolvedValue(0),
     findCircleById: vi.fn().mockResolvedValue(null),
     deleteCircle: vi.fn().mockResolvedValue(undefined),
+    findAllExplorerCircles: vi.fn().mockResolvedValue([]),
+    countExplorerCircles: vi.fn().mockResolvedValue(0),
+    updateCircleExcluded: vi.fn().mockResolvedValue(undefined),
+    updateCircleOverrideScore: vi.fn().mockResolvedValue(undefined),
     findAllMoments: vi.fn().mockResolvedValue([]),
     countMoments: vi.fn().mockResolvedValue(0),
     findMomentById: vi.fn().mockResolvedValue(null),
@@ -155,6 +159,11 @@ export function makeAdminCircleDetail(
         startsAt: new Date("2026-03-15T18:00:00Z"),
       },
     ],
+    isDemo: false,
+    explorerScore: 42,
+    overrideScore: null,
+    excludedFromExplorer: false,
+    scoreUpdatedAt: null,
     ...overrides,
   };
 }

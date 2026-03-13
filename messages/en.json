@@ -531,6 +531,7 @@
     "users": "Users",
     "circles": "Communities",
     "moments": "Events",
+    "explorer": "Explorer",
     "backToSite": "Back to site",
     "insights": "Insights",
     "insightRegistrations": "Registrations",
@@ -581,7 +582,23 @@
       "city": "City",
       "description": "Description",
       "recentMoments": "Recent Events",
-      "noMoments": "No Events."
+      "noMoments": "No Events.",
+      "explorerVisibility": "Explorer Visibility"
+    },
+    "explorer": {
+      "title": "Explorer Visibility",
+      "lastUpdated": "updated {date}",
+      "filter": {
+        "all": "All",
+        "excluded": "Excluded",
+        "boosted": "Boosted"
+      },
+      "columns": {
+        "score": "Score",
+        "override": "Override",
+        "visible": "Visible",
+        "demo": "Demo"
+      }
     },
     "viewPublicPage": "View page",
     "momentDetail": {

@@ -13,6 +13,9 @@ import { adminDeleteUser } from "@/domain/usecases/admin/admin-delete-user";
 import { getAdminCircles } from "@/domain/usecases/admin/get-admin-circles";
 import { getAdminCircle } from "@/domain/usecases/admin/get-admin-circle";
 import { adminDeleteCircle } from "@/domain/usecases/admin/admin-delete-circle";
+import { getAdminExplorerCircles } from "@/domain/usecases/admin/get-admin-explorer-circles";
+import { adminUpdateCircleExcluded } from "@/domain/usecases/admin/admin-update-circle-excluded";
+import { adminUpdateCircleOverrideScore } from "@/domain/usecases/admin/admin-update-circle-override-score";
 import { getAdminMoments } from "@/domain/usecases/admin/get-admin-moments";
 import { getAdminMoment } from "@/domain/usecases/admin/get-admin-moment";
 import { adminDeleteMoment } from "@/domain/usecases/admin/admin-delete-moment";
@@ -20,7 +23,7 @@ import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-mo
 import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
-import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
+import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminExplorerFilters, AdminExplorerCircleRow, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 
 const deps = { adminRepository: prismaAdminRepository };
@@ -201,6 +204,62 @@ export async function adminCancelMomentAction(
   try {
     await adminUpdateMomentStatus(check.data.role, momentId, "CANCELLED" as MomentStatus, deps);
     revalidatePath("/admin/moments");
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+// ─────────────────────────────────────────────
+// Explorer
+// ─────────────────────────────────────────────
+
+export async function getAdminExplorerCirclesAction(
+  filters: AdminExplorerFilters
+): Promise<ActionResult<{ circles: AdminExplorerCircleRow[]; total: number }>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  const result = await getAdminExplorerCircles(check.data.role, filters, deps);
+  return { success: true, data: result };
+}
+
+export async function adminUpdateCircleExcludedAction(
+  circleId: string,
+  excluded: boolean
+): Promise<ActionResult> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  try {
+    await adminUpdateCircleExcluded(check.data.role, circleId, excluded, deps);
+    revalidatePath("/admin/explorer");
+    revalidatePath(`/admin/circles/${circleId}`);
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function adminUpdateCircleOverrideScoreAction(
+  circleId: string,
+  score: number | null
+): Promise<ActionResult> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  try {
+    await adminUpdateCircleOverrideScore(check.data.role, circleId, score, deps);
+    revalidatePath("/admin/explorer");
+    revalidatePath(`/admin/circles/${circleId}`);
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
