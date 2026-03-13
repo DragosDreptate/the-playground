@@ -157,7 +157,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
           </div>
 
           {/* Right column — desktop only */}
-          <div className="hidden sm:flex shrink-0 items-center ml-4">
+          <div className="hidden sm:flex shrink-0 items-center ml-8">
             {rightColumn}
           </div>
 
