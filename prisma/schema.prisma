@@ -167,7 +167,7 @@ model Circle {
   stripeConnectAccountId String?
   inviteToken           String?          @unique @map("invite_token")
   // Explorer scoring
-  isDemo               Boolean   @default(false)   @map("is_demo")
+  isDemo               Boolean   @default(false)
   excludedFromExplorer Boolean   @default(false)   @map("excluded_from_explorer")
   overrideScore        Int?                         @map("override_score")
   explorerScore        Int       @default(0)        @map("explorer_score")
