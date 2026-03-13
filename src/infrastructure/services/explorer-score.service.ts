@@ -11,7 +11,7 @@ import type { CircleCategory } from "@/domain/models/circle";
 
 // Constantes du scoring Circle — reflètent la formule de la spec
 const CIRCLE_RAW_MAX = 205; // somme max des points bruts (20+18+15+10+7+5+80+50)
-const DEMO_SCORE_CAP = 30; // plafond de score pour les Communautés de démo
+const DEMO_SCORE_CAP = 50; // plafond de score pour les Communautés de démo
 const DESCRIPTION_MIN_LENGTH = 30; // longueur minimale de description pour +10 pts
 const MEMBER_SCORE_MAX = 80; // plafond scoring membres (memberCount × 8)
 const PAST_EVENT_SCORE_MAX = 50; // plafond scoring événements passés (pastEventCount × 10)
@@ -44,7 +44,7 @@ export type MomentScoreInput = {
  * Calcule le score Explorer d'une Communauté (0–100).
  *
  * Si `overrideScore` est non-null, il est retourné directement sans calcul.
- * Si `isDemo`, le score est plafonné à 30.
+ * Si `isDemo`, le score est plafonné à 50.
  */
 export function calculateCircleScore(input: CircleScoreInput): number {
   if (input.overrideScore !== null) {
@@ -72,7 +72,7 @@ export function calculateCircleScore(input: CircleScoreInput): number {
  * Calcule le score Explorer d'un événement (0–100).
  *
  * Score = 50 % score Communauté parente + 50 % signaux propres à l'événement.
- * Si le Circle est une démo (`circleIsDemo`), le score est plafonné à 30.
+ * Si le Circle est une démo (`circleIsDemo`), le score est plafonné à 50.
  */
 export function calculateMomentScore(input: MomentScoreInput): number {
   const momentRaw =

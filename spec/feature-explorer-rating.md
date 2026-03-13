@@ -35,7 +35,7 @@ Avant tout calcul de score, les entités suivantes sont **exclues de l'affichage
 
 Ces entités n'apparaissent jamais sur Explorer, quel que soit leur score.
 
-> Les communautés `@demo.playground` ne sont **pas** exclues — elles apparaissent mélangées dans la liste avec un badge "Démo" et un score capé à 30. Voir section dédiée ci-dessous.
+> Les communautés `@demo.playground` ne sont **pas** exclues — elles apparaissent mélangées dans la liste avec un badge "Démo" et un score capé à 50. Voir section dédiée ci-dessous.
 
 ---
 
@@ -55,20 +55,20 @@ Les communautés seedées avec `@demo.playground` ont `isDemo: true`.
 
 ### Comportement
 
-- **Score capé à 30/100** → score calculé normalement puis plafonné à 30, quel que soit le résultat brut. Les vraies communautés actives (score > 30) passent naturellement devant. Les démos restent visibles et mélangées avec les vraies communautés peu actives.
+- **Score capé à 50/100** → score calculé normalement puis plafonné à 50, quel que soit le résultat brut. Les vraies communautés actives (score > 50) passent naturellement devant. Les démos restent visibles et mélangées avec les vraies communautés peu actives.
 - **Badge "Démo"** affiché sur les cards Explorer — Communautés ET événements appartenant à un Circle `isDemo: true`
 - **Exclues du pool "À la une"** automatiquement
 
 ```
 score_circle = isDemo
-  ? Math.min(Math.round((raw_score / 205) * 100), 30)   // capé à 30
+  ? Math.min(Math.round((raw_score / 205) * 100), 50)   // capé à 50
   : Math.round((raw_score / 205) * 100)                  // normal
 ```
 
 ### Rationale
 
 - Les démos sont parfaitement seedées (cover, membres, events) → score brut ~90/100 sans cap. Elles domineraient Explorer sans plafonnement.
-- Cap à 30 : mélangées au milieu, jamais en tête. Descendent progressivement quand le vrai catalogue grossit — sans action manuelle.
+- Cap à 50 : mélangées au milieu, jamais en tête. Descendent progressivement quand le vrai catalogue grossit — sans action manuelle.
 - Badge "Démo" : transparence maintenue pour les visiteurs.
 - Cap tuneable : valeur initiale conservative, à ajuster selon la densité du catalogue.
 
@@ -162,7 +162,7 @@ score_moment = Math.round(score_circle * 0.5 + moment_raw * 0.5)  // normalisé 
 #### Règle d'exclusion
 
 Événements dont le host a un email `@test.playground` : exclus via filtre `WHERE`.
-Événements d'un Circle `isDemo: true` : affichés avec badge "Démo", score capé à 30.
+Événements d'un Circle `isDemo: true` : affichés avec badge "Démo", score capé à 50.
 
 ---
 
@@ -293,7 +293,7 @@ Route protégée par header `Authorization: Bearer CRON_SECRET` (injecté automa
 2. Pour chaque Circle :
    a. Calculer raw_score
    b. Normaliser → score 0–100
-   c. Si isDemo → Math.min(score, 30)
+   c. Si isDemo → Math.min(score, 50)
    d. Si overrideScore != null → utiliser overrideScore directement
    e. Écrire explorerScore + scoreUpdatedAt
 
@@ -304,7 +304,7 @@ Route protégée par header `Authorization: Bearer CRON_SECRET` (injecté automa
    a. Récupérer explorerScore du Circle parent (déjà calculé à l'étape 2)
    b. Calculer moment_raw
    c. score_moment = round(score_circle * 0.5 + moment_raw * 0.5)
-   d. Si circle.isDemo → Math.min(score_moment, 30)
+   d. Si circle.isDemo → Math.min(score_moment, 50)
    e. Écrire explorerScore
 
 5. Logger : nb circles mis à jour, nb moments mis à jour, durée
@@ -345,8 +345,8 @@ Passer à 2x/jour ou 4x/jour si nécessaire : modifier uniquement le `schedule` 
 | 2026-03-13 | Seuil "à la une" volontairement bas (cover only) pour garantir un pool large au lancement |
 | 2026-03-13 | Override admin : `excludedFromExplorer` (boolean) + `overrideScore` (Int?) sur Circle uniquement |
 | 2026-03-13 | Override géré exclusivement depuis le backend admin (/admin/*) — deux écrans : liste Explorer + détail Circle |
-| 2026-03-13 | Communautés @demo.playground : `isDemo: true`, score capé à 30/100, badge "Démo" sur cards Communauté ET Événement |
-| 2026-03-13 | Cap démo à 30 provisoire — à tuner selon la densité du catalogue au lancement |
+| 2026-03-13 | Communautés @demo.playground : `isDemo: true`, score capé à 50/100, badge "Démo" sur cards Communauté ET Événement |
+| 2026-03-13 | Cap démo ajusté à 50 — les vraies communautés actives (score > 50) passent devant |
 | 2026-03-13 | Démos mélangées dans la liste (pas reléguées en fin) — donnent de la consistance à Explorer pendant le lancement |
 | 2026-03-13 | Architecture : batch quotidien à 3h00 via Vercel Cron — score persisté en DB, requête Explorer = ORDER BY index |
 | 2026-03-13 | Champs DB : `explorerScore Int` + `scoreUpdatedAt DateTime?` sur Circle, `explorerScore Int` sur Moment |
