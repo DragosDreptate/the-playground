@@ -122,9 +122,9 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 </div>
               </div>
             ) : (
-              <span className="ml-6 text-xs text-muted-foreground whitespace-nowrap">
+              <div className="rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
                 {t("circleCard.noUpcomingMoments")}
-              </span>
+              </div>
             )}
           </div>
 
