@@ -185,6 +185,8 @@ async function sendRegistrationEmails(
         videoLink: moment.videoLink,
         url: `${baseUrl}/m/${moment.slug}`,
         organizerName: circle.name,
+        method: "REQUEST",
+        attendeeEmail: user.email,
       })
     : undefined;
 
@@ -317,6 +319,8 @@ async function sendPromotionEmail(
     videoLink: moment.videoLink,
     url: `${promotionBaseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
+    method: "REQUEST",
+    attendeeEmail: user.email,
   });
 
   await emailService.sendWaitlistPromotion({

@@ -173,6 +173,8 @@ export async function createMomentAction(
         videoLink: result.moment.videoLink,
         url: `${appUrl}/m/${result.moment.slug}`,
         organizerName: circle.name,
+        method: "REQUEST",
+        attendeeEmail: host.email,
       });
 
       const t = await getTranslations({ locale, namespace: "Email" });
@@ -370,6 +372,7 @@ async function sendMomentUpdateEmails(
     videoLink: moment.videoLink,
     url: `${baseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
+    method: "REQUEST",
   });
 
   const updateStrings = {
