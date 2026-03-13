@@ -47,8 +47,10 @@ export default async function ExplorerPage({
   const activeTab = tab === "moments" ? "moments" : "circles";
   const category = categoryParam as CircleCategory | undefined;
   const defaultSort: ExplorerSortBy = activeTab === "moments" ? "date" : "popular";
-  const sortBy: ExplorerSortBy =
-    sortByParam === "date" ? "date" : sortByParam === "members" ? "members" : sortByParam === "popular" ? "popular" : defaultSort;
+  const VALID_SORTS: ExplorerSortBy[] = ["date", "popular", "members"];
+  const sortBy: ExplorerSortBy = VALID_SORTS.includes(sortByParam as ExplorerSortBy)
+    ? (sortByParam as ExplorerSortBy)
+    : defaultSort;
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();

@@ -1,4 +1,5 @@
 import { prisma } from "@/infrastructure/db/prisma";
+import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   AdminRepository,
   AdminStats,
@@ -170,6 +171,34 @@ function commentOrderBy(
     case "circleName": return { moment: { circle: { name: d } } };
     case "createdAt": return { createdAt: d };
     default: return { createdAt: "desc" };
+  }
+}
+
+function explorerMomentWhere(filters: AdminExplorerMomentFilters): Prisma.MomentWhereInput {
+  const where: Prisma.MomentWhereInput = {
+    circle: {
+      visibility: "PUBLIC",
+      NOT: excludeTestHostFilter(),
+    },
+  };
+  if (filters.search) {
+    where.OR = [
+      { title: { contains: filters.search, mode: "insensitive" } },
+      { circle: { name: { contains: filters.search, mode: "insensitive" } } },
+    ];
+  }
+  return where;
+}
+
+function explorerMomentOrderBy(sortBy?: string, sortOrder?: string): Prisma.MomentOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "title": return { title: d };
+    case "circleName": return { circle: { name: d } };
+    case "startsAt": return { startsAt: d };
+    case "registrationCount": return { registrations: { _count: d } };
+    case "explorerScore": return { explorerScore: d };
+    default: return { explorerScore: "desc" };
   }
 }
 
@@ -623,31 +652,13 @@ export const prismaAdminRepository: AdminRepository = {
   },
 
   async findAllExplorerMoments(filters: AdminExplorerMomentFilters): Promise<AdminExplorerMomentRow[]> {
-    const where: Prisma.MomentWhereInput = { circle: { visibility: "PUBLIC" } };
-    if (filters.search) {
-      where.OR = [
-        { title: { contains: filters.search, mode: "insensitive" } },
-        { circle: { name: { contains: filters.search, mode: "insensitive" } } },
-      ];
-    }
-    const d = filters.sortOrder ?? "desc";
-    const orderBy = (() => {
-      switch (filters.sortBy) {
-        case "title": return { title: d } as Prisma.MomentOrderByWithRelationInput;
-        case "circleName": return { circle: { name: d } } as Prisma.MomentOrderByWithRelationInput;
-        case "startsAt": return { startsAt: d } as Prisma.MomentOrderByWithRelationInput;
-        case "registrationCount": return { registrations: { _count: d } } as Prisma.MomentOrderByWithRelationInput;
-        case "explorerScore": return { explorerScore: d } as Prisma.MomentOrderByWithRelationInput;
-        default: return { explorerScore: "desc" } as Prisma.MomentOrderByWithRelationInput;
-      }
-    })();
     const records = await prisma.moment.findMany({
-      where,
+      where: explorerMomentWhere(filters),
       include: {
         circle: { select: { name: true, slug: true, isDemo: true } },
         _count: { select: { registrations: true } },
       },
-      orderBy,
+      orderBy: explorerMomentOrderBy(filters.sortBy, filters.sortOrder),
       take: filters.limit ?? DEFAULT_LIMIT,
       skip: filters.offset ?? 0,
     });
@@ -665,14 +676,7 @@ export const prismaAdminRepository: AdminRepository = {
   },
 
   async countExplorerMoments(filters: AdminExplorerMomentFilters): Promise<number> {
-    const where: Prisma.MomentWhereInput = { circle: { visibility: "PUBLIC" } };
-    if (filters.search) {
-      where.OR = [
-        { title: { contains: filters.search, mode: "insensitive" } },
-        { circle: { name: { contains: filters.search, mode: "insensitive" } } },
-      ];
-    }
-    return prisma.moment.count({ where });
+    return prisma.moment.count({ where: explorerMomentWhere(filters) });
   },
 
   // ── Moments ──────────────────────────────

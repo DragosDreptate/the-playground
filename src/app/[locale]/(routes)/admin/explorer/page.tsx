@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
+import { AdminExplorerTabs } from "@/components/admin/admin-explorer-tabs";
 import type { ExplorerFilter } from "@/domain/ports/repositories/admin-repository";
 
 const PAGE_SIZE = 20;
@@ -78,21 +79,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("explorer.title")}</h1>
 
-      {/* Tabs Communautés / Événements */}
-      <div className="flex gap-1 border-b">
-        <Link
-          href="/admin/explorer"
-          className="px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary"
-        >
-          {t("explorer.tabs.circles")}
-        </Link>
-        <Link
-          href="/admin/explorer/moments"
-          className="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground"
-        >
-          {t("explorer.tabs.moments")}
-        </Link>
-      </div>
+      <AdminExplorerTabs activeTab="circles" />
 
       {/* Filtres */}
       <div className="flex gap-2">

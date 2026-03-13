@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { AdminExplorerTabs } from "@/components/admin/admin-explorer-tabs";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
@@ -64,21 +65,7 @@ export default async function AdminExplorerMomentsPage({ searchParams }: Props) 
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("explorer.title")}</h1>
 
-      {/* Tabs Communautés / Événements */}
-      <div className="flex gap-1 border-b">
-        <Link
-          href="/admin/explorer"
-          className="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-muted-foreground hover:text-foreground"
-        >
-          {t("explorer.tabs.circles")}
-        </Link>
-        <Link
-          href="/admin/explorer/moments"
-          className="px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary"
-        >
-          {t("explorer.tabs.moments")}
-        </Link>
-      </div>
+      <AdminExplorerTabs activeTab="moments" />
 
       <AdminSearch />
 
