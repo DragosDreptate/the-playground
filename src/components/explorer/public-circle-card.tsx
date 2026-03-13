@@ -110,7 +110,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           </div>
 
           {/* Right column — desktop only */}
-          <div className="hidden sm:flex shrink-0 items-center">
+          <div className="hidden sm:flex shrink-0 items-center ml-4">
             {circle.nextMoment && nextMomentDate ? (
               <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[220px]">
                 <div className="min-w-0">
