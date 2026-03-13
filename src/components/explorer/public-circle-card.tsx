@@ -57,7 +57,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div
-            className="size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
@@ -69,6 +69,11 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 className="size-full object-cover"
                 sizes="120px"
               />
+            )}
+            {circle.isDemo && (
+              <span className="absolute bottom-1 left-1 rounded px-1 py-0.5 text-[10px] font-semibold leading-none text-white" style={{ background: "rgba(0,0,0,0.55)" }}>
+                {t("circleCard.demo")}
+              </span>
             )}
           </div>
 

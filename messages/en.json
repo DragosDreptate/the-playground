@@ -510,7 +510,8 @@
       "roleBadge": {
         "host": "Organizer",
         "member": "Member"
-      }
+      },
+      "demo": "Demo"
     },
     "momentCard": {
       "free": "Free",
