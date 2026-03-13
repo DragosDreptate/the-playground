@@ -583,7 +583,7 @@
 │  Bienvenue, [Prénom] !                      │
 │                                             │
 │  Vous souhaitez :                           │
-│  [🎯 Découvrir des événements]              │
+│  [🎯 Explorer des événements]               │
 │  [🏠 Créer ma communauté] → guide Host     │
 └─────────────────────────────────────────────┘
 ```

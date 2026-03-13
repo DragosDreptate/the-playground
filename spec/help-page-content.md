@@ -62,7 +62,7 @@ En tant que membre, vous pouvez :
 - Voir les **autres membres**
 - Être notifié des nouveaux événements par email (selon vos préférences)
 
-Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page **Découvrir** ou depuis la page d'une Communauté.
+Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page **Explorer** ou depuis la page d'une Communauté.
 
 ---
 
@@ -126,7 +126,7 @@ Pour créer votre Communauté :
 3. Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)
 4. Ajoutez une image de couverture (optionnel mais recommandé)
 
-> Une Communauté publique apparaît dans **Découvrir** et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct.
+> Une Communauté publique apparaît dans **Explorer** et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct.
 
 ---
 
@@ -205,7 +205,7 @@ Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playgr
 ---
 
 **Quelle est la différence entre une Communauté publique et privée ?**
-Une Communauté publique est visible dans **Découvrir** et accessible à tous. Une Communauté privée n'est accessible que via un lien direct — elle n'apparaît pas dans l'annuaire.
+Une Communauté publique est visible dans **Explorer** et accessible à tous. Une Communauté privée n'est accessible que via un lien direct — elle n'apparaît pas dans l'annuaire.
 
 ---
 

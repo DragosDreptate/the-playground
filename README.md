@@ -47,7 +47,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - Page communauté : prochains événements, membres, historique
 
 **Plateforme**
-- Répertoire public de communautés ([Découvrir](https://the-playground.fr/explorer))
+- Répertoire public de communautés ([Explorer](https://the-playground.fr/explorer))
 - Bilingue FR / EN
 - 100% gratuit — seuls les frais Stripe (~2,9% + 0,30€) sur les événements payants
 

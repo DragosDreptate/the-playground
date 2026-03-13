@@ -119,7 +119,7 @@ Le vocabulaire de The Playground est structurant. Il porte le positionnement et 
 | **L'événement** | Un rendez-vous | Un point de rencontre dans la vie de la communauté — on se retrouve, on partage, on revient |
 | **L'Organisateur** | Celui qui crée et anime | Le pilote — il lance les événements, les membres suivent |
 | **Le Participant** | Celui qui s'inscrit | Un membre actif — pas un passager anonyme, un membre qui reste |
-| **Découvrir** | L'espace de découverte | L'annuaire ouvert — toutes les communautés publiques, sans algorithme, sans ranking |
+| **Explorer** | L'espace de découverte | L'annuaire ouvert — toutes les communautés publiques, sans algorithme, sans ranking |
 
 ### Pourquoi "Communauté" (pas "groupe")
 
@@ -133,7 +133,7 @@ Le mot **Communauté** évoque la proximité, le lien, l'appartenance. On est "d
 - **Enthousiaste** mais pas naïf
 - **Direct** — on va à l'essentiel, pas de jargon corporate
 - **Inclusif** — tout le monde peut créer une communauté, pas besoin d'être un "community builder professionnel"
-- Les concepts domaine sont toujours capitalisés : **Communauté**, **Organisateur**, **Participant**, **Découvrir**
+- Les concepts domaine sont toujours capitalisés : **Communauté**, **Organisateur**, **Participant**, **Explorer**
 
 ---
 
@@ -396,7 +396,7 @@ Les données appartiennent à l'Organisateur, pas à la plateforme. Export compl
 
 ### 7. Pas d'algorithme
 
-Pas de ranking, pas de feed, pas de recommandation algorithmique. Découvrir est un annuaire ouvert. La distribution vient des Organisateurs (liens partageables), pas de la plateforme.
+Pas de ranking, pas de feed, pas de recommandation algorithmique. Explorer est un annuaire ouvert. La distribution vient des Organisateurs (liens partageables), pas de la plateforme.
 
 ---
 
@@ -456,7 +456,7 @@ Focus sur les marchés où Meetup est dominant et contesté.
 | Organisateur | Admin, manager |
 | S'inscrire | S'abonner, suivre |
 | Gratuit, pour toujours | Freemium, offre de base |
-| Découvrir | Le répertoire, l'annuaire |
+| Explorer | Le répertoire, l'annuaire |
 | Page premium | Landing page, formulaire |
 
 ---

@@ -16,7 +16,7 @@ Dans ce modèle :
 
 Ce qui disparaît de l'UI :
 - Sélection / création de Communauté
-- Découvrir / Explorer (pas de découverte multi-communautés)
+- Explorer (pas de découverte multi-communautés)
 - Notion de "s'inscrire à une Communauté" (on est membre de LA communauté)
 
 Ce qui change de sens :
@@ -94,13 +94,13 @@ apps/
 Chaque Communauté peut avoir un domaine custom (`events.mycommunity.com`). Sur ce domaine, seule cette Communauté est affichée. The Playground reste l'infrastructure invisible.
 
 ```
-the-playground.fr          → plateforme multi-communauté (Découvrir, etc.)
+the-playground.fr          → plateforme multi-communauté (Explorer, etc.)
 events.mycommunity.com     → Circle ID=xxx, branding custom, mono-communauté
 ```
 
 **Principe technique :**
 - Le middleware détecte le domaine entrant → résout le Circle associé
-- L'UI masque la couche Communauté (plus de selector, plus de Découvrir)
+- L'UI masque la couche Communauté (plus de selector, plus d'Explorer)
 - Le header affiche le nom et le logo du client
 - Un objet `theme` en DB contient les variables CSS du client
 

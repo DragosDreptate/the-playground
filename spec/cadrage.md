@@ -182,7 +182,7 @@ Contient :
 - Notification Organisateur lors d'un nouveau commentaire ✅
 - **Après l'événement** : découvrir la page Communauté, les prochains événements, les autres membres → rétention ✅
 
-## Découvrir (découverte publique) ✅
+## Explorer (découverte publique) ✅
 
 - Annuaire simple de Communautés publiques ✅
 - Filtrable par thème (catégorie), ville en affichage uniquement (pas de filtre MVP) ✅
@@ -220,7 +220,7 @@ Contient :
 - Données exportables (export complet Communauté : membres, événements, historique)
 - Pas d'algorithme de ranking global
 - Pas de feed social
-- Pas de marketplace (mais Découvrir : annuaire simple de Communautés publiques)
+- Pas de marketplace (mais Explorer : annuaire simple de Communautés publiques)
 - Ownership des données pour les Communautés
 - Architecture notifications multi-canal dès la conception (V1 = email, puis SMS/push/WhatsApp)
 - **UI bilingue dès V1** (FR/EN) avec architecture i18n native pour support multi-langue futur
@@ -300,7 +300,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, notification Organisateur nouveau follower, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux participants, broadcast "Inviter ma Communauté") ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
-- Découvrir (répertoire public de Communautés + événements) ✅
+- Explorer (répertoire public de Communautés + événements) ✅
 - Export données (CSV inscrits) ✅ — export membres Communauté et export historique pas encore implémentés
 - Admin plateforme (dashboard stats, listes paginées, modération) ✅
 - Gestion membres Communauté : retrait de membre ✅, invitation par lien privé (token) ✅

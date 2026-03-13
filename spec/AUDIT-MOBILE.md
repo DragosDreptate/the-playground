@@ -116,14 +116,14 @@ La sidebar admin fait 224px (`w-56`) fixe. Sur un ecran de 375px, il reste 151px
 </nav>
 ```
 
-Les liens de navigation (Découvrir, Mon espace) sont dans un `flex-1 justify-center`. Sur mobile, ces liens sont visibles mais compriment l'espace. Pire : avec le logo a gauche, les toggles langue/theme et le menu utilisateur a droite, la zone centrale est tres etroite (~100-150px). Les textes des liens risquent de se superposer ou d'etre illisibles.
+Les liens de navigation (Explorer, Mon espace) sont dans un `flex-1 justify-center`. Sur mobile, ces liens sont visibles mais compriment l'espace. Pire : avec le logo a gauche, les toggles langue/theme et le menu utilisateur a droite, la zone centrale est tres etroite (~100-150px). Les textes des liens risquent de se superposer ou d'etre illisibles.
 
-Il n'y a **aucun menu hamburger ni drawer mobile**. Les utilisateurs authentifies n'ont aucune alternative pour acceder a Découvrir ou Mon espace de maniere confortable sur petit ecran (ils sont accessibles via le UserMenu dropdown, mais ce n'est pas intuitif).
+Il n'y a **aucun menu hamburger ni drawer mobile**. Les utilisateurs authentifies n'ont aucune alternative pour acceder à Explorer ou Mon espace de maniere confortable sur petit ecran (ils sont accessibles via le UserMenu dropdown, mais ce n'est pas intuitif).
 
 **Solution** :
 - Masquer les liens centraux sur mobile : `hidden md:flex` sur le `<nav>`
 - Ajouter un menu hamburger (Sheet/Drawer) sur mobile avec les liens
-- OU integrer "Découvrir" et "Mon espace" comme items supplementaires dans le `UserMenu` dropdown (ils y sont deja partiellement : Dashboard est dans le UserMenu, mais pas Découvrir)
+- OU integrer "Explorer" et "Mon espace" comme items supplementaires dans le `UserMenu` dropdown (ils y sont deja partiellement : Dashboard est dans le UserMenu, mais pas Explorer)
 
 ---
 
@@ -480,7 +480,7 @@ Cette valeur produit un gris moyen (~62% lightness) sur un fond sombre (~16% lig
 
 ---
 
-### 4. Explorer / Découvrir
+### 4. Explorer
 
 #### Ergonomie
 - **P1-5** : Les pills de filtre categorie occupent beaucoup d'espace vertical en `flex-wrap`

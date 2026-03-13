@@ -82,7 +82,7 @@
 | **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher avec label "Vue :"), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
 | **Dashboard onglet Participant renommé** : libellé "Mes événements" → "Mes inscriptions" (FR) / "My registrations" (EN) — clé i18n `Dashboard.myMoments`. | 2026-03-02 | — |
 | **Page Aide `/help`** : page statique avec sidebar de navigation (ancres), FAQ accordion, sections Participant et Organisateur, i18n FR/EN/RO/NL/ES (namespace `Help`). Lien "Aide" ajouté dans le footer (`Footer.product.help`). | 2026-03-02 | — |
-| **Page Découvrir : H1 "Communautés & événements"** (FR) / "Communities & events" (EN) — mise à jour de la clé i18n `Explorer.title`. | 2026-03-02 | — |
+| **Page Explorer : H1 "Communautés & événements"** (FR) / "Communities & events" (EN) — mise à jour de la clé i18n `Explorer.title`. | 2026-03-02 | — |
 | **Suppression membre d'une Communauté** : usecase `removeCircleMember`, contrôle Organisateur, annulation automatique des inscriptions à venir, i18n FR/EN. | 2026-03-01 | `706cf9b` |
 | **Invitation Communauté par lien** : usecases `generateCircleInviteToken` / `joinCircleByInvite` / `revokeCircleInviteToken`, token unique sur `Circle` (`inviteToken`), page publique `/circles/join/[token]` (rejoint la Communauté sans passer par un événement), bouton génération/révocation sur la page Communauté Organisateur, i18n FR/EN, tests unitaires + tests de sécurité (`circle-invite-security.test.ts`) + spec E2E (`circle-invite.spec.ts`). | 2026-03-04 | `ef288f7` |
 | **Catégorie personnalisée sur Communauté** : champ `customCategory` (string, max 100 chars) sur `Circle` (DB + domaine + repository). Activé uniquement quand la catégorie choisie est `OTHER`. Validé côté client dans `CircleForm` + géré dans les usecases `createCircle`/`updateCircle` via helper `resolveCustomCategoryForCreate`/`resolveCustomCategoryForUpdate` (`src/lib/circle-category-helpers.ts`). Affiché à la place du label "Autre" sur les cards et pages Communauté. | — | — |
@@ -282,7 +282,7 @@
   - CRUD commentaire sur chaque événement
   - Visible sur la page publique et la vue dashboard
 
-- [x] **Découvrir** (ex-Répertoire) ✅ — `spec/feature-explorer-la-carte.md`
+- [x] **Explorer** (ex-Répertoire, ex-Découvrir) ✅ — `spec/feature-explorer-la-carte.md`
   - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
   - Tab **Communautés** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain événement en teaser)
   - Tab **Événements** : agenda chronologique des événements PUBLISHED de Communautés publiques (card community-first)
@@ -380,7 +380,7 @@
   - Table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` avec 3 états (cloche/abonné·e/hover se désabonner)
   - Visible uniquement pour les utilisateurs connectés non-membres sur `/circles/[slug]`
   - Email aux followers à chaque nouvel événement, déduplication avec membres
-  - **Option future** : préférences granulaires (opt-out), affichage sur page Découvrir
+  - **Option future** : préférences granulaires (opt-out), affichage sur page Explorer
 
 - [ ] Track (série d'événements récurrents dans une Communauté)
 - [ ] Check-in (marquer présent sur place)
@@ -467,3 +467,4 @@
 | 2026-02-28 | **Infrastructure E2E — globalTeardown** : `tests/e2e/global-teardown.ts` ajouté dans `playwright.config.ts`. Nettoyage propre des données `@test.playground` après chaque run E2E (Moments → Circles → Users, dans l'ordre des contraintes FK). Le prochain run repart d'un état propre via `globalSetup`. |
 | 2026-02-28 | **Données démo enrichies** : `thomas@demo.playground` ajouté dans `db-seed-demo-data.ts` — user "blank slate" avec `dashboardMode: null` (reset à chaque run du seed). Permet de tester le flux welcome page en prod sans créer un compte. |
 | 2026-03-03 | **Broadcast — cooldown 24h** : le verrou permanent "envoi unique par événement" a été remplacé par un cooldown 24h (`COOLDOWN_MS = 24 * 60 * 60 * 1000`). Après expiration du cooldown, l'Organisateur peut renvoyer l'invitation. Pendant le cooldown, le bouton affiche "Envoyée" (disabled) avec un tooltip Radix indiquant le temps restant avant le prochain envoi possible. `broadcastSentAt` est écrasé à chaque envoi (timestamp mis à jour). |
+| 2026-03-13 | Terminologie FR : "Découvrir" → **"Explorer"** pour aligner FR et EN (Explore). Nom de page plus cohérent entre les deux langues. Clé i18n `Explorer` et route `/explorer` inchangées. |

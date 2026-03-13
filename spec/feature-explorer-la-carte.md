@@ -1,23 +1,23 @@
-# Découvrir — Spec d'implémentation
+# Explorer — Spec d'implémentation
 
 > "L'espace de jeu ouvert" — la page de découverte de The Playground.
 > Page `/explorer` : vitrine publique des Communautés et événements ouverts à tous.
 >
 > Référence produit : `spec/ux-parcours-jtbd.md` (parcours cold traffic, persona Host débutant)
-> Référence backlog : section "Découvrir"
+> Référence backlog : section "Explorer"
 >
-> **Terminologie** : "Découvrir" (FR) / "Explore" (EN). Route : `/explorer`. Clé i18n : `Explorer`.
+> **Terminologie** : "Explorer" (FR) / "Explore" (EN). Route : `/explorer`. Clé i18n : `Explorer`.
 
 ---
 
 ## Vision produit
 
-**Découvrir** est la réponse à la question : *"Que voit un utilisateur qui arrive sur
+**Explorer** est la réponse à la question : *"Que voit un utilisateur qui arrive sur
 The Playground sans lien partagé ?"*
 
 Aujourd'hui : rien. Bounce immédiat.
 
-Découvrir est l'**espace de jeu ouvert** — l'incarnation du nom "Playground". On y trouve
+Explorer est l'**espace de jeu ouvert** — l'incarnation du nom "Playground". On y trouve
 toutes les Communautés et événements publics, sans algorithme, sans ranking, sans mise en avant payante.
 Juste les communautés et leurs événements, dans l'ordre chronologique.
 
@@ -59,7 +59,7 @@ model Circle {
 ```
 
 **Décision** : nullable en DB, obligatoire dans le formulaire de création (validation côté usecase).
-Les Communautés existantes sans catégorie restent valides et apparaissent sur Découvrir sans filtre.
+Les Communautés existantes sans catégorie restent valides et apparaissent sur Explorer sans filtre.
 
 ### Ajout : `city` (string libre) — affichage uniquement, pas de filtre MVP
 
@@ -349,7 +349,7 @@ Contenu (community-first) :
 ## Page Communauté publique (hors dashboard)
 
 Actuellement, la page Communauté n'existe qu'en version dashboard (authentifiée).
-Pour Découvrir, il faut une **page Communauté publique** accessible sans compte.
+Pour Explorer, il faut une **page Communauté publique** accessible sans compte.
 
 ```
 src/app/[locale]/(routes)/circles/[slug]/page.tsx
@@ -384,7 +384,7 @@ src/components/circles/circle-form.tsx
   "Explorer": {
     "title": "Communautés & événements",
     "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
-    "navLink": "Découvrir",
+    "navLink": "Explorer",
     "tabs": {
       "circles": "Communautés",
       "moments": "Événements"
@@ -414,7 +414,7 @@ src/components/circles/circle-form.tsx
 
 ## Navigation — Points d'accès
 
-Découvrir est accessible depuis :
+Explorer est accessible depuis :
 
 1. **Header principal** : lien "Explorer" (FR) / "Explore" (EN) dans la nav (visible pour les utilisateurs connectés)
 2. **Dashboard** : lien dans les empty states pour les Participants sans événement à venir
@@ -446,7 +446,7 @@ Découvrir est accessible depuis :
 | 8 | Composants : `PublicCircleCard`, `PublicMomentCard`, `ExplorerFilterBar` | Étape 4 |
 | 9 | Page `/explorer` | Étapes 7, 8 |
 | 10 | Page Communauté publique `/circles/[slug]` | Étape 7 |
-| 11 | Ajouter lien "Découvrir" dans le header | Étape 9 |
+| 11 | Ajouter lien "Explorer" dans le header | Étape 9 |
 | 12 | i18n FR + EN | Toutes |
 
 ---
@@ -465,3 +465,4 @@ Découvrir est accessible depuis :
 | `revalidate: 60` sur `/explorer` | Fraîcheur acceptable sans rebuild, pas de full SSR dynamique |
 | Pas de pagination complexe en MVP | `limit: 20` suffit pour le lancement |
 | Renommage "Répertoire" → "La Carte" → "Découvrir" | Nom plus direct, cohérent avec l'action utilisateur |
+| Renommage "Découvrir" → "Explorer" | Alignement FR/EN — "Explorer" (FR) = "Explore" (EN), plus cohérent |
