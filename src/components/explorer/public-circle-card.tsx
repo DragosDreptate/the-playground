@@ -113,9 +113,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           <div className="hidden sm:flex shrink-0 items-center ml-4">
             {circle.nextMoment && nextMomentDate ? (
               <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[220px]">
-                <div className="min-w-0">
-                  <span className="truncate font-medium text-foreground">{circle.nextMoment.title}</span>
-                </div>
+                <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
                 <div className="flex items-center gap-1.5">
                   <CalendarIcon className="size-3 shrink-0 text-primary" />
                   <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
