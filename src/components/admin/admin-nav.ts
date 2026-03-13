@@ -6,6 +6,7 @@ import {
   TicketCheck,
   MessageSquare,
   TrendingUp,
+  UserPlus,
 } from "lucide-react";
 
 export const adminNavItems = [
@@ -17,6 +18,7 @@ export const adminNavItems = [
 
 export const adminInsightItems = [
   { key: "insightRegistrations", href: "/admin/insights/registrations", icon: TicketCheck },
+  { key: "insightFollowers", href: "/admin/insights/followers", icon: UserPlus },
   { key: "insightComments", href: "/admin/insights/comments", icon: MessageSquare },
   { key: "insightActivation", href: "/admin/insights/activation", icon: TrendingUp },
 ] as const;
