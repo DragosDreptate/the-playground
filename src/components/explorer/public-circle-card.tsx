@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { formatDayMonth } from "@/lib/format-date";
+import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
@@ -23,6 +23,9 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
   const nextMomentDate = circle.nextMoment
     ? formatDayMonth(new Date(circle.nextMoment.startsAt), locale)
+    : null;
+  const nextMomentTime = circle.nextMoment
+    ? formatTime(new Date(circle.nextMoment.startsAt))
     : null;
 
   const categoryLabel =
@@ -116,7 +119,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 </div>
                 <div className="flex items-center gap-1.5">
                   <CalendarIcon className="size-3 shrink-0 text-primary" />
-                  <span className="whitespace-nowrap">{nextMomentDate}</span>
+                  <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
                 </div>
               </div>
             ) : (
