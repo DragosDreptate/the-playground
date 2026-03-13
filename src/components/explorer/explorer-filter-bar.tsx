@@ -80,9 +80,7 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
           {activeTab === "circles" && (
             <SelectItem value="members">{t("filters.sortBy.members")}</SelectItem>
           )}
-          <SelectItem value="date">
-            {activeTab === "circles" ? t("filters.sortBy.newest") : t("filters.sortBy.date")}
-          </SelectItem>
+          <SelectItem value="date">{t("filters.sortBy.date")}</SelectItem>
         </SelectContent>
       </Select>
     </div>
