@@ -50,6 +50,8 @@ export type PublicCircle = {
     title: string;
     startsAt: Date;
   } | null;
+  isDemo: boolean;
+  explorerScore: number;
 };
 
 export type CircleFollowerInfo = {

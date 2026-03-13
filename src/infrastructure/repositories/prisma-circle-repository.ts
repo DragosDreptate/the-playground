@@ -322,6 +322,33 @@ export const prismaCircleRepository: CircleRepository = {
       where: {
         visibility: "PUBLIC",
         ...(filters.category && { category: filters.category }),
+        // Exclure les circles admin-exclus
+        excludedFromExplorer: false,
+        // Exclure les circles dont le host a un email @test.playground
+        NOT: {
+          memberships: {
+            some: {
+              role: "HOST",
+              user: { email: { endsWith: "@test.playground" } },
+            },
+          },
+        },
+        // Seuil d'affichage : ≥1 membre réel (PLAYER) OU ≥1 event publié à venir
+        OR: [
+          {
+            memberships: {
+              some: { role: "PLAYER" },
+            },
+          },
+          {
+            moments: {
+              some: {
+                status: "PUBLISHED",
+                startsAt: { gte: now },
+              },
+            },
+          },
+        ],
       },
       include: {
         // Comptes SQL précis — aucun enregistrement Moment chargé en mémoire pour le count
@@ -341,9 +368,10 @@ export const prismaCircleRepository: CircleRepository = {
           select: { title: true, startsAt: true },
         },
       },
-      orderBy: filters.sortBy === "popular"
-        ? { memberships: { _count: "desc" } }
-        : { createdAt: "desc" },
+      orderBy:
+        filters.sortBy === "date"
+          ? { createdAt: "desc" }
+          : [{ explorerScore: "desc" }, { createdAt: "desc" }],
       take: filters.limit ?? 20,
       skip: filters.offset ?? 0,
     });
@@ -364,6 +392,8 @@ export const prismaCircleRepository: CircleRepository = {
       // upcomingMomentCount issu du _count SQL, pas de moments.length
       upcomingMomentCount: c._count.moments,
       nextMoment: c.moments[0] ?? null,
+      isDemo: c.isDemo,
+      explorerScore: c.explorerScore,
     }));
   },
 
