@@ -190,6 +190,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     </div>
                   </>
                 )}
+                {circle.isDemo && (
+                  <span className="absolute top-3 left-3 rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary">
+                    {t("demo")}
+                  </span>
+                )}
                 {moment.status === "PAST" && (
                   <div className="absolute bottom-3 left-3">
                     <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">

@@ -87,7 +87,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div
-            className="size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
             style={moment.coverImage ? undefined : { background: gradient }}
           >
             {moment.coverImage && (
@@ -99,6 +99,11 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
                 className="size-full object-cover"
                 sizes="120px"
               />
+            )}
+            {moment.circle.isDemo && (
+              <span className="absolute top-1.5 left-1.5 rounded-md border border-primary/70 bg-black/80 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
+                {t("circleCard.demo")}
+              </span>
             )}
           </div>
 

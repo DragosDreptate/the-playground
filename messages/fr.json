@@ -471,7 +471,8 @@
       "createFailed": "Échec de la création de l'événement",
       "updateFailed": "Échec de la mise à jour de l'événement",
       "deleteFailed": "Échec de la suppression de l'événement"
-    }
+    },
+    "demo": "Démo"
   },
   "CircleCategory": {
     "TECH": "Tech & IA",

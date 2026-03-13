@@ -471,7 +471,8 @@
       "createFailed": "Failed to create Event",
       "updateFailed": "Failed to update Event",
       "deleteFailed": "Failed to delete Event"
-    }
+    },
+    "demo": "Demo"
   },
   "CircleCategory": {
     "TECH": "Tech & AI",
