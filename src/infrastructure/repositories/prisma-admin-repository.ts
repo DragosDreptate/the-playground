@@ -15,6 +15,7 @@ import type {
   AdminMomentRow,
   AdminMomentDetail,
   AdminInsightRegistration,
+  AdminInsightFollower,
   AdminInsightComment,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
@@ -165,6 +166,20 @@ function commentOrderBy(
     case "circleName": return { moment: { circle: { name: d } } };
     case "createdAt": return { createdAt: d };
     default: return { createdAt: "desc" };
+  }
+}
+
+function followerOrderBy(
+  sortBy?: string,
+  sortOrder?: string
+): Prisma.CircleMembershipOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "userName": return { user: { firstName: d } };
+    case "userEmail": return { user: { email: d } };
+    case "circleName": return { circle: { name: d } };
+    case "joinedAt": return { joinedAt: d };
+    default: return { joinedAt: "desc" };
   }
 }
 
@@ -702,6 +717,48 @@ export const prismaAdminRepository: AdminRepository = {
         momentSlug: c.moment.slug,
         circleName: c.moment.circle.name,
         createdAt: c.createdAt,
+      })),
+      total,
+    };
+  },
+
+  async getFollowersInsight(
+    days: number,
+    limit: number,
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
+  ): Promise<{ followers: AdminInsightFollower[]; total: number }> {
+    const since = daysAgo(days);
+    const where: Prisma.CircleMembershipWhereInput = {
+      role: "PLAYER",
+      joinedAt: { gte: since },
+      user: realUserWhere(),
+      circle: realCircleWhere(),
+    };
+    const [memberships, total] = await Promise.all([
+      prisma.circleMembership.findMany({
+        where,
+        include: {
+          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+          circle: { select: { id: true, name: true, slug: true } },
+        },
+        orderBy: followerOrderBy(sortBy, sortOrder),
+        take: limit,
+        skip: offset,
+      }),
+      prisma.circleMembership.count({ where }),
+    ]);
+    return {
+      followers: memberships.map((m) => ({
+        id: m.id,
+        userId: m.userId,
+        userEmail: m.user.email,
+        userName: [m.user.firstName, m.user.lastName].filter(Boolean).join(" ") || null,
+        circleId: m.circle.id,
+        circleName: m.circle.name,
+        circleSlug: m.circle.slug,
+        joinedAt: m.joinedAt,
       })),
       total,
     };

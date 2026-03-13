@@ -65,6 +65,7 @@ export default async function AdminDashboardPage() {
           delta={stats.recentFollowers}
           deltaLabel={t("stats.thisWeek")}
           icon={UserPlus}
+          href="/admin/insights/followers"
         />
       </div>
 
