@@ -8,6 +8,7 @@ import { formatShortDate, formatTime } from "@/lib/format-date";
 import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
+import { DemoBadge } from "@/components/badges/demo-badge";
 
 type Props = {
   moment: PublicMoment;
@@ -87,7 +88,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div
-            className="size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
             style={moment.coverImage ? undefined : { background: gradient }}
           >
             {moment.coverImage && (
@@ -100,6 +101,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
                 sizes="120px"
               />
             )}
+            {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
           </div>
 
           {/* Body */}

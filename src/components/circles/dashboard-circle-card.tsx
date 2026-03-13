@@ -2,9 +2,8 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
-import { formatDayMonth } from "@/lib/format-date";
+import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -12,112 +11,108 @@ type Props = {
 };
 
 export async function DashboardCircleCard({ circle }: Props) {
-  const t = await getTranslations("Explorer");
-  const tDashboard = await getTranslations("Dashboard");
-  const tCategory = await getTranslations("CircleCategory");
-  const locale = await getLocale();
+  const [t, tCategory, locale] = await Promise.all([
+    getTranslations("Explorer"),
+    getTranslations("CircleCategory"),
+    getLocale(),
+  ]);
 
   const gradient = getMomentGradient(circle.name);
 
-  const nextMomentDate = circle.nextMoment
-    ? formatDayMonth(circle.nextMoment.startsAt, locale)
-    : null;
+  const nextMomentStart = circle.nextMoment?.startsAt ?? null;
+  const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
+  const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
+  const hasNextMoment = !!(circle.nextMoment && nextMomentDate);
+
+  const categoryLabel =
+    circle.category === "OTHER" && circle.customCategory
+      ? circle.customCategory
+      : circle.category
+        ? tCategory(circle.category)
+        : null;
 
   return (
-    <div className="bg-card flex flex-col overflow-hidden rounded-2xl border border-border p-4 transition-colors hover:border-primary/30 sm:p-5">
-      {/* Zone cliquable : cover + contenu */}
-      <Link href={`/dashboard/circles/${circle.slug}`} className="group block">
-        {/* Cover 1:1 */}
-        <div className="relative mb-4">
+    <Link href={`/dashboard/circles/${circle.slug}`} className="group block min-w-0">
+      <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
+        <div className="flex items-center gap-3 sm:gap-4">
+
+          {/* Thumbnail */}
           <div
-            className="absolute inset-x-4 -bottom-2 h-6 opacity-50 blur-xl"
-            style={{ background: gradient }}
-          />
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl">
-            {circle.coverImage ? (
+            className="size-[72px] shrink-0 overflow-hidden rounded-xl"
+            style={circle.coverImage ? undefined : { background: gradient }}
+          >
+            {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 100vw, 280px"
+                width={72}
+                height={72}
+                className="size-full object-cover"
+                sizes="72px"
               />
-            ) : (
-              <>
-                <div className="size-full" style={{ background: gradient }} />
-                <div className="absolute inset-0 bg-black/20" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                    <Users className="size-4 text-white" />
-                  </div>
-                </div>
-              </>
             )}
           </div>
-        </div>
 
-        {/* Contenu */}
-        <div className="space-y-2">
-          {/* Catégorie + rôle + ville */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {circle.category && (
-              <span className="text-xs font-semibold text-foreground">
-                {circle.category === "OTHER" && circle.customCategory
-                  ? circle.customCategory
-                  : tCategory(circle.category)}
+          {/* Body */}
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {categoryLabel && (
+                <span className="text-foreground text-xs font-semibold">{categoryLabel}</span>
+              )}
+              <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
+                {circle.memberRole === "HOST"
+                  ? t("circleCard.roleBadge.host")
+                  : t("circleCard.roleBadge.member")}
               </span>
-            )}
-            <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
-              {circle.memberRole === "HOST"
-                ? t("circleCard.roleBadge.host")
-                : t("circleCard.roleBadge.member")}
-            </span>
-            {circle.city && (
-              <span className="text-xs text-muted-foreground">{circle.city}</span>
-            )}
-          </div>
-
-          <h3 className="font-semibold leading-snug group-hover:underline">{circle.name}</h3>
-
-          <p className="line-clamp-2 text-sm text-muted-foreground">{circle.description}</p>
-
-          {/* Stats */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Users className="size-3.5 shrink-0" />
-              <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+              {circle.city && (
+                <span className="text-muted-foreground text-xs">{circle.city}</span>
+              )}
             </div>
-            {circle.upcomingMomentCount > 0 && (
+            <h3 className="text-sm font-semibold leading-snug group-hover:underline truncate">
+              {circle.name}
+            </h3>
+            <p className="text-muted-foreground line-clamp-1 text-xs">
+              {circle.description}
+            </p>
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
               <div className="flex items-center gap-1">
-                <CalendarIcon className="size-3.5 shrink-0" />
-                <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
+                <Users className="size-3.5 shrink-0" />
+                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+              </div>
+              {circle.upcomingMomentCount > 0 && (
+                <div className="flex items-center gap-1">
+                  <CalendarIcon className="size-3.5 shrink-0" />
+                  <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
+                </div>
+              )}
+            </div>
+            {/* Prochain événement — mobile uniquement */}
+            {hasNextMoment && (
+              <div className="rounded-lg border border-border bg-muted/40 px-2 py-1.5 sm:hidden">
+                <p className="truncate text-xs font-medium">{circle.nextMoment!.title}</p>
               </div>
             )}
           </div>
 
-          {/* Prochain événement */}
-          {circle.nextMoment && nextMomentDate && (
-            <div className="rounded-lg border border-border bg-muted/40 px-2 py-2">
-              <p className="text-xs font-medium text-muted-foreground">
-                {t("circleCard.nextMoment")}
-              </p>
-              <p className="mt-0.5 truncate text-sm font-medium">{circle.nextMoment.title}</p>
-              <p className="text-xs text-muted-foreground">{nextMomentDate}</p>
-            </div>
-          )}
-        </div>
-      </Link>
+          {/* Colonne droite — desktop uniquement */}
+          <div className="hidden sm:flex shrink-0 items-center ml-4">
+            {hasNextMoment ? (
+              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[200px]">
+                <p className="truncate font-medium text-foreground">{circle.nextMoment!.title}</p>
+                <div className="flex items-center gap-1.5">
+                  <CalendarIcon className="size-3 shrink-0 text-primary" />
+                  <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                {t("circleCard.noUpcomingMoments")}
+              </div>
+            )}
+          </div>
 
-      {/* Bouton Créer un événement — HOST uniquement */}
-      {circle.memberRole === "HOST" && (
-        <div className="mt-3">
-          <Button asChild variant="outline" size="sm" className="w-full">
-            <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
-              {tDashboard("createMoment")}
-            </Link>
-          </Button>
         </div>
-      )}
-    </div>
+      </div>
+    </Link>
   );
 }

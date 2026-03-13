@@ -35,6 +35,7 @@ export async function MomentTimelineItem({
   const locale = await getLocale();
 
   const isCancelled = moment.status === "CANCELLED";
+  const isPast = moment.status === "PAST";
 
   const isRegistered =
     userRegistrationStatus === "REGISTERED" ||
@@ -45,13 +46,9 @@ export async function MomentTimelineItem({
     ? "bg-destructive/50"
     : moment.status === "PAST"
       ? "bg-border"
-      : variant === "public"
-        ? "bg-primary"
-        : isHost || isRegistered
-          ? "bg-primary"
-          : isWaitlisted
-            ? "bg-amber-400"
-            : "bg-border";
+      : isWaitlisted
+        ? "bg-amber-400"
+        : "bg-primary";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -98,7 +95,7 @@ export async function MomentTimelineItem({
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="group block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : "border-border hover:border-primary/30"}`}>
+          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
@@ -114,16 +111,16 @@ export async function MomentTimelineItem({
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1">
                 {/* Time */}
-                <p className="text-muted-foreground text-xs">{timeStr}</p>
+                <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
                 {/* Title */}
-                <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : "group-hover:underline"}`}>
+                <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
                   {moment.title}
                 </p>
 
                 {/* Location */}
                 {locationLabel && (
-                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                  <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                     <LocationIcon className="size-3.5 shrink-0" />
                     <span className="truncate">{locationLabel}</span>
                   </div>
@@ -169,11 +166,11 @@ export async function MomentTimelineItem({
                   alt={moment.title}
                   width={60}
                   height={60}
-                  className={`size-[60px] shrink-0 rounded-lg object-cover ${isCancelled ? "grayscale opacity-40" : ""}`}
+                  className={`size-[60px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[60px] shrink-0 rounded-lg ${isCancelled ? "grayscale opacity-40" : ""}`}
+                  className={`size-[60px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}

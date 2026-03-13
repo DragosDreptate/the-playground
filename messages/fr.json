@@ -56,7 +56,8 @@
     "private": "Privé",
     "showMore": "Voir plus",
     "showLess": "Voir moins",
-    "you": "Vous"
+    "you": "Vous",
+    "demo": "Démo"
   },
   "Auth": {
     "signIn": {
@@ -510,7 +511,8 @@
       "roleBadge": {
         "host": "Organisateur",
         "member": "Membre"
-      }
+      },
+      "demo": "Démo"
     },
     "momentCard": {
       "free": "Gratuit",
