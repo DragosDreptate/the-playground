@@ -68,7 +68,7 @@ Les évolutions du Playground, jour après jour.
 - **Badge "Vous"** : votre nom est mis en évidence sur la page publique d'un événement que vous organisez
 - **Mon espace** : libellé plus clair devant le sélecteur de vue Organisateur / Participant
 - **Mes inscriptions** : l'onglet s'appelle désormais "Mes inscriptions" (plus précis)
-- **Page Découvrir** : titre plus clair et adapté FR / EN
+- **Page Explorer** : titre plus clair et adapté FR / EN
 
 ### Corrigé
 
@@ -198,7 +198,7 @@ Les évolutions du Playground, jour après jour.
 
 ### Ajouté
 
-- **Découvrir — "Voir plus"** : les Communautés et événements se chargent par lots sur la page Découvrir, plus de page unique interminable
+- **Explorer — "Voir plus"** : les Communautés et événements se chargent par lots sur la page Explorer, plus de page unique interminable
 - **Lien de partage** : sur la page de gestion de votre Communauté, retrouvez le lien public à partager, avec copie en un clic
 - **Liste des membres améliorée** : vue verticale une ligne par membre, badge Organisateur avec couronne, bouton "Voir plus" au-delà de 10 membres
 - **Navigation active** : la page en cours est mise en évidence dans le menu de navigation
@@ -275,11 +275,11 @@ Les évolutions du Playground, jour après jour.
 
 ---
 
-## [0.5.0] — 2026-02-21 — Découvrir
+## [0.5.0] — 2026-02-21 — Explorer
 
 ### Ajouté
 
-- **Page Découvrir** : répertoire public de toutes les Communautés et événements, filtrable par catégorie — trouvez facilement une Communauté qui vous correspond
+- **Page Explorer** : répertoire public de toutes les Communautés et événements, filtrable par catégorie — trouvez facilement une Communauté qui vous correspond
 - **Pages Communauté publiques** : chaque Communauté a une page accessible sans connexion — partageable, lisible par tous
 - **Page d'accueil** : présentation du produit pour les nouveaux visiteurs
 

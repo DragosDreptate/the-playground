@@ -39,7 +39,7 @@
    - 4.6 CommentThread
    - 4.7 CircleMembersList
    - 4.8 CoverImagePicker
-   - 4.9 PublicCircleCard (Découvrir)
+   - 4.9 PublicCircleCard (Explorer)
    - 4.10 Admin StatsCard
 5. [Patterns de layout](#5-patterns-de-layout)
    - 5.1 SiteHeader
@@ -874,13 +874,13 @@ Fichier : `src/components/circles/cover-image-picker.tsx`
 
 ---
 
-### 4.9 PublicCircleCard (Découvrir)
+### 4.9 PublicCircleCard (Explorer)
 
 Fichier : `src/components/explorer/public-circle-card.tsx`
 
 **Deux variantes**
 
-`variant="card"` (grille Découvrir) :
+`variant="card"` (grille Explorer) :
 ```
 div (rounded-xl border overflow-hidden hover:border-primary/30)
 ├─ Cover (w-full aspect-square)  — CARRÉ 1:1
@@ -930,7 +930,7 @@ header (sticky top-0 z-50 border-b/40 bg-background/80 backdrop-blur-sm)
   │  ├─ PlayIcon : size-6 rounded-[5px] bg-gradient-to-br from-pink-500 to-violet-500
   │  └─ "the playground" : text-[15px] font-extrabold tracking-[-0.4px]
   ├─ Nav (hidden md:flex — centre)
-  │  ├─ CompassIcon + "Découvrir" → /explorer
+  │  ├─ CompassIcon + "Explorer" → /explorer
   │  └─ LayoutDashboardIcon + "Mon espace" → /dashboard
   ├─ flex-1 spacer (mobile)
   └─ Actions (right)
@@ -1336,7 +1336,7 @@ disabled:opacity-50 disabled:pointer-events-none                    // élément
 | Player | **Participant** | **Member** |
 | Register | **S'inscrire** | **Join** |
 | Dashboard | **Mon espace** | **Dashboard** |
-| Explorer | **Découvrir** | **Explore** |
+| Explorer | **Explorer** | **Explore** |
 
 ### Genre en français
 

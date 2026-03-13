@@ -95,7 +95,7 @@
       "cta": "Commencer"
     },
     "explore": {
-      "title": "Découvrir des Communautés",
+      "title": "Explorer des Communautés",
       "description": "Explorez les communautés publiques et rejoignez celles qui vous correspondent.",
       "cta": "Explorer"
     },
@@ -106,7 +106,7 @@
       "subtitle": "Choisis ton mode par défaut.",
       "participant": {
         "title": "Je participe",
-        "description": "Découvrir et rejoindre des événements qui m'inspirent"
+        "description": "Explorer et rejoindre des événements qui m'inspirent"
       },
       "organizer": {
         "title": "J'organise",
@@ -138,12 +138,12 @@
     "noUpcomingMoments": "Aucun événement à venir.",
     "noMoments": "Aucun événement pour l'instant.",
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
-    "noMomentsHintExplore": "Découvrir des événements →",
+    "noMomentsHintExplore": "Explorer des événements →",
     "noMomentsOrganizer": "Aucun événement organisé pour l'instant.",
     "noMomentsOrganizerHint": "Créez votre premier événement depuis une Communauté.",
     "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
-    "emptyCirclesHintExplore": "Découvrir des communautés →",
+    "emptyCirclesHintExplore": "Explorer des communautés →",
     "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
     "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
     "onboardingMoments": {
@@ -486,7 +486,7 @@
   "Explorer": {
     "title": "Communautés & événements",
     "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
-    "navLink": "Découvrir",
+    "navLink": "Explorer",
     "tabs": {
       "circles": "Communautés",
       "moments": "Événements"
@@ -734,7 +734,7 @@
     },
     "product": {
       "title": "Produit",
-      "explore": "Découvrir",
+      "explore": "Explorer",
       "howItWorks": "Comment ça marche",
       "about": "À propos",
       "changelog": "Changelog",
@@ -1002,7 +1002,7 @@
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Découvrir</strong> ou depuis la page d'une Communauté. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1051,7 +1051,7 @@
         "step2": "Cliquez sur <strong>Créer une Communauté</strong>",
         "step3": "Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)",
         "step4": "Ajoutez une image de couverture (optionnel mais recommandé)",
-        "callout": "Une Communauté publique apparaît dans <strong>Découvrir</strong> et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct."
+        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct."
       },
       "createEvent": {
         "title": "Créer un événement",
@@ -1122,7 +1122,7 @@
       },
       "q2": {
         "question": "Quelle est la différence entre une Communauté publique et privée ?",
-        "answer": "Une Communauté publique est visible dans Découvrir et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
+        "answer": "Une Communauté publique est visible dans Explorer et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
       },
       "q3": {
         "question": "Puis-je organiser des événements sans créer de Communauté ?",

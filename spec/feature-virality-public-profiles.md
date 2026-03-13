@@ -304,7 +304,7 @@ Redirige vers `/u/[publicId]` de l'utilisateur connecté.
 
 ---
 
-### 8.3 Page Découvrir — `/explorer/page.tsx`
+### 8.3 Page Explorer — `/explorer/page.tsx`
 
 **Optionnel pour le MVP** — prioriser F1, F2, F3.
 
