@@ -492,7 +492,11 @@
       "moments": "Événements"
     },
     "filters": {
-      "allCategories": "Toutes les thématiques"
+      "allCategories": "Toutes les thématiques",
+      "sortBy": {
+        "date": "Date",
+        "popular": "Popularité"
+      }
     },
     "empty": {
       "circles": "Aucune Communauté publique pour cette thématique.",

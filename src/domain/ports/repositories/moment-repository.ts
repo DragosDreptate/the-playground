@@ -41,6 +41,7 @@ export type UpdateMomentInput = {
 
 export type PublicMomentFilters = {
   category?: CircleCategory;
+  sortBy?: "date" | "popular";
   limit?: number;
   offset?: number;
 };

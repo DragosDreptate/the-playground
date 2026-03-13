@@ -16,6 +16,7 @@ import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerGrid } from "@/components/explorer/explorer-grid";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
+import type { ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
 const PAGE_SIZE = 12;
@@ -40,11 +41,12 @@ export async function generateMetadata() {
 export default async function ExplorerPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; category?: string }>;
+  searchParams: Promise<{ tab?: string; category?: string; sort?: string }>;
 }) {
-  const { tab, category: categoryParam } = await searchParams;
+  const { tab, category: categoryParam, sort } = await searchParams;
   const activeTab = tab === "moments" ? "moments" : "circles";
   const category = categoryParam as CircleCategory | undefined;
+  const sortBy = (sort === "popular" ? "popular" : "date") as ExplorerSortBy;
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();
@@ -56,13 +58,13 @@ export default async function ExplorerPage({
       Promise.all([
         activeTab === "circles"
           ? getPublicCircles(
-              { category, limit: FETCH_SIZE },
+              { category, sortBy, limit: FETCH_SIZE },
               { circleRepository: prismaCircleRepository }
             )
           : Promise.resolve([]),
         activeTab === "moments"
           ? getPublicUpcomingMoments(
-              { category, limit: FETCH_SIZE },
+              { category, sortBy, limit: FETCH_SIZE },
               { momentRepository: prismaMomentRepository }
             )
           : Promise.resolve([]),
@@ -110,28 +112,28 @@ export default async function ExplorerPage({
       {/* Tabs + filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
-          <Link
-            href={category ? `?tab=circles&category=${category}` : "?tab=circles"}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === "circles"
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t("tabs.circles")}
-          </Link>
-          <Link
-            href={category ? `?tab=moments&category=${category}` : "?tab=moments"}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              activeTab === "moments"
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t("tabs.moments")}
-          </Link>
+          {(["circles", "moments"] as const).map((tabKey) => {
+            const params = new URLSearchParams();
+            if (tabKey !== "circles") params.set("tab", tabKey);
+            if (category) params.set("category", category);
+            if (sortBy !== "date") params.set("sort", sortBy);
+            const href = params.size > 0 ? `?${params.toString()}` : "?tab=circles";
+            return (
+              <Link
+                key={tabKey}
+                href={href}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === tabKey
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t(`tabs.${tabKey}`)}
+              </Link>
+            );
+          })}
         </div>
-        <ExplorerFilterBar selectedCategory={category} activeTab={activeTab} />
+        <ExplorerFilterBar selectedCategory={category} sortBy={sortBy} activeTab={activeTab} />
       </div>
 
       {/* Content */}
@@ -142,12 +144,13 @@ export default async function ExplorerPage({
           </div>
         ) : (
           <ExplorerGrid
-            key={`circles-${category ?? "all"}`}
+            key={`circles-${category ?? "all"}-${sortBy}`}
             tab="circles"
             initialItems={circles}
             initialHasMore={circlesHasMore}
             membershipRoleMap={membershipRoleMap}
             category={category}
+            sortBy={sortBy}
           />
         )
       ) : moments.length === 0 ? (
@@ -156,13 +159,14 @@ export default async function ExplorerPage({
         </div>
       ) : (
         <ExplorerGrid
-          key={`moments-${category ?? "all"}`}
+          key={`moments-${category ?? "all"}-${sortBy}`}
           tab="moments"
           initialItems={moments}
           initialHasMore={momentsHasMore}
           registrationStatusMap={registrationStatusMap}
           membershipBySlug={membershipBySlug}
           category={category}
+          sortBy={sortBy}
         />
       )}
     </div>

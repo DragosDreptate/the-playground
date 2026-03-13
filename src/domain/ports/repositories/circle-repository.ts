@@ -25,8 +25,11 @@ export type UpdateCircleInput = {
   inviteToken?: string | null;
 };
 
+export type ExplorerSortBy = "date" | "popular";
+
 export type PublicCircleFilters = {
   category?: CircleCategory;
+  sortBy?: ExplorerSortBy;
   limit?: number;
   offset?: number;
 };

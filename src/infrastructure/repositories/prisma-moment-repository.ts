@@ -148,7 +148,9 @@ export const prismaMomentRepository: MomentRepository = {
         circle: { select: { slug: true, name: true, category: true, city: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
       },
-      orderBy: { startsAt: "asc" },
+      orderBy: filters.sortBy === "popular"
+        ? { registrations: { _count: "desc" } }
+        : { startsAt: "asc" },
       take: filters.limit ?? 20,
       skip: filters.offset ?? 0,
     });
