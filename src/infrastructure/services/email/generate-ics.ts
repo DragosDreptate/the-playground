@@ -74,7 +74,7 @@ export function generateIcs(data: IcsEventData): string {
       ? [`CONFERENCE;FEATURE=VIDEO;LABEL="Lien de réunion";VALUE=URI:${data.videoLink}`]
       : []),
     `URL:${data.url}`,
-    `ORGANIZER;CN=${escapeIcsText(data.organizerName)}:MAILTO:noreply@theplayground.community`,
+    `ORGANIZER;CN=${escapeIcsText(data.organizerName)}:MAILTO:theplayground@thespark.fr`,
     // ATTENDEE requis pour METHOD:REQUEST (RFC 6047 — iMIP)
     // Déclenche la bannière calendrier inline dans Outlook
     ...(method === "REQUEST" && data.attendeeEmail
