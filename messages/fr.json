@@ -530,6 +530,7 @@
     "backToSite": "Retour au site",
     "insights": "Insights",
     "insightRegistrations": "Inscriptions",
+    "insightFollowers": "Abonnements",
     "insightComments": "Commentaires",
     "insightActivation": "Activation",
     "stats": {
@@ -538,6 +539,7 @@
       "totalMoments": "Événements",
       "totalRegistrations": "Inscriptions",
       "totalComments": "Commentaires",
+      "totalFollowers": "Abonnements",
       "thisWeek": "cette semaine"
     },
     "table": {

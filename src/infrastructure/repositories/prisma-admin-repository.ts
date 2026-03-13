@@ -15,6 +15,7 @@ import type {
   AdminMomentRow,
   AdminMomentDetail,
   AdminInsightRegistration,
+  AdminInsightFollower,
   AdminInsightComment,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
@@ -168,6 +169,20 @@ function commentOrderBy(
   }
 }
 
+function followerOrderBy(
+  sortBy?: string,
+  sortOrder?: string
+): Prisma.CircleMembershipOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "userName": return { user: { firstName: d } };
+    case "userEmail": return { user: { email: d } };
+    case "circleName": return { circle: { name: d } };
+    case "joinedAt": return { joinedAt: d };
+    default: return { joinedAt: "desc" };
+  }
+}
+
 // Whitelist pour le tri raw SQL (activation once/retained)
 const ACTIVATION_SQL_SORT: Record<string, string> = {
   name: 'u."firstName"',
@@ -218,26 +233,35 @@ export const prismaAdminRepository: AdminRepository = {
     const since = sevenDaysAgo();
     const realUser = realUserWhere();
     const realCircle = realCircleWhere();
+    const realMembership: Prisma.CircleMembershipWhereInput = {
+      role: "PLAYER",
+      user: realUser,
+      circle: realCircle,
+    };
     const [
       totalUsers,
       totalCircles,
       totalMoments,
       totalRegistrations,
       totalComments,
+      totalFollowers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
+      recentFollowers,
     ] = await Promise.all([
       prisma.user.count({ where: realUser }),
       prisma.circle.count({ where: realCircle }),
       prisma.moment.count({ where: { circle: realCircle } }),
       prisma.registration.count({ where: { status: { not: "CANCELLED" }, user: realUser } }),
       prisma.comment.count({ where: { user: realUser } }),
+      prisma.circleMembership.count({ where: realMembership }),
       prisma.user.count({ where: { ...realUser, createdAt: { gte: since } } }),
       prisma.circle.count({ where: { ...realCircle, createdAt: { gte: since } } }),
       prisma.moment.count({ where: { circle: realCircle, createdAt: { gte: since } } }),
       prisma.comment.count({ where: { user: realUser, createdAt: { gte: since } } }),
+      prisma.circleMembership.count({ where: { ...realMembership, joinedAt: { gte: since } } }),
     ]);
     return {
       totalUsers,
@@ -245,10 +269,12 @@ export const prismaAdminRepository: AdminRepository = {
       totalMoments,
       totalRegistrations,
       totalComments,
+      totalFollowers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
+      recentFollowers,
     };
   },
 
@@ -691,6 +717,48 @@ export const prismaAdminRepository: AdminRepository = {
         momentSlug: c.moment.slug,
         circleName: c.moment.circle.name,
         createdAt: c.createdAt,
+      })),
+      total,
+    };
+  },
+
+  async getFollowersInsight(
+    days: number,
+    limit: number,
+    offset: number,
+    sortBy?: string,
+    sortOrder?: "asc" | "desc"
+  ): Promise<{ followers: AdminInsightFollower[]; total: number }> {
+    const since = daysAgo(days);
+    const where: Prisma.CircleMembershipWhereInput = {
+      role: "PLAYER",
+      joinedAt: { gte: since },
+      user: realUserWhere(),
+      circle: realCircleWhere(),
+    };
+    const [memberships, total] = await Promise.all([
+      prisma.circleMembership.findMany({
+        where,
+        include: {
+          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+          circle: { select: { id: true, name: true, slug: true } },
+        },
+        orderBy: followerOrderBy(sortBy, sortOrder),
+        take: limit,
+        skip: offset,
+      }),
+      prisma.circleMembership.count({ where }),
+    ]);
+    return {
+      followers: memberships.map((m) => ({
+        id: m.id,
+        userId: m.userId,
+        userEmail: m.user.email,
+        userName: [m.user.firstName, m.user.lastName].filter(Boolean).join(" ") || null,
+        circleId: m.circle.id,
+        circleName: m.circle.name,
+        circleSlug: m.circle.slug,
+        joinedAt: m.joinedAt,
       })),
       total,
     };
