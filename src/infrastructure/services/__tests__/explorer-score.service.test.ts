@@ -131,10 +131,10 @@ describe("calculateCircleScore", () => {
   // ── Communautés démo ─────────────────────────────────────────────────────
 
   describe("given a demo community (isDemo = true)", () => {
-    it("should cap score at 30 even when raw score would yield ~90/100", () => {
+    it("should cap score at 50 even when raw score would yield ~90/100", () => {
       // Score brut élevé : tout coché, 8 membres, 4 events passés
       // raw = 20+18+15+10+7+5+(8*8=64)+(4*10=40) = 179
-      // round(179/205*100) = round(87.3) = 87 → capé à 30
+      // round(179/205*100) = round(87.3) = 87 → capé à 50
       const input = baseCircleInput({
         isDemo: true,
         coverImage: "https://example.com/cover.jpg",
@@ -146,10 +146,10 @@ describe("calculateCircleScore", () => {
         pastEventCount: 4,
       });
 
-      expect(calculateCircleScore(input)).toBe(30);
+      expect(calculateCircleScore(input)).toBe(50);
     });
 
-    it("should not cap if the calculated score is already below 30", () => {
+    it("should not cap if the calculated score is already below 50", () => {
       // raw = 5 (ageInDays only) → round(5/205*100) = round(2.4) = 2
       const input = baseCircleInput({
         isDemo: true,
@@ -273,7 +273,7 @@ describe("calculateMomentScore", () => {
   // ── Communauté démo ──────────────────────────────────────────────────────
 
   describe("given an event in a demo circle (circleIsDemo = true)", () => {
-    it("should cap the moment score at 30", () => {
+    it("should cap the moment score at 50", () => {
       const input = baseMomentInput({
         registrantCount: 10,
         coverImage: "https://example.com/cover.jpg",
@@ -281,13 +281,13 @@ describe("calculateMomentScore", () => {
         locationName: "Paris",
         circleScore: 80,
         circleIsDemo: true,
-        // score non capé = 90 → capé à 30
+        // score non capé = 90 → capé à 50
       });
 
-      expect(calculateMomentScore(input)).toBe(30);
+      expect(calculateMomentScore(input)).toBe(50);
     });
 
-    it("should not cap if the score is already below 30", () => {
+    it("should not cap if the score is already below 50", () => {
       const input = baseMomentInput({
         registrantCount: 0,
         circleScore: 10,

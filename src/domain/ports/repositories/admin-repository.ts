@@ -253,6 +253,26 @@ export type AdminExplorerCircleRow = {
   hostName: string;
 };
 
+export type AdminExplorerMomentFilters = {
+  search?: string;
+  limit?: number;
+  offset?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+};
+
+export type AdminExplorerMomentRow = {
+  id: string;
+  slug: string;
+  title: string;
+  circleName: string;
+  circleSlug: string;
+  isDemo: boolean;
+  explorerScore: number;
+  startsAt: Date;
+  registrationCount: number;
+};
+
 // ─────────────────────────────────────────────
 // Repository interface
 // ─────────────────────────────────────────────
@@ -275,11 +295,15 @@ export interface AdminRepository {
   findCircleById(id: string): Promise<AdminCircleDetail | null>;
   deleteCircle(id: string): Promise<void>;
 
-  // Explorer
+  // Explorer — Circles
   findAllExplorerCircles(filters: AdminExplorerFilters): Promise<AdminExplorerCircleRow[]>;
   countExplorerCircles(filters: AdminExplorerFilters): Promise<number>;
   updateCircleExcluded(id: string, excluded: boolean): Promise<void>;
   updateCircleOverrideScore(id: string, score: number | null): Promise<void>;
+
+  // Explorer — Moments
+  findAllExplorerMoments(filters: AdminExplorerMomentFilters): Promise<AdminExplorerMomentRow[]>;
+  countExplorerMoments(filters: AdminExplorerMomentFilters): Promise<number>;
 
   // Moments
   findAllMoments(filters: AdminMomentFilters): Promise<AdminMomentRow[]>;

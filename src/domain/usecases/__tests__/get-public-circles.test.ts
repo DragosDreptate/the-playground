@@ -101,6 +101,16 @@ describe("getPublicCircles", () => {
       expect(circleRepository.findPublic).toHaveBeenCalledWith({ sortBy: "popular" });
     });
 
+    it("should pass sortBy=members to the repository", async () => {
+      const circleRepository = createMockCircleRepository({
+        findPublic: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicCircles({ sortBy: "members" }, { circleRepository });
+
+      expect(circleRepository.findPublic).toHaveBeenCalledWith({ sortBy: "members" });
+    });
+
     it("should combine sortBy with category filter", async () => {
       const circleRepository = createMockCircleRepository({
         findPublic: vi.fn().mockResolvedValue([]),

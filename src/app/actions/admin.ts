@@ -14,6 +14,7 @@ import { getAdminCircles } from "@/domain/usecases/admin/get-admin-circles";
 import { getAdminCircle } from "@/domain/usecases/admin/get-admin-circle";
 import { adminDeleteCircle } from "@/domain/usecases/admin/admin-delete-circle";
 import { getAdminExplorerCircles } from "@/domain/usecases/admin/get-admin-explorer-circles";
+import { getAdminExplorerMoments } from "@/domain/usecases/admin/get-admin-explorer-moments";
 import { adminUpdateCircleExcluded } from "@/domain/usecases/admin/admin-update-circle-excluded";
 import { adminUpdateCircleOverrideScore } from "@/domain/usecases/admin/admin-update-circle-override-score";
 import { getAdminMoments } from "@/domain/usecases/admin/get-admin-moments";
@@ -23,7 +24,7 @@ import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-mo
 import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
-import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminExplorerFilters, AdminExplorerCircleRow, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
+import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminExplorerFilters, AdminExplorerCircleRow, AdminExplorerMomentFilters, AdminExplorerMomentRow, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 
 const deps = { adminRepository: prismaAdminRepository };
@@ -268,6 +269,16 @@ export async function adminUpdateCircleOverrideScoreAction(
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
+}
+
+export async function getAdminExplorerMomentsAction(
+  filters: AdminExplorerMomentFilters
+): Promise<ActionResult<{ moments: AdminExplorerMomentRow[]; total: number }>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  const result = await getAdminExplorerMoments(check.data.role, filters, deps);
+  return { success: true, data: result };
 }
 
 // ─────────────────────────────────────────────

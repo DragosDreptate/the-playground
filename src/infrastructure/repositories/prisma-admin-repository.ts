@@ -1,4 +1,5 @@
 import { prisma } from "@/infrastructure/db/prisma";
+import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   AdminRepository,
   AdminStats,
@@ -13,6 +14,8 @@ import type {
   AdminCircleDetail,
   AdminExplorerFilters,
   AdminExplorerCircleRow,
+  AdminExplorerMomentFilters,
+  AdminExplorerMomentRow,
   AdminMomentFilters,
   AdminMomentRow,
   AdminMomentDetail,
@@ -168,6 +171,34 @@ function commentOrderBy(
     case "circleName": return { moment: { circle: { name: d } } };
     case "createdAt": return { createdAt: d };
     default: return { createdAt: "desc" };
+  }
+}
+
+function explorerMomentWhere(filters: AdminExplorerMomentFilters): Prisma.MomentWhereInput {
+  const where: Prisma.MomentWhereInput = {
+    circle: {
+      visibility: "PUBLIC",
+      NOT: excludeTestHostFilter(),
+    },
+  };
+  if (filters.search) {
+    where.OR = [
+      { title: { contains: filters.search, mode: "insensitive" } },
+      { circle: { name: { contains: filters.search, mode: "insensitive" } } },
+    ];
+  }
+  return where;
+}
+
+function explorerMomentOrderBy(sortBy?: string, sortOrder?: string): Prisma.MomentOrderByWithRelationInput {
+  const d = dir(sortOrder);
+  switch (sortBy) {
+    case "title": return { title: d };
+    case "circleName": return { circle: { name: d } };
+    case "startsAt": return { startsAt: d };
+    case "registrationCount": return { registrations: { _count: d } };
+    case "explorerScore": return { explorerScore: d };
+    default: return { explorerScore: "desc" };
   }
 }
 
@@ -618,6 +649,34 @@ export const prismaAdminRepository: AdminRepository = {
 
   async updateCircleOverrideScore(id: string, score: number | null): Promise<void> {
     await prisma.circle.update({ where: { id }, data: { overrideScore: score } });
+  },
+
+  async findAllExplorerMoments(filters: AdminExplorerMomentFilters): Promise<AdminExplorerMomentRow[]> {
+    const records = await prisma.moment.findMany({
+      where: explorerMomentWhere(filters),
+      include: {
+        circle: { select: { name: true, slug: true, isDemo: true } },
+        _count: { select: { registrations: true } },
+      },
+      orderBy: explorerMomentOrderBy(filters.sortBy, filters.sortOrder),
+      take: filters.limit ?? DEFAULT_LIMIT,
+      skip: filters.offset ?? 0,
+    });
+    return records.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      circleName: r.circle.name,
+      circleSlug: r.circle.slug,
+      isDemo: r.circle.isDemo,
+      explorerScore: r.explorerScore,
+      startsAt: r.startsAt,
+      registrationCount: r._count.registrations,
+    }));
+  },
+
+  async countExplorerMoments(filters: AdminExplorerMomentFilters): Promise<number> {
+    return prisma.moment.count({ where: explorerMomentWhere(filters) });
   },
 
   // ── Moments ──────────────────────────────

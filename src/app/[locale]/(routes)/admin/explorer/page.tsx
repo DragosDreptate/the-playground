@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
+import { AdminExplorerTabs } from "@/components/admin/admin-explorer-tabs";
 import type { ExplorerFilter } from "@/domain/ports/repositories/admin-repository";
 
 const PAGE_SIZE = 20;
@@ -77,6 +78,8 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t("explorer.title")}</h1>
+
+      <AdminExplorerTabs activeTab="circles" />
 
       {/* Filtres */}
       <div className="flex gap-2">

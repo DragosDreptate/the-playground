@@ -496,7 +496,8 @@
       "allCategories": "Toutes les thématiques",
       "sortBy": {
         "date": "Date",
-        "popular": "Popularité"
+        "popular": "Recommandé",
+        "members": "Popularité"
       }
     },
     "empty": {
@@ -600,6 +601,10 @@
         "override": "Override",
         "visible": "Visible",
         "demo": "Démo"
+      },
+      "tabs": {
+        "circles": "Communautés",
+        "moments": "Événements"
       }
     },
     "viewPublicPage": "Voir la page",
@@ -632,7 +637,8 @@
       "status": "Statut",
       "registrations": "Inscrits",
       "comments": "Commentaires",
-      "actions": "Actions"
+      "actions": "Actions",
+      "startsAt": "Date"
     },
     "activation": {
       "title": "Taux d'activation",
@@ -1025,7 +1031,7 @@
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer par thématique et trier les Communautés par popularité ou par date. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1074,7 +1080,7 @@
         "step2": "Cliquez sur <strong>Créer une Communauté</strong>",
         "step3": "Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)",
         "step4": "Ajoutez une image de couverture (optionnel mais recommandé)",
-        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct."
+        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> (l'annuaire public de la plateforme) et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct et n'apparaît pas dans l'annuaire."
       },
       "createEvent": {
         "title": "Créer un événement",
@@ -1145,7 +1151,7 @@
       },
       "q2": {
         "question": "Quelle est la différence entre une Communauté publique et privée ?",
-        "answer": "Une Communauté publique est visible dans Explorer et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
+        "answer": "Une Communauté publique est visible dans Explorer (l'annuaire public, filtrable par thématique et triable par popularité ou par date) et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
       },
       "q3": {
         "question": "Puis-je organiser des événements sans créer de Communauté ?",
