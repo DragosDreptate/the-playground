@@ -71,7 +71,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
               />
             )}
             {circle.isDemo && (
-              <span className="absolute bottom-1 left-1 rounded px-1 py-0.5 text-[10px] font-semibold leading-none text-white" style={{ background: "rgba(0,0,0,0.55)" }}>
+              <span className="absolute top-1.5 left-1.5 rounded-md border border-primary/70 bg-black/80 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
                 {t("circleCard.demo")}
               </span>
             )}

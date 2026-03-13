@@ -214,6 +214,11 @@ export default async function PublicCirclePage({
                   </div>
                 </>
               )}
+              {circle.isDemo && (
+                <span className="absolute top-2 left-2 rounded-md border border-primary/70 bg-black/80 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
+                  {tExplorer("circleCard.demo")}
+                </span>
+              )}
             </div>
           </div>
 

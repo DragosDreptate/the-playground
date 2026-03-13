@@ -31,6 +31,7 @@ function toDomainCircle(record: PrismaCircle): Circle {
     city: record.city ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
     inviteToken: record.inviteToken ?? null,
+    isDemo: record.isDemo,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -199,6 +200,7 @@ export const prismaCircleRepository: CircleRepository = {
       city: string | null;
       stripeConnectAccountId: string | null;
       inviteToken: string | null;
+      isDemo: boolean;
       createdAt: Date;
       updatedAt: Date;
       memberCount: number;
@@ -224,6 +226,7 @@ export const prismaCircleRepository: CircleRepository = {
         c.city                    AS "city",
         c."stripeConnectAccountId" AS "stripeConnectAccountId",
         c.invite_token            AS "inviteToken",
+        c."isDemo"                AS "isDemo",
         c."createdAt"             AS "createdAt",
         c."updatedAt"             AS "updatedAt",
         (SELECT COUNT(*)::int FROM circle_memberships WHERE "circleId" = c.id)
@@ -258,6 +261,7 @@ export const prismaCircleRepository: CircleRepository = {
       city: row.city,
       stripeConnectAccountId: row.stripeConnectAccountId,
       inviteToken: row.inviteToken,
+      isDemo: row.isDemo ?? false,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       memberRole: row.role,

@@ -63,6 +63,7 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     city: null,
     stripeConnectAccountId: null,
     inviteToken: null,
+    isDemo: false,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,
