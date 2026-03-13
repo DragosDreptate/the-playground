@@ -93,7 +93,7 @@ export function createResendEmailService(): EmailService {
             {
               filename: "event.ics",
               content: Buffer.from(data.icsContent).toString("base64"),
-              contentType: "text/calendar; method=PUBLISH",
+              contentType: "text/calendar; method=REQUEST",
             },
           ],
         }),
@@ -113,7 +113,7 @@ export function createResendEmailService(): EmailService {
             {
               filename: "event.ics",
               content: Buffer.from(data.icsContent).toString("base64"),
-              contentType: "text/calendar; method=PUBLISH",
+              contentType: "text/calendar; method=REQUEST",
             },
           ],
         }),
@@ -182,7 +182,7 @@ export function createResendEmailService(): EmailService {
             {
               filename: "event.ics",
               content: Buffer.from(data.icsContent).toString("base64"),
-              contentType: "text/calendar; method=PUBLISH",
+              contentType: "text/calendar; method=REQUEST",
             },
           ],
         }),
@@ -209,7 +209,7 @@ export function createResendEmailService(): EmailService {
             {
               filename: "event.ics",
               content: Buffer.from(data.icsContent).toString("base64"),
-              contentType: "text/calendar; method=PUBLISH",
+              contentType: "text/calendar; method=REQUEST",
             },
           ],
         }),

@@ -15,6 +15,15 @@ type IcsEventData = {
   videoLink?: string | null; // Video conference URL — overrides location for ONLINE events
   url: string; // Public URL of the Moment
   organizerName: string; // Circle name
+  /**
+   * iCalendar METHOD (RFC 5546).
+   * - "PUBLISH" : informationnel — pour le téléchargement direct (.ics)
+   * - "REQUEST" : invitation meeting — déclenche la bannière calendrier inline dans Outlook
+   * @default "PUBLISH"
+   */
+  method?: "PUBLISH" | "REQUEST";
+  /** Email du participant (ATTENDEE). Requis pour METHOD:REQUEST (conformité RFC 6047). */
+  attendeeEmail?: string;
 };
 
 function formatIcsDate(date: Date): string {
@@ -30,6 +39,7 @@ function escapeIcsText(text: string): string {
 }
 
 export function generateIcs(data: IcsEventData): string {
+  const method = data.method ?? "PUBLISH";
   const dtStart = formatIcsDate(data.startsAt);
   const dtEnd = formatIcsDate(
     data.endsAt ?? new Date(data.startsAt.getTime() + 2 * 60 * 60 * 1000)
@@ -50,7 +60,7 @@ export function generateIcs(data: IcsEventData): string {
     "VERSION:2.0",
     "PRODID:-//The Playground//EN",
     "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
+    `METHOD:${method}`,
     "BEGIN:VEVENT",
     `UID:${data.uid}@theplayground`,
     `DTSTAMP:${now}`,
@@ -65,6 +75,11 @@ export function generateIcs(data: IcsEventData): string {
       : []),
     `URL:${data.url}`,
     `ORGANIZER;CN=${escapeIcsText(data.organizerName)}:MAILTO:noreply@theplayground.community`,
+    // ATTENDEE requis pour METHOD:REQUEST (RFC 6047 — iMIP)
+    // Déclenche la bannière calendrier inline dans Outlook
+    ...(method === "REQUEST" && data.attendeeEmail
+      ? [`ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED:MAILTO:${data.attendeeEmail}`]
+      : []),
     "STATUS:CONFIRMED",
     "END:VEVENT",
     "END:VCALENDAR",
