@@ -19,7 +19,7 @@ import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
 import type { ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 10;
 const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function generateMetadata() {

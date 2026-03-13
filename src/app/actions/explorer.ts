@@ -13,7 +13,7 @@ import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/c
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 10;
 const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function loadMoreCirclesAction({
