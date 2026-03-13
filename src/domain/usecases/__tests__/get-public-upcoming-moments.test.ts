@@ -8,6 +8,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
     id: "moment-1",
     slug: "meetup-react",
     title: "Meetup React",
+    description: null,
     coverImage: null,
     startsAt: new Date("2026-03-15T18:00:00Z"),
     endsAt: new Date("2026-03-15T20:00:00Z"),

@@ -49,6 +49,7 @@ export type PublicMoment = {
   id: string;
   slug: string;
   title: string;
+  description: string | null;
   coverImage: string | null;
   startsAt: Date;
   endsAt: Date | null;

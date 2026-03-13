@@ -157,6 +157,7 @@ export const prismaMomentRepository: MomentRepository = {
       id: m.id,
       slug: m.slug,
       title: m.title,
+      description: m.description ?? null,
       coverImage: m.coverImage ?? null,
       startsAt: m.startsAt,
       endsAt: m.endsAt,
