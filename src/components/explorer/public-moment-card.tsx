@@ -68,25 +68,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     <span className="text-muted-foreground text-xs">{moment.circle.city}</span>
   );
 
-  // Colonne droite desktop : status badge ou date badge
-  const rightColumn = isOrganizer ? (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-2.5 py-1.5 text-xs font-semibold text-primary whitespace-nowrap">
-      <Crown className="size-3" />
-      {t("momentCard.roleBadge.host")}
-    </span>
-  ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-2.5 py-1.5 text-xs font-semibold text-primary whitespace-nowrap">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-      {t("momentCard.roleBadge.registered")}
-    </span>
-  ) : registrationStatus === "WAITLISTED" ? (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-2.5 py-1.5 text-xs font-semibold text-primary whitespace-nowrap">
-      <Clock className="size-3" />
-      {t("momentCard.roleBadge.waitlisted")}
-    </span>
-  ) : (
+  // Colonne droite desktop : toujours le badge date
+  const rightColumn = (
     <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 px-3 py-2 text-center min-w-[52px]">
       <span className="text-lg font-bold leading-none" suppressHydrationWarning>
         {startsAt.getDate()}
