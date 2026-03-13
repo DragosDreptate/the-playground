@@ -15,7 +15,7 @@ export const adminNavItems = [
   { key: "users", href: "/admin/users", icon: Users },
   { key: "circles", href: "/admin/circles", icon: CircleDot },
   { key: "moments", href: "/admin/moments", icon: CalendarDays },
-  { key: "explorer", href: "/admin/explorer", icon: Compass },
+  { key: "explorerNav", href: "/admin/explorer", icon: Compass },
 ] as const;
 
 export const adminInsightItems = [
