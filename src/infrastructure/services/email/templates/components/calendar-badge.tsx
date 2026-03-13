@@ -16,7 +16,8 @@ export function CalendarBadge({ month, day }: CalendarBadgeProps) {
 }
 
 const badge: React.CSSProperties = {
-  background: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+  backgroundColor: "#ec4899",
+  backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
   borderRadius: "12px",
   width: "64px",
   height: "64px",

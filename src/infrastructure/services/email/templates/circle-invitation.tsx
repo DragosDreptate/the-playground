@@ -213,7 +213,7 @@ export function CircleInvitationEmail({
                       <td style={{ textAlign: "right", verticalAlign: "middle", whiteSpace: "nowrap", paddingLeft: "12px" }}>
                         <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
                           <tbody><tr>
-                            <td style={{ width: "10px", height: "10px", borderRadius: "3px", background: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }} />
+                            <td style={{ width: "10px", height: "10px", borderRadius: "3px", backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }} />
                             <td style={{ paddingLeft: "5px", verticalAlign: "middle", fontSize: "10px", color: "#d1d5db", fontWeight: 500 }}>
                               the-playground.fr
                             </td>
@@ -244,4 +244,4 @@ const topbarTd: React.CSSProperties = { padding: "16px 28px", borderBottom: "1px
 const badgeStyle: React.CSSProperties = { fontSize: "11px", fontWeight: 600, color: "#ec4899", backgroundColor: "#fde8f0", padding: "3px 10px", borderRadius: "20px" };
 const contentTd: React.CSSProperties = { padding: "20px 28px 28px" };
 const circleNameStyle: React.CSSProperties = { fontSize: "22px", fontWeight: 800, color: "#0f0f1a", letterSpacing: "-0.03em", lineHeight: "1.2", margin: "0 0 18px 0", textAlign: "center" };
-const ctaStyle: React.CSSProperties = { backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", color: "#ffffff", fontSize: "15px", fontWeight: 700, borderRadius: "10px", padding: "13px 32px", textDecoration: "none", display: "block", width: "100%", textAlign: "center", boxSizing: "border-box" };
+const ctaStyle: React.CSSProperties = { backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", color: "#ffffff", fontSize: "15px", fontWeight: 700, borderRadius: "10px", padding: "13px 32px", textDecoration: "none", display: "block", width: "100%", textAlign: "center", boxSizing: "border-box" };

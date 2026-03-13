@@ -54,7 +54,7 @@ const iconSection: React.CSSProperties = {
 // line-height + text-align pour centrage email-compatible (flex non supporté).
 // font-size:0 évite l'espace fantôme autour du span inline.
 const iconBox: React.CSSProperties = {
-  background: "linear-gradient(135deg, #ec4899, #a855f7)",
+  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #a855f7)",
   borderRadius: "11px",
   width: "48px",
   height: "48px",
@@ -111,7 +111,7 @@ const ctaSection: React.CSSProperties = {
 };
 
 const ctaButton: React.CSSProperties = {
-  background: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
   color: "#ffffff",
   fontSize: "14px",
   fontWeight: 600,
