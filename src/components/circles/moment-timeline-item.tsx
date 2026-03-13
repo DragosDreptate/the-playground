@@ -45,13 +45,9 @@ export async function MomentTimelineItem({
     ? "bg-destructive/50"
     : moment.status === "PAST"
       ? "bg-border"
-      : variant === "public"
-        ? "bg-primary"
-        : isHost || isRegistered
-          ? "bg-primary"
-          : isWaitlisted
-            ? "bg-amber-400"
-            : "bg-border";
+      : isWaitlisted
+        ? "bg-amber-400"
+        : "bg-primary";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
