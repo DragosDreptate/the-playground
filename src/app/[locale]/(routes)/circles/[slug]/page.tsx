@@ -24,6 +24,7 @@ import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+import { DemoBadge } from "@/components/badges/demo-badge";
 import Image from "next/image";
 import {
   Globe,
@@ -214,11 +215,7 @@ export default async function PublicCirclePage({
                   </div>
                 </>
               )}
-              {circle.isDemo && (
-                <span className="absolute top-3 left-3 rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary">
-                  {tExplorer("circleCard.demo")}
-                </span>
-              )}
+              {circle.isDemo && <DemoBadge label={tExplorer("circleCard.demo")} size="lg" />}
             </div>
           </div>
 

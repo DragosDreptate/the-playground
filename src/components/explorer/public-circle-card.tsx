@@ -8,6 +8,7 @@ import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
+import { DemoBadge } from "@/components/badges/demo-badge";
 
 type Props = {
   circle: PublicCircle;
@@ -70,11 +71,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 sizes="120px"
               />
             )}
-            {circle.isDemo && (
-              <span className="absolute top-1.5 left-1.5 rounded-md border border-primary/70 bg-black/80 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
-                {t("circleCard.demo")}
-              </span>
-            )}
+            {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
           </div>
 
           {/* Body */}

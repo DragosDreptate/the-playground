@@ -56,7 +56,8 @@
     "private": "Privé",
     "showMore": "Voir plus",
     "showLess": "Voir moins",
-    "you": "Vous"
+    "you": "Vous",
+    "demo": "Démo"
   },
   "Auth": {
     "signIn": {
@@ -471,8 +472,7 @@
       "createFailed": "Échec de la création de l'événement",
       "updateFailed": "Échec de la mise à jour de l'événement",
       "deleteFailed": "Échec de la suppression de l'événement"
-    },
-    "demo": "Démo"
+    }
   },
   "CircleCategory": {
     "TECH": "Tech & IA",

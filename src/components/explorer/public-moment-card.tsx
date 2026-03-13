@@ -8,6 +8,7 @@ import { formatShortDate, formatTime } from "@/lib/format-date";
 import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
+import { DemoBadge } from "@/components/badges/demo-badge";
 
 type Props = {
   moment: PublicMoment;
@@ -100,11 +101,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
                 sizes="120px"
               />
             )}
-            {moment.circle.isDemo && (
-              <span className="absolute top-1.5 left-1.5 rounded-md border border-primary/70 bg-black/80 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
-                {t("circleCard.demo")}
-              </span>
-            )}
+            {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
           </div>
 
           {/* Body */}
