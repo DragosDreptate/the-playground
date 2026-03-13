@@ -111,7 +111,7 @@ export async function DashboardContent({
         {hostCircles.length === 0 ? (
           <OrganizerOnboardingGuide />
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="flex flex-col gap-3">
             {hostCircles.map((circle) => (
               <DashboardCircleCard key={circle.id} circle={circle} />
             ))}
@@ -210,7 +210,7 @@ export async function DashboardContent({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-3">
           {participantCircles.map((circle) => (
             <DashboardCircleCard key={circle.id} circle={circle} />
           ))}

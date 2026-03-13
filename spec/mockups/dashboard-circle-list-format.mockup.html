@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Dashboard Mes Communautés : Format Liste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26,27,46,0.08), 0 2px 4px -2px rgba(26,27,46,0.05);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+/* ── Layout ── */
+.page { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.section-label {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted-foreground); margin-bottom: 1rem;
+}
+.section-label .badge-opt {
+  background: var(--primary); color: #fff;
+  border-radius: 4px; padding: 2px 7px; font-size: 10px; letter-spacing: 0.05em;
+}
+.section-divider {
+  border: none; border-top: 2px dashed var(--border);
+  margin: 3rem 0;
+}
+
+/* ── Compare grid ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+@media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
+
+/* ── Dashboard shell ── */
+.dash-shell {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.dash-header {
+  padding: 1.25rem 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.dash-greeting { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.dash-subtitle { font-size: 12px; color: var(--muted-foreground); margin-bottom: 1rem; }
+.dash-tabs {
+  display: flex; gap: 0; margin: 0 -1.25rem;
+}
+.dash-tab {
+  padding: 0.6rem 1.25rem;
+  font-size: 13px; font-weight: 500;
+  color: var(--muted-foreground);
+  border-bottom: 2px solid transparent;
+  cursor: pointer; white-space: nowrap;
+}
+.dash-tab.active {
+  color: var(--foreground);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+.dash-body { padding: 1rem 1.25rem 1.25rem; }
+
+/* ── Current state grid ── */
+.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+/* ── Card — CURRENT (vertical) ── */
+.card-vertical {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0.875rem;
+  display: flex; flex-direction: column; gap: 0.625rem;
+  transition: border-color 0.15s;
+}
+.card-vertical:hover { border-color: rgba(232,69,122,0.3); }
+.cv-cover {
+  aspect-ratio: 1/1;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+.cv-cover-gradient-1 { background: linear-gradient(135deg, #e8457a, #9333ea); }
+.cv-cover-gradient-2 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+.cv-cover-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cv-cover-icon-inner {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+.cv-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.cv-category { font-size: 11px; font-weight: 700; color: var(--foreground); }
+.badge-role {
+  display: inline-flex; align-items: center;
+  border: 1px solid rgba(232,69,122,0.4);
+  border-radius: 4px; padding: 1px 6px;
+  font-size: 10px; font-weight: 600; color: var(--primary);
+}
+.cv-city { font-size: 11px; color: var(--muted-foreground); }
+.cv-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.cv-desc { font-size: 11px; color: var(--muted-foreground); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.cv-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 11px; color: var(--muted-foreground); }
+.cv-stat { display: flex; align-items: center; gap: 4px; }
+.cv-next {
+  background: rgba(240,239,247,0.6);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 8px;
+}
+.cv-next-label { font-size: 10px; font-weight: 500; color: var(--muted-foreground); }
+.cv-next-title { font-size: 11px; font-weight: 600; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-next-date { font-size: 10px; color: var(--muted-foreground); }
+.btn-outline-sm {
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 5px 12px; font-size: 11px; font-weight: 500;
+  color: var(--foreground); background: transparent;
+  cursor: pointer; text-align: center; width: 100%;
+}
+.btn-outline-sm:hover { border-color: rgba(232,69,122,0.4); }
+
+/* ── Card — NEW (horizontal list) ── */
+.card-list {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.75rem 1rem;
+  display: flex; align-items: center; gap: 0.875rem;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.card-list:hover { border-color: rgba(232,69,122,0.3); }
+
+/* Thumbnail */
+.cl-thumb {
+  width: 72px; height: 72px; min-width: 72px;
+  border-radius: 10px; overflow: hidden; position: relative;
+  flex-shrink: 0;
+}
+.cl-thumb-gradient-1 { background: linear-gradient(135deg, #e8457a, #9333ea); }
+.cl-thumb-gradient-2 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+.cl-thumb-gradient-3 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.cl-thumb-gradient-4 { background: linear-gradient(135deg, #10b981, #3b82f6); }
+.cl-thumb-icon {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.cl-thumb-icon-inner {
+  background: rgba(255,255,255,0.22);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Body */
+.cl-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.cl-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.cl-title { font-size: 14px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-desc { font-size: 12px; color: var(--muted-foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cl-stats { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted-foreground); }
+.cl-stat { display: flex; align-items: center; gap: 3px; }
+
+/* Right column — next event badge */
+.cl-right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.badge-next {
+  display: flex; flex-direction: column; gap: 3px;
+  border: 1px solid var(--border);
+  background: var(--muted);
+  border-radius: 10px; padding: 7px 10px;
+  max-width: 180px;
+}
+.badge-next-title { font-size: 11px; font-weight: 600; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.badge-next-date { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted-foreground); }
+.badge-next-date svg { color: var(--primary); flex-shrink: 0; }
+.badge-none {
+  border: 1px solid var(--border);
+  background: var(--muted);
+  border-radius: 10px; padding: 7px 10px;
+  font-size: 11px; color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+/* Option A — + icon button */
+.btn-icon-ghost {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border); background: transparent;
+  cursor: pointer; color: var(--muted-foreground);
+  flex-shrink: 0; transition: all 0.15s;
+}
+.btn-icon-ghost:hover { border-color: var(--primary); color: var(--primary); background: rgba(232,69,122,0.05); }
+
+/* Option B — ghost button row at bottom */
+.card-list-b { flex-wrap: wrap; }
+.cl-cta-row {
+  width: 100%; margin-top: 0.375rem; padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: flex-end;
+}
+.btn-ghost-sm {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 7px; padding: 4px 10px;
+  font-size: 11px; font-weight: 500;
+  color: var(--muted-foreground); background: transparent;
+  cursor: pointer; border: none; transition: all 0.15s;
+}
+.btn-ghost-sm:hover { background: var(--muted); color: var(--foreground); }
+
+/* Option C — clickable "no event" badge */
+.badge-none-link {
+  border: 1px dashed rgba(232,69,122,0.4);
+  background: rgba(232,69,122,0.04);
+  border-radius: 10px; padding: 7px 10px;
+  font-size: 11px; color: var(--primary);
+  white-space: nowrap; cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  transition: all 0.15s;
+}
+.badge-none-link:hover { background: rgba(232,69,122,0.09); border-color: var(--primary); }
+
+/* ── SVG icons ── */
+.icon { display: inline-block; vertical-align: middle; }
+
+/* ── Page title ── */
+.page-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.page-subtitle { font-size: 13px; color: var(--muted-foreground); margin-bottom: 2.5rem; }
+
+/* ── Option annotation ── */
+.opt-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+.opt-pill {
+  display: inline-flex; align-items: center;
+  background: var(--primary); color: #fff;
+  border-radius: 6px; padding: 3px 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+}
+.opt-title { font-size: 13px; font-weight: 600; color: var(--foreground); }
+.opt-desc { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+
+.tag-host { background: rgba(232,69,122,0.08); color: var(--primary); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 600; }
+.tag-member { background: var(--muted); color: var(--muted-foreground); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 600; }
+
+.list-gap { display: flex; flex-direction: column; gap: 0.5rem; }
+
+/* Current state label */
+.current-label {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--muted-foreground); background: var(--muted);
+  border-radius: 5px; padding: 2px 8px; margin-bottom: 1rem;
+}
+
+.section-title {
+  font-size: 18px; font-weight: 700; margin-bottom: 6px;
+}
+.section-intro {
+  font-size: 13px; color: var(--muted-foreground); margin-bottom: 1.75rem; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div style="margin-bottom: 2.5rem;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground);margin-bottom:.5rem;">Mockup · Dashboard</div>
+    <h1 class="page-title">Mes Communautés — Format Liste</h1>
+    <p class="page-subtitle">Comparaison état actuel (grid 2 colonnes) vs. nouveau format liste horizontal — 3 variantes pour le CTA Organisateur</p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       ÉTAT ACTUEL
+  ════════════════════════════════════════════════════════ -->
+  <div style="margin-bottom:0.75rem;">
+    <span class="current-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      État actuel
+    </span>
+  </div>
+
+  <div class="dash-shell" style="max-width:600px; margin-bottom: 0.5rem;">
+    <div class="dash-header">
+      <div class="dash-greeting">Bonjour Jean 👋</div>
+      <div class="dash-subtitle">Gérez vos communautés et événements</div>
+      <div class="dash-tabs">
+        <div class="dash-tab">Événements</div>
+        <div class="dash-tab active">Communautés</div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="grid-2col">
+        <!-- Card HOST 1 -->
+        <div class="card-vertical">
+          <div class="cv-cover cv-cover-gradient-1">
+            <div class="cv-cover-icon">
+              <div class="cv-cover-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cv-meta">
+            <span class="cv-category">Tech</span>
+            <span class="badge-role">Organisateur</span>
+            <span class="cv-city">Paris</span>
+          </div>
+          <div class="cv-title">Tech Paris Meetup</div>
+          <div class="cv-desc">La communauté des développeurs parisiens passionnés de tech et d'innovation</div>
+          <div class="cv-stats">
+            <div class="cv-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>124 membres</span>
+            </div>
+            <div class="cv-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>3 événements</span>
+            </div>
+          </div>
+          <div class="cv-next">
+            <div class="cv-next-label">Prochain événement</div>
+            <div class="cv-next-title">Workshop React 19</div>
+            <div class="cv-next-date">20 mars</div>
+          </div>
+          <div class="btn-outline-sm">Créer un événement</div>
+        </div>
+        <!-- Card MEMBER 1 -->
+        <div class="card-vertical">
+          <div class="cv-cover cv-cover-gradient-2">
+            <div class="cv-cover-icon">
+              <div class="cv-cover-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cv-meta">
+            <span class="cv-category">Design</span>
+            <span class="badge-role">Membre</span>
+            <span class="cv-city">Lyon</span>
+          </div>
+          <div class="cv-title">Design Lyon</div>
+          <div class="cv-desc">Communauté des designers lyonnais — UX, graphisme, motion</div>
+          <div class="cv-stats">
+            <div class="cv-stat">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>58 membres</span>
+            </div>
+          </div>
+          <div class="cv-next">
+            <div class="cv-next-label">Prochain événement</div>
+            <div class="cv-next-title">Critique de portfolios</div>
+            <div class="cv-next-date">22 mars</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:11px;color:var(--muted-foreground);margin-bottom:2.5rem;">
+    ⚠ Problèmes : grid 2 col = cards trop étroites sur mobile, cover 1:1 pleine largeur prend trop de place, peu lisible, CTA "Créer un événement" fullwidth peu premium.
+  </p>
+
+  <hr class="section-divider">
+
+  <!-- ════════════════════════════════════════════════════════
+       NOUVEAU FORMAT — VUE D'ENSEMBLE
+  ════════════════════════════════════════════════════════ -->
+  <div class="section-title">Nouveau format — Liste horizontale</div>
+  <p class="section-intro">
+    Thumbnail carré 72px à gauche · contenu au centre · badge prochain événement à droite.<br>
+    Le différenciateur : la gestion du CTA "Créer un événement" pour les Organisateurs (HOST).
+  </p>
+
+  <!-- ════════════════════════════════════════════════════════
+       OPTION A
+  ════════════════════════════════════════════════════════ -->
+  <div class="opt-header">
+    <span class="opt-pill">Option A</span>
+    <div>
+      <div class="opt-title">Icône + (ghost) à droite du badge</div>
+      <div class="opt-desc">Bouton icon-only positionné après le badge événement — compact, non intrusif</div>
+    </div>
+  </div>
+
+  <div class="dash-shell" style="max-width:700px; margin-bottom:0.5rem;">
+    <div class="dash-header">
+      <div class="dash-greeting">Bonjour Jean 👋</div>
+      <div class="dash-subtitle">Gérez vos communautés et événements</div>
+      <div class="dash-tabs">
+        <div class="dash-tab">Événements</div>
+        <div class="dash-tab active">Communautés</div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="list-gap">
+
+        <!-- HOST · prochain événement · Option A -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-1">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Tech</span>
+              <span class="badge-role">Organisateur</span>
+              <span class="cv-city">Paris</span>
+            </div>
+            <div class="cl-title">Tech Paris Meetup</div>
+            <div class="cl-desc">La communauté des développeurs parisiens passionnés de tech</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                124 membres
+              </div>
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                3 événements
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <div class="badge-next">
+              <div class="badge-next-title">Workshop React 19</div>
+              <div class="badge-next-date">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 mars · 19h00
+              </div>
+            </div>
+            <!-- CTA HOST Option A -->
+            <button class="btn-icon-ghost" title="Créer un événement">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- HOST · aucun événement · Option A -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-3">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Sport</span>
+              <span class="badge-role">Organisateur</span>
+              <span class="cv-city">Bordeaux</span>
+            </div>
+            <div class="cl-title">Running Bordeaux</div>
+            <div class="cl-desc">Sorties running hebdomadaires et entraînements collectifs</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                12 membres
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <div class="badge-none">Aucun événement</div>
+            <!-- CTA HOST Option A -->
+            <button class="btn-icon-ghost" title="Créer un événement">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- MEMBER · Option A (pas de CTA) -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-2">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Design</span>
+              <span class="badge-role">Membre</span>
+              <span class="cv-city">Lyon</span>
+            </div>
+            <div class="cl-title">Design Lyon</div>
+            <div class="cl-desc">Communauté des designers lyonnais — UX, graphisme, motion</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                58 membres
+              </div>
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                1 événement
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <div class="badge-next">
+              <div class="badge-next-title">Critique de portfolios</div>
+              <div class="badge-next-date">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                22 mars · 14h00
+              </div>
+            </div>
+            <!-- Pas de CTA pour MEMBER -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted-foreground);margin-bottom:2.5rem;">
+    ✅ Compact · Non intrusif · Tooltip "Créer un événement" au hover · Alignement propre · <strong>Inconvénient :</strong> affordance réduite (le + n'est pas évident sans tooltip)
+  </p>
+
+  <hr class="section-divider">
+
+  <!-- ════════════════════════════════════════════════════════
+       OPTION B
+  ════════════════════════════════════════════════════════ -->
+  <div class="opt-header">
+    <span class="opt-pill">Option B</span>
+    <div>
+      <div class="opt-title">Ghost button "Créer un événement" en bas de carte</div>
+      <div class="opt-desc">Ligne dédiée sous le contenu principal, séparée par un border-top</div>
+    </div>
+  </div>
+
+  <div class="dash-shell" style="max-width:700px; margin-bottom:0.5rem;">
+    <div class="dash-header">
+      <div class="dash-greeting">Bonjour Jean 👋</div>
+      <div class="dash-subtitle">Gérez vos communautés et événements</div>
+      <div class="dash-tabs">
+        <div class="dash-tab">Événements</div>
+        <div class="dash-tab active">Communautés</div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="list-gap">
+
+        <!-- HOST · prochain événement · Option B -->
+        <div class="card-list card-list-b">
+          <div style="display:flex;align-items:center;gap:0.875rem;width:100%;min-width:0;">
+            <div class="cl-thumb cl-thumb-gradient-1">
+              <div class="cl-thumb-icon">
+                <div class="cl-thumb-icon-inner">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="cl-body">
+              <div class="cl-meta">
+                <span class="cv-category" style="font-size:11px;">Tech</span>
+                <span class="badge-role">Organisateur</span>
+                <span class="cv-city">Paris</span>
+              </div>
+              <div class="cl-title">Tech Paris Meetup</div>
+              <div class="cl-desc">La communauté des développeurs parisiens passionnés de tech</div>
+              <div class="cl-stats">
+                <div class="cl-stat">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  124 membres
+                </div>
+                <div class="cl-stat">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  3 événements
+                </div>
+              </div>
+            </div>
+            <div class="cl-right">
+              <div class="badge-next">
+                <div class="badge-next-title">Workshop React 19</div>
+                <div class="badge-next-date">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  20 mars · 19h00
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- CTA HOST Option B -->
+          <div class="cl-cta-row">
+            <button class="btn-ghost-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer un événement
+            </button>
+          </div>
+        </div>
+
+        <!-- HOST · aucun événement · Option B -->
+        <div class="card-list card-list-b">
+          <div style="display:flex;align-items:center;gap:0.875rem;width:100%;min-width:0;">
+            <div class="cl-thumb cl-thumb-gradient-3">
+              <div class="cl-thumb-icon">
+                <div class="cl-thumb-icon-inner">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="cl-body">
+              <div class="cl-meta">
+                <span class="cv-category" style="font-size:11px;">Sport</span>
+                <span class="badge-role">Organisateur</span>
+                <span class="cv-city">Bordeaux</span>
+              </div>
+              <div class="cl-title">Running Bordeaux</div>
+              <div class="cl-desc">Sorties running hebdomadaires et entraînements collectifs</div>
+              <div class="cl-stats">
+                <div class="cl-stat">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  12 membres
+                </div>
+              </div>
+            </div>
+            <div class="cl-right">
+              <div class="badge-none">Aucun événement</div>
+            </div>
+          </div>
+          <!-- CTA HOST Option B -->
+          <div class="cl-cta-row">
+            <button class="btn-ghost-sm">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer un événement
+            </button>
+          </div>
+        </div>
+
+        <!-- MEMBER · Option B (pas de CTA) -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-2">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Design</span>
+              <span class="badge-role">Membre</span>
+              <span class="cv-city">Lyon</span>
+            </div>
+            <div class="cl-title">Design Lyon</div>
+            <div class="cl-desc">Communauté des designers lyonnais — UX, graphisme, motion</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                58 membres
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <div class="badge-next">
+              <div class="badge-next-title">Critique de portfolios</div>
+              <div class="badge-next-date">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                22 mars · 14h00
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted-foreground);margin-bottom:2.5rem;">
+    ✅ Label explicite · Bonne affordance · <strong>Inconvénient :</strong> casse le format "liste pure" (hauteur variable HOST vs MEMBER), layout moins cohérent entre les deux rôles
+  </p>
+
+  <hr class="section-divider">
+
+  <!-- ════════════════════════════════════════════════════════
+       OPTION C
+  ════════════════════════════════════════════════════════ -->
+  <div class="opt-header">
+    <span class="opt-pill">Option C</span>
+    <div>
+      <div class="opt-title">Badge "Aucun événement" cliquable → créer</div>
+      <div class="opt-desc">Le badge devient un lien de création quand vide (HOST uniquement). Quand événement présent, pas de CTA secondaire.</div>
+    </div>
+  </div>
+
+  <div class="dash-shell" style="max-width:700px; margin-bottom:0.5rem;">
+    <div class="dash-header">
+      <div class="dash-greeting">Bonjour Jean 👋</div>
+      <div class="dash-subtitle">Gérez vos communautés et événements</div>
+      <div class="dash-tabs">
+        <div class="dash-tab">Événements</div>
+        <div class="dash-tab active">Communautés</div>
+      </div>
+    </div>
+    <div class="dash-body">
+      <div class="list-gap">
+
+        <!-- HOST · prochain événement · Option C (badge normal, pas de CTA visible) -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-1">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Tech</span>
+              <span class="badge-role">Organisateur</span>
+              <span class="cv-city">Paris</span>
+            </div>
+            <div class="cl-title">Tech Paris Meetup</div>
+            <div class="cl-desc">La communauté des développeurs parisiens passionnés de tech</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                124 membres
+              </div>
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                3 événements
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <!-- Événement présent → badge normal, pas de CTA -->
+            <div class="badge-next">
+              <div class="badge-next-title">Workshop React 19</div>
+              <div class="badge-next-date">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                20 mars · 19h00
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HOST · aucun événement · Option C → badge cliquable -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-3">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Sport</span>
+              <span class="badge-role">Organisateur</span>
+              <span class="cv-city">Bordeaux</span>
+            </div>
+            <div class="cl-title">Running Bordeaux</div>
+            <div class="cl-desc">Sorties running hebdomadaires et entraînements collectifs</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                12 membres
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <!-- CTA HOST Option C → badge cliquable -->
+            <div class="badge-none-link">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Créer un événement
+            </div>
+          </div>
+        </div>
+
+        <!-- MEMBER · aucun événement · Option C → badge muted non cliquable -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-4">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Art</span>
+              <span class="badge-role">Membre</span>
+              <span class="cv-city">Nantes</span>
+            </div>
+            <div class="cl-title">Atelier Créatif Nantes</div>
+            <div class="cl-desc">Ateliers peinture, sculpture et arts plastiques en collectif</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                31 membres
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <!-- MEMBER → badge muted non cliquable -->
+            <div class="badge-none">Aucun événement</div>
+          </div>
+        </div>
+
+        <!-- MEMBER · prochain événement · Option C -->
+        <div class="card-list">
+          <div class="cl-thumb cl-thumb-gradient-2">
+            <div class="cl-thumb-icon">
+              <div class="cl-thumb-icon-inner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+          </div>
+          <div class="cl-body">
+            <div class="cl-meta">
+              <span class="cv-category" style="font-size:11px;">Design</span>
+              <span class="badge-role">Membre</span>
+              <span class="cv-city">Lyon</span>
+            </div>
+            <div class="cl-title">Design Lyon</div>
+            <div class="cl-desc">Communauté des designers lyonnais — UX, graphisme, motion</div>
+            <div class="cl-stats">
+              <div class="cl-stat">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                58 membres
+              </div>
+            </div>
+          </div>
+          <div class="cl-right">
+            <div class="badge-next">
+              <div class="badge-next-title">Critique de portfolios</div>
+              <div class="badge-next-date">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                22 mars · 14h00
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <p style="font-size:11px;color:var(--muted-foreground);margin-bottom:3rem;">
+    ✅ Hauteur homogène HOST/MEMBER · Contextuel ("Créer" remplace "Aucun événement") · Zéro élément supplémentaire · <strong>Inconvénient :</strong> CTA invisible quand un événement existe déjà (on peut créer un 2e événement sans CTA évident)
+  </p>
+
+  <!-- ════════════════════════════════════════════════════════
+       SYNTHÈSE
+  ════════════════════════════════════════════════════════ -->
+  <hr class="section-divider">
+  <div class="section-title">Synthèse comparative</div>
+  <div style="margin-top:1rem;overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead>
+        <tr style="background:var(--muted);">
+          <th style="padding:8px 12px;text-align:left;border:1px solid var(--border);font-weight:700;">Critère</th>
+          <th style="padding:8px 12px;text-align:center;border:1px solid var(--border);font-weight:700;color:var(--primary);">Option A · Icône +</th>
+          <th style="padding:8px 12px;text-align:center;border:1px solid var(--border);font-weight:700;color:var(--primary);">Option B · Ghost button bas</th>
+          <th style="padding:8px 12px;text-align:center;border:1px solid var(--border);font-weight:700;color:var(--primary);">Option C · Badge cliquable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:7px 12px;border:1px solid var(--border);">Affordance (clarté)</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">⚠ Faible sans tooltip</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Excellent (label explicite)</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Bon (contextuel)</td>
+        </tr>
+        <tr style="background:var(--muted);">
+          <td style="padding:7px 12px;border:1px solid var(--border);">Hauteur homogène HOST/MEMBER</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Oui</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">❌ Non (HOST plus haute)</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Oui</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 12px;border:1px solid var(--border);">CTA visible quand événement présent</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Oui</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Oui</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">❌ Non</td>
+        </tr>
+        <tr style="background:var(--muted);">
+          <td style="padding:7px 12px;border:1px solid var(--border);">Cohérence format liste</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Parfaite</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">⚠ Légère rupture</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Parfaite</td>
+        </tr>
+        <tr>
+          <td style="padding:7px 12px;border:1px solid var(--border);">Complexité implémentation</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Simple</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Simple</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Simple</td>
+        </tr>
+        <tr style="background:var(--muted);">
+          <td style="padding:7px 12px;border:1px solid var(--border);">Design premium / Luma-like</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Très premium</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">⚠ Correct</td>
+          <td style="padding:7px 12px;border:1px solid var(--border);text-align:center;">✅ Élégant</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:1.5rem;padding:1rem 1.25rem;background:rgba(232,69,122,0.06);border:1px solid rgba(232,69,122,0.2);border-radius:12px;font-size:12px;line-height:1.7;">
+    <strong style="color:var(--primary);">Recommandation :</strong> <strong>Option A</strong> si on veut le design le plus propre et qu'on ajoute un tooltip clair au hover. <strong>Option C</strong> si on préfère zéro élément supplémentaire et qu'on accepte que le CTA disparaisse quand un événement existe — ce qui est logique : si tu as déjà un événement planifié, le besoin de créer en urgence est moindre.
+    <br><br>
+    <strong>Option B à éviter</strong> : hauteur incohérente entre HOST et MEMBER dans une même liste, ça saute aux yeux.
+  </div>
+
+</div>
+</body>
+</html>
