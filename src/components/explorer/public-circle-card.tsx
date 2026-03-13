@@ -114,12 +114,9 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 <span className="truncate">{circle.nextMoment.title} · {nextMomentDate}</span>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 px-3 py-2 text-center min-w-[52px]">
-                <span className="text-lg font-bold leading-none">{circle.memberCount}</span>
-                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                  {t("circleCard.membersShort")}
-                </span>
-              </div>
+              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                {t("circleCard.noUpcomingMoments")}
+              </span>
             )}
           </div>
 

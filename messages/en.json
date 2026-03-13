@@ -500,7 +500,6 @@
     },
     "circleCard": {
       "members": "{count} members",
-      "membersShort": "members",
       "upcomingMoments": "{count} upcoming Event(s)",
       "noUpcomingMoments": "No upcoming Events",
       "nextMoment": "Next Event",
