@@ -18,6 +18,7 @@ import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { DemoBadge } from "@/components/badges/demo-badge";
 import Image from "next/image";
 import {
   CalendarIcon,
@@ -190,6 +191,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     </div>
                   </>
                 )}
+                {circle.isDemo && <DemoBadge label={tCommon("demo")} size="lg" />}
                 {moment.status === "PAST" && (
                   <div className="absolute bottom-3 left-3">
                     <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">

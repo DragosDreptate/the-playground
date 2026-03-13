@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Badge Démo sur carte Communauté</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #09090b;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 48px 32px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: #71717a;
+      margin-bottom: 48px;
+    }
+
+    .variants-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      max-width: 760px;
+    }
+
+    .variant-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .variant-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #52525b;
+    }
+
+    .variant-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #a1a1aa;
+      margin-bottom: 4px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background-color: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      transition: border-color 0.15s;
+    }
+
+    .card:hover {
+      border-color: #3f3f46;
+    }
+
+    /* Cover */
+    .card-cover {
+      flex-shrink: 0;
+      width: 120px;
+      height: 120px;
+      position: relative;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    }
+
+    .card-cover-gradient-alt {
+      background: linear-gradient(135deg, #0f766e 0%, #0891b2 100%);
+    }
+
+    /* Badge on cover (Option B) */
+    .badge-on-cover {
+      position: absolute;
+      bottom: 6px;
+      left: 6px;
+      background: rgba(0, 0, 0, 0.62);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 20px;
+      line-height: 1.5;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Card content */
+    .card-content {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    /* Metadata row */
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .meta-tag {
+      font-size: 11px;
+      font-weight: 500;
+      color: #71717a;
+      background-color: #27272a;
+      border: 1px solid #3f3f46;
+      padding: 2px 8px;
+      border-radius: 20px;
+      line-height: 1.5;
+    }
+
+    /* Badge inline (Option A) */
+    .badge-demo-inline {
+      font-size: 11px;
+      font-weight: 500;
+      color: #71717a;
+      background-color: #27272a;
+      border: 1px solid #3f3f46;
+      padding: 2px 8px;
+      border-radius: 20px;
+      line-height: 1.5;
+    }
+
+    /* Card title */
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Card description */
+    .card-description {
+      font-size: 13px;
+      color: #71717a;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Stats row */
+    .card-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #71717a;
+    }
+
+    .stat-icon {
+      font-size: 13px;
+    }
+
+    /* Right column — next event */
+    .card-right {
+      flex-shrink: 0;
+      width: 148px;
+      padding: 14px 14px 14px 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+
+    .next-event-box {
+      background-color: #09090b;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 8px 10px;
+      width: 100%;
+    }
+
+    .next-event-label {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #52525b;
+      margin-bottom: 4px;
+    }
+
+    .next-event-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: #e4e4e7;
+      margin-bottom: 2px;
+    }
+
+    .next-event-name {
+      font-size: 11px;
+      color: #71717a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Divider */
+    .divider {
+      border: none;
+      border-top: 1px solid #27272a;
+      margin: 0;
+    }
+
+    /* Annotation */
+    .annotation {
+      font-size: 12px;
+      color: #52525b;
+      margin-top: 8px;
+      padding-left: 2px;
+    }
+
+    .annotation strong {
+      color: #71717a;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mockup — Badge Démo sur carte Communauté</h1>
+  <p class="page-subtitle">Comparaison des options d'affichage du badge "Démo" sur PublicCircleCard · Format liste horizontale</p>
+
+  <div class="variants-grid">
+
+    <!-- ── Variant 1 : Sans badge ── -->
+    <div class="variant-section">
+      <div class="variant-label">Option actuelle</div>
+      <div class="variant-title">Sans badge — communauté standard</div>
+
+      <div class="card">
+        <div class="card-cover"></div>
+
+        <div class="card-content">
+          <div class="card-meta">
+            <span class="meta-tag">Tech</span>
+            <span class="meta-tag">Paris</span>
+          </div>
+          <div class="card-title">Paris Creative Tech</div>
+          <div class="card-description">Une communauté pour les makers, designers et développeurs qui construisent des produits à Paris. Meetups mensuels, workshops et side projects.</div>
+          <div class="card-stats">
+            <span class="stat-item"><span class="stat-icon">👥</span> 24 membres</span>
+            <span class="stat-item"><span class="stat-icon">📅</span> 3 événements</span>
+          </div>
+        </div>
+
+        <div class="card-right">
+          <div class="next-event-box">
+            <div class="next-event-label">Prochain</div>
+            <div class="next-event-date">Jeu. 19 mars</div>
+            <div class="next-event-name">Workshop React 19</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="annotation">Carte standard, aucune mention du statut démo. Aucune distinction visuelle pour l'équipe.</p>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ── Variant 2 : Badge inline (Option A) ── -->
+    <div class="variant-section">
+      <div class="variant-label">Option A — <strong>Proposée</strong></div>
+      <div class="variant-title">Badge dans les métadonnées — même ligne que catégorie et ville</div>
+
+      <div class="card">
+        <div class="card-cover card-cover-gradient-alt"></div>
+
+        <div class="card-content">
+          <div class="card-meta">
+            <span class="meta-tag">Bien-être</span>
+            <span class="meta-tag">Lyon</span>
+            <!-- Badge Démo inline -->
+            <span class="badge-demo-inline">Démo</span>
+          </div>
+          <div class="card-title">Yoga Montmartre Collective</div>
+          <div class="card-description">Pratique collective du yoga en plein air sur la butte Montmartre. Tous niveaux bienvenus, tapis fournis les matins ensoleillés.</div>
+          <div class="card-stats">
+            <span class="stat-item"><span class="stat-icon">👥</span> 18 membres</span>
+            <span class="stat-item"><span class="stat-icon">📅</span> 6 événements</span>
+          </div>
+        </div>
+
+        <div class="card-right">
+          <div class="next-event-box">
+            <div class="next-event-label">Prochain</div>
+            <div class="next-event-date">Sam. 22 mars</div>
+            <div class="next-event-name">Yoga au lever du soleil</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="annotation">
+        <strong>Avantages :</strong> discret, ne casse pas la structure de la carte, lisible au survol rapide, cohérent avec les autres pills de métadonnées.
+        <br /><strong>Inconvénients :</strong> peut passer inaperçu si on ne cherche pas activement.
+      </p>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- ── Variant 3 : Badge sur la cover (Option B) ── -->
+    <div class="variant-section">
+      <div class="variant-label">Option B — Alternative</div>
+      <div class="variant-title">Badge en surimpression sur la cover — coin inférieur gauche</div>
+
+      <div class="card">
+        <div class="card-cover" style="background: linear-gradient(135deg, #b45309 0%, #d97706 100%);">
+          <!-- Badge overlaid on cover -->
+          <span class="badge-on-cover">Démo</span>
+        </div>
+
+        <div class="card-content">
+          <div class="card-meta">
+            <span class="meta-tag">Business</span>
+            <span class="meta-tag">Bordeaux</span>
+          </div>
+          <div class="card-title">Startups du Sud-Ouest</div>
+          <div class="card-description">Réseau d'entrepreneurs et de startups dans la région Nouvelle-Aquitaine. Pitchs, mentorat et accélération collective chaque mois.</div>
+          <div class="card-stats">
+            <span class="stat-item"><span class="stat-icon">👥</span> 41 membres</span>
+            <span class="stat-item"><span class="stat-icon">📅</span> 2 événements</span>
+          </div>
+        </div>
+
+        <div class="card-right">
+          <div class="next-event-box">
+            <div class="next-event-label">Prochain</div>
+            <div class="next-event-date">Mar. 24 mars</div>
+            <div class="next-event-name">Demo Day Printemps</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="annotation">
+        <strong>Avantages :</strong> très visible, impossible à rater, similaire au badge "Sold out" / "Complet" sur Luma.
+        <br /><strong>Inconvénients :</strong> peut sembler trop saillant si beaucoup de cartes démo sont affichées ensemble ; superpose l'image de couverture.
+      </p>
+    </div>
+
+  </div>
+
+</body>
+</html>
