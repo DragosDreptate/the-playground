@@ -39,7 +39,7 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
     const params = new URLSearchParams();
     if (activeTab !== "circles") params.set("tab", activeTab);
     if (category) params.set("category", category);
-    if (sort && sort !== "date") params.set("sort", sort);
+    if (sort && sort !== "date") params.set("sortBy", sort);
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   }

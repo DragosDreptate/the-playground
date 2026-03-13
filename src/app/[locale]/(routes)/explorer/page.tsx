@@ -41,12 +41,12 @@ export async function generateMetadata() {
 export default async function ExplorerPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; category?: string; sort?: string }>;
+  searchParams: Promise<{ tab?: string; category?: string; sortBy?: string }>;
 }) {
-  const { tab, category: categoryParam, sort } = await searchParams;
+  const { tab, category: categoryParam, sortBy: sortByParam } = await searchParams;
   const activeTab = tab === "moments" ? "moments" : "circles";
   const category = categoryParam as CircleCategory | undefined;
-  const sortBy = (sort === "popular" ? "popular" : "date") as ExplorerSortBy;
+  const sortBy: ExplorerSortBy = sortByParam === "popular" ? "popular" : "date";
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();
@@ -116,7 +116,7 @@ export default async function ExplorerPage({
             const params = new URLSearchParams();
             if (tabKey !== "circles") params.set("tab", tabKey);
             if (category) params.set("category", category);
-            if (sortBy !== "date") params.set("sort", sortBy);
+            if (sortBy !== "date") params.set("sortBy", sortBy);
             const href = params.size > 0 ? `?${params.toString()}` : "?tab=circles";
             return (
               <Link

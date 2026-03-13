@@ -1,5 +1,6 @@
 import type { Moment, LocationType, MomentStatus, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
 import type { CircleCategory } from "@/domain/models/circle";
+import type { ExplorerSortBy } from "./circle-repository";
 import type { PublicMomentRegistration } from "@/domain/models/user";
 
 export type CreateMomentInput = {
@@ -41,7 +42,7 @@ export type UpdateMomentInput = {
 
 export type PublicMomentFilters = {
   category?: CircleCategory;
-  sortBy?: "date" | "popular";
+  sortBy?: ExplorerSortBy;
   limit?: number;
   offset?: number;
 };

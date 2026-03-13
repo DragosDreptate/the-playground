@@ -21,12 +21,9 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
   const gradient = getMomentGradient(circle.name);
 
-  const nextMomentDate = circle.nextMoment
-    ? formatDayMonth(new Date(circle.nextMoment.startsAt), locale)
-    : null;
-  const nextMomentTime = circle.nextMoment
-    ? formatTime(new Date(circle.nextMoment.startsAt))
-    : null;
+  const nextMomentStart = circle.nextMoment ? new Date(circle.nextMoment.startsAt) : null;
+  const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
+  const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
 
   const categoryLabel =
     circle.category === "OTHER" && circle.customCategory
