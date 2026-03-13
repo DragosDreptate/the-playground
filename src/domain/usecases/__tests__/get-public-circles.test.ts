@@ -78,6 +78,38 @@ describe("getPublicCircles", () => {
     });
   });
 
+  describe("given a sortBy filter", () => {
+    it("should pass sortBy=date to the repository", async () => {
+      const circleRepository = createMockCircleRepository({
+        findPublic: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicCircles({ sortBy: "date" }, { circleRepository });
+
+      expect(circleRepository.findPublic).toHaveBeenCalledWith({ sortBy: "date" });
+    });
+
+    it("should pass sortBy=popular to the repository", async () => {
+      const circleRepository = createMockCircleRepository({
+        findPublic: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicCircles({ sortBy: "popular" }, { circleRepository });
+
+      expect(circleRepository.findPublic).toHaveBeenCalledWith({ sortBy: "popular" });
+    });
+
+    it("should combine sortBy with category filter", async () => {
+      const circleRepository = createMockCircleRepository({
+        findPublic: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicCircles({ category: "TECH", sortBy: "popular" }, { circleRepository });
+
+      expect(circleRepository.findPublic).toHaveBeenCalledWith({ category: "TECH", sortBy: "popular" });
+    });
+  });
+
   describe("given no public circles", () => {
     it("should return an empty array", async () => {
       const circleRepository = createMockCircleRepository({

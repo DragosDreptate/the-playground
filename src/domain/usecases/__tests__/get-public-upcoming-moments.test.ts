@@ -83,6 +83,38 @@ describe("getPublicUpcomingMoments", () => {
     });
   });
 
+  describe("given a sortBy filter", () => {
+    it("should pass sortBy=date to the repository", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ sortBy: "date" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ sortBy: "date" });
+    });
+
+    it("should pass sortBy=popular to the repository", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ sortBy: "popular" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ sortBy: "popular" });
+    });
+
+    it("should combine sortBy with category filter", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ category: "TECH", sortBy: "popular" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ category: "TECH", sortBy: "popular" });
+    });
+  });
+
   describe("given an online moment", () => {
     it("should return moments with ONLINE locationType", async () => {
       const onlineMoment = makePublicMoment({
