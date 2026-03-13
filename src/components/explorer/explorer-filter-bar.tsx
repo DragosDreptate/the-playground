@@ -35,11 +35,13 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
   const router = useRouter();
   const pathname = usePathname();
 
+  const defaultSort: ExplorerSortBy = activeTab === "moments" ? "date" : "popular";
+
   function buildHref(category?: CircleCategory, sort?: ExplorerSortBy) {
     const params = new URLSearchParams();
     if (activeTab !== "circles") params.set("tab", activeTab);
     if (category) params.set("category", category);
-    if (sort && sort !== "date") params.set("sortBy", sort);
+    if (sort && sort !== defaultSort) params.set("sortBy", sort);
     const query = params.toString();
     return query ? `${pathname}?${query}` : pathname;
   }
@@ -74,8 +76,13 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="date">{t("filters.sortBy.date")}</SelectItem>
           <SelectItem value="popular">{t("filters.sortBy.popular")}</SelectItem>
+          {activeTab === "circles" && (
+            <SelectItem value="members">{t("filters.sortBy.members")}</SelectItem>
+          )}
+          <SelectItem value="date">
+            {activeTab === "circles" ? t("filters.sortBy.newest") : t("filters.sortBy.date")}
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

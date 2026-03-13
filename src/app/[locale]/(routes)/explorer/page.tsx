@@ -46,7 +46,9 @@ export default async function ExplorerPage({
   const { tab, category: categoryParam, sortBy: sortByParam } = await searchParams;
   const activeTab = tab === "moments" ? "moments" : "circles";
   const category = categoryParam as CircleCategory | undefined;
-  const sortBy: ExplorerSortBy = sortByParam === "popular" ? "popular" : "date";
+  const defaultSort: ExplorerSortBy = activeTab === "moments" ? "date" : "popular";
+  const sortBy: ExplorerSortBy =
+    sortByParam === "date" ? "date" : sortByParam === "members" ? "members" : sortByParam === "popular" ? "popular" : defaultSort;
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();
@@ -116,8 +118,8 @@ export default async function ExplorerPage({
             const params = new URLSearchParams();
             if (tabKey !== "circles") params.set("tab", tabKey);
             if (category) params.set("category", category);
-            if (sortBy !== "date") params.set("sortBy", sortBy);
-            const href = params.size > 0 ? `?${params.toString()}` : "?tab=circles";
+            // Sort resets to tab default when switching tabs
+            const href = params.size > 0 ? `?${params.toString()}` : "?";
             return (
               <Link
                 key={tabKey}

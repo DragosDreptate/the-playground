@@ -371,7 +371,9 @@ export const prismaCircleRepository: CircleRepository = {
       orderBy:
         filters.sortBy === "date"
           ? { createdAt: "desc" }
-          : [{ explorerScore: "desc" }, { createdAt: "desc" }],
+          : filters.sortBy === "members"
+            ? [{ memberships: { _count: "desc" } }, { explorerScore: "desc" }]
+            : [{ explorerScore: "desc" }, { createdAt: "desc" }],
       take: filters.limit ?? 20,
       skip: filters.offset ?? 0,
     });

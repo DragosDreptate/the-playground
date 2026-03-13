@@ -496,7 +496,9 @@
       "allCategories": "All categories",
       "sortBy": {
         "date": "Date",
-        "popular": "Recommended"
+        "newest": "Newest",
+        "popular": "Recommended",
+        "members": "Popularity"
       }
     },
     "empty": {
