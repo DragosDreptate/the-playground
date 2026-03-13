@@ -1,3 +1,9 @@
 {
-  "ignoreCommand": "exit 1"
+  "ignoreCommand": "exit 1",
+  "crons": [
+    {
+      "path": "/api/cron/recalculate-scores",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }
