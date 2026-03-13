@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatShortDate, formatTime } from "@/lib/format-date";
-import { MapPin, Globe, Users, Crown, Clock, CalendarIcon } from "lucide-react";
+import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
@@ -38,7 +38,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
       ? moment.capacity - moment.registrationCount
       : null;
 
-  // Badge rôle — pill outline rose (même style que les cartes Communauté)
+  // Badge rôle — inline dans la meta row
   const roleBadge = isOrganizer ? (
     <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-1.5 py-0.5 text-xs font-semibold text-primary">
       <Crown className="size-3" aria-hidden="true" />
@@ -58,7 +58,6 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     </span>
   ) : null;
 
-  // Catégorie — texte plain bold blanc (pas un pill badge)
   const categoryLabel = moment.circle.category && (
     <span className="text-xs font-semibold text-foreground">
       {tCategory(moment.circle.category)}
@@ -69,124 +68,83 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     <span className="text-muted-foreground text-xs">{moment.circle.city}</span>
   );
 
-  const stats = (
-    <div className="text-muted-foreground flex items-center gap-3 text-xs">
-      {locationLabel && (
-        <div className="flex items-center gap-1">
-          <LocationIcon className="size-3.5 shrink-0" />
-          <span className="truncate">{locationLabel}</span>
-        </div>
-      )}
-      <div className="flex items-center gap-1 shrink-0">
-        <Users className="size-3.5 shrink-0" />
-        {spotsRemaining !== null && spotsRemaining > 0 ? (
-          <span>{t("momentCard.spotsRemaining", { count: spotsRemaining })}</span>
-        ) : (
-          <span>{t("momentCard.registeredCount", { count: moment.registrationCount })}</span>
-        )}
-      </div>
+  // Colonne droite desktop : toujours le badge date
+  const rightColumn = (
+    <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 px-3 py-2 text-center min-w-[52px]">
+      <span className="text-lg font-bold leading-none" suppressHydrationWarning>
+        {startsAt.getDate()}
+      </span>
+      <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground" suppressHydrationWarning>
+        {startsAt.toLocaleDateString(locale, { month: "short" })}
+      </span>
     </div>
   );
 
   return (
     <Link href={`/m/${moment.slug}`} className="group block min-w-0">
-      <div className="bg-card overflow-hidden rounded-2xl border p-4 transition-colors hover:border-primary/30 sm:p-5">
+      <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
+        <div className="flex items-center gap-3 sm:gap-4">
 
-        {/* ── Mobile: compact horizontal ── */}
-        <div className="sm:hidden">
-          <div className="flex items-start gap-3">
-            {/* Thumbnail carré 72px */}
-            <div
-              className="size-[72px] shrink-0 overflow-hidden rounded-xl"
-              style={moment.coverImage ? undefined : { background: gradient }}
-            >
-              {moment.coverImage && (
-                <Image
-                  src={moment.coverImage}
-                  alt={moment.title}
-                  width={72}
-                  height={72}
-                  className="object-cover"
-                />
-              )}
-            </div>
-
-            {/* Info */}
-            <div className="min-w-0 flex-1 space-y-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                {categoryLabel}
-                {roleBadge}
-                {cityLabel}
-              </div>
-              <p className="truncate text-xs font-semibold text-foreground">
-                {moment.circle.name}
-              </p>
-              <h3 className="truncate text-sm font-semibold group-hover:underline">
-                {moment.title}
-              </h3>
-              <p className="text-muted-foreground text-xs" suppressHydrationWarning>{dateStr} · {timeStr}</p>
-              {locationLabel && (
-                <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                  <LocationIcon className="size-3.5 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── Desktop: vertical card ── */}
-        <div className="hidden sm:block">
-          {/* Cover — image ou gradient 1:1 */}
-          <div className="relative mb-4">
-            <div
-              className="absolute inset-x-4 -bottom-2 h-6 opacity-50 blur-xl"
-              style={{ background: gradient }}
-            />
-            <div className="relative aspect-square w-full overflow-hidden rounded-xl">
-              {moment.coverImage ? (
-                <Image
-                  src={moment.coverImage}
-                  alt={moment.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 100vw, 280px"
-                />
-              ) : (
-                <>
-                  <div className="size-full" style={{ background: gradient }} />
-                  <div className="absolute inset-0 bg-black/15" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex size-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                      <CalendarIcon className="size-4 text-white" />
-                    </div>
-                  </div>
-                </>
-              )}
-              {/* Date en overlay bas-gauche */}
-              <div className="absolute bottom-2.5 left-2.5 rounded-lg border border-white/10 bg-black/55 px-2.5 py-1 backdrop-blur-md">
-                <span className="text-xs font-semibold text-white" suppressHydrationWarning>{dateStr} · {timeStr}</span>
-              </div>
-            </div>
+          {/* Cover — 72px mobile / 120px desktop */}
+          <div
+            className="size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            style={moment.coverImage ? undefined : { background: gradient }}
+          >
+            {moment.coverImage && (
+              <Image
+                src={moment.coverImage}
+                alt={moment.title}
+                width={120}
+                height={120}
+                className="size-full object-cover"
+                sizes="120px"
+              />
+            )}
           </div>
 
-          {/* Content */}
-          <div className="space-y-2">
+          {/* Body */}
+          <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel}
               {roleBadge}
               {cityLabel}
             </div>
-            <p className="text-xs font-semibold text-foreground">
+            <p className="truncate text-xs font-semibold text-foreground">
               {moment.circle.name}
             </p>
-            <h3 className="font-semibold leading-snug group-hover:underline">
+            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:underline">
               {moment.title}
             </h3>
-            {stats}
+            {moment.description && (
+              <p className="text-muted-foreground line-clamp-1 text-xs sm:text-sm">
+                {moment.description}
+              </p>
+            )}
+            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
+              <span suppressHydrationWarning>{dateStr} · {timeStr}</span>
+              {locationLabel && (
+                <div className="flex items-center gap-1">
+                  <LocationIcon className="size-3 shrink-0" />
+                  <span className="truncate">{locationLabel}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1 shrink-0">
+                <Users className="size-3 shrink-0" />
+                {spotsRemaining !== null && spotsRemaining > 0 ? (
+                  <span>{t("momentCard.spotsRemaining", { count: spotsRemaining })}</span>
+                ) : (
+                  <span>{t("momentCard.registeredCount", { count: moment.registrationCount })}</span>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
 
+          {/* Right column — desktop only */}
+          <div className="hidden sm:flex shrink-0 items-center ml-8">
+            {rightColumn}
+          </div>
+
+        </div>
       </div>
     </Link>
   );

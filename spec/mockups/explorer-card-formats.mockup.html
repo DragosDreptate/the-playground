@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explorer — Formats de cards — The Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #ec4899;
+      --background: #0f0f13;
+      --foreground: #f0f0f5;
+      --card: #18181f;
+      --card-hover: #1e1e26;
+      --muted: #1a1a22;
+      --muted-foreground: #71717a;
+      --border: #27272f;
+      --border-hover: rgba(236,72,153,0.3);
+      --radius-card: 16px;
+      --radius-cover: 12px;
+      --grad-1: linear-gradient(135deg, #ec4899, #8b5cf6);
+      --grad-2: linear-gradient(135deg, #3b82f6, #06b6d4);
+      --grad-3: linear-gradient(135deg, #f59e0b, #ef4444);
+      --grad-4: linear-gradient(135deg, #10b981, #3b82f6);
+      --grad-5: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --grad-6: linear-gradient(135deg, #f43f5e, #fb923c);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── HEADER ─── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,15,19,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--grad-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { width: 14px; height: 14px; }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--foreground);
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--muted-foreground);
+      transition: color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .nav-link:hover { color: var(--foreground); background: var(--muted); }
+    .nav-link.active {
+      color: var(--foreground);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+      text-decoration: none;
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-sm { padding: 6px 14px; }
+    .btn-outline {
+      background: transparent;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: var(--muted); border-color: rgba(240,240,245,0.3); }
+
+    /* ─── MAIN ─── */
+    .main-content {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    /* Pill tabs */
+    .pill-tabs {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 2px;
+      width: fit-content;
+      background: var(--card);
+      margin-bottom: 20px;
+    }
+    .pill-tab {
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted-foreground);
+      transition: background 0.15s, color 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .pill-tab.active {
+      background: var(--foreground);
+      color: var(--background);
+    }
+    .pill-tab:hover:not(.active) { color: var(--foreground); }
+
+    /* Toolbar : filter + format switcher */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .toolbar-left { display: flex; align-items: center; gap: 8px; }
+    .select-filter {
+      appearance: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--foreground);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 30px 7px 12px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color 0.15s;
+    }
+    .select-filter:focus { outline: none; border-color: var(--border-hover); }
+    .select-filter:hover { border-color: rgba(240,240,245,0.3); }
+
+    .format-switcher {
+      display: flex;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .format-btn {
+      padding: 5px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted-foreground);
+      transition: background 0.15s, color 0.15s;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    .format-btn.active {
+      background: var(--muted);
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .format-btn:hover:not(.active) { color: var(--foreground); }
+
+    /* ─── TABS ─── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ─── GRIDS ─── */
+    .grid-panel { display: none; }
+    .grid-panel.active { display: block; }
+
+    /* ═══ FORMAT A — Compact horizontal (2 cols) ═══ */
+    .grid-a {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .card-a {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    }
+    .card-a:hover {
+      background: var(--card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .card-a-cover {
+      width: 96px;
+      height: 96px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-a-body { flex: 1; min-width: 0; }
+    .card-a-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 3px;
+      flex-wrap: wrap;
+    }
+    .cat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .city-label {
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+    .badge-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(236,72,153,0.4);
+      color: #ec4899;
+      background: rgba(236,72,153,0.08);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .badge-role svg { width: 10px; height: 10px; }
+    .card-a-circle {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      margin-bottom: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-a-name {
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: text-decoration 0.1s;
+    }
+    .card-a:hover .card-a-name { text-decoration: underline; text-underline-offset: 2px; }
+    .card-a-desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.4;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      margin-bottom: 5px;
+    }
+    .card-a-stats {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .card-a-stats svg { width: 12px; height: 12px; flex-shrink: 0; }
+    .card-m-date {
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 3px;
+    }
+    .card-m-loc {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .card-m-loc svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    /* ═══ FORMAT C — Liste (1 col) ═══ */
+    .grid-c {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .card-c {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .card-c:hover {
+      background: var(--card-hover);
+      border-color: var(--border-hover);
+    }
+    .card-c-cover {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card-c-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .card-c-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+    }
+    .card-c-circle {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      margin-bottom: 3px;
+    }
+    .card-c-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .card-c-desc {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      margin-bottom: 6px;
+    }
+    .card-c-stats {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .card-c-stats svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .card-c-right {
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .next-event-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 5px 12px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+    .next-event-pill svg { width: 11px; height: 11px; color: var(--primary); flex-shrink: 0; }
+    .btn-ghost-xs {
+      background: transparent;
+      color: var(--muted-foreground);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .btn-ghost-xs:hover { color: var(--foreground); border-color: rgba(240,240,245,0.3); background: var(--muted); }
+
+    /* Date badge — right column, moment liste */
+    .date-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      min-width: 52px;
+      text-align: center;
+    }
+    .date-badge-day { font-size: 18px; font-weight: 700; line-height: 1; color: var(--foreground); }
+    .date-badge-month { font-size: 10px; font-weight: 500; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* Status badge — right column, moment liste */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 9999px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      border: 1px solid rgba(236,72,153,0.4);
+      color: #ec4899;
+      background: rgba(236,72,153,0.08);
+    }
+    .status-badge svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    .cover-icon {
+      width: 28px;
+      height: 28px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .cover-icon svg { width: 14px; height: 14px; color: white; }
+    .cover-icon-lg {
+      width: 40px;
+      height: 40px;
+    }
+    .cover-icon-lg svg { width: 20px; height: 20px; }
+
+    .dot-sep { color: var(--border); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+      </div>
+      <span class="logo-text">The Playground</span>
+    </a>
+    <nav class="header-nav">
+      <a href="#" class="nav-link active">Explorer</a>
+      <a href="#" class="nav-link">Mon espace</a>
+    </nav>
+    <div class="header-right">
+      <button class="btn btn-sm btn-outline">Se connecter</button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+  <h1 class="page-title">Communautés &amp; événements</h1>
+  <p class="page-subtitle">Des communautés qui partagent vos passions, près de chez vous ou en ligne.</p>
+
+  <!-- Pill tabs -->
+  <div class="pill-tabs">
+    <button class="pill-tab active" onclick="switchTab('circles', this)">Communautés</button>
+    <button class="pill-tab" onclick="switchTab('moments', this)">Événements</button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <select class="select-filter">
+        <option>Toutes les thématiques</option>
+        <option>Tech</option>
+        <option>Design</option>
+        <option>Business</option>
+        <option>Sport</option>
+        <option>Art</option>
+        <option>Social</option>
+      </select>
+      <select class="select-filter">
+        <option>Toutes les villes</option>
+        <option>Paris</option>
+        <option>Lyon</option>
+        <option>Bordeaux</option>
+        <option>Nantes</option>
+        <option>Remote</option>
+      </select>
+    </div>
+    <div class="format-switcher">
+      <button class="format-btn active" onclick="switchFormat('a', this)">Compact horizontal</button>
+      <button class="format-btn" onclick="switchFormat('c', this)">Liste</button>
+    </div>
+  </div>
+
+  <!-- ═══ TAB: COMMUNAUTÉS ═══ -->
+  <div class="tab-content active" data-tab="circles">
+
+    <!-- FORMAT A — Compact horizontal -->
+    <div id="panel-a-circles" class="grid-panel active">
+      <div class="grid-a">
+
+        <!-- Card 1 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-1);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Design</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role">Organisateur</span>
+            </div>
+            <div class="card-a-name">Design &amp; Produit Paris</div>
+            <div class="card-a-desc">UX, product design, recherche utilisateur et systèmes de design.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>142 membres</span>
+              <span class="dot-sep">·</span>
+              <span>3 événements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-2);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-a-name">JS &amp; Frontend Lyon</div>
+            <div class="card-a-desc">JavaScript, React, Vue, performance web et outillage frontend.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>89 membres</span>
+              <span class="dot-sep">·</span>
+              <span>1 événement</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-3);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Business</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role">Membre</span>
+            </div>
+            <div class="card-a-name">Startups &amp; Founders</div>
+            <div class="card-a-desc">Entrepreneurs, fondateurs, investisseurs et builders.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>234 membres</span>
+              <span class="dot-sep">·</span>
+              <span>2 événements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-4);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Bordeaux</span>
+            </div>
+            <div class="card-a-name">Yoga &amp; Bien-être Bordeaux</div>
+            <div class="card-a-desc">Yoga, méditation, pleine conscience et bien-être au quotidien.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>67 membres</span>
+              <span class="dot-sep">·</span>
+              <span>Aucun à venir</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-5);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Remote</span>
+            </div>
+            <div class="card-a-name">AI Builders</div>
+            <div class="card-a-desc">LLMs, agents IA, fine-tuning, RAG et applications d'IA générative.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>312 membres</span>
+              <span class="dot-sep">·</span>
+              <span>4 événements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-6);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Art</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-a-name">Photo &amp; Cinéma</div>
+            <div class="card-a-desc">Photographie argentique, numérique, cinéma indépendant et critique.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>45 membres</span>
+              <span class="dot-sep">·</span>
+              <span>1 événement</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-1);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Social</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-a-name">Langues &amp; Culture</div>
+            <div class="card-a-desc">Échanges linguistiques, cultures du monde, voyages et rencontres.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>78 membres</span>
+              <span class="dot-sep">·</span>
+              <span>2 événements</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-3);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Nantes</span>
+            </div>
+            <div class="card-a-name">Running Club Nantes</div>
+            <div class="card-a-desc">Sorties running, trails urbains, préparation semi-marathon et marathons.</div>
+            <div class="card-a-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>156 membres</span>
+              <span class="dot-sep">·</span>
+              <span>1 événement</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORMAT C — Liste -->
+    <div id="panel-c-circles" class="grid-panel">
+      <div class="grid-c">
+
+        <!-- Card 1 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-1);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Design</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role">Organisateur</span>
+            </div>
+            <div class="card-c-name">Design &amp; Produit Paris</div>
+            <div class="card-c-desc">UX, product design, recherche utilisateur et systèmes de design pour les équipes product modernes.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>142 membres · 3 événements à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="next-event-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Prochain : UX Research Sprint · 15 mars
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-2);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-c-name">JS &amp; Frontend Lyon</div>
+            <div class="card-c-desc">JavaScript, React, Vue, performance web et outillage frontend moderne.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>89 membres · 1 événement à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="next-event-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Prochain : Meetup React 19 · 18 mars
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-3);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Business</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role">Membre</span>
+            </div>
+            <div class="card-c-name">Startups &amp; Founders</div>
+            <div class="card-c-desc">Entrepreneurs, fondateurs, investisseurs et builders en quête de connexions fortes.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>234 membres · 2 événements à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <button class="btn-ghost-xs">Voir</button>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-4);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Bordeaux</span>
+            </div>
+            <div class="card-c-name">Yoga &amp; Bien-être Bordeaux</div>
+            <div class="card-c-desc">Yoga, méditation, pleine conscience et bien-être au quotidien à Bordeaux.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>67 membres · Aucun événement à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <button class="btn-ghost-xs">Voir</button>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-5);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Remote</span>
+            </div>
+            <div class="card-c-name">AI Builders</div>
+            <div class="card-c-desc">LLMs, agents IA, fine-tuning, RAG et applications d'IA générative en production.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>312 membres · 4 événements à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="next-event-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Prochain : Agents IA en prod · 20 mars
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-6);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Art</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-c-name">Photo &amp; Cinéma</div>
+            <div class="card-c-desc">Photographie argentique, numérique, cinéma indépendant et critique visuelle.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>45 membres · 1 événement à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <button class="btn-ghost-xs">Voir</button>
+          </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-1);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Social</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-c-name">Langues &amp; Culture</div>
+            <div class="card-c-desc">Échanges linguistiques, cultures du monde, voyages et rencontres internationales.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>78 membres · 2 événements à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <button class="btn-ghost-xs">Voir</button>
+          </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-3);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Nantes</span>
+            </div>
+            <div class="card-c-name">Running Club Nantes</div>
+            <div class="card-c-desc">Sorties running, trails urbains, préparation semi-marathon et marathons.</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>156 membres · 1 événement à venir</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="next-event-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Prochain : Run du dimanche · 22 mars
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB: ÉVÉNEMENTS ═══ -->
+  <div class="tab-content" data-tab="moments">
+
+    <!-- FORMAT A — Compact horizontal -->
+    <div id="panel-a-moments" class="grid-panel active">
+      <div class="grid-a">
+
+        <!-- Card 1 — Organisateur -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-1);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Design</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 5-4-7-4 7-6-5z"/></svg> Organisateur</span>
+            </div>
+            <div class="card-a-circle">Design &amp; Produit Paris</div>
+            <div class="card-a-name">Apéro Design #12</div>
+            <div class="card-m-date">sam. 15 mars · 18h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Le Comptoir · 12 places restantes</span></div>
+          </div>
+        </div>
+
+        <!-- Card 2 — Inscrit -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-2);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Lyon</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+            </div>
+            <div class="card-a-circle">JS &amp; Frontend Lyon</div>
+            <div class="card-a-name">Meetup React 19</div>
+            <div class="card-m-date">mar. 18 mars · 19h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>En ligne · 34 inscrits</span></div>
+          </div>
+        </div>
+
+        <!-- Card 3 — Sans badge -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-3);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Business</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-a-circle">Startups &amp; Founders</div>
+            <div class="card-a-name">Pitch Night #8</div>
+            <div class="card-m-date">jeu. 20 mars · 19h30</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Station F · 8 places restantes</span></div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Liste d'attente -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-4);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Bordeaux</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Liste d'attente</span>
+            </div>
+            <div class="card-a-circle">Yoga &amp; Bien-être Bordeaux</div>
+            <div class="card-a-name">Séance Yoga Matin</div>
+            <div class="card-m-date">sam. 22 mars · 8h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Parc Bordelais · Complet</span></div>
+          </div>
+        </div>
+
+        <!-- Card 5 — Inscrit -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-5);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Remote</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+            </div>
+            <div class="card-a-circle">AI Builders</div>
+            <div class="card-a-name">Agents IA en prod</div>
+            <div class="card-m-date">jeu. 20 mars · 20h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>En ligne · 156 inscrits</span></div>
+          </div>
+        </div>
+
+        <!-- Card 6 — Sans badge -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-6);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Art</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-a-circle">Photo &amp; Cinéma</div>
+            <div class="card-a-name">Expo Photo Urbaine</div>
+            <div class="card-m-date">mar. 25 mars · 18h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Galerie Lumière · 20 places</span></div>
+          </div>
+        </div>
+
+        <!-- Card 7 — Sans badge -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-2);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Social</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-a-circle">Langues &amp; Culture</div>
+            <div class="card-a-name">Conversation Exchange</div>
+            <div class="card-m-date">dim. 16 mars · 14h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Café des Arts · 5 places restantes</span></div>
+          </div>
+        </div>
+
+        <!-- Card 8 — Sans badge -->
+        <div class="card-a">
+          <div class="card-a-cover" style="background: var(--grad-3);">
+            <div class="cover-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-a-body">
+            <div class="card-a-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Nantes</span>
+            </div>
+            <div class="card-a-circle">Running Club Nantes</div>
+            <div class="card-a-name">Run du dimanche #22</div>
+            <div class="card-m-date">dim. 22 mars · 9h00</div>
+            <div class="card-m-loc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Place du Commerce · 18 places</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FORMAT C — Liste -->
+    <div id="panel-c-moments" class="grid-panel">
+      <div class="grid-c">
+
+        <!-- Card 1 — Organisateur -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-1);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Design</span>
+              <span class="city-label">· Paris</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 5-4-7-4 7-6-5z"/></svg> Organisateur</span>
+            </div>
+            <div class="card-c-circle">Design &amp; Produit Paris</div>
+            <div class="card-c-name">Apéro Design #12</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>sam. 15 mars · 18h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Le Comptoir · 12 places restantes</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <span class="status-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 5-4-7-4 7-6-5z"/></svg> Organisateur</span>
+          </div>
+        </div>
+
+        <!-- Card 2 — Inscrit -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-2);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Lyon</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+            </div>
+            <div class="card-c-circle">JS &amp; Frontend Lyon</div>
+            <div class="card-c-name">Meetup React 19</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>mar. 18 mars · 19h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>En ligne · 34 inscrits</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <span class="status-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+          </div>
+        </div>
+
+        <!-- Card 3 — Date badge -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-3);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Business</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-c-circle">Startups &amp; Founders</div>
+            <div class="card-c-name">Pitch Night #8</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>jeu. 20 mars · 19h30</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Station F · 8 places restantes</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="date-badge"><div class="date-badge-day">20</div><div class="date-badge-month">mars</div></div>
+          </div>
+        </div>
+
+        <!-- Card 4 — Liste d'attente -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-4);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Bordeaux</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Liste d'attente</span>
+            </div>
+            <div class="card-c-circle">Yoga &amp; Bien-être Bordeaux</div>
+            <div class="card-c-name">Séance Yoga Matin</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>sam. 22 mars · 8h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Parc Bordelais · Complet</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <span class="status-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Liste d'attente</span>
+          </div>
+        </div>
+
+        <!-- Card 5 — Inscrit -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-5);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Tech</span>
+              <span class="city-label">· Remote</span>
+              <span class="badge-role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+            </div>
+            <div class="card-c-circle">AI Builders</div>
+            <div class="card-c-name">Agents IA en prod</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>jeu. 20 mars · 20h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span>En ligne · 156 inscrits</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <span class="status-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
+          </div>
+        </div>
+
+        <!-- Card 6 — Date badge -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-6);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Art</span>
+              <span class="city-label">· Lyon</span>
+            </div>
+            <div class="card-c-circle">Photo &amp; Cinéma</div>
+            <div class="card-c-name">Expo Photo Urbaine</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>mar. 25 mars · 18h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Galerie Lumière · 20 places restantes</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="date-badge"><div class="date-badge-day">25</div><div class="date-badge-month">mars</div></div>
+          </div>
+        </div>
+
+        <!-- Card 7 — Date badge -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-2);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Social</span>
+              <span class="city-label">· Paris</span>
+            </div>
+            <div class="card-c-circle">Langues &amp; Culture</div>
+            <div class="card-c-name">Conversation Exchange</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>dim. 16 mars · 14h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Café des Arts · 5 places restantes</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="date-badge"><div class="date-badge-day">16</div><div class="date-badge-month">mars</div></div>
+          </div>
+        </div>
+
+        <!-- Card 8 — Date badge -->
+        <div class="card-c">
+          <div class="card-c-cover" style="background: var(--grad-3);">
+            <div class="cover-icon cover-icon-lg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          </div>
+          <div class="card-c-body">
+            <div class="card-c-meta">
+              <span class="cat-label">Sport</span>
+              <span class="city-label">· Nantes</span>
+            </div>
+            <div class="card-c-circle">Running Club Nantes</div>
+            <div class="card-c-name">Run du dimanche #22</div>
+            <div class="card-c-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>dim. 22 mars · 9h00</span>
+              <span class="dot-sep">·</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>Place du Commerce · 18 places</span>
+            </div>
+          </div>
+          <div class="card-c-right">
+            <div class="date-badge"><div class="date-badge-day">22</div><div class="date-badge-month">mars</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  let activeTab = 'circles';
+  let activeFormat = 'a';
+
+  function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelector('.tab-content[data-tab="' + tab + '"]').classList.add('active');
+    document.querySelectorAll('.pill-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFormat(activeFormat);
+  }
+
+  function switchFormat(id, btn) {
+    activeFormat = id;
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFormat(id);
+  }
+
+  function applyFormat(id) {
+    const activeTabEl = document.querySelector('.tab-content.active');
+    activeTabEl.querySelectorAll('.grid-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + id + '-' + activeTab).classList.add('active');
+  }
+</script>
+
+</body>
+</html>

@@ -492,7 +492,11 @@
       "moments": "Events"
     },
     "filters": {
-      "allCategories": "All categories"
+      "allCategories": "All categories",
+      "sortBy": {
+        "date": "Date",
+        "popular": "Popularity"
+      }
     },
     "empty": {
       "circles": "No public Communities for this category.",

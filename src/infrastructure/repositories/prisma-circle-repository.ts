@@ -341,7 +341,9 @@ export const prismaCircleRepository: CircleRepository = {
           select: { title: true, startsAt: true },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: filters.sortBy === "popular"
+        ? { memberships: { _count: "desc" } }
+        : { createdAt: "desc" },
       take: filters.limit ?? 20,
       skip: filters.offset ?? 0,
     });

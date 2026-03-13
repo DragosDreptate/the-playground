@@ -8,6 +8,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
     id: "moment-1",
     slug: "meetup-react",
     title: "Meetup React",
+    description: null,
     coverImage: null,
     startsAt: new Date("2026-03-15T18:00:00Z"),
     endsAt: new Date("2026-03-15T20:00:00Z"),
@@ -79,6 +80,38 @@ describe("getPublicUpcomingMoments", () => {
       expect(result).toHaveLength(2);
       expect(result[0].slug).toBe("meetup-a");
       expect(result[1].slug).toBe("meetup-b");
+    });
+  });
+
+  describe("given a sortBy filter", () => {
+    it("should pass sortBy=date to the repository", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ sortBy: "date" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ sortBy: "date" });
+    });
+
+    it("should pass sortBy=popular to the repository", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ sortBy: "popular" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ sortBy: "popular" });
+    });
+
+    it("should combine sortBy with category filter", async () => {
+      const momentRepository = createMockMomentRepository({
+        findPublicUpcoming: vi.fn().mockResolvedValue([]),
+      });
+
+      await getPublicUpcomingMoments({ category: "TECH", sortBy: "popular" }, { momentRepository });
+
+      expect(momentRepository.findPublicUpcoming).toHaveBeenCalledWith({ category: "TECH", sortBy: "popular" });
     });
   });
 

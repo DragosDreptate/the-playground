@@ -37,11 +37,10 @@ test.describe("Découvrir — page Explorer", () => {
   });
 
   test("should display category filter options", async ({ page }) => {
+    // Le filtre thématique est un Select (combobox) dont le trigger affiche "Toutes les thématiques"
     const categoryFilter = page
-      .locator("select, [role='combobox'], button, [data-testid='category-filter']")
-      .filter({
-        hasText: /catégorie|category|tech|design|sport|business|art|science|social/i,
-      })
+      .locator("[role='combobox']")
+      .filter({ hasText: /thématique|catégorie|category/i })
       .first();
     await expect(categoryFilter).toBeVisible();
   });

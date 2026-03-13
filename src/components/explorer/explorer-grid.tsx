@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PublicCircleCard } from "@/components/explorer/public-circle-card";
 import { PublicMomentCard } from "@/components/explorer/public-moment-card";
 import { loadMoreCirclesAction, loadMoreMomentsAction } from "@/app/actions/explorer";
-import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
+import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -18,6 +18,7 @@ type CirclesProps = {
   initialHasMore: boolean;
   membershipRoleMap: Record<string, CircleMemberRole>;
   category?: CircleCategory;
+  sortBy?: ExplorerSortBy;
 };
 
 type MomentsProps = {
@@ -27,6 +28,7 @@ type MomentsProps = {
   registrationStatusMap: Record<string, RegistrationStatus | null>;
   membershipBySlug: Record<string, CircleMemberRole>;
   category?: CircleCategory;
+  sortBy?: ExplorerSortBy;
 };
 
 type Props = CirclesProps | MomentsProps;
@@ -59,6 +61,7 @@ export function ExplorerGrid(props: Props) {
         const result = await loadMoreCirclesAction({
           offset: circleItems.length,
           category: props.category,
+          sortBy: props.sortBy,
         });
         setCircleItems((prev) => [...prev, ...result.circles]);
         setHasMore(result.hasMore);
@@ -67,6 +70,7 @@ export function ExplorerGrid(props: Props) {
         const result = await loadMoreMomentsAction({
           offset: momentItems.length,
           category: props.category,
+          sortBy: props.sortBy,
         });
         setMomentItems((prev) => [...prev, ...result.moments]);
         setHasMore(result.hasMore);
@@ -78,7 +82,7 @@ export function ExplorerGrid(props: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="flex flex-col gap-2 sm:gap-3">
         {props.tab === "circles"
           ? circleItems.map((circle) => (
               <PublicCircleCard

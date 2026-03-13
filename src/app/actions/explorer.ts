@@ -9,19 +9,21 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
-import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
+import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 10;
 const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function loadMoreCirclesAction({
   offset,
   category,
+  sortBy,
 }: {
   offset: number;
   category?: CircleCategory;
+  sortBy?: ExplorerSortBy;
 }): Promise<{
   circles: PublicCircle[];
   hasMore: boolean;
@@ -31,7 +33,7 @@ export async function loadMoreCirclesAction({
 
   const [fetched, userCircles] = await Promise.all([
     getPublicCircles(
-      { category, limit: FETCH_SIZE, offset },
+      { category, sortBy, limit: FETCH_SIZE, offset },
       { circleRepository: prismaCircleRepository }
     ),
     session?.user?.id
@@ -53,9 +55,11 @@ export async function loadMoreCirclesAction({
 export async function loadMoreMomentsAction({
   offset,
   category,
+  sortBy,
 }: {
   offset: number;
   category?: CircleCategory;
+  sortBy?: ExplorerSortBy;
 }): Promise<{
   moments: PublicMoment[];
   hasMore: boolean;
@@ -66,7 +70,7 @@ export async function loadMoreMomentsAction({
 
   const [fetched, userCircles] = await Promise.all([
     getPublicUpcomingMoments(
-      { category, limit: FETCH_SIZE, offset },
+      { category, sortBy, limit: FETCH_SIZE, offset },
       { momentRepository: prismaMomentRepository }
     ),
     session?.user?.id
