@@ -116,7 +116,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
               {moment.title}
             </h3>
             {moment.description && (
-              <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
+              <p className="text-muted-foreground line-clamp-1 text-xs sm:text-sm">
                 {moment.description}
               </p>
             )}
