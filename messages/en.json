@@ -600,6 +600,10 @@
         "override": "Override",
         "visible": "Visible",
         "demo": "Demo"
+      },
+      "tabs": {
+        "circles": "Communities",
+        "moments": "Events"
       }
     },
     "viewPublicPage": "View page",
@@ -632,7 +636,8 @@
       "status": "Status",
       "registrations": "Registrations",
       "comments": "Comments",
-      "actions": "Actions"
+      "actions": "Actions",
+      "startsAt": "Date"
     },
     "activation": {
       "title": "Activation rate",

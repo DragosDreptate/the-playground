@@ -31,6 +31,8 @@ export function createMockAdminRepository(
     countExplorerCircles: vi.fn().mockResolvedValue(0),
     updateCircleExcluded: vi.fn().mockResolvedValue(undefined),
     updateCircleOverrideScore: vi.fn().mockResolvedValue(undefined),
+    findAllExplorerMoments: vi.fn().mockResolvedValue([]),
+    countExplorerMoments: vi.fn().mockResolvedValue(0),
     findAllMoments: vi.fn().mockResolvedValue([]),
     countMoments: vi.fn().mockResolvedValue(0),
     findMomentById: vi.fn().mockResolvedValue(null),
