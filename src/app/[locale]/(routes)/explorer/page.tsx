@@ -107,32 +107,32 @@ export default async function ExplorerPage({
         <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
-        <Link
-          href={category ? `?tab=circles&category=${category}` : "?tab=circles"}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "circles"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {t("tabs.circles")}
-        </Link>
-        <Link
-          href={category ? `?tab=moments&category=${category}` : "?tab=moments"}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "moments"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {t("tabs.moments")}
-        </Link>
+      {/* Tabs + filter bar */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+          <Link
+            href={category ? `?tab=circles&category=${category}` : "?tab=circles"}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeTab === "circles"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t("tabs.circles")}
+          </Link>
+          <Link
+            href={category ? `?tab=moments&category=${category}` : "?tab=moments"}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeTab === "moments"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t("tabs.moments")}
+          </Link>
+        </div>
+        <ExplorerFilterBar selectedCategory={category} activeTab={activeTab} />
       </div>
-
-      {/* Filter bar */}
-      <ExplorerFilterBar selectedCategory={category} activeTab={activeTab} />
 
       {/* Content */}
       {activeTab === "circles" ? (
