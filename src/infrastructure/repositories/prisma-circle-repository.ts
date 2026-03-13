@@ -6,7 +6,9 @@ import type {
   PublicCircleFilters,
   PublicCircle,
   CircleFollowerInfo,
+  FeaturedCircle,
 } from "@/domain/ports/repositories/circle-repository";
+import { seededShuffle } from "@/lib/seeded-shuffle";
 import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
@@ -462,6 +464,65 @@ export const prismaCircleRepository: CircleRepository = {
       email: r.user.email,
       firstName: r.user.firstName,
       lastName: r.user.lastName,
+    }));
+  },
+
+  async findFeatured(): Promise<FeaturedCircle[]> {
+    const circles = await prisma.circle.findMany({
+      where: {
+        visibility: "PUBLIC",
+        coverImage: { not: null },
+        excludedFromExplorer: false,
+        isDemo: false,
+        NOT: {
+          memberships: {
+            some: {
+              role: "HOST",
+              user: { email: { endsWith: "@test.playground" } },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        category: true,
+        customCategory: true,
+        city: true,
+        coverImage: true,
+        coverImageAttribution: true,
+        _count: {
+          select: {
+            memberships: true,
+            moments: {
+              where: {
+                status: "PUBLISHED",
+                startsAt: { gte: new Date() },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Seed = date du jour (YYYY-MM-DD) → sélection stable sur 24h
+    const today = new Date().toISOString().slice(0, 10);
+    const shuffled = seededShuffle(circles, today);
+
+    return shuffled.slice(0, 3).map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      description: c.description,
+      category: c.category ?? null,
+      customCategory: c.customCategory ?? null,
+      city: c.city ?? null,
+      coverImage: c.coverImage!, // non-null garanti par le WHERE
+      coverImageAttribution: c.coverImageAttribution as CoverImageAttribution | null,
+      memberCount: c._count.memberships,
+      upcomingMomentCount: c._count.moments,
     }));
   },
 

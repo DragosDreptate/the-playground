@@ -31,6 +31,7 @@ export function createMockCircleRepository(
     findPlayersForNewMomentNotification: vi.fn<CircleRepository["findPlayersForNewMomentNotification"]>().mockResolvedValue([]),
     findByInviteToken: vi.fn<CircleRepository["findByInviteToken"]>().mockResolvedValue(null),
     getPublicCirclesForUser: vi.fn<CircleRepository["getPublicCirclesForUser"]>().mockResolvedValue([]),
+    findFeatured: vi.fn<CircleRepository["findFeatured"]>().mockResolvedValue([]),
     ...overrides,
   };
 }

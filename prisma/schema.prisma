@@ -166,6 +166,8 @@ model Circle {
   city                  String?
   stripeConnectAccountId String?
   inviteToken           String?          @unique @map("invite_token")
+  isDemo                Boolean          @default(false) @map("is_demo")
+  excludedFromExplorer  Boolean          @default(false) @map("excluded_from_explorer")
 
   // Explorer scoring
   isDemo               Boolean   @default(false)
