@@ -53,7 +53,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
-      <div className="bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
+      <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
         <div className="flex items-center gap-3 sm:gap-4">
 
           {/* Cover — 72px mobile / 120px desktop */}

@@ -19,15 +19,15 @@ export function ExplorerFeatured({ circles }: Props) {
 
   return (
     <div className="relative mb-8 overflow-hidden rounded-[20px] border border-border">
-      {/* Backdrop cinématique — palette rose/violet du design system */}
+      {/* Backdrop cinématique — dark mode uniquement */}
       <div
-        className="absolute inset-0 scale-105 opacity-40"
+        className="absolute inset-0 hidden scale-105 opacity-40 dark:block"
         style={{
           background: "linear-gradient(135deg, #6d28d9 0%, #9333ea 40%, #ec4899 100%)",
           filter: "blur(48px) saturate(1.4)",
         }}
       />
-      {/* Overlay sombre */}
+      {/* Overlay */}
       <div className="absolute inset-0 bg-background/85" />
 
       <div className="relative z-10 p-5 sm:p-6">
