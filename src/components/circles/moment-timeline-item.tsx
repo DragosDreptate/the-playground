@@ -117,29 +117,12 @@ export async function MomentTimelineItem({
                 {/* Time */}
                 <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
-                {/* Title */}
-                <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
-                  {moment.title}
-                </p>
-
-                {/* Location */}
-                {locationLabel && (
-                  <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                    <LocationIcon className="size-3.5 shrink-0" />
-                    <span className="truncate">{locationLabel}</span>
-                  </div>
-                )}
-
-                {/* Inscriptions + statut — dashboard uniquement */}
-                {!isCancelled && variant === "dashboard" && (
-                  <div className="flex items-center gap-2 pt-1">
-                    {registrationCount > 0 && (
-                      <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                        <Users className="size-3.5 shrink-0" />
-                        <span>{t("registrations.registered", { count: registrationCount })}</span>
-                      </div>
-                    )}
-
+                {/* Title + badge — dashboard uniquement */}
+                {!isCancelled && variant === "dashboard" ? (
+                  <div className="flex items-baseline gap-3">
+                    <p className={`min-w-0 truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                      {moment.title}
+                    </p>
                     {isDraft ? (
                       <DraftBadge label={t("status.draft")} />
                     ) : isHost ? (
@@ -158,6 +141,26 @@ export async function MomentTimelineItem({
                         {tDashboard("registrationStatus.waitlisted")}
                       </Badge>
                     ) : null}
+                  </div>
+                ) : (
+                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                    {moment.title}
+                  </p>
+                )}
+
+                {/* Inscrits — dashboard uniquement */}
+                {!isCancelled && variant === "dashboard" && registrationCount > 0 && (
+                  <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                    <Users className="size-3 shrink-0" />
+                    <span>{t("registrations.registered", { count: registrationCount })}</span>
+                  </div>
+                )}
+
+                {/* Location */}
+                {locationLabel && (
+                  <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
                   </div>
                 )}
               </div>
