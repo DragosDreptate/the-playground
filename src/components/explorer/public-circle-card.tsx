@@ -79,6 +79,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryBadge}
               {roleBadge}
+              {circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
               {cityLabel}
             </div>
             <h3 className="text-sm sm:text-base font-semibold leading-snug group-hover:underline">

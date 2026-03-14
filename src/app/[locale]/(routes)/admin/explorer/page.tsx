@@ -126,12 +126,19 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
               circles.map((circle) => (
                 <TableRow key={circle.id} className={circle.excludedFromExplorer ? "opacity-50" : ""}>
                   <TableCell>
-                    <Link
-                      href={`/admin/circles/${circle.id}`}
-                      className="font-medium hover:underline"
-                    >
-                      {circle.name}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/circles/${circle.id}`}
+                        className="font-medium hover:underline"
+                      >
+                        {circle.name}
+                      </Link>
+                      {circle.visibility === "PRIVATE" && (
+                        <span className="rounded border border-muted-foreground/30 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                          {t("explorer.columns.private")}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">{circle.hostName}</TableCell>
                   <TableCell className="text-right tabular-nums font-mono text-sm">

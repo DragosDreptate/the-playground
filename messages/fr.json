@@ -600,7 +600,8 @@
         "score": "Score",
         "override": "Override",
         "visible": "Visible",
-        "demo": "Démo"
+        "demo": "Démo",
+        "private": "Privée"
       },
       "tabs": {
         "circles": "Communautés",

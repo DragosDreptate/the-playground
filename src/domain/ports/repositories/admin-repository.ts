@@ -243,6 +243,7 @@ export type AdminExplorerCircleRow = {
   id: string;
   slug: string;
   name: string;
+  visibility: "PUBLIC" | "PRIVATE";
   isDemo: boolean;
   explorerScore: number;
   overrideScore: number | null;

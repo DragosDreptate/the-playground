@@ -203,7 +203,7 @@ function explorerMomentOrderBy(sortBy?: string, sortOrder?: string): Prisma.Mome
 }
 
 function explorerCircleWhere(filters: AdminExplorerFilters): Prisma.CircleWhereInput {
-  const where: Prisma.CircleWhereInput = { visibility: "PUBLIC" };
+  const where: Prisma.CircleWhereInput = { NOT: excludeTestHostFilter() };
   if (filters.filter === "excluded") where.excludedFromExplorer = true;
   if (filters.filter === "boosted") where.overrideScore = { not: null };
   if (filters.search) {
@@ -627,6 +627,7 @@ export const prismaAdminRepository: AdminRepository = {
         id: r.id,
         slug: r.slug,
         name: r.name,
+        visibility: r.visibility as "PUBLIC" | "PRIVATE",
         isDemo: r.isDemo,
         explorerScore: r.explorerScore,
         overrideScore: r.overrideScore,
