@@ -44,5 +44,6 @@ export type RegistrationWithMoment = Registration & {
     circleName: string;
     circleSlug: string;
     circleCoverImage: string | null;
+    registrationCount: number;
   };
 };

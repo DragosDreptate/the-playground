@@ -53,6 +53,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleSlug: props.moment.circle.slug,
         circleName: props.moment.circle.name,
         circleCoverImage: props.moment.circle.coverImage,
+        registrationCount: props.moment.registrationCount,
       }
     : {
         slug: props.registration.moment.slug,
@@ -64,6 +65,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleSlug: props.registration.moment.circleSlug,
         circleName: props.registration.moment.circleName,
         circleCoverImage: props.registration.moment.circleCoverImage,
+        registrationCount: props.registration.moment.registrationCount,
       };
 
   const [isToday, setIsToday] = useState(false);
@@ -196,11 +198,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 )}
               </div>
 
-              {/* Inscrits — organisateur uniquement */}
-              {isOrganizer && (props as OrganizerProps).moment.registrationCount > 0 && (
+              {/* Inscrits */}
+              {momentData.registrationCount > 0 && (
                 <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                   <Users className="size-3 shrink-0" />
-                  <span>{tMoment("registrations.registered", { count: (props as OrganizerProps).moment.registrationCount })}</span>
+                  <span>{tMoment("registrations.registered", { count: momentData.registrationCount })}</span>
                 </div>
               )}
 
