@@ -142,22 +142,22 @@ export async function MomentTimelineItem({
                     )}
 
                     {isDraft ? (
-                      <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <FileEdit className="size-3" />
                         {t("status.draft")}
                       </Badge>
                     ) : isHost ? (
-                      <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <Crown className="size-3" />
                         {tDashboard("role.host")}
                       </Badge>
                     ) : isRegistered ? (
-                      <Badge variant="default" className="gap-1 text-xs">
+                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <Check className="size-3" />
                         {tDashboard("registrationStatus.registered")}
                       </Badge>
                     ) : isWaitlisted ? (
-                      <Badge variant="secondary" className="gap-1 text-xs">
+                      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
                         <Clock className="size-3" />
                         {tDashboard("registrationStatus.waitlisted")}
                       </Badge>
