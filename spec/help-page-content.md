@@ -145,7 +145,7 @@ Les champs essentiels :
 - **Prix** — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)
 - **Image de couverture**
 
-> Conseil : un bon titre et une bonne description suffisent pour un événement réussi. Les participants voient cette page en premier — soignez-la.
+> L'événement est créé en **brouillon** : il n'est pas encore visible dans Explorer ni ouvert aux inscriptions. Quand il est prêt, cliquez sur **Publier** pour le rendre public et notifier les membres de la Communauté.
 
 ---
 
@@ -154,14 +154,14 @@ Les champs essentiels :
 Depuis le tableau de bord de votre événement, vous accédez à :
 - La **liste des inscrits** (avec leurs noms, emails, et statut)
 - La **liste d'attente**
-- La possibilité de **cocher les présents** (check-in) le jour J
+- Le **nombre de places restantes** et le compteur d'inscrits en temps réel
 - L'**export CSV** de la liste complète
 
 ---
 
 ### Contacter vos participants
 
-Depuis le tableau de bord de l'événement, le bouton **Envoyer un message** vous permet d'envoyer un email à l'ensemble des inscrits actifs. Utile pour partager des informations de dernière minute, le programme détaillé, ou un lien de connexion.
+Depuis le tableau de bord de l'événement, le bouton **Inviter ma Communauté** vous permet d'envoyer un email à l'ensemble des membres de votre Communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures.
 
 ---
 

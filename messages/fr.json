@@ -1043,7 +1043,7 @@
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer par thématique et trier les Communautés par popularité ou par date. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer les Communautés par thématique. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1110,19 +1110,19 @@
         "adv1": "<strong>Capacité</strong> — nombre maximum de participants (active la liste d'attente automatiquement)",
         "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
         "adv3": "<strong>Image de couverture</strong>",
-        "callout": "Conseil : un bon titre et une bonne description suffisent pour un événement réussi. Les participants voient cette page en premier — soignez-la."
+        "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Explorer ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la Communauté."
       },
       "manageRegistrations": {
         "title": "Gérer les inscriptions",
         "intro": "Depuis le tableau de bord de votre événement, vous accédez à :",
         "item1": "La <strong>liste des inscrits</strong> (avec leurs noms, emails, et statut)",
-        "item2": "La <strong>liste d'attente</strong>",
-        "item3": "La possibilité de <strong>cocher les présents</strong> (check-in) le jour J",
+        "item2": "La <strong>liste d'attente</strong> (participants en attente d'une place)",
+        "item3": "Le <strong>nombre de places restantes</strong> et le compteur d'inscrits en temps réel",
         "item4": "L'<strong>export CSV</strong> de la liste complète"
       },
       "contact": {
         "title": "Contacter vos participants",
-        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Envoyer un message</strong> vous permet d'envoyer un email à l'ensemble des inscrits actifs. Utile pour partager des informations de dernière minute, le programme détaillé, ou un lien de connexion."
+        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma Communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre Communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures."
       },
       "editCancel": {
         "title": "Modifier ou annuler un événement",
@@ -1163,7 +1163,7 @@
       },
       "q2": {
         "question": "Quelle est la différence entre une Communauté publique et privée ?",
-        "answer": "Une Communauté publique est visible dans Explorer (l'annuaire public, filtrable par thématique et triable par popularité ou par date) et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
+        "answer": "Une Communauté publique est visible dans Explorer (l'annuaire public, filtrable par thématique) et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
       },
       "q3": {
         "question": "Puis-je organiser des événements sans créer de Communauté ?",

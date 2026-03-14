@@ -86,6 +86,7 @@
 | **Invitation Communauté par lien** : usecases `generateCircleInviteToken` / `joinCircleByInvite` / `revokeCircleInviteToken`, token unique sur `Circle` (`inviteToken`), page publique `/circles/join/[token]` (rejoint la Communauté sans passer par un événement), bouton génération/révocation sur la page Communauté Organisateur, i18n FR/EN, tests unitaires + tests de sécurité (`circle-invite-security.test.ts`) + spec E2E (`circle-invite.spec.ts`). | 2026-03-04 | `ef288f7` |
 | **Catégorie personnalisée sur Communauté** : champ `customCategory` (string, max 100 chars) sur `Circle` (DB + domaine + repository). Activé uniquement quand la catégorie choisie est `OTHER`. Validé côté client dans `CircleForm` + géré dans les usecases `createCircle`/`updateCircle` via helper `resolveCustomCategoryForCreate`/`resolveCustomCategoryForUpdate` (`src/lib/circle-category-helpers.ts`). Affiché à la place du label "Autre" sur les cards et pages Communauté. | — | — |
 | **Rejoindre une Communauté directement (remplacement du Follow)** : suppression complète du modèle `CircleFollow` et des usecases `followCircle`/`unfollowCircle`. Nouveau usecase `joinCircleDirectly` + action `joinCircleDirectlyAction` + composant `JoinCircleButton`. Crée directement une `CircleMembership` PLAYER depuis la page Communauté publique. Admin stats : `totalMembers`/`recentMembers` (remplace `totalFollowers`/`recentFollowers`). | 2026-03-14 | — |
+| **Statut Brouillon (DRAFT) sur les événements** : `MomentStatus` enrichi avec `"DRAFT"`. Tout nouvel événement créé est en DRAFT par défaut. Usecase `publishMoment` (transition DRAFT → PUBLISHED, sens unique). Bouton "Publier" sur la vue Organisateur. Notifications membres + email Organisateur déplacés à la publication (plus à la création). Page publique accessible en DRAFT (bandeau "en cours de préparation", inscription bloquée). Dashboard Host : événements DRAFT dans l'onglet "à venir". Explorer : événements DRAFT exclus. Sitemap : événements DRAFT exclus. OG tags supprimés sur les pages DRAFT. | 2026-03-14 | — |
 
 ---
 
@@ -291,7 +292,7 @@
 ### Priorité moyenne
 
 - [x] **Email aux membres : nouvel événement dans leur Communauté** (gap M-4) ✅
-  - Automatique à la création (cohérent avec modèle actuel : création = publication)
+  - Automatique à la **publication** (`publishMomentAction`) — les événements en Brouillon ne déclenchent pas de notification
   - Destinataires : membres PLAYER de la Communauté (hors créateur), filtrés par préférence `notifyNewMomentInCircle`
   - Créateur exclu de la notification (via `findPlayersForNewMomentNotification`)
 
@@ -426,6 +427,7 @@
 | 2026-02-20 | Pas de merge/liaison manuelle de comptes dans le MVP (si emails différents = comptes différents) |
 | 2026-02-20 | Positionnement clarifié : community-centric (modèle Meetup) + UX premium (expérience Luma) + 100% gratuit. La Communauté est l'entité centrale, l'événement est la porte d'entrée virale, la page Communauté est la couche de rétention (absente chez Luma). Dashboard Organisateur = Communauté-first. *(Terminologie FR mise à jour le 2026-02-22 : Cercle → Communauté, Escale → événement)* |
 | 2026-02-20 | L'organisateur est automatiquement inscrit (REGISTERED) à l'événement qu'il crée — règle métier dans `createMoment`. |
+| 2026-03-14 | Statut DRAFT : tout événement créé est en Brouillon par défaut. Transition DRAFT → PUBLISHED via `publishMoment` (sens unique). Notifications membres et email Organisateur déplacés à la publication. Événements DRAFT exclus de l'Explorer et du sitemap. |
 | 2026-02-20 | Check-in retiré du MVP → Phase 2 (pas prioritaire pour le lancement) |
 | 2026-02-20 | ~~La Carte = Circles uniquement (pas d'événements).~~ **Révisée le 2026-02-21** : La Carte = Circles + événements à venir de Circles publics. *(Renommé "Découvrir" le 2026-02-22)* |
 | 2026-02-21 | Événements passés accessibles sur la page publique `/m/[slug]` (avec UI "Événement terminé"). Seuls les CANCELLED renvoient une 404. |

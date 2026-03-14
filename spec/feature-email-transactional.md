@@ -18,7 +18,7 @@ Les emails transactionnels sont le premier canal de communication entre la plate
 5. **Notification Organisateur : nouveau commentaire** — informe l'Organisateur quand un Participant commente son événement
 6. **Mise à jour d'événement** — notifie les inscrits quand la date ou le lieu change (`momentUpdate`) + confirme le changement à l'Organisateur (`hostMomentUpdate`)
 7. **Annulation d'événement** — notifie tous les inscrits REGISTERED quand un événement est annulé (`momentCancelled`)
-8. **Confirmation de création d'événement** — confirme à l'Organisateur que son événement est publié (`hostMomentCreated`)
+8. **Confirmation de publication d'événement** — confirme à l'Organisateur que son événement est publié (`hostMomentCreated`)
 
 **Inspiration Luma** : calendar badge (mois + jour), layout clean, CTA visible, footer discret. Adapté au branding The Playground (gradient rose → violet).
 
@@ -57,8 +57,8 @@ Server Action (joinMomentAction)
 | Mise à jour d'événement (Participant) | `moment-update` | `updateMomentAction` (si date ou lieu change) | Inscrits REGISTERED | Non |
 | Mise à jour d'événement (Organisateur) | `moment-update` (variante host) | `updateMomentAction` (si date ou lieu change) | Organisateur créateur | Non |
 | Annulation d'événement | `moment-cancelled` | `cancelMomentAction` | Inscrits REGISTERED | Non |
-| Confirmation création d'événement | `host-moment-created` | `createMomentAction` | Organisateur créateur | Non |
-| Nouvel événement (membre) | `new-moment-notification` | `createMomentAction` (via `notify-new-moment.ts`) | Membres PLAYER de la Communauté (sauf créateur, filtre `notifyNewMomentInCircle`) | Non |
+| Confirmation publication d'événement | `host-moment-created` | `publishMomentAction` | Organisateur créateur | Non |
+| Nouvel événement (membre) | `new-moment-notification` | `publishMomentAction` (via `notify-new-moment.ts`) | Membres PLAYER de la Communauté (sauf créateur, filtre `notifyNewMomentInCircle`) | Non |
 | Invitation Communauté (Broadcast) | `broadcast-moment` | `broadcastMomentAction` | Membres de la Communauté (cooldown 24h entre envois, renvoi possible après expiration) | Non |
 | Invitation par lien privé | `circle-invitation` | `joinCircleByInviteAction` (via `circle.ts`) | Utilisateur invité | Non |
 | Alerte admin : entité créée | `admin-entity-created` | `notifyAdminEntityCreatedAction` (`notify-admin-entity-created.ts`) | Équipe admin (`ADMIN_NOTIFICATION_EMAIL`) | Non |
@@ -390,8 +390,8 @@ Quand un Organisateur crée un événement, il est automatiquement inscrit (REGI
 |---------|-----------|
 | `src/app/actions/registration.ts` | Ajout envoi emails (fire-and-forget) après `joinMoment` et `cancelRegistration` |
 | `src/app/actions/comment.ts` | Notification `sendNewComment` (inscrits + Organisateurs) après `addComment` (PR #93) |
-| `src/app/actions/moment.ts` | Ajout notifications mise à jour, annulation et confirmation création |
-| `src/app/actions/notify-new-moment.ts` | Notification membres (`sendNewMomentToMember`) à la création d'un événement (followers supprimés — système Follow retiré) |
+| `src/app/actions/moment.ts` | Ajout notifications mise à jour, annulation et confirmation publication |
+| `src/app/actions/notify-new-moment.ts` | Notification membres (`sendNewMomentToMember`) à la publication d'un événement (followers supprimés — système Follow retiré) |
 | `src/app/actions/broadcast-moment.ts` | Envoi email d'invitation Communauté (`sendBroadcastMoments`), cooldown 24h entre envois (renvoi possible après expiration) |
 | `messages/fr.json` | Namespace `"Email"` étendu (broadcast, mise à jour, annulation, création) + namespace `"Moment.broadcast"` |
 | `messages/en.json` | Namespace `"Email"` étendu (broadcast, mise à jour, annulation, création) + namespace `"Moment.broadcast"` |
