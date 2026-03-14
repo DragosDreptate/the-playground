@@ -120,8 +120,7 @@ export async function createMomentAction(
     prismaCircleRepository.findById(circleId).then(async (circle) => {
       if (!circle) return;
 
-      // Notifier les followers et membres du Circle (sauf si admin)
-      if (isAdminUser(session)) return;
+      // Notifier les membres du Circle (l'admin est filtré côté destinataires)
       notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
         (err) => {
           console.error("[notifyNewMoment] Erreur:", err);
