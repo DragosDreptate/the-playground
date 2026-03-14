@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
+import { MapPin, Globe, Users, Check, Clock, XCircle, Crown, FileEdit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -98,22 +98,13 @@ export async function MomentTimelineItem({
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="group block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isDraft ? "border-muted-foreground/20 hover:border-muted-foreground/40" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
+          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
                 <XCircle className="size-3.5 shrink-0 text-destructive" />
                 <span className="text-destructive text-xs font-medium">
                   {t("public.eventCancelled")}
-                </span>
-              </div>
-            )}
-
-            {/* Bandeau brouillon */}
-            {isDraft && variant === "dashboard" && (
-              <div className="flex items-center gap-2 rounded-t-xl border-b border-muted-foreground/20 bg-muted/50 px-4 py-2">
-                <span className="text-muted-foreground text-xs font-medium">
-                  {t("status.draft")}
                 </span>
               </div>
             )}
@@ -150,7 +141,12 @@ export async function MomentTimelineItem({
                       </div>
                     )}
 
-                    {isHost ? (
+                    {isDraft ? (
+                      <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
+                        <FileEdit className="size-3" />
+                        {t("status.draft")}
+                      </Badge>
+                    ) : isHost ? (
                       <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
                         <Crown className="size-3" />
                         {tDashboard("role.host")}
