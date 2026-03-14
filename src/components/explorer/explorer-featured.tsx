@@ -18,7 +18,7 @@ export function ExplorerFeatured({ circles }: Props) {
   if (circles.length === 0) return null;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-primary/20">
+    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-border">
       {/* Backdrop — palette rose/violet du design system */}
       <div
         className="absolute inset-0 scale-105 opacity-45"
