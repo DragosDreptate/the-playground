@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import { getDisplayName } from "@/lib/display-name";
+import { linkifyText } from "@/lib/linkify";
 import type { CommentWithUser } from "@/domain/models/comment";
 
 const MAX_CONTENT_LENGTH = 2000;
@@ -196,7 +197,7 @@ export function CommentThread({
                       )}
                     </div>
                     <p className="mt-0.5 text-sm whitespace-pre-wrap break-words">
-                      {comment.content}
+                      {linkifyText(comment.content)}
                     </p>
                   </div>
                 </div>
