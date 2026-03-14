@@ -169,13 +169,13 @@ export async function MomentTimelineItem({
                 <Image
                   src={moment.coverImage}
                   alt={moment.title}
-                  width={60}
-                  height={60}
-                  className={`size-[60px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  width={72}
+                  height={72}
+                  className={`size-[72px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[60px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[72px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}
