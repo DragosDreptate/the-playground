@@ -58,8 +58,8 @@ export async function DashboardCircleCard({ circle }: Props) {
             {categoryLabel && (
               <span className="text-muted-foreground text-xs">{categoryLabel}</span>
             )}
-            <div className="flex items-center gap-1.5">
-              <h3 className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug group-hover:underline">
+            <div className="flex items-baseline gap-1.5">
+              <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
                 {circle.name}
               </h3>
               <span className="shrink-0 inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
