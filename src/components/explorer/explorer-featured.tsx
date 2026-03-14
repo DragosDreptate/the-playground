@@ -101,18 +101,19 @@ export function ExplorerFeatured({ circles }: Props) {
                   <p className="truncate text-base font-bold text-foreground group-hover:underline">
                     {circle.name}
                   </p>
-                  {/* Ligne 3 : membres */}
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Users className="size-3 shrink-0" />
-                    <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-                  </div>
-                  {/* Ligne 4 : ville */}
-                  {circle.city && (
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="size-3 shrink-0" />
-                      <span className="truncate">{circle.city}</span>
+                  {/* Ligne 3 : ville + membres */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                    {circle.city && (
+                      <div className="flex items-center gap-1">
+                        <MapPin className="size-3 shrink-0" />
+                        <span className="truncate">{circle.city}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <Users className="size-3 shrink-0" />
+                      <span>{t("circleCard.members", { count: circle.memberCount })}</span>
                     </div>
-                  )}
+                  </div>
                 </div>
               </Link>
             );
