@@ -82,12 +82,6 @@ export async function DashboardCircleCard({ circle }: Props) {
                 <Users className="size-3.5 shrink-0" />
                 <span>{t("circleCard.members", { count: circle.memberCount })}</span>
               </div>
-              {circle.upcomingMomentCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="size-3.5 shrink-0" />
-                  <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-                </div>
-              )}
             </div>
             {/* Prochain événement — mobile uniquement */}
             {hasNextMoment && (
