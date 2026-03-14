@@ -38,17 +38,17 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Thumbnail */}
           <div
-            className="size-[72px] shrink-0 overflow-hidden rounded-xl"
+            className="size-[90px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={72}
-                height={72}
+                width={90}
+                height={90}
                 className="size-full object-cover"
-                sizes="72px"
+                sizes="90px"
               />
             )}
           </div>
