@@ -84,7 +84,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   return (
     <Link href={`/m/${moment.slug}`} className="group block min-w-0">
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div
