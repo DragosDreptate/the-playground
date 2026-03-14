@@ -215,7 +215,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   isDraft ? (
                     <Badge
                       variant="outline"
-                      className="shrink-0 gap-1 border-muted-foreground/40 text-xs text-muted-foreground"
+                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
                     >
                       <FileEdit className="size-3" />
                       {tMoment("status.draft")}
