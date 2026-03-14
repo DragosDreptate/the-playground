@@ -176,13 +176,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Crown className="size-3" />
                       {t("role.host")}
-                      {(props as OrganizerProps).moment.registrationCount > 0 && (
-                        <span className="flex items-center gap-0.5">
-                          {" · "}
-                          <Users className="size-2.5" />
-                          {(props as OrganizerProps).moment.registrationCount}
-                        </span>
-                      )}
                     </Badge>
                   ) : isHost ? (
                     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
@@ -202,6 +195,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   ) : null
                 )}
               </div>
+
+              {/* Inscrits — organisateur uniquement */}
+              {isOrganizer && (props as OrganizerProps).moment.registrationCount > 0 && (
+                <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                  <Users className="size-3 shrink-0" />
+                  <span>{tMoment("registrations.registered", { count: (props as OrganizerProps).moment.registrationCount })}</span>
+                </div>
+              )}
 
               {/* Location */}
               {locationLabel && (
