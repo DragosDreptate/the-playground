@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, Star } from "lucide-react";
+import { Users, Star, MapPin } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -65,7 +65,7 @@ export function ExplorerFeatured({ circles }: Props) {
               <Link
                 key={circle.id}
                 href={`/circles/${circle.slug}`}
-                className="group flex gap-3 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
+                className="group flex gap-4 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
               >
                 {/* Cover 1:1 — côté = hauteur du contenu (self-stretch + aspect-square) */}
                 <div
@@ -92,11 +92,16 @@ export function ExplorerFeatured({ circles }: Props) {
                   <p className="truncate text-sm font-bold text-foreground group-hover:underline">
                     {circle.name}
                   </p>
-                  <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Users className="size-3 shrink-0" />
-                    <span>
-                      {t("circleCard.members", { count: circle.memberCount })}
-                    </span>
+                    <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+                    {circle.city && (
+                      <>
+                        <span className="opacity-40">·</span>
+                        <MapPin className="size-3 shrink-0" />
+                        <span className="truncate">{circle.city}</span>
+                      </>
+                    )}
                   </div>
                   {categoryLabel && (
                     <div className="mt-1.5 inline-block rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
