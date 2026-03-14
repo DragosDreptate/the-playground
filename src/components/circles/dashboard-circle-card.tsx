@@ -57,7 +57,7 @@ export async function DashboardCircleCard({ circle }: Props) {
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel && (
-                <span className="text-foreground text-xs font-semibold">{categoryLabel}</span>
+                <span className="text-muted-foreground text-xs">{categoryLabel}</span>
               )}
               <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
                 {circle.memberRole === "HOST"
