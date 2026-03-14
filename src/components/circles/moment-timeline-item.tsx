@@ -36,6 +36,7 @@ export async function MomentTimelineItem({
 
   const isCancelled = moment.status === "CANCELLED";
   const isPast = moment.status === "PAST";
+  const isDraft = moment.status === "DRAFT";
 
   const isRegistered =
     userRegistrationStatus === "REGISTERED" ||
@@ -44,11 +45,13 @@ export async function MomentTimelineItem({
 
   const dotClass = isCancelled
     ? "bg-destructive/50"
-    : moment.status === "PAST"
+    : isPast
       ? "bg-border"
-      : isWaitlisted
-        ? "bg-amber-400"
-        : "bg-primary";
+      : isDraft
+        ? "bg-muted-foreground/40"
+        : isWaitlisted
+          ? "bg-amber-400"
+          : "bg-primary";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -95,13 +98,22 @@ export async function MomentTimelineItem({
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="group block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
+          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isDraft ? "border-muted-foreground/20 hover:border-muted-foreground/40" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
                 <XCircle className="size-3.5 shrink-0 text-destructive" />
                 <span className="text-destructive text-xs font-medium">
                   {t("public.eventCancelled")}
+                </span>
+              </div>
+            )}
+
+            {/* Bandeau brouillon */}
+            {isDraft && variant === "dashboard" && (
+              <div className="flex items-center gap-2 rounded-t-xl border-b border-muted-foreground/20 bg-muted/50 px-4 py-2">
+                <span className="text-muted-foreground text-xs font-medium">
+                  {t("status.draft")}
                 </span>
               </div>
             )}
