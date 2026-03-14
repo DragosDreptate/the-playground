@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -37,10 +37,10 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
   const roleBadge = membershipRole && (
-    <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
+    <span className="inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
       {membershipRole === "HOST"
-        ? t("circleCard.roleBadge.host")
-        : t("circleCard.roleBadge.member")}
+        ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
+        : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
     </span>
   );
 
