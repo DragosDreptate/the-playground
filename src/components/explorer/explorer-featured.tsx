@@ -28,9 +28,7 @@ export function ExplorerFeatured({ circles }: Props) {
         }}
       />
       {/* Overlay sombre */}
-      <div
-        className="absolute inset-0 bg-card/85"
-      />
+      <div className="absolute inset-0 bg-background/90" />
 
       <div className="relative z-10 p-5 sm:p-6">
         {/* Header */}
