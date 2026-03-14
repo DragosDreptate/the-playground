@@ -369,9 +369,14 @@
       "shareTitle": "Share my event"
     },
     "status": {
+      "draft": "Draft",
       "published": "Published",
       "cancelled": "Cancelled",
       "past": "Past"
+    },
+    "actions": {
+      "publish": "Publish",
+      "publishing": "Publishing..."
     },
     "public": {
       "hostedBy": "Hosted by",
@@ -408,7 +413,10 @@
         "google": "Google Calendar",
         "ics": ".ics file"
       },
-      "waitlistPosition": "You're #{position} on the waitlist"
+      "waitlistPosition": "You're #{position} on the waitlist",
+      "draftNotice": "This event is being prepared and has not been published yet.",
+      "draftTitle": "Event in preparation",
+      "draftBody": "This event is not yet open for registration. Check back soon!"
     },
     "registrations": {
       "title": "Attendees",

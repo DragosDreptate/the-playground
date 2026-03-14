@@ -16,12 +16,14 @@ type MomentCardProps = {
 };
 
 const statusVariant = {
+  DRAFT: "outline",
   PUBLISHED: "default",
   CANCELLED: "outline",
   PAST: "outline",
 } as const;
 
 const statusClassName = {
+  DRAFT: "border-muted-foreground/40 text-muted-foreground",
   PUBLISHED: "",
   CANCELLED: "border-destructive/40 text-destructive",
   PAST: "",

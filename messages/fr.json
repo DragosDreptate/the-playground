@@ -369,9 +369,14 @@
       "shareTitle": "Partager mon événement"
     },
     "status": {
+      "draft": "Brouillon",
       "published": "Publié",
       "cancelled": "Annulé",
       "past": "Passé"
+    },
+    "actions": {
+      "publish": "Publier",
+      "publishing": "Publication..."
     },
     "public": {
       "hostedBy": "Organisé par",
@@ -408,7 +413,10 @@
         "google": "Google Calendar",
         "ics": "Fichier .ics"
       },
-      "waitlistPosition": "Vous êtes {position}° sur la liste d'attente"
+      "waitlistPosition": "Vous êtes {position}° sur la liste d'attente",
+      "draftNotice": "Cet événement est en cours de préparation et n'est pas encore publié.",
+      "draftTitle": "Événement en cours de préparation",
+      "draftBody": "Cet événement n'est pas encore ouvert aux inscriptions. Revenez bientôt !"
     },
     "registrations": {
       "title": "Participants",

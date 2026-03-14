@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
 import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dialog";
+import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
@@ -75,12 +76,14 @@ export type MomentDetailViewProps = HostViewProps | PublicViewProps;
 // ── Helpers ──────────────────────────────────────────────────
 
 const statusVariant = {
+  DRAFT: "outline",
   PUBLISHED: "default",
   CANCELLED: "outline",
   PAST: "outline",
 } as const;
 
 const statusClassName = {
+  DRAFT: "border-muted-foreground/40 text-muted-foreground",
   PUBLISHED: "",
   CANCELLED: "border-destructive/40 text-destructive",
   PAST: "",
@@ -277,7 +280,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             )}
             {isHostView && (
               <div className="flex shrink-0 gap-2">
-                <Button asChild size="sm">
+                {moment.status === "DRAFT" && (
+                  <PublishMomentButton momentId={moment.id} circleSlug={props.circleSlug} momentSlug={props.momentSlug} />
+                )}
+                <Button asChild size="sm" variant={moment.status === "DRAFT" ? "outline" : "default"}>
                   <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
                     {tCommon("edit")}
                   </Link>
@@ -299,6 +305,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
             {moment.title}
           </h1>
+
+          {/* Banner Moment brouillon — visible par tous */}
+          {moment.status === "DRAFT" && (
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+              <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
+              <p className="text-muted-foreground text-sm">
+                {t("public.draftNotice")}
+              </p>
+            </div>
+          )}
 
           {/* Banner Moment passé */}
           {moment.status === "PAST" && (
@@ -498,7 +514,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Public : inscription ou carte de statut */}
           {!isHostView && (
-            moment.status === "PAST" ? (
+            moment.status === "DRAFT" ? (
+              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
+                <p className="font-semibold">{t("public.draftTitle")}</p>
+                <p className="text-muted-foreground text-sm">{t("public.draftBody")}</p>
+              </div>
+            ) : moment.status === "PAST" ? (
               <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
                 <p className="font-semibold">{t("public.eventEnded")}</p>
                 {registeredCount > 0 && (

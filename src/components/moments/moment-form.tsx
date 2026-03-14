@@ -225,8 +225,8 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
 
         {/* Right column — Form fields */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
-          {/* Status select (edit mode only) */}
-          {moment && (
+          {/* Status select (edit mode, PUBLISHED/CANCELLED only — DRAFT uses publish button) */}
+          {moment && moment.status !== "DRAFT" && (
             <div className="flex justify-end">
               <Select
                 name="status"

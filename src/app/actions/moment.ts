@@ -20,6 +20,7 @@ import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
+import { publishMoment } from "@/domain/usecases/publish-moment";
 import { DomainError } from "@/domain/errors";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
@@ -116,19 +117,10 @@ export async function createMomentAction(
       }
     );
 
-    // Fire-and-forget : notifier les followers/membres + envoyer email de confirmation à l'organisateur
+    // Fire-and-forget : notifier les admins de la nouvelle création (brouillon)
     prismaCircleRepository.findById(circleId).then(async (circle) => {
       if (!circle) return;
 
-      // Notifier les membres du Circle (l'admin est filtré côté destinataires)
-      notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
-        (err) => {
-          console.error("[notifyNewMoment] Erreur:", err);
-          Sentry.captureException(err);
-        }
-      );
-
-      // Notifier les admins de la nouvelle création
       const creator = await prismaUserRepository.findById(session.user.id);
       notifyAdminEntityCreated({
         entityType: "moment",
@@ -140,72 +132,12 @@ export async function createMomentAction(
         circleName: circle.name,
         circleSlug: circle.slug,
       }).catch(console.error);
-
-      // Email de confirmation à l'organisateur avec ICS
-      const [host, locale] = await Promise.all([
-        prismaUserRepository.findById(session.user.id),
-        getLocale(),
-      ]);
-      if (!host?.email) return;
-
-      const dateFnsLocale = getDateFnsLocale(locale);
-      const momentDate = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-      const momentDateMonth = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-      const momentDateDay = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "d");
-      const locationText = formatLocationText(
-        result.moment.locationType,
-        result.moment.locationName,
-        result.moment.locationAddress,
-        result.moment.videoLink,
-        locale
-      );
-      const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-      const icsContent = generateIcs({
-        uid: result.moment.id,
-        title: result.moment.title,
-        description: result.moment.description,
-        startsAt: result.moment.startsAt,
-        endsAt: result.moment.endsAt,
-        location: locationText,
-        videoLink: result.moment.videoLink,
-        url: `${appUrl}/m/${result.moment.slug}`,
-        organizerName: circle.name,
-        method: "REQUEST",
-        attendeeEmail: host.email,
-      });
-
-      const t = await getTranslations({ locale, namespace: "Email" });
-      await emailService.sendHostMomentCreated({
-        to: host.email,
-        hostName,
-        momentTitle: result.moment.title,
-        momentSlug: result.moment.slug,
-        circleSlug: circle.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
-        circleName: circle.name,
-        icsContent,
-        strings: {
-          subject: t("hostMomentCreated.subject", { momentTitle: result.moment.title }),
-          heading: t("hostMomentCreated.heading"),
-          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: result.moment.title }),
-          dateLabel: t("common.dateLabel"),
-          locationLabel: t("common.locationLabel"),
-          manageMomentCta: t("hostMomentCreated.manageMomentCta"),
-          footer: t("common.footer"),
-        },
-      });
     }).catch((err) => {
       console.error(err);
       Sentry.captureException(err);
     });
 
     // Pas de revalidatePath : la page est nouvelle (aucun cache stale), le dashboard est dynamique.
-    // La page Circle publique se rafraîchit via son ISR (60s).
     return { success: true, data: result.moment };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -549,4 +481,106 @@ async function sendMomentCancelledEmails(
       });
     })
   );
+}
+
+export async function publishMomentAction(
+  momentId: string
+): Promise<ActionResult<Moment>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
+    const result = await publishMoment(
+      { momentId, userId: session.user.id },
+      { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
+    );
+
+    // Fire-and-forget : notifier les membres + envoyer email de confirmation à l'organisateur
+    prismaCircleRepository.findById(result.moment.circleId).then(async (circle) => {
+      if (!circle) return;
+
+      notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
+        (err) => {
+          console.error("[notifyNewMoment] Erreur:", err);
+          Sentry.captureException(err);
+        }
+      );
+
+      const [host, locale] = await Promise.all([
+        prismaUserRepository.findById(session.user.id),
+        getLocale(),
+      ]);
+      if (!host?.email) return;
+
+      const dateFnsLocale = getDateFnsLocale(locale);
+      const momentDate = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+      const momentDateMonth = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
+      const momentDateDay = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "d");
+      const locationText = formatLocationText(
+        result.moment.locationType,
+        result.moment.locationName,
+        result.moment.locationAddress,
+        result.moment.videoLink,
+        locale
+      );
+      const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+      const icsContent = generateIcs({
+        uid: result.moment.id,
+        title: result.moment.title,
+        description: result.moment.description,
+        startsAt: result.moment.startsAt,
+        endsAt: result.moment.endsAt,
+        location: locationText,
+        videoLink: result.moment.videoLink,
+        url: `${appUrl}/m/${result.moment.slug}`,
+        organizerName: circle.name,
+        method: "REQUEST",
+        attendeeEmail: host.email,
+      });
+
+      const t = await getTranslations({ locale, namespace: "Email" });
+      await emailService.sendHostMomentCreated({
+        to: host.email,
+        hostName,
+        momentTitle: result.moment.title,
+        momentSlug: result.moment.slug,
+        circleSlug: circle.slug,
+        momentDate,
+        momentDateMonth,
+        momentDateDay,
+        locationText,
+        circleName: circle.name,
+        icsContent,
+        strings: {
+          subject: t("hostMomentCreated.subject", { momentTitle: result.moment.title }),
+          heading: t("hostMomentCreated.heading"),
+          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: result.moment.title }),
+          dateLabel: t("common.dateLabel"),
+          locationLabel: t("common.locationLabel"),
+          manageMomentCta: t("hostMomentCreated.manageMomentCta"),
+          footer: t("common.footer"),
+        },
+      });
+    }).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
+
+    revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
+    revalidatePath(`/m/${result.moment.slug}`);
+    revalidatePath(`/en/m/${result.moment.slug}`);
+    return { success: true, data: result.moment };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
 }
