@@ -4,7 +4,7 @@ export type { CoverImageAttribution };
 
 export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
-export type MomentStatus = "PUBLISHED" | "CANCELLED" | "PAST";
+export type MomentStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "PAST";
 
 export type HostMomentSummary = {
   id: string;

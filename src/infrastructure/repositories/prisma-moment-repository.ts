@@ -229,7 +229,7 @@ export const prismaMomentRepository: MomentRepository = {
     const now = new Date();
     const records = await prisma.moment.findMany({
       where: {
-        status: "PUBLISHED",
+        status: { in: ["DRAFT", "PUBLISHED"] },
         startsAt: { gte: now },
         circle: {
           memberships: { some: { userId: hostUserId, role: "HOST" } },
@@ -275,7 +275,7 @@ export const prismaMomentRepository: MomentRepository = {
   ): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }> {
     const records = await prisma.moment.findMany({
       where: {
-        status: { in: ["PUBLISHED", "PAST"] },
+        status: { in: ["DRAFT", "PUBLISHED", "PAST"] },
         circle: {
           memberships: { some: { userId: hostUserId, role: "HOST" } },
         },

@@ -84,7 +84,7 @@ export async function createMoment(
     capacity: input.capacity,
     price: input.price,
     currency: input.currency,
-    status: "PUBLISHED",
+    status: "DRAFT",
   });
 
   // L'organisateur est automatiquement inscrit en tant que Participant
