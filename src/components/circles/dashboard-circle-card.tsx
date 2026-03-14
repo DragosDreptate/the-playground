@@ -58,7 +58,7 @@ export async function DashboardCircleCard({ circle }: Props) {
             {categoryLabel && (
               <span className="text-muted-foreground text-xs">{categoryLabel}</span>
             )}
-            <div className="flex items-baseline gap-1.5">
+            <div className="flex items-baseline gap-3">
               <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
                 {circle.name}
               </h3>
