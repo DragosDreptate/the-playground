@@ -3,8 +3,9 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Users, Check, Clock, XCircle, Crown, FileEdit } from "lucide-react";
+import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DraftBadge } from "@/components/badges/draft-badge";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
@@ -140,10 +141,7 @@ export async function MomentTimelineItem({
                     )}
 
                     {isDraft ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                        <FileEdit className="size-3" />
-                        {t("status.draft")}
-                      </Badge>
+                      <DraftBadge label={t("status.draft")} />
                     ) : isHost ? (
                       <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <Crown className="size-3" />

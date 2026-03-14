@@ -20,11 +20,11 @@ import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-re
 import { formatDateRange } from "@/lib/format-date";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { DemoBadge } from "@/components/badges/demo-badge";
+import { DraftBadge } from "@/components/badges/draft-badge";
 import Image from "next/image";
 import {
   CalendarIcon,
   Download,
-  FileEdit,
   Mail,
   MapPin,
   Globe,
@@ -176,10 +176,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 style={{ aspectRatio: "1 / 1" }}
               >
                 {moment.status === "DRAFT" && (
-                  <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary">
-                    <FileEdit className="size-3.5" />
-                    {t("status.draft")}
-                  </span>
+                  <DraftBadge label={t("status.draft")} variant="cover" />
                 )}
                 {moment.coverImage ? (
                   <Image
