@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin } from "lucide-react";
+import { Users, CalendarIcon } from "lucide-react";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -56,9 +56,6 @@ export async function DashboardCircleCard({ circle }: Props) {
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <h3 className="text-sm font-semibold leading-snug group-hover:underline truncate">
-                {circle.name}
-              </h3>
               {categoryLabel && (
                 <span className="text-foreground text-xs font-semibold">{categoryLabel}</span>
               )}
@@ -67,13 +64,13 @@ export async function DashboardCircleCard({ circle }: Props) {
                   ? t("circleCard.roleBadge.host")
                   : t("circleCard.roleBadge.member")}
               </span>
+              {circle.city && (
+                <span className="text-muted-foreground text-xs">{circle.city}</span>
+              )}
             </div>
-            {circle.city && (
-              <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                <MapPin className="size-3 shrink-0" />
-                <span className="truncate">{circle.city}</span>
-              </div>
-            )}
+            <h3 className="text-sm font-semibold leading-snug group-hover:underline truncate">
+              {circle.name}
+            </h3>
             <p className="text-muted-foreground line-clamp-1 text-xs">
               {circle.description}
             </p>
