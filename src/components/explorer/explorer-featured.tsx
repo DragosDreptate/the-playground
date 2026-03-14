@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, Star, MapPin, Tag } from "lucide-react";
+import { Users, MapPin, Tag } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -84,19 +84,13 @@ export function ExplorerFeatured({ circles }: Props) {
 
                 {/* Info */}
                 <div className="min-w-0 flex-1 flex flex-col justify-center gap-0.5">
-                  {/* Ligne 1 : thématique + badge aligné à droite */}
-                  <div className="flex items-center justify-between gap-2">
-                    {categoryLabel && (
-                      <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground truncate">
-                        <Tag className="size-3 shrink-0" />
-                        {categoryLabel}
-                      </span>
-                    )}
-                    <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/35 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                      <Star className="size-2 shrink-0" aria-hidden="true" />
-                      {t("featured.badge")}
-                    </div>
-                  </div>
+                  {/* Ligne 1 : thématique */}
+                  {categoryLabel && (
+                    <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground truncate">
+                      <Tag className="size-3 shrink-0" />
+                      {categoryLabel}
+                    </span>
+                  )}
                   {/* Ligne 2 : nom */}
                   <p className="truncate text-base font-bold text-foreground group-hover:underline">
                     {circle.name}
