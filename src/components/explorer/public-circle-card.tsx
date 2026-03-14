@@ -78,13 +78,15 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryBadge}
-              {roleBadge}
               {circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
               {cityLabel}
             </div>
-            <h3 className="text-sm sm:text-base font-semibold leading-snug group-hover:underline">
-              {circle.name}
-            </h3>
+            <div className="flex items-baseline gap-3">
+              <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
+                {circle.name}
+              </h3>
+              {roleBadge}
+            </div>
             <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
               {circle.description}
             </p>
