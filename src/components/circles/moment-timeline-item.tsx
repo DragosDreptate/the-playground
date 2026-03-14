@@ -131,38 +131,35 @@ export async function MomentTimelineItem({
 
                 {/* Inscriptions + statut — dashboard uniquement */}
                 {!isCancelled && variant === "dashboard" && (
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <div className="flex items-center gap-2 pt-1">
                     {registrationCount > 0 && (
                       <div className="text-muted-foreground flex items-center gap-1 text-xs">
                         <Users className="size-3.5 shrink-0" />
-                        <span>
-                          {t("registrations.registered", { count: registrationCount })}
-                        </span>
+                        <span>{t("registrations.registered", { count: registrationCount })}</span>
                       </div>
                     )}
 
                     {isDraft ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Badge variant="outline" className="ml-auto shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <FileEdit className="size-3" />
                         {t("status.draft")}
                       </Badge>
                     ) : isHost ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Badge variant="outline" className="ml-auto shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <Crown className="size-3" />
                         {tDashboard("role.host")}
                       </Badge>
                     ) : isRegistered ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Badge variant="outline" className="ml-auto shrink-0 gap-1 border-primary/40 text-xs text-primary">
                         <Check className="size-3" />
                         {tDashboard("registrationStatus.registered")}
                       </Badge>
                     ) : isWaitlisted ? (
-                      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+                      <Badge variant="secondary" className="ml-auto shrink-0 gap-1 text-xs">
                         <Clock className="size-3" />
                         {tDashboard("registrationStatus.waitlisted")}
                       </Badge>
                     ) : null}
-
                   </div>
                 )}
               </div>
