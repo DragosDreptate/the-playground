@@ -145,27 +145,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors ${
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 transition-colors ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
-            {/* Cover — LEFT, 64×64px */}
-            {momentData.coverImage ? (
-              <Image
-                src={momentData.coverImage}
-                alt={momentData.title}
-                width={64}
-                height={64}
-                className={`size-16 shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-16 shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
-
-            {/* Content — RIGHT */}
+            {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1">
               {/* Time */}
               <p
@@ -260,6 +244,22 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 )}
               </div>
             </div>
+
+            {/* Cover — RIGHT, 64×64px */}
+            {momentData.coverImage ? (
+              <Image
+                src={momentData.coverImage}
+                alt={momentData.title}
+                width={64}
+                height={64}
+                className={`size-16 shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+              />
+            ) : (
+              <div
+                className={`size-16 shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                style={{ background: gradient }}
+              />
+            )}
           </div>
         </Link>
       </div>
