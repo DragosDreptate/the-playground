@@ -332,7 +332,7 @@
       "endLabel": "End",
       "pickDate": "Pick a date",
       "endBeforeStart": "The end date must be after the start date.",
-      "createMoment": "Publish"
+      "createMoment": "Save draft"
     },
     "radar": {
       "title": "Planning Radar",
