@@ -97,7 +97,7 @@ export function ExplorerFeatured({ circles }: Props) {
                     </div>
                   </div>
                   {/* Ligne 2 : nom */}
-                  <p className="truncate text-sm font-bold text-foreground group-hover:underline">
+                  <p className="truncate text-base font-bold text-foreground group-hover:underline">
                     {circle.name}
                   </p>
                   {/* Ligne 3 : membres */}
