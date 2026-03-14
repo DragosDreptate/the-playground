@@ -720,7 +720,7 @@
       "heading": "{circleName} invites you",
       "intro": "{hostName} is sharing an event with you",
       "ctaLabel": "View event",
-      "unsubscribeText": "You're receiving this email because you follow {circleName}.",
+      "unsubscribeText": "You're receiving this email because you are a member of {circleName}.",
       "unsubscribeLabel": "Manage notifications"
     },
     "circleInvitation": {
@@ -955,7 +955,7 @@
       "newComment": "New comment",
       "newCommentDesc": "When someone comments on an event you're attending",
       "newMomentInCircle": "New event",
-      "newMomentInCircleDesc": "When an event is created in a Community you follow",
+      "newMomentInCircleDesc": "When an event is created in a Community you belong to",
       "saved": "Preferences saved"
     },
     "publicProfile": {

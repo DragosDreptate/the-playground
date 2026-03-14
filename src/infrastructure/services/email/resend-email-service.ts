@@ -5,7 +5,6 @@ import type {
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
   NewCommentEmailData,
-  NewMomentFollowerEmailData,
   NewMomentMemberEmailData,
   MomentUpdateEmailData,
   MomentCancelledEmailData,
@@ -135,17 +134,6 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: NewCommentEmail({ ...data, baseUrl }),
-      });
-    },
-
-    async sendNewMomentToFollower(
-      data: NewMomentFollowerEmailData
-    ): Promise<void> {
-      await send({
-        from,
-        to: data.to,
-        subject: data.strings.subject,
-        react: NewMomentNotificationEmail({ ...data, baseUrl }),
       });
     },
 
