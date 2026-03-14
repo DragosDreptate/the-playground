@@ -77,7 +77,9 @@ export default async function ExplorerPage({
         session?.user?.id
           ? prismaCircleRepository.findAllByUserId(session.user.id)
           : Promise.resolve([]),
-        getFeaturedCircles({ circleRepository: prismaCircleRepository }),
+        activeTab === "circles"
+          ? getFeaturedCircles({ circleRepository: prismaCircleRepository })
+          : Promise.resolve([]),
       ])
   );
 
@@ -116,8 +118,8 @@ export default async function ExplorerPage({
         <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
       </div>
 
-      {/* À la une */}
-      <ExplorerFeatured circles={featuredCircles} />
+      {/* À la une — uniquement sur l'onglet Communautés */}
+      {activeTab === "circles" && <ExplorerFeatured circles={featuredCircles} />}
 
       {/* Tabs + filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
