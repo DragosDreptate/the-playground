@@ -12,7 +12,9 @@ export const revalidate = 300;
 import { getCachedSession } from "@/lib/auth-cache";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
+import { getFeaturedCircles } from "@/domain/usecases/get-featured-circles";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
+import { ExplorerFeatured } from "@/components/explorer/explorer-featured";
 import { ExplorerGrid } from "@/components/explorer/explorer-grid";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
@@ -56,7 +58,7 @@ export default async function ExplorerPage({
   const session = await getCachedSession();
 
   // Fetch only the active tab to avoid over-fetching
-  const [circlesRaw, momentsRaw, userCircles] = await measureTime(
+  const [circlesRaw, momentsRaw, userCircles, featuredCircles] = await measureTime(
     "explorer:data",
     () =>
       Promise.all([
@@ -75,6 +77,7 @@ export default async function ExplorerPage({
         session?.user?.id
           ? prismaCircleRepository.findAllByUserId(session.user.id)
           : Promise.resolve([]),
+        getFeaturedCircles({ circleRepository: prismaCircleRepository }),
       ])
   );
 
@@ -112,6 +115,9 @@ export default async function ExplorerPage({
         <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
       </div>
+
+      {/* À la une */}
+      <ExplorerFeatured circles={featuredCircles} />
 
       {/* Tabs + filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

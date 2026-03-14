@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Découvrir — "À la une" — 3 propositions (4 communautés) — The Playground</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #ec4899;
+      --primary-soft: rgba(236,72,153,0.12);
+      --primary-border: rgba(236,72,153,0.35);
+      --background: #0f0f13;
+      --foreground: #f0f0f5;
+      --card: #18181f;
+      --card-hover: #1e1e26;
+      --muted: #1a1a22;
+      --muted-foreground: #71717a;
+      --border: #27272f;
+      --border-hover: rgba(236,72,153,0.3);
+      --accent: #6ee7d0;
+      --radius-card: 16px;
+      --radius-cover: 12px;
+      --grad-1: linear-gradient(135deg, #ec4899, #8b5cf6);
+      --grad-2: linear-gradient(135deg, #3b82f6, #06b6d4);
+      --grad-3: linear-gradient(135deg, #f59e0b, #ef4444);
+      --grad-4: linear-gradient(135deg, #10b981, #3b82f6);
+      --grad-5: linear-gradient(135deg, #6366f1, #8b5cf6);
+      --grad-6: linear-gradient(135deg, #f43f5e, #fb923c);
+      --grad-7: linear-gradient(135deg, #a855f7, #3b82f6);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0a0a0e;
+      color: var(--foreground);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAVIGATION ENTRE PROPOSITIONS ─── */
+    .nav-proposals {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(10,10,14,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-link-pill {
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--muted-foreground);
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-link-pill:hover {
+      color: var(--foreground);
+      background: var(--muted);
+    }
+    .nav-link-pill.p1 { color: #ec4899; border-color: rgba(236,72,153,0.3); }
+    .nav-link-pill.p1:hover { background: rgba(236,72,153,0.08); }
+    .nav-link-pill.p2 { color: #8b5cf6; border-color: rgba(139,92,246,0.3); }
+    .nav-link-pill.p2:hover { background: rgba(139,92,246,0.08); }
+    .nav-link-pill.p3 { color: #06b6d4; border-color: rgba(6,182,212,0.3); }
+    .nav-link-pill.p3:hover { background: rgba(6,182,212,0.08); }
+
+    /* ─── SECTION SÉPARATRICE ─── */
+    .proposal-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 40px 24px 0;
+      max-width: 1072px;
+      margin: 0 auto;
+    }
+    .proposal-divider::before,
+    .proposal-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .proposal-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+    }
+    .proposal-label.p1 { color: #ec4899; border-color: rgba(236,72,153,0.4); background: rgba(236,72,153,0.06); }
+    .proposal-label.p2 { color: #8b5cf6; border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.06); }
+    .proposal-label.p3 { color: #06b6d4; border-color: rgba(6,182,212,0.4); background: rgba(6,182,212,0.06); }
+
+    /* ─── SITE HEADER ─── */
+    .site-header {
+      height: 60px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,15,19,0.9);
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--grad-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-text {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--foreground);
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .nav-link {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--muted-foreground);
+      cursor: pointer;
+    }
+    .nav-link.active {
+      color: var(--foreground);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-sm { padding: 6px 14px; }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--foreground);
+      border: 1px solid var(--border);
+    }
+    .avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 9999px;
+      background: var(--grad-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    /* ─── MAIN LAYOUT ─── */
+    .main-content {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+    .page-header {
+      margin-bottom: 24px;
+    }
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-size: 15px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+
+    /* Pill tabs */
+    .pill-tabs {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 3px;
+      gap: 2px;
+      width: fit-content;
+      background: var(--card);
+    }
+    .pill-tab {
+      padding: 6px 18px;
+      border-radius: 9999px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted-foreground);
+      font-family: 'Inter', sans-serif;
+    }
+    .pill-tab.active {
+      background: var(--foreground);
+      color: var(--background);
+    }
+    .tabs-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .filter-select {
+      appearance: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--foreground);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 30px 7px 12px;
+      cursor: pointer;
+    }
+
+    /* Grid standard (pour contexte) */
+    .circles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .circle-card-std {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+    }
+    .circle-card-std:hover {
+      border-color: var(--border-hover);
+      background: var(--card-hover);
+    }
+    .cover-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .cover-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .cover-grad {
+      width: 72px;
+      height: 72px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .card-info { flex: 1; min-width: 0; }
+    .card-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-meta {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-bottom: 8px;
+    }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: var(--muted);
+    }
+    .tag-primary {
+      border-color: rgba(236,72,153,0.3);
+      color: #ec4899;
+      background: rgba(236,72,153,0.08);
+    }
+    .badge-demo {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 9999px;
+      border: 1px solid rgba(251,191,36,0.4);
+      color: #fbbf24;
+      background: rgba(251,191,36,0.08);
+      letter-spacing: 0.03em;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════
+       PROPOSITION 1 — "Trio éditorial"
+       Layout asymétrique : 1 grande + 2 empilées
+    ═══════════════════════════════════════════════════════ */
+
+    .featured-p1 {
+      margin-bottom: 32px;
+    }
+    .featured-p1-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .featured-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .featured-icon-p1 {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--grad-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .featured-section-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .featured-subtitle {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot-separator {
+      width: 3px;
+      height: 3px;
+      border-radius: 9999px;
+      background: var(--muted-foreground);
+      display: inline-block;
+    }
+
+    /* Layout : 60/40 */
+    .p1-layout {
+      display: grid;
+      grid-template-columns: 1fr 0.62fr;
+      gap: 12px;
+    }
+    /* Grande card gauche */
+    .p1-main-card {
+      position: relative;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      aspect-ratio: 4/3;
+      background: var(--card);
+    }
+    .p1-main-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .p1-main-cover {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .p1-main-gradient {
+      position: absolute;
+      inset: 0;
+    }
+    .p1-main-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+    }
+    .p1-featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      background: rgba(236,72,153,0.9);
+      color: #fff;
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+    .p1-main-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: #fff;
+      margin-bottom: 8px;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+    }
+    .p1-main-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .p1-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+      font-weight: 500;
+    }
+    .p1-meta-tag {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.9);
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Deux cards secondaires à droite */
+    .p1-side {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .p1-side-card {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      gap: 0;
+    }
+    .p1-side-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .p1-side-cover {
+      width: 100px;
+      flex-shrink: 0;
+      background: var(--muted);
+      position: relative;
+    }
+    .p1-side-cover-grad {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .p1-side-info {
+      flex: 1;
+      padding: 14px 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0;
+    }
+    .p1-side-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: rgba(236,72,153,0.12);
+      border: 1px solid rgba(236,72,153,0.3);
+      color: #ec4899;
+      margin-bottom: 6px;
+      width: fit-content;
+      letter-spacing: 0.03em;
+    }
+    .p1-side-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .p1-side-meta {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .p1-side-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+    .p1-side-cat {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: var(--muted);
+    }
+    .p1-join-btn {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════
+       PROPOSITION 2 — "Trio spotlight"
+       3 cards égales avec gradient border + effet glow
+    ═══════════════════════════════════════════════════════ */
+
+    .featured-p2 {
+      margin-bottom: 32px;
+    }
+    .featured-p2-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .featured-p2-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .featured-p2-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #ec4899;
+    }
+    .featured-p2-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    .featured-p2-hint {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .p2-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .p2-card-wrap {
+      position: relative;
+      border-radius: calc(var(--radius-card) + 1px);
+      padding: 1px;
+      background: var(--grad-1);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .p2-card-wrap:nth-child(2) { background: var(--grad-7); }
+    .p2-card-wrap:nth-child(3) { background: var(--grad-4); }
+    .p2-card-wrap:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .p2-card {
+      background: #14141a;
+      border-radius: var(--radius-card);
+      overflow: hidden;
+    }
+    .p2-cover-zone {
+      width: 100%;
+      aspect-ratio: 1/1;
+      position: relative;
+      overflow: hidden;
+    }
+    .p2-cover-fill {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .p2-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.7) 100%);
+    }
+    .p2-cover-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      backdrop-filter: blur(8px);
+      background: rgba(0,0,0,0.55);
+      color: rgba(255,255,255,0.9);
+      border: 1px solid rgba(255,255,255,0.12);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .p2-cover-members {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      padding: 3px 9px;
+      border-radius: 9999px;
+    }
+    .p2-body {
+      padding: 14px 14px 16px;
+    }
+    .p2-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 5px;
+    }
+    .p2-desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.55;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .p2-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .p2-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: var(--muted);
+    }
+    .p2-cta {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+    }
+    .p2-cta:hover { background: rgba(236,72,153,0.2); }
+
+
+    /* ═══════════════════════════════════════════════════════
+       PROPOSITION 3 — "Bandeau cinématique"
+       Pleine largeur — image de fond floutée, 3 communautés en cartes glass
+    ═══════════════════════════════════════════════════════ */
+
+    .featured-p3 {
+      margin-bottom: 32px;
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .p3-backdrop {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: blur(40px) saturate(1.2);
+      transform: scale(1.05);
+      opacity: 0.35;
+    }
+    .p3-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(10,10,14,0.92) 0%, rgba(20,14,28,0.88) 100%);
+    }
+    .p3-content {
+      position: relative;
+      z-index: 1;
+      padding: 24px 24px 24px;
+    }
+    .p3-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .p3-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .p3-spark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--grad-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(236,72,153,0.4);
+    }
+    .p3-heading {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    .p3-subheading {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 2px;
+    }
+    .p3-refresh-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .p3-clock-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background: #10b981;
+      box-shadow: 0 0 6px rgba(16,185,129,0.6);
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .p3-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .p3-glass-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .p3-glass-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(236,72,153,0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .p3-glass-cover {
+      width: 100%;
+      aspect-ratio: 1/1;
+      position: relative;
+      overflow: hidden;
+    }
+    .p3-glass-cover-fill {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .p3-glass-cover-shine {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 60%);
+    }
+    .p3-glass-body {
+      padding: 12px 12px 14px;
+    }
+    .p3-glass-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      margin-bottom: 4px;
+      color: rgba(255,255,255,0.95);
+    }
+    .p3-glass-meta {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .p3-glass-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .p3-glass-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+    }
+    .p3-glass-btn {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 8px;
+      background: rgba(236,72,153,0.15);
+      border: 1px solid rgba(236,72,153,0.35);
+      color: #ec4899;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.01em;
+    }
+
+
+    /* ─── GRILLE STANDARD (contexte sous les propositions) ─── */
+    .section-separator {
+      margin: 32px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .section-sep-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+    .load-more {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .load-more-btn {
+      padding: 8px 24px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted-foreground);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .load-more-btn:hover { background: var(--muted); color: var(--foreground); }
+
+    /* ─── ANNOTATION DESCRIPTIONS ─── */
+    .proposal-desc-box {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .desc-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+    }
+    .desc-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .desc-text {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      line-height: 1.6;
+    }
+    .desc-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       PROPOSITION 4 — LISTE HORIZONTALE
+    ═══════════════════════════════════════════════════════ */
+
+    .featured-p4 {
+      margin-bottom: 32px;
+    }
+    .p4-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .p4-title-group { display: flex; flex-direction: column; gap: 4px; }
+    .p4-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+    .p4-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+    .p4-hint {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    .p4-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .p4-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .p4-card:hover {
+      background: var(--card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .p4-card:hover .p4-cover-wrap { box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+
+    .p4-cover-wrap {
+      width: 88px;
+      height: 88px;
+      border-radius: 11px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .p4-cover-fill {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .p4-cover-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      font-weight: 900;
+      color: rgba(255,255,255,0.12);
+      letter-spacing: -1px;
+    }
+
+    .p4-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .p4-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      width: fit-content;
+      letter-spacing: 0.03em;
+    }
+    .p4-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .p4-meta {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .p4-desc {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      max-width: 480px;
+    }
+    .p4-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 2px;
+    }
+    .p4-tag {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 9px;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted-foreground);
+      background: var(--muted);
+    }
+    .p4-cta {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 14px;
+      border-radius: 8px;
+      background: var(--primary-soft);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.15s;
+      margin-left: auto;
+    }
+    .p4-cta:hover { background: rgba(236,72,153,0.2); }
+
+    .p4-upcoming {
+      flex-shrink: 0;
+      text-align: right;
+    }
+    .p4-event-label {
+      font-size: 10px;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+    .p4-event-date {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--foreground);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .p4-event-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 9999px;
+      background: #10b981;
+      flex-shrink: 0;
+    }
+
+    /* ─── P4 GLASS VARIANT (cinematic frame) ─── */
+    .p4-card-glass {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .p4-card-glass:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(236,72,153,0.35);
+    }
+    .p4-card-glass .p4-name { color: rgba(255,255,255,0.95); }
+    .p4-card-glass .p4-meta { color: rgba(255,255,255,0.5); }
+    .p4-card-glass .p4-tag {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* SVG icons inline */
+    svg { display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<!-- Navigation entre propositions -->
+<nav class="nav-proposals">
+  <span class="nav-title">Explorer — "À la une" — 3 propositions</span>
+  <div class="nav-links">
+    <a href="#prop2" class="nav-link-pill p2">① Quartet spotlight</a>
+    <a href="#prop3" class="nav-link-pill p3">② Bandeau cinématique</a>
+    <a href="#prop4" class="nav-link-pill" style="color: #f59e0b; border-color: rgba(245,158,11,0.3);">③ Liste horizontale</a>
+  </div>
+</nav>
+
+
+<div style="display:none"><!-- ═══════════════════════════════════════════════
+     PROPOSITION 1 — TRIO ÉDITORIAL (retiré)
+═══════════════════════════════════════════════ -->
+
+<div id="prop1" class="proposal-divider">
+  <span class="proposal-label p1">① Proposition 1 — Trio éditorial</span>
+</div>
+
+<div class="proposal-desc-box">
+  <div class="desc-box" style="border-color: rgba(236,72,153,0.25); background: rgba(236,72,153,0.04);">
+    <div class="desc-title">
+      <span class="desc-pill" style="background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.35); color: #ec4899;">Layout asymétrique</span>
+      Trio éditorial — 1 grande card + 2 secondaires
+    </div>
+    <div class="desc-text">
+      Une grande card principale (60% de largeur) avec la cover en plein fond et un overlay gradient, accompagnée de 2 cards compactes empilées sur la droite (40%). Inspiré des unes de magazines numériques. Crée une hiérarchie visuelle forte et guide le regard vers la communauté "principale du jour". Les 2 secondaires restent cliquables et lisibles sans effort.
+    </div>
+  </div>
+</div>
+
+<div class="main-content" style="padding-top: 0;">
+  <!-- En-tête page -->
+  <header class="site-header" style="margin-bottom: 0; border-radius: 16px 16px 0 0; overflow: hidden;">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="logo-text">The Playground</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Mon espace</a>
+        <a href="#" class="nav-link active">Découvrir</a>
+      </nav>
+      <div class="header-right">
+        <div class="avatar-sm">D</div>
+      </div>
+    </div>
+  </header>
+
+  <div style="padding-top: 32px;">
+    <!-- Page header -->
+    <div class="page-header">
+      <h1 class="page-title">Découvrir</h1>
+      <p class="page-subtitle">Explorez les communautés actives et les prochains événements près de chez vous.</p>
+    </div>
+
+    <!-- === À LA UNE P1 === -->
+    <div class="featured-p1">
+      <div class="featured-p1-header">
+        <div class="featured-title-row">
+          <div class="featured-icon-p1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <span class="featured-section-title">À la une</span>
+        </div>
+        <div class="featured-subtitle">
+          <span>Sélectionnées parmi les communautés actives</span>
+          <span class="dot-separator"></span>
+          <span>Renouvellement quotidien</span>
+        </div>
+      </div>
+
+      <div class="p1-layout">
+        <!-- Grande card principale -->
+        <div class="p1-main-card">
+          <!-- Cover (gradient simulant une vraie photo) -->
+          <div class="p1-main-gradient" style="background: linear-gradient(135deg, #1e1033 0%, #3b1278 35%, #7e22ce 65%, #ec4899 100%);"></div>
+          <!-- Pattern overlay -->
+          <div style="position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 80%, rgba(236,72,153,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139,92,246,0.4) 0%, transparent 50%);"></div>
+          <!-- Nom cover simulé -->
+          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.08;">
+            <div style="font-size: 72px; font-weight: 900; letter-spacing: -4px; color: #fff; text-align: center; line-height: 1;">TECH<br>PARIS</div>
+          </div>
+          <!-- Gradient overlay bas -->
+          <div style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.85) 100%);"></div>
+          <!-- Contenu overlay -->
+          <div class="p1-main-content">
+            <div class="p1-featured-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="#fff" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              À la une
+            </div>
+            <div class="p1-main-title">Paris Tech Builders</div>
+            <div class="p1-main-meta">
+              <div class="p1-meta-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                248 membres
+              </div>
+              <div class="p1-meta-item">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Prochain event le 22 mars
+              </div>
+              <span class="p1-meta-tag">Tech &amp; Dev</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 cards secondaires -->
+        <div class="p1-side">
+          <div class="p1-side-card">
+            <div class="p1-side-cover">
+              <div class="p1-side-cover-grad" style="background: linear-gradient(135deg, #0f2744, #1d4ed8, #06b6d4);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;">
+                <div style="font-size: 32px; font-weight: 900; color: #fff;">UX</div>
+              </div>
+            </div>
+            <div class="p1-side-info">
+              <div>
+                <div class="p1-side-badge">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  À la une
+                </div>
+                <div class="p1-side-title">UX Collective Paris</div>
+                <div class="p1-side-meta">84 membres · 6 events passés</div>
+              </div>
+              <div class="p1-side-bottom">
+                <span class="p1-side-cat">Design</span>
+                <button class="p1-join-btn">Voir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p1-side-card">
+            <div class="p1-side-cover">
+              <div class="p1-side-cover-grad" style="background: linear-gradient(135deg, #1a2f1a, #16a34a, #4ade80);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;">
+                <div style="font-size: 28px; font-weight: 900; color: #fff;">🌱</div>
+              </div>
+            </div>
+            <div class="p1-side-info">
+              <div>
+                <div class="p1-side-badge">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  À la une
+                </div>
+                <div class="p1-side-title">Startups Durables Lyon</div>
+                <div class="p1-side-meta">57 membres · 4 events passés</div>
+              </div>
+              <div class="p1-side-bottom">
+                <span class="p1-side-cat">Entrepreneuriat</span>
+                <button class="p1-join-btn">Voir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="p1-side-card">
+            <div class="p1-side-cover">
+              <div class="p1-side-cover-grad" style="background: linear-gradient(135deg, #2d1a00, #b45309, #f59e0b);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;">
+                <div style="font-size: 28px; font-weight: 900; color: #fff;">PM</div>
+              </div>
+            </div>
+            <div class="p1-side-info">
+              <div>
+                <div class="p1-side-badge">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  À la une
+                </div>
+                <div class="p1-side-title">Product Makers Bordeaux</div>
+                <div class="p1-side-meta">41 membres · 3 events passés</div>
+              </div>
+              <div class="p1-side-bottom">
+                <span class="p1-side-cat">Product</span>
+                <button class="p1-join-btn">Voir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs + filtres -->
+    <div class="tabs-toolbar">
+      <div class="pill-tabs">
+        <button class="pill-tab active">Communautés</button>
+        <button class="pill-tab">Événements</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <select class="filter-select"><option>Toutes catégories</option></select>
+        <select class="filter-select"><option>Les plus populaires</option></select>
+      </div>
+    </div>
+
+    <!-- Grid standard (contexte) -->
+    <div class="circles-grid">
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Le Collectif Créatif</div>
+          <div class="card-meta">142 membres · 8 événements</div>
+          <div class="card-tags"><span class="tag">Art &amp; Créativité</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"></div>
+        <div class="card-info">
+          <div class="card-name">Freelances Bordeaux</div>
+          <div class="card-meta">96 membres · 5 événements</div>
+          <div class="card-tags"><span class="tag">Business</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #10b981, #3b82f6);"></div>
+        <div class="card-info">
+          <div class="card-name">Makers &amp; Hackers Nantes</div>
+          <div class="card-meta">73 membres · 3 événements</div>
+          <div class="card-tags"><span class="tag">Tech &amp; Dev</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Product Circle</div>
+          <div class="card-meta">61 membres · 2 événements</div>
+          <div class="card-tags"><span class="tag">Product</span><span class="badge-demo">Démo</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="load-more"><button class="load-more-btn">Afficher plus</button></div>
+  </div>
+</div>
+</div><!-- end P1 hidden -->
+
+
+<!-- ═══════════════════════════════════════════════
+     PROPOSITION 2 — QUARTET SPOTLIGHT
+═══════════════════════════════════════════════ -->
+
+<div id="prop2" class="proposal-divider" style="padding-top: 60px;">
+  <span class="proposal-label p2">② Proposition 2 — Trio spotlight</span>
+</div>
+
+<div class="proposal-desc-box">
+  <div class="desc-box" style="border-color: rgba(139,92,246,0.25); background: rgba(139,92,246,0.04);">
+    <div class="desc-title">
+      <span class="desc-pill" style="background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.35); color: #8b5cf6;">3 cards égales</span>
+      Trio spotlight — gradient border + cover 1:1
+    </div>
+    <div class="desc-text">
+      Trois cards de taille identique avec un gradient border distinctif (chaque card a sa propre couleur d'accent), une cover 1:1 plein cadre, et un corps avec description + CTA. Simple, équitable pour les 3 communautés, très lisible. Le gradient border est le seul signal qui les distingue du reste de la grille — élégant sans être ostentatoire.
+    </div>
+  </div>
+</div>
+
+<div class="main-content" style="padding-top: 0;">
+  <header class="site-header" style="margin-bottom: 0; border-radius: 16px 16px 0 0; overflow: hidden;">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="logo-text">The Playground</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Mon espace</a>
+        <a href="#" class="nav-link active">Découvrir</a>
+      </nav>
+      <div class="header-right"><div class="avatar-sm">D</div></div>
+    </div>
+  </header>
+
+  <div style="padding-top: 32px;">
+    <div class="page-header">
+      <h1 class="page-title">Découvrir</h1>
+      <p class="page-subtitle">Explorez les communautés actives et les prochains événements près de chez vous.</p>
+    </div>
+
+    <!-- === À LA UNE P2 === -->
+    <div class="featured-p2">
+      <div class="featured-p2-header">
+        <div class="featured-p2-title-group">
+          <div class="featured-p2-eyebrow">✦ À la une</div>
+          <div class="featured-p2-title">Communautés du jour</div>
+        </div>
+        <div class="featured-p2-hint">Sélectionnées parmi les communautés actives · Renouvellement quotidien</div>
+      </div>
+
+      <div class="p2-grid">
+        <!-- Card 1 — grad rose/violet -->
+        <div class="p2-card-wrap">
+          <div class="p2-card">
+            <div class="p2-cover-zone">
+              <div class="p2-cover-fill" style="background: linear-gradient(135deg, #1e1033, #7e22ce, #ec4899);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.1;"><span style="font-size: 64px; font-weight: 900; color: #fff;">TP</span></div>
+              <div class="p2-cover-overlay"></div>
+              <div class="p2-cover-badge">✦ À la une</div>
+              <div class="p2-cover-members">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                248 membres
+              </div>
+            </div>
+            <div class="p2-body">
+              <div class="p2-name">Paris Tech Builders</div>
+              <div class="p2-footer">
+                <span class="p2-tag">Tech &amp; Dev</span>
+                <button class="p2-cta">Découvrir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 — grad violet/bleu -->
+        <div class="p2-card-wrap">
+          <div class="p2-card">
+            <div class="p2-cover-zone">
+              <div class="p2-cover-fill" style="background: linear-gradient(135deg, #0f2744, #2563eb, #7c3aed);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.1;"><span style="font-size: 56px; font-weight: 900; color: #fff;">UX</span></div>
+              <div class="p2-cover-overlay"></div>
+              <div class="p2-cover-badge">✦ À la une</div>
+              <div class="p2-cover-members">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                84 membres
+              </div>
+            </div>
+            <div class="p2-body">
+              <div class="p2-name">UX Collective Paris</div>
+              <div class="p2-footer">
+                <span class="p2-tag">Design</span>
+                <button class="p2-cta">Découvrir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 — grad vert/bleu -->
+        <div class="p2-card-wrap">
+          <div class="p2-card">
+            <div class="p2-cover-zone">
+              <div class="p2-cover-fill" style="background: linear-gradient(135deg, #0a2818, #166534, #10b981);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.1;"><span style="font-size: 52px; font-weight: 900; color: #fff;">SDL</span></div>
+              <div class="p2-cover-overlay"></div>
+              <div class="p2-cover-badge">✦ À la une</div>
+              <div class="p2-cover-members">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                57 membres
+              </div>
+            </div>
+            <div class="p2-body">
+              <div class="p2-name">Startups Durables Lyon</div>
+              <div class="p2-footer">
+                <span class="p2-tag">Entrepreneuriat</span>
+                <button class="p2-cta">Découvrir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 — grad orange/ambre -->
+        <div class="p2-card-wrap" style="background: var(--grad-3);">
+          <div class="p2-card">
+            <div class="p2-cover-zone">
+              <div class="p2-cover-fill" style="background: linear-gradient(135deg, #2d1a00, #b45309, #f59e0b);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.1;"><span style="font-size: 48px; font-weight: 900; color: #fff;">PM</span></div>
+              <div class="p2-cover-overlay"></div>
+              <div class="p2-cover-badge">✦ À la une</div>
+              <div class="p2-cover-members">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                41 membres
+              </div>
+            </div>
+            <div class="p2-body">
+              <div class="p2-name">Product Makers Bordeaux</div>
+              <div class="p2-footer">
+                <span class="p2-tag">Product</span>
+                <button class="p2-cta">Découvrir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs + filtres -->
+    <div class="tabs-toolbar">
+      <div class="pill-tabs">
+        <button class="pill-tab active">Communautés</button>
+        <button class="pill-tab">Événements</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <select class="filter-select"><option>Toutes catégories</option></select>
+        <select class="filter-select"><option>Les plus populaires</option></select>
+      </div>
+    </div>
+    <div class="circles-grid">
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Le Collectif Créatif</div>
+          <div class="card-meta">142 membres · 8 événements</div>
+          <div class="card-tags"><span class="tag">Art &amp; Créativité</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"></div>
+        <div class="card-info">
+          <div class="card-name">Freelances Bordeaux</div>
+          <div class="card-meta">96 membres · 5 événements</div>
+          <div class="card-tags"><span class="tag">Business</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #10b981, #3b82f6);"></div>
+        <div class="card-info">
+          <div class="card-name">Makers &amp; Hackers Nantes</div>
+          <div class="card-meta">73 membres · 3 événements</div>
+          <div class="card-tags"><span class="tag">Tech &amp; Dev</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Product Circle</div>
+          <div class="card-meta">61 membres · 2 événements</div>
+          <div class="card-tags"><span class="tag">Product</span><span class="badge-demo">Démo</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="load-more"><button class="load-more-btn">Afficher plus</button></div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PROPOSITION 3 — BANDEAU CINÉMATIQUE
+═══════════════════════════════════════════════ -->
+
+<div id="prop3" class="proposal-divider" style="padding-top: 60px;">
+  <span class="proposal-label p3">③ Proposition 3 — Bandeau cinématique</span>
+</div>
+
+<div class="proposal-desc-box">
+  <div class="desc-box" style="border-color: rgba(6,182,212,0.25); background: rgba(6,182,212,0.04);">
+    <div class="desc-title">
+      <span class="desc-pill" style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.35); color: #06b6d4;">Glassmorphism</span>
+      Bandeau cinématique — fond ambiant + cards glass
+    </div>
+    <div class="desc-text">
+      Une zone pleine largeur avec un backdrop coloré (les covers des communautés floutées en fond), une légère vignette sombre, et 3 "glass cards" au-dessus. L'effet d'ambiance est généré automatiquement depuis les covers des communautés sélectionnées. Un point lumineux animé indique le renouvellement en temps réel (minuit). C'est l'approche la plus immersive et la plus distincte — rompt clairement avec la grille standard en dessous.
+    </div>
+  </div>
+</div>
+
+<div class="main-content" style="padding-top: 0;">
+  <header class="site-header" style="margin-bottom: 0; border-radius: 16px 16px 0 0; overflow: hidden;">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="logo-text">The Playground</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Mon espace</a>
+        <a href="#" class="nav-link active">Découvrir</a>
+      </nav>
+      <div class="header-right"><div class="avatar-sm">D</div></div>
+    </div>
+  </header>
+
+  <div style="padding-top: 32px;">
+    <div class="page-header">
+      <h1 class="page-title">Découvrir</h1>
+      <p class="page-subtitle">Explorez les communautés actives et les prochains événements près de chez vous.</p>
+    </div>
+
+    <!-- === À LA UNE P3 === -->
+    <div class="featured-p3" style="margin-bottom: 32px;">
+      <!-- Backdrop ambiant (covers floutées simulées) -->
+      <div class="p3-backdrop" style="background: linear-gradient(135deg, #7e22ce 0%, #1d4ed8 30%, #ec4899 60%, #16a34a 100%);"></div>
+      <div class="p3-bg-overlay"></div>
+
+      <div class="p3-content">
+        <div class="p3-header">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); margin-bottom: 4px;">✦ À la une</div>
+            <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.4px; color: var(--foreground);">Communautés du jour</div>
+          </div>
+          <div class="p3-refresh-info">
+            <div class="p3-clock-dot"></div>
+            <span>Renouvellement à minuit</span>
+          </div>
+        </div>
+
+        <div class="p3-cards">
+          <!-- Glass card 1 -->
+          <div class="p3-glass-card">
+            <div class="p3-glass-cover">
+              <div class="p3-glass-cover-fill" style="background: linear-gradient(135deg, #1e1033, #7e22ce, #ec4899);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;"><span style="font-size: 52px; font-weight: 900; color: #fff;">TP</span></div>
+              <div class="p3-glass-cover-shine"></div>
+            </div>
+            <div class="p3-glass-body">
+              <div class="p3-glass-name">Paris Tech Builders</div>
+              <div class="p3-glass-meta">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                248 membres
+                <span class="dot-separator"></span>
+                Tech &amp; Dev
+              </div>
+              <div class="p3-glass-footer">
+                <span class="p3-glass-tag">Paris</span>
+                <button class="p3-glass-btn">Découvrir</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Glass card 2 -->
+          <div class="p3-glass-card">
+            <div class="p3-glass-cover">
+              <div class="p3-glass-cover-fill" style="background: linear-gradient(135deg, #0f2744, #1d4ed8, #06b6d4);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;"><span style="font-size: 48px; font-weight: 900; color: #fff;">UX</span></div>
+              <div class="p3-glass-cover-shine"></div>
+            </div>
+            <div class="p3-glass-body">
+              <div class="p3-glass-name">UX Collective Paris</div>
+              <div class="p3-glass-meta">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                84 membres
+                <span class="dot-separator"></span>
+                Design
+              </div>
+              <div class="p3-glass-footer">
+                <span class="p3-glass-tag">Paris</span>
+                <button class="p3-glass-btn">Découvrir</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Glass card 3 -->
+          <div class="p3-glass-card">
+            <div class="p3-glass-cover">
+              <div class="p3-glass-cover-fill" style="background: linear-gradient(135deg, #0a2818, #166534, #10b981);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;"><span style="font-size: 44px; font-weight: 900; color: #fff;">SDL</span></div>
+              <div class="p3-glass-cover-shine"></div>
+            </div>
+            <div class="p3-glass-body">
+              <div class="p3-glass-name">Startups Durables Lyon</div>
+              <div class="p3-glass-meta">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                57 membres
+                <span class="dot-separator"></span>
+                Entrepreneuriat
+              </div>
+              <div class="p3-glass-footer">
+                <span class="p3-glass-tag">Lyon</span>
+                <button class="p3-glass-btn">Découvrir</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Glass card 4 -->
+          <div class="p3-glass-card">
+            <div class="p3-glass-cover">
+              <div class="p3-glass-cover-fill" style="background: linear-gradient(135deg, #2d1a00, #b45309, #f59e0b);"></div>
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0.12;"><span style="font-size: 40px; font-weight: 900; color: #fff;">PM</span></div>
+              <div class="p3-glass-cover-shine"></div>
+            </div>
+            <div class="p3-glass-body">
+              <div class="p3-glass-name">Product Makers Bordeaux</div>
+              <div class="p3-glass-meta">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                41 membres
+                <span class="dot-separator"></span>
+                Product
+              </div>
+              <div class="p3-glass-footer">
+                <span class="p3-glass-tag">Bordeaux</span>
+                <button class="p3-glass-btn">Découvrir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs + filtres -->
+    <div class="tabs-toolbar">
+      <div class="pill-tabs">
+        <button class="pill-tab active">Communautés</button>
+        <button class="pill-tab">Événements</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <select class="filter-select"><option>Toutes catégories</option></select>
+        <select class="filter-select"><option>Les plus populaires</option></select>
+      </div>
+    </div>
+    <div class="circles-grid">
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Le Collectif Créatif</div>
+          <div class="card-meta">142 membres · 8 événements</div>
+          <div class="card-tags"><span class="tag">Art &amp; Créativité</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"></div>
+        <div class="card-info">
+          <div class="card-name">Freelances Bordeaux</div>
+          <div class="card-meta">96 membres · 5 événements</div>
+          <div class="card-tags"><span class="tag">Business</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #10b981, #3b82f6);"></div>
+        <div class="card-info">
+          <div class="card-name">Makers &amp; Hackers Nantes</div>
+          <div class="card-meta">73 membres · 3 événements</div>
+          <div class="card-tags"><span class="tag">Tech &amp; Dev</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Product Circle</div>
+          <div class="card-meta">61 membres · 2 événements</div>
+          <div class="card-tags"><span class="tag">Product</span><span class="badge-demo">Démo</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="load-more"><button class="load-more-btn">Afficher plus</button></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     PROPOSITION 4 — LISTE HORIZONTALE
+═══════════════════════════════════════════════ -->
+
+<div id="prop4" class="proposal-divider" style="padding-top: 60px;">
+  <span class="proposal-label" style="color: #f59e0b; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.06);">③ Liste horizontale</span>
+</div>
+
+<div class="proposal-desc-box">
+  <div class="desc-box" style="border-color: rgba(245,158,11,0.25); background: rgba(245,158,11,0.04);">
+    <div class="desc-title">
+      <span class="desc-pill" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #f59e0b;">Cover 1:1 gauche</span>
+      Liste horizontale — cover carrée à gauche, infos à droite
+    </div>
+    <div class="desc-text">
+      3 cards empilées en colonne, chacune en mode horizontal : cover 1:1 à gauche (100×100px), informations à droite (nom, membres, description courte, tag). La section forme un bloc unitaire avec des séparateurs internes — différent d'une grille de cards. Proche du pattern "liste classée" que les utilisateurs reconnaissent immédiatement. Prochain événement affiché pour les communautés qui en ont un.
+    </div>
+  </div>
+</div>
+
+<div class="main-content" style="padding-top: 0;">
+  <header class="site-header" style="margin-bottom: 0; border-radius: 16px 16px 0 0; overflow: hidden;">
+    <div class="header-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        </div>
+        <span class="logo-text">The Playground</span>
+      </a>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Mon espace</a>
+        <a href="#" class="nav-link active">Découvrir</a>
+      </nav>
+      <div class="header-right"><div class="avatar-sm">D</div></div>
+    </div>
+  </header>
+
+  <div style="padding-top: 32px;">
+    <div class="page-header">
+      <h1 class="page-title">Découvrir</h1>
+      <p class="page-subtitle">Explorez les communautés actives et les prochains événements près de chez vous.</p>
+    </div>
+
+    <!-- === À LA UNE P4 === -->
+    <div class="featured-p3" style="margin-bottom: 32px;">
+      <div class="p3-backdrop" style="background: linear-gradient(135deg, #7e22ce 0%, #1d4ed8 30%, #ec4899 60%, #16a34a 100%);"></div>
+      <div class="p3-bg-overlay"></div>
+      <div class="p3-content">
+        <div class="p3-header">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); margin-bottom: 4px;">✦ À la une</div>
+            <div style="font-size: 18px; font-weight: 800; letter-spacing: -0.4px; color: var(--foreground);">Communautés du jour</div>
+          </div>
+          <div class="p3-refresh-info">
+            <div class="p3-clock-dot"></div>
+            <span>Renouvellement à minuit</span>
+          </div>
+        </div>
+
+        <div class="p4-cards">
+
+        <!-- Card 1 -->
+        <div class="p4-card p4-card-glass">
+          <div class="p4-cover-wrap">
+            <div class="p4-cover-fill" style="background: linear-gradient(135deg, #1e1033, #7e22ce, #ec4899);"></div>
+            <div class="p4-cover-label">TP</div>
+          </div>
+          <div class="p4-info">
+            <div class="p4-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              À la une
+            </div>
+            <div class="p4-name">Paris Tech Builders</div>
+            <div class="p4-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              248 membres
+            </div>
+            <div class="p4-footer">
+              <span class="p4-tag">Tech &amp; Dev</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="p4-card p4-card-glass">
+          <div class="p4-cover-wrap">
+            <div class="p4-cover-fill" style="background: linear-gradient(135deg, #0f2744, #1d4ed8, #06b6d4);"></div>
+            <div class="p4-cover-label">UX</div>
+          </div>
+          <div class="p4-info">
+            <div class="p4-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              À la une
+            </div>
+            <div class="p4-name">UX Collective Paris</div>
+            <div class="p4-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              84 membres
+            </div>
+            <div class="p4-footer">
+              <span class="p4-tag">Design</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="p4-card p4-card-glass">
+          <div class="p4-cover-wrap">
+            <div class="p4-cover-fill" style="background: linear-gradient(135deg, #0a2818, #166534, #10b981);"></div>
+            <div class="p4-cover-label">SDL</div>
+          </div>
+          <div class="p4-info">
+            <div class="p4-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              À la une
+            </div>
+            <div class="p4-name">Startups Durables Lyon</div>
+            <div class="p4-meta">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              57 membres
+            </div>
+            <div class="p4-footer">
+              <span class="p4-tag">Entrepreneuriat</span>
+            </div>
+          </div>
+        </div>
+
+        </div><!-- /p4-cards -->
+      </div><!-- /p3-content -->
+    </div><!-- /featured-p3 -->
+
+    <!-- Tabs + filtres -->
+    <div class="tabs-toolbar">
+      <div class="pill-tabs">
+        <button class="pill-tab active">Communautés</button>
+        <button class="pill-tab">Événements</button>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <select class="filter-select"><option>Toutes catégories</option></select>
+        <select class="filter-select"><option>Les plus populaires</option></select>
+      </div>
+    </div>
+
+    <!-- Grid standard (contexte) -->
+    <div class="circles-grid">
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #ec4899, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Le Collectif Créatif</div>
+          <div class="card-meta">142 membres · 8 événements</div>
+          <div class="card-tags"><span class="tag">Art &amp; Créativité</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"></div>
+        <div class="card-info">
+          <div class="card-name">Freelances Bordeaux</div>
+          <div class="card-meta">96 membres · 5 événements</div>
+          <div class="card-tags"><span class="tag">Business</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #10b981, #3b82f6);"></div>
+        <div class="card-info">
+          <div class="card-name">Makers &amp; Hackers Nantes</div>
+          <div class="card-meta">73 membres · 3 événements</div>
+          <div class="card-tags"><span class="tag">Tech &amp; Dev</span></div>
+        </div>
+      </div>
+      <div class="circle-card-std">
+        <div class="cover-grad" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);"></div>
+        <div class="card-info">
+          <div class="card-name">Product Circle</div>
+          <div class="card-meta">61 membres · 2 événements</div>
+          <div class="card-tags"><span class="tag">Product</span><span class="badge-demo">Démo</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="load-more"><button class="load-more-btn">Afficher plus</button></div>
+  </div>
+</div>
+
+<!-- Spacer final -->
+<div style="height: 80px;"></div>
+
+</body>
+</html>
