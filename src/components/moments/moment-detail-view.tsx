@@ -176,12 +176,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 style={{ aspectRatio: "1 / 1" }}
               >
                 {moment.status === "DRAFT" && (
-                  <div className="absolute left-3 top-3 z-10">
-                    <Badge variant="outline" className="gap-1 border-primary/40 bg-background/90 text-xs text-primary backdrop-blur-sm">
-                      <FileEdit className="size-3" />
-                      {t("status.draft")}
-                    </Badge>
-                  </div>
+                  <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary">
+                    <FileEdit className="size-3.5" />
+                    {t("status.draft")}
+                  </span>
                 )}
                 {moment.coverImage ? (
                   <Image
