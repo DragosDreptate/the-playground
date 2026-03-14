@@ -88,8 +88,7 @@ export async function broadcastMomentAction(
     session.user.id
   );
 
-  const allRecipients = members;
-  const allUserIds = allRecipients.map((r) => r.userId);
+  const allUserIds = members.map((r) => r.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
 
   // Résoudre la locale dans le contexte de la request
@@ -109,7 +108,7 @@ export async function broadcastMomentAction(
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const hostName = session.user.name ?? session.user.email ?? "";
 
-  const recipientsToEmail = allRecipients.filter((r) => {
+  const recipientsToEmail = members.filter((r) => {
     const prefs = prefsMap.get(r.userId);
     return prefs?.notifyNewMomentInCircle !== false;
   });
