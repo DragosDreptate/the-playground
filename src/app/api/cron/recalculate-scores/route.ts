@@ -9,9 +9,14 @@ import {
 /**
  * POST /api/cron/recalculate-scores
  *
- * Batch quotidien de recalcul des scores Explorer pour les Communautés et événements publics.
- * Déclenché chaque nuit à 3h via Vercel Cron (vercel.json).
+ * Batch quotidien de recalcul des scores Explorer pour toutes les Communautés
+ * (publiques ET privées) et leurs événements publics à venir.
  *
+ * Les Communautés privées sont scorées pour qu'elles aient un score prêt
+ * si elles passent en publique entre deux exécutions du cron.
+ * Elles n'apparaissent jamais sur Explorer (filtre visibility: PUBLIC dans les requêtes Explorer).
+ *
+ * Déclenché chaque nuit à 3h via Vercel Cron (vercel.json).
  * Protection : header Authorization: Bearer CRON_SECRET
  */
 export async function POST(request: NextRequest) {
@@ -28,7 +33,6 @@ export async function POST(request: NextRequest) {
     // 2. Calcul des scores Communautés (étape 1 & 2)
     const circles = await prisma.circle.findMany({
       where: {
-        visibility: "PUBLIC",
         excludedFromExplorer: false,
         NOT: excludeTestHostFilter(),
       },
@@ -96,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     const circlesDuration = Date.now() - startedAt;
     console.log(
-      `[recalculate-scores] Circles: ${circles.length} mis à jour en ${circlesDuration}ms`
+      `[recalculate-scores] Circles (public + privées): ${circles.length} mis à jour en ${circlesDuration}ms`
     );
 
     // 3. Calcul des scores événements (étape 3 & 4)
