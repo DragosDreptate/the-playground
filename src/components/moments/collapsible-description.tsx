@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { linkifyText } from "@/lib/linkify";
 
 type Props = {
   text: string;
@@ -44,7 +45,7 @@ export function CollapsibleDescription({ text, maxLines = 10 }: Props) {
         className="text-sm leading-relaxed whitespace-pre-wrap"
         style={expanded ? undefined : { ...clampBase, WebkitLineClamp: maxLines }}
       >
-        {text}
+        {linkifyText(text)}
       </p>
       {(isClamped || expanded) && (
         <button

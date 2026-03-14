@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminCircleDeleteButton } from "./delete-button";
+import { linkifyText } from "@/lib/linkify";
 import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
 
 type Props = {
@@ -84,7 +85,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
             <CardTitle className="text-base">{t("circleDetail.description")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{circle.description}</p>
+            <p className="text-sm whitespace-pre-wrap">{linkifyText(circle.description)}</p>
           </CardContent>
         </Card>
       )}

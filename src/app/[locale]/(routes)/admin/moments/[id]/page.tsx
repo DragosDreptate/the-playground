@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminMomentActions } from "./actions";
+import { linkifyText } from "@/lib/linkify";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -105,7 +106,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
             <CardTitle className="text-base">Description</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{moment.description}</p>
+            <p className="text-sm whitespace-pre-wrap">{linkifyText(moment.description)}</p>
           </CardContent>
         </Card>
       )}
