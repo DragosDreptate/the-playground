@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon } from "lucide-react";
+import { Users, CalendarIcon, MapPin } from "lucide-react";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -64,9 +64,6 @@ export async function DashboardCircleCard({ circle }: Props) {
                   ? t("circleCard.roleBadge.host")
                   : t("circleCard.roleBadge.member")}
               </span>
-              {circle.city && (
-                <span className="text-muted-foreground text-xs">{circle.city}</span>
-              )}
             </div>
             <h3 className="text-sm font-semibold leading-snug group-hover:underline truncate">
               {circle.name}
@@ -75,6 +72,12 @@ export async function DashboardCircleCard({ circle }: Props) {
               {circle.description}
             </p>
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
+              {circle.city && (
+                <div className="flex items-center gap-1">
+                  <MapPin className="size-3.5 shrink-0" />
+                  <span>{circle.city}</span>
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <Users className="size-3.5 shrink-0" />
                 <span>{t("circleCard.members", { count: circle.memberCount })}</span>
