@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Tag } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -34,7 +34,8 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
         : null;
 
   const categoryBadge = categoryLabel && (
-    <span className="text-muted-foreground text-xs">
+    <span className="flex items-center gap-1 text-muted-foreground text-xs">
+      <Tag className="size-3 shrink-0" />
       {categoryLabel}
     </span>
   );

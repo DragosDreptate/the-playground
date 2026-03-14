@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatShortDate, formatTime } from "@/lib/format-date";
-import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
+import { MapPin, Globe, Users, Crown, Clock, Tag } from "lucide-react";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -60,7 +60,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   ) : null;
 
   const categoryLabel = moment.circle.category && (
-    <span className="text-xs font-semibold text-foreground">
+    <span className="flex items-center gap-1 text-muted-foreground text-xs">
+      <Tag className="size-3 shrink-0" />
       {tCategory(moment.circle.category)}
     </span>
   );

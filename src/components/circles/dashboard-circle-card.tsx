@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Tag } from "lucide-react";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -56,7 +56,10 @@ export async function DashboardCircleCard({ circle }: Props) {
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
             {categoryLabel && (
-              <span className="text-muted-foreground text-xs">{categoryLabel}</span>
+              <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                <Tag className="size-3 shrink-0" />
+                {categoryLabel}
+              </span>
             )}
             <div className="flex items-baseline gap-3">
               <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">

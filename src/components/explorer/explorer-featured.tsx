@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, Star, MapPin } from "lucide-react";
+import { Users, Star, MapPin, Tag } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -87,7 +87,8 @@ export function ExplorerFeatured({ circles }: Props) {
                   {/* Ligne 1 : thématique + badge aligné à droite */}
                   <div className="flex items-center justify-between gap-2">
                     {categoryLabel && (
-                      <span className="min-w-0 text-xs font-semibold text-muted-foreground truncate">
+                      <span className="flex min-w-0 items-center gap-1 text-xs text-muted-foreground truncate">
+                        <Tag className="size-3 shrink-0" />
                         {categoryLabel}
                       </span>
                     )}
