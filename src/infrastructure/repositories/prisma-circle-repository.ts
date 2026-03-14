@@ -410,7 +410,7 @@ export const prismaCircleRepository: CircleRepository = {
     excludeUserId: string
   ): Promise<CircleFollowerInfo[]> {
     const rows = await prisma.circleMembership.findMany({
-      where: { circleId, userId: { not: excludeUserId } },
+      where: { circleId, userId: { not: excludeUserId }, user: { role: { not: "ADMIN" } } },
       include: {
         user: {
           select: { email: true, firstName: true, lastName: true },
