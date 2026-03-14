@@ -18,23 +18,18 @@ export function ExplorerFeatured({ circles }: Props) {
   if (circles.length === 0) return null;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-[20px] border">
-      {/* Backdrop cinématique */}
+    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-primary/20">
+      {/* Backdrop — palette rose/violet du design system */}
       <div
-        className="absolute inset-0 scale-105 opacity-30"
+        className="absolute inset-0 scale-105 opacity-45"
         style={{
-          background:
-            "linear-gradient(135deg, #7e22ce 0%, #1d4ed8 30%, #ec4899 60%, #16a34a 100%)",
-          filter: "blur(40px) saturate(1.2)",
+          background: "linear-gradient(135deg, #6d28d9 0%, #9333ea 40%, #ec4899 100%)",
+          filter: "blur(48px) saturate(1.4)",
         }}
       />
       {/* Overlay sombre */}
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(10,10,14,0.92) 0%, rgba(20,14,28,0.88) 100%)",
-        }}
+        className="absolute inset-0 bg-card/85"
       />
 
       <div className="relative z-10 p-5 sm:p-6">
@@ -72,20 +67,7 @@ export function ExplorerFeatured({ circles }: Props) {
               <Link
                 key={circle.id}
                 href={`/circles/${circle.slug}`}
-                className="group flex items-center gap-3 rounded-[14px] p-3 transition-all"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  backdropFilter: "blur(10px)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                  e.currentTarget.style.borderColor = "rgba(236,72,153,0.35)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.05)";
-                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
-                }}
+                className="group flex items-center gap-3 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
               >
                 {/* Cover 1:1 */}
                 <div
@@ -127,14 +109,7 @@ export function ExplorerFeatured({ circles }: Props) {
                     </span>
                   </div>
                   {categoryLabel && (
-                    <div
-                      className="mt-1.5 inline-block rounded-full px-2 py-0.5 text-[11px]"
-                      style={{
-                        background: "rgba(255,255,255,0.08)",
-                        border: "1px solid rgba(255,255,255,0.12)",
-                        color: "rgba(240,240,245,0.6)",
-                      }}
-                    >
+                    <div className="mt-1.5 inline-block rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
                       {categoryLabel}
                     </div>
                   )}
