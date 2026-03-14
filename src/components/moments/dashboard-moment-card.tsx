@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Globe, Check, Clock, Crown, Users } from "lucide-react";
+import { MapPin, Globe, Check, Clock, Crown, Users, FileEdit } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 import { CircleAvatar } from "@/components/circles/circle-avatar";
@@ -32,11 +32,13 @@ type DashboardMomentCardProps = ParticipantProps | OrganizerProps;
 export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
+  const tMoment = useTranslations("Moment");
   const locale = useLocale();
 
   const isOrganizer = props.variant === "organizer";
   const isPast = props.isPast ?? false;
   const isLast = props.isLast;
+  const isDraft = isOrganizer && (props as OrganizerProps).moment.status === "DRAFT";
 
   // Extraire les données selon le variant
   const momentData = isOrganizer
@@ -79,13 +81,15 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const dotClass = isPast
     ? "bg-border"
-    : isOrganizer || isHost
-      ? "bg-primary"
-      : isRegistered
+    : isDraft
+      ? "bg-muted-foreground/40"
+      : isOrganizer || isHost
         ? "bg-primary"
-        : isWaitlisted
-          ? "bg-amber-400"
-          : "bg-border";
+        : isRegistered
+          ? "bg-primary"
+          : isWaitlisted
+            ? "bg-amber-400"
+            : "bg-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
@@ -208,7 +212,15 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </span>
 
                 {!isPast && (
-                  isOrganizer ? (
+                  isDraft ? (
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 gap-1 border-muted-foreground/40 text-xs text-muted-foreground"
+                    >
+                      <FileEdit className="size-3" />
+                      {tMoment("status.draft")}
+                    </Badge>
+                  ) : isOrganizer ? (
                     <Badge
                       variant="outline"
                       className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
