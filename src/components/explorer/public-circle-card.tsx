@@ -87,16 +87,16 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
               {circle.description}
             </p>
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
-              <div className="flex items-center gap-1">
-                <Users className="size-3.5 shrink-0" />
-                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-              </div>
               {circle.city && (
                 <div className="flex items-center gap-1">
                   <MapPin className="size-3.5 shrink-0" />
                   <span>{circle.city}</span>
                 </div>
               )}
+              <div className="flex items-center gap-1">
+                <Users className="size-3.5 shrink-0" />
+                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+              </div>
               {circle.upcomingMomentCount > 0 && (
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="size-3.5 shrink-0" />
