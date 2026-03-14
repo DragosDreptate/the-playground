@@ -34,7 +34,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
         : null;
 
   const categoryBadge = categoryLabel && (
-    <span className="text-foreground text-xs font-semibold">
+    <span className="text-muted-foreground text-xs">
       {categoryLabel}
     </span>
   );
