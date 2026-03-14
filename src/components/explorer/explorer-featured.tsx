@@ -83,35 +83,32 @@ export function ExplorerFeatured({ circles }: Props) {
                 </div>
 
                 {/* Info */}
-                <div className="min-w-0 flex-1 flex flex-col justify-between gap-0.5">
-                  <div className="flex flex-col gap-0.5">
-                    {/* Ligne 1 : thématique */}
+                <div className="min-w-0 flex-1 flex flex-col justify-center gap-0.5">
+                  {/* Ligne 1 : thématique + badge aligné à droite */}
+                  <div className="flex items-center justify-between gap-2">
                     {categoryLabel && (
                       <span className="min-w-0 text-xs font-semibold text-muted-foreground truncate">
                         {categoryLabel}
                       </span>
                     )}
-                    {/* Ligne 2 : nom */}
-                    <p className="truncate text-sm font-bold text-foreground group-hover:underline">
-                      {circle.name}
-                    </p>
-                    {/* Ligne 3 : membres */}
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Users className="size-3 shrink-0" />
-                      <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-                    </div>
-                    {/* Ligne 4 : ville */}
-                    {circle.city && (
-                      <p className="truncate text-xs text-muted-foreground">{circle.city}</p>
-                    )}
-                  </div>
-                  {/* Badge — bas droite */}
-                  <div className="flex justify-end">
                     <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/35 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                       <Star className="size-2 shrink-0" aria-hidden="true" />
                       {t("featured.badge")}
                     </div>
                   </div>
+                  {/* Ligne 2 : nom */}
+                  <p className="truncate text-sm font-bold text-foreground group-hover:underline">
+                    {circle.name}
+                  </p>
+                  {/* Ligne 3 : membres */}
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Users className="size-3 shrink-0" />
+                    <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+                  </div>
+                  {/* Ligne 4 : ville */}
+                  {circle.city && (
+                    <p className="truncate text-xs text-muted-foreground">{circle.city}</p>
+                  )}
                 </div>
               </Link>
             );
