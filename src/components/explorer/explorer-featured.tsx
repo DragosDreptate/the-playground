@@ -23,7 +23,7 @@ export function ExplorerFeatured({ circles }: Props) {
       <div
         className="absolute inset-0 scale-105 opacity-45"
         style={{
-          background: "linear-gradient(135deg, #6d28d9 0%, #9333ea 40%, #ec4899 100%)",
+          background: "linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)",
           filter: "blur(48px) saturate(1.4)",
         }}
       />
