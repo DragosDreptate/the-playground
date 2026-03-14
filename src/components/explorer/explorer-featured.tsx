@@ -18,17 +18,7 @@ export function ExplorerFeatured({ circles }: Props) {
   if (circles.length === 0) return null;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-border">
-      {/* Backdrop cinématique — dark mode uniquement */}
-      <div
-        className="absolute inset-0 hidden scale-105 opacity-40 dark:block"
-        style={{
-          background: "linear-gradient(135deg, #6d28d9 0%, #9333ea 40%, #ec4899 100%)",
-          filter: "blur(48px) saturate(1.4)",
-        }}
-      />
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-background/85" />
+    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-border" style={{ background: "#1b1d35" }}>
 
       <div className="relative z-10 p-5 sm:p-6">
         {/* Header */}
