@@ -26,22 +26,6 @@ export class UnauthorizedCircleActionError extends DomainError {
   }
 }
 
-export class AlreadyFollowingCircleError extends DomainError {
-  readonly code = "ALREADY_FOLLOWING";
-
-  constructor() {
-    super("Already following this circle");
-  }
-}
-
-export class NotFollowingCircleError extends DomainError {
-  readonly code = "NOT_FOLLOWING";
-
-  constructor() {
-    super("Not following this circle");
-  }
-}
-
 export class CannotLeaveAsHostError extends DomainError {
   readonly code = "CANNOT_LEAVE_AS_HOST";
 

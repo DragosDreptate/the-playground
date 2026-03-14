@@ -28,7 +28,6 @@ export type DashboardMode = "PARTICIPANT" | "ORGANIZER";
 export type NotificationPreferences = {
   notifyNewRegistration: boolean;
   notifyNewComment: boolean;
-  notifyNewFollower: boolean;
   notifyNewMomentInCircle: boolean;
 };
 
@@ -44,7 +43,6 @@ export type User = {
   role: UserRole;
   notifyNewRegistration: boolean;
   notifyNewComment: boolean;
-  notifyNewFollower: boolean;
   notifyNewMomentInCircle: boolean;
   dashboardMode: DashboardMode | null;
   publicId: string | null;

@@ -20,7 +20,6 @@ describe("updateNotificationPreferences", () => {
             userId: "unknown-user",
             notifyNewRegistration: false,
             notifyNewComment: false,
-            notifyNewFollower: false,
             notifyNewMomentInCircle: false,
           },
           { userRepository }
@@ -35,7 +34,6 @@ describe("updateNotificationPreferences", () => {
       const updatedPrefs = makeNotificationPreferences({
         notifyNewRegistration: false,
         notifyNewComment: true,
-        notifyNewFollower: false,
         notifyNewMomentInCircle: true,
       });
 
@@ -49,7 +47,6 @@ describe("updateNotificationPreferences", () => {
           userId: "user-1",
           notifyNewRegistration: false,
           notifyNewComment: true,
-          notifyNewFollower: false,
           notifyNewMomentInCircle: true,
         },
         { userRepository }
@@ -75,7 +72,6 @@ describe("updateNotificationPreferences", () => {
           userId: "user-1",
           notifyNewRegistration: true,
           notifyNewComment: false,
-          notifyNewFollower: true,
           notifyNewMomentInCircle: false,
         },
         { userRepository }
@@ -84,7 +80,6 @@ describe("updateNotificationPreferences", () => {
       expect(captured).toEqual({
         notifyNewRegistration: true,
         notifyNewComment: false,
-        notifyNewFollower: true,
         notifyNewMomentInCircle: false,
       });
     });
@@ -96,7 +91,6 @@ describe("updateNotificationPreferences", () => {
       const allOff = makeNotificationPreferences({
         notifyNewRegistration: false,
         notifyNewComment: false,
-        notifyNewFollower: false,
         notifyNewMomentInCircle: false,
       });
 
@@ -112,7 +106,6 @@ describe("updateNotificationPreferences", () => {
 
       expect(result.notifyNewRegistration).toBe(false);
       expect(result.notifyNewComment).toBe(false);
-      expect(result.notifyNewFollower).toBe(false);
       expect(result.notifyNewMomentInCircle).toBe(false);
     });
   });

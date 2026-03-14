@@ -21,7 +21,6 @@ function toDomainUser(record: PrismaUser): User {
     role: record.role,
     notifyNewRegistration: record.notifyNewRegistration,
     notifyNewComment: record.notifyNewComment,
-    notifyNewFollower: record.notifyNewFollower,
     notifyNewMomentInCircle: record.notifyNewMomentInCircle,
     dashboardMode: record.dashboardMode as DashboardMode | null,
     publicId: record.publicId ?? null,
@@ -34,7 +33,6 @@ function toNotificationPreferences(record: PrismaUser): NotificationPreferences 
   return {
     notifyNewRegistration: record.notifyNewRegistration,
     notifyNewComment: record.notifyNewComment,
-    notifyNewFollower: record.notifyNewFollower,
     notifyNewMomentInCircle: record.notifyNewMomentInCircle,
   };
 }
@@ -103,7 +101,6 @@ export const prismaUserRepository: UserRepository = {
       select: {
         notifyNewRegistration: true,
         notifyNewComment: true,
-        notifyNewFollower: true,
         notifyNewMomentInCircle: true,
       },
     });
@@ -121,7 +118,6 @@ export const prismaUserRepository: UserRepository = {
         id: true,
         notifyNewRegistration: true,
         notifyNewComment: true,
-        notifyNewFollower: true,
         notifyNewMomentInCircle: true,
       },
     });
@@ -131,7 +127,6 @@ export const prismaUserRepository: UserRepository = {
         {
           notifyNewRegistration: r.notifyNewRegistration,
           notifyNewComment: r.notifyNewComment,
-          notifyNewFollower: r.notifyNewFollower,
           notifyNewMomentInCircle: r.notifyNewMomentInCircle,
         },
       ])
@@ -147,7 +142,6 @@ export const prismaUserRepository: UserRepository = {
       data: {
         notifyNewRegistration: input.notifyNewRegistration,
         notifyNewComment: input.notifyNewComment,
-        notifyNewFollower: input.notifyNewFollower,
         notifyNewMomentInCircle: input.notifyNewMomentInCircle,
       },
     });

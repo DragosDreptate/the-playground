@@ -20,7 +20,7 @@ import type {
   AdminMomentRow,
   AdminMomentDetail,
   AdminInsightRegistration,
-  AdminInsightFollower,
+  AdminInsightMember,
   AdminInsightComment,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
@@ -301,12 +301,12 @@ export const prismaAdminRepository: AdminRepository = {
       totalMoments,
       totalRegistrations,
       totalComments,
-      totalFollowers,
+      totalMembers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
-      recentFollowers,
+      recentMembers,
     ] = await Promise.all([
       prisma.user.count({ where: realUser }),
       prisma.circle.count({ where: realCircle }),
@@ -326,12 +326,12 @@ export const prismaAdminRepository: AdminRepository = {
       totalMoments,
       totalRegistrations,
       totalComments,
-      totalFollowers,
+      totalMembers,
       recentUsers,
       recentCircles,
       recentMoments,
       recentComments,
-      recentFollowers,
+      recentMembers,
     };
   },
 
@@ -863,13 +863,13 @@ export const prismaAdminRepository: AdminRepository = {
     };
   },
 
-  async getFollowersInsight(
+  async getMembersInsight(
     days: number,
     limit: number,
     offset: number,
     sortBy?: string,
     sortOrder?: "asc" | "desc"
-  ): Promise<{ followers: AdminInsightFollower[]; total: number }> {
+  ): Promise<{ members: AdminInsightMember[]; total: number }> {
     const since = daysAgo(days);
     const where: Prisma.CircleMembershipWhereInput = {
       role: "PLAYER",
@@ -891,7 +891,7 @@ export const prismaAdminRepository: AdminRepository = {
       prisma.circleMembership.count({ where }),
     ]);
     return {
-      followers: memberships.map((m) => ({
+      members: memberships.map((m) => ({
         id: m.id,
         userId: m.userId,
         userEmail: m.user.email,

@@ -133,7 +133,6 @@ model User {
   role                      UserRole  @default(USER)
   notifyNewRegistration     Boolean   @default(true)
   notifyNewComment          Boolean   @default(true)
-  notifyNewFollower         Boolean   @default(true)
   notifyNewMomentInCircle   Boolean   @default(true)
   dashboardMode             DashboardMode?
   publicId                  String?   @unique @map("public_id")
@@ -146,7 +145,6 @@ model User {
   moments       Moment[]           @relation("CreatedMoments")
   registrations Registration[]
   comments      Comment[]
-  circleFollows CircleFollow[]
   radarUsages   RadarUsage[]
 
   @@map("users")
@@ -178,7 +176,6 @@ model Circle {
 
   memberships   CircleMembership[]
   moments       Moment[]
-  circleFollows CircleFollow[]
 
   // Index composite (visibility, category) : utilisé dans getPublicCircles (explorer)
   // WHERE visibility = 'PUBLIC' — couvert par le préfixe visibility
@@ -306,16 +303,3 @@ model RadarUsage {
   @@map("radar_usage")
 }
 
-model CircleFollow {
-  id        String   @id @default(cuid())
-  userId    String
-  circleId  String
-  createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  circle Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, circleId])
-  @@index([circleId])
-  @@map("circle_follows")
-}

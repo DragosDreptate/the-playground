@@ -10,7 +10,7 @@ import type {
   FeaturedCircle,
 } from "@/domain/ports/repositories/circle-repository";
 import { seededShuffle } from "@/lib/seeded-shuffle";
-import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
@@ -403,48 +403,6 @@ export const prismaCircleRepository: CircleRepository = {
     await prisma.circleMembership.delete({
       where: { userId_circleId: { userId, circleId } },
     });
-  },
-
-  async followCircle(userId: string, circleId: string): Promise<CircleFollow> {
-    const row = await prisma.circleFollow.create({
-      data: { userId, circleId },
-    });
-    return {
-      id: row.id,
-      userId: row.userId,
-      circleId: row.circleId,
-      createdAt: row.createdAt,
-    };
-  },
-
-  async unfollowCircle(userId: string, circleId: string): Promise<void> {
-    await prisma.circleFollow.delete({
-      where: { userId_circleId: { userId, circleId } },
-    });
-  },
-
-  async getFollowStatus(userId: string, circleId: string): Promise<boolean> {
-    const row = await prisma.circleFollow.findUnique({
-      where: { userId_circleId: { userId, circleId } },
-    });
-    return row !== null;
-  },
-
-  async findFollowers(circleId: string): Promise<CircleFollowerInfo[]> {
-    const rows = await prisma.circleFollow.findMany({
-      where: { circleId },
-      include: {
-        user: {
-          select: { email: true, firstName: true, lastName: true },
-        },
-      },
-    });
-    return rows.map((r) => ({
-      userId: r.userId,
-      email: r.user.email,
-      firstName: r.user.firstName,
-      lastName: r.user.lastName,
-    }));
   },
 
   async findPlayersForNewMomentNotification(

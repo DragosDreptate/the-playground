@@ -76,12 +76,5 @@ export async function leaveCircle(
   // 4. Supprime la membership
   await circleRepository.removeMembership(input.circleId, input.userId);
 
-  // 5. Supprime le follow s'il existe (silencieux — pas d'erreur si absent)
-  try {
-    await circleRepository.unfollowCircle(input.userId, input.circleId);
-  } catch {
-    // L'utilisateur ne suivait pas la Communauté — pas d'erreur
-  }
-
   return { cancelledRegistrations, promotedRegistrations };
 }

@@ -1,5 +1,5 @@
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
-import type { Circle, CircleMembership, CircleFollow } from "@/domain/models/circle";
+import type { Circle, CircleMembership } from "@/domain/models/circle";
 import { vi } from "vitest";
 
 export function createMockCircleRepository(
@@ -24,26 +24,10 @@ export function createMockCircleRepository(
     findPublic: vi.fn<CircleRepository["findPublic"]>().mockResolvedValue([]),
     findMemberCountsByCircleIds: vi.fn<CircleRepository["findMemberCountsByCircleIds"]>().mockResolvedValue(new Map()),
     removeMembership: vi.fn<CircleRepository["removeMembership"]>().mockResolvedValue(undefined),
-    followCircle: vi.fn<CircleRepository["followCircle"]>().mockResolvedValue(makeCircleFollow()),
-    unfollowCircle: vi.fn<CircleRepository["unfollowCircle"]>().mockResolvedValue(undefined),
-    getFollowStatus: vi.fn<CircleRepository["getFollowStatus"]>().mockResolvedValue(false),
-    findFollowers: vi.fn<CircleRepository["findFollowers"]>().mockResolvedValue([]),
     findPlayersForNewMomentNotification: vi.fn<CircleRepository["findPlayersForNewMomentNotification"]>().mockResolvedValue([]),
     findByInviteToken: vi.fn<CircleRepository["findByInviteToken"]>().mockResolvedValue(null),
     getPublicCirclesForUser: vi.fn<CircleRepository["getPublicCirclesForUser"]>().mockResolvedValue([]),
     findFeatured: vi.fn<CircleRepository["findFeatured"]>().mockResolvedValue([]),
-    ...overrides,
-  };
-}
-
-export function makeCircleFollow(
-  overrides: Partial<CircleFollow> = {}
-): CircleFollow {
-  return {
-    id: "follow-1",
-    userId: "user-1",
-    circleId: "circle-1",
-    createdAt: new Date("2026-01-01"),
     ...overrides,
   };
 }

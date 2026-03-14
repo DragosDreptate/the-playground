@@ -28,7 +28,6 @@ export async function updateNotificationPreferences(
   return userRepository.updateNotificationPreferences(input.userId, {
     notifyNewRegistration: input.notifyNewRegistration,
     notifyNewComment: input.notifyNewComment,
-    notifyNewFollower: input.notifyNewFollower,
     notifyNewMomentInCircle: input.notifyNewMomentInCircle,
   });
 }

@@ -12,8 +12,7 @@ const emailService = createResendEmailService();
 import { createCircle } from "@/domain/usecases/create-circle";
 import { updateCircle } from "@/domain/usecases/update-circle";
 import { deleteCircle } from "@/domain/usecases/delete-circle";
-import { followCircle } from "@/domain/usecases/follow-circle";
-import { unfollowCircle } from "@/domain/usecases/unfollow-circle";
+import { joinCircleDirectly } from "@/domain/usecases/join-circle-directly";
 import { leaveCircle } from "@/domain/usecases/leave-circle";
 import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
@@ -203,79 +202,20 @@ export async function deleteCircleAction(
   }
 }
 
-export async function followCircleAction(
+export async function joinCircleDirectlyAction(
   circleId: string
-): Promise<ActionResult<{ following: boolean }>> {
+): Promise<ActionResult<{ alreadyMember: boolean }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
   try {
-    await followCircle(
+    const { alreadyMember } = await joinCircleDirectly(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
-
-    // Notifier les HOSTs après la réponse (sauf si admin)
-    const followerName = session.user.name ?? session.user.email;
-    if (isAdminUser(session)) return { success: true, data: { following: true } };
-    after(async () => {
-      try {
-        const circle = await prismaCircleRepository.findById(circleId);
-        if (!circle) return;
-        const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
-        const hostUserIds = hosts.map((h) => h.userId);
-        const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
-        await Promise.allSettled(
-          hosts
-            .filter((h) => prefsMap.get(h.userId)?.notifyNewFollower !== false)
-            .map((h) =>
-              emailService.sendHostNewFollower({
-                to: h.user.email,
-                hostName: h.user.firstName ?? h.user.email,
-                followerName,
-                circleName: circle.name,
-                circleSlug: circle.slug,
-                strings: {
-                  subject: `🔔 Nouveau follower — ${circle.name}`,
-                  heading: `Nouveau follower sur ${circle.name}`,
-                  message: `${followerName} suit maintenant votre Communauté.`,
-                  viewMembersCta: "Voir les membres",
-                  footer: `Vous recevez cet email car vous êtes Organisateur de ${circle.name} sur The Playground.`,
-                },
-              })
-            )
-        );
-      } catch (e) {
-        Sentry.captureException(e);
-      }
-    });
-
-    return { success: true, data: { following: true } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
-}
-
-export async function unfollowCircleAction(
-  circleId: string
-): Promise<ActionResult<void>> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
-  }
-
-  try {
-    await unfollowCircle(
-      { circleId, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
-    );
-    return { success: true, data: undefined };
+    return { success: true, data: { alreadyMember } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
@@ -474,25 +414,3 @@ export async function inviteToCircleByEmailAction(
   }
 }
 
-export async function getFollowStatusAction(
-  circleId: string
-): Promise<ActionResult<{ following: boolean }>> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
-  }
-
-  try {
-    const following = await prismaCircleRepository.getFollowStatus(
-      session.user.id,
-      circleId
-    );
-    return { success: true, data: { following } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
-}

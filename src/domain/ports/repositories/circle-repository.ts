@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, CircleFollow, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, DashboardCircle } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 
 export type CreateCircleInput = {
@@ -100,11 +100,6 @@ export interface CircleRepository {
   findMemberCountsByCircleIds(circleIds: string[]): Promise<Map<string, number>>;
   findPublic(filters: PublicCircleFilters): Promise<PublicCircle[]>;
   removeMembership(circleId: string, userId: string): Promise<void>;
-  // Follow
-  followCircle(userId: string, circleId: string): Promise<CircleFollow>;
-  unfollowCircle(userId: string, circleId: string): Promise<void>;
-  getFollowStatus(userId: string, circleId: string): Promise<boolean>;
-  findFollowers(circleId: string): Promise<CircleFollowerInfo[]>;
   /** Membres du Circle (PLAYER ou HOST) à notifier pour un nouvel événement, en excluant le créateur */
   findPlayersForNewMomentNotification(circleId: string, excludeUserId: string): Promise<CircleFollowerInfo[]>;
   /** Communautés publiques dont l'utilisateur est membre — pour la page profil public. */

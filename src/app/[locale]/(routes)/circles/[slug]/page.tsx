@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { getCircleUserInitials } from "@/lib/display-name";
-import { FollowButton } from "@/components/circles/follow-button";
+import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
@@ -115,7 +115,6 @@ export default async function PublicCirclePage({
     ReturnType<typeof getCircleMoments>,
     ReturnType<typeof prismaCircleRepository.countMembers>,
     Promise<boolean | null>,
-    Promise<boolean | null>,
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
@@ -129,27 +128,23 @@ export default async function PublicCirclePage({
     session?.user?.id
       ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m !== null)
       : Promise.resolve(null),
-    session?.user?.id
-      ? prismaCircleRepository.getFollowStatus(session.user.id, circle.id)
-      : Promise.resolve(null),
     // Players chargés uniquement pour les connectés (section membres)
     session?.user?.id
       ? prismaCircleRepository.findMembersByRole(circle.id, "PLAYER")
       : Promise.resolve([]),
   ];
 
-  const [hosts, allMoments, memberCount, isMemberResult, isFollowingResult, players] =
+  const [hosts, allMoments, memberCount, isMemberResult, players] =
     await measureTime("circle-page:data", () => Promise.all(parallelQueries));
 
   const isMember = isMemberResult === true;
-  const isFollowing = isFollowingResult === true;
   const isHost = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;
   const isConnected = !!session?.user?.id;
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
-  const showFollowButton = !!session?.user?.id && !isMember;
+  const showJoinButton = !!session?.user?.id && !isMember;
   const showMemberBadge = isMember && !isHost;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
@@ -320,9 +315,9 @@ export default async function PublicCirclePage({
             <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
           )}
 
-          {/* Bouton Suivre — visible uniquement pour les utilisateurs connectés non-membres */}
-          {showFollowButton && (
-            <FollowButton circleId={circle.id} initialFollowing={isFollowing} />
+          {/* Bouton Rejoindre — visible uniquement pour les utilisateurs connectés non-membres */}
+          {showJoinButton && (
+            <JoinCircleButton circleId={circle.id} />
           )}
         </div>
 

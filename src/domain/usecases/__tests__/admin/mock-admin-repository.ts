@@ -39,7 +39,7 @@ export function createMockAdminRepository(
     deleteMoment: vi.fn().mockResolvedValue(undefined),
     updateMomentStatus: vi.fn().mockResolvedValue(undefined),
     getRegistrationsInsight: vi.fn().mockResolvedValue({ registrations: [], total: 0 }),
-    getFollowersInsight: vi.fn().mockResolvedValue({ followers: [], total: 0 }),
+    getMembersInsight: vi.fn().mockResolvedValue({ members: [], total: 0 }),
     getCommentsInsight: vi.fn().mockResolvedValue({ comments: [], total: 0 }),
     getUsersByActivation: vi.fn().mockResolvedValue({ users: [], total: 0 }),
     ...overrides,
@@ -80,12 +80,12 @@ export function makeAdminStats(overrides: Partial<AdminStats> = {}): AdminStats 
     totalMoments: 25,
     totalRegistrations: 150,
     totalComments: 87,
-    totalFollowers: 200,
+    totalMembers: 200,
     recentUsers: 5,
     recentCircles: 2,
     recentMoments: 4,
     recentComments: 12,
-    recentFollowers: 18,
+    recentMembers: 18,
     ...overrides,
   };
 }

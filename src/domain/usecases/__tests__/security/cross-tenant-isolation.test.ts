@@ -660,7 +660,6 @@ describe("Security — Cross-Tenant Isolation (IDOR) — removeCircleMember", ()
             makeMembership({ userId: "target-player", circleId: "circle-a", role: "PLAYER" })
           ),
         removeMembership: vi.fn().mockResolvedValue(undefined),
-        unfollowCircle: vi.fn().mockResolvedValue(undefined),
       });
       const registrationRepo = createMockRegistrationRepository({
         findFutureActiveByUserAndCircle: vi.fn().mockResolvedValue([]),
@@ -708,7 +707,6 @@ describe("Security — Cross-Tenant Isolation (IDOR) — leaveCircle", () => {
             makeMembership({ userId: "user-alice", circleId: "circle-1", role: "PLAYER" })
           ),
         removeMembership: vi.fn().mockResolvedValue(undefined),
-        unfollowCircle: vi.fn().mockResolvedValue(undefined),
       });
       const registrationRepo = createMockRegistrationRepository({
         findFutureActiveByUserAndCircle: vi.fn().mockResolvedValue([]),

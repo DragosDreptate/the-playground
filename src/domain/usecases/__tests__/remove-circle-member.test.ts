@@ -196,26 +196,4 @@ describe("removeCircleMember", () => {
     });
   });
 
-  describe("given a PLAYER who is not following the circle", () => {
-    it("should not throw even if unfollowCircle fails", async () => {
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi
-          .fn()
-          .mockResolvedValueOnce(makeHostMembership())
-          .mockResolvedValueOnce(makePlayerMembership()),
-        removeMembership: vi.fn().mockResolvedValue(undefined),
-        unfollowCircle: vi.fn().mockRejectedValue(new Error("Not following")),
-      });
-      const registrationRepo = createMockRegistrationRepository({
-        findFutureActiveByUserAndCircle: vi.fn().mockResolvedValue([]),
-      });
-
-      await expect(
-        removeCircleMember(
-          { circleId: CIRCLE_ID, hostUserId: HOST_ID, targetUserId: TARGET_ID },
-          { circleRepository: circleRepo, registrationRepository: registrationRepo }
-        )
-      ).resolves.not.toThrow();
-    });
-  });
 });

@@ -13,13 +13,13 @@ import {
 } from "@/components/ui/table";
 
 const PAGE_SIZE = 20;
-const BASE = "/admin/insights/followers";
+const BASE = "/admin/insights/members";
 
 type Props = {
   searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
 
-export default async function AdminInsightFollowersPage({ searchParams }: Props) {
+export default async function AdminInsightMembersPage({ searchParams }: Props) {
   const params = await searchParams;
   const days = Number(params.days ?? "30");
   const page = Number(params.page ?? "1");
@@ -32,7 +32,7 @@ export default async function AdminInsightFollowersPage({ searchParams }: Props)
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
-  const { followers, total } = await prismaAdminRepository.getFollowersInsight(
+  const { members, total } = await prismaAdminRepository.getMembersInsight(
     days,
     PAGE_SIZE,
     offset,
@@ -51,7 +51,7 @@ export default async function AdminInsightFollowersPage({ searchParams }: Props)
             <ArrowLeft className="size-4" />
             Dashboard
           </Link>
-          <h1 className="text-2xl font-bold">Abonnements</h1>
+          <h1 className="text-2xl font-bold">Membres</h1>
         </div>
         <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
@@ -63,40 +63,40 @@ export default async function AdminInsightFollowersPage({ searchParams }: Props)
               <SH label="Participant" column="userName" />
               <SH label="Email" column="userEmail" />
               <SH label="Communauté" column="circleName" />
-              <SH label="Date d'abonnement" column="joinedAt" className="w-px" />
+              <SH label="Date d'adhésion" column="joinedAt" className="w-px" />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {followers.length === 0 ? (
+            {members.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
-                  Aucun abonnement sur cette période
+                  Aucun membre sur cette période
                 </TableCell>
               </TableRow>
             ) : (
-              followers.map((f) => (
-                <TableRow key={f.id}>
+              members.map((m) => (
+                <TableRow key={m.id}>
                   <TableCell>
                     <Link
-                      href={`/admin/users/${f.userId}`}
+                      href={`/admin/users/${m.userId}`}
                       className="font-medium hover:underline"
                     >
-                      {f.userName ?? "—"}
+                      {m.userName ?? "—"}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{f.userEmail}</TableCell>
+                  <TableCell className="text-muted-foreground">{m.userEmail}</TableCell>
                   <TableCell>
                     <Link
-                      href={`/c/${f.circleSlug}`}
+                      href={`/circles/${m.circleSlug}`}
                       target="_blank"
                       className="flex items-center gap-1 hover:underline"
                     >
-                      {f.circleName}
+                      {m.circleName}
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />
                     </Link>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
-                    {f.joinedAt.toLocaleDateString("fr-FR")}
+                    {m.joinedAt.toLocaleDateString("fr-FR")}
                   </TableCell>
                 </TableRow>
               ))

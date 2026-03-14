@@ -3,8 +3,6 @@ export {
   CircleNotFoundError,
   SlugAlreadyExistsError,
   UnauthorizedCircleActionError,
-  AlreadyFollowingCircleError,
-  NotFollowingCircleError,
   CannotLeaveAsHostError,
   NotMemberOfCircleError,
   CannotRemoveHostError,

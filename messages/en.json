@@ -241,9 +241,8 @@
       "noPastMoments": "No past Events.",
       "today": "Today",
       "manageMoment": "Manage this Event",
-      "follow": "Follow",
-      "unfollow": "Unfollow",
-      "following": "Following",
+      "join": "Join",
+      "joined": "Member",
       "isMember": "You are a member",
       "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community",
@@ -453,7 +452,7 @@
       "triggerButton": "Invite my Community",
       "alreadySent": "Invited on {date}",
       "dialogTitle": "Invite my Community",
-      "dialogDescription": "An invitation email will be sent to the members and followers of {circleName}.",
+      "dialogDescription": "An invitation email will be sent to the members of {circleName}.",
       "customMessageLabel": "Custom message (optional)",
       "customMessagePlaceholder": "E.g. Don't miss this event! Limited spots available.",
       "sendButton": "Send",
@@ -462,7 +461,7 @@
       "successToast": "Invitation sent to {count} people",
       "alreadySentError": "The invitation has already been sent",
       "notHostError": "Only the organizer can invite the Community",
-      "hint": "Send an invitation email to all members and followers",
+      "hint": "Send an invitation email to all members",
       "alreadySentShort": "Sent",
       "cooldownHint": "Next send available in {time}"
     },
@@ -538,7 +537,7 @@
     "backToSite": "Back to site",
     "insights": "Insights",
     "insightRegistrations": "Registrations",
-    "insightFollowers": "Followers",
+    "insightMembers": "Members",
     "insightComments": "Comments",
     "insightActivation": "Activation",
     "stats": {
@@ -547,7 +546,7 @@
       "totalMoments": "Events",
       "totalRegistrations": "Registrations",
       "totalComments": "Comments",
-      "totalFollowers": "Followers",
+      "totalMembers": "Members",
       "thisWeek": "this week"
     },
     "table": {
@@ -955,8 +954,6 @@
       "newRegistrationDesc": "When someone registers for one of your events",
       "newComment": "New comment",
       "newCommentDesc": "When someone comments on an event you're attending",
-      "newFollower": "New follower",
-      "newFollowerDesc": "When someone follows one of your Communities",
       "newMomentInCircle": "New event",
       "newMomentInCircleDesc": "When an event is created in a Community you follow",
       "saved": "Preferences saved"
