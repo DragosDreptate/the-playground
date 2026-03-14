@@ -180,35 +180,30 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </div>
               )}
 
-              {/* Community + badge */}
-              <div className="flex items-center justify-between gap-2 pt-0.5">
-                <span
-                  className={`flex min-w-0 shrink items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                  }`}
-                >
-                  <CircleAvatar
-                    name={momentData.circleName}
-                    image={momentData.circleCoverImage}
-                    size="xs"
-                  />
-                  <span className="truncate">{momentData.circleName}</span>
-                </span>
+              {/* Community */}
+              <span
+                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
+                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                }`}
+              >
+                <CircleAvatar
+                  name={momentData.circleName}
+                  image={momentData.circleCoverImage}
+                  size="xs"
+                />
+                <span className="truncate">{momentData.circleName}</span>
+              </span>
 
-                {!isPast && (
-                  isDraft ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
+              {/* Badge */}
+              {!isPast && (
+                <div className="flex items-center gap-2 pt-1">
+                  {isDraft ? (
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <FileEdit className="size-3" />
                       {tMoment("status.draft")}
                     </Badge>
                   ) : isOrganizer ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Crown className="size-3" />
                       {t("role.host")}
                       {(props as OrganizerProps).moment.registrationCount > 0 && (
@@ -220,18 +215,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                       )}
                     </Badge>
                   ) : isHost ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Crown className="size-3" />
                       {t("role.host")}
                     </Badge>
                   ) : isRegistered ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                       <Check className="size-3" />
                       {t("registrationStatus.registered")}
                     </Badge>
@@ -240,9 +229,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                       <Clock className="size-3" />
                       {t("registrationStatus.waitlisted")}
                     </Badge>
-                  ) : null
-                )}
-              </div>
+                  ) : null}
+                </div>
+              )}
             </div>
 
             {/* Cover — RIGHT, 64×64px */}
