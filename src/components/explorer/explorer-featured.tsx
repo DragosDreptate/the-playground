@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users } from "lucide-react";
+import { Users, Star } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -79,6 +79,7 @@ export function ExplorerFeatured({ circles }: Props) {
                     height={72}
                     className="size-full object-cover"
                     sizes="72px"
+                    priority
                   />
                 </div>
 
@@ -86,15 +87,7 @@ export function ExplorerFeatured({ circles }: Props) {
                 <div className="min-w-0 flex-1">
                   {/* Badge */}
                   <div className="mb-1 inline-flex items-center gap-1 rounded-full border border-primary/35 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                    <svg
-                      width="8"
-                      height="8"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
+                    <Star className="size-2 shrink-0" aria-hidden="true" />
                     {t("featured.badge")}
                   </div>
                   <p className="truncate text-sm font-bold text-foreground group-hover:underline">

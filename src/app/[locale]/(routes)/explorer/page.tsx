@@ -77,7 +77,9 @@ export default async function ExplorerPage({
         session?.user?.id
           ? prismaCircleRepository.findAllByUserId(session.user.id)
           : Promise.resolve([]),
-        getFeaturedCircles({ circleRepository: prismaCircleRepository }),
+        activeTab === "circles"
+          ? getFeaturedCircles({ circleRepository: prismaCircleRepository })
+          : Promise.resolve([]),
       ])
   );
 
