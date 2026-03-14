@@ -24,6 +24,7 @@ import Image from "next/image";
 import {
   CalendarIcon,
   Download,
+  FileEdit,
   Mail,
   MapPin,
   Globe,
@@ -174,6 +175,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
                 style={{ aspectRatio: "1 / 1" }}
               >
+                {moment.status === "DRAFT" && (
+                  <div className="absolute left-3 top-3 z-10">
+                    <Badge variant="outline" className="gap-1 border-primary/40 bg-background/90 text-xs text-primary backdrop-blur-sm">
+                      <FileEdit className="size-3" />
+                      {t("status.draft")}
+                    </Badge>
+                  </div>
+                )}
                 {moment.coverImage ? (
                   <Image
                     src={moment.coverImage}
