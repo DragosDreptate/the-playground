@@ -160,45 +160,17 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 {timeStr}
               </p>
 
-              {/* Title */}
-              <p
-                className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:underline"
-                }`}
-              >
-                {momentData.title}
-              </p>
-
-              {/* Location */}
-              {locationLabel && (
-                <div
-                  className={`flex items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+              {/* Title + badge */}
+              <div className="flex items-baseline gap-3">
+                <p
+                  className={`min-w-0 truncate font-semibold leading-snug ${
+                    isPast ? "text-muted-foreground" : "group-hover:underline"
                   }`}
                 >
-                  <LocationIcon className="size-3 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
-                </div>
-              )}
-
-              {/* Community */}
-              <span
-                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
-                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                }`}
-              >
-                <CircleAvatar
-                  name={momentData.circleName}
-                  image={momentData.circleCoverImage}
-                  size="xs"
-                />
-                <span className="truncate">{momentData.circleName}</span>
-              </span>
-
-              {/* Badge */}
-              {!isPast && (
-                <div className="flex items-center gap-2 pt-1">
-                  {isDraft ? (
+                  {momentData.title}
+                </p>
+                {!isPast && (
+                  isDraft ? (
                     <DraftBadge label={tMoment("status.draft")} />
                   ) : isOrganizer ? (
                     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
@@ -227,9 +199,36 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                       <Clock className="size-3" />
                       {t("registrationStatus.waitlisted")}
                     </Badge>
-                  ) : null}
+                  ) : null
+                )}
+              </div>
+
+              {/* Location */}
+              {locationLabel && (
+                <div
+                  className={`flex items-center gap-1.5 text-xs ${
+                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                  }`}
+                >
+                  <LocationIcon className="size-3 shrink-0" />
+                  <span className="truncate">{locationLabel}</span>
                 </div>
               )}
+
+              {/* Community */}
+              <span
+                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
+                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                }`}
+              >
+                <CircleAvatar
+                  name={momentData.circleName}
+                  image={momentData.circleCoverImage}
+                  size="xs"
+                />
+                <span className="truncate">{momentData.circleName}</span>
+              </span>
+
             </div>
 
             {/* Cover — RIGHT, 64×64px */}
