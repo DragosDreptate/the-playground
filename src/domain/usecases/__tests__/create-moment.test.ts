@@ -32,13 +32,13 @@ describe("CreateMoment", () => {
   };
 
   describe("given a HOST user with valid input", () => {
-    it("should create the Moment with a generated slug in PUBLISHED status", async () => {
+    it("should create the Moment with a generated slug in DRAFT status", async () => {
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(makeMembership()),
       });
       const momentRepo = createMockMomentRepository({
         create: vi.fn().mockResolvedValue(
-          makeMoment({ title: "Weekly Meetup", slug: "weekly-meetup", status: "PUBLISHED" })
+          makeMoment({ title: "Weekly Meetup", slug: "weekly-meetup", status: "DRAFT" })
         ),
       });
       const registrationRepo = createMockRegistrationRepository();
@@ -55,11 +55,11 @@ describe("CreateMoment", () => {
           slug: "weekly-meetup",
           circleId: "circle-1",
           createdById: "user-1",
-          status: "PUBLISHED",
+          status: "DRAFT",
         })
       );
       expect(result.moment.title).toBe("Weekly Meetup");
-      expect(result.moment.status).toBe("PUBLISHED");
+      expect(result.moment.status).toBe("DRAFT");
     });
 
     it("should automatically register the Host as a Participant", async () => {
