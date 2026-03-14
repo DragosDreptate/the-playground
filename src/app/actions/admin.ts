@@ -21,6 +21,7 @@ import { getAdminMoments } from "@/domain/usecases/admin/get-admin-moments";
 import { getAdminMoment } from "@/domain/usecases/admin/get-admin-moment";
 import { adminDeleteMoment } from "@/domain/usecases/admin/admin-delete-moment";
 import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-moment-status";
+import { recalculateCircleScore } from "@/infrastructure/services/recalculate-circle-score";
 import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
@@ -238,6 +239,7 @@ export async function adminUpdateCircleExcludedAction(
 
   try {
     await adminUpdateCircleExcluded(check.data.role, circleId, excluded, deps);
+    await recalculateCircleScore(circleId);
     revalidatePath("/admin/explorer");
     revalidatePath(`/admin/circles/${circleId}`);
     return { success: true, data: undefined };
@@ -259,6 +261,7 @@ export async function adminUpdateCircleOverrideScoreAction(
 
   try {
     await adminUpdateCircleOverrideScore(check.data.role, circleId, score, deps);
+    await recalculateCircleScore(circleId);
     revalidatePath("/admin/explorer");
     revalidatePath(`/admin/circles/${circleId}`);
     return { success: true, data: undefined };
