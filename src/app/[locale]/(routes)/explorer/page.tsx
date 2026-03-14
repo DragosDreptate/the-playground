@@ -6,9 +6,9 @@ import {
 } from "@/infrastructure/repositories";
 import { measureTime } from "@/lib/perf-logger";
 
-// Revalide toutes les 5 minutes — la page Découvrir ne nécessite pas un temps réel strict.
+// Revalide toutes les heures — stabilise la sélection "À la une" sur des plages de 60 min.
 // Les filtres par catégorie + onglets sont gérés côté SSR via searchParams.
-export const revalidate = 300;
+export const revalidate = 3600;
 import { getCachedSession } from "@/lib/auth-cache";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
