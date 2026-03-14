@@ -65,19 +65,18 @@ export function ExplorerFeatured({ circles }: Props) {
               <Link
                 key={circle.id}
                 href={`/circles/${circle.slug}`}
-                className="group flex items-center gap-3 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
+                className="group flex gap-3 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
               >
-                {/* Cover 1:1 */}
+                {/* Cover — largeur fixe, hauteur calée sur le contenu */}
                 <div
-                  className="relative size-[72px] shrink-0 overflow-hidden rounded-xl"
+                  className="relative w-[72px] shrink-0 self-stretch overflow-hidden rounded-xl"
                   style={{ background: gradient }}
                 >
                   <Image
                     src={circle.coverImage}
                     alt={circle.name}
-                    width={72}
-                    height={72}
-                    className="size-full object-cover"
+                    fill
+                    className="object-cover"
                     sizes="72px"
                     priority
                   />
