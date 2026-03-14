@@ -5,10 +5,11 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
+import { CategoryBadge } from "@/components/badges/category-badge";
 
 type Props = {
   circle: PublicCircle;
@@ -33,28 +34,21 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
         ? tCategory(circle.category)
         : null;
 
-  const categoryBadge = categoryLabel && (
-    <span className="text-foreground text-xs font-semibold">
-      {categoryLabel}
-    </span>
-  );
+  const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
   const roleBadge = membershipRole && (
-    <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
+    <span className="inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
       {membershipRole === "HOST"
-        ? t("circleCard.roleBadge.host")
-        : t("circleCard.roleBadge.member")}
+        ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
+        : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
     </span>
   );
 
-  const cityLabel = circle.city && (
-    <span className="text-muted-foreground text-xs">{circle.city}</span>
-  );
 
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div
@@ -76,19 +70,23 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {categoryBadge}
+            {categoryBadge}
+            <div className="flex items-baseline gap-3">
+              <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
+                {circle.name}
+              </h3>
               {roleBadge}
-              {circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
-              {cityLabel}
             </div>
-            <h3 className="text-sm sm:text-base font-semibold leading-snug group-hover:underline">
-              {circle.name}
-            </h3>
             <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
               {circle.description}
             </p>
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
+              {circle.city && (
+                <div className="flex items-center gap-1">
+                  <MapPin className="size-3.5 shrink-0" />
+                  <span>{circle.city}</span>
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <Users className="size-3.5 shrink-0" />
                 <span>{t("circleCard.members", { count: circle.memberCount })}</span>

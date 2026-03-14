@@ -315,11 +315,13 @@
               [Formulaire : titre, date, lieu, description]
               [Options avancées masquées : capacité, prix]
                         ↓
-              [Publication → slug généré → /m/[slug] créée]
+              [Enregistrer → slug généré → /m/[slug] créée en BROUILLON]
                         ↓
-              [Page événement dashboard → lien partageable visible]
+              [Page événement dashboard → bouton "Publier" visible]
                         ↓
-              [Copie + partage WhatsApp/email/réseaux]
+              [Clic "Publier" → statut PUBLISHED → notifications envoyées]
+                        ↓
+              [Lien partageable visible → copie + partage WhatsApp/email/réseaux]
                         ↓
               [Premiers inscrits → notification email Host ✅]
 ```
@@ -328,6 +330,8 @@
 - Bouton "Créer un événement" sur dashboard (si Organisateur) ✓
 - Formulaire minimaliste avec options avancées ✓
 - Génération de slug ✓
+- Création en statut DRAFT par défaut ✓
+- Bouton "Publier" sur la vue Organisateur (DRAFT uniquement) ✓
 - Lien partageable avec bouton Copier sur la page événement dashboard ✓
 - Auto-inscription de l'Organisateur à l'événement ✓
 - Email de notification à l'Organisateur quand un Participant s'inscrit ✓
@@ -340,7 +344,7 @@
 | D2 | Le bouton "Créer un événement" n'est visible que si l'utilisateur est déjà Organisateur. Un Participant qui veut organiser n'a pas de CTA évident pour devenir Organisateur | Adoption Organisateur bloquée | Haute |
 | D3 | Après création d'un événement, pas de step "Partagez maintenant" avec le lien en grand | Le partage n'est pas assez encouragé | Moyenne |
 | D4 | L'événement est automatiquement lié à la Communauté de l'Organisateur, mais si l'Organisateur a plusieurs Communautés, la sélection dans le formulaire n'est pas évidente | Confusion multi-Communauté | Moyenne |
-| D5 | Pas de moyen de programmer un événement (brouillon) avant de le publier | L'Organisateur doit tout remplir en une fois | Basse |
+| ~~D5~~ | ~~Pas de moyen de programmer un événement (brouillon) avant de le publier~~ ✅ **Résolu** — statut DRAFT : tout événement créé est en brouillon. L'Organisateur publie quand il est prêt via le bouton "Publier". | ~~L'Organisateur doit tout remplir en une fois~~ | ~~Basse~~ ✅ |
 
 ---
 
@@ -535,7 +539,7 @@
 | L-1 | Onboarding différencié Organisateur vs Participant | G |
 | L-2 | Communication groupée Organisateur → membres Communauté | E |
 | L-3 | Page marketing/landing pour cold traffic | G |
-| L-4 | Brouillon d'événement (publication différée) | D |
+| ~~L-4~~ | ~~Brouillon d'événement (publication différée)~~ ✅ **Résolu** — statut DRAFT implémenté (voir D5) | ~~D~~ |
 | L-5 | Stats Communauté enrichies | F |
 
 ---

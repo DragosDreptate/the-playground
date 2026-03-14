@@ -151,7 +151,7 @@ describe("JoinMoment", () => {
   });
 
   describe("given a Moment that is not PUBLISHED", () => {
-    it.each(["CANCELLED", "PAST"] as const)(
+    it.each(["DRAFT", "CANCELLED", "PAST"] as const)(
       "should throw MomentNotOpenForRegistrationError for %s status",
       async (status) => {
         const momentRepo = createMockMomentRepository({

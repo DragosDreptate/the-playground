@@ -46,7 +46,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug, locale } = await params;
   const moment = await getMoment(slug);
-  if (!moment || moment.status === "CANCELLED") return {};
+  if (!moment || moment.status === "CANCELLED" || moment.status === "DRAFT") return {};
 
   const circle = await getCircle(moment.circleId);
   const t = await getTranslations({ locale, namespace: "Moment" });

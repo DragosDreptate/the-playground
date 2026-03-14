@@ -18,7 +18,7 @@ export function CircleAvatar({ name, image, size = "default" }: CircleAvatarProp
 
   return (
     <div
-      className={`${sizeClasses[size]} shrink-0 rounded-full flex items-center justify-center font-semibold text-white`}
+      className={`${sizeClasses[size]} shrink-0 rounded-md flex items-center justify-center font-semibold text-white`}
       style={{
         background: image ? undefined : gradient,
         backgroundImage: image ? `url(${image})` : undefined,

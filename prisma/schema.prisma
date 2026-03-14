@@ -43,6 +43,7 @@ enum LocationType {
 }
 
 enum MomentStatus {
+  DRAFT
   PUBLISHED
   CANCELLED
   PAST

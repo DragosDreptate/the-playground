@@ -13,6 +13,7 @@ export {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
   MomentPastDateError,
+  MomentAlreadyPublishedError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {

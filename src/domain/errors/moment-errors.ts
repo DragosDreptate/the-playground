@@ -31,3 +31,11 @@ export class MomentPastDateError extends DomainError {
     super("The event start date cannot be in the past");
   }
 }
+
+export class MomentAlreadyPublishedError extends DomainError {
+  readonly code = "MOMENT_ALREADY_PUBLISHED";
+
+  constructor(momentId: string) {
+    super(`Moment is already published: ${momentId}`);
+  }
+}

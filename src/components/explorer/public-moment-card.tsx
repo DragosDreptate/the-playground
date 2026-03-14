@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatShortDate, formatTime } from "@/lib/format-date";
 import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
+import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -59,11 +60,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     </span>
   ) : null;
 
-  const categoryLabel = moment.circle.category && (
-    <span className="text-xs font-semibold text-foreground">
-      {tCategory(moment.circle.category)}
-    </span>
-  );
+  const categoryLabel = moment.circle.category
+    ? <CategoryBadge label={tCategory(moment.circle.category)} />
+    : null;
 
   const cityLabel = moment.circle.city && (
     <span className="text-muted-foreground text-xs">{moment.circle.city}</span>
@@ -84,7 +83,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   return (
     <Link href={`/m/${moment.slug}`} className="group block min-w-0">
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
 
           {/* Cover — 72px mobile / 120px desktop */}
           <div

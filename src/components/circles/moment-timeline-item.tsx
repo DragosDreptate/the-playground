@@ -5,6 +5,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { DraftBadge } from "@/components/badges/draft-badge";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
@@ -36,6 +37,7 @@ export async function MomentTimelineItem({
 
   const isCancelled = moment.status === "CANCELLED";
   const isPast = moment.status === "PAST";
+  const isDraft = moment.status === "DRAFT";
 
   const isRegistered =
     userRegistrationStatus === "REGISTERED" ||
@@ -44,11 +46,13 @@ export async function MomentTimelineItem({
 
   const dotClass = isCancelled
     ? "bg-destructive/50"
-    : moment.status === "PAST"
+    : isPast
       ? "bg-border"
-      : isWaitlisted
-        ? "bg-amber-400"
-        : "bg-primary";
+      : isDraft
+        ? "bg-muted-foreground/40"
+        : isWaitlisted
+          ? "bg-amber-400"
+          : "bg-primary";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -107,54 +111,56 @@ export async function MomentTimelineItem({
             )}
 
             {/* Corps de la carte */}
-            <div className="flex items-start gap-4 p-4">
+            <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1">
                 {/* Time */}
                 <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
-                {/* Title */}
-                <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
-                  {moment.title}
-                </p>
+                {/* Title + badge — dashboard uniquement */}
+                {!isCancelled && variant === "dashboard" ? (
+                  <div className="flex items-baseline gap-3">
+                    <p className={`min-w-0 truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                      {moment.title}
+                    </p>
+                    {isDraft ? (
+                      <DraftBadge label={t("status.draft")} />
+                    ) : isHost ? (
+                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                        <Crown className="size-3" />
+                        {tDashboard("role.host")}
+                      </Badge>
+                    ) : isRegistered ? (
+                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                        <Check className="size-3" />
+                        {tDashboard("registrationStatus.registered")}
+                      </Badge>
+                    ) : isWaitlisted ? (
+                      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+                        <Clock className="size-3" />
+                        {tDashboard("registrationStatus.waitlisted")}
+                      </Badge>
+                    ) : null}
+                  </div>
+                ) : (
+                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                    {moment.title}
+                  </p>
+                )}
+
+                {/* Inscrits — dashboard uniquement */}
+                {!isCancelled && variant === "dashboard" && registrationCount > 0 && (
+                  <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                    <Users className="size-3 shrink-0" />
+                    <span>{t("registrations.registered", { count: registrationCount })}</span>
+                  </div>
+                )}
 
                 {/* Location */}
                 {locationLabel && (
                   <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                     <LocationIcon className="size-3.5 shrink-0" />
                     <span className="truncate">{locationLabel}</span>
-                  </div>
-                )}
-
-                {/* Inscriptions + statut — dashboard uniquement */}
-                {!isCancelled && variant === "dashboard" && (
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    {registrationCount > 0 && (
-                      <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                        <Users className="size-3.5 shrink-0" />
-                        <span>
-                          {t("registrations.registered", { count: registrationCount })}
-                        </span>
-                      </div>
-                    )}
-
-                    {isHost ? (
-                      <Badge variant="outline" className="gap-1 border-primary/40 text-primary text-xs">
-                        <Crown className="size-3" />
-                        {tDashboard("role.host")}
-                      </Badge>
-                    ) : isRegistered ? (
-                      <Badge variant="default" className="gap-1 text-xs">
-                        <Check className="size-3" />
-                        {tDashboard("registrationStatus.registered")}
-                      </Badge>
-                    ) : isWaitlisted ? (
-                      <Badge variant="secondary" className="gap-1 text-xs">
-                        <Clock className="size-3" />
-                        {tDashboard("registrationStatus.waitlisted")}
-                      </Badge>
-                    ) : null}
-
                   </div>
                 )}
               </div>
@@ -164,13 +170,13 @@ export async function MomentTimelineItem({
                 <Image
                   src={moment.coverImage}
                   alt={moment.title}
-                  width={60}
-                  height={60}
-                  className={`size-[60px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  width={90}
+                  height={90}
+                  className={`size-[90px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[60px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[90px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}

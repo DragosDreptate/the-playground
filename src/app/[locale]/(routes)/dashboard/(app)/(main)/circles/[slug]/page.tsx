@@ -100,7 +100,7 @@ export default async function CircleDetailPage({
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
+  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isHost));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
   const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
 

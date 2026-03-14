@@ -3,7 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
+import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -38,43 +39,44 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Thumbnail */}
           <div
-            className="size-[72px] shrink-0 overflow-hidden rounded-xl"
+            className="size-[90px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={72}
-                height={72}
+                width={90}
+                height={90}
                 className="size-full object-cover"
-                sizes="72px"
+                sizes="90px"
               />
             )}
           </div>
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {categoryLabel && (
-                <span className="text-foreground text-xs font-semibold">{categoryLabel}</span>
-              )}
-              <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
+            {categoryLabel && <CategoryBadge label={categoryLabel} />}
+            <div className="flex items-baseline gap-3">
+              <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
+                {circle.name}
+              </h3>
+              <span className="shrink-0 inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
                 {circle.memberRole === "HOST"
-                  ? t("circleCard.roleBadge.host")
-                  : t("circleCard.roleBadge.member")}
+                  ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
+                  : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
               </span>
-              {circle.city && (
-                <span className="text-muted-foreground text-xs">{circle.city}</span>
-              )}
             </div>
-            <h3 className="text-sm font-semibold leading-snug group-hover:underline truncate">
-              {circle.name}
-            </h3>
             <p className="text-muted-foreground line-clamp-1 text-xs">
               {circle.description}
             </p>
             <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
+              {circle.city && (
+                <div className="flex items-center gap-1">
+                  <MapPin className="size-3.5 shrink-0" />
+                  <span>{circle.city}</span>
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 <Users className="size-3.5 shrink-0" />
                 <span>{t("circleCard.members", { count: circle.memberCount })}</span>

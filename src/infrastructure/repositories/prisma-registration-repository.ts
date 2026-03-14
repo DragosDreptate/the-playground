@@ -216,6 +216,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
+        registrationCount: 0,
       },
     }));
   },
@@ -260,6 +261,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
+        registrationCount: 0,
       },
     }));
   },
@@ -290,6 +292,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       cName: string;
       cSlug: string;
       cCoverImage: string | null;
+      mRegistrationCount: bigint;
     };
 
     const rows = await prisma.$queryRaw<Row[]>`
@@ -314,7 +317,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         m.status                AS "mStatus",
         c.name                  AS "cName",
         c.slug                  AS "cSlug",
-        c."coverImage"          AS "cCoverImage"
+        c."coverImage"          AS "cCoverImage",
+        (SELECT COUNT(*) FROM registrations r2
+         WHERE r2."momentId" = m.id
+           AND r2.status IN ('REGISTERED', 'CHECKED_IN')) AS "mRegistrationCount"
       FROM registrations r
       JOIN moments m ON m.id = r."momentId"
       JOIN circles c ON c.id = m."circleId"
@@ -349,6 +355,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleName: row.cName,
         circleSlug: row.cSlug,
         circleCoverImage: row.cCoverImage,
+        registrationCount: Number(row.mRegistrationCount),
       },
     });
 

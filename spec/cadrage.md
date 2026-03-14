@@ -297,7 +297,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Pages événement autonomes et partageables ✅
 - Inscriptions (avec inscription automatique à la Communauté) ✅
 - Liste d'attente avec promotion automatique ✅
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux membres, broadcast "Inviter ma Communauté") ✅
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, mise à jour événement, annulation événement, confirmation publication événement, notification nouvel événement dans communauté aux membres à la publication, broadcast "Inviter ma Communauté") ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Explorer (répertoire public de Communautés + événements) ✅

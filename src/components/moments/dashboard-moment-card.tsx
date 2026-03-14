@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
+import { DraftBadge } from "@/components/badges/draft-badge";
 import { MapPin, Globe, Check, Clock, Crown, Users } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -32,11 +33,13 @@ type DashboardMomentCardProps = ParticipantProps | OrganizerProps;
 export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
+  const tMoment = useTranslations("Moment");
   const locale = useLocale();
 
   const isOrganizer = props.variant === "organizer";
   const isPast = props.isPast ?? false;
   const isLast = props.isLast;
+  const isDraft = isOrganizer && (props as OrganizerProps).moment.status === "DRAFT";
 
   // Extraire les données selon le variant
   const momentData = isOrganizer
@@ -50,6 +53,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleSlug: props.moment.circle.slug,
         circleName: props.moment.circle.name,
         circleCoverImage: props.moment.circle.coverImage,
+        registrationCount: props.moment.registrationCount,
       }
     : {
         slug: props.registration.moment.slug,
@@ -61,6 +65,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleSlug: props.registration.moment.circleSlug,
         circleName: props.registration.moment.circleName,
         circleCoverImage: props.registration.moment.circleCoverImage,
+        registrationCount: props.registration.moment.registrationCount,
       };
 
   const [isToday, setIsToday] = useState(false);
@@ -79,13 +84,15 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const dotClass = isPast
     ? "bg-border"
-    : isOrganizer || isHost
-      ? "bg-primary"
-      : isRegistered
+    : isDraft
+      ? "bg-muted-foreground/40"
+      : isOrganizer || isHost
         ? "bg-primary"
-        : isWaitlisted
-          ? "bg-amber-400"
-          : "bg-border";
+        : isRegistered
+          ? "bg-primary"
+          : isWaitlisted
+            ? "bg-amber-400"
+            : "bg-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
@@ -141,27 +148,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors ${
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 transition-colors ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
-            {/* Cover — LEFT, 64×64px */}
-            {momentData.coverImage ? (
-              <Image
-                src={momentData.coverImage}
-                alt={momentData.title}
-                width={64}
-                height={64}
-                className={`size-16 shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-16 shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
-
-            {/* Content — RIGHT */}
+            {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1">
               {/* Time */}
               <p
@@ -171,14 +162,49 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 {timeStr}
               </p>
 
-              {/* Title */}
-              <p
-                className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:underline"
-                }`}
-              >
-                {momentData.title}
-              </p>
+              {/* Title + badge */}
+              <div className="flex items-baseline gap-3">
+                <p
+                  className={`min-w-0 truncate font-semibold leading-snug ${
+                    isPast ? "text-muted-foreground" : "group-hover:underline"
+                  }`}
+                >
+                  {momentData.title}
+                </p>
+                {!isPast && (
+                  isDraft ? (
+                    <DraftBadge label={tMoment("status.draft")} />
+                  ) : isOrganizer ? (
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Crown className="size-3" />
+                      {t("role.host")}
+                    </Badge>
+                  ) : isHost ? (
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Crown className="size-3" />
+                      {t("role.host")}
+                    </Badge>
+                  ) : isRegistered ? (
+                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                      <Check className="size-3" />
+                      {t("registrationStatus.registered")}
+                    </Badge>
+                  ) : isWaitlisted ? (
+                    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+                      <Clock className="size-3" />
+                      {t("registrationStatus.waitlisted")}
+                    </Badge>
+                  ) : null
+                )}
+              </div>
+
+              {/* Inscrits */}
+              {momentData.registrationCount > 0 && (
+                <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                  <Users className="size-3 shrink-0" />
+                  <span>{tMoment("registrations.registered", { count: momentData.registrationCount })}</span>
+                </div>
+              )}
 
               {/* Location */}
               {locationLabel && (
@@ -192,62 +218,37 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </div>
               )}
 
-              {/* Community + badge */}
-              <div className="flex items-center justify-between gap-2 pt-0.5">
-                <span
-                  className={`flex min-w-0 shrink items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                  }`}
-                >
-                  <CircleAvatar
-                    name={momentData.circleName}
-                    image={momentData.circleCoverImage}
-                    size="xs"
-                  />
-                  <span className="truncate">{momentData.circleName}</span>
-                </span>
+              {/* Community */}
+              <span
+                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
+                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                }`}
+              >
+                <CircleAvatar
+                  name={momentData.circleName}
+                  image={momentData.circleCoverImage}
+                  size="xs"
+                />
+                <span className="truncate">{momentData.circleName}</span>
+              </span>
 
-                {!isPast && (
-                  isOrganizer ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                      {(props as OrganizerProps).moment.registrationCount > 0 && (
-                        <span className="flex items-center gap-0.5">
-                          {" · "}
-                          <Users className="size-2.5" />
-                          {(props as OrganizerProps).moment.registrationCount}
-                        </span>
-                      )}
-                    </Badge>
-                  ) : isHost ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                    </Badge>
-                  ) : isRegistered ? (
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 gap-1 border-primary/40 text-xs text-primary"
-                    >
-                      <Check className="size-3" />
-                      {t("registrationStatus.registered")}
-                    </Badge>
-                  ) : isWaitlisted ? (
-                    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                      <Clock className="size-3" />
-                      {t("registrationStatus.waitlisted")}
-                    </Badge>
-                  ) : null
-                )}
-              </div>
             </div>
+
+            {/* Cover — RIGHT, 64×64px */}
+            {momentData.coverImage ? (
+              <Image
+                src={momentData.coverImage}
+                alt={momentData.title}
+                width={90}
+                height={90}
+                className={`size-[90px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+              />
+            ) : (
+              <div
+                className={`size-[90px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                style={{ background: gradient }}
+              />
+            )}
           </div>
         </Link>
       </div>

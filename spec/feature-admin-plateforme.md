@@ -231,7 +231,7 @@ src/app/[locale]/(routes)/admin/layout.tsx
 ### Design
 
 - Tables : composants shadcn/ui (`Table`, `TableHeader`, `TableRow`, `TableCell`)
-- Badges : statuts (PUBLISHED/CANCELLED/PAST), rôles (ADMIN/USER), visibilité (PUBLIC/PRIVATE)
+- Badges : statuts (DRAFT/PUBLISHED/CANCELLED/PAST), rôles (ADMIN/USER), visibilité (PUBLIC/PRIVATE)
 - Boutons destructifs : modale de confirmation (`AlertDialog`) avant suppression/annulation
 - Layout responsive : sidebar collapse sur mobile
 
