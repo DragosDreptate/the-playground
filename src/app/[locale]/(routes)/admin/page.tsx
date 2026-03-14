@@ -60,12 +60,12 @@ export default async function AdminDashboardPage() {
           href="/admin/insights/comments"
         />
         <StatsCard
-          label={t("stats.totalFollowers")}
-          value={stats.totalFollowers}
-          delta={stats.recentFollowers}
+          label={t("stats.totalMembers")}
+          value={stats.totalMembers}
+          delta={stats.recentMembers}
           deltaLabel={t("stats.thisWeek")}
           icon={UserPlus}
-          href="/admin/insights/followers"
+          href="/admin/insights/members"
         />
       </div>
 

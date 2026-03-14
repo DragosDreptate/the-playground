@@ -95,7 +95,7 @@ export type NewMomentNotificationStrings = {
   unsubscribeLabel: string;
 };
 
-export type NewMomentFollowerEmailData = {
+export type NewMomentMemberEmailData = {
   to: string;
   recipientName: string;
   circleName: string;
@@ -105,23 +105,6 @@ export type NewMomentFollowerEmailData = {
   momentDate: string;
   momentLocation: string;
   strings: NewMomentNotificationStrings;
-};
-
-export type NewMomentMemberEmailData = NewMomentFollowerEmailData;
-
-export type HostNewFollowerEmailData = {
-  to: string;
-  hostName: string;
-  followerName: string;
-  circleName: string;
-  circleSlug: string;
-  strings: {
-    subject: string;
-    heading: string;
-    message: string;
-    viewMembersCta: string;
-    footer: string;
-  };
 };
 
 export type MomentUpdateEmailData = {
@@ -278,9 +261,7 @@ export interface EmailService {
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
   sendNewComment(data: NewCommentEmailData): Promise<void>;
-  sendNewMomentToFollower(data: NewMomentFollowerEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
-  sendHostNewFollower(data: HostNewFollowerEmailData): Promise<void>;
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;

@@ -165,7 +165,6 @@ export async function updateNotificationPreferencesAction(
   const prefs: NotificationPreferences = {
     notifyNewRegistration: formData.get("notifyNewRegistration") === "true",
     notifyNewComment: formData.get("notifyNewComment") === "true",
-    notifyNewFollower: formData.get("notifyNewFollower") === "true",
     notifyNewMomentInCircle: formData.get("notifyNewMomentInCircle") === "true",
   };
 

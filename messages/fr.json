@@ -241,9 +241,8 @@
       "noPastMoments": "Aucun événement passé.",
       "today": "Aujourd'hui",
       "manageMoment": "Gérer cet événement",
-      "follow": "Suivre",
-      "unfollow": "Se désabonner",
-      "following": "Abonné·e",
+      "join": "Rejoindre",
+      "joined": "Membre",
       "isMember": "Vous êtes membre",
       "isHost": "Vous êtes Organisateur",
       "manageCircle": "Gérer cette Communauté",
@@ -453,7 +452,7 @@
       "triggerButton": "Inviter ma Communauté",
       "alreadySent": "Invitation envoyée le {date}",
       "dialogTitle": "Inviter ma Communauté",
-      "dialogDescription": "Un email d'invitation sera envoyé aux membres et followers de {circleName}.",
+      "dialogDescription": "Un email d'invitation sera envoyé aux membres de {circleName}.",
       "customMessageLabel": "Message personnalisé (optionnel)",
       "customMessagePlaceholder": "Ex : Ne manquez pas cet événement ! Places limitées.",
       "sendButton": "Envoyer",
@@ -462,7 +461,7 @@
       "successToast": "Invitation envoyée à {count} personnes",
       "alreadySentError": "L'invitation a déjà été envoyée",
       "notHostError": "Seul l'organisateur peut inviter la Communauté",
-      "hint": "Envoyez un email d'invitation à tous les membres et followers",
+      "hint": "Envoyez un email d'invitation à tous les membres",
       "alreadySentShort": "Envoyée",
       "cooldownHint": "Prochain envoi disponible dans {time}"
     },
@@ -538,7 +537,7 @@
     "backToSite": "Retour au site",
     "insights": "Insights",
     "insightRegistrations": "Inscriptions",
-    "insightFollowers": "Abonnements",
+    "insightMembers": "Membres",
     "insightComments": "Commentaires",
     "insightActivation": "Activation",
     "stats": {
@@ -547,7 +546,7 @@
       "totalMoments": "Événements",
       "totalRegistrations": "Inscriptions",
       "totalComments": "Commentaires",
-      "totalFollowers": "Abonnements",
+      "totalMembers": "Membres",
       "thisWeek": "cette semaine"
     },
     "table": {
@@ -721,7 +720,7 @@
       "heading": "{circleName} vous invite",
       "intro": "{hostName} partage un événement avec vous",
       "ctaLabel": "Voir l'événement",
-      "unsubscribeText": "Vous recevez cet email car vous suivez {circleName}.",
+      "unsubscribeText": "Vous recevez cet email car vous êtes membre de {circleName}.",
       "unsubscribeLabel": "Gérer mes notifications"
     },
     "circleInvitation": {
@@ -955,10 +954,8 @@
       "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements",
       "newComment": "Nouveau commentaire",
       "newCommentDesc": "Quand quelqu'un commente un événement auquel vous participez",
-      "newFollower": "Nouveau follower",
-      "newFollowerDesc": "Quand quelqu'un suit une de vos Communautés",
       "newMomentInCircle": "Nouvel événement",
-      "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté que vous suivez",
+      "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté dont vous êtes membre",
       "saved": "Préférences enregistrées"
     },
     "publicProfile": {

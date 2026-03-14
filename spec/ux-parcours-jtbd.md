@@ -364,7 +364,7 @@
 - Liste des inscrits avec avatars ✓
 - Bouton Modifier ✓
 - Lien partageable avec Copier ✓
-- Broadcast "Inviter ma Communauté" ✓ — notifie membres + followers (cooldown 24h, message personnalisable)
+- Broadcast "Inviter ma Communauté" ✓ — notifie les membres de la Communauté (cooldown 24h, message personnalisable)
 
 **Gaps :**
 
@@ -600,7 +600,7 @@
 - **Fil de commentaires** : engagement post-événement, communauté vivante
 
 ### Talons d'Achille actuels
-- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Organisateur nouvelle inscription, notification tous inscrits nouveau commentaire, notification nouveau follower, notification de mise à jour d'événement, notification d'annulation, notification Organisateur à la création, notification membres à la création, notification followers à la création, invitation Communauté (Broadcast), magic link — 13 emails implémentés. Rappels 24h/1h restent à faire (Phase 2).
+- ~~**Pas d'emails**~~ ✅ **Résolu** : confirmation inscription, confirmation liste d'attente, promotion, notification Organisateur nouvelle inscription, notification tous inscrits nouveau commentaire, notification de mise à jour d'événement, notification d'annulation, notification Organisateur à la création, notification membres à la création, invitation Communauté (Broadcast), magic link — 11 emails actifs implémentés. Rappels 24h/1h restent à faire (Phase 2).
 - ~~**Pas de notification aux membres à la création d'un événement**~~ ✅ **Résolu** (B3, M-4) — email `notifyNewMoment` envoyé automatiquement à la création.
 - ~~**Formulaire de commentaire masqué sur PAST**~~ ✅ **Résolu** — PR #93 : formulaire visible pour tous les utilisateurs connectés, incluant l'Organisateur, avec placeholder contextuel "Remerciements, photos, retours..."
 - **L'après-inscription est partiellement guidée** : CTA "Ajouter au calendrier" ✅ résolu, mais lien vers le dashboard encore absent (gap A2)

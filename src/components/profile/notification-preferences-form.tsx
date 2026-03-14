@@ -38,7 +38,6 @@ export function NotificationPreferencesForm({
     // Inject boolean values from state (switches don't submit natively in formData)
     formData.set("notifyNewRegistration", String(prefs.notifyNewRegistration));
     formData.set("notifyNewComment", String(prefs.notifyNewComment));
-    formData.set("notifyNewFollower", String(prefs.notifyNewFollower));
     formData.set("notifyNewMomentInCircle", String(prefs.notifyNewMomentInCircle));
 
     const result = await action(formData);
@@ -93,15 +92,6 @@ export function NotificationPreferencesForm({
             onCheckedChange={(val) =>
               setPrefs((p) => ({ ...p, notifyNewRegistration: val }))
             }
-          />
-          <ToggleRow
-            label={t("newFollower")}
-            description={t("newFollowerDesc")}
-            checked={prefs.notifyNewFollower}
-            onCheckedChange={(val) =>
-              setPrefs((p) => ({ ...p, notifyNewFollower: val }))
-            }
-            isLast
           />
         </div>
       </div>

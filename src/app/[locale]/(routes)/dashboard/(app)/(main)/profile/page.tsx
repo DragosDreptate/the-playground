@@ -197,7 +197,6 @@ export default async function ProfilePage({
           preferences={{
             notifyNewRegistration: user.notifyNewRegistration,
             notifyNewComment: user.notifyNewComment,
-            notifyNewFollower: user.notifyNewFollower,
             notifyNewMomentInCircle: user.notifyNewMomentInCircle,
           }}
           email={user.email}

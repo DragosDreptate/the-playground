@@ -68,16 +68,15 @@
 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. | 2026-02-22 | — |
 | Cover Communauté : `CoverImagePicker` (tabs Photos Unsplash + Importer), server action `processCoverImage` dans `cover-image.ts`, champs `coverImage`/`coverImageAttribution` sur Communauté (DB + domaine), API proxy Unsplash `/api/unsplash/search`, affichage sur 5 emplacements, attribution "Photo par [Nom] sur Unsplash". | 2026-02-23 | — |
 | Cover événement : mêmes champs `coverImage`/`coverImageAttribution` sur événement (DB + domaine), même composant `CoverImagePicker`, même server action `processCoverImage`, affichage sur pages publique et Organisateur. | 2026-02-23 | — |
-| **Suivre une Communauté (Follow)** : table `CircleFollow` (DB + domaine), usecases `followCircle`/`unfollowCircle`, composant `FollowButton` (cloche, 3 états), intégré sur page Communauté publique (visible uniquement pour les utilisateurs connectés non-membres). Notification email aux followers à la création d'un événement (fire-and-forget). Déduplique followers+membres (un follower-membre ne reçoit qu'un seul email). | 2026-02-24 | `80a1390` |
-| **Email aux membres : nouvel événement dans leur Communauté** : `notifyNewMoment` envoie automatiquement un email à tous les membres (PLAYERs) à la création d'un événement, sauf au créateur. Intégré dans `createMomentAction`. Fire-and-forget. Template distinct du template follower (intro "votre Communauté" vs "une Communauté que vous suivez"). | 2026-02-24 | `80a1390` |
+| **Rejoindre une Communauté directement** : usecase `joinCircleDirectly`, action `joinCircleDirectlyAction`, composant `JoinCircleButton` (remplace l'ancien `FollowButton`). Crée directement une `CircleMembership` PLAYER sans passer par un événement. Visible sur la page Communauté publique `/circles/[slug]` pour les utilisateurs connectés non-membres. | 2026-02-24 | — |
+| **Email aux membres : nouvel événement dans leur Communauté** : `notifyNewMoment` envoie automatiquement un email à tous les membres (PLAYERs) à la création d'un événement, sauf au créateur. Intégré dans `createMomentAction`. Fire-and-forget. Template `new-moment-notification.tsx`. | 2026-02-24 | `80a1390` |
 | CoverImagePicker — photos aléatoires Unsplash à l'ouverture : suppression des photos curées statiques, nouvelle route `/api/unsplash/random` (8 appels parallèles `/photos/random`, 1 par thématique, cache `s-maxage=300`), skeleton 8 cases pendant le chargement, `defaultPhotos` mis en cache entre les ouvertures. | 2026-02-23 | `dcd2c6c` |
 | CoverImagePicker — pagination recherche : remplacement du bouton "Voir plus" (qui agrandissait la modale) par une navigation prev/next qui remplace les photos sans changer la taille de la modale. | 2026-02-23 | — |
 | CoverImagePicker — fix state reset : `handleApply` et `handleRemove` appelaient `setOpen(false)` directement (bypasse `onOpenChange` en mode contrôlé Radix), laissant `pending` stale. Corrigé en appelant `handleOpenChange(false)` pour garantir le reset complet. Fix parallèle : le bouton déclencheur appelait `setOpen(true)` au lieu de `handleOpenChange(true)`, empêchant le fetch des photos aléatoires. | 2026-02-23 | `e1131ef`, `9d5cfde` |
 | **Refonte dashboard "Mon espace"** : tab Événements (`DashboardMomentCard` redesigné — cover 64 px à gauche, titre line-clamp-2, badge aligné à droite) + tab Communautés (nouveau `DashboardCircleCard` style Explorer — cover 1:1, stats membres/événements, prochain événement, bouton "Créer un événement" Organisateur-only). Nouveau type domaine `DashboardCircle` (`CircleWithRole` + `memberCount` + `upcomingMomentCount` + `nextMoment`). Nouveau usecase `getUserDashboardCircles`. Nouvelle méthode repository `findAllByUserIdWithStats` (requête unique, pas de N+1). Grille Communautés `sm:grid-cols-2`. 9 nouveaux tests unitaires (`get-user-dashboard-circles.test.ts`). | 2026-02-24 | `6a912a2` |
 | **Emails transactionnels supplémentaires** : notification de mise à jour d'événement (`momentUpdate` / `hostMomentUpdate` — envoyés aux inscrits et à l'Organisateur quand date ou lieu change) + notification d'annulation d'événement (`momentCancelled` — envoyé à tous les inscrits REGISTERED quand un événement est annulé) + notification Organisateur à la création d'événement (`hostMomentCreated` — confirmation par email au créateur). Port `EmailService` étendu avec `sendMomentUpdate`, `sendMomentCancelled`, `sendHostMomentCreated`. Fire-and-forget depuis `updateMomentAction` et `cancelMomentAction`. i18n FR/EN complet dans `messages/*.json`. | 2026-02-24 | — |
-| **Email alerte Organisateur : nouveau follower** : `host-new-follower` template, `sendHostNewFollower` sur `EmailService`, déclenché depuis `followCircleAction`, respecte la préférence `notifyNewFollower`, fire-and-forget. | 2026-02-24 | — |
-| **Broadcast "Inviter ma Communauté"** : bouton sur la vue Organisateur d'un événement — envoie un email à tous les membres et followers de la Communauté (cooldown 24h entre envois, protégé par `broadcastSentAt` ; bouton affiche "Envoyée" + tooltip temps restant pendant le cooldown, redevient actif après 24h). `broadcastMomentAction` (`src/app/actions/broadcast-moment.ts`), méthode `sendBroadcastMoment` sur `EmailService`, template `broadcast-moment` (react-email). Message personnalisable (`customMessage?`). i18n `Moment.broadcast.*` FR/EN complet. | 2026-02-28 | — |
-| **Préférences de notifications email** : 4 booléens sur `User` (`notifyNewRegistration`, `notifyNewComment`, `notifyNewFollower`, `notifyNewMomentInCircle`), usecase `updateNotificationPreferences`, server action dans `profile.ts`, section "Notifications" sur `/dashboard/profile` avec toggles `Switch`, i18n FR/EN `Profile.notifications.*`. | 2026-02-24 | — |
+| **Broadcast "Inviter ma Communauté"** : bouton sur la vue Organisateur d'un événement — envoie un email à tous les membres de la Communauté (cooldown 24h entre envois, protégé par `broadcastSentAt` ; bouton affiche "Envoyée" + tooltip temps restant pendant le cooldown, redevient actif après 24h). `broadcastMomentAction` (`src/app/actions/broadcast-moment.ts`), méthode `sendBroadcastMoment` sur `EmailService`, template `broadcast-moment` (react-email). Message personnalisable (`customMessage?`). i18n `Moment.broadcast.*` FR/EN complet. | 2026-02-28 | — |
+| **Préférences de notifications email** : 3 booléens sur `User` (`notifyNewRegistration`, `notifyNewComment`, `notifyNewMomentInCircle`), usecase `updateNotificationPreferences`, server action dans `profile.ts`, section "Notifications" sur `/dashboard/profile` avec toggles `Switch`, i18n FR/EN `Profile.notifications.*`. | 2026-02-24 | — |
 | **Export CSV des inscrits** : bouton "Exporter CSV" sur la vue Organisateur d'un événement (`RegistrationsList`), client-side avec BOM UTF-8, colonnes prénom/nom/email/statut/date. i18n `Moment.registrations.exportCsv` + `Moment.registrations.csvHeaders.*`. | 2026-02-24 | — |
 | **Dashboard Mode Switcher Participant / Organisateur** : enum `DashboardMode` sur `User` (DB + domaine + session Auth.js). Usecases `setDashboardMode`, `getHostUpcomingMoments`, `getHostPastMoments`. Composants `DashboardModeSwitcher` (pill switcher avec label "Vue :"), `CreateMomentButton` (CTA adaptatif 0/1/2+ Communautés), `CreateMomentDropdown` (Popover). Dashboard content filtré par mode (vue Participant / vue Organisateur). Welcome page redesignée : deux cartes cliquables "Je participe" / "J'organise". `shouldRedirectToWelcome` (`src/lib/dashboard.ts`). `SiteHeader` + `MobileNav` avec `dashboardHref` conditionnel. Homepage CTAs adaptatifs. `globalTeardown` E2E. `thomas@demo.playground` ajouté. 19 tests unitaires + spec E2E `dashboard-mode-switcher.spec.ts` (9 tests). | 2026-02-28 | — |
 | **Dashboard onglet Participant renommé** : libellé "Mes événements" → "Mes inscriptions" (FR) / "My registrations" (EN) — clé i18n `Dashboard.myMoments`. | 2026-03-02 | — |
@@ -86,6 +85,7 @@
 | **Suppression membre d'une Communauté** : usecase `removeCircleMember`, contrôle Organisateur, annulation automatique des inscriptions à venir, i18n FR/EN. | 2026-03-01 | `706cf9b` |
 | **Invitation Communauté par lien** : usecases `generateCircleInviteToken` / `joinCircleByInvite` / `revokeCircleInviteToken`, token unique sur `Circle` (`inviteToken`), page publique `/circles/join/[token]` (rejoint la Communauté sans passer par un événement), bouton génération/révocation sur la page Communauté Organisateur, i18n FR/EN, tests unitaires + tests de sécurité (`circle-invite-security.test.ts`) + spec E2E (`circle-invite.spec.ts`). | 2026-03-04 | `ef288f7` |
 | **Catégorie personnalisée sur Communauté** : champ `customCategory` (string, max 100 chars) sur `Circle` (DB + domaine + repository). Activé uniquement quand la catégorie choisie est `OTHER`. Validé côté client dans `CircleForm` + géré dans les usecases `createCircle`/`updateCircle` via helper `resolveCustomCategoryForCreate`/`resolveCustomCategoryForUpdate` (`src/lib/circle-category-helpers.ts`). Affiché à la place du label "Autre" sur les cards et pages Communauté. | — | — |
+| **Rejoindre une Communauté directement (remplacement du Follow)** : suppression complète du modèle `CircleFollow` et des usecases `followCircle`/`unfollowCircle`. Nouveau usecase `joinCircleDirectly` + action `joinCircleDirectlyAction` + composant `JoinCircleButton`. Crée directement une `CircleMembership` PLAYER depuis la page Communauté publique. Admin stats : `totalMembers`/`recentMembers` (remplace `totalFollowers`/`recentFollowers`). | 2026-03-14 | — |
 
 ---
 
@@ -121,15 +121,10 @@
   - Contenu : nom du nouvel inscrit, total inscrits / places restantes, lien vers gestion
   - Skip quand l'Organisateur s'inscrit lui-même
 
-- [x] **Email alerte Organisateur : nouveau follower de sa Communauté** ✅
-  - Déclenché dans `followCircleAction` après `followCircle` — fire-and-forget
-  - Destinataires : tous les Organisateurs de la Communauté suivie
-  - Contenu : prénom/nom du follower, lien vers la page Communauté, lien vers la liste des membres
-  - Respecte la préférence `notifyNewFollower` de l'Organisateur
-  - Template : `host-new-follower` (react-email). Port `EmailService.sendHostNewFollower` + adapter `ResendEmailService`.
+- ~~**Email alerte Organisateur : nouveau follower**~~ — supprimé lors de la suppression du système Follow (remplacé par `joinCircleDirectly`).
 
 - [x] **Architecture email multi-canal** (infrastructure) ✅
-  - Port `EmailService` (13 méthodes) + adapter `ResendEmailService`
+  - Port `EmailService` (14 méthodes) + adapter `ResendEmailService`
   - Templates React (react-email) : calendar badge gradient, layout blanc/gris
   - Fire-and-forget depuis server actions (pas de queue pour le MVP)
   - Clé API : `AUTH_RESEND_KEY` (partagée auth + transactionnel)
@@ -261,7 +256,7 @@
 
 - [x] **Préférences de notifications email** ✅ — intégrées dans la page profil (pas de page `/dashboard/settings` séparée)
   - Section "Notifications" sur `/dashboard/profile` avec toggles `Switch` par type
-  - Préférences implémentées : `notifyNewFollower`, `notifyNewRegistration`, `notifyNewComment`, `notifyNewMomentInCircle`
+  - Préférences implémentées : `notifyNewRegistration`, `notifyNewComment`, `notifyNewMomentInCircle`
   - Toutes activées par défaut (opt-out), champs booléens sur `User` en DB
   - Usecase `updateNotificationPreferences` + server action dans `profile.ts`
   - Chaque server action qui envoie un email consulte la préférence avant d'appeler `emailService`
@@ -297,7 +292,7 @@
 
 - [x] **Email aux membres : nouvel événement dans leur Communauté** (gap M-4) ✅
   - Automatique à la création (cohérent avec modèle actuel : création = publication)
-  - Déduplication : si un utilisateur est à la fois follower et membre, il reçoit uniquement l'email membre
+  - Destinataires : membres PLAYER de la Communauté (hors créateur), filtrés par préférence `notifyNewMomentInCircle`
   - Créateur exclu de la notification (via `findPlayersForNewMomentNotification`)
 
 - [ ] **Export données Organisateur**
@@ -348,8 +343,10 @@
   - Limites suggérées : 10 inscriptions/min/IP, 5 créations/heure/user
 
 - [x] **Tests unitaires complets** — 690 tests, 68 fichiers, tous usecases couverts (37 racine + 11 admin) ✅
+  - **Note** : `joinCircleDirectly` n'a pas encore de fichier de test unitaire dédié (`join-circle-directly.test.ts` manquant)
 - [x] **Tests de sécurité** — RBAC, IDOR cross-tenant, accès admin, avatar isolation, onboarding guards, invite token (99+ tests dédiés sécurité) ✅
 - [x] **Tests E2E Playwright** — 11 specs (auth, join-moment, host-flow, cancel-registration, comments, onboarding, waitlist, explore, dashboard-mode-switcher, broadcast-moment, circle-invite). Infrastructure `globalSetup` + `globalTeardown` (nettoyage propre des données `@test.playground` après chaque run). ✅
+  - **Note** : le parcours "rejoindre une Communauté directement via `JoinCircleButton`" (sans événement) n'est pas encore couvert en E2E
 - [ ] **Accessibilité axe-core** dans Playwright
 
 - [ ] **Bundle analyzer** (`@next/bundle-analyzer`)
@@ -376,11 +373,7 @@
   - **Migration** : remplacer `@prisma/adapter-pg` + `PrismaPg` par `@neondatabase/serverless` Pool + `PrismaNeon` en mode Pool. Garder `PRISMA_USE_HTTP_ADAPTER=true` comme rollback. Mesurer l'impact en prod.
   - **Risque** : migration plus complexe, à planifier après stabilisation des performances post React.cache()
 
-- [x] **Suivre une Communauté (Follow)** ✅ — implémenté en 2026-02-24 (commit `80a1390`)
-  - Table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` avec 3 états (cloche/abonné·e/hover se désabonner)
-  - Visible uniquement pour les utilisateurs connectés non-membres sur `/circles/[slug]`
-  - Email aux followers à chaque nouvel événement, déduplication avec membres
-  - **Option future** : préférences granulaires (opt-out), affichage sur page Explorer
+- [ ] **Suivre une Communauté (Follow)** — *système Follow supprimé* (2026-03-14) et remplacé par `joinCircleDirectly`. Si une fonctionnalité d'abonnement sans adhésion complète est souhaitée à terme, à repenser.
 
 - [ ] Track (série d'événements récurrents dans une Communauté)
 - [ ] Check-in (marquer présent sur place)

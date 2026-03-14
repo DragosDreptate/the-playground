@@ -45,7 +45,6 @@ export function makeUser(overrides: Partial<User> = {}): User {
     role: "USER",
     notifyNewRegistration: true,
     notifyNewComment: true,
-    notifyNewFollower: true,
     notifyNewMomentInCircle: true,
     dashboardMode: null,
     publicId: "test-user-1234",
@@ -73,7 +72,6 @@ export function makeNotificationPreferences(
   return {
     notifyNewRegistration: true,
     notifyNewComment: true,
-    notifyNewFollower: true,
     notifyNewMomentInCircle: true,
     ...overrides,
   };

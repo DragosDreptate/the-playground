@@ -12,12 +12,12 @@ export type AdminStats = {
   totalMoments: number;
   totalRegistrations: number;
   totalComments: number;
-  totalFollowers: number; // abonnements PLAYER aux Communautés
+  totalMembers: number; // membres PLAYER des Communautés
   recentUsers: number; // derniers 7 jours
   recentCircles: number;
   recentMoments: number;
   recentComments: number;
-  recentFollowers: number;
+  recentMembers: number;
 };
 
 // ─────────────────────────────────────────────
@@ -194,10 +194,10 @@ export type AdminInsightRegistration = {
 };
 
 // ─────────────────────────────────────────────
-// Insight — Followers
+// Insight — Members
 // ─────────────────────────────────────────────
 
-export type AdminInsightFollower = {
+export type AdminInsightMember = {
   id: string;
   userId: string;
   userEmail: string;
@@ -321,13 +321,13 @@ export interface AdminRepository {
     sortBy?: string,
     sortOrder?: "asc" | "desc"
   ): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
-  getFollowersInsight(
+  getMembersInsight(
     days: number,
     limit: number,
     offset: number,
     sortBy?: string,
     sortOrder?: "asc" | "desc"
-  ): Promise<{ followers: AdminInsightFollower[]; total: number }>;
+  ): Promise<{ members: AdminInsightMember[]; total: number }>;
   getCommentsInsight(
     days: number,
     limit: number,

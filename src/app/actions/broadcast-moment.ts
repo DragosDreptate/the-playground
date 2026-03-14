@@ -74,23 +74,12 @@ export async function broadcastMomentAction(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   const circleName = circle?.name ?? "";
 
-  const [members, followers] = await Promise.all([
-    prismaCircleRepository.findPlayersForNewMomentNotification(
-      moment.circleId,
-      session.user.id
-    ),
-    prismaCircleRepository.findFollowers(moment.circleId),
-  ]);
+  const members = await prismaCircleRepository.findPlayersForNewMomentNotification(
+    moment.circleId,
+    session.user.id
+  );
 
-  // Déduplication : follower déjà membre → ne recevoir que l'email membre
-  const memberUserIds = new Set(members.map((m) => m.userId));
-  const followersToNotify = followers.filter((f) => !memberUserIds.has(f.userId));
-
-  const allRecipients = [
-    ...members.map((m) => ({ ...m, isMember: true })),
-    ...followersToNotify.map((f) => ({ ...f, isMember: false })),
-  ];
-
+  const allRecipients = members;
   const allUserIds = allRecipients.map((r) => r.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
 

@@ -59,13 +59,6 @@ export type CircleMemberWithUser = CircleMembership & {
   };
 };
 
-export type CircleFollow = {
-  id: string;
-  userId: string;
-  circleId: string;
-  createdAt: Date;
-};
-
 export type DashboardCircle = CircleWithRole & {
   memberCount: number;
   upcomingMomentCount: number;

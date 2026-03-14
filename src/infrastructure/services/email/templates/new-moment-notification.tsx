@@ -1,9 +1,9 @@
 import { Button, Link, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
-import type { NewMomentFollowerEmailData } from "@/domain/ports/services/email-service";
+import type { NewMomentMemberEmailData } from "@/domain/ports/services/email-service";
 
-type Props = NewMomentFollowerEmailData & {
+type Props = NewMomentMemberEmailData & {
   baseUrl: string;
 };
 

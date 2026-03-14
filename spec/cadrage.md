@@ -297,7 +297,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Pages événement autonomes et partageables ✅
 - Inscriptions (avec inscription automatique à la Communauté) ✅
 - Liste d'attente avec promotion automatique ✅
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, notification Organisateur nouveau follower, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux participants, broadcast "Inviter ma Communauté") ✅
+- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, mise à jour événement, annulation événement, confirmation création événement, notification nouvel événement dans communauté aux membres, broadcast "Inviter ma Communauté") ✅
 - Stripe Connect (événements payants) — pas encore implémenté
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Explorer (répertoire public de Communautés + événements) ✅
@@ -309,7 +309,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 
 - Tracks (séries d'événements récurrents)
 - Check-in le jour J
-- [x] **Suivre une Communauté (Follow)** ✅ — table `CircleFollow`, usecases `followCircle`/`unfollowCircle`, `FollowButton` (cloche), email aux followers à chaque nouvel événement
+- [ ] **Suivre une Communauté (Follow)** — *système Follow supprimé (2026-03-14), remplacé par `joinCircleDirectly` (adhésion directe PLAYER)*. À repenser si une fonctionnalité d'abonnement sans adhésion est souhaitée.
 - [x] **Radar concurrentiel** ✅ — POC `/lab/events-radar` : agent IA (Claude) qui scrape Luma, Meetup, Eventbrite pour trouver les événements concurrents dans une ville et un créneau donnés. `RadarUsage` en DB pour le rate-limiting.
 - Dashboard analytics simple
 - Fil de commentaires enrichi
