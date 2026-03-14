@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, Star } from "lucide-react";
+import { Users, Star, MapPin } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -107,7 +107,10 @@ export function ExplorerFeatured({ circles }: Props) {
                   </div>
                   {/* Ligne 4 : ville */}
                   {circle.city && (
-                    <p className="truncate text-xs text-muted-foreground">{circle.city}</p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <MapPin className="size-3 shrink-0" />
+                      <span className="truncate">{circle.city}</span>
+                    </div>
                   )}
                 </div>
               </Link>
