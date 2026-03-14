@@ -55,9 +55,6 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
-              {circle.name}
-            </h3>
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel && (
                 <span className="text-foreground text-xs font-semibold">{categoryLabel}</span>
@@ -68,6 +65,9 @@ export async function DashboardCircleCard({ circle }: Props) {
                   : t("circleCard.roleBadge.member")}
               </span>
             </div>
+            <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
+              {circle.name}
+            </h3>
             {circle.city && (
               <div className="text-muted-foreground flex items-center gap-1 text-xs">
                 <MapPin className="size-3 shrink-0" />
