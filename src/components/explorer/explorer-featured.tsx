@@ -87,7 +87,7 @@ export function ExplorerFeatured({ circles }: Props) {
                   {/* Ligne 1 : thématique + badge aligné à droite */}
                   <div className="flex items-center justify-between gap-2">
                     {categoryLabel && (
-                      <span className="text-xs font-semibold text-muted-foreground truncate">
+                      <span className="min-w-0 text-xs font-semibold text-muted-foreground truncate">
                         {categoryLabel}
                       </span>
                     )}
