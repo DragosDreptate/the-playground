@@ -69,7 +69,7 @@ export function ExplorerFeatured({ circles }: Props) {
               >
                 {/* Cover 1:1 — côté = hauteur du contenu (self-stretch + aspect-square) */}
                 <div
-                  className="relative aspect-square self-stretch shrink-0 overflow-hidden rounded-xl"
+                  className="relative size-[90px] shrink-0 overflow-hidden rounded-xl"
                   style={{ background: gradient }}
                 >
                   <Image
@@ -77,7 +77,7 @@ export function ExplorerFeatured({ circles }: Props) {
                     alt={circle.name}
                     fill
                     className="object-cover"
-                    sizes="96px"
+                    sizes="90px"
                     priority
                   />
                 </div>
