@@ -82,7 +82,6 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
               <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
                 {circle.name}
               </h3>
-              {circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
               {roleBadge}
             </div>
             <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
