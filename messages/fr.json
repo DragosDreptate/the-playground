@@ -490,7 +490,7 @@
     "featured": {
       "eyebrow": "À la une",
       "title": "Communautés du jour",
-      "refreshHint": "Renouvellement à minuit",
+      "refreshHint": "Sélectionnées parmi les communautés actives · Renouvellement quotidien",
       "badge": "À la une"
     },
     "tabs": {

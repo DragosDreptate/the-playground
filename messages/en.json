@@ -490,7 +490,7 @@
     "featured": {
       "eyebrow": "Featured",
       "title": "Communities of the day",
-      "refreshHint": "Refreshes at midnight",
+      "refreshHint": "Selected from active communities · Refreshes daily",
       "badge": "Featured"
     },
     "tabs": {
