@@ -5,7 +5,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon } from "lucide-react";
+import { Users, CalendarIcon, MapPin } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -47,9 +47,6 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
     </span>
   );
 
-  const cityLabel = circle.city && (
-    <span className="text-muted-foreground text-xs">{circle.city}</span>
-  );
 
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
@@ -79,7 +76,6 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryBadge}
               {circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
-              {cityLabel}
             </div>
             <div className="flex items-baseline gap-3">
               <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
@@ -95,6 +91,12 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 <Users className="size-3.5 shrink-0" />
                 <span>{t("circleCard.members", { count: circle.memberCount })}</span>
               </div>
+              {circle.city && (
+                <div className="flex items-center gap-1">
+                  <MapPin className="size-3.5 shrink-0" />
+                  <span>{circle.city}</span>
+                </div>
+              )}
               {circle.upcomingMomentCount > 0 && (
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="size-3.5 shrink-0" />
