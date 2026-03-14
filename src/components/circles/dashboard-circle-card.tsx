@@ -3,7 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin, Tag } from "lucide-react";
+import { Users, CalendarIcon, MapPin } from "lucide-react";
+import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
 
 type Props = {
@@ -55,17 +56,12 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            {categoryLabel && (
-              <span className="flex items-center gap-1 text-muted-foreground text-xs">
-                <Tag className="size-3 shrink-0" />
-                {categoryLabel}
-              </span>
-            )}
+            {categoryLabel && <CategoryBadge label={categoryLabel} />}
             <div className="flex items-baseline gap-3">
               <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
                 {circle.name}
               </h3>
-              <span className="shrink-0 inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-xs font-medium text-primary">
+              <span className="shrink-0 inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
                 {circle.memberRole === "HOST"
                   ? t("circleCard.roleBadge.host")
                   : t("circleCard.roleBadge.member")}

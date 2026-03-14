@@ -5,10 +5,11 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin, Tag } from "lucide-react";
+import { Users, CalendarIcon, MapPin } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
+import { CategoryBadge } from "@/components/badges/category-badge";
 
 type Props = {
   circle: PublicCircle;
@@ -33,12 +34,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
         ? tCategory(circle.category)
         : null;
 
-  const categoryBadge = categoryLabel && (
-    <span className="flex items-center gap-1 text-muted-foreground text-xs">
-      <Tag className="size-3 shrink-0" />
-      {categoryLabel}
-    </span>
-  );
+  const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
   const roleBadge = membershipRole && (
     <span className="inline-flex items-center rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
@@ -74,11 +70,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
-            {categoryBadge && (
-              <div className="flex flex-wrap items-center gap-1.5">
-                {categoryBadge}
-              </div>
-            )}
+            {categoryBadge}
             <div className="flex items-baseline gap-3">
               <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
                 {circle.name}
