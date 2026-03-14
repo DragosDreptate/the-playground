@@ -487,6 +487,12 @@
     "title": "Communautés & événements",
     "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
     "navLink": "Explorer",
+    "featured": {
+      "eyebrow": "À la une",
+      "title": "Communautés du jour",
+      "refreshHint": "Sélectionnées parmi les communautés actives · Renouvellement quotidien",
+      "badge": "À la une"
+    },
     "tabs": {
       "circles": "Communautés",
       "moments": "Événements"

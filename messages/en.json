@@ -487,6 +487,12 @@
     "title": "Communities & events",
     "description": "Communities that share your values, events you don't want to miss.",
     "navLink": "Explore",
+    "featured": {
+      "eyebrow": "Featured",
+      "title": "Communities of the day",
+      "refreshHint": "Selected from active communities · Refreshes daily",
+      "badge": "Featured"
+    },
     "tabs": {
       "circles": "Communities",
       "moments": "Events"
