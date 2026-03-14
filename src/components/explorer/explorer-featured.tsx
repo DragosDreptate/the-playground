@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, Star, MapPin } from "lucide-react";
+import { Users, Star } from "lucide-react";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 
 type Props = {
@@ -83,30 +83,31 @@ export function ExplorerFeatured({ circles }: Props) {
                 </div>
 
                 {/* Info */}
-                <div className="min-w-0 flex-1">
-                  {/* Badge */}
-                  <div className="mb-1 inline-flex items-center gap-1 rounded-full border border-primary/35 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-                    <Star className="size-2 shrink-0" aria-hidden="true" />
-                    {t("featured.badge")}
+                <div className="min-w-0 flex-1 flex flex-col justify-center gap-0.5">
+                  {/* Ligne 1 : thématique + badge */}
+                  <div className="flex items-center gap-2">
+                    {categoryLabel && (
+                      <span className="text-xs font-semibold text-muted-foreground truncate">
+                        {categoryLabel}
+                      </span>
+                    )}
+                    <div className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/35 bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                      <Star className="size-2 shrink-0" aria-hidden="true" />
+                      {t("featured.badge")}
+                    </div>
                   </div>
+                  {/* Ligne 2 : nom */}
                   <p className="truncate text-sm font-bold text-foreground group-hover:underline">
                     {circle.name}
                   </p>
-                  <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  {/* Ligne 3 : membres */}
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Users className="size-3 shrink-0" />
                     <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-                    {circle.city && (
-                      <>
-                        <span className="opacity-40">·</span>
-                        <MapPin className="size-3 shrink-0" />
-                        <span className="truncate">{circle.city}</span>
-                      </>
-                    )}
                   </div>
-                  {categoryLabel && (
-                    <div className="mt-1.5 inline-block rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-                      {categoryLabel}
-                    </div>
+                  {/* Ligne 4 : ville */}
+                  {circle.city && (
+                    <p className="truncate text-xs text-muted-foreground">{circle.city}</p>
                   )}
                 </div>
               </Link>
