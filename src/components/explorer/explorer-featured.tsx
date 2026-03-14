@@ -28,7 +28,7 @@ export function ExplorerFeatured({ circles }: Props) {
         }}
       />
       {/* Overlay */}
-      <div className="absolute inset-0 bg-background/55" />
+      <div className="absolute inset-0 bg-background/78" />
 
       <div className="relative z-10 p-5 sm:p-6">
         {/* Header */}
