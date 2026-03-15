@@ -1,15 +1,17 @@
 import { Button, Link, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
+import { CalendarBadge } from "./components/calendar-badge";
 import type { BroadcastMomentEmailData } from "@/domain/ports/services/email-service";
 
 type Props = BroadcastMomentEmailData;
 
 export function BroadcastMomentEmail({
-  circleName,
   momentTitle,
   momentSlug,
   momentDate,
+  momentDateMonth,
+  momentDateDay,
   momentLocation,
   appUrl,
   strings,
@@ -19,8 +21,11 @@ export function BroadcastMomentEmail({
 
   return (
     <EmailLayout preview={strings.preheader} footer={strings.unsubscribeText}>
-      <Text style={heading}>{strings.heading}</Text>
+      <CalendarBadge month={momentDateMonth} day={momentDateDay} />
 
+      <Text style={title}>{momentTitle}</Text>
+
+      <Text style={heading}>{strings.heading}</Text>
       <Text style={intro}>{strings.intro}</Text>
 
       {strings.customMessage && (
@@ -29,13 +34,19 @@ export function BroadcastMomentEmail({
         </Section>
       )}
 
-      <Section style={eventCard}>
-        <Text style={eventTitle}>{momentTitle}</Text>
-        <Text style={eventMeta}>{momentDate}</Text>
+      <Section style={metaSection}>
+        <Text style={metaRow}>
+          <span style={metaLabel}>{strings.dateLabel}</span>
+          <br />
+          <span style={metaValue}>{momentDate}</span>
+        </Text>
         {momentLocation && (
-          <Text style={eventMeta}>{momentLocation}</Text>
+          <Text style={metaRow}>
+            <span style={metaLabel}>{strings.locationLabel}</span>
+            <br />
+            <span style={metaValue}>{momentLocation}</span>
+          </Text>
         )}
-        <Text style={communityLabel}>{circleName}</Text>
       </Section>
 
       <Section style={ctaSection}>
@@ -53,11 +64,20 @@ export function BroadcastMomentEmail({
   );
 }
 
+const title: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: 700,
+  color: "#18181b",
+  textAlign: "center" as const,
+  margin: "0 0 24px 0",
+  lineHeight: "28px",
+};
+
 const heading: React.CSSProperties = {
   fontSize: "16px",
   fontWeight: 600,
   color: "#18181b",
-  margin: "0 0 12px 0",
+  margin: "0 0 8px 0",
   lineHeight: "24px",
 };
 
@@ -84,34 +104,31 @@ const customMessageText: React.CSSProperties = {
   fontStyle: "italic",
 };
 
-const eventCard: React.CSSProperties = {
-  backgroundColor: "#f4f4f5",
-  borderRadius: "8px",
-  padding: "16px",
+const metaSection: React.CSSProperties = {
+  borderTop: "1px solid #e4e4e7",
+  paddingTop: "16px",
   marginBottom: "24px",
 };
 
-const eventTitle: React.CSSProperties = {
-  fontSize: "15px",
-  fontWeight: 600,
+const metaRow: React.CSSProperties = {
+  fontSize: "14px",
   color: "#18181b",
-  margin: "0 0 6px 0",
-  lineHeight: "22px",
-};
-
-const eventMeta: React.CSSProperties = {
-  fontSize: "13px",
-  color: "#71717a",
-  margin: "0 0 4px 0",
+  margin: "0 0 12px 0",
   lineHeight: "20px",
 };
 
-const communityLabel: React.CSSProperties = {
+const metaLabel: React.CSSProperties = {
+  color: "#71717a",
   fontSize: "12px",
-  color: "#a855f7",
   fontWeight: 500,
-  margin: "8px 0 0 0",
-  lineHeight: "18px",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.5px",
+};
+
+const metaValue: React.CSSProperties = {
+  color: "#18181b",
+  fontSize: "14px",
+  fontWeight: 500,
 };
 
 const ctaSection: React.CSSProperties = {

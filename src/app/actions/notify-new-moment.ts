@@ -24,12 +24,22 @@ function formatMomentLocation(moment: Moment): string {
   );
 }
 
+function formatMomentDateMonth(moment: Moment): string {
+  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: fr }).toUpperCase();
+}
+
+function formatMomentDateDay(moment: Moment): string {
+  return formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
+}
+
 function buildMemberStrings(circleName: string): NewMomentNotificationStrings {
   return {
     subject: `🎉 Nouvel événement — ${circleName}`,
     preheader: `Un nouvel événement vient d'être publié dans votre Communauté`,
     heading: `Nouvel événement dans ${circleName}`,
     intro: "Un nouvel événement vient d'être publié dans votre Communauté :",
+    dateLabel: "Date",
+    locationLabel: "Lieu",
     ctaLabel: "S'inscrire",
     unsubscribeText: `Vous recevez cet email car vous êtes membre de ${circleName} sur The Playground.`,
     unsubscribeLabel: "Voir la Communauté",
@@ -48,6 +58,8 @@ export async function notifyNewMoment(
   );
 
   const momentDate = formatMomentDate(moment);
+  const momentDateMonth = formatMomentDateMonth(moment);
+  const momentDateDay = formatMomentDateDay(moment);
   const momentLocation = formatMomentLocation(moment);
   const memberStrings = buildMemberStrings(circleName);
 
@@ -68,6 +80,8 @@ export async function notifyNewMoment(
         momentTitle: moment.title,
         momentSlug: moment.slug,
         momentDate,
+        momentDateMonth,
+        momentDateDay,
         momentLocation,
         strings: memberStrings,
       });

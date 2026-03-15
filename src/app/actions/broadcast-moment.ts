@@ -28,6 +28,15 @@ function formatMomentDate(startsAt: Date, locale: string): string {
   return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, pattern, { locale: dateFnsLocale });
 }
 
+function formatMomentDateMonth(startsAt: Date, locale: string): string {
+  const dateFnsLocale = locale === "fr" ? fr : enUS;
+  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
+}
+
+function formatMomentDateDay(startsAt: Date): string {
+  return formatInTimeZone(startsAt, PLATFORM_TIMEZONE, "d");
+}
+
 export async function broadcastMomentAction(
   momentId: string,
   customMessage?: string
@@ -88,6 +97,8 @@ export async function broadcastMomentAction(
   const t = await getTranslations("Email.broadcastMoment");
 
   const momentDate = formatMomentDate(moment.startsAt, locale);
+  const momentDateMonth = formatMomentDateMonth(moment.startsAt, locale);
+  const momentDateDay = formatMomentDateDay(moment.startsAt);
   const momentLocation =
     moment.locationType === "ONLINE"
       ? (locale === "fr" ? "En ligne" : "Online")
@@ -112,12 +123,16 @@ export async function broadcastMomentAction(
       heading: t("heading", { circleName }),
       intro: t("intro", { hostName }),
       customMessage: customMessage?.trim() || undefined,
+      dateLabel: t("dateLabel"),
+      locationLabel: t("locationLabel"),
       ctaLabel: t("ctaLabel"),
       unsubscribeText: t("unsubscribeText", { circleName }),
       unsubscribeLabel: t("unsubscribeLabel"),
     },
     momentTitle: moment.title,
     momentDate,
+    momentDateMonth,
+    momentDateDay,
     momentLocation,
     circleName,
     momentSlug: moment.slug,

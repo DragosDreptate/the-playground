@@ -25,6 +25,7 @@ import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
+import { notifyHostNewCircleMember } from "./notify-host-new-circle-member";
 import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
@@ -215,6 +216,43 @@ export async function joinCircleDirectlyAction(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
+
+    if (!alreadyMember) {
+      const t = await getTranslations("Email");
+      const userId = session.user.id;
+      after(async () => {
+        try {
+          const [circle, user] = await Promise.all([
+            prismaCircleRepository.findById(circleId),
+            prismaUserRepository.findById(userId),
+          ]);
+          if (!circle || !user) return;
+
+          const playerName =
+            [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+
+          await notifyHostNewCircleMember(
+            circleId,
+            circle.slug,
+            circle.name,
+            userId,
+            playerName,
+            (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
+            {
+              subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
+              heading: t("hostCircleMemberNotification.heading"),
+              message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
+              manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
+              footer: t("common.footer"),
+            }
+          );
+        } catch (err) {
+          console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
+          Sentry.captureException(err);
+        }
+      });
+    }
+
     return { success: true, data: { alreadyMember } };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -346,6 +384,40 @@ export async function joinCircleByInviteAction(
       { token, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
+
+    if (!alreadyMember) {
+      const t = await getTranslations("Email");
+      const userId = session.user.id;
+      after(async () => {
+        try {
+          const user = await prismaUserRepository.findById(userId);
+          if (!user) return;
+
+          const playerName =
+            [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+
+          await notifyHostNewCircleMember(
+            circle.id,
+            circle.slug,
+            circle.name,
+            userId,
+            playerName,
+            (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
+            {
+              subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
+              heading: t("hostCircleMemberNotification.heading"),
+              message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
+              manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
+              footer: t("common.footer"),
+            }
+          );
+        } catch (err) {
+          console.error("[joinCircleByInviteAction] Erreur notification host :", err);
+          Sentry.captureException(err);
+        }
+      });
+    }
+
     return { success: true, data: { circleSlug: circle.slug, alreadyMember } };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -397,6 +469,7 @@ export async function inviteToCircleByEmailAction(
           strings: {
             subject: t("subject", { inviterName, circleName: circle.name }),
             ctaLabel: t("ctaLabel"),
+            footer: t("footer", { inviterName }),
           },
         });
       } catch (e) {

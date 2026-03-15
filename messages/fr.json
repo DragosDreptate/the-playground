@@ -696,6 +696,13 @@
       "statusMessage": "Vous avez programmé {momentTitle}. Partagez le lien pour inviter vos participants.",
       "manageMomentCta": "Gérer l'événement"
     },
+    "hostCircleMemberNotification": {
+      "subject": "{playerName} a rejoint {circleName}",
+      "heading": "Nouveau membre",
+      "message": "{playerName} a rejoint votre Communauté {circleName}.",
+      "memberCountInfo": "{count} membre(s)",
+      "manageMembersCta": "Voir les membres"
+    },
     "hostNotification": {
       "subject": "{playerName} s'est inscrit(e) à {momentTitle}",
       "heading": "Nouvelle inscription",
@@ -733,13 +740,16 @@
       "preheader": "{circleName} vous invite à un événement",
       "heading": "{circleName} vous invite",
       "intro": "{hostName} partage un événement avec vous",
+      "dateLabel": "Date",
+      "locationLabel": "Lieu",
       "ctaLabel": "Voir l'événement",
       "unsubscribeText": "Vous recevez cet email car vous êtes membre de {circleName}.",
       "unsubscribeLabel": "Gérer mes notifications"
     },
     "circleInvitation": {
       "subject": "{inviterName} vous invite à rejoindre {circleName}",
-      "ctaLabel": "Rejoindre la Communauté"
+      "ctaLabel": "Rejoindre la Communauté",
+      "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr"
     },
     "common": {
       "dateLabel": "Date",

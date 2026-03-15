@@ -90,6 +90,8 @@ export type NewMomentNotificationStrings = {
   preheader: string;
   heading: string;
   intro: string;
+  dateLabel: string;
+  locationLabel: string;
   ctaLabel: string;
   unsubscribeText: string;
   unsubscribeLabel: string;
@@ -103,6 +105,8 @@ export type NewMomentMemberEmailData = {
   momentTitle: string;
   momentSlug: string;
   momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
   momentLocation: string;
   strings: NewMomentNotificationStrings;
 };
@@ -161,12 +165,16 @@ export type BroadcastMomentEmailData = {
     heading: string;
     intro: string;
     customMessage?: string;
+    dateLabel: string;
+    locationLabel: string;
     ctaLabel: string;
     unsubscribeText: string;
     unsubscribeLabel: string;
   };
   momentTitle: string;
   momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
   momentLocation: string | null;
   circleName: string;
   momentSlug: string;
@@ -209,6 +217,7 @@ export type CircleInvitationEmailData = {
   strings: {
     subject: string;
     ctaLabel: string;
+    footer: string;
   };
 };
 
@@ -233,6 +242,23 @@ export type AdminEntityCreatedEmailData = {
     heading: string;
     message: string;
     ctaLabel: string;
+    footer: string;
+  };
+};
+
+export type HostNewCircleMemberEmailData = {
+  to: string;
+  hostName: string;
+  playerName: string;
+  circleName: string;
+  circleSlug: string;
+  memberCount: number;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    memberCountInfo: string;
+    manageMembersCta: string;
     footer: string;
   };
 };
@@ -270,4 +296,5 @@ export interface EmailService {
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
   sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;
+  sendHostNewCircleMember(data: HostNewCircleMemberEmailData): Promise<void>;
 }
