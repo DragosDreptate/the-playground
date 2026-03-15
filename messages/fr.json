@@ -1043,7 +1043,7 @@
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer les Communautés par thématique. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
+        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer les Communautés par thématique et les trier (Recommandé, Popularité, Date). La section <strong>À la une</strong> met en avant une sélection de Communautés actives. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1092,7 +1092,7 @@
         "step2": "Cliquez sur <strong>Créer une Communauté</strong>",
         "step3": "Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)",
         "step4": "Ajoutez une image de couverture (optionnel mais recommandé)",
-        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> (l'annuaire public de la plateforme) et est accessible par tous. Une Communauté privée est uniquement accessible via lien direct et n'apparaît pas dans l'annuaire."
+        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> (l'annuaire public de la plateforme), est accessible par tous, et peut figurer dans la section <strong>À la une</strong>. Une Communauté privée est uniquement accessible via lien direct et n'apparaît pas dans l'annuaire."
       },
       "createEvent": {
         "title": "Créer un événement",
