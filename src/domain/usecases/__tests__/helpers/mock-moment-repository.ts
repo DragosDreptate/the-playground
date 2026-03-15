@@ -20,6 +20,8 @@ export function createMockMomentRepository(
     findPastByHostUserId: vi.fn<MomentRepository["findPastByHostUserId"]>().mockResolvedValue([]),
     findAllByHostUserId: vi.fn<MomentRepository["findAllByHostUserId"]>().mockResolvedValue({ upcoming: [], past: [] }),
     markBroadcastSent: vi.fn<MomentRepository["markBroadcastSent"]>().mockResolvedValue(undefined),
+    findMomentsNeedingReminder: vi.fn<MomentRepository["findMomentsNeedingReminder"]>().mockResolvedValue([]),
+    markReminderSent: vi.fn<MomentRepository["markReminderSent"]>().mockResolvedValue(undefined),
     getUpcomingPublicMomentsForUser: vi.fn<MomentRepository["getUpcomingPublicMomentsForUser"]>().mockResolvedValue([]),
     ...overrides,
   };
@@ -46,6 +48,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     currency: "EUR",
     status: "PUBLISHED",
     broadcastSentAt: null,
+    reminder24hSentAt: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,

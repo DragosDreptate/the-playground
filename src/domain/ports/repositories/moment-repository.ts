@@ -81,6 +81,19 @@ export type UpcomingCircleMoment = {
   registrationCount: number;
 };
 
+export type MomentForReminder = {
+  id: string;
+  slug: string;
+  title: string;
+  startsAt: Date;
+  endsAt: Date | null;
+  locationType: LocationType;
+  locationName: string | null;
+  videoLink: string | null;
+  circle: { name: string; slug: string };
+  registeredUsers: Array<{ email: string; name: string | null }>;
+};
+
 export interface MomentRepository {
   create(input: CreateMomentInput): Promise<Moment>;
   findById(id: string): Promise<Moment | null>;
@@ -104,6 +117,10 @@ export interface MomentRepository {
   findAllByHostUserId(hostUserId: string): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }>;
   /** Marque un Moment comme ayant été diffusé (broadcast email envoyé). */
   markBroadcastSent(momentId: string): Promise<void>;
+  /** Événements PUBLISHED dont le rappel 24h n'a pas encore été envoyé, démarrant dans la fenêtre donnée. */
+  findMomentsNeedingReminder(windowStart: Date, windowEnd: Date): Promise<MomentForReminder[]>;
+  /** Marque un Moment comme ayant reçu son rappel 24h. */
+  markReminderSent(momentId: string): Promise<void>;
   /** Événements à venir dans des Circles publics auxquels l'utilisateur est inscrit (REGISTERED) — pour la page profil public. */
   getUpcomingPublicMomentsForUser(userId: string): Promise<PublicMomentRegistration[]>;
 }

@@ -275,6 +275,28 @@ export type HostNewCircleMemberEmailData = {
   };
 };
 
+export type RegistrationReminderEmailData = {
+  to: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  momentDate: string; // Pré-formaté
+  momentDateMonth: string; // Ex : "MAR"
+  momentDateDay: string; // Ex : "16"
+  locationText: string;
+  circleName: string;
+  circleSlug: string;
+  icsContent?: string; // Pièce jointe .ics
+  strings: {
+    subject: string;
+    heading: string;
+    dateLabel: string;
+    locationLabel: string;
+    viewMomentCta: string;
+    footer: string;
+  };
+};
+
 export type AdminNewUserEmailData = {
   to: string;
   userName: string;
@@ -312,4 +334,5 @@ export interface EmailService {
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
   sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;
   sendHostNewCircleMember(data: HostNewCircleMemberEmailData): Promise<void>;
+  sendRegistrationReminderBatch(data: RegistrationReminderEmailData[]): Promise<void>;
 }

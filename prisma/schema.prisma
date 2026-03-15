@@ -227,6 +227,7 @@ model Moment {
   currency              String       @default("EUR")
   status                MomentStatus @default(PUBLISHED)
   broadcastSentAt       DateTime?
+  reminder24hSentAt     DateTime?
 
   // Explorer scoring
   explorerScore Int @default(0) @map("explorer_score")
