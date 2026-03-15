@@ -23,13 +23,12 @@ export async function joinCircleDirectly(
   const { circleId, userId } = input;
   const { circleRepository } = deps;
 
-  const circle = await circleRepository.findById(circleId);
+  const [circle, existing] = await Promise.all([
+    circleRepository.findById(circleId),
+    circleRepository.findMembership(circleId, userId),
+  ]);
   if (!circle) throw new CircleNotFoundError(circleId);
-
-  const existing = await circleRepository.findMembership(circleId, userId);
-  if (existing) {
-    return { membership: existing, alreadyMember: true };
-  }
+  if (existing) return { membership: existing, alreadyMember: true };
 
   const membership = await circleRepository.addMembership(circleId, userId, "PLAYER");
   return { membership, alreadyMember: false };
