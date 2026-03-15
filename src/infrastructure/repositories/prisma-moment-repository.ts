@@ -2,6 +2,7 @@ import { prisma, Prisma } from "@/infrastructure/db/prisma";
 import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
 import type {
   MomentRepository,
+  MomentForReminder,
   CreateMomentInput,
   UpdateMomentInput,
   PublicMomentFilters,
@@ -35,6 +36,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     currency: record.currency,
     status: record.status,
     broadcastSentAt: record.broadcastSentAt,
+    reminder24hSentAt: record.reminder24hSentAt,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -370,6 +372,58 @@ export const prismaMomentRepository: MomentRepository = {
         coverImage: m.circle.coverImage ?? null,
       },
     }));
+  },
+
+  async findMomentsNeedingReminder(windowStart: Date, windowEnd: Date): Promise<MomentForReminder[]> {
+    const moments = await prisma.moment.findMany({
+      where: {
+        status: "PUBLISHED",
+        startsAt: { gte: windowStart, lte: windowEnd },
+        reminder24hSentAt: null,
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        startsAt: true,
+        endsAt: true,
+        locationType: true,
+        locationName: true,
+        videoLink: true,
+        circle: { select: { name: true, slug: true } },
+        registrations: {
+          where: { status: "REGISTERED" },
+          select: {
+            user: { select: { email: true, name: true } },
+          },
+        },
+      },
+    });
+
+    return moments.map((m) => ({
+      id: m.id,
+      slug: m.slug,
+      title: m.title,
+      description: m.description,
+      startsAt: m.startsAt,
+      endsAt: m.endsAt,
+      locationType: m.locationType,
+      videoLink: m.videoLink,
+      locationName: m.locationName,
+      circle: { name: m.circle.name, slug: m.circle.slug },
+      registeredUsers: m.registrations.map((r) => ({
+        email: r.user.email!,
+        name: r.user.name,
+      })),
+    }));
+  },
+
+  async markReminderSent(momentId: string): Promise<void> {
+    await prisma.moment.update({
+      where: { id: momentId },
+      data: { reminder24hSentAt: new Date() },
+    });
   },
 
   async getUpcomingPublicMomentsForUser(userId: string): Promise<PublicMomentRegistration[]> {

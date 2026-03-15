@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import type {
   EmailService,
   RegistrationConfirmationEmailData,
+  RegistrationReminderEmailData,
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
   NewCommentEmailData,
@@ -32,6 +33,7 @@ import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
 import { AdminNewUserEmail } from "./templates/admin-new-user";
 import { HostNewCircleMemberEmail } from "./templates/host-new-circle-member";
+import { RegistrationReminderEmail } from "./templates/registration-reminder";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -303,6 +305,28 @@ export function createResendEmailService(): EmailService {
         subject: data.strings.subject,
         react: HostNewCircleMemberEmail({ ...data, baseUrl }),
       });
+    },
+
+    async sendRegistrationReminderBatch(
+      data: RegistrationReminderEmailData[]
+    ): Promise<void> {
+      await sendBatch(
+        data.map((item) => ({
+          from,
+          to: item.to,
+          subject: item.strings.subject,
+          react: RegistrationReminderEmail({ ...item, baseUrl }),
+          ...(item.icsContent && {
+            attachments: [
+              {
+                filename: "event.ics",
+                content: Buffer.from(item.icsContent).toString("base64"),
+                contentType: "text/calendar; method=PUBLISH",
+              },
+            ],
+          }),
+        }))
+      );
     },
   };
 }

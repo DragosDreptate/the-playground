@@ -44,6 +44,7 @@ export type Moment = {
   currency: string;
   status: MomentStatus;
   broadcastSentAt: Date | null;
+  reminder24hSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
