@@ -279,10 +279,11 @@
   - Visible sur la page publique et la vue dashboard
 
 - [x] **Explorer** (ex-Répertoire, ex-Découvrir) ✅ — `spec/feature-explorer-la-carte.md`
-  - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 60)
-  - Tab **Communautés** : annuaire des Circles publics (card : nom, catégorie, ville, N membres, prochain événement en teaser)
-  - Tab **Événements** : agenda chronologique des événements PUBLISHED de Communautés publiques (card community-first)
-  - Filtre **catégorie** (MVP) — pas de filtre ville (densité insuffisante au lancement)
+  - Page `/explorer` : vitrine publique, "répertoire de tous les possibles" (SSR, revalidate: 300)
+  - Section **"À la une"** : 3 Communautés mises en avant (sélection par `getFeaturedCircles`, renouvelées quotidiennement), composant `ExplorerFeatured`
+  - Tab **Communautés** : annuaire des Communautés publiques (card : nom, catégorie, ville, N membres, prochain événement en teaser)
+  - Tab **Événements** : agenda des événements PUBLISHED de Communautés publiques (card community-first)
+  - Filtres par **catégorie** + **tri** (`sortBy` : Recommandé / Popularité / Date — défaut Communautés : Recommandé, défaut Événements : Date)
   - Page Communauté publique `/circles/[slug]` accessible sans compte (SEO + cold traffic)
   - Lien "Explorer" dans le header principal (visible utilisateurs connectés)
   - Schema : `CircleCategory` enum (8 valeurs) + `category` + `city` sur Communauté

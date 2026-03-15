@@ -1043,7 +1043,7 @@
         "item2": "Browse <strong>past events</strong>",
         "item3": "See <strong>other members</strong> and visit their public profile",
         "item4": "Be notified of new events by email (based on your preferences)",
-        "outro": "You can also join a Community without registering for an event, from the <strong>Explore</strong> page or from a Community page. On Explore, you can filter Communities by topic. If the Community is private, the Organizer can send you a <strong>private invite link</strong> — click it to join directly, no event registration required."
+        "outro": "You can also join a Community without registering for an event, from the <strong>Explore</strong> page or from a Community page. On Explore, you can filter Communities by topic and sort them (Recommended, Popularity, Date). The <strong>Featured</strong> section highlights a selection of active Communities. If the Community is private, the Organizer can send you a <strong>private invite link</strong> — click it to join directly, no event registration required."
       },
       "waitlist": {
         "title": "Waitlist",
@@ -1092,7 +1092,7 @@
         "step2": "Click <strong>Create a Community</strong>",
         "step3": "Fill in: name, description, topic, city, visibility (public or private)",
         "step4": "Add a cover image (optional but recommended)",
-        "callout": "A public Community appears in <strong>Explore</strong> (the platform's public directory) and is accessible to everyone. A private Community is only accessible via a direct link and does not appear in the directory."
+        "callout": "A public Community appears in <strong>Explore</strong> (the platform's public directory), is accessible to everyone, and may be featured in the <strong>Featured</strong> section. A private Community is only accessible via a direct link and does not appear in the directory."
       },
       "createEvent": {
         "title": "Create an event",

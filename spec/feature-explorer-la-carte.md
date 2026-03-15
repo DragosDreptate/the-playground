@@ -18,17 +18,15 @@ The Playground sans lien partagé ?"*
 Aujourd'hui : rien. Bounce immédiat.
 
 Explorer est l'**espace de jeu ouvert** — l'incarnation du nom "Playground". On y trouve
-toutes les Communautés et événements publics, sans algorithme, sans ranking, sans mise en avant payante.
-Juste les communautés et leurs événements, dans l'ordre chronologique.
+toutes les Communautés et événements publics, avec des filtres simples mais sans algorithme opaque ni mise en avant payante.
 
-**Ce que ce n'est pas** : une marketplace. Pas de featured listings, pas d'algorithme de
-recommandation, pas de classement. Un annuaire ouvert, community-first.
+**Ce que ce n'est pas** : une marketplace. Pas de featured listings payants, pas d'algorithme de
+recommandation caché. Un annuaire ouvert, community-first.
 
 **Invariants** :
 - Seules les Communautés `PUBLIC` apparaissent
 - Seuls les événements `PUBLISHED` (à venir) de Communautés publiques apparaissent
 - La Communauté est toujours plus visible que l'événement sur les cards
-- Ordre chronologique uniquement (pas de ranking)
 - Un Organisateur contrôle sa visibilité via `visibility: PRIVATE` sur sa Communauté
 
 ---
@@ -264,33 +262,14 @@ async findPublicUpcoming(filters: PublicMomentFilters): Promise<PublicMoment[]> 
 src/app/[locale]/(routes)/explorer/page.tsx
 ```
 
-**Rendu** : Server Component, SSR avec revalidation (`revalidate: 60` secondes).
-**URL params** : `?tab=moments|circles`, `?category=TECH`
+**Rendu** : Server Component, SSR avec revalidation (`revalidate: 300` secondes).
+**URL params** : `?tab=moments|circles`, `?category=TECH`, `?sortBy=popular|members|date`
 
-```typescript
-// Structure de la page
-export default async function ExplorerPage({ searchParams }) {
-  const tab = searchParams.tab ?? "circles";
-  const category = searchParams.category;  // seul filtre MVP
-
-  const [circles, moments] = await Promise.all([
-    getPublicCircles({ category }, { circleRepository: prismaCircleRepository }),
-    getPublicUpcomingMoments({ category }, { momentRepository: prismaMomentRepository }),
-  ]);
-
-  return (
-    <>
-      <ExplorerHeader />          {/* titre + description */}
-      <ExplorerFilterBar />       {/* filtre catégorie uniquement — Client Component */}
-      <ExplorerTabs              {/* Communautés / Événements */}
-        tab={tab}
-        circles={circles}
-        moments={moments}
-      />
-    </>
-  );
-}
-```
+Structure de la page :
+1. **Header** — titre + description
+2. **Section "À la une"** (`ExplorerFeatured`) — 3 Communautés mises en avant, renouvelées quotidiennement. Visible uniquement sur l'onglet Communautés. Usecase `getFeaturedCircles`.
+3. **Barre de filtres** (`ExplorerFilterBar`) — filtre catégorie + filtre de tri (Client Component)
+4. **Grille de résultats** (`ExplorerGrid`) — Communautés ou Événements selon le tab actif, avec chargement incrémental
 
 **Metadata SEO** (générée dynamiquement via `generateMetadata` + `getTranslations("Explorer")`) :
 ```typescript
@@ -305,15 +284,30 @@ export async function generateMetadata() {
 
 ### Composants
 
+#### `ExplorerFeatured` (Client Component)
+
+```
+src/components/explorer/explorer-featured.tsx
+```
+
+- Affiche 3 Communautés sélectionnées par `getFeaturedCircles`
+- Visible uniquement sur l'onglet Communautés (masqué côté Événements)
+- Design distinct : bloc encadré avec label "✦ À la une" et indicateur de renouvellement quotidien
+- Chaque carte : image de couverture 1:1, nom, badge catégorie, ville, nombre de membres
+
 #### `ExplorerFilterBar` (Client Component)
 
 ```
 src/components/explorer/explorer-filter-bar.tsx
 ```
 
-- Pills/chips de catégorie (une seule sélection, "Toutes" = aucun filtre)
-- Mise à jour de l'URL via `router.push` (SSR-friendly, partageable, lien partageable avec le filtre)
-- Pas d'input ville en MVP
+- **Filtre catégorie** : select dropdown (une seule sélection, "Toutes les thématiques" = aucun filtre)
+- **Filtre de tri** (`sortBy`) :
+  - Onglet Communautés : Recommandé (défaut) / Popularité / Date
+  - Onglet Événements : Date (défaut) / Recommandé
+  - Le tri "Popularité" (nombre de membres) n'est disponible que sur l'onglet Communautés
+- Mise à jour de l'URL via `router.push` (SSR-friendly, URL partageable avec les filtres actifs)
+- Le tri se réinitialise à la valeur par défaut du tab lors du changement d'onglet
 
 #### `PublicCircleCard`
 
@@ -385,12 +379,23 @@ src/components/circles/circle-form.tsx
     "title": "Communautés & événements",
     "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
     "navLink": "Explorer",
+    "featured": {
+      "eyebrow": "À la une",
+      "title": "Communautés du jour",
+      "refreshHint": "Sélectionnées parmi les communautés actives · Renouvellement quotidien",
+      "badge": "À la une"
+    },
     "tabs": {
       "circles": "Communautés",
       "moments": "Événements"
     },
     "filters": {
-      "allCategories": "Toutes les thématiques"
+      "allCategories": "Toutes les thématiques",
+      "sortBy": {
+        "date": "Date",
+        "popular": "Recommandé",
+        "members": "Popularité"
+      }
     },
     "empty": {
       "circles": "Aucune Communauté publique pour cette thématique.",
@@ -428,7 +433,7 @@ Explorer est accessible depuis :
 - Page `/explorer` : indexable, `sitemap.xml`
 - Pages Communauté publiques `/circles/[slug]` : indexables, metadata dynamiques
 - Pages événement publiques `/m/[slug]` : déjà existantes et indexables
-- `revalidate: 60` sur toutes les pages → fraîcheur sans rebuild complet
+- `revalidate: 300` sur `/explorer` → fraîcheur toutes les 5 minutes sans rebuild complet
 
 ---
 
@@ -456,13 +461,15 @@ Explorer est accessible depuis :
 | Décision | Raison |
 | --- | --- |
 | Tab par défaut : Communautés (pas Événements) | Community-first : on découvre d'abord une communauté, pas un événement |
-| Ordre chronologique uniquement | Pas d'algorithme, pas de ranking — invariant positionnement |
-| **Filtre MVP : catégorie uniquement (pas de ville)** | La densité par ville sera insuffisante au lancement. La catégorie est utile dès la première Communauté. Un filtre ville vide est pire qu'absent. |
+| **Filtre catégorie** | Axe de filtrage principal — utile dès la première Communauté |
+| **Filtre de tri** (`sortBy`) | Améliore la pertinence sans imposer un algorithme opaque. Défauts différents par tab : Recommandé (Communautés) / Date (Événements). Le tri Popularité (membres) est limité à l'onglet Communautés. |
+| **Section "À la une"** | Mettre en valeur les Communautés actives pour guider les nouveaux utilisateurs — renouvellement quotidien via `getFeaturedCircles`, sélection côté admin/algorithme simple |
+| **Filtre MVP : pas de filtre ville** | La densité par ville sera insuffisante au lancement. Un filtre ville vide est pire qu'absent. |
 | `city` = affichage uniquement en MVP | Enrichit les cards sans créer un filtre inutile. Filtre géographique post-MVP quand la densité le justifie. |
 | `city` = string libre (pas enum) | Flexibilité MVP, normalisation post-MVP si besoin |
 | `category` = nullable en DB, obligatoire en UI | Rétrocompatibilité + meilleure expérience à la création |
 | Page Communauté publique séparée du dashboard | Accès sans auth, SEO, parcours cold traffic |
-| `revalidate: 60` sur `/explorer` | Fraîcheur acceptable sans rebuild, pas de full SSR dynamique |
-| Pas de pagination complexe en MVP | `limit: 20` suffit pour le lancement |
+| `revalidate: 300` sur `/explorer` | Fraîcheur toutes les 5 minutes — suffisant, réduit la charge vs SSR dynamique pur |
+| Pas de pagination complexe en MVP | Over-fetch pattern : 11 items chargés, 10 affichés, "Voir plus" déclenche un fetch supplémentaire |
 | Renommage "Répertoire" → "La Carte" → "Découvrir" | Nom plus direct, cohérent avec l'action utilisateur |
 | Renommage "Découvrir" → "Explorer" | Alignement FR/EN — "Explorer" (FR) = "Explore" (EN), plus cohérent |
