@@ -66,34 +66,22 @@ export async function notifyNewMoment(
   const allUserIds = members.map((m) => m.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
 
-  // Notifier les membres (excluant déjà le créateur) qui ont activé les notifications
-  const memberResults = await Promise.allSettled(
-    members.map(async (m) => {
-      const prefs = prefsMap.get(m.userId);
-      if (!prefs?.notifyNewMomentInCircle) return;
+  const recipients = members
+    .filter((m) => prefsMap.get(m.userId)?.notifyNewMomentInCircle !== false)
+    .map((m) => ({ to: m.email, recipientName: m.firstName ?? m.email }));
 
-      return emailService.sendNewMomentToMember({
-        to: m.email,
-        recipientName: m.firstName ?? m.email,
-        circleName,
-        circleSlug,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        momentLocation,
-        strings: memberStrings,
-      });
-    })
-  );
+  if (recipients.length === 0) return;
 
-  memberResults.forEach((result, i) => {
-    if (result.status === "rejected") {
-      console.error(
-        `[notifyNewMoment] Échec envoi email membre ${members[i]?.email}:`,
-        result.reason
-      );
-    }
+  await emailService.sendNewMomentToMembers({
+    recipients,
+    circleName,
+    circleSlug,
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    momentDate,
+    momentDateMonth,
+    momentDateDay,
+    momentLocation,
+    strings: memberStrings,
   });
 }
