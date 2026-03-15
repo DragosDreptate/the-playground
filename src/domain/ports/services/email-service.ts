@@ -165,12 +165,16 @@ export type BroadcastMomentEmailData = {
     heading: string;
     intro: string;
     customMessage?: string;
+    dateLabel: string;
+    locationLabel: string;
     ctaLabel: string;
     unsubscribeText: string;
     unsubscribeLabel: string;
   };
   momentTitle: string;
   momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
   momentLocation: string | null;
   circleName: string;
   momentSlug: string;

@@ -740,6 +740,8 @@
       "preheader": "{circleName} invites you to an event",
       "heading": "{circleName} invites you",
       "intro": "{hostName} is sharing an event with you",
+      "dateLabel": "Date",
+      "locationLabel": "Location",
       "ctaLabel": "View event",
       "unsubscribeText": "You're receiving this email because you are a member of {circleName}.",
       "unsubscribeLabel": "Manage notifications"
