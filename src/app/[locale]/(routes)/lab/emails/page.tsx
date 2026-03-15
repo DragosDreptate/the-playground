@@ -2,6 +2,7 @@ import { render } from "@react-email/components";
 import { RegistrationConfirmationEmail } from "@/infrastructure/services/email/templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "@/infrastructure/services/email/templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "@/infrastructure/services/email/templates/host-new-registration";
+import { HostNewCircleMemberEmail } from "@/infrastructure/services/email/templates/host-new-circle-member";
 import { HostMomentCreatedEmail } from "@/infrastructure/services/email/templates/host-moment-created";
 import { NewCommentEmail } from "@/infrastructure/services/email/templates/new-comment";
 import { HostNewCommentEmail } from "@/infrastructure/services/email/templates/host-new-comment";
@@ -91,6 +92,27 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
           heading: "Nouvelle inscription",
           message: "Alice Martin s'est inscrit(e) à Soirée JS & Pizza",
           manageRegistrationsCta: "Gérer les inscriptions",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "host-new-circle-member",
+      label: "Host — Nouveau membre Communauté",
+      element: HostNewCircleMemberEmail({
+        to: "bob@example.com",
+        hostName: "Bob Dupont",
+        playerName: "Alice Martin",
+        circleName: "Paris Creative Tech",
+        circleSlug: "paris-creative-tech",
+        memberCount: 48,
+        strings: {
+          subject: "Alice Martin a rejoint Paris Creative Tech",
+          heading: "Nouveau membre",
+          message: "Alice Martin vient de rejoindre Paris Creative Tech.",
+          memberCountInfo: "48 membres au total",
+          manageMembersCta: "Voir les membres",
           footer: FOOTER,
         },
         baseUrl: BASE_URL,
@@ -284,6 +306,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
         strings: {
           subject: "Bob Dupont vous invite à rejoindre Paris Creative Tech",
           ctaLabel: "Rejoindre la Communauté",
+          footer: "Invitation envoyée par Bob Dupont via The Playground — the-playground.fr",
         },
         baseUrl: BASE_URL,
       }),
