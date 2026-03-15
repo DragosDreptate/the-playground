@@ -1,16 +1,6 @@
-import {
-  Html,
-  Head,
-  Body,
-  Container,
-  Preview,
-  Text,
-  Button,
-  Link,
-  Hr,
-  Img,
-} from "@react-email/components";
+import { Button, Link, Img, Section, Text } from "@react-email/components";
 import * as React from "react";
+import { EmailLayout } from "./components/email-layout";
 import type { CircleInvitationEmailData } from "@/domain/ports/services/email-service";
 import { getMomentGradient } from "@/lib/gradient";
 
@@ -57,191 +47,251 @@ export function CircleInvitationEmail({
   const avatarCount = Math.min(5, memberCount ?? 0);
 
   return (
-    <Html>
-      <Head />
-      <Preview>{strings.subject}</Preview>
-      <Body style={body}>
-        <Container style={container}>
-          <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={card}>
-            <tbody>
+    <EmailLayout preview={strings.subject} footer={strings.footer}>
 
-              {/* ── 1. Topbar ── */}
-              <tr>
-                <td style={topbarTd}>
-                  <table width="100%" cellPadding="0" cellSpacing="0" role="presentation">
-                    <tbody><tr>
-                      <td style={{ verticalAlign: "middle" }}>
-                        <table cellPadding="0" cellSpacing="0" role="presentation"><tbody><tr>
-                          <td style={{ width: "22px", height: "22px", verticalAlign: "middle" }}>
-                            <Img src="https://the-playground.fr/icon-192.png" width="22" height="22" alt="The Playground" style={{ borderRadius: "6px", display: "block" }} />
-                          </td>
-                          <td style={{ paddingLeft: "8px", verticalAlign: "middle", fontSize: "13px", fontWeight: 700, color: "#1a1b2e", letterSpacing: "-0.01em" }}>
-                            The Playground
-                          </td>
-                        </tr></tbody></table>
-                      </td>
-                      <td style={{ textAlign: "right", verticalAlign: "middle" }}>
-                        <span style={badgeStyle}>Invitation</span>
-                      </td>
-                    </tr></tbody>
-                  </table>
-                </td>
-              </tr>
+      {/* Badge */}
+      <Section style={badgeSection}>
+        <span style={badgeStyle}>Invitation</span>
+      </Section>
 
-              {/* ── 2. Cover : image réelle ou carré dégradé ── */}
-              <tr>
-                <td style={{ textAlign: "center", padding: "24px 28px 0" }}>
-                  {coverImageUrl ? (
-                    <Img
-                      src={coverImageUrl}
-                      width="88"
-                      height="88"
-                      alt={circleName}
-                      style={{ borderRadius: "14px", border: "3px solid #f0f0f4", boxShadow: "0 4px 16px rgba(0,0,0,0.10)", display: "inline-block" }}
-                    />
-                  ) : (
-                    <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
-                      <tbody><tr>
-                        <td style={{ width: "88px", height: "88px", borderRadius: "14px", background: grad, border: "3px solid #f0f0f4" }} />
-                      </tr></tbody>
-                    </table>
-                  )}
-                </td>
-              </tr>
-
-              {/* ── 3. Content ── */}
-              <tr>
-                <td style={contentTd}>
-
-                  {/* Inviter */}
-                  <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "14px" }}>
-                    <tbody><tr><td style={{ textAlign: "center" }}>
-                      <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
-                        <tbody><tr>
-                          <td style={{ width: "30px", height: "30px", borderRadius: "50%", background: grad, fontSize: "10px", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: "30px", verticalAlign: "middle" }}>
-                            {initials}
-                          </td>
-                          <td style={{ paddingLeft: "8px", verticalAlign: "middle", fontSize: "13px", color: "#6b7280" }}>
-                            <span style={{ fontWeight: 700, color: "#7c3aed" }}>{inviterName}</span>
-                            {" vous invite à rejoindre"}
-                          </td>
-                        </tr></tbody>
-                      </table>
-                    </td></tr></tbody>
-                  </table>
-
-                  {/* Circle name */}
-                  <Text style={circleNameStyle}>{circleName}</Text>
-
-                  {/* Description */}
-                  <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "16px" }}>
-                    <tbody><tr>
-                      <td style={{ backgroundColor: "#fafafa", border: "1px solid #f0f0f4", borderRadius: "10px", padding: "14px 16px" }}>
-                        {paras.map((p, i) => (
-                          <p key={i} style={{ fontSize: "13px", color: "#374151", lineHeight: "1.65", margin: "0 0 8px 0" }}>{p}</p>
-                        ))}
-                        {truncated && (
-                          <Link href={circleUrl} style={{ fontSize: "13px", fontWeight: 600, color: "#7c3aed", textDecoration: "none" }}>
-                            Voir plus →
-                          </Link>
-                        )}
-                      </td>
-                    </tr></tbody>
-                  </table>
-
-                  {/* Stats : membres + événements */}
-                  {showSocial && (
-                    <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "16px" }}>
-                      <tbody><tr>
-                        <td style={{ backgroundColor: "#f9f9fb", border: "1px solid #f0f0f2", borderRadius: "8px", padding: "10px 14px", textAlign: "center" }}>
-                          <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
-                            <tbody><tr>
-                              <td style={{ fontSize: "13px", color: "#374151", fontWeight: 500, whiteSpace: "nowrap" }}>
-                                👥&nbsp;<strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
-                              </td>
-                              {(momentCount ?? 0) > 0 && (
-                                <>
-                                  <td style={{ padding: "0 10px", color: "#d1d5db", fontSize: "13px" }}>|</td>
-                                  <td style={{ fontSize: "13px", color: "#374151", fontWeight: 500, whiteSpace: "nowrap" }}>
-                                    📅&nbsp;<strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
-                                  </td>
-                                </>
-                              )}
-                            </tr></tbody>
-                          </table>
-                        </td>
-                      </tr></tbody>
-                    </table>
-                  )}
-
-                  {/* Members avatars (cercles colorés anonymes) */}
-                  {showSocial && avatarCount > 0 && (
-                    <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "20px" }}>
-                      <tbody><tr><td style={{ textAlign: "center" }}>
-                        {PLACEHOLDER_AVATAR_COLORS.slice(0, avatarCount).map((bg, i) => (
-                          <span key={i} style={{
-                            display: "inline-block",
-                            width: "26px", height: "26px",
-                            borderRadius: "50%",
-                            background: bg,
-                            border: "2px solid #fff",
-                            marginLeft: i === 0 ? "0" : "-7px",
-                            verticalAlign: "middle",
-                          }} />
-                        ))}
-                        <span style={{ fontSize: "12px", color: "#6b7280", verticalAlign: "middle", marginLeft: "8px" }}>
-                          Rejoignez&nbsp;<strong style={{ color: "#374151" }}>{memberCount}</strong>&nbsp;membres
-                        </span>
-                      </td></tr></tbody>
-                    </table>
-                  )}
-
-                  {/* CTA */}
-                  <Button style={ctaStyle} href={inviteUrl}>
-                    {strings.ctaLabel}
-                  </Button>
-
-                  {/* Footer */}
-                  <Hr style={{ borderColor: "#f0f0f4", margin: "20px 0 14px" }} />
-                  <table width="100%" cellPadding="0" cellSpacing="0" role="presentation">
-                    <tbody><tr>
-                      <td style={{ verticalAlign: "middle" }}>
-                        <Text style={{ fontSize: "11px", color: "#9ca3af", margin: "0", lineHeight: "1.5" }}>
-                          Invitation envoyée par <strong>{inviterName}</strong> via The Playground
-                        </Text>
-                      </td>
-                      <td style={{ textAlign: "right", verticalAlign: "middle", whiteSpace: "nowrap", paddingLeft: "12px" }}>
-                        <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
-                          <tbody><tr>
-                            <td style={{ width: "10px", height: "10px", borderRadius: "3px", backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", verticalAlign: "middle" }} />
-                            <td style={{ paddingLeft: "5px", verticalAlign: "middle", fontSize: "10px", color: "#d1d5db", fontWeight: 500 }}>
-                              the-playground.fr
-                            </td>
-                          </tr></tbody>
-                        </table>
-                      </td>
-                    </tr></tbody>
-                  </table>
-
-                </td>
-              </tr>
-            </tbody>
+      {/* Cover : image réelle ou carré dégradé */}
+      <Section style={coverSection}>
+        {coverImageUrl ? (
+          <Img
+            src={coverImageUrl}
+            width="80"
+            height="80"
+            alt={circleName}
+            style={coverImg}
+          />
+        ) : (
+          <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
+            <tbody><tr>
+              <td style={{ width: "80px", height: "80px", borderRadius: "14px", background: grad, border: "3px solid #f0f0f4" }} />
+            </tr></tbody>
           </table>
-        </Container>
-      </Body>
-    </Html>
+        )}
+      </Section>
+
+      {/* Inviter */}
+      <table width="100%" cellPadding="0" cellSpacing="0" role="presentation" style={{ marginBottom: "14px" }}>
+        <tbody><tr><td style={{ textAlign: "center" }}>
+          <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
+            <tbody><tr>
+              <td style={inviterAvatar(grad)}>{initials}</td>
+              <td style={inviterText}>
+                <span style={inviterName_}>{inviterName}</span>
+                {" vous invite à rejoindre"}
+              </td>
+            </tr></tbody>
+          </table>
+        </td></tr></tbody>
+      </table>
+
+      {/* Circle name */}
+      <Text style={circleNameStyle}>{circleName}</Text>
+
+      {/* Description */}
+      <Section style={descBox}>
+        {paras.map((p, i) => (
+          <p key={i} style={descPara}>{p}</p>
+        ))}
+        {truncated && (
+          <Link href={circleUrl} style={descLink}>
+            Voir plus →
+          </Link>
+        )}
+      </Section>
+
+      {/* Stats : membres + événements */}
+      {showSocial && (
+        <Section style={statsBox}>
+          <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
+            <tbody><tr>
+              <td style={statCell}>
+                👥&nbsp;<strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
+              </td>
+              {(momentCount ?? 0) > 0 && (
+                <>
+                  <td style={statDivider}>|</td>
+                  <td style={statCell}>
+                    📅&nbsp;<strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
+                  </td>
+                </>
+              )}
+            </tr></tbody>
+          </table>
+        </Section>
+      )}
+
+      {/* Member avatars */}
+      {showSocial && avatarCount > 0 && (
+        <Section style={avatarSection}>
+          {PLACEHOLDER_AVATAR_COLORS.slice(0, avatarCount).map((bg, i) => (
+            <span key={i} style={avatarDot(bg, i)} />
+          ))}
+          <span style={avatarLabel}>
+            Rejoignez&nbsp;<strong style={{ color: "#374151" }}>{memberCount}</strong>&nbsp;membres
+          </span>
+        </Section>
+      )}
+
+      {/* CTA */}
+      <Section style={ctaSection}>
+        <Button style={ctaButton} href={inviteUrl}>
+          {strings.ctaLabel}
+        </Button>
+      </Section>
+
+    </EmailLayout>
   );
 }
 
-const body: React.CSSProperties = {
-  backgroundColor: "#f4f4f5",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif',
-  margin: "0", padding: "0",
+// ── Styles ──────────────────────────────────────────────
+
+const badgeSection: React.CSSProperties = {
+  textAlign: "center" as const,
+  marginBottom: "20px",
 };
-const container: React.CSSProperties = { maxWidth: "520px", margin: "0 auto", padding: "32px 16px 40px" };
-const card: React.CSSProperties = { backgroundColor: "#ffffff", borderRadius: "16px", overflow: "hidden" };
-const topbarTd: React.CSSProperties = { padding: "16px 28px", borderBottom: "1px solid #f0f0f4" };
-const badgeStyle: React.CSSProperties = { fontSize: "11px", fontWeight: 600, color: "#ec4899", backgroundColor: "#fde8f0", padding: "3px 10px", borderRadius: "20px" };
-const contentTd: React.CSSProperties = { padding: "20px 28px 28px" };
-const circleNameStyle: React.CSSProperties = { fontSize: "22px", fontWeight: 800, color: "#0f0f1a", letterSpacing: "-0.03em", lineHeight: "1.2", margin: "0 0 18px 0", textAlign: "center" };
-const ctaStyle: React.CSSProperties = { backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg,#ec4899,#8b5cf6)", color: "#ffffff", fontSize: "15px", fontWeight: 700, borderRadius: "10px", padding: "13px 32px", textDecoration: "none", display: "block", width: "100%", textAlign: "center", boxSizing: "border-box" };
+
+const badgeStyle: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 600,
+  color: "#ec4899",
+  backgroundColor: "#fde8f0",
+  padding: "3px 10px",
+  borderRadius: "20px",
+};
+
+const coverSection: React.CSSProperties = {
+  textAlign: "center" as const,
+  marginBottom: "20px",
+};
+
+const coverImg: React.CSSProperties = {
+  borderRadius: "14px",
+  border: "3px solid #f0f0f4",
+  boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+  display: "inline-block",
+};
+
+function inviterAvatar(bg: string): React.CSSProperties {
+  return {
+    width: "28px",
+    height: "28px",
+    borderRadius: "50%",
+    background: bg,
+    fontSize: "10px",
+    fontWeight: 700,
+    color: "#fff",
+    textAlign: "center",
+    lineHeight: "28px",
+    verticalAlign: "middle",
+  };
+}
+
+const inviterText: React.CSSProperties = {
+  paddingLeft: "8px",
+  verticalAlign: "middle",
+  fontSize: "13px",
+  color: "#6b7280",
+};
+
+const inviterName_: React.CSSProperties = {
+  fontWeight: 700,
+  color: "#7c3aed",
+};
+
+const circleNameStyle: React.CSSProperties = {
+  fontSize: "20px",
+  fontWeight: 700,
+  color: "#18181b",
+  letterSpacing: "-0.02em",
+  lineHeight: "1.3",
+  margin: "0 0 16px 0",
+  textAlign: "center" as const,
+};
+
+const descBox: React.CSSProperties = {
+  backgroundColor: "#f4f4f5",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "16px",
+};
+
+const descPara: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#52525b",
+  lineHeight: "1.65",
+  margin: "0 0 8px 0",
+};
+
+const descLink: React.CSSProperties = {
+  fontSize: "13px",
+  fontWeight: 600,
+  color: "#7c3aed",
+  textDecoration: "none",
+};
+
+const statsBox: React.CSSProperties = {
+  backgroundColor: "#f4f4f5",
+  borderRadius: "8px",
+  padding: "10px 14px",
+  marginBottom: "16px",
+  textAlign: "center" as const,
+};
+
+const statCell: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#374151",
+  fontWeight: 500,
+  whiteSpace: "nowrap",
+};
+
+const statDivider: React.CSSProperties = {
+  padding: "0 10px",
+  color: "#d1d5db",
+  fontSize: "13px",
+};
+
+const avatarSection: React.CSSProperties = {
+  textAlign: "center" as const,
+  marginBottom: "20px",
+};
+
+function avatarDot(bg: string, index: number): React.CSSProperties {
+  return {
+    display: "inline-block",
+    width: "26px",
+    height: "26px",
+    borderRadius: "50%",
+    background: bg,
+    border: "2px solid #fff",
+    marginLeft: index === 0 ? "0" : "-7px",
+    verticalAlign: "middle",
+  };
+}
+
+const avatarLabel: React.CSSProperties = {
+  fontSize: "12px",
+  color: "#6b7280",
+  verticalAlign: "middle",
+  marginLeft: "8px",
+};
+
+const ctaSection: React.CSSProperties = {
+  textAlign: "center" as const,
+};
+
+const ctaButton: React.CSSProperties = {
+  backgroundColor: "#ec4899",
+  backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
+  color: "#ffffff",
+  fontSize: "14px",
+  fontWeight: 600,
+  borderRadius: "8px",
+  padding: "12px 32px",
+  textDecoration: "none",
+  display: "block",
+  textAlign: "center" as const,
+};

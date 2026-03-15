@@ -746,7 +746,8 @@
     },
     "circleInvitation": {
       "subject": "{inviterName} vous invite à rejoindre {circleName}",
-      "ctaLabel": "Rejoindre la Communauté"
+      "ctaLabel": "Rejoindre la Communauté",
+      "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr"
     },
     "common": {
       "dateLabel": "Date",

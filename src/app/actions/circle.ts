@@ -469,6 +469,7 @@ export async function inviteToCircleByEmailAction(
           strings: {
             subject: t("subject", { inviterName, circleName: circle.name }),
             ctaLabel: t("ctaLabel"),
+            footer: t("footer", { inviterName }),
           },
         });
       } catch (e) {

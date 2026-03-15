@@ -209,6 +209,7 @@ export type CircleInvitationEmailData = {
   strings: {
     subject: string;
     ctaLabel: string;
+    footer: string;
   };
 };
 
