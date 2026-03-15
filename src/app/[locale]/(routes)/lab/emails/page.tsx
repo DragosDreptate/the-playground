@@ -14,6 +14,7 @@ import { CircleInvitationEmail } from "@/infrastructure/services/email/templates
 import { AdminEntityCreatedEmail } from "@/infrastructure/services/email/templates/admin-entity-created";
 import { AdminNewUserEmail } from "@/infrastructure/services/email/templates/admin-new-user";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
+import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
 import { EmailPreviewClient } from "./email-preview-client";
 
 const BASE_URL = "https://the-playground.fr";
@@ -359,6 +360,31 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
       label: "Magic Link (connexion)",
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
+      }),
+    },
+    {
+      id: "registration-reminder",
+      label: "Rappel 24h avant événement",
+      element: RegistrationReminderEmail({
+        to: "alice@example.com",
+        playerName: "Alice Martin",
+        momentTitle: "Soirée JS & Pizza",
+        momentSlug: "soiree-js-pizza",
+        momentDate: "vendredi 21 mars 2026, 19:00",
+        momentDateMonth: "MAR",
+        momentDateDay: "21",
+        locationText: "Le Cargo, 18 rue de la Paix, Paris",
+        circleName: "Paris Creative Tech",
+        circleSlug: "paris-creative-tech",
+        strings: {
+          subject: "Rappel : Soirée JS & Pizza — demain",
+          heading: "C'est demain ! Voici un rappel pour votre événement.",
+          dateLabel: "Date",
+          locationLabel: "Lieu",
+          viewMomentCta: "Voir l'événement",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
       }),
     },
   ];
