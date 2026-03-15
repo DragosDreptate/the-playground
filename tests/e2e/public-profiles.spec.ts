@@ -82,7 +82,7 @@ test.describe("F8 — Lien 'Voir mon profil public' depuis la page profil dashbo
 
     await page.goto("/fr/dashboard/profile");
 
-    const viewProfileLink = page.locator("a[href*='/u/']");
+    const viewProfileLink = page.locator("a[href*='/u/']").first();
     await expect(viewProfileLink).toBeVisible();
 
     await context.close();
