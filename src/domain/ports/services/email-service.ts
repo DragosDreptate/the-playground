@@ -229,6 +229,18 @@ export type BroadcastMomentsBatchEmailData = Omit<BroadcastMomentEmailData, "to"
   recipients: string[];
 };
 
+export type NewMomentMembersEmailData = Omit<NewMomentMemberEmailData, "to" | "recipientName"> & {
+  recipients: Array<{ to: string; recipientName: string }>;
+};
+
+export type MomentUpdateBatchEmailData = Omit<MomentUpdateEmailData, "to" | "playerName"> & {
+  recipients: Array<{ to: string; playerName: string }>;
+};
+
+export type MomentCancelledBatchEmailData = Omit<MomentCancelledEmailData, "to" | "recipientName"> & {
+  recipients: Array<{ to: string; recipientName: string }>;
+};
+
 export type AdminEntityCreatedEmailData = {
   to: string;
   entityType: "circle" | "moment";
@@ -288,8 +300,11 @@ export interface EmailService {
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
   sendNewComment(data: NewCommentEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
+  sendNewMomentToMembers(data: NewMomentMembersEmailData): Promise<void>;
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;
+  sendMomentUpdateBatch(data: MomentUpdateBatchEmailData): Promise<void>;
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
+  sendMomentCancelledBatch(data: MomentCancelledBatchEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
   sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;

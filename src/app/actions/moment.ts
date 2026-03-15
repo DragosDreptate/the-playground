@@ -316,69 +316,52 @@ async function sendMomentUpdateEmails(
     footer: t("common.footer"),
   };
 
-  await Promise.all(
-    confirmed.map(async (registration) => {
-      const user = registration.user;
-      if (!user?.email) return;
+  const commonFields = {
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    momentDate,
+    momentDateMonth,
+    momentDateDay,
+    locationText,
+    circleName: circle.name,
+    circleSlug: circle.slug,
+    dateChanged,
+    locationChanged,
+    icsContent,
+  };
 
-      const playerName =
-        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+  // Notifier les participants en batch
+  const participantRecipients = confirmed
+    .filter((r) => r.user?.email)
+    .map((r) => ({
+      to: r.user!.email!,
+      playerName: [r.user!.firstName, r.user!.lastName].filter(Boolean).join(" ") || r.user!.email!,
+    }));
 
-      return emailService.sendMomentUpdate({
-        to: user.email,
-        playerName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
-        circleName: circle.name,
-        circleSlug: circle.slug,
-        dateChanged,
-        locationChanged,
-        icsContent,
-        strings: {
-          ...updateStrings,
-          heading: t("momentUpdate.heading"),
-          intro: t("momentUpdate.intro"),
-        },
-      });
-    })
-  );
+  if (participantRecipients.length > 0) {
+    await emailService.sendMomentUpdateBatch({
+      ...commonFields,
+      recipients: participantRecipients,
+      strings: { ...updateStrings, heading: t("momentUpdate.heading"), intro: t("momentUpdate.intro") },
+    });
+  }
 
-  // Notifier l'organisateur aussi
+  // Notifier les Organisateurs en batch
   const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
-  await Promise.all(
-    hosts.map(async (host) => {
-      const user = host.user;
-      if (!user?.email) return;
+  const hostRecipients = hosts
+    .filter((h) => h.user?.email)
+    .map((h) => ({
+      to: h.user!.email!,
+      playerName: [h.user!.firstName, h.user!.lastName].filter(Boolean).join(" ") || h.user!.email!,
+    }));
 
-      const hostName =
-        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-
-      return emailService.sendMomentUpdate({
-        to: user.email,
-        playerName: hostName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
-        circleName: circle.name,
-        circleSlug: circle.slug,
-        dateChanged,
-        locationChanged,
-        icsContent,
-        strings: {
-          ...updateStrings,
-          heading: t("hostMomentUpdate.heading"),
-          intro: t("hostMomentUpdate.intro"),
-        },
-      });
-    })
-  );
+  if (hostRecipients.length > 0) {
+    await emailService.sendMomentUpdateBatch({
+      ...commonFields,
+      recipients: hostRecipients,
+      strings: { ...updateStrings, heading: t("hostMomentUpdate.heading"), intro: t("hostMomentUpdate.intro") },
+    });
+  }
 }
 
 export async function deleteMomentAction(
@@ -458,29 +441,27 @@ async function sendMomentCancelledEmails(
     footer: t("common.footer"),
   };
 
-  // Notifier REGISTERED et WAITLISTED (tous les participants actifs)
-  await Promise.all(
-    registrations.map(async (registration) => {
-      const user = registration.user;
-      if (!user?.email) return;
+  // Notifier REGISTERED et WAITLISTED (tous les participants actifs) en batch
+  const recipients = registrations
+    .filter((r) => r.user?.email)
+    .map((r) => ({
+      to: r.user!.email!,
+      recipientName: [r.user!.firstName, r.user!.lastName].filter(Boolean).join(" ") || r.user!.email!,
+    }));
 
-      const recipientName =
-        [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-
-      return emailService.sendMomentCancelled({
-        to: user.email,
-        recipientName,
-        momentTitle: moment.title,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
-        circleName: circle.name,
-        circleSlug: circle.slug,
-        strings,
-      });
-    })
-  );
+  if (recipients.length > 0) {
+    await emailService.sendMomentCancelledBatch({
+      recipients,
+      momentTitle: moment.title,
+      momentDate,
+      momentDateMonth,
+      momentDateDay,
+      locationText,
+      circleName: circle.name,
+      circleSlug: circle.slug,
+      strings,
+    });
+  }
 }
 
 export async function publishMomentAction(

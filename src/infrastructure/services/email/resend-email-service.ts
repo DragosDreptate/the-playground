@@ -6,8 +6,11 @@ import type {
   HostNewRegistrationEmailData,
   NewCommentEmailData,
   NewMomentMemberEmailData,
+  NewMomentMembersEmailData,
   MomentUpdateEmailData,
+  MomentUpdateBatchEmailData,
   MomentCancelledEmailData,
+  MomentCancelledBatchEmailData,
   HostMomentCreatedEmailData,
   BroadcastMomentsBatchEmailData,
   AdminEntityCreatedEmailData,
@@ -64,6 +67,7 @@ export function createResendEmailService(): EmailService {
 
   // Envoie un batch en respectant la limite de 100 emails par appel Resend.
   // Filtre les emails de démo et découpe en chunks si nécessaire.
+  // Un délai de 500ms est appliqué entre les chunks pour éviter le rate limiting.
   async function sendBatch(
     emails: Parameters<typeof resend.batch.send>[0]
   ): Promise<void> {
@@ -74,6 +78,7 @@ export function createResendEmailService(): EmailService {
     if (real.length === 0) return;
     const CHUNK_SIZE = 100;
     for (let i = 0; i < real.length; i += CHUNK_SIZE) {
+      if (i > 0) await new Promise((r) => setTimeout(r, 500));
       await resend.batch.send(real.slice(i, i + CHUNK_SIZE));
     }
   }
@@ -150,6 +155,18 @@ export function createResendEmailService(): EmailService {
       });
     },
 
+    async sendNewMomentToMembers(data: NewMomentMembersEmailData): Promise<void> {
+      const { recipients, ...common } = data;
+      await sendBatch(
+        recipients.map(({ to, recipientName }) => ({
+          from,
+          to,
+          subject: common.strings.subject,
+          react: NewMomentNotificationEmail({ ...common, to, recipientName, baseUrl }),
+        }))
+      );
+    },
+
     async sendMomentUpdate(data: MomentUpdateEmailData): Promise<void> {
       await send({
         from,
@@ -175,6 +192,37 @@ export function createResendEmailService(): EmailService {
         subject: data.strings.subject,
         react: MomentCancelledEmail({ ...data, baseUrl }),
       });
+    },
+
+    async sendMomentUpdateBatch(data: MomentUpdateBatchEmailData): Promise<void> {
+      const { recipients, ...common } = data;
+      await sendBatch(
+        recipients.map(({ to, playerName }) => ({
+          from,
+          to,
+          subject: common.strings.subject,
+          react: MomentUpdateEmail({ ...common, to, playerName, baseUrl }),
+          ...(common.icsContent && {
+            attachments: [{
+              filename: "event.ics",
+              content: Buffer.from(common.icsContent).toString("base64"),
+              contentType: "text/calendar; method=REQUEST",
+            }],
+          }),
+        }))
+      );
+    },
+
+    async sendMomentCancelledBatch(data: MomentCancelledBatchEmailData): Promise<void> {
+      const { recipients, ...common } = data;
+      await sendBatch(
+        recipients.map(({ to, recipientName }) => ({
+          from,
+          to,
+          subject: common.strings.subject,
+          react: MomentCancelledEmail({ ...common, to, recipientName, baseUrl }),
+        }))
+      );
     },
 
     async sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void> {
