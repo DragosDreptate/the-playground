@@ -696,6 +696,13 @@
       "statusMessage": "Vous avez programmé {momentTitle}. Partagez le lien pour inviter vos participants.",
       "manageMomentCta": "Gérer l'événement"
     },
+    "hostCircleMemberNotification": {
+      "subject": "{playerName} a rejoint {circleName}",
+      "heading": "Nouveau membre",
+      "message": "{playerName} a rejoint votre Communauté {circleName}.",
+      "memberCountInfo": "{count} membre(s)",
+      "manageMembersCta": "Voir les membres"
+    },
     "hostNotification": {
       "subject": "{playerName} s'est inscrit(e) à {momentTitle}",
       "heading": "Nouvelle inscription",

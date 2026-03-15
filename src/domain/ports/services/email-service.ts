@@ -237,6 +237,23 @@ export type AdminEntityCreatedEmailData = {
   };
 };
 
+export type HostNewCircleMemberEmailData = {
+  to: string;
+  hostName: string;
+  playerName: string;
+  circleName: string;
+  circleSlug: string;
+  memberCount: number;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    memberCountInfo: string;
+    manageMembersCta: string;
+    footer: string;
+  };
+};
+
 export type AdminNewUserEmailData = {
   to: string;
   userName: string;
@@ -270,4 +287,5 @@ export interface EmailService {
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
   sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;
+  sendHostNewCircleMember(data: HostNewCircleMemberEmailData): Promise<void>;
 }

@@ -696,6 +696,13 @@
       "statusMessage": "You've scheduled {momentTitle}. Share the link to invite your participants.",
       "manageMomentCta": "Manage event"
     },
+    "hostCircleMemberNotification": {
+      "subject": "{playerName} joined {circleName}",
+      "heading": "New member",
+      "message": "{playerName} joined your Community {circleName}.",
+      "memberCountInfo": "{count} member(s)",
+      "manageMembersCta": "View members"
+    },
     "hostNotification": {
       "subject": "{playerName} joined {momentTitle}",
       "heading": "New registration",
