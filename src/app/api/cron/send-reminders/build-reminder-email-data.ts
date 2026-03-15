@@ -24,25 +24,30 @@ export function formatLocationText(moment: MomentForReminder): string {
   return moment.locationName ?? "Lieu à confirmer";
 }
 
-export function buildReminderEmailData(
+/** Génère le contenu ICS une seule fois par événement (METHOD:PUBLISH, invariant pour tous les inscrits). */
+export function buildMomentIcs(
   moment: MomentForReminder,
-  user: { email: string; name: string | null },
-  appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-): RegistrationReminderEmailData {
-  const locationText = formatLocationText(moment);
-  const icsContent = generateIcs({
+  appUrl: string
+): string {
+  return generateIcs({
     uid: moment.id,
     title: moment.title,
-    description: "",
+    description: moment.description,
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
-    location: locationText,
+    location: formatLocationText(moment),
     videoLink: moment.videoLink,
     url: `${appUrl}/m/${moment.slug}`,
     organizerName: moment.circle.name,
     method: "PUBLISH",
   });
+}
 
+export function buildReminderEmailData(
+  moment: MomentForReminder,
+  user: { email: string; name: string | null },
+  icsContent: string
+): RegistrationReminderEmailData {
   return {
     to: user.email,
     playerName: user.name ?? user.email,
@@ -51,7 +56,7 @@ export function buildReminderEmailData(
     momentDate: formatMomentDate(moment.startsAt),
     momentDateMonth: formatMomentDateMonth(moment.startsAt),
     momentDateDay: formatMomentDateDay(moment.startsAt),
-    locationText,
+    locationText: formatLocationText(moment),
     circleName: moment.circle.name,
     circleSlug: moment.circle.slug,
     icsContent,

@@ -85,6 +85,7 @@ export type MomentForReminder = {
   id: string;
   slug: string;
   title: string;
+  description: string;
   startsAt: Date;
   endsAt: Date | null;
   locationType: LocationType;

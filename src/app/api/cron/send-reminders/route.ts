@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prismaMomentRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
-import { buildReminderEmailData } from "./build-reminder-email-data";
+import { buildMomentIcs, buildReminderEmailData } from "./build-reminder-email-data";
 
 /**
  * POST /api/cron/send-reminders
@@ -13,6 +13,10 @@ import { buildReminderEmailData } from "./build-reminder-email-data";
  * Déclenché toutes les heures via Vercel Cron (vercel.json).
  * Protection : header Authorization: Bearer CRON_SECRET
  */
+
+const emailService = createResendEmailService();
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
 export async function POST(request: NextRequest) {
   // 1. Auth check
   const authHeader = request.headers.get("authorization");
@@ -26,15 +30,16 @@ export async function POST(request: NextRequest) {
   const windowEnd = new Date(now.getTime() + 26 * 60 * 60 * 1000);   // +26h
 
   try {
-    const emailService = createResendEmailService();
     const moments = await prismaMomentRepository.findMomentsNeedingReminder(windowStart, windowEnd);
 
     let totalSent = 0;
 
     for (const moment of moments) {
       if (moment.registeredUsers.length > 0) {
+        // ICS généré une fois par événement (METHOD:PUBLISH, invariant pour tous les inscrits)
+        const icsContent = buildMomentIcs(moment, APP_URL);
         const emailDataList = moment.registeredUsers.map((user) =>
-          buildReminderEmailData(moment, user)
+          buildReminderEmailData(moment, user, icsContent)
         );
         await emailService.sendRegistrationReminderBatch(emailDataList);
         totalSent += emailDataList.length;
