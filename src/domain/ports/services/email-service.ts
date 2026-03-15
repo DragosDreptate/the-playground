@@ -90,6 +90,8 @@ export type NewMomentNotificationStrings = {
   preheader: string;
   heading: string;
   intro: string;
+  dateLabel: string;
+  locationLabel: string;
   ctaLabel: string;
   unsubscribeText: string;
   unsubscribeLabel: string;
@@ -103,6 +105,8 @@ export type NewMomentMemberEmailData = {
   momentTitle: string;
   momentSlug: string;
   momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
   momentLocation: string;
   strings: NewMomentNotificationStrings;
 };
