@@ -7,7 +7,7 @@ const PLATFORM_TIMEZONE = "Europe/Paris";
 import { prismaCircleRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
 import type { Moment } from "@/domain/models/moment";
-import type { NewMomentNotificationStrings, NewMomentMembersEmailData } from "@/domain/ports/services/email-service";
+import type { NewMomentNotificationStrings } from "@/domain/ports/services/email-service";
 
 const emailService = createResendEmailService();
 
@@ -72,7 +72,7 @@ export async function notifyNewMoment(
 
   if (recipients.length === 0) return;
 
-  const batchData: NewMomentMembersEmailData = {
+  await emailService.sendNewMomentToMembers({
     recipients,
     circleName,
     circleSlug,
@@ -83,7 +83,5 @@ export async function notifyNewMoment(
     momentDateDay,
     momentLocation,
     strings: memberStrings,
-  };
-
-  await emailService.sendNewMomentToMembers(batchData);
+  });
 }

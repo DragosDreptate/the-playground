@@ -30,6 +30,7 @@ import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
+import { getDisplayName } from "@/lib/display-name";
 
 const emailService = createResendEmailService();
 
@@ -267,11 +268,11 @@ async function sendMomentUpdateEmails(
   t: TranslationFunction,
   locale: string
 ): Promise<void> {
-  const circle = await prismaCircleRepository.findById(moment.circleId);
+  const [circle, registrations] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+  ]);
   if (!circle) return;
-
-  const registrations =
-    await prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id);
 
   const confirmed = registrations.filter((r) => r.status === "REGISTERED");
   if (confirmed.length === 0) return;
@@ -335,7 +336,7 @@ async function sendMomentUpdateEmails(
     .filter((r) => r.user?.email)
     .map((r) => ({
       to: r.user!.email!,
-      playerName: [r.user!.firstName, r.user!.lastName].filter(Boolean).join(" ") || r.user!.email!,
+      playerName: getDisplayName(r.user!.firstName, r.user!.lastName, r.user!.email!),
     }));
 
   if (participantRecipients.length > 0) {
@@ -352,7 +353,7 @@ async function sendMomentUpdateEmails(
     .filter((h) => h.user?.email)
     .map((h) => ({
       to: h.user!.email!,
-      playerName: [h.user!.firstName, h.user!.lastName].filter(Boolean).join(" ") || h.user!.email!,
+      playerName: getDisplayName(h.user!.firstName, h.user!.lastName, h.user!.email!),
     }));
 
   if (hostRecipients.length > 0) {
@@ -446,7 +447,7 @@ async function sendMomentCancelledEmails(
     .filter((r) => r.user?.email)
     .map((r) => ({
       to: r.user!.email!,
-      recipientName: [r.user!.firstName, r.user!.lastName].filter(Boolean).join(" ") || r.user!.email!,
+      recipientName: getDisplayName(r.user!.firstName, r.user!.lastName, r.user!.email!),
     }));
 
   if (recipients.length > 0) {
