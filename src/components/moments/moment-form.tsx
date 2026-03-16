@@ -102,7 +102,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     moment?.locationType ?? "IN_PERSON"
   );
   const [priceOpen, setPriceOpen] = useState(!!(moment?.price && moment.price > 0));
-  const [capacityOpen, setCapacityOpen] = useState(moment?.capacity != null);
+  const [capacityOpen, setCapacityOpen] = useState(false);
 
   // --- Form submission ---
   async function handleSubmit(

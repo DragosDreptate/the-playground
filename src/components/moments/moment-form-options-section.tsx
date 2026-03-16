@@ -1,16 +1,9 @@
 "use client";
 
-import { Lock, Pencil, Ticket, Users } from "lucide-react";
+import { Check, Lock, Pencil, Ticket, Users, X } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
@@ -40,6 +33,9 @@ export function MomentFormOptionsSection({
   defaultCapacity = null,
 }: MomentFormOptionsSectionProps) {
   const t = useTranslations("Moment");
+  const [capacityValue, setCapacityValue] = useState<string>(
+    defaultCapacity?.toString() ?? ""
+  );
 
   return (
     <div className="space-y-1">
@@ -88,38 +84,57 @@ export function MomentFormOptionsSection({
                 className="text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1.5 text-sm transition-colors"
                 onClick={() => onCapacityOpenChange(true)}
               >
-                <span>{t("form.unlimited")}</span>
+                <span>
+                  {capacityValue || t("form.unlimited")}
+                </span>
                 <Pencil className="size-3.5" />
               </button>
             ) : (
-              <button
-                type="button"
-                className="text-muted-foreground hover:text-foreground cursor-pointer text-xs transition-colors"
-                onClick={() => onCapacityOpenChange(false)}
-              >
-                {t("form.unlimited")}
-              </button>
-            )}
-          </div>
-
-          {capacityOpen && (
-            <div className="mt-2 pl-12">
-              <div className="max-w-xs space-y-1">
-                <Label htmlFor="capacity" className="text-xs">
-                  {t("form.capacity")}
-                </Label>
+              <div className="flex items-center gap-1.5">
                 <Input
                   id="capacity"
                   name="capacity"
                   type="number"
                   min="1"
                   placeholder={t("form.capacityPlaceholder")}
-                  defaultValue={defaultCapacity ?? ""}
-                  className="h-9"
+                  aria-label={t("form.capacityLabel")}
+                  value={capacityValue}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, "");
+                    const num = parseInt(val, 10);
+                    setCapacityValue(val === "" ? "" : String(Math.max(1, num)));
+                  }}
+                  className="h-7 w-20 text-right text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      onCapacityOpenChange(false);
+                    }
+                  }}
+                  autoFocus
                 />
+                <button
+                  type="button"
+                  className="text-primary hover:text-primary/80 cursor-pointer transition-colors"
+                  onClick={() => onCapacityOpenChange(false)}
+                  title={t("form.capacityConfirm")}
+                >
+                  <Check className="size-3.5" />
+                </button>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                  onClick={() => {
+                    setCapacityValue("");
+                    onCapacityOpenChange(false);
+                  }}
+                  title={t("form.unlimited")}
+                >
+                  <X className="size-3.5" />
+                </button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
