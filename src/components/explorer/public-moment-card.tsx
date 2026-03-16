@@ -108,7 +108,6 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel}
               {roleBadge}
-              {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
               {cityLabel}
             </div>
             <p className="truncate text-xs font-semibold text-foreground">
