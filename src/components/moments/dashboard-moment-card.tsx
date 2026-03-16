@@ -110,7 +110,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   return (
     <div className="flex gap-0">
       {/* Date column */}
-      <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
+      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
         {!isPast && isToday ? (
           <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
             {tCircle("detail.today")}
@@ -142,7 +142,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
       </div>
 
       {/* Card */}
-      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
+      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
         <Link
           href={`/dashboard/circles/${momentData.circleSlug}/moments/${momentData.slug}`}
           className="group block"
