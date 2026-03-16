@@ -165,7 +165,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               {/* Title + badge */}
               <div className="flex items-baseline gap-3">
                 <p
-                  className={`min-w-0 truncate font-semibold leading-snug ${
+                  className={`min-w-0 flex-1 truncate font-semibold leading-snug ${
                     isPast ? "text-muted-foreground" : "group-hover:underline"
                   }`}
                 >
