@@ -332,7 +332,8 @@
       "endLabel": "Fin",
       "pickDate": "Choisir une date",
       "endBeforeStart": "La date de fin doit être après la date de début.",
-      "createMoment": "Enregistrer le brouillon"
+      "createMoment": "Enregistrer le brouillon",
+      "pastDateReadOnly": "Date non modifiable — l'événement est passé."
     },
     "radar": {
       "title": "Radar de planification",
