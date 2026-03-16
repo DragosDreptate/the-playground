@@ -148,7 +148,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors sm:items-center ${
+            className={`bg-card flex items-start gap-3 rounded-xl border p-3 shadow-lg transition-colors sm:items-center ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
