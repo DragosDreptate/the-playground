@@ -118,13 +118,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ) : (
           <>
             <p
-              className={`text-xs ${isPast || isDraft ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+              className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
               suppressHydrationWarning
             >
               {weekday}
             </p>
             <p
-              className={`text-sm font-medium leading-snug ${isPast || isDraft ? "text-muted-foreground" : ""}`}
+              className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}
               suppressHydrationWarning
             >
               {dateStr}
