@@ -98,13 +98,6 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 </div>
               )}
             </div>
-            {/* Next event — mobile only, block below stats */}
-            {circle.nextMoment && nextMomentDate && (
-              <div className="rounded-lg border border-border bg-muted/40 px-2 py-1.5 sm:hidden">
-                <p className="text-muted-foreground text-xs font-medium">{t("circleCard.nextMoment")}</p>
-                <p className="mt-0.5 truncate text-xs font-medium">{circle.nextMoment.title}</p>
-              </div>
-            )}
           </div>
 
           {/* Right column — desktop only */}
