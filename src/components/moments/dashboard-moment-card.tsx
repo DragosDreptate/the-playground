@@ -110,7 +110,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   return (
     <div className="flex gap-0">
       {/* Date column */}
-      <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
+      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
         {!isPast && isToday ? (
           <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
             {tCircle("detail.today")}
@@ -142,34 +142,25 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
       </div>
 
       {/* Card */}
-      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
+      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
         <Link
           href={`/dashboard/circles/${momentData.circleSlug}/moments/${momentData.slug}`}
           className="group block"
         >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 transition-colors ${
+            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors sm:items-center ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1">
-              {/* Time */}
-              <p
-                className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-                suppressHydrationWarning
-              >
-                {timeStr}
-              </p>
-
-              {/* Title + badge */}
-              <div className="flex items-baseline gap-3">
+              {/* Time + badge */}
+              <div className="flex items-center gap-2">
                 <p
-                  className={`min-w-0 truncate font-semibold leading-snug ${
-                    isPast ? "text-muted-foreground" : "group-hover:underline"
-                  }`}
+                  className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+                  suppressHydrationWarning
                 >
-                  {momentData.title}
+                  {timeStr}
                 </p>
                 {!isPast && (
                   isDraft ? (
@@ -197,6 +188,15 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   ) : null
                 )}
               </div>
+
+              {/* Title */}
+              <p
+                className={`truncate font-semibold leading-snug ${
+                  isPast ? "text-muted-foreground" : "group-hover:underline"
+                }`}
+              >
+                {momentData.title}
+              </p>
 
               {/* Inscrits */}
               {momentData.registrationCount > 0 && (
@@ -231,21 +231,20 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 />
                 <span className="truncate">{momentData.circleName}</span>
               </span>
-
             </div>
 
-            {/* Cover — RIGHT, 64×64px */}
+            {/* Cover — RIGHT, alignée avec le titre */}
             {momentData.coverImage ? (
               <Image
                 src={momentData.coverImage}
                 alt={momentData.title}
                 width={90}
                 height={90}
-                className={`size-[90px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[90px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`size-[90px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[90px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}

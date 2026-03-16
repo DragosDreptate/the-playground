@@ -120,7 +120,7 @@ export async function MomentTimelineItem({
                 {/* Title + badge — dashboard uniquement */}
                 {!isCancelled && variant === "dashboard" ? (
                   <div className="flex items-baseline gap-3">
-                    <p className={`min-w-0 truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                    <p className={`min-w-0 flex-1 truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
                       {moment.title}
                     </p>
                     {isDraft ? (
