@@ -225,6 +225,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           </div>
 
           {/* Circle — cliquable */}
+          <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
+            {t("public.proposedByCommunity")}
+          </p>
           <Link
             href={circleHref}
             className="group flex items-start gap-3 px-1"
@@ -632,6 +635,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </p>
               )}
             </div>
+            <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
+              {t("public.proposedByCommunity")}
+            </p>
             <Link
               href={circleHref}
               className="group flex items-start gap-3 px-1"
