@@ -148,7 +148,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors ${
+            className={`bg-card flex items-start gap-3 rounded-xl border p-3 transition-colors sm:items-center ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
@@ -240,11 +240,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 alt={momentData.title}
                 width={90}
                 height={90}
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[90px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[90px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}
