@@ -1139,7 +1139,7 @@
       "editCancel": {
         "title": "Edit or cancel an event",
         "intro": "From the event dashboard:",
-        "item1": "<strong>Edit</strong> — update information at any time. Registered attendees are notified by email if key details change.",
+        "item1": "<strong>Edit</strong> — update information at any time. Registered attendees are notified by email if the date or location changes. For a past event, the date can no longer be changed; other details (title, description, location) remain editable.",
         "item2": "<strong>Cancel</strong> — cancel the event. All attendees receive a cancellation email.",
         "callout": "A cancelled event cannot be reactivated. If you simply want to reschedule, edit the date rather than cancelling."
       },
@@ -1158,13 +1158,13 @@
         "outro": "Members automatically join your Community when they register for one of your events."
       },
       "inviteMembers": {
-        "title": "Invite members by link",
-        "intro": "You can invite someone directly into your Community without them needing to register for an event first. From your Community page, generate a <strong>private invite link</strong> and share it — by email, WhatsApp, or any other channel.",
-        "step1": "Go to your Community page",
-        "step2": "In the Members section, click <strong>Generate an invite link</strong>",
-        "step3": "Copy the link and share it with the people you want to invite",
-        "step4": "They click, sign in, and instantly join your Community",
-        "callout": "This link is <strong>revocable at any time</strong> — click Revoke to deactivate it. Members who already joined are not affected. The same link can be used by multiple people."
+        "title": "Invite members",
+        "intro": "You can invite someone directly into your Community without them needing to register for an event first. Two options are available from the <strong>Share & Invite</strong> card on your Community page:",
+        "step1": "<strong>By email</strong> — enter up to 10 email addresses and send an invitation directly from the platform. Each recipient receives an email with a link to join the Community.",
+        "step2": "<strong>By invite link</strong> — a private invite link is available in the Share & Invite card. Copy it and share it via WhatsApp, Slack, or any other channel. If the link has been revoked, click <strong>Generate a link</strong> to create a new one.",
+        "step3": "The person clicks the link, signs in, and instantly joins your Community.",
+        "step4": "They appear immediately in the member list — you receive an email notification.",
+        "callout": "The invite link is <strong>revocable at any time</strong> — click Revoke to deactivate it. Members who already joined are not affected. The same link can be used by multiple people."
       }
     },
     "faq": {

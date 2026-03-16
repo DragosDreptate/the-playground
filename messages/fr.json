@@ -1139,7 +1139,7 @@
       "editCancel": {
         "title": "Modifier ou annuler un événement",
         "intro": "Depuis le tableau de bord de l'événement :",
-        "item1": "<strong>Modifier</strong> — modifiez les informations à tout moment. Les participants inscrits sont notifiés par email si des informations clés changent.",
+        "item1": "<strong>Modifier</strong> — modifiez les informations à tout moment. Les participants inscrits sont notifiés par email si la date ou le lieu change. Pour un événement passé, la date n'est plus modifiable ; les autres informations (titre, description, lieu) restent éditables.",
         "item2": "<strong>Annuler</strong> — annulez l'événement. Tous les participants reçoivent un email d'annulation.",
         "callout": "Un événement annulé ne peut pas être réactivé. Si vous souhaitez simplement le reporter, modifiez la date plutôt que d'annuler."
       },
@@ -1158,13 +1158,13 @@
         "outro": "Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements."
       },
       "inviteMembers": {
-        "title": "Inviter des membres par lien",
-        "intro": "Vous pouvez inviter quelqu'un directement dans votre Communauté sans qu'il ait besoin de s'inscrire à un événement. Depuis la page de votre Communauté, générez un <strong>lien d'invitation privé</strong> et partagez-le — par email, WhatsApp, ou tout autre canal.",
-        "step1": "Rendez-vous sur la page de votre Communauté",
-        "step2": "Dans la section Membres, cliquez sur <strong>Générer un lien d'invitation</strong>",
-        "step3": "Copiez le lien et partagez-le avec les personnes à inviter",
-        "step4": "La personne clique, se connecte, et rejoint instantanément votre Communauté",
-        "callout": "Ce lien est <strong>révocable à tout moment</strong> — cliquez sur Révoquer pour le désactiver. Les membres déjà rejoints ne sont pas affectés. Un même lien peut être utilisé par plusieurs personnes."
+        "title": "Inviter des membres",
+        "intro": "Vous pouvez inviter quelqu'un directement dans votre Communauté sans qu'il ait besoin de s'inscrire à un événement. Deux options sont disponibles depuis la carte <strong>Partager & Inviter</strong> sur la page de votre Communauté :",
+        "step1": "<strong>Par email</strong> — saisissez jusqu'à 10 adresses email et envoyez une invitation directement depuis la plateforme. Chaque destinataire reçoit un email avec un lien pour rejoindre la Communauté.",
+        "step2": "<strong>Par lien d'invitation</strong> — un lien privé est disponible dans la carte Partager & Inviter. Copiez-le et partagez-le via WhatsApp, Slack, ou tout autre canal. Si le lien a été révoqué, cliquez sur <strong>Générer un lien</strong> pour en créer un nouveau.",
+        "step3": "La personne clique sur le lien, se connecte, et rejoint instantanément votre Communauté.",
+        "step4": "Elle apparaît aussitôt dans la liste des membres — vous recevez une notification par email.",
+        "callout": "Le lien d'invitation est <strong>révocable à tout moment</strong> — cliquez sur Révoquer pour le désactiver. Les membres déjà rejoints ne sont pas affectés. Un même lien peut être utilisé par plusieurs personnes."
       }
     },
     "faq": {
