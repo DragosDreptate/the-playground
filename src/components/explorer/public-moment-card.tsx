@@ -5,7 +5,8 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatShortDate, formatTime } from "@/lib/format-date";
-import { MapPin, Globe, Users, Crown, Clock } from "lucide-react";
+import { MapPin, Globe, Users, Crown, Clock, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -42,22 +43,20 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
   // Badge rôle — inline dans la meta row
   const roleBadge = isOrganizer ? (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-1.5 py-0.5 text-xs font-semibold text-primary">
-      <Crown className="size-3" aria-hidden="true" />
+    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+      <Crown className="size-3" />
       {t("momentCard.roleBadge.host")}
-    </span>
+    </Badge>
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-1.5 py-0.5 text-xs font-semibold text-primary">
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
+    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+      <Check className="size-3" />
       {t("momentCard.roleBadge.registered")}
-    </span>
+    </Badge>
   ) : registrationStatus === "WAITLISTED" ? (
-    <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/40 bg-primary/5 px-1.5 py-0.5 text-xs font-semibold text-primary">
-      <Clock className="size-3" aria-hidden="true" />
+    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+      <Clock className="size-3" />
       {t("momentCard.roleBadge.waitlisted")}
-    </span>
+    </Badge>
   ) : null;
 
   const categoryLabel = moment.circle.category
@@ -108,7 +107,6 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel}
               {roleBadge}
-              {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} inline />}
               {cityLabel}
             </div>
             <p className="truncate text-xs font-semibold text-foreground">
