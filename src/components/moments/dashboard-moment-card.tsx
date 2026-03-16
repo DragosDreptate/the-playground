@@ -154,22 +154,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1">
-              {/* Time */}
-              <p
-                className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-                suppressHydrationWarning
-              >
-                {timeStr}
-              </p>
-
-              {/* Title + badge */}
-              <div className="flex items-baseline gap-3">
+              {/* Time + badge */}
+              <div className="flex items-center gap-2">
                 <p
-                  className={`min-w-0 flex-1 truncate font-semibold leading-snug ${
-                    isPast ? "text-muted-foreground" : "group-hover:underline"
-                  }`}
+                  className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+                  suppressHydrationWarning
                 >
-                  {momentData.title}
+                  {timeStr}
                 </p>
                 {!isPast && (
                   isDraft ? (
@@ -197,6 +188,15 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   ) : null
                 )}
               </div>
+
+              {/* Title */}
+              <p
+                className={`truncate font-semibold leading-snug ${
+                  isPast ? "text-muted-foreground" : "group-hover:underline"
+                }`}
+              >
+                {momentData.title}
+              </p>
 
               {/* Inscrits */}
               {momentData.registrationCount > 0 && (
