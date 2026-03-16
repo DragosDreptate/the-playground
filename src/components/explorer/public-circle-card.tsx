@@ -8,6 +8,7 @@ import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
+import { Badge } from "@/components/ui/badge";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 
@@ -37,11 +38,11 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
   const roleBadge = membershipRole && (
-    <span className="inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
+    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       {membershipRole === "HOST"
         ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
         : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
-    </span>
+    </Badge>
   );
 
 
@@ -70,13 +71,15 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
-            {categoryBadge}
-            <div className="flex items-baseline gap-3">
-              <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
-                {circle.name}
-              </h3>
+            {/* Badges — catégorie + rôle */}
+            <div className="flex items-center gap-2">
+              {categoryBadge}
               {roleBadge}
             </div>
+            {/* Titre — pleine largeur */}
+            <h3 className="truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
+              {circle.name}
+            </h3>
             <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">
               {circle.description}
             </p>
