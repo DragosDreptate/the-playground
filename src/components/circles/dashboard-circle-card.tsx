@@ -56,17 +56,19 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            {categoryLabel && <CategoryBadge label={categoryLabel} />}
-            <div className="flex items-baseline gap-3">
-              <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
-                {circle.name}
-              </h3>
+            {/* Badges — catégorie + rôle */}
+            <div className="flex items-center gap-2">
+              {categoryLabel && <CategoryBadge label={categoryLabel} />}
               <span className="shrink-0 inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
                 {circle.memberRole === "HOST"
                   ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
                   : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
               </span>
             </div>
+            {/* Titre — pleine largeur */}
+            <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
+              {circle.name}
+            </h3>
             <p className="text-muted-foreground line-clamp-1 text-xs">
               {circle.description}
             </p>
