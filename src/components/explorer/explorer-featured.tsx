@@ -66,7 +66,7 @@ export function ExplorerFeatured({ circles }: Props) {
               <Link
                 key={circle.id}
                 href={`/circles/${circle.slug}`}
-                className="group flex gap-4 rounded-[14px] border border-border bg-card p-3 transition-colors hover:border-primary/30 hover:bg-card/70"
+                className="group flex gap-4 rounded-[14px] border border-border bg-card p-3 shadow-lg dark:shadow-none transition-colors hover:border-primary/30 hover:bg-card/70"
               >
                 {/* Cover 1:1 — côté = hauteur du contenu (self-stretch + aspect-square) */}
                 <div
