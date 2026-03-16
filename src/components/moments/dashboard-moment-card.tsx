@@ -148,13 +148,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 transition-colors ${
+            className={`bg-card rounded-xl border p-3 transition-colors ${
               isPast ? "border-border" : "border-border hover:border-primary/30"
             }`}
           >
-            {/* Content — LEFT */}
-            <div className="min-w-0 flex-1 space-y-1">
-              {/* Time + badge */}
+            <div className="space-y-1">
+              {/* Time + badge — pleine largeur */}
               <div className="flex items-center gap-2">
                 <p
                   className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
@@ -189,14 +188,30 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 )}
               </div>
 
-              {/* Title */}
-              <p
-                className={`truncate font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:underline"
-                }`}
-              >
-                {momentData.title}
-              </p>
+              {/* Titre + cover alignés en haut */}
+              <div className="flex items-start gap-3">
+                <p
+                  className={`min-w-0 flex-1 font-semibold leading-snug ${
+                    isPast ? "text-muted-foreground" : "group-hover:underline"
+                  }`}
+                >
+                  {momentData.title}
+                </p>
+                {momentData.coverImage ? (
+                  <Image
+                    src={momentData.coverImage}
+                    alt={momentData.title}
+                    width={90}
+                    height={90}
+                    className={`size-[72px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                  />
+                ) : (
+                  <div
+                    className={`size-[72px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
+                    style={{ background: gradient }}
+                  />
+                )}
+              </div>
 
               {/* Inscrits */}
               {momentData.registrationCount > 0 && (
@@ -231,24 +246,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 />
                 <span className="truncate">{momentData.circleName}</span>
               </span>
-
             </div>
-
-            {/* Cover — RIGHT, 64×64px */}
-            {momentData.coverImage ? (
-              <Image
-                src={momentData.coverImage}
-                alt={momentData.title}
-                width={90}
-                height={90}
-                className={`size-[90px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-[90px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
           </div>
         </Link>
       </div>
