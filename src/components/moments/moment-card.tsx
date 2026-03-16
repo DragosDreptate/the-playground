@@ -37,7 +37,7 @@ export function MomentCard({ moment, circleSlug }: MomentCardProps) {
     <Link
       href={`/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
     >
-      <Card className="transition-colors hover:border-primary/30">
+      <Card className="shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 flex-1">

@@ -35,7 +35,7 @@ export async function DashboardCircleCard({ circle }: Props) {
 
   return (
     <Link href={`/dashboard/circles/${circle.slug}`} className="group block min-w-0">
-      <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 transition-colors hover:border-primary/30">
+      <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-3 sm:gap-4">
 
           {/* Thumbnail */}

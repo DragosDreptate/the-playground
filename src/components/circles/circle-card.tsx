@@ -25,7 +25,7 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
   const gradient = getMomentGradient(circle.name);
 
   return (
-    <div className="border-border bg-card hover:border-primary/30 flex items-center gap-4 rounded-xl border p-4 transition-colors">
+    <div className="border-border bg-card hover:border-primary/30 flex items-center gap-4 rounded-xl border p-4 shadow-lg dark:shadow-none transition-colors">
 
       {/* Zone cliquable : avatar + contenu */}
       <Link href={href ?? `/dashboard/circles/${circle.slug}`} className="flex min-w-0 flex-1 items-start gap-4">
