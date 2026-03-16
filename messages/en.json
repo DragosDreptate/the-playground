@@ -332,7 +332,8 @@
       "endLabel": "End",
       "pickDate": "Pick a date",
       "endBeforeStart": "The end date must be after the start date.",
-      "createMoment": "Save draft"
+      "createMoment": "Save draft",
+      "pastDateReadOnly": "Date is read-only — this event is in the past."
     },
     "radar": {
       "title": "Planning Radar",

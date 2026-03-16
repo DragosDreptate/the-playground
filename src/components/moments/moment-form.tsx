@@ -53,6 +53,7 @@ function getDefaultEndDate(start: Date): Date {
 export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
+  const isPast = moment?.status === "PAST";
   const router = useRouter();
 
   // --- Date/time state ---
@@ -275,7 +276,13 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onStartTimeChange={setStartTime}
             onEndDateChange={setEndDate}
             onEndTimeChange={setEndTime}
+            disabled={isPast}
           />
+          {isPast && (
+            <p className="text-muted-foreground pl-12 text-xs">
+              {t("form.pastDateReadOnly")}
+            </p>
+          )}
 
           {/* Location row */}
           <MomentFormLocationRow

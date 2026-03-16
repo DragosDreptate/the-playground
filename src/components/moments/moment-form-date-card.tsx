@@ -32,6 +32,7 @@ type MomentFormDateCardProps = {
   onStartTimeChange: (time: string) => void;
   onEndDateChange: (date: Date | undefined) => void;
   onEndTimeChange: (time: string) => void;
+  disabled?: boolean;
 };
 
 export function MomentFormDateCard({
@@ -43,6 +44,7 @@ export function MomentFormDateCard({
   onStartTimeChange,
   onEndDateChange,
   onEndTimeChange,
+  disabled = false,
 }: MomentFormDateCardProps) {
   const t = useTranslations("Moment");
   const locale = useLocale();
@@ -175,18 +177,26 @@ export function MomentFormDateCard({
         <span className="text-muted-foreground w-12 shrink-0 text-sm">
           {t("form.startLabel")}
         </span>
-        <DatePickerButton
-          date={startDate}
-          label={formatDate(startDate)}
-          locale={dateFnsLocale}
-          disabledBefore={today}
-          onSelect={handleStartDateChange}
-        />
-        <TimeSelect
-          value={startTime}
-          onChange={handleStartTimeChange}
-          options={filteredStartTimeOptions}
-        />
+        {disabled ? (
+          <span className="text-muted-foreground text-sm font-medium">
+            {formatDate(startDate)} · {startTime}
+          </span>
+        ) : (
+          <>
+            <DatePickerButton
+              date={startDate}
+              label={formatDate(startDate)}
+              locale={dateFnsLocale}
+              disabledBefore={today}
+              onSelect={handleStartDateChange}
+            />
+            <TimeSelect
+              value={startTime}
+              onChange={handleStartTimeChange}
+              options={filteredStartTimeOptions}
+            />
+          </>
+        )}
       </div>
 
       {/* End row */}
@@ -197,29 +207,37 @@ export function MomentFormDateCard({
         <span className="text-muted-foreground w-12 shrink-0 text-sm">
           {t("form.endLabel")}
         </span>
-        <DatePickerButton
-          date={endDate}
-          label={formatDate(endDate)}
-          locale={dateFnsLocale}
-          disabledBefore={startDate}
-          onSelect={handleEndDateChange}
-        />
-        <TimeSelect
-          value={endTime}
-          onChange={onEndTimeChange}
-          options={timeOptions}
-        />
+        {disabled ? (
+          <span className="text-muted-foreground text-sm font-medium">
+            {formatDate(endDate)} · {endTime}
+          </span>
+        ) : (
+          <>
+            <DatePickerButton
+              date={endDate}
+              label={formatDate(endDate)}
+              locale={dateFnsLocale}
+              disabledBefore={startDate}
+              onSelect={handleEndDateChange}
+            />
+            <TimeSelect
+              value={endTime}
+              onChange={onEndTimeChange}
+              options={timeOptions}
+            />
+          </>
+        )}
       </div>
 
       {/* End before start warning */}
-      {isEndBeforeStart && (
+      {!disabled && isEndBeforeStart && (
         <p className="text-destructive pl-12 text-xs">
           {t("form.endBeforeStart")}
         </p>
       )}
 
       {/* Timezone badge */}
-      {timezone && (
+      {!disabled && timezone && (
         <div className="pl-12">
           <Badge variant="secondary" className="text-xs font-normal">
             {timezone}

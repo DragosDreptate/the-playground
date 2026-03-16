@@ -186,6 +186,9 @@ export async function updateMomentAction(
     const coverData = await processCoverImage(formData);
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
+    // Événement passé : ignorer les dates soumises — elles sont non modifiables
+    const isPastMoment = existingMoment?.status === "PAST";
+
     const result = await updateMoment(
       {
         momentId,
@@ -193,8 +196,8 @@ export async function updateMomentAction(
         ...(title && { title: title.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...coverData,
-        ...(startsAtRaw && { startsAt: new Date(startsAtRaw) }),
-        ...(endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
+        ...(!isPastMoment && startsAtRaw && { startsAt: new Date(startsAtRaw) }),
+        ...(!isPastMoment && endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
         ...(locationType && { locationType }),
         ...(locationName !== undefined && { locationName: locationName || null }),
         ...(locationAddress !== undefined && { locationAddress: locationAddress || null }),
