@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
 
@@ -56,17 +57,19 @@ export async function DashboardCircleCard({ circle }: Props) {
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            {categoryLabel && <CategoryBadge label={categoryLabel} />}
-            <div className="flex items-baseline gap-3">
-              <h3 className="min-w-0 truncate text-sm font-semibold leading-snug group-hover:underline">
-                {circle.name}
-              </h3>
-              <span className="shrink-0 inline-flex items-center gap-1 rounded border border-primary/40 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-primary">
+            {/* Badges — catégorie + rôle */}
+            <div className="flex items-center gap-2">
+              {categoryLabel && <CategoryBadge label={categoryLabel} />}
+              <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                 {circle.memberRole === "HOST"
                   ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
                   : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
-              </span>
+              </Badge>
             </div>
+            {/* Titre — pleine largeur */}
+            <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
+              {circle.name}
+            </h3>
             <p className="text-muted-foreground line-clamp-1 text-xs">
               {circle.description}
             </p>
@@ -88,12 +91,6 @@ export async function DashboardCircleCard({ circle }: Props) {
                 </div>
               )}
             </div>
-            {/* Prochain événement — mobile uniquement */}
-            {hasNextMoment && (
-              <div className="rounded-lg border border-border bg-muted/40 px-2 py-1.5 sm:hidden">
-                <p className="truncate text-xs font-medium">{circle.nextMoment!.title}</p>
-              </div>
-            )}
           </div>
 
           {/* Colonne droite — desktop uniquement */}
