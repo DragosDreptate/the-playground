@@ -90,6 +90,104 @@ const statusClassName = {
   PAST: "",
 } as const;
 
+type MomentCoverBlockProps = {
+  coverImage: Moment["coverImage"];
+  coverImageAttribution: Moment["coverImageAttribution"];
+  title: string;
+  status: Moment["status"];
+  isDemo: boolean;
+  gradient: string;
+  sizes: string;
+  draftLabel: string;
+  demoLabel: string;
+  pastLabel: string;
+};
+
+function MomentCoverBlock({
+  coverImage, coverImageAttribution, title, status, isDemo, gradient,
+  sizes, draftLabel, demoLabel, pastLabel,
+}: MomentCoverBlockProps) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="relative">
+        <div className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl" style={{ background: gradient }} />
+        <div
+          className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" ? "opacity-70 grayscale" : ""}`}
+          style={{ aspectRatio: "1 / 1" }}
+        >
+          {status === "DRAFT" && <DraftBadge label={draftLabel} variant="cover" />}
+          {coverImage ? (
+            <Image src={coverImage} alt={title} fill className="object-cover" sizes={sizes} priority />
+          ) : (
+            <>
+              <div className="size-full" style={{ background: gradient }} />
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                  <ImageIcon className="size-6 text-white" />
+                </div>
+              </div>
+            </>
+          )}
+          {isDemo && <DemoBadge label={demoLabel} size="lg" />}
+          {status === "PAST" && (
+            <div className="absolute bottom-3 left-3">
+              <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                {pastLabel}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+      {coverImageAttribution && (
+        <p className="text-muted-foreground px-1 text-xs">
+          Photo par{" "}
+          <a href={coverImageAttribution.url} target="_blank" rel="noopener noreferrer" className="hover:text-foreground underline">
+            {coverImageAttribution.name}
+          </a>{" "}
+          sur Unsplash
+        </p>
+      )}
+    </div>
+  );
+}
+
+type CircleInfoBlockProps = {
+  circle: Pick<Circle, "coverImage" | "name" | "description">;
+  circleHref: string;
+  proposedByLabel: string;
+};
+
+function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBlockProps) {
+  return (
+    <>
+      <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
+        {proposedByLabel}
+      </p>
+      <Link href={circleHref} className="group flex items-start gap-3 px-1">
+        <div
+          className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
+          style={
+            circle.coverImage
+              ? { backgroundImage: `url(${circle.coverImage})` }
+              : { background: getMomentGradient(circle.name) }
+          }
+        />
+        <div className="min-w-0">
+          <p className="text-sm font-semibold leading-snug group-hover:underline">
+            {circle.name}
+          </p>
+          {circle.description && (
+            <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
+              {circle.description}
+            </p>
+          )}
+        </div>
+      </Link>
+    </>
+  );
+}
+
 
 // ── Component ────────────────────────────────────────────────
 
@@ -165,92 +263,25 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
         <div className="order-2 hidden w-full flex-col gap-4 lg:order-1 lg:flex lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
 
           {/* Cover — carré, glow blur */}
-          <div className="flex flex-col gap-2">
-            <div className="relative">
-              <div
-                className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
-                style={{ background: gradient }}
-              />
-              <div
-                className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
-                style={{ aspectRatio: "1 / 1" }}
-              >
-                {moment.status === "DRAFT" && (
-                  <DraftBadge label={t("status.draft")} variant="cover" />
-                )}
-                {moment.coverImage ? (
-                  <Image
-                    src={moment.coverImage}
-                    alt={moment.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 100vw, 340px"
-                    priority
-                  />
-                ) : (
-                  <>
-                    <div className="size-full" style={{ background: gradient }} />
-                    <div className="absolute inset-0 bg-black/20" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                        <ImageIcon className="size-6 text-white" />
-                      </div>
-                    </div>
-                  </>
-                )}
-                {circle.isDemo && <DemoBadge label={tCommon("demo")} size="lg" />}
-                {moment.status === "PAST" && (
-                  <div className="absolute bottom-3 left-3">
-                    <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      {t(`status.past`)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            {moment.coverImageAttribution && (
-              <p className="text-muted-foreground px-1 text-xs">
-                Photo par{" "}
-                <a
-                  href={moment.coverImageAttribution.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground underline"
-                >
-                  {moment.coverImageAttribution.name}
-                </a>{" "}
-                sur Unsplash
-              </p>
-            )}
-          </div>
+          <MomentCoverBlock
+            coverImage={moment.coverImage}
+            coverImageAttribution={moment.coverImageAttribution}
+            title={moment.title}
+            status={moment.status}
+            isDemo={circle.isDemo}
+            gradient={gradient}
+            sizes="(max-width: 1024px) 100vw, 340px"
+            draftLabel={t("status.draft")}
+            demoLabel={tCommon("demo")}
+            pastLabel={t("status.past")}
+          />
 
           {/* Circle — cliquable */}
-          <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
-            {t("public.proposedByCommunity")}
-          </p>
-          <Link
-            href={circleHref}
-            className="group flex items-start gap-3 px-1"
-          >
-            <div
-              className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
-              style={
-                circle.coverImage
-                  ? { backgroundImage: `url(${circle.coverImage})` }
-                  : { background: getMomentGradient(circle.name) }
-              }
-            />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold leading-snug group-hover:underline">
-                {circle.name}
-              </p>
-              {circle.description && (
-                <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
-                  {circle.description}
-                </p>
-              )}
-            </div>
-          </Link>
+          <CircleInfoBlock
+            circle={circle}
+            circleHref={circleHref}
+            proposedByLabel={t("public.proposedByCommunity")}
+          />
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
@@ -345,62 +376,19 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           )}
 
           {/* Cover — mobile uniquement (dupliquée depuis LEFT column) */}
-          <div className="flex flex-col gap-2 lg:hidden">
-            <div className="relative">
-              <div
-                className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
-                style={{ background: gradient }}
-              />
-              <div
-                className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
-                style={{ aspectRatio: "1 / 1" }}
-              >
-                {moment.status === "DRAFT" && (
-                  <DraftBadge label={t("status.draft")} variant="cover" />
-                )}
-                {moment.coverImage ? (
-                  <Image
-                    src={moment.coverImage}
-                    alt={moment.title}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                  />
-                ) : (
-                  <>
-                    <div className="size-full" style={{ background: gradient }} />
-                    <div className="absolute inset-0 bg-black/20" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                        <ImageIcon className="size-6 text-white" />
-                      </div>
-                    </div>
-                  </>
-                )}
-                {circle.isDemo && <DemoBadge label={tCommon("demo")} size="lg" />}
-                {moment.status === "PAST" && (
-                  <div className="absolute bottom-3 left-3">
-                    <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                      {t(`status.past`)}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            {moment.coverImageAttribution && (
-              <p className="text-muted-foreground px-1 text-xs">
-                Photo par{" "}
-                <a
-                  href={moment.coverImageAttribution.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground underline"
-                >
-                  {moment.coverImageAttribution.name}
-                </a>{" "}
-                sur Unsplash
-              </p>
-            )}
+          <div className="lg:hidden">
+            <MomentCoverBlock
+              coverImage={moment.coverImage}
+              coverImageAttribution={moment.coverImageAttribution}
+              title={moment.title}
+              status={moment.status}
+              isDemo={circle.isDemo}
+              gradient={gradient}
+              sizes="calc(100vw - 32px)"
+              draftLabel={t("status.draft")}
+              demoLabel={tCommon("demo")}
+              pastLabel={t("status.past")}
+            />
           </div>
 
           {/* Description */}
@@ -652,33 +640,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           )}
 
           {/* Circle info — mobile uniquement (dupliquée depuis LEFT column) */}
-          <div className="flex flex-col gap-3 lg:hidden">
-            <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
-              {t("public.proposedByCommunity")}
-            </p>
-            <Link
-              href={circleHref}
-              className="group flex items-start gap-3 px-1"
-            >
-              <div
-                className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
-                style={
-                  circle.coverImage
-                    ? { backgroundImage: `url(${circle.coverImage})` }
-                    : { background: getMomentGradient(circle.name) }
-                }
-              />
-              <div className="min-w-0">
-                <p className="text-sm font-semibold leading-snug group-hover:underline">
-                  {circle.name}
-                </p>
-                {circle.description && (
-                  <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
-                    {circle.description}
-                  </p>
-                )}
-              </div>
-            </Link>
+          <div className="flex flex-col gap-4 lg:hidden">
+            <CircleInfoBlock
+              circle={circle}
+              circleHref={circleHref}
+              proposedByLabel={t("public.proposedByCommunity")}
+            />
           </div>
 
           {/* Prochains événements du Circle — public view uniquement */}
