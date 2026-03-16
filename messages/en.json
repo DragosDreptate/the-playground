@@ -406,6 +406,7 @@
       "eventCancelled": "Event cancelled",
       "attendedCount": "{count} members attended",
       "viewCircleMoments": "See upcoming Events from this Community",
+      "proposedByCommunity": "Proposed by the Community",
       "upcomingInCircle": "Also in this Community",
       "seeAllCircleEvents": "See all events",
       "addToCalendar": {
