@@ -344,6 +344,65 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
+          {/* Cover — mobile uniquement (dupliquée depuis LEFT column) */}
+          <div className="flex flex-col gap-2 lg:hidden">
+            <div className="relative">
+              <div
+                className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
+                style={{ background: gradient }}
+              />
+              <div
+                className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
+                style={{ aspectRatio: "1 / 1" }}
+              >
+                {moment.status === "DRAFT" && (
+                  <DraftBadge label={t("status.draft")} variant="cover" />
+                )}
+                {moment.coverImage ? (
+                  <Image
+                    src={moment.coverImage}
+                    alt={moment.title}
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                ) : (
+                  <>
+                    <div className="size-full" style={{ background: gradient }} />
+                    <div className="absolute inset-0 bg-black/20" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                        <ImageIcon className="size-6 text-white" />
+                      </div>
+                    </div>
+                  </>
+                )}
+                {circle.isDemo && <DemoBadge label={tCommon("demo")} size="lg" />}
+                {moment.status === "PAST" && (
+                  <div className="absolute bottom-3 left-3">
+                    <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      {t(`status.past`)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            {moment.coverImageAttribution && (
+              <p className="text-muted-foreground px-1 text-xs">
+                Photo par{" "}
+                <a
+                  href={moment.coverImageAttribution.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-foreground underline"
+                >
+                  {moment.coverImageAttribution.name}
+                </a>{" "}
+                sur Unsplash
+              </p>
+            )}
+          </div>
+
           {/* Description */}
           {moment.description && (
             <CollapsibleDescription text={moment.description} />
@@ -576,65 +635,24 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             )
           )}
 
-          {/* Cover + Circle info — mobile uniquement (bloc dupliqué depuis LEFT column) */}
-          <div className="flex flex-col gap-4 lg:hidden">
-            <div className="flex flex-col gap-2">
-              <div className="relative">
-                <div
-                  className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
-                  style={{ background: gradient }}
-                />
-                <div
-                  className={`relative w-full overflow-hidden rounded-2xl transition-all ${moment.status === "PAST" ? "opacity-70 grayscale" : ""}`}
-                  style={{ aspectRatio: "1 / 1" }}
-                >
-                  {moment.status === "DRAFT" && (
-                    <DraftBadge label={t("status.draft")} variant="cover" />
-                  )}
-                  {moment.coverImage ? (
-                    <Image
-                      src={moment.coverImage}
-                      alt={moment.title}
-                      fill
-                      className="object-cover"
-                      sizes="100vw"
-                    />
-                  ) : (
-                    <>
-                      <div className="size-full" style={{ background: gradient }} />
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                          <ImageIcon className="size-6 text-white" />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  {circle.isDemo && <DemoBadge label={tCommon("demo")} size="lg" />}
-                  {moment.status === "PAST" && (
-                    <div className="absolute bottom-3 left-3">
-                      <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                        {t(`status.past`)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {moment.coverImageAttribution && (
-                <p className="text-muted-foreground px-1 text-xs">
-                  Photo par{" "}
-                  <a
-                    href={moment.coverImageAttribution.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-foreground underline"
-                  >
-                    {moment.coverImageAttribution.name}
-                  </a>{" "}
-                  sur Unsplash
-                </p>
-              )}
+          {/* Liste des participants */}
+          {registrations.length > 0 && (
+            <div className="border-border bg-card rounded-2xl border p-6">
+              <RegistrationsList
+                registrations={registrations}
+                registeredCount={registeredCount}
+                waitlistedCount={waitlistedCount}
+                capacity={moment.capacity}
+                variant={isHostView ? "host" : "public"}
+                hostUserIds={new Set(hosts.map((h) => h.user.id))}
+                momentSlug={isHostView ? moment.slug : undefined}
+                isConnected={isAuthenticated}
+              />
             </div>
+          )}
+
+          {/* Circle info — mobile uniquement (dupliquée depuis LEFT column) */}
+          <div className="flex flex-col gap-3 lg:hidden">
             <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
               {t("public.proposedByCommunity")}
             </p>
@@ -662,22 +680,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
             </Link>
           </div>
-
-          {/* Liste des participants */}
-          {registrations.length > 0 && (
-            <div className="border-border bg-card rounded-2xl border p-6">
-              <RegistrationsList
-                registrations={registrations}
-                registeredCount={registeredCount}
-                waitlistedCount={waitlistedCount}
-                capacity={moment.capacity}
-                variant={isHostView ? "host" : "public"}
-                hostUserIds={new Set(hosts.map((h) => h.user.id))}
-                momentSlug={isHostView ? moment.slug : undefined}
-                isConnected={isAuthenticated}
-              />
-            </div>
-          )}
 
           {/* Prochains événements du Circle — public view uniquement */}
           {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
