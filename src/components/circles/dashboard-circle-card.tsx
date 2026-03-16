@@ -90,12 +90,6 @@ export async function DashboardCircleCard({ circle }: Props) {
                 </div>
               )}
             </div>
-            {/* Prochain événement — mobile uniquement */}
-            {hasNextMoment && (
-              <div className="rounded-lg border border-border bg-muted/40 px-2 py-1.5 sm:hidden">
-                <p className="truncate text-xs font-medium">{circle.nextMoment!.title}</p>
-              </div>
-            )}
           </div>
 
           {/* Colonne droite — desktop uniquement */}
