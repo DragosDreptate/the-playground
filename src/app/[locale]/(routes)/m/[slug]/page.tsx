@@ -161,8 +161,44 @@ export default async function PublicMomentPage({
     slug: moment.slug,
   };
 
+  const jsonLd =
+    moment.status === "PUBLISHED" || moment.status === "PAST"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Event",
+          name: moment.title,
+          startDate: moment.startsAt.toISOString(),
+          ...(moment.endsAt && { endDate: moment.endsAt.toISOString() }),
+          location:
+            moment.locationType === "ONLINE"
+              ? { "@type": "VirtualLocation" }
+              : {
+                  "@type": "Place",
+                  name: moment.locationName ?? moment.locationAddress ?? undefined,
+                  address: moment.locationAddress ?? undefined,
+                },
+          organizer: { "@type": "Organization", name: circle.name },
+          url: `${appUrl}/m/${moment.slug}`,
+          eventStatus: "https://schema.org/EventScheduled",
+          eventAttendanceMode:
+            moment.locationType === "ONLINE"
+              ? "https://schema.org/OnlineEventAttendanceMode"
+              : "https://schema.org/OfflineEventAttendanceMode",
+          ...(moment.capacity !== null && {
+            maximumAttendeeCapacity: moment.capacity,
+            remainingAttendeeCapacity: Math.max(0, moment.capacity - registeredCount),
+          }),
+        }
+      : null;
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <MomentViewTracker
         momentId={moment.id}
         momentSlug={moment.slug}
