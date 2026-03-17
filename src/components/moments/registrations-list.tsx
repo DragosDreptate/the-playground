@@ -186,7 +186,7 @@ export function RegistrationsList({
         <RemoveRegistrationDialog
           registrationId={removeTarget.id}
           playerName={removeTarget.name}
-          open={!!removeTarget}
+          open
           onOpenChange={(open) => { if (!open) setRemoveTarget(null); }}
         />
       )}

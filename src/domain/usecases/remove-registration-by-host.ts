@@ -42,20 +42,18 @@ export async function removeRegistrationByHost(
     throw new RegistrationNotFoundError(input.registrationId);
   }
 
-  // 3. Vérifie que l'appelant est HOST du Circle
-  const callerMembership = await circleRepository.findMembership(
-    moment.circleId,
-    input.hostUserId
-  );
+  // 3. Charge les memberships en parallèle — indépendantes l'une de l'autre
+  const [callerMembership, targetMembership] = await Promise.all([
+    circleRepository.findMembership(moment.circleId, input.hostUserId),
+    circleRepository.findMembership(moment.circleId, registration.userId),
+  ]);
+
+  // 3a. Vérifie que l'appelant est HOST du Circle
   if (!callerMembership || callerMembership.role !== "HOST") {
     throw new UnauthorizedCircleActionError(input.hostUserId, moment.circleId);
   }
 
-  // 4. Empêche de retirer l'inscription d'un autre HOST
-  const targetMembership = await circleRepository.findMembership(
-    moment.circleId,
-    registration.userId
-  );
+  // 3b. Empêche de retirer l'inscription d'un autre HOST
   if (targetMembership?.role === "HOST") {
     throw new CannotRemoveHostRegistrationError();
   }

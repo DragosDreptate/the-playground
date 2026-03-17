@@ -371,11 +371,9 @@ export async function removeRegistrationByHostAction(
 
     const locale = await getLocale();
     const t = await getTranslations("Email");
-    const registrationId_ = result.cancelledRegistration.id;
-    const momentId = result.cancelledRegistration.momentId;
-    const userId = result.cancelledRegistration.userId;
+    const { momentId, userId } = result.cancelledRegistration;
 
-    sendRemovedByHostEmail(registrationId_, momentId, userId, t, locale).catch(
+    sendRemovedByHostEmail(momentId, userId, t, locale).catch(
       (err) => {
         console.error(err);
         Sentry.captureException(err);
@@ -402,7 +400,6 @@ export async function removeRegistrationByHostAction(
 }
 
 async function sendRemovedByHostEmail(
-  _registrationId: string,
   momentId: string,
   userId: string,
   t: TranslationFunction,
