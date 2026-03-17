@@ -156,8 +156,28 @@ export default async function PublicCirclePage({
 
   const gradient = getMomentGradient(circle.name);
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const jsonLd =
+    circle.visibility === "PUBLIC"
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: circle.name,
+          ...(circle.description && { description: circle.description }),
+          url: `${appUrl}/circles/${circle.slug}`,
+          ...(circle.city && { location: { "@type": "Place", name: circle.city } }),
+          ...(circle.coverImage && { image: circle.coverImage }),
+        }
+      : null;
+
   return (
     <div className="space-y-8">
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <CircleViewTracker
         circleId={circle.id}
         circleSlug={circle.slug}

@@ -218,8 +218,8 @@ export default async function OgImage() {
           <img
             src={phoneBase64}
             alt=""
-            width={320}
-            height={464}
+            width={300}
+            height={540}
             style={{
               objectFit: "contain",
             }}
