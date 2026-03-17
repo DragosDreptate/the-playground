@@ -2,6 +2,12 @@ import { Button, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import type { HostNewRegistrationEmailData } from "@/domain/ports/services/email-service";
+import {
+  ctaButton,
+  headingLg as heading,
+  statsSection,
+  statsText,
+} from "./components/email-styles";
 
 type Props = HostNewRegistrationEmailData & {
   baseUrl: string;
@@ -35,14 +41,6 @@ export function HostNewRegistrationEmail({
   );
 }
 
-const heading: React.CSSProperties = {
-  fontSize: "16px",
-  fontWeight: 600,
-  color: "#18181b",
-  margin: "0 0 16px 0",
-  lineHeight: "24px",
-};
-
 const message: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
@@ -50,32 +48,7 @@ const message: React.CSSProperties = {
   lineHeight: "22px",
 };
 
-const statsSection: React.CSSProperties = {
-  backgroundColor: "#f4f4f5",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "24px",
-};
-
-const statsText: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#18181b",
-  fontWeight: 500,
-  margin: "0",
-  textAlign: "center" as const,
-};
-
 const ctaSection: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
-const ctaButton: React.CSSProperties = {
-  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
-  color: "#ffffff",
-  fontSize: "14px",
-  fontWeight: 600,
-  borderRadius: "8px",
-  padding: "12px 32px",
-  textDecoration: "none",
-  display: "inline-block",
-};

@@ -3,6 +3,7 @@ import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import { CalendarBadge } from "./components/calendar-badge";
 import type { MomentCancelledEmailData } from "@/domain/ports/services/email-service";
+import { ctaButton, headingSm as heading } from "./components/email-styles";
 
 type Props = MomentCancelledEmailData & {
   baseUrl: string;
@@ -47,14 +48,6 @@ const title: React.CSSProperties = {
   textDecoration: "line-through",
 };
 
-const heading: React.CSSProperties = {
-  fontSize: "16px",
-  fontWeight: 600,
-  color: "#18181b",
-  margin: "0 0 8px 0",
-  lineHeight: "24px",
-};
-
 const message: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
@@ -67,13 +60,3 @@ const ctaSection: React.CSSProperties = {
   marginBottom: "16px",
 };
 
-const ctaButton: React.CSSProperties = {
-  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
-  color: "#ffffff",
-  fontSize: "14px",
-  fontWeight: 600,
-  borderRadius: "8px",
-  padding: "12px 32px",
-  textDecoration: "none",
-  display: "inline-block",
-};

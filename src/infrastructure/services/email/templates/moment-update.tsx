@@ -3,6 +3,15 @@ import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import { CalendarBadge } from "./components/calendar-badge";
 import type { MomentUpdateEmailData } from "@/domain/ports/services/email-service";
+import {
+  ctaButton,
+  title,
+  headingSm as heading,
+  metaSection,
+  metaRow,
+  metaLabel,
+  metaValue,
+} from "./components/email-styles";
 
 type Props = MomentUpdateEmailData & {
   baseUrl: string;
@@ -64,23 +73,6 @@ export function MomentUpdateEmail({
   );
 }
 
-const title: React.CSSProperties = {
-  fontSize: "20px",
-  fontWeight: 700,
-  color: "#18181b",
-  textAlign: "center" as const,
-  margin: "0 0 24px 0",
-  lineHeight: "28px",
-};
-
-const heading: React.CSSProperties = {
-  fontSize: "16px",
-  fontWeight: 600,
-  color: "#18181b",
-  margin: "0 0 8px 0",
-  lineHeight: "24px",
-};
-
 const intro: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
@@ -106,44 +98,7 @@ const changeTag: React.CSSProperties = {
   margin: "0 6px 0 0",
 };
 
-const metaSection: React.CSSProperties = {
-  borderTop: "1px solid #e4e4e7",
-  paddingTop: "16px",
-  marginBottom: "24px",
-};
-
-const metaRow: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#18181b",
-  margin: "0 0 12px 0",
-  lineHeight: "20px",
-};
-
-const metaLabel: React.CSSProperties = {
-  color: "#71717a",
-  fontSize: "12px",
-  fontWeight: 500,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.5px",
-};
-
-const metaValue: React.CSSProperties = {
-  color: "#18181b",
-  fontSize: "14px",
-  fontWeight: 500,
-};
-
 const ctaSection: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
-const ctaButton: React.CSSProperties = {
-  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
-  color: "#ffffff",
-  fontSize: "14px",
-  fontWeight: 600,
-  borderRadius: "8px",
-  padding: "12px 32px",
-  textDecoration: "none",
-  display: "inline-block",
-};
