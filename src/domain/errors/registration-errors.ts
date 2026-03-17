@@ -55,3 +55,11 @@ export class HostCannotCancelRegistrationError extends DomainError {
     super("A Host cannot cancel their registration for a Moment they organize");
   }
 }
+
+export class CannotRemoveHostRegistrationError extends DomainError {
+  readonly code = "CANNOT_REMOVE_HOST_REGISTRATION";
+
+  constructor() {
+    super("Cannot remove the registration of a Host from their own Circle");
+  }
+}

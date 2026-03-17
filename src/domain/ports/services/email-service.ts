@@ -297,6 +297,26 @@ export type RegistrationReminderEmailData = {
   };
 };
 
+export type RegistrationRemovedByHostEmailData = {
+  to: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  momentDate: string;
+  momentDateMonth: string;
+  momentDateDay: string;
+  locationText: string;
+  circleName: string;
+  circleSlug: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 export type MemberRemovedFromCircleEmailData = {
   to: string;
   memberName: string;
@@ -351,4 +371,5 @@ export interface EmailService {
   sendHostNewCircleMember(data: HostNewCircleMemberEmailData): Promise<void>;
   sendRegistrationReminderBatch(data: RegistrationReminderEmailData[]): Promise<void>;
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;
+  sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
 }

@@ -20,6 +20,7 @@ import type {
   AdminNewUserEmailData,
   HostNewCircleMemberEmailData,
   MemberRemovedFromCircleEmailData,
+  RegistrationRemovedByHostEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -36,6 +37,7 @@ import { AdminNewUserEmail } from "./templates/admin-new-user";
 import { HostNewCircleMemberEmail } from "./templates/host-new-circle-member";
 import { RegistrationReminderEmail } from "./templates/registration-reminder";
 import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-circle";
+import { RegistrationRemovedByHostEmail } from "./templates/registration-removed-by-host";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -317,6 +319,17 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: MemberRemovedFromCircleEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendRegistrationRemovedByHost(
+      data: RegistrationRemovedByHostEmailData
+    ): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: RegistrationRemovedByHostEmail({ ...data, baseUrl }),
       });
     },
 

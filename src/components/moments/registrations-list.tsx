@@ -4,10 +4,11 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, Crown, Download } from "lucide-react";
+import { Clock, Crown, Download, UserMinus } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { Link } from "@/i18n/navigation";
 import { getDisplayName } from "@/lib/display-name";
+import { RemoveRegistrationDialog } from "@/components/moments/remove-registration-dialog";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
 const PAGE_SIZE = 10;
@@ -38,6 +39,7 @@ export function RegistrationsList({
   const tDashboard = useTranslations("Dashboard");
 
   const [showAll, setShowAll] = useState(false);
+  const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
 
   function handleExportCsv() {
     const headers = [
@@ -152,6 +154,17 @@ export function RegistrationsList({
                       {t("registrations.status.waitlisted")}
                     </Badge>
                   )}
+                  {variant === "host" && !isHost && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
+                      onClick={() => setRemoveTarget({ id: reg.id, name: displayName })}
+                    >
+                      <UserMinus className="size-3.5" />
+                      {t("registrations.removeAction")}
+                    </Button>
+                  )}
                 </div>
               );
             })}
@@ -168,6 +181,14 @@ export function RegistrationsList({
             </Button>
           )}
         </>
+      )}
+      {removeTarget && (
+        <RemoveRegistrationDialog
+          registrationId={removeTarget.id}
+          playerName={removeTarget.name}
+          open={!!removeTarget}
+          onOpenChange={(open) => { if (!open) setRemoveTarget(null); }}
+        />
       )}
     </div>
   );

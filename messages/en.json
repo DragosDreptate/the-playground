@@ -432,6 +432,11 @@
         "waitlisted": "Waitlisted"
       },
       "exportCsv": "Export CSV",
+      "removeAction": "Remove",
+      "removeTitle": "Remove {name}?",
+      "removeDescription": "{name}'s registration for this event will be cancelled. If a waitlist exists, the first person on it will be automatically promoted.",
+      "removeConfirm": "Remove",
+      "removeCancel": "Cancel",
       "csvHeaders": {
         "firstName": "First name",
         "lastName": "Last name",
@@ -753,6 +758,12 @@
       "subject": "{inviterName} invited you to join {circleName}",
       "ctaLabel": "Join the Community",
       "footer": "Invitation sent by {inviterName} via The Playground — the-playground.fr"
+    },
+    "registrationRemovedByHost": {
+      "subject": "Registration invalidated: {momentTitle}",
+      "heading": "Your registration has been invalidated",
+      "message": "The organizer of {circleName} has invalidated your registration for {momentTitle}.",
+      "ctaLabel": "View Community"
     },
     "memberRemovedFromCircle": {
       "subject": "Your membership in {circleName} has been invalidated",

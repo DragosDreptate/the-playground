@@ -19,7 +19,9 @@ import { createResendEmailService } from "@/infrastructure/services";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
+import { removeRegistrationByHost } from "@/domain/usecases/remove-registration-by-host";
 import { DomainError } from "@/domain/errors";
+import { getDisplayName } from "@/lib/display-name";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
@@ -344,6 +346,110 @@ async function sendPromotionEmail(
       dateLabel: t("common.dateLabel"),
       locationLabel: t("common.locationLabel"),
       viewMomentCta: t("common.viewMomentCta"),
+      footer: t("common.footer"),
+    },
+  });
+}
+
+export async function removeRegistrationByHostAction(
+  registrationId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const result = await removeRegistrationByHost(
+      { registrationId, hostUserId: session.user.id },
+      {
+        registrationRepository: prismaRegistrationRepository,
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+      }
+    );
+
+    const locale = await getLocale();
+    const t = await getTranslations("Email");
+    const registrationId_ = result.cancelledRegistration.id;
+    const momentId = result.cancelledRegistration.momentId;
+    const userId = result.cancelledRegistration.userId;
+
+    sendRemovedByHostEmail(registrationId_, momentId, userId, t, locale).catch(
+      (err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    );
+
+    if (result.promotedRegistration) {
+      sendPromotionEmail(result.promotedRegistration, t, locale).catch(
+        (err) => {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      );
+    }
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+async function sendRemovedByHostEmail(
+  _registrationId: string,
+  momentId: string,
+  userId: string,
+  t: TranslationFunction,
+  locale: string
+): Promise<void> {
+  const [user, moment] = await Promise.all([
+    prismaUserRepository.findById(userId),
+    prismaMomentRepository.findById(momentId),
+  ]);
+  if (!user || !moment) return;
+
+  const circle = await prismaCircleRepository.findById(moment.circleId);
+  if (!circle) return;
+
+  const dateFnsLocale = getDateFnsLocale(locale);
+  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
+    locale: dateFnsLocale,
+  });
+  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
+    locale: dateFnsLocale,
+  });
+  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
+  const locationText = formatLocationText(
+    moment.locationType,
+    moment.locationName,
+    moment.locationAddress,
+    moment.videoLink,
+    locale
+  );
+  const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+
+  await emailService.sendRegistrationRemovedByHost({
+    to: user.email,
+    playerName,
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    momentDate,
+    momentDateMonth,
+    momentDateDay,
+    locationText,
+    circleName: circle.name,
+    circleSlug: circle.slug,
+    strings: {
+      subject: t("registrationRemovedByHost.subject", { momentTitle: moment.title }),
+      heading: t("registrationRemovedByHost.heading"),
+      message: t("registrationRemovedByHost.message", { circleName: circle.name, momentTitle: moment.title }),
+      ctaLabel: t("registrationRemovedByHost.ctaLabel"),
       footer: t("common.footer"),
     },
   });
