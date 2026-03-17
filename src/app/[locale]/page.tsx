@@ -28,10 +28,19 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "The Playground — Lancez votre communauté, organisez vos événements",
       description,
       siteName: "The Playground",
+      images: [
+        {
+          url: "/hero-phone.png",
+          width: 1241,
+          height: 1453,
+          alt: "The Playground — application mobile",
+        },
+      ],
     },
     twitter: {
       title: "The Playground — Lancez votre communauté, organisez vos événements",
       description,
+      images: ["/hero-phone.png"],
     },
   };
 }
@@ -40,8 +49,24 @@ export default async function HomePage() {
   const session = await getCachedSession();
   const t = await getTranslations("HomePage");
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "The Playground",
+            url: appUrl,
+            description:
+              "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
+            image: `${appUrl}/hero-phone.png`,
+          }),
+        }}
+      />
       <PwaRedirect isLoggedIn={!!session?.user?.id} />
       <SiteHeader />
 
