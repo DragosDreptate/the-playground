@@ -80,12 +80,12 @@ export default async function HomePage() {
             </div>
 
             {/* RIGHT — iPhone mockup illustration (desktop only) */}
-            <div className="hidden shrink-0 justify-center lg:flex lg:w-[820px]">
+            <div className="hidden shrink-0 justify-center lg:flex lg:w-[700px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/hero-phone.png"
                 alt="The Playground sur mobile"
-                className="w-full max-w-[820px] drop-shadow-2xl lg:-translate-x-24"
+                className="w-full max-w-[700px] drop-shadow-2xl lg:-translate-x-24 lg:scale-125"
                 draggable={false}
               />
             </div>
