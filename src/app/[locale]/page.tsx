@@ -85,7 +85,7 @@ export default async function HomePage() {
               <img
                 src="/hero-phone.png"
                 alt="The Playground sur mobile"
-                className="w-full max-w-[700px] drop-shadow-2xl"
+                className="w-full max-w-[700px] drop-shadow-2xl lg:-translate-x-24"
                 draggable={false}
               />
             </div>
