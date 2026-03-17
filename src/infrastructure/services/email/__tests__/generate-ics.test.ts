@@ -50,7 +50,7 @@ describe("generateIcs", () => {
       const ics = generateIcs(defaultData);
 
       expect(ics).toContain(
-        "ORGANIZER;CN=Design & Produit Lyon:MAILTO:theplayground@thespark.fr"
+        "ORGANIZER;CN=Design & Produit Lyon:MAILTO:hello@the-playground.fr"
       );
     });
 
