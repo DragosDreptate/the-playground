@@ -15,6 +15,8 @@ import { AdminEntityCreatedEmail } from "@/infrastructure/services/email/templat
 import { AdminNewUserEmail } from "@/infrastructure/services/email/templates/admin-new-user";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
+import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
+import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
 import { EmailPreviewClient } from "./email-preview-client";
 
 const BASE_URL = "https://the-playground.fr";
@@ -360,6 +362,49 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
       label: "Magic Link (connexion)",
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
+      }),
+    },
+    {
+      id: "registration-removed-by-host",
+      label: "Inscription invalidée par l'Organisateur",
+      element: RegistrationRemovedByHostEmail({
+        to: "alice@example.com",
+        playerName: "Alice Martin",
+        momentTitle: "Soirée JS & Pizza",
+        momentSlug: "soiree-js-pizza",
+        momentDate: "vendredi 21 mars 2026, 19:00",
+        momentDateMonth: "MAR",
+        momentDateDay: "21",
+        locationText: "Le Cargo, 18 rue de la Paix, Paris",
+        circleName: "Paris Creative Tech",
+        circleSlug: "paris-creative-tech",
+        strings: {
+          subject: "Inscription invalidée : Soirée JS & Pizza",
+          heading: "Votre inscription a été invalidée",
+          message: "L'organisateur de Paris Creative Tech a invalidé votre inscription à Soirée JS & Pizza.",
+          ctaLabel: "Voir la Communauté",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "member-removed-from-circle",
+      label: "Membre retiré de la Communauté",
+      element: MemberRemovedFromCircleEmail({
+        to: "alice@example.com",
+        memberName: "Alice Martin",
+        circleName: "Paris Creative Tech",
+        cancelledRegistrations: 2,
+        strings: {
+          subject: "Votre inscription à Paris Creative Tech a été invalidée",
+          heading: "Votre inscription a été invalidée",
+          message: "L'organisateur de Paris Creative Tech a invalidé votre inscription à cette Communauté.",
+          cancelledRegistrationsMessage: "Vos 2 inscription(s) à venir dans cette Communauté ont également été annulées.",
+          ctaLabel: "Découvrir d'autres Communautés",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
       }),
     },
     {
