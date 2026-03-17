@@ -30,5 +30,6 @@ export {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
   HostCannotCancelRegistrationError,
+  CannotRemoveHostRegistrationError,
 } from "./registration-errors";
 export { AdminUnauthorizedError } from "./admin-errors";

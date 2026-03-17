@@ -2,6 +2,13 @@ import { Button, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import type { AdminEntityCreatedEmailData } from "@/domain/ports/services/email-service";
+import {
+  ctaButton,
+  headingLg as heading,
+  infoCard,
+  infoLabel,
+  infoValue,
+} from "./components/email-styles";
 
 type Props = AdminEntityCreatedEmailData & {
   baseUrl: string;
@@ -48,14 +55,6 @@ export function AdminEntityCreatedEmail({
   );
 }
 
-const heading: React.CSSProperties = {
-  fontSize: "16px",
-  fontWeight: 600,
-  color: "#18181b",
-  margin: "0 0 16px 0",
-  lineHeight: "24px",
-};
-
 const message: React.CSSProperties = {
   fontSize: "14px",
   color: "#52525b",
@@ -63,40 +62,7 @@ const message: React.CSSProperties = {
   lineHeight: "22px",
 };
 
-const infoCard: React.CSSProperties = {
-  backgroundColor: "#f4f4f5",
-  borderRadius: "8px",
-  padding: "12px 16px",
-  marginBottom: "24px",
-};
-
-const infoLabel: React.CSSProperties = {
-  fontSize: "11px",
-  fontWeight: 600,
-  color: "#71717a",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.05em",
-  margin: "8px 0 2px 0",
-};
-
-const infoValue: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#18181b",
-  fontWeight: 500,
-  margin: "0 0 4px 0",
-};
-
 const ctaSection: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
-const ctaButton: React.CSSProperties = {
-  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #8b5cf6)",
-  color: "#ffffff",
-  fontSize: "14px",
-  fontWeight: 600,
-  borderRadius: "8px",
-  padding: "12px 32px",
-  textDecoration: "none",
-  display: "inline-block",
-};

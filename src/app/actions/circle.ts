@@ -31,6 +31,7 @@ import {
   resolveCustomCategoryForUpdate,
 } from "@/lib/circle-category-helpers";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
+import { getDisplayName } from "@/lib/display-name";
 
 export async function createCircleAction(
   formData: FormData
@@ -300,13 +301,50 @@ export async function removeCircleMemberAction(
 
   try {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    await removeCircleMember(
+    const result = await removeCircleMember(
       { circleId, hostUserId: session.user.id, targetUserId },
       {
         circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
       }
     );
+
+    const t = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [targetUser, circle] = await Promise.all([
+          prismaUserRepository.findById(targetUserId),
+          prismaCircleRepository.findById(circleId),
+        ]);
+        if (!targetUser || !circle) return;
+
+        const memberName = getDisplayName(targetUser.firstName, targetUser.lastName, targetUser.email);
+        const footer = t("common.footer");
+
+        await emailService.sendMemberRemovedFromCircle({
+          to: targetUser.email,
+          memberName,
+          circleName: circle.name,
+          cancelledRegistrations: result.cancelledRegistrations,
+          strings: {
+            subject: t("memberRemovedFromCircle.subject", { circleName: circle.name }),
+            heading: t("memberRemovedFromCircle.heading"),
+            message: t("memberRemovedFromCircle.message", { circleName: circle.name }),
+            cancelledRegistrationsMessage:
+              result.cancelledRegistrations > 0
+                ? t("memberRemovedFromCircle.cancelledRegistrationsMessage", {
+                    count: result.cancelledRegistrations,
+                  })
+                : undefined,
+            ctaLabel: t("memberRemovedFromCircle.ctaLabel"),
+            footer,
+          },
+        });
+      } catch {
+        // fire-and-forget — ne pas bloquer l'action si l'email échoue
+      }
+    });
+
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/dashboard/circles");
     return { success: true, data: undefined };

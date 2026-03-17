@@ -2,14 +2,14 @@ import { Button, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import { CalendarBadge } from "./components/calendar-badge";
-import type { MomentCancelledEmailData } from "@/domain/ports/services/email-service";
-import { ctaButton, headingSm as heading } from "./components/email-styles";
+import type { RegistrationRemovedByHostEmailData } from "@/domain/ports/services/email-service";
+import { ctaButton, title, headingSm as heading } from "./components/email-styles";
 
-type Props = MomentCancelledEmailData & {
+type Props = RegistrationRemovedByHostEmailData & {
   baseUrl: string;
 };
 
-export function MomentCancelledEmail({
+export function RegistrationRemovedByHostEmail({
   momentTitle,
   momentDateMonth,
   momentDateDay,
@@ -37,16 +37,6 @@ export function MomentCancelledEmail({
     </EmailLayout>
   );
 }
-
-const title: React.CSSProperties = {
-  fontSize: "20px",
-  fontWeight: 700,
-  color: "#71717a",
-  textAlign: "center" as const,
-  margin: "0 0 24px 0",
-  lineHeight: "28px",
-  textDecoration: "line-through",
-};
 
 const message: React.CSSProperties = {
   fontSize: "14px",
