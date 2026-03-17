@@ -754,6 +754,13 @@
       "ctaLabel": "Rejoindre la Communauté",
       "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr"
     },
+    "memberRemovedFromCircle": {
+      "subject": "Votre inscription à {circleName} a été invalidée",
+      "heading": "Votre inscription a été invalidée",
+      "message": "L'organisateur de {circleName} a invalidé votre inscription à cette Communauté.",
+      "cancelledRegistrationsMessage": "Vos {count} inscription(s) à venir dans cette Communauté ont également été annulées.",
+      "ctaLabel": "Découvrir d'autres Communautés"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",

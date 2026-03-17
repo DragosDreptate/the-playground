@@ -23,6 +23,7 @@ export function createMockEmailService(
     sendAdminNewUser: vi.fn().mockResolvedValue(undefined),
     sendHostNewCircleMember: vi.fn().mockResolvedValue(undefined),
     sendRegistrationReminderBatch: vi.fn().mockResolvedValue(undefined),
+    sendMemberRemovedFromCircle: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

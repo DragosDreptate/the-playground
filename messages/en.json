@@ -754,6 +754,13 @@
       "ctaLabel": "Join the Community",
       "footer": "Invitation sent by {inviterName} via The Playground — the-playground.fr"
     },
+    "memberRemovedFromCircle": {
+      "subject": "Your membership in {circleName} has been invalidated",
+      "heading": "Your membership has been invalidated",
+      "message": "The organizer of {circleName} has invalidated your membership in this Community.",
+      "cancelledRegistrationsMessage": "Your {count} upcoming registration(s) in this Community have also been cancelled.",
+      "ctaLabel": "Discover other Communities"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",
