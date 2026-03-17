@@ -80,7 +80,7 @@ export default async function HomePage() {
             </div>
 
             {/* RIGHT — iPhone mockup illustration (desktop only) */}
-            <div className="hidden shrink-0 justify-center lg:flex lg:w-[700px] lg:-mr-32">
+            <div className="hidden shrink-0 justify-center lg:flex lg:w-[700px] lg:-mr-64">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/hero-phone.png"
