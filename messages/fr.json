@@ -1101,11 +1101,11 @@
       },
       "notifications": {
         "title": "Gérer ses notifications",
-        "intro": "Dans votre profil (<strong>Mon espace → Profil</strong>), vous pouvez activer ou désactiver les emails :",
-        "item1": "Confirmation d'inscription",
-        "item2": "Rappels avant l'événement",
-        "item3": "Modifications ou annulation d'événement",
-        "item4": "Nouveaux événements dans vos Communautés"
+        "intro": "Dans votre profil (<strong>Mon espace → Profil</strong>), vous pouvez activer ou désactiver certains emails. Trois préférences sont disponibles :",
+        "item1": "Nouvelle inscription à l'un de vos événements (pour les Organisateurs)",
+        "item2": "Nouveau commentaire sur un événement",
+        "item3": "Nouvel événement publié dans une Communauté dont vous êtes membre",
+        "item4": "D'autres emails sont envoyés automatiquement et ne peuvent pas être désactivés : confirmation d'inscription, rappels avant l'événement, notifications de modification ou d'annulation."
       },
       "leave": {
         "title": "Quitter une Communauté",
@@ -1163,8 +1163,8 @@
         "callout": "Un événement annulé ne peut pas être réactivé. Si vous souhaitez simplement le reporter, modifiez la date plutôt que d'annuler."
       },
       "radar": {
-        "title": "Le Radar — trouver l'inspiration",
-        "intro": "Le <strong>Radar</strong> est un outil IA disponible dans le formulaire de création d'événement. Il analyse les tendances et événements similaires dans votre ville pour vous aider à trouver le bon sujet, le bon créneau, ou la bonne approche.",
+        "title": "Le Radar — éviter les conflits",
+        "intro": "Le <strong>Radar</strong> est un outil disponible dans le formulaire de création d'événement. Une fois le titre, la date et le lieu renseignés, il scanne les événements existants (Luma, Eventbrite, Meetup) dans votre ville pendant la semaine choisie, pour vous aider à détecter les conflits et choisir le meilleur créneau.",
         "limit": "Vous avez <strong>25 analyses par jour</strong>."
       },
       "share": {
@@ -1209,12 +1209,12 @@
         "answer": "Ils doivent créer un compte, mais le processus est très rapide : un email suffit (lien magique, sans mot de passe), ou une connexion Google / GitHub. Aucun formulaire long."
       },
       "q6": {
-        "question": "Comment récupérer mes données ?",
-        "answer": "Depuis Mon espace → Profil, les Organisateurs peuvent exporter leurs données. Pour toute demande spécifique (RGPD, suppression de compte), contactez-nous."
+        "question": "Comment récupérer ou supprimer mes données ?",
+        "answer": "Pour toute demande liée à vos données (accès, export, suppression de compte — droits RGPD), contactez-nous directement à hello@the-playground.fr. La suppression de compte est également disponible depuis Mon espace → Profil."
       },
       "q7": {
         "question": "Comment signaler un contenu inapproprié ?",
-        "answer": "Utilisez le lien Signaler présent sur les pages d'événements et de Communautés, ou contactez-nous directement par email."
+        "answer": "Contactez-nous directement par email à hello@the-playground.fr en décrivant le contenu concerné (lien de la page, description du problème). Nous traitons chaque signalement dans les meilleurs délais."
       }
     },
     "contact": {

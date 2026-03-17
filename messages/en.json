@@ -1101,11 +1101,11 @@
       },
       "notifications": {
         "title": "Manage notifications",
-        "intro": "In your profile (<strong>Dashboard → Profile</strong>), you can enable or disable emails:",
-        "item1": "Registration confirmation",
-        "item2": "Event reminders",
-        "item3": "Event changes or cancellations",
-        "item4": "New events in your Communities"
+        "intro": "In your profile (<strong>Dashboard → Profile</strong>), you can enable or disable certain emails. Three preferences are available:",
+        "item1": "New registration for one of your events (for Organizers)",
+        "item2": "New comment on an event",
+        "item3": "New event published in a Community you belong to",
+        "item4": "Some emails are sent automatically and cannot be disabled: registration confirmation, event reminders, event update or cancellation notifications."
       },
       "leave": {
         "title": "Leave a Community",
@@ -1163,8 +1163,8 @@
         "callout": "A cancelled event cannot be reactivated. If you simply want to reschedule, edit the date rather than cancelling."
       },
       "radar": {
-        "title": "The Radar — find inspiration",
-        "intro": "The <strong>Radar</strong> is an AI tool available in the event creation form. It analyzes trends and similar events in your city to help you find the right topic, timing, or approach.",
+        "title": "The Radar — avoid scheduling conflicts",
+        "intro": "The <strong>Radar</strong> is a tool available in the event creation form. Once you have filled in the title, date, and location, it scans existing events (Luma, Eventbrite, Meetup) in your city during the selected week, helping you detect scheduling conflicts and pick the best time slot.",
         "limit": "You have <strong>25 analyses per day</strong>."
       },
       "share": {
@@ -1209,12 +1209,12 @@
         "answer": "They need to create an account, but the process is very quick: an email is enough (magic link, no password), or sign in with Google / GitHub. No long forms."
       },
       "q6": {
-        "question": "How do I get my data back?",
-        "answer": "From Dashboard → Profile, Organizers can export their data. For any specific request (GDPR, account deletion), contact us."
+        "question": "How do I access or delete my data?",
+        "answer": "For any request related to your data (access, export, account deletion — GDPR rights), contact us directly at hello@the-playground.fr. Account deletion is also available from Dashboard → Profile."
       },
       "q7": {
         "question": "How do I report inappropriate content?",
-        "answer": "Use the Report link on event and Community pages, or contact us directly by email."
+        "answer": "Contact us directly by email at hello@the-playground.fr, describing the content in question (link to the page, description of the issue). We review every report as quickly as possible."
       }
     },
     "contact": {
