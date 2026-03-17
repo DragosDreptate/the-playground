@@ -206,6 +206,28 @@ export default async function HomePage() {
 
         {/* PWA — télécharger l'app (iOS + Android) */}
         <PwaInstallSection />
+
+        {/* Contact */}
+        <section className="bg-muted/60 px-4 py-16">
+          <div className="mx-auto flex max-w-lg flex-col items-center text-center">
+            <h2 className="text-xl font-bold tracking-tight">
+              Vous avez une question avant de vous lancer&nbsp;?
+            </h2>
+            <p className="text-muted-foreground mt-2 text-sm">
+              On répond personnellement sous 24h.
+            </p>
+            <Button asChild variant="outline" size="sm" className="mt-6">
+              <Link href="/contact">Écrire un message →</Link>
+            </Button>
+            <p className="text-muted-foreground mt-3 text-xs">
+              Ou consultez la{" "}
+              <Link href="/help" className="underline underline-offset-2 hover:text-foreground transition-colors">
+                page Aide
+              </Link>{" "}
+              pour les questions fréquentes.
+            </p>
+          </div>
+        </section>
       </main>
 
       <SiteFooter />

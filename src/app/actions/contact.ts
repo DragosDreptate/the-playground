@@ -12,8 +12,11 @@ export async function sendContactMessageAction(
     return { success: true, data: undefined };
   }
 
-  const name = (formData.get("name") as string | null)?.trim() ?? "";
+  const firstName = (formData.get("firstName") as string | null)?.trim() ?? "";
+  const lastName = (formData.get("lastName") as string | null)?.trim() ?? "";
+  const name = [firstName, lastName].filter(Boolean).join(" ");
   const email = (formData.get("email") as string | null)?.trim() ?? "";
+  const subject = (formData.get("subject") as string | null)?.trim() ?? "";
   const message = (formData.get("message") as string | null)?.trim() ?? "";
 
   if (!name || !email || !message) {
@@ -33,9 +36,9 @@ export async function sendContactMessageAction(
       from,
       to: "ddreptate@gmail.com",
       replyTo: email,
-      subject: `[Contact] Message de ${name}`,
-      text: `Nom : ${name}\nEmail : ${email}\n\n${message}`,
-      html: `<p><strong>Nom :</strong> ${name}</p><p><strong>Email :</strong> ${email}</p><hr/><p>${message.replace(/\n/g, "<br/>")}</p>`,
+      subject: `[Contact] ${subject ? subject + " — " : ""}Message de ${name}`,
+      text: `Nom : ${name}\nEmail : ${email}\nSujet : ${subject || "—"}\n\n${message}`,
+      html: `<p><strong>Nom :</strong> ${name}</p><p><strong>Email :</strong> ${email}</p><p><strong>Sujet :</strong> ${subject || "—"}</p><hr/><p>${message.replace(/\n/g, "<br/>")}</p>`,
     });
 
     if (error) {
