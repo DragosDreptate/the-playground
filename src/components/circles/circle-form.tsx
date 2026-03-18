@@ -213,7 +213,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                     value={customCategoryValue}
                     onChange={(e) => setCustomCategoryValue(e.target.value)}
                     required
-                    maxLength={100}
+                    maxLength={30}
                     className="h-9"
                   />
                 </div>
