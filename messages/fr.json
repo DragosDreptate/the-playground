@@ -438,6 +438,8 @@
       "removeConfirm": "Retirer",
       "removeCancel": "Annuler",
       "csvHeaders": {
+        "eventName": "Événement",
+        "eventDate": "Date de l'événement",
         "firstName": "Prénom",
         "lastName": "Nom",
         "email": "Email",

@@ -21,6 +21,8 @@ type RegistrationsListProps = {
   variant?: "host" | "public";
   hostUserIds?: Set<string>;
   momentSlug?: string;
+  momentTitle?: string;
+  momentStartsAt?: Date;
   isConnected?: boolean;
 };
 
@@ -32,6 +34,8 @@ export function RegistrationsList({
   variant = "host",
   hostUserIds = new Set(),
   momentSlug,
+  momentTitle,
+  momentStartsAt,
   isConnected = false,
 }: RegistrationsListProps) {
   const t = useTranslations("Moment");
@@ -42,7 +46,15 @@ export function RegistrationsList({
   const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
 
   function handleExportCsv() {
+    const eventDate = momentStartsAt ? new Date(momentStartsAt).toLocaleDateString() : "";
+    const metaRow = [
+      momentTitle ?? "",
+      eventDate,
+      "", "", "", "", "",
+    ];
     const headers = [
+      t("registrations.csvHeaders.eventName"),
+      t("registrations.csvHeaders.eventDate"),
       t("registrations.csvHeaders.firstName"),
       t("registrations.csvHeaders.lastName"),
       t("registrations.csvHeaders.email"),
@@ -50,20 +62,28 @@ export function RegistrationsList({
       t("registrations.csvHeaders.registeredAt"),
     ];
     const rows = registrations.map((r) => [
+      momentTitle ?? "",
+      eventDate,
       r.user.firstName ?? "",
       r.user.lastName ?? "",
       r.user.email,
       t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted"}`),
       new Date(r.registeredAt).toLocaleDateString(),
     ]);
-    const csv = [headers, ...rows]
+    const csv = [metaRow, headers, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
       .join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `participants-${momentSlug ?? "export"}.csv`;
+    const dateStr = momentStartsAt
+      ? new Date(momentStartsAt).toISOString().slice(0, 10)
+      : "export";
+    const titleSlug = momentTitle
+      ? momentTitle.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50)
+      : (momentSlug ?? "export");
+    a.download = `participants-${titleSlug}-${dateStr}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
