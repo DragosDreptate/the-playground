@@ -155,7 +155,7 @@ export const prismaMomentRepository: MomentRepository = {
         },
       },
       include: {
-        circle: { select: { slug: true, name: true, category: true, city: true, isDemo: true } },
+        circle: { select: { slug: true, name: true, category: true, customCategory: true, city: true, isDemo: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
       },
       orderBy,
@@ -180,6 +180,7 @@ export const prismaMomentRepository: MomentRepository = {
         slug: m.circle.slug,
         name: m.circle.name,
         category: m.circle.category ?? null,
+        customCategory: m.circle.customCategory ?? null,
         city: m.circle.city ?? null,
         isDemo: m.circle.isDemo,
       },
