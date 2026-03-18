@@ -20,6 +20,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
       slug: "tech-paris",
       name: "Tech Paris",
       category: "TECH",
+      customCategory: null,
       city: "Paris",
       isDemo: false,
     },

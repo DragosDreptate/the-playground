@@ -59,9 +59,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     </Badge>
   ) : null;
 
-  const categoryLabel = moment.circle.category
-    ? <CategoryBadge label={tCategory(moment.circle.category)} />
-    : null;
+  const categoryLabel =
+    moment.circle.category === "OTHER" && moment.circle.customCategory
+      ? <CategoryBadge label={moment.circle.customCategory} />
+      : moment.circle.category
+        ? <CategoryBadge label={tCategory(moment.circle.category)} />
+        : null;
 
   const cityLabel = moment.circle.city && (
     <span className="text-muted-foreground text-xs">{moment.circle.city}</span>
