@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ExcludedToggle, OverrideScoreInput } from "@/components/admin/explorer-controls";
+import { ExcludedToggle, OverrideScoreInput, RecalculateScoresButton } from "@/components/admin/explorer-controls";
 import { AdminExplorerTabs } from "@/components/admin/admin-explorer-tabs";
 import type { ExplorerFilter } from "@/domain/ports/repositories/admin-repository";
 
@@ -77,7 +77,10 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t("explorer.title")}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t("explorer.title")}</h1>
+        <RecalculateScoresButton />
+      </div>
 
       <AdminExplorerTabs activeTab="circles" />
 

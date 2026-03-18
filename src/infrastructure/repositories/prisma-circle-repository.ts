@@ -333,11 +333,13 @@ export const prismaCircleRepository: CircleRepository = {
         excludedFromExplorer: false,
         // Exclure les circles dont le host est un compte de test
         NOT: excludeTestHostFilter(),
-        // Seuil d'affichage : ≥1 membre réel (PLAYER) OU ≥1 event publié à venir
+        // Seuil d'affichage : ≥1 membre (HOST ou PLAYER) OU ≥1 event publié à venir
+        // Note : HOST est inclus pour que les communautés nouvellement créées soient visibles
+        // dès la création, avant que des Participants aient rejoint.
         OR: [
           {
             memberships: {
-              some: { role: "PLAYER" },
+              some: { role: { in: ["HOST", "PLAYER"] } },
             },
           },
           {
