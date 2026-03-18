@@ -11,6 +11,7 @@ import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 import { DemoBadge } from "@/components/badges/demo-badge";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
   moment: PublicMoment;
@@ -59,9 +60,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
     </Badge>
   ) : null;
 
-  const categoryLabel = moment.circle.category
-    ? <CategoryBadge label={tCategory(moment.circle.category)} />
-    : null;
+  const categoryLabelText = resolveCategoryLabel(moment.circle.category, moment.circle.customCategory, tCategory);
+  const categoryLabel = categoryLabelText ? <CategoryBadge label={categoryLabelText} /> : null;
 
   const cityLabel = moment.circle.city && (
     <span className="text-muted-foreground text-xs">{moment.circle.city}</span>

@@ -64,6 +64,7 @@ export type PublicMoment = {
     slug: string;
     name: string;
     category: CircleCategory | null;
+    customCategory: string | null;
     city: string | null;
     isDemo: boolean;
   };

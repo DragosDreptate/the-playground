@@ -7,6 +7,7 @@ import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
   circle: DashboardCircle;
@@ -26,12 +27,7 @@ export async function DashboardCircleCard({ circle }: Props) {
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
   const hasNextMoment = !!(circle.nextMoment && nextMomentDate);
 
-  const categoryLabel =
-    circle.category === "OTHER" && circle.customCategory
-      ? circle.customCategory
-      : circle.category
-        ? tCategory(circle.category)
-        : null;
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
   return (
     <Link href={`/dashboard/circles/${circle.slug}`} className="group block min-w-0">

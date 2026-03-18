@@ -7,6 +7,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { Users, MapPin } from "lucide-react";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
   circles: FeaturedCircle[];
@@ -55,12 +56,7 @@ export function ExplorerFeatured({ circles }: Props) {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {circles.map((circle) => {
             const gradient = getMomentGradient(circle.name);
-            const categoryLabel =
-              circle.category === "OTHER" && circle.customCategory
-                ? circle.customCategory
-                : circle.category
-                  ? tCategory(circle.category)
-                  : null;
+            const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
             return (
               <Link

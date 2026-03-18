@@ -31,6 +31,7 @@ import { notifyHostNewCircleMember } from "./notify-host-new-circle-member";
 import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
+  isCustomCategoryMissing,
 } from "@/lib/circle-category-helpers";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
@@ -60,6 +61,13 @@ export async function createCircleAction(
     return {
       success: false,
       error: "Description is required",
+      code: "VALIDATION",
+    };
+  }
+  if (isCustomCategoryMissing(category, customCategory)) {
+    return {
+      success: false,
+      error: "Custom category is required when 'Other' is selected",
       code: "VALIDATION",
     };
   }
@@ -148,9 +156,17 @@ export async function updateCircleAction(
   const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
+  const customCategoryRaw = formData.get("customCategory") as string | null;
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
+  }
+  if (isCustomCategoryMissing(category, customCategoryRaw)) {
+    return {
+      success: false,
+      error: "Custom category is required when 'Other' is selected",
+      code: "VALIDATION",
+    };
   }
 
   try {
@@ -163,7 +179,7 @@ export async function updateCircleAction(
     const customCategory = resolveCustomCategoryForUpdate(
       category,
       existingCircle?.category ?? null,
-      formData.get("customCategory") as string | null
+      customCategoryRaw
     );
 
     const coverData = await processCoverImage(formData);
