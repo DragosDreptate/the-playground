@@ -63,6 +63,13 @@ export async function createCircleAction(
       code: "VALIDATION",
     };
   }
+  if (category === "OTHER" && !customCategory) {
+    return {
+      success: false,
+      error: "Custom category is required when 'Other' is selected",
+      code: "VALIDATION",
+    };
+  }
 
   try {
     const coverData = await processCoverImage(formData);
@@ -148,9 +155,17 @@ export async function updateCircleAction(
   const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
+  const customCategoryRaw = formData.get("customCategory") as string | null;
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
+  }
+  if (category === "OTHER" && !(customCategoryRaw ?? "").trim()) {
+    return {
+      success: false,
+      error: "Custom category is required when 'Other' is selected",
+      code: "VALIDATION",
+    };
   }
 
   try {
@@ -163,7 +178,7 @@ export async function updateCircleAction(
     const customCategory = resolveCustomCategoryForUpdate(
       category,
       existingCircle?.category ?? null,
-      formData.get("customCategory") as string | null
+      customCategoryRaw
     );
 
     const coverData = await processCoverImage(formData);

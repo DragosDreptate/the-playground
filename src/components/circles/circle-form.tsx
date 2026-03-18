@@ -50,6 +50,9 @@ export function CircleForm({ circle, action }: CircleFormProps) {
     circle?.category ?? ""
   );
   const [circleName, setCircleName] = useState(circle?.name ?? "");
+  const [descriptionValue, setDescriptionValue] = useState(circle?.description ?? "");
+  const [cityValue, setCityValue] = useState(circle?.city ?? "");
+  const [customCategoryValue, setCustomCategoryValue] = useState(circle?.customCategory ?? "");
   const [localError, setLocalError] = useState<string | undefined>();
 
   const previewImage =
@@ -156,7 +159,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
           <input
             name="name"
             placeholder={t("form.namePlaceholder")}
-            defaultValue={circle?.name ?? ""}
+            value={circleName}
             required
             maxLength={100}
             onChange={(e) => setCircleName(e.target.value)}
@@ -207,7 +210,8 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                   <Input
                     name="customCategory"
                     placeholder={t("form.customCategoryPlaceholder")}
-                    defaultValue={circle?.customCategory ?? ""}
+                    value={customCategoryValue}
+                    onChange={(e) => setCustomCategoryValue(e.target.value)}
                     maxLength={100}
                     className="h-9"
                   />
@@ -225,7 +229,8 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                 <Input
                   name="city"
                   placeholder={t("form.cityPlaceholder")}
-                  defaultValue={circle?.city ?? ""}
+                  value={cityValue}
+                  onChange={(e) => setCityValue(e.target.value)}
                   maxLength={100}
                   className="h-9"
                 />
@@ -278,7 +283,8 @@ export function CircleForm({ circle, action }: CircleFormProps) {
               <Textarea
                 name="description"
                 placeholder={t("form.descriptionPlaceholder")}
-                defaultValue={circle?.description ?? ""}
+                value={descriptionValue}
+                onChange={(e) => setDescriptionValue(e.target.value)}
                 required
                 rows={4}
                 className="resize-none"
