@@ -19,7 +19,7 @@ export function HostNewCircleMemberEmail({
   baseUrl,
   strings,
 }: Props) {
-  const manageUrl = `${baseUrl}/dashboard/circles/${circleSlug}/members`;
+  const manageUrl = `${baseUrl}/dashboard/circles/${circleSlug}#members-section`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
