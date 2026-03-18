@@ -5,6 +5,8 @@ import * as Sentry from "@sentry/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
+import { prisma } from "@/infrastructure/db/prisma";
+import { calculateCircleScore } from "@/infrastructure/services/explorer-score.service";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService } from "@/infrastructure/services";
 
@@ -79,8 +81,32 @@ export async function createCircleAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Fire-and-forget : notifier les admins de la nouvelle Communauté
+    // Fire-and-forget : calculer le score initial + notifier les admins
     after(async () => {
+      try {
+        // Calcul et persistance du score Explorer initial.
+        // Sans ça, la communauté resterait à score=0 jusqu'au cron de 3h00
+        // et n'apparaîtrait pas dans Explorer avant le lendemain.
+        const initialScore = calculateCircleScore({
+          description: result.circle.description,
+          coverImage: result.circle.coverImage ?? null,
+          category: result.circle.category ?? null,
+          createdAt: new Date(),
+          isDemo: false,
+          overrideScore: null,
+          memberCount: 0,
+          pastEventCount: 0,
+          hasPastEventWithRegistrant: false,
+          hasUpcomingEvent: false,
+        });
+        await prisma.circle.update({
+          where: { id: result.circle.id },
+          data: { explorerScore: initialScore, scoreUpdatedAt: new Date() },
+        });
+      } catch (e) {
+        Sentry.captureException(e);
+      }
+
       try {
         const creator = await prismaUserRepository.findById(session.user.id);
         await notifyAdminEntityCreated({
