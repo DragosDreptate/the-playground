@@ -1,6 +1,32 @@
 import type { CircleCategory } from "@/domain/models/circle";
 
 /**
+ * Retourne true si la catégorie est "OTHER" et que la valeur personnalisée est absente.
+ * Utilisé pour la validation dans les Server Actions.
+ */
+export function isCustomCategoryMissing(
+  category: CircleCategory | null | undefined,
+  value: string | null | undefined
+): boolean {
+  return category === "OTHER" && !(value ?? "").trim();
+}
+
+/**
+ * Résout le label d'affichage d'une catégorie :
+ * - "OTHER" + customCategory → customCategory
+ * - autre catégorie → traduction via tCategory
+ * - pas de catégorie → null
+ */
+export function resolveCategoryLabel(
+  category: CircleCategory | null | undefined,
+  customCategory: string | null | undefined,
+  tCategory: (key: CircleCategory) => string
+): string | null {
+  if (category === "OTHER" && customCategory) return customCategory;
+  return category ? tCategory(category) : null;
+}
+
+/**
  * Calcule la valeur de customCategory à passer lors de la CRÉATION d'un Circle.
  *
  * - category = "OTHER"  → retourne la valeur saisie (trimmée), ou null si vide

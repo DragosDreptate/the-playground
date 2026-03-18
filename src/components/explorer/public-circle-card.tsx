@@ -11,6 +11,7 @@ import type { CircleMemberRole } from "@/domain/models/circle";
 import { Badge } from "@/components/ui/badge";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
   circle: PublicCircle;
@@ -28,12 +29,7 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
 
-  const categoryLabel =
-    circle.category === "OTHER" && circle.customCategory
-      ? circle.customCategory
-      : circle.category
-        ? tCategory(circle.category)
-        : null;
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 

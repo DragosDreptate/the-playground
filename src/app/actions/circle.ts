@@ -31,6 +31,7 @@ import { notifyHostNewCircleMember } from "./notify-host-new-circle-member";
 import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
+  isCustomCategoryMissing,
 } from "@/lib/circle-category-helpers";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
@@ -63,7 +64,7 @@ export async function createCircleAction(
       code: "VALIDATION",
     };
   }
-  if (category === "OTHER" && !customCategory) {
+  if (isCustomCategoryMissing(category, customCategory)) {
     return {
       success: false,
       error: "Custom category is required when 'Other' is selected",
@@ -160,7 +161,7 @@ export async function updateCircleAction(
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
   }
-  if (category === "OTHER" && !(customCategoryRaw ?? "").trim()) {
+  if (isCustomCategoryMissing(category, customCategoryRaw)) {
     return {
       success: false,
       error: "Custom category is required when 'Other' is selected",
