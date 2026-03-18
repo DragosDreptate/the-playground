@@ -212,6 +212,7 @@ export function CircleForm({ circle, action }: CircleFormProps) {
                     placeholder={t("form.customCategoryPlaceholder")}
                     value={customCategoryValue}
                     onChange={(e) => setCustomCategoryValue(e.target.value)}
+                    required
                     maxLength={100}
                     className="h-9"
                   />
