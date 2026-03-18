@@ -22,6 +22,7 @@ import { getAdminMoment } from "@/domain/usecases/admin/get-admin-moment";
 import { adminDeleteMoment } from "@/domain/usecases/admin/admin-delete-moment";
 import { adminUpdateMomentStatus } from "@/domain/usecases/admin/admin-update-moment-status";
 import { recalculateCircleScore } from "@/infrastructure/services/recalculate-circle-score";
+import { recalculateAllScores } from "@/infrastructure/services/recalculate-all-scores";
 import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
@@ -269,6 +270,23 @@ export async function adminUpdateCircleOverrideScoreAction(
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function adminRecalculateAllScoresAction(): Promise<
+  ActionResult<{ circles: number; moments: number; durationMs: number }>
+> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  try {
+    const result = await recalculateAllScores();
+    revalidatePath("/admin/explorer");
+    revalidatePath("/admin/explorer/moments");
+    return { success: true, data: result };
+  } catch (error) {
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }

@@ -4,11 +4,48 @@ import { useTransition, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, X } from "lucide-react";
+import { Check, X, RefreshCw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import {
   adminUpdateCircleExcludedAction,
   adminUpdateCircleOverrideScoreAction,
+  adminRecalculateAllScoresAction,
 } from "@/app/actions/admin";
+
+// ── Recalcul global des scores ────────────────────────────────────────────────
+
+export function RecalculateScoresButton() {
+  const t = useTranslations("Admin.explorer");
+  const [pending, startTransition] = useTransition();
+  const [result, setResult] = useState<{ circles: number; moments: number } | null>(null);
+
+  function handleRecalculate() {
+    setResult(null);
+    startTransition(async () => {
+      const res = await adminRecalculateAllScoresAction();
+      if (res.success) setResult({ circles: res.data.circles, moments: res.data.moments });
+    });
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleRecalculate}
+        disabled={pending}
+      >
+        <RefreshCw className={`mr-1.5 size-3.5 ${pending ? "animate-spin" : ""}`} />
+        {pending ? t("recalculating") : t("recalculateScores")}
+      </Button>
+      {result && !pending && (
+        <span className="text-xs text-muted-foreground">
+          {t("recalculateDone", { circles: result.circles, moments: result.moments })}
+        </span>
+      )}
+    </div>
+  );
+}
 
 // ── Toggle exclu ──────────────────────────────────────────────────────────────
 

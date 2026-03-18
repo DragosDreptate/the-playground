@@ -611,6 +611,9 @@
     },
     "explorer": {
       "title": "Visibilité Explorer",
+      "recalculateScores": "Recalculer les scores",
+      "recalculating": "Recalcul en cours…",
+      "recalculateDone": "{circles} communautés et {moments} événements mis à jour",
       "lastUpdated": "maj {date}",
       "filter": {
         "all": "Toutes",
