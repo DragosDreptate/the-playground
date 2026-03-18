@@ -24,39 +24,72 @@ export async function recalculateAllScores(): Promise<RecalculateAllScoresResult
   const startedAt = Date.now();
   const now = new Date();
 
-  // 1. Recalcul des scores Communautés
-  const circles = await prisma.circle.findMany({
-    where: {
-      excludedFromExplorer: false,
-      NOT: excludeTestHostFilter(),
-    },
-    select: {
-      id: true,
-      description: true,
-      coverImage: true,
-      category: true,
-      createdAt: true,
-      isDemo: true,
-      overrideScore: true,
-      _count: {
-        select: {
-          memberships: { where: { role: "PLAYER" } },
-        },
+  // Fetch circles et moments en parallèle — les scores moments dépendent des scores circles,
+  // mais les deux queries DB sont indépendantes et peuvent s'exécuter simultanément.
+  const [circles, moments] = await Promise.all([
+    prisma.circle.findMany({
+      where: {
+        excludedFromExplorer: false,
+        NOT: excludeTestHostFilter(),
       },
-      moments: {
-        select: {
-          status: true,
-          startsAt: true,
-          _count: {
-            select: {
-              registrations: { where: { status: "REGISTERED" } },
+      select: {
+        id: true,
+        description: true,
+        coverImage: true,
+        category: true,
+        createdAt: true,
+        isDemo: true,
+        overrideScore: true,
+        _count: {
+          select: {
+            memberships: { where: { role: "PLAYER" } },
+          },
+        },
+        moments: {
+          select: {
+            status: true,
+            startsAt: true,
+            _count: {
+              select: {
+                registrations: { where: { status: "REGISTERED" } },
+              },
             },
           },
         },
       },
-    },
-  });
+    }),
+    prisma.moment.findMany({
+      where: {
+        status: "PUBLISHED",
+        startsAt: { gte: now },
+        circle: {
+          visibility: "PUBLIC",
+          excludedFromExplorer: false,
+          NOT: excludeTestHostFilter(),
+        },
+      },
+      select: {
+        id: true,
+        description: true,
+        coverImage: true,
+        locationName: true,
+        circle: {
+          select: {
+            id: true,
+            explorerScore: true,
+            isDemo: true,
+          },
+        },
+        _count: {
+          select: {
+            registrations: { where: { status: "REGISTERED" } },
+          },
+        },
+      },
+    }),
+  ]);
 
+  // 1. Calcul et persistance des scores Communautés
   const circleScoreMap = new Map<string, number>();
 
   await prisma.$transaction(
@@ -92,37 +125,7 @@ export async function recalculateAllScores(): Promise<RecalculateAllScoresResult
     })
   );
 
-  // 2. Recalcul des scores événements
-  const moments = await prisma.moment.findMany({
-    where: {
-      status: "PUBLISHED",
-      startsAt: { gte: now },
-      circle: {
-        visibility: "PUBLIC",
-        excludedFromExplorer: false,
-        NOT: excludeTestHostFilter(),
-      },
-    },
-    select: {
-      id: true,
-      description: true,
-      coverImage: true,
-      locationName: true,
-      circle: {
-        select: {
-          id: true,
-          explorerScore: true,
-          isDemo: true,
-        },
-      },
-      _count: {
-        select: {
-          registrations: { where: { status: "REGISTERED" } },
-        },
-      },
-    },
-  });
-
+  // 2. Calcul et persistance des scores événements (utilise circleScoreMap calculé à l'étape 1)
   await prisma.$transaction(
     moments.map((moment) => {
       const circleScore =

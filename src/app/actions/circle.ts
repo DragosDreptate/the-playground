@@ -91,7 +91,7 @@ export async function createCircleAction(
           description: result.circle.description,
           coverImage: result.circle.coverImage ?? null,
           category: result.circle.category ?? null,
-          createdAt: new Date(),
+          createdAt: result.circle.createdAt,
           isDemo: false,
           overrideScore: null,
           memberCount: 0,
