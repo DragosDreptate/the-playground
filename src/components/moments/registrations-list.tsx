@@ -8,6 +8,7 @@ import { Clock, Crown, Download, UserMinus } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { Link } from "@/i18n/navigation";
 import { getDisplayName } from "@/lib/display-name";
+import { generateSlug } from "@/lib/slug";
 import { RemoveRegistrationDialog } from "@/components/moments/remove-registration-dialog";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
@@ -46,12 +47,9 @@ export function RegistrationsList({
   const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
 
   function handleExportCsv() {
-    const eventDate = momentStartsAt ? new Date(momentStartsAt).toLocaleDateString() : "";
-    const metaRow = [
-      momentTitle ?? "",
-      eventDate,
-      "", "", "", "", "",
-    ];
+    const momentDate = momentStartsAt ? new Date(momentStartsAt) : null;
+    const eventDate = momentDate ? momentDate.toLocaleDateString() : "";
+    const title = momentTitle ?? "";
     const headers = [
       t("registrations.csvHeaders.eventName"),
       t("registrations.csvHeaders.eventDate"),
@@ -61,8 +59,9 @@ export function RegistrationsList({
       t("registrations.csvHeaders.status"),
       t("registrations.csvHeaders.registeredAt"),
     ];
+    const metaRow = [title, eventDate, ...Array(headers.length - 2).fill("")];
     const rows = registrations.map((r) => [
-      momentTitle ?? "",
+      title,
       eventDate,
       r.user.firstName ?? "",
       r.user.lastName ?? "",
@@ -77,12 +76,8 @@ export function RegistrationsList({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    const dateStr = momentStartsAt
-      ? new Date(momentStartsAt).toISOString().slice(0, 10)
-      : "export";
-    const titleSlug = momentTitle
-      ? momentTitle.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50)
-      : (momentSlug ?? "export");
+    const dateStr = momentDate ? momentDate.toISOString().slice(0, 10) : "export";
+    const titleSlug = title ? generateSlug(title).slice(0, 50) : (momentSlug ?? "export");
     a.download = `participants-${titleSlug}-${dateStr}.csv`;
     a.click();
     URL.revokeObjectURL(url);
