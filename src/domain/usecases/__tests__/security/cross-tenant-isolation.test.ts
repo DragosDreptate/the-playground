@@ -746,6 +746,7 @@ function makeDashboardCircleForSecurity(
   return {
     ...makeCircle(),
     memberRole: "HOST",
+    membershipStatus: "ACTIVE",
     memberCount: 1,
     upcomingMomentCount: 0,
     nextMoment: null,

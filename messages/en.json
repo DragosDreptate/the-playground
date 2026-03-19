@@ -604,7 +604,8 @@
       "nextMoment": "Next Event",
       "roleBadge": {
         "host": "Organizer",
-        "member": "Member"
+        "member": "Member",
+        "pending": "Pending approval"
       },
       "demo": "Demo"
     },

@@ -64,6 +64,7 @@ export type CircleMemberWithUser = CircleMembership & {
 };
 
 export type DashboardCircle = CircleWithRole & {
+  membershipStatus: MembershipStatus;
   memberCount: number;
   upcomingMomentCount: number;
   nextMoment: { title: string; startsAt: Date } | null;

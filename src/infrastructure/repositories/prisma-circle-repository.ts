@@ -223,6 +223,7 @@ export const prismaCircleRepository: CircleRepository = {
     type Row = {
       membershipId: string;
       role: CircleMemberRole;
+      membershipStatus: MembershipStatus;
       joinedAt: Date;
       id: string;
       slug: string;
@@ -250,6 +251,7 @@ export const prismaCircleRepository: CircleRepository = {
       SELECT
         cm.id                     AS "membershipId",
         cm.role                   AS "role",
+        cm.status                 AS "membershipStatus",
         cm."joinedAt"             AS "joinedAt",
         c.id                      AS "id",
         c.slug                    AS "slug",
@@ -282,7 +284,7 @@ export const prismaCircleRepository: CircleRepository = {
         ) x) AS "nextMoment"
       FROM circle_memberships cm
       JOIN circles c ON c.id = cm."circleId"
-      WHERE cm."userId" = ${userId} AND cm.status = 'ACTIVE'
+      WHERE cm."userId" = ${userId} AND cm.status IN ('ACTIVE', 'PENDING')
       ORDER BY cm."joinedAt" DESC
     `;
 
@@ -305,6 +307,7 @@ export const prismaCircleRepository: CircleRepository = {
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       memberRole: row.role,
+      membershipStatus: row.membershipStatus,
       memberCount: row.memberCount,
       upcomingMomentCount: row.upcomingMomentCount,
       nextMoment: row.nextMoment

@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
+import { Users, CalendarIcon, MapPin, Crown, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
@@ -30,7 +30,7 @@ export async function DashboardCircleCard({ circle }: Props) {
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
   return (
-    <Link href={`/dashboard/circles/${circle.slug}`} className="group block min-w-0">
+    <Link href={circle.membershipStatus === "PENDING" ? `/circles/${circle.slug}` : `/dashboard/circles/${circle.slug}`} className="group block min-w-0">
       <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-3 sm:gap-4">
 
@@ -56,11 +56,18 @@ export async function DashboardCircleCard({ circle }: Props) {
             {/* Badges — catégorie + rôle */}
             <div className="flex items-center gap-2">
               {categoryLabel && <CategoryBadge label={categoryLabel} />}
-              <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                {circle.memberRole === "HOST"
-                  ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
-                  : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
-              </Badge>
+              {circle.membershipStatus === "PENDING" ? (
+                <Badge variant="secondary" className="shrink-0 gap-1 text-xs text-amber-600">
+                  <Clock className="size-3" />
+                  {t("circleCard.roleBadge.pending")}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                  {circle.memberRole === "HOST"
+                    ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
+                    : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
+                </Badge>
+              )}
             </div>
             {/* Titre — pleine largeur */}
             <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
