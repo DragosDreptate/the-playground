@@ -64,7 +64,9 @@
     "showMore": "Show more",
     "showLess": "Show less",
     "you": "You",
-    "demo": "Demo"
+    "demo": "Demo",
+    "copyLink": "Copy link",
+    "copied": "Copied!"
   },
   "Auth": {
     "signIn": {
@@ -291,7 +293,42 @@
       "alreadyMember": "You are already a member",
       "invalidToken": "This invite link is no longer valid",
       "joined": "Welcome to the Community!",
-      "viewCircle": "View Community"
+      "viewCircle": "View Community",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "emailAddMore": "Add an address",
+      "emailMaxReached": "Maximum {max} addresses per send."
+    },
+    "leave": {
+      "triggerButton": "Leave Community",
+      "title": "Leave {circleName}?",
+      "description": "You will leave this Community and will no longer be listed as a member. Your registrations for upcoming events will be cancelled and spots released to people on the waitlist.",
+      "cancel": "Cancel",
+      "confirm": "Leave Community",
+      "pending": "Leaving…"
+    },
+    "coverPicker": {
+      "ariaModify": "Edit cover image",
+      "modifyButton": "Edit cover",
+      "dialogTitle": "Cover image",
+      "tabPhotos": "Photos",
+      "tabUpload": "Upload",
+      "photoAlt": "Photo by {name}",
+      "noResults": "No results for \"{query}\"",
+      "resultCount": "{count, plural, one {# result} other {# results}}",
+      "unsplashHint": "Unsplash photos · type to search",
+      "prev": "← Previous",
+      "next": "Next →",
+      "previewAlt": "Preview",
+      "ariaRemovePreview": "Remove preview",
+      "uploadCta": "Click to upload",
+      "uploadHint": "JPG, PNG or WebP · max 5 MB",
+      "uploadTooLarge": "File too large (max {max} MB)",
+      "uploadInvalidFormat": "Unsupported format (JPG, PNG or WebP only)",
+      "changeImage": "Change image",
+      "removeCover": "Remove cover",
+      "cancel": "Cancel",
+      "apply": "Apply"
     }
   },
   "Moment": {
@@ -361,7 +398,12 @@
       "close": "Close",
       "cityLabel": "in {city}",
       "badgeNew": "NEW",
-      "analyzeShort": "Analyze"
+      "analyzeShort": "Analyze",
+      "cityConnector": " near ",
+      "dateConnector": " around ",
+      "eventCount": "{count, plural, one {# event} other {# events}}",
+      "otherCount": "{count, plural, one {# other} other {# others}}",
+      "totalFound": "{count, plural, one {# event found} other {# events found}}"
     },
     "delete": {
       "title": "Delete Event",
@@ -1274,6 +1316,13 @@
     "successDescription": "Thank you for your message. We will reply personally within 24h.",
     "notePrefix": "No account needed. For frequently asked questions, check our",
     "noteHelpLink": "Help page",
-    "noteSuffix": "."
+    "noteSuffix": ".",
+    "errorMissingFields": "Required fields are missing",
+    "errorInvalidEmail": "Invalid email address",
+    "errorSendFailed": "Failed to send message"
+  },
+  "About": {
+    "pageTitle": "About · The Playground",
+    "pageDescription": "The story of The Playground — why, how, and what's next."
   }
 }

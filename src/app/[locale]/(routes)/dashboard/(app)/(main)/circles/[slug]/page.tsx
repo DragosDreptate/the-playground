@@ -422,8 +422,8 @@ export default async function CircleDetailPage({
                 linkGenerate: t("invite.linkGenerate"),
                 linkRevoke: t("invite.linkRevoke"),
                 linkRevoked: t("invite.linkRevoked"),
-                copyLink: "Copier le lien",
-                copied: "Copié !",
+                copyLink: t("invite.copyLink"),
+                copied: t("invite.copied"),
               }}
             />
           )}

@@ -64,7 +64,9 @@
     "showMore": "Voir plus",
     "showLess": "Voir moins",
     "you": "Vous",
-    "demo": "Démo"
+    "demo": "Démo",
+    "copyLink": "Copier le lien",
+    "copied": "Copié !"
   },
   "Auth": {
     "signIn": {
@@ -291,7 +293,42 @@
       "alreadyMember": "Vous êtes déjà membre",
       "invalidToken": "Ce lien d'invitation n'est plus valide",
       "joined": "Bienvenue dans la Communauté !",
-      "viewCircle": "Voir la Communauté"
+      "viewCircle": "Voir la Communauté",
+      "copyLink": "Copier le lien",
+      "copied": "Copié !",
+      "emailAddMore": "Ajouter une adresse",
+      "emailMaxReached": "Maximum {max} adresses par envoi."
+    },
+    "leave": {
+      "triggerButton": "Quitter la Communauté",
+      "title": "Quitter {circleName} ?",
+      "description": "Tu vas quitter cette Communauté et ne seras plus listé comme membre. Tes inscriptions aux prochains événements seront annulées et les places libérées pour les personnes en liste d'attente.",
+      "cancel": "Annuler",
+      "confirm": "Quitter la Communauté",
+      "pending": "En cours…"
+    },
+    "coverPicker": {
+      "ariaModify": "Modifier l'image de couverture",
+      "modifyButton": "Modifier la couverture",
+      "dialogTitle": "Image de couverture",
+      "tabPhotos": "Photos",
+      "tabUpload": "Importer",
+      "photoAlt": "Photo par {name}",
+      "noResults": "Aucun résultat pour « {query} »",
+      "resultCount": "{count, plural, one {# résultat} other {# résultats}}",
+      "unsplashHint": "Photos Unsplash · tapez pour chercher",
+      "prev": "← Précédent",
+      "next": "Suivant →",
+      "previewAlt": "Aperçu",
+      "ariaRemovePreview": "Supprimer l'aperçu",
+      "uploadCta": "Cliquez pour importer",
+      "uploadHint": "JPG, PNG ou WebP · max 5 Mo",
+      "uploadTooLarge": "Fichier trop volumineux (max {max} Mo)",
+      "uploadInvalidFormat": "Format non supporté (JPG, PNG ou WebP uniquement)",
+      "changeImage": "Changer d'image",
+      "removeCover": "Supprimer la couverture",
+      "cancel": "Annuler",
+      "apply": "Appliquer"
     }
   },
   "Moment": {
@@ -361,7 +398,12 @@
       "close": "Fermer",
       "cityLabel": "dans {city}",
       "badgeNew": "NOUVEAU",
-      "analyzeShort": "Analyser"
+      "analyzeShort": "Analyser",
+      "cityConnector": " à ",
+      "dateConnector": " autour du ",
+      "eventCount": "{count, plural, one {# événement} other {# événements}}",
+      "otherCount": "{count, plural, one {# autre} other {# autres}}",
+      "totalFound": "{count, plural, one {# événement trouvé} other {# événements trouvés}}"
     },
     "delete": {
       "title": "Supprimer l'événement",
@@ -1274,6 +1316,13 @@
     "successDescription": "Merci pour votre message. On vous répond personnellement sous 24h.",
     "notePrefix": "Pas de compte nécessaire. Pour les questions fréquentes, consultez la",
     "noteHelpLink": "page Aide",
-    "noteSuffix": "."
+    "noteSuffix": ".",
+    "errorMissingFields": "Champs requis manquants",
+    "errorInvalidEmail": "Email invalide",
+    "errorSendFailed": "Erreur d'envoi"
+  },
+  "About": {
+    "pageTitle": "À propos · The Playground",
+    "pageDescription": "L'histoire de The Playground — pourquoi, comment, et ce qui vient."
   }
 }

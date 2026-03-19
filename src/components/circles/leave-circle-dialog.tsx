@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import {
   AlertDialog,
@@ -23,6 +24,7 @@ type LeaveCircleDialogProps = {
 };
 
 export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogProps) {
+  const t = useTranslations("Circle.leave");
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,17 +52,13 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
           className="w-full gap-2 border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary"
         >
           <LogOut className="size-3.5" />
-          Quitter la Communauté
+          {t("triggerButton")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Quitter {circleName} ?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Tu vas quitter cette Communauté et ne seras plus listé comme membre.
-            Tes inscriptions aux prochains événements seront annulées et les places
-            libérées pour les personnes en liste d&apos;attente.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{t("title", { circleName })}</AlertDialogTitle>
+          <AlertDialogDescription>{t("description")}</AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
@@ -68,13 +66,13 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleLeave}
             disabled={isPending}
             className="bg-destructive text-white hover:bg-destructive/90"
           >
-            {isPending ? "En cours…" : "Quitter la Communauté"}
+            {isPending ? t("pending") : t("confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

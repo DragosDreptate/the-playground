@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Link as NextIntlLink } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +45,7 @@ function isValidEmail(email: string): boolean {
 }
 
 export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
+  const tInvite = useTranslations("Circle.invite");
   const router = useRouter();
 
   // ── Email state ──
@@ -162,7 +164,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               <div key={idx} className="flex items-center gap-2">
                 <Input
                   type="email"
-                  placeholder={idx === 0 ? t.emailPlaceholder : "Ajouter un email…"}
+                  placeholder={idx === 0 ? t.emailPlaceholder : tInvite("emailAddMore")}
                   value={field}
                   onChange={(e) => handleEmailChange(idx, e.target.value)}
                   className="h-8 flex-1 text-sm"
@@ -191,11 +193,11 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               className="text-primary mb-3 inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80"
             >
               <Plus className="size-3" />
-              Ajouter une adresse
+              {tInvite("emailAddMore")}
             </button>
           ) : (
             <p className="text-muted-foreground mb-3 text-xs">
-              Maximum {MAX_EMAIL_FIELDS} adresses par envoi.
+              {tInvite("emailMaxReached", { max: MAX_EMAIL_FIELDS })}
             </p>
           )}
 
@@ -273,6 +275,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
 }
 
 function InlineCopyButton({ value }: { value: string }) {
+  const t = useTranslations("Circle.invite");
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -294,7 +297,7 @@ function InlineCopyButton({ value }: { value: string }) {
       ) : (
         <Copy className="size-3.5" />
       )}
-      {copied ? "Copié !" : "Copier le lien"}
+      {copied ? t("copied") : t("copyLink")}
     </Button>
   );
 }

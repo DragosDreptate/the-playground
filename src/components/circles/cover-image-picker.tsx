@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Camera, Search, Upload, Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ function PhotoGrid({
   selectedId: string | null;
   onSelect: (photo: UnsplashPhoto) => void;
 }) {
+  const t = useTranslations("Circle.coverPicker");
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       {photos.map((photo) => {
@@ -59,7 +61,7 @@ function PhotoGrid({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.thumbUrl}
-              alt={`Photo par ${photo.author.name}`}
+              alt={t("photoAlt", { name: photo.author.name })}
               className="size-full object-cover"
               loading="lazy"
             />
@@ -85,6 +87,7 @@ export function CoverImagePicker({
   currentAttribution,
   onSelect,
 }: Props) {
+  const t = useTranslations("Circle.coverPicker");
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<CoverSelection | null>(null);
 
@@ -184,12 +187,12 @@ export function CoverImagePicker({
 
     const MAX_MB = 5;
     if (file.size > MAX_MB * 1024 * 1024) {
-      setUploadError(`Fichier trop volumineux (max ${MAX_MB} Mo)`);
+      setUploadError(t("uploadTooLarge", { max: MAX_MB }));
       return;
     }
     const allowed = ["image/jpeg", "image/png", "image/webp"];
     if (!allowed.includes(file.type)) {
-      setUploadError("Format non supporté (JPG, PNG ou WebP uniquement)");
+      setUploadError(t("uploadInvalidFormat"));
       return;
     }
 
@@ -265,7 +268,7 @@ export function CoverImagePicker({
         onClick={() => handleOpenChange(true)}
         className="group relative w-full cursor-pointer overflow-hidden rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         style={{ aspectRatio: "1 / 1" }}
-        aria-label="Modifier l'image de couverture"
+        aria-label={t("ariaModify")}
       >
         {previewImage ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -282,7 +285,7 @@ export function CoverImagePicker({
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
           <div className="flex translate-y-1 items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-black opacity-0 shadow transition-all group-hover:translate-y-0 group-hover:opacity-100">
             <Camera className="size-4" />
-            Modifier la couverture
+            {t("modifyButton")}
           </div>
         </div>
       </button>
@@ -296,16 +299,16 @@ export function CoverImagePicker({
           "sm:top-[50%] sm:left-[50%] sm:w-full sm:h-auto sm:max-h-[90vh] sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:overflow-hidden",
         ].join(" ")}>
           <DialogHeader>
-            <DialogTitle>Image de couverture</DialogTitle>
+            <DialogTitle>{t("dialogTitle")}</DialogTitle>
           </DialogHeader>
 
           <Tabs defaultValue="photos">
             <TabsList className="w-full">
               <TabsTrigger value="photos" className="flex-1">
-                Photos
+                {t("tabPhotos")}
               </TabsTrigger>
               <TabsTrigger value="upload" className="flex-1">
-                Importer
+                {t("tabUpload")}
               </TabsTrigger>
             </TabsList>
 
@@ -328,7 +331,7 @@ export function CoverImagePicker({
               {/* Résultats, skeleton ou photos par défaut */}
               {searchResults !== null && searchResults.length === 0 ? (
                 <p className="text-muted-foreground py-8 text-center text-sm">
-                  Aucun résultat pour « {query} »
+                  {t("noResults", { query })}
                 </p>
               ) : isLoadingDefaults && searchResults === null ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -343,7 +346,7 @@ export function CoverImagePicker({
                 <>
                   {searchResults !== null && (
                     <p className="text-muted-foreground text-xs">
-                      {searchTotal} résultat{searchTotal !== 1 ? "s" : ""}
+                      {t("resultCount", { count: searchTotal })}
                     </p>
                   )}
                   <PhotoGrid
@@ -353,7 +356,7 @@ export function CoverImagePicker({
                   />
                   {searchResults === null && (
                     <p className="text-muted-foreground text-xs">
-                      Photos Unsplash · tapez pour chercher
+                      {t("unsplashHint")}
                     </p>
                   )}
                   {searchResults !== null && searchTotalPages > 1 && (
@@ -365,7 +368,7 @@ export function CoverImagePicker({
                         onClick={() => handleGoToPage(searchPage - 1)}
                         disabled={searchPage <= 1 || isLoadingMore}
                       >
-                        ← Précédent
+                        {t("prev")}
                       </Button>
                       <span className="text-muted-foreground text-xs">
                         {isLoadingMore ? (
@@ -381,7 +384,7 @@ export function CoverImagePicker({
                         onClick={() => handleGoToPage(searchPage + 1)}
                         disabled={searchPage >= searchTotalPages || isLoadingMore}
                       >
-                        Suivant →
+                        {t("next")}
                       </Button>
                     </div>
                   )}
@@ -404,7 +407,7 @@ export function CoverImagePicker({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadPreview}
-                    alt="Aperçu"
+                    alt={t("previewAlt")}
                     className="w-full rounded-xl object-cover"
                     style={{ maxHeight: 200 }}
                   />
@@ -416,7 +419,7 @@ export function CoverImagePicker({
                       setPending(null);
                     }}
                     className="absolute right-2 top-2 cursor-pointer rounded-full bg-black/60 p-1 text-white"
-                    aria-label="Supprimer l'aperçu"
+                    aria-label={t("ariaRemovePreview")}
                   >
                     <X className="size-3.5" />
                   </button>
@@ -429,8 +432,8 @@ export function CoverImagePicker({
                 >
                   <Upload className="text-muted-foreground size-8" />
                   <div className="space-y-1 text-center">
-                    <p className="text-sm font-medium">Cliquez pour importer</p>
-                    <p className="text-muted-foreground text-xs">JPG, PNG ou WebP · max 5 Mo</p>
+                    <p className="text-sm font-medium">{t("uploadCta")}</p>
+                    <p className="text-muted-foreground text-xs">{t("uploadHint")}</p>
                   </div>
                 </button>
               )}
@@ -442,7 +445,7 @@ export function CoverImagePicker({
                   onClick={() => fileInputRef.current?.click()}
                   className="w-full"
                 >
-                  Changer d'image
+                  {t("changeImage")}
                 </Button>
               )}
 
@@ -461,7 +464,7 @@ export function CoverImagePicker({
                 onClick={handleRemove}
                 className="text-muted-foreground"
               >
-                Supprimer la couverture
+                {t("removeCover")}
               </Button>
             )}
             <div className="flex gap-2 ml-auto">
@@ -470,14 +473,14 @@ export function CoverImagePicker({
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
               >
-                Annuler
+                {t("cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={handleApply}
                 disabled={!pending}
               >
-                Appliquer
+                {t("apply")}
               </Button>
             </div>
           </DialogFooter>
