@@ -20,12 +20,12 @@ export async function sendContactMessageAction(
   const message = (formData.get("message") as string | null)?.trim() ?? "";
 
   if (!name || !email || !message) {
-    return { success: false, error: "Champs requis manquants", code: "VALIDATION_ERROR" };
+    return { success: false, error: "MISSING_FIELDS", code: "VALIDATION_ERROR" };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { success: false, error: "Email invalide", code: "INVALID_EMAIL" };
+    return { success: false, error: "INVALID_EMAIL", code: "INVALID_EMAIL" };
   }
 
   const resend = new Resend(process.env.AUTH_RESEND_KEY ?? "re_not_configured");
@@ -49,7 +49,7 @@ export async function sendContactMessageAction(
     console.log("[contact] Email envoyé, id:", data?.id);
   } catch (err) {
     console.error("[contact] Exception Resend:", err);
-    return { success: false, error: "Erreur d'envoi", code: "SEND_ERROR" };
+    return { success: false, error: "SEND_ERROR", code: "SEND_ERROR" };
   }
 
   return { success: true, data: undefined };

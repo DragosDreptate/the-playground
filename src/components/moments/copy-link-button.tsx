@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Copy, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 type CopyLinkButtonProps = {
@@ -9,6 +10,7 @@ type CopyLinkButtonProps = {
 };
 
 export function CopyLinkButton({ value }: CopyLinkButtonProps) {
+  const t = useTranslations("Common");
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
@@ -30,7 +32,7 @@ export function CopyLinkButton({ value }: CopyLinkButtonProps) {
       ) : (
         <Copy className="size-3.5" />
       )}
-      {copied ? "Copié !" : "Copier le lien"}
+      {copied ? t("copied") : t("copyLink")}
     </Button>
   );
 }

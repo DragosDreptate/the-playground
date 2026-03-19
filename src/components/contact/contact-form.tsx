@@ -23,10 +23,17 @@ export function ContactForm() {
     { value: "Other", label: t("subjectOther") },
   ];
 
+  const errorKeys: Record<string, string> = {
+    MISSING_FIELDS: t("errorMissingFields"),
+    INVALID_EMAIL: t("errorInvalidEmail"),
+    SEND_ERROR: t("errorSendFailed"),
+  };
+
   async function handleSubmit(_prev: FormState, formData: FormData): Promise<FormState> {
     const result = await sendContactMessageAction(formData);
     if (result.success) return { success: true };
-    return { success: false, error: result.error };
+    const message = errorKeys[result.error] ?? t("errorSendFailed");
+    return { success: false, error: message };
   }
 
   const [state, formAction, pending] = useActionState(handleSubmit, null);

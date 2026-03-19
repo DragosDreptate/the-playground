@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { CheckIcon, Github, Star } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("About");
   return {
-    title: "À propos · The Playground",
-    description:
-      "L'histoire de The Playground — pourquoi, comment, et ce qui vient.",
+    title: t("pageTitle"),
+    description: t("pageDescription"),
     openGraph: {
-      title: "À propos · The Playground",
-      description:
-        "L'histoire de The Playground — pourquoi, comment, et ce qui vient.",
+      title: t("pageTitle"),
+      description: t("pageDescription"),
     },
   };
 }

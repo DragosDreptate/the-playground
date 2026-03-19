@@ -381,10 +381,10 @@ export function MomentFormRadar({
               <>
                 {t("hint")}
                 {lastCity && (
-                  <> à <strong className="text-foreground">{lastCity}</strong></>
+                  <>{t("cityConnector")}<strong className="text-foreground">{lastCity}</strong></>
                 )}
                 {startsAt && (
-                  <> autour du <strong className="text-foreground">{formatShortDate(startsAt, locale)}</strong></>
+                  <>{t("dateConnector")}<strong className="text-foreground">{formatShortDate(startsAt, locale)}</strong></>
                 )}
                 {lastKeywords.length > 0 && (
                   <> — {lastKeywords.join(", ")}</>
@@ -519,7 +519,7 @@ export function MomentFormRadar({
                   <SectionHeader
                     label={`${t("conflictsSection")} — ${formatDayFull(targetDate, locale)}`}
                     count={dayEvents.length}
-                    countLabel={`${dayEvents.length} événement${dayEvents.length > 1 ? "s" : ""}`}
+                    countLabel={t("eventCount", { count: dayEvents.length })}
                     dotColor="red"
                   />
                   {dayEvents.length > 0 ? (
@@ -538,7 +538,7 @@ export function MomentFormRadar({
                   <SectionHeader
                     label={`${t("weekSection")} — ${formatWeekRange(weekFrom, weekTo, locale)}`}
                     count={weekEvents.length}
-                    countLabel={`${weekEvents.length} autre${weekEvents.length > 1 ? "s" : ""}`}
+                    countLabel={t("otherCount", { count: weekEvents.length })}
                     dotColor="orange"
                   />
                   {weekEvents.length > 0 ? (
@@ -561,8 +561,10 @@ export function MomentFormRadar({
               {events !== null && !noCity && !loading && (
                 <>
                   <Search className="size-3.5" />
-                  <strong className="text-foreground font-semibold">{events.length}</strong>
-                  {" "}événement{events.length > 1 ? "s" : ""} trouvé{events.length > 1 ? "s" : ""}
+                  {t.rich("totalFound", {
+                    count: events.length,
+                    bold: (chunks) => <strong className="text-foreground font-semibold">{chunks}</strong>,
+                  })}
                 </>
               )}
             </span>

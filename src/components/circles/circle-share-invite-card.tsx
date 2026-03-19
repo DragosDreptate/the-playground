@@ -32,8 +32,8 @@ type Props = {
     linkGenerate: string;
     linkRevoke: string;
     linkRevoked: string;
-    copyLink: string;
-    copied: string;
+    emailAddMore: string;
+    emailMaxReached: string;
   };
 };
 
@@ -162,7 +162,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               <div key={idx} className="flex items-center gap-2">
                 <Input
                   type="email"
-                  placeholder={idx === 0 ? t.emailPlaceholder : "Ajouter un email…"}
+                  placeholder={idx === 0 ? t.emailPlaceholder : t.emailAddMore}
                   value={field}
                   onChange={(e) => handleEmailChange(idx, e.target.value)}
                   className="h-8 flex-1 text-sm"
@@ -191,11 +191,11 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               className="text-primary mb-3 inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80"
             >
               <Plus className="size-3" />
-              Ajouter une adresse
+              {t.emailAddMore}
             </button>
           ) : (
             <p className="text-muted-foreground mb-3 text-xs">
-              Maximum {MAX_EMAIL_FIELDS} adresses par envoi.
+              {t.emailMaxReached}
             </p>
           )}
 
@@ -243,7 +243,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
                 <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
                   {inviteUrl.replace(/^https?:\/\//, "")}
                 </div>
-                <InlineCopyButton value={inviteUrl} />
+                <CopyLinkButton value={inviteUrl} />
               </div>
               <button
                 type="button"
@@ -269,32 +269,5 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
         </div>
       </div>
     </div>
-  );
-}
-
-function InlineCopyButton({ value }: { value: string }) {
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      className="h-8 shrink-0 gap-1.5 px-3"
-      onClick={handleCopy}
-    >
-      {copied ? (
-        <Check className="size-3.5 text-green-500" />
-      ) : (
-        <Copy className="size-3.5" />
-      )}
-      {copied ? "Copié !" : "Copier le lien"}
-    </Button>
   );
 }
