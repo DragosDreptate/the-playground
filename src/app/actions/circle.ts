@@ -161,8 +161,7 @@ export async function updateCircleAction(
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
   const customCategoryRaw = formData.get("customCategory") as string | null;
-  const requiresApprovalRaw = formData.get("requiresApproval");
-  const requiresApprovalUpdate = requiresApprovalRaw !== null ? requiresApprovalRaw === "on" : undefined;
+  const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
@@ -201,7 +200,7 @@ export async function updateCircleAction(
         ...(customCategory !== undefined && { customCategory }),
         city,
         ...coverData,
-        ...(requiresApprovalUpdate !== undefined && { requiresApproval: requiresApprovalUpdate }),
+        requiresApproval: requiresApprovalUpdate,
       },
       { circleRepository: circleRepo }
     );

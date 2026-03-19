@@ -258,6 +258,7 @@
       "pastMoments": "Past Events",
       "noUpcomingMoments": "No upcoming Events.",
       "noPastMoments": "No past Events.",
+      "noPendingMemberships": "Approval enabled — no pending requests.",
       "today": "Today",
       "manageMoment": "Manage this Event",
       "join": "Join",
@@ -497,6 +498,7 @@
       "waitlisted": "{count} waitlisted",
       "capacity": "{count} capacity",
       "empty": "No one has joined yet.",
+      "noPendingApprovals": "Approval enabled — no pending requests.",
       "status": {
         "registered": "Joined",
         "waitlisted": "Waitlisted"

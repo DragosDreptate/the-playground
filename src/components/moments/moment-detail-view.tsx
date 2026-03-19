@@ -35,6 +35,7 @@ import {
   ChevronRight,
   Users,
   ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────
@@ -626,12 +627,19 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             )
           )}
 
-          {/* Demandes en attente — Host uniquement */}
-          {isHostView && props.variant === "host" && props.pendingRegistrations && props.pendingRegistrations.length > 0 && (
+          {/* Demandes en attente — Host uniquement si requiresApproval */}
+          {isHostView && props.variant === "host" && moment.requiresApproval && (
             <div className="border-border bg-card rounded-2xl border p-6">
-              <PendingRegistrationsList
-                pendingRegistrations={props.pendingRegistrations}
-              />
+              {props.pendingRegistrations && props.pendingRegistrations.length > 0 ? (
+                <PendingRegistrationsList
+                  pendingRegistrations={props.pendingRegistrations}
+                />
+              ) : (
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <ShieldCheck className="size-5 shrink-0" />
+                  <p className="text-sm">{t("registrations.noPendingApprovals")}</p>
+                </div>
+              )}
             </div>
           )}
 

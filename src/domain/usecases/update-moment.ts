@@ -25,6 +25,7 @@ type UpdateMomentInput = {
   price?: number;
   currency?: string;
   status?: MomentStatus;
+  requiresApproval?: boolean;
 };
 
 type UpdateMomentDeps = {
