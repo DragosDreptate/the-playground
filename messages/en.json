@@ -436,7 +436,7 @@
       "free": "Free",
       "spotsAvailable": "{count} spots",
       "registerFree": "Join",
-      "requestToJoin": "Request to join",
+      "requestToJoin": "Join (subject to approval)",
       "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
       "registered": "Joined",

@@ -436,7 +436,7 @@
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
       "registerFree": "S'inscrire",
-      "requestToJoin": "Faire une demande",
+      "requestToJoin": "S'inscrire (soumis à validation)",
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
       "registered": "Inscrit",

@@ -287,7 +287,7 @@ Logique additionnelle :
 ### Scénario 1 — Événement avec validation, Communauté sans
 
 ```
-Player → /m/[slug] → "Faire une demande"
+Player → /m/[slug] → "S'inscrire (soumis à validation)"
   → Registration: PENDING_APPROVAL
   → Circle: auto-join SKIPPED (en attente de l'approbation Moment)
   → Email Organisateur : "Nouvelle demande d'inscription"
@@ -322,7 +322,7 @@ Host Dashboard → onglet "En attente" sur la Communauté
 ### Scénario 3 — Les deux avec validation
 
 ```
-Player → /m/[slug] → "Faire une demande"
+Player → /m/[slug] → "S'inscrire (soumis à validation)"
   → Registration: PENDING_APPROVAL
   → Circle: auto-join SKIPPED (en attente)
   → Email Organisateur : "Nouvelle demande d'inscription"
@@ -341,7 +341,7 @@ Host approuve CircleMembership :
 ### Scénario 4 — Join Circle direct (page /circles/[slug])
 
 ```
-Player → /circles/[slug] → "Faire une demande"
+Player → /circles/[slug] → "S'inscrire (soumis à validation)"
   Si circle.requiresApproval = false :
     → CircleMembership: ACTIVE (comportement actuel)
     → Email Organisateur : "Nouveau membre"
@@ -403,7 +403,7 @@ Section "Options avancées" (masquées par défaut) :
 ### Page publique événement (`/m/[slug]`)
 
 Si `moment.requiresApproval = true` et Participant non-inscrit :
-- CTA : "Faire une demande" (au lieu de "S'inscrire")
+- CTA : "S'inscrire (soumis à validation)" (au lieu de "S'inscrire")
 - Sous le CTA : "L'Organisateur validera votre demande manuellement."
 
 Post-soumission (Registration = PENDING_APPROVAL) :
@@ -412,7 +412,7 @@ Post-soumission (Registration = PENDING_APPROVAL) :
 ### Page publique Communauté (`/circles/[slug]`)
 
 Si `circle.requiresApproval = true` et Participant non-membre :
-- CTA : "Faire une demande" (au lieu de "Rejoindre")
+- CTA : "S'inscrire (soumis à validation)" (au lieu de "Rejoindre")
 - Post-soumission : "Votre demande est en cours de validation par l'Organisateur."
 
 ### Page d'invite token (`/circles/join/[token]`)
@@ -535,8 +535,8 @@ Ajouter dans `messages/fr.json` et `messages/en.json` :
 | `registrations.status.rejected` | Refusée | Rejected |
 | `membership.status.pending` | En attente | Pending |
 | `membership.status.active` | Membre | Member |
-| `moment.requestToJoin` | Faire une demande | Request to join |
-| `circle.requestToJoin` | Faire une demande | Request to join |
+| `moment.requestToJoin` | S'inscrire (soumis à validation) | Request to join |
+| `circle.requestToJoin` | S'inscrire (soumis à validation) | Request to join |
 | `moment.pendingApproval` | Demande envoyée — en attente de validation | Request sent — pending approval |
 | `circle.pendingApproval` | Votre demande est en cours de validation | Your request is pending approval |
 
@@ -625,7 +625,7 @@ Le scénario "événement sans validation + Communauté avec validation" crée u
 
 - Le Participant est inscrit à l'événement mais n'apparaît pas comme membre de la Communauté
 - Il reçoit les notifications événement mais pas les notifications Communauté
-- Sur la page Communauté, il voit "Faire une demande" alors qu'il est déjà inscrit à un événement de cette Communauté
+- Sur la page Communauté, il voit "S'inscrire (soumis à validation)" alors qu'il est déjà inscrit à un événement de cette Communauté
 
 ### Risque FAIBLE — Schema Prisma
 
