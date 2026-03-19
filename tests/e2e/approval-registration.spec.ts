@@ -559,22 +559,24 @@ test.describe("Edge cases", () => {
     const cta = main.getByRole("button", { name: /soumis à validation|subject to approval/i });
     if (await cta.isVisible()) await cta.click();
 
-    // Reload to get server state
+    // Reload to get server state with PENDING_APPROVAL registration
     await navigateToMoment(page, SLUGS.MOMENT_WITH_APPROVAL);
 
-    // Try to find the comment form — it should either not exist or the submit should fail
+    // The comment form textarea should not be visible for a PENDING_APPROVAL user
+    // The server action blocks comments (D11), but the UI may also hide the form
     const commentInput = page.getByPlaceholder(/commentaire|comment/i);
-    if (await commentInput.isVisible()) {
+
+    // If visible, attempt to post — server should reject
+    if (await commentInput.isVisible({ timeout: 2000 }).catch(() => false)) {
       await commentInput.fill("Test comment from pending user");
       const publishButton = page.getByRole("button", { name: /publier|publish/i });
-      if (await publishButton.isVisible()) {
-        await publishButton.click();
-        // The comment should not appear (server blocks it)
-        await page.waitForTimeout(2000);
-        await expect(page.getByText("Test comment from pending user")).not.toBeVisible();
-      }
+      await publishButton.click();
+      // Wait for server response, then verify the comment was NOT posted
+      await page.waitForTimeout(3000);
+      await expect(page.getByText("Test comment from pending user")).not.toBeVisible();
     }
-    // If comment input is not visible at all, that's also correct (D11)
+    // If comment input is not visible, D11 is enforced at the UI level (also valid)
+
     await ctx.close();
   });
 });
@@ -600,17 +602,24 @@ test.describe("Creation forms — requiresApproval toggle", () => {
       await page.waitForLoadState("networkidle");
     }
 
-    // Toggle should be visible
-    await expect(page.getByText(/validation des inscriptions|membership approval|registration approval/i)).toBeVisible();
+    // Toggle label should be visible
+    await expect(page.getByText("Validation des inscriptions")).toBeVisible();
+    // Description should be visible
+    await expect(page.getByText(/approuvées manuellement|approved manually/i)).toBeVisible();
+    // Switch should be present
+    await expect(page.locator("#requiresApproval")).toBeVisible();
   });
 
   test("should display requiresApproval toggle in event creation form", async ({ page }) => {
-    // Navigate to create moment in the main circle
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
     await page.waitForLoadState("networkidle");
 
-    // Toggle should be visible
-    await expect(page.getByText(/validation des inscriptions|registration approval/i)).toBeVisible();
+    // Toggle label should be visible
+    await expect(page.getByText("Validation des inscriptions")).toBeVisible();
+    // Description should be visible
+    await expect(page.getByText(/approuvées manuellement|approved manually/i)).toBeVisible();
+    // Switch should be present
+    await expect(page.locator("#requiresApproval")).toBeVisible();
   });
 });
 

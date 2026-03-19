@@ -26,7 +26,7 @@ Certains Organisateurs souhaitent contrôler qui rejoint leur Communauté ou qui
 | D12 | Un Participant avec CircleMembership `PENDING` **ne reçoit pas** les notifications de nouveaux événements du Circle (broadcast). |
 | D13 | Si un événement est **annulé** (`CANCELLED`) ou devient **passé** (`PAST`), toutes les Registrations `PENDING_APPROVAL` sont auto-rejetées (`REJECTED`). |
 | D14 | `leaveCircle` avec membership `PENDING` = annuler sa demande. Même comportement que quitter en tant que membre actif. |
-| D15 | Le dashboard Participant affiche les demandes en attente (`PENDING_APPROVAL`) dans la timeline "upcoming", avec un badge distinctif (même pattern que `WAITLISTED`). Pas de section séparée. Badge : icône Hourglass + "En attente de validation". |
+| D15 | Le dashboard Participant affiche les demandes en attente (PENDING_APPROVAL) dans une section dédiée, distincte des inscriptions confirmées. |
 | D16 | Re-inscription après `REJECTED` : même mécanisme que la re-inscription après `CANCELLED` — la Registration existante est réactivée en `PENDING_APPROVAL` (pas de nouvelle ligne). |
 
 ---
@@ -535,8 +535,8 @@ Ajouter dans `messages/fr.json` et `messages/en.json` :
 | `registrations.status.rejected` | Refusée | Rejected |
 | `membership.status.pending` | En attente | Pending |
 | `membership.status.active` | Membre | Member |
-| `moment.requestToJoin` | S'inscrire (soumis à validation) | Request to join |
-| `circle.requestToJoin` | S'inscrire (soumis à validation) | Request to join |
+| `moment.requestToJoin` | S'inscrire (soumis à validation) | Join (subject to approval) |
+| `circle.joinRequiresApproval` | Rejoindre (soumis à validation) | Join (subject to approval) |
 | `moment.pendingApproval` | Demande envoyée — en attente de validation | Request sent — pending approval |
 | `circle.pendingApproval` | Votre demande est en cours de validation | Your request is pending approval |
 
@@ -652,14 +652,29 @@ Pour réduire le risque, l'implémentation doit se faire en **3 phases distincte
 1. Ajouter `MembershipStatus` enum + champ `status` sur `CircleMembership` (`@default(ACTIVE)`)
 2. Ajouter `requiresApproval` sur Circle et Moment (`@default(false)`)
 3. Ajouter `PENDING_APPROVAL` et `REJECTED` à `RegistrationStatus`
-4. **Auditer et mettre à jour** chaque méthode du `CircleRepository` :
+4. Mettre à jour le domain model `CircleMembership` (ajout du champ `status`)
+5. Mettre à jour le domain model `Circle` et `Moment` (ajout de `requiresApproval`)
+6. Mettre à jour tous les mappers Prisma ↔ domaine
+7. **Auditer et mettre à jour les 12 méthodes du \****`CircleRepository`** (liste exhaustive dans la section Infrastructure) :
   - `countMembers` → `WHERE status = ACTIVE`
   - `findMembersByRole` → `WHERE status = ACTIVE`
-  - `findMembership` → distinguer "a une membership" et "est membre actif"
-  - Toute autre query touchant les memberships
-5. Mettre à jour le domain model `CircleMembership` (ajout du champ `status`)
-6. Mettre à jour tous les mappers Prisma ↔ domaine
-7. **Tests de non-régression** : tous les tests existants doivent passer sans modification (le `@default(ACTIVE)` garantit le comportement identique)
+  - `findMemberCountsByCircleIds` → `WHERE status = ACTIVE`
+  - `findPlayersForNewMomentNotification` → `WHERE status = ACTIVE`
+  - `findByUserId` → `WHERE status = ACTIVE`
+  - `findAllByUserId` → `WHERE status = ACTIVE`
+  - `findAllByUserIdWithStats` → `WHERE status = ACTIVE`
+  - `getPublicCirclesForUser` → `WHERE status = ACTIVE`
+  - `findMembership` → retourner avec `status`, pas de filtre (les appelants vérifient)
+  - `createWithHostMembership` → inchangé (HOST = ACTIVE)
+8. **Mettre à jour le \****`PrismaAdminRepository`** :
+  - `findAllCircles()` → `_count.memberships` avec `WHERE status = ACTIVE`
+  - `getMembersInsight()` → `WHERE status = ACTIVE`
+9. **Mettre à jour \****`getPublicCircles()`** (Explorer) : `_count.memberships` avec `WHERE status = ACTIVE`
+10. **Mettre à jour \****`recalculate-circle-score.ts`** : ajouter `status: "ACTIVE"` au filtre existant
+11. **Mettre à jour \****`get-user-registration.ts`** : ajouter `REJECTED` aux statuts "pas inscrit"
+12. **Ajouter les clés i18n** pour les nouveaux statuts
+13. **Mettre à jour les mocks de test** (`mock-circle-repository.ts`) pour inclure le champ `status`
+14. **Tests de non-régression** : tous les tests existants doivent passer sans modification (le `@default(ACTIVE)` garantit le comportement identique)
 
 **Critère de validation** : aucun changement de comportement visible. Les 690+ tests existants passent au vert.
 
@@ -680,17 +695,12 @@ Pour réduire le risque, l'implémentation doit se faire en **3 phases distincte
 
 **Objectif** : modifier `JoinMoment`, `JoinCircleDirectly`, `JoinCircleByInvite` pour brancher sur `requiresApproval`.
 
-1. Modifier `JoinMoment` : si `requiresApproval = true` → `PENDING_APPROVAL`, gestion re-inscription après REJECTED [D16]
+1. Modifier `JoinMoment` : si `requiresApproval = true` → `PENDING_APPROVAL`
 2. Modifier les 3 usecases de join Circle : si `requiresApproval = true` → `PENDING`
-3. Modifier `cancel-moment` : auto-rejet des PENDING_APPROVAL [D13]
-4. Modifier `leave-circle` : supporter le départ avec status PENDING [D14]
-5. Modifier `registration-button.tsx` : ajouter l'état PENDING_APPROVAL
-6. Bloquer les commentaires pour les Registration PENDING_APPROVAL [D11]
-7. Modifier les formulaires de création Circle et Moment (toggle `requiresApproval`)
-8. Modifier l'UI des pages publiques (CTA conditionnel, états post-soumission)
-9. Modifier le dashboard Participant : afficher les PENDING_APPROVAL [D15]
-10. **Tests de non-régression** : vérifier que `requiresApproval = false` (défaut) produit exactement le même comportement qu'avant
-11. **Tests E2E** : 7 scénarios complets (voir section Tests)
+3. Modifier l'UI des pages publiques (CTA conditionnel, états post-soumission)
+4. Modifier les formulaires de création Circle et Moment (toggle `requiresApproval`)
+5. **Tests de non-régression** : vérifier que `requiresApproval = false` (défaut) produit exactement le même comportement qu'avant
+6. **Tests E2E** : scénarios complets avec validation activée
 
 **Critère de validation** : le flow normal (sans validation) est identique. Le flow avec validation fonctionne de bout en bout.
 
