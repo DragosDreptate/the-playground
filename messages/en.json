@@ -858,7 +858,11 @@
       "registrationRejectedMessage": "Your registration request for the Event \"{momentTitle}\" was not accepted.",
       "rejectedHeading": "Request declined",
       "viewCircleCta": "View Community",
-      "viewMomentCta": "View Event"
+      "viewMomentCta": "View Event",
+      "hostPendingRegistrationSubject": "New registration request — {momentTitle}",
+      "hostPendingRegistrationHeading": "New registration request",
+      "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
+      "manageCta": "Manage requests"
     },
     "common": {
       "dateLabel": "Date",

@@ -858,7 +858,11 @@
       "registrationRejectedMessage": "Votre demande d'inscription à l'événement « {momentTitle} » n'a pas été acceptée.",
       "rejectedHeading": "Demande refusée",
       "viewCircleCta": "Voir la Communauté",
-      "viewMomentCta": "Voir l'événement"
+      "viewMomentCta": "Voir l'événement",
+      "hostPendingRegistrationSubject": "Nouvelle demande d'inscription — {momentTitle}",
+      "hostPendingRegistrationHeading": "Nouvelle demande d'inscription",
+      "hostPendingRegistrationMessage": "{playerName} souhaite s'inscrire à l'événement « {momentTitle} ». Cette inscription nécessite votre validation.",
+      "manageCta": "Gérer les demandes"
     },
     "common": {
       "dateLabel": "Date",

@@ -68,13 +68,11 @@ export async function joinMomentAction(
       }
     );
 
-    // Skip emails for pending approval registrations
     if (!result.pendingApproval) {
-      // Resolve i18n in the request context (before fire-and-forget)
+      // Normal flow: send confirmation to participant + notification to host
       const locale = await getLocale();
       const t = await getTranslations("Email");
 
-      // Fire-and-forget: send emails without blocking the response (sauf si admin)
       if (!isAdminUser(session)) sendRegistrationEmails(
         momentId,
         session.user.id,
@@ -84,6 +82,50 @@ export async function joinMomentAction(
       ).catch((err) => {
         console.error(err);
         Sentry.captureException(err);
+      });
+    } else {
+      // Pending approval: notify host that a new request needs review
+      const t = await getTranslations("Email");
+      const userId = session.user.id;
+      if (!isAdminUser(session)) after(async () => {
+        try {
+          const [user, moment] = await Promise.all([
+            prismaUserRepository.findById(userId),
+            prismaMomentRepository.findById(momentId),
+          ]);
+          if (!user || !moment) return;
+          const circle = await prismaCircleRepository.findById(moment.circleId);
+          if (!circle) return;
+
+          const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+          const hosts = await prismaCircleRepository.findMembersByRole(moment.circleId, "HOST");
+          const hostUserIds = hosts.map((h) => h.userId);
+          const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+
+          await Promise.all(
+            hosts.map(async (host) => {
+              const prefs = prefsMap.get(host.userId);
+              if (!prefs?.notifyNewRegistration) return;
+              const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+              return emailService.sendApprovalNotification({
+                to: host.user.email,
+                recipientName: hostName,
+                entityName: moment.title,
+                entitySlug: `dashboard/circles/${circle.slug}/moments/${moment.slug}`,
+                strings: {
+                  subject: t("approvalNotification.hostPendingRegistrationSubject", { playerName, momentTitle: moment.title }),
+                  heading: t("approvalNotification.hostPendingRegistrationHeading"),
+                  message: t("approvalNotification.hostPendingRegistrationMessage", { playerName, momentTitle: moment.title }),
+                  ctaLabel: t("approvalNotification.manageCta"),
+                  footer: t("common.footer"),
+                },
+              });
+            })
+          );
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
       });
     }
 
