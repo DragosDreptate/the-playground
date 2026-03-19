@@ -41,7 +41,14 @@
     "heroBranded1": "Community",
     "heroBranded2": "Events",
     "heroRestPrefix1": "your",
-    "heroRestPrefix2": "your"
+    "heroRestPrefix2": "your",
+    "stepLabel": "Step",
+    "contactTitle": "Have a question before getting started?",
+    "contactSubtitle": "We reply personally within 24h.",
+    "contactCta": "Send a message →",
+    "contactHelpPrefix": "Or check our",
+    "contactHelpLink": "Help page",
+    "contactHelpSuffix": "for frequently asked questions."
   },
   "Common": {
     "loading": "Loading...",
@@ -1237,5 +1244,34 @@
       "success": "Message sent! We'll get back to you as soon as possible.",
       "error": "An error occurred. Please try again or contact us directly at hello@the-playground.fr"
     }
+  },
+  "Contact": {
+    "pageTitle": "Contact — The Playground",
+    "pageDescription": "Contact The Playground team. We reply personally within 24h.",
+    "heroTitle": "Contact us",
+    "heroDescription": "A question, an idea, feedback? We read every message and reply personally within 24h.",
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "Jane",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Smith",
+    "emailLabel": "Email",
+    "emailPlaceholder": "jane@example.com",
+    "subjectLabel": "Subject",
+    "subjectOptional": "(optional)",
+    "subjectDefault": "Choose a subject — optional",
+    "subjectGeneral": "General question",
+    "subjectOrganize": "I want to organize events",
+    "subjectTechnical": "Technical issue",
+    "subjectSuggestion": "Suggestion / Idea",
+    "subjectOther": "Other",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Describe your request...",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "successTitle": "Message sent!",
+    "successDescription": "Thank you for your message. We will reply personally within 24h.",
+    "notePrefix": "No account needed. For frequently asked questions, check our",
+    "noteHelpLink": "Help page",
+    "noteSuffix": "."
   }
 }
