@@ -39,6 +39,7 @@ type RegistrationButtonProps = {
   calendarData?: CalendarEventData;
   appUrl?: string;
   waitlistPosition?: number;
+  requiresApproval?: boolean;
 };
 
 function StatsColumn({
@@ -85,6 +86,7 @@ export function RegistrationButton({
   calendarData,
   appUrl,
   waitlistPosition,
+  requiresApproval = false,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -118,6 +120,27 @@ export function RegistrationButton({
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
+    );
+  }
+
+  // Pending approval
+  if (localStatus === "PENDING_APPROVAL") {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 rounded-xl bg-amber-500/[0.06] p-4">
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
+            <Clock className="size-4" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">
+              {t("public.pendingApprovalBannerTitle")}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              {t("public.pendingApprovalBannerDescription")}
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -260,9 +283,11 @@ export function RegistrationButton({
         >
           {isPending
             ? tCommon("loading")
-            : isFull
-              ? t("public.joinWaitlist")
-              : t("public.registerFree")}
+            : requiresApproval
+              ? t("public.requestToJoin")
+              : isFull
+                ? t("public.joinWaitlist")
+                : t("public.registerFree")}
         </Button>
         <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
       </div>

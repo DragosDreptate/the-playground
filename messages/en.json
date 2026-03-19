@@ -184,7 +184,9 @@
     },
     "registrationStatus": {
       "registered": "Joined",
-      "waitlisted": "Waitlisted"
+      "waitlisted": "Waitlisted",
+      "pending_approval": "Pending approval",
+      "rejected": "Rejected"
     },
     "online": "Online",
     "hybrid": "Hybrid",
@@ -434,10 +436,13 @@
       "free": "Free",
       "spotsAvailable": "{count} spots",
       "registerFree": "Join",
+      "requestToJoin": "Request to join",
       "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
       "registered": "Joined",
       "registeredBannerTitle": "You're attending this event",
+      "pendingApprovalBannerTitle": "Request sent",
+      "pendingApprovalBannerDescription": "The organizer will review your request manually.",
       "waitlisted": "Waitlisted",
       "waitlistedBannerTitle": "You're on the waitlist",
       "joinWaitlist": "Join the waitlist",

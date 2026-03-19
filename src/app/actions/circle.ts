@@ -20,9 +20,11 @@ import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { revokeCircleInviteToken } from "@/domain/usecases/revoke-circle-invite-token";
 import { joinCircleByInvite } from "@/domain/usecases/join-circle-by-invite";
+import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
+import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { DomainError } from "@/domain/errors";
-import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
+import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
@@ -248,19 +250,19 @@ export async function deleteCircleAction(
 
 export async function joinCircleDirectlyAction(
   circleId: string
-): Promise<ActionResult<{ alreadyMember: boolean }>> {
+): Promise<ActionResult<{ alreadyMember: boolean; pendingApproval: boolean }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
   try {
-    const { alreadyMember } = await joinCircleDirectly(
+    const { alreadyMember, pendingApproval } = await joinCircleDirectly(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember) {
+    if (!alreadyMember && !pendingApproval) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
       after(async () => {
@@ -296,7 +298,7 @@ export async function joinCircleDirectlyAction(
       });
     }
 
-    return { success: true, data: { alreadyMember } };
+    return { success: true, data: { alreadyMember, pendingApproval } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
@@ -453,19 +455,19 @@ export async function revokeCircleInviteTokenAction(
 
 export async function joinCircleByInviteAction(
   token: string
-): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean }>> {
+): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean; pendingApproval: boolean }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
   try {
-    const { circle, alreadyMember } = await joinCircleByInvite(
+    const { circle, alreadyMember, pendingApproval } = await joinCircleByInvite(
       { token, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember) {
+    if (!alreadyMember && !pendingApproval) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
       after(async () => {
@@ -498,7 +500,7 @@ export async function joinCircleByInviteAction(
       });
     }
 
-    return { success: true, data: { circleSlug: circle.slug, alreadyMember } };
+    return { success: true, data: { circleSlug: circle.slug, alreadyMember, pendingApproval } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
@@ -556,6 +558,56 @@ export async function inviteToCircleByEmailAction(
         Sentry.captureException(e);
       }
     });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function approveCircleMembershipAction(
+  circleId: string,
+  memberUserId: string
+): Promise<ActionResult<CircleMembership>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const result = await approveCircleMembership(
+      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+
+    return { success: true, data: result };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function rejectCircleMembershipAction(
+  circleId: string,
+  memberUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await rejectCircleMembership(
+      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
 
     return { success: true, data: undefined };
   } catch (error) {

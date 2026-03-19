@@ -20,6 +20,8 @@ import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { removeRegistrationByHost } from "@/domain/usecases/remove-registration-by-host";
+import { approveMomentRegistration } from "@/domain/usecases/approve-moment-registration";
+import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-registration";
 import { DomainError } from "@/domain/errors";
 import { getDisplayName } from "@/lib/display-name";
 import type { Registration } from "@/domain/models/registration";
@@ -65,21 +67,24 @@ export async function joinMomentAction(
       }
     );
 
-    // Resolve i18n in the request context (before fire-and-forget)
-    const locale = await getLocale();
-    const t = await getTranslations("Email");
+    // Skip emails for pending approval registrations
+    if (!result.pendingApproval) {
+      // Resolve i18n in the request context (before fire-and-forget)
+      const locale = await getLocale();
+      const t = await getTranslations("Email");
 
-    // Fire-and-forget: send emails without blocking the response (sauf si admin)
-    if (!isAdminUser(session)) sendRegistrationEmails(
-      momentId,
-      session.user.id,
-      result.registration,
-      t,
-      locale
-    ).catch((err) => {
-      console.error(err);
-      Sentry.captureException(err);
-    });
+      // Fire-and-forget: send emails without blocking the response (sauf si admin)
+      if (!isAdminUser(session)) sendRegistrationEmails(
+        momentId,
+        session.user.id,
+        result.registration,
+        t,
+        locale
+      ).catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
+    }
 
     return { success: true, data: result.registration };
   } catch (error) {
@@ -450,4 +455,60 @@ async function sendRemovedByHostEmail(
       footer: t("common.footer"),
     },
   });
+}
+
+export async function approveMomentRegistrationAction(
+  registrationId: string
+): Promise<ActionResult<Registration>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const result = await approveMomentRegistration(
+      { registrationId, hostUserId: session.user.id },
+      {
+        registrationRepository: prismaRegistrationRepository,
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+      }
+    );
+
+    return { success: true, data: result.registration };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function rejectMomentRegistrationAction(
+  registrationId: string
+): Promise<ActionResult<Registration>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const result = await rejectMomentRegistration(
+      { registrationId, hostUserId: session.user.id },
+      {
+        registrationRepository: prismaRegistrationRepository,
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+      }
+    );
+
+    return { success: true, data: result };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
 }

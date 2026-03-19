@@ -618,6 +618,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   calendarData={props.calendarData}
                   appUrl={props.appUrl}
                   waitlistPosition={props.waitlistPosition}
+                  requiresApproval={moment.requiresApproval}
                 />
               </div>
             )

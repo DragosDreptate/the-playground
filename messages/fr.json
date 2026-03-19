@@ -184,7 +184,9 @@
     },
     "registrationStatus": {
       "registered": "Inscrit",
-      "waitlisted": "Liste d'attente"
+      "waitlisted": "Liste d'attente",
+      "pending_approval": "En attente de validation",
+      "rejected": "Refusée"
     },
     "online": "En ligne",
     "hybrid": "Hybride",
@@ -434,10 +436,13 @@
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
       "registerFree": "S'inscrire",
+      "requestToJoin": "Faire une demande",
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
       "registered": "Inscrit",
       "registeredBannerTitle": "Vous participez à cet événement",
+      "pendingApprovalBannerTitle": "Demande envoyée",
+      "pendingApprovalBannerDescription": "L'Organisateur validera votre demande manuellement.",
       "waitlisted": "Liste d'attente",
       "waitlistedBannerTitle": "Vous êtes sur liste d'attente",
       "joinWaitlist": "S'inscrire sur la liste d'attente",
