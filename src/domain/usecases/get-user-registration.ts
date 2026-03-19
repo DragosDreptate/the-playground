@@ -21,7 +21,7 @@ export async function getUserRegistration(
     input.userId
   );
 
-  if (!registration || registration.status === "CANCELLED") {
+  if (!registration || registration.status === "CANCELLED" || registration.status === "REJECTED") {
     return null;
   }
 

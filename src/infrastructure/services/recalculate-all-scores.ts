@@ -42,7 +42,7 @@ export async function recalculateAllScores(): Promise<RecalculateAllScoresResult
         overrideScore: true,
         _count: {
           select: {
-            memberships: { where: { role: "PLAYER" } },
+            memberships: { where: { role: "PLAYER", status: "ACTIVE" } },
           },
         },
         moments: {

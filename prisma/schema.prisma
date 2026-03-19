@@ -50,10 +50,17 @@ enum MomentStatus {
 }
 
 enum RegistrationStatus {
+  PENDING_APPROVAL
   REGISTERED
   WAITLISTED
   CANCELLED
   CHECKED_IN
+  REJECTED
+}
+
+enum MembershipStatus {
+  PENDING
+  ACTIVE
 }
 
 enum PaymentStatus {
@@ -165,6 +172,7 @@ model Circle {
   city                  String?
   stripeConnectAccountId String?
   inviteToken           String?          @unique @map("invite_token")
+  requiresApproval     Boolean   @default(false) @map("requires_approval")
   // Explorer scoring
   isDemo               Boolean   @default(false)
   excludedFromExplorer Boolean   @default(false)   @map("excluded_from_explorer")
@@ -192,6 +200,7 @@ model CircleMembership {
   userId   String
   circleId String
   role     CircleMemberRole
+  status   MembershipStatus @default(ACTIVE)
   joinedAt DateTime         @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -200,6 +209,8 @@ model CircleMembership {
   @@unique([userId, circleId])
   // Index sur circleId+role : utilisé dans findMembersByRole, countMembers, findAllCircles (admin)
   @@index([circleId, role])
+  // Index sur circleId+status : utilisé dans countMembers (WHERE status = ACTIVE), findPendingMemberships
+  @@index([circleId, status])
   // Index sur userId : utilisé dans findByUserId, findAllByUserId, delete (user)
   @@index([userId])
   // Index composite (userId, role) : utilisé dans findAllByHostUserId — WHERE userId = ? AND role = 'HOST'
@@ -226,6 +237,7 @@ model Moment {
   price                 Int          @default(0)
   currency              String       @default("EUR")
   status                MomentStatus @default(PUBLISHED)
+  requiresApproval     Boolean      @default(false) @map("requires_approval")
   broadcastSentAt       DateTime?
   reminder24hSentAt     DateTime?
 
