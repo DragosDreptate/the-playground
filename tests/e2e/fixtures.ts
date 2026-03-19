@@ -20,6 +20,14 @@ export const SLUGS = {
   CIRCLE: "paris-creative-tech",
   /** Circle public pour les tests Explorer (yoga-montmartre) */
   PUBLIC_CIRCLE: "yoga-montmartre",
+  /** Circle avec requiresApproval=true */
+  APPROVAL_CIRCLE: "test-approval-circle",
+  /** Moment avec requiresApproval=true dans paris-creative-tech (Circle sans approval) */
+  MOMENT_WITH_APPROVAL: "test-moment-with-approval",
+  /** Moment sans approval dans test-approval-circle (Circle avec approval) — cross-flow D2 */
+  MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE: "test-moment-no-approval-in-approval-circle",
+  /** Moment avec approval dans test-approval-circle (double approval) */
+  MOMENT_BOTH_APPROVAL: "test-moment-both-approval",
 } as const;
 
 // ── Chemins auth (générés par globalSetup) ────────────────────────────────────

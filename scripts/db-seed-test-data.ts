@@ -155,6 +155,23 @@ const SEED_DATA = [
         registrations: ["host", "player1"],
         comments: [],
       },
+      {
+        slug: "test-moment-with-approval",
+        title: "Masterclass Architecture Hexagonale",
+        description:
+          "Masterclass avancée sur l'architecture hexagonale en TypeScript. " +
+          "Places limitées, sélection sur dossier.",
+        startsAt: new Date("2026-04-25T14:00:00"),
+        endsAt: new Date("2026-04-25T17:00:00"),
+        locationType: "IN_PERSON" as const,
+        locationName: "Le Wagon Paris",
+        locationAddress: "16 Villa Gaudelet, 75011 Paris",
+        capacity: 10,
+        status: "PUBLISHED" as const,
+        requiresApproval: true,
+        registrations: ["host"],
+        comments: [],
+      },
     ],
   },
   {
@@ -223,6 +240,52 @@ const SEED_DATA = [
       },
     ],
   },
+  {
+    // ── Circle 3 : approval test ──────────────────────────────────────────────
+    slug: "test-approval-circle",
+    name: "Tech Interviews Paris",
+    description:
+      "Communauté sélective pour développeurs seniors préparant des entretiens tech. " +
+      "Les demandes de membership sont soumises à validation.",
+    visibility: "PUBLIC" as const,
+    requiresApproval: true,
+    moments: [
+      {
+        slug: "test-moment-no-approval-in-approval-circle",
+        title: "Mock Interview — Frontend",
+        description:
+          "Session de pratique d'entretiens techniques frontend. " +
+          "React, TypeScript, architecture composants.",
+        startsAt: new Date("2026-04-15T18:00:00"),
+        endsAt: new Date("2026-04-15T20:00:00"),
+        locationType: "ONLINE" as const,
+        locationName: null,
+        locationAddress: null,
+        capacity: 10,
+        status: "PUBLISHED" as const,
+        requiresApproval: false,
+        registrations: ["host"],
+        comments: [],
+      },
+      {
+        slug: "test-moment-both-approval",
+        title: "Coaching Senior — Entretien système",
+        description:
+          "Coaching individuel pour entretiens système design. " +
+          "Places limitées, validation manuelle requise.",
+        startsAt: new Date("2026-04-20T14:00:00"),
+        endsAt: new Date("2026-04-20T16:00:00"),
+        locationType: "IN_PERSON" as const,
+        locationName: "WeWork La Fayette",
+        locationAddress: "33 Rue La Fayette, 75009 Paris",
+        capacity: 5,
+        status: "PUBLISHED" as const,
+        requiresApproval: true,
+        registrations: ["host"],
+        comments: [],
+      },
+    ],
+  },
 ];
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -266,6 +329,7 @@ async function main() {
   for (const circleData of SEED_DATA) {
     console.log(`\n⭕ Circle: ${circleData.name}`);
 
+    const circleRequiresApproval = (circleData as { requiresApproval?: boolean }).requiresApproval ?? false;
     const circle = await prisma.circle.upsert({
       where: { slug: circleData.slug },
       create: {
@@ -273,11 +337,13 @@ async function main() {
         name: circleData.name,
         description: circleData.description,
         visibility: circleData.visibility,
+        requiresApproval: circleRequiresApproval,
       },
       update: {
         name: circleData.name,
         description: circleData.description,
         visibility: circleData.visibility,
+        requiresApproval: circleRequiresApproval,
       },
     });
 
@@ -291,6 +357,7 @@ async function main() {
     const playersInCircle = new Set<string>();
 
     for (const momentData of circleData.moments) {
+      const momentRequiresApproval = (momentData as { requiresApproval?: boolean }).requiresApproval ?? false;
       const moment = await prisma.moment.upsert({
         where: { slug: momentData.slug },
         create: {
@@ -308,6 +375,7 @@ async function main() {
           price: 0,
           currency: "EUR",
           status: momentData.status,
+          requiresApproval: momentRequiresApproval,
         },
         update: {
           title: momentData.title,
@@ -317,6 +385,7 @@ async function main() {
           status: momentData.status,
           capacity: momentData.capacity,
           broadcastSentAt: null,
+          requiresApproval: momentRequiresApproval,
         },
       });
       console.log(`  📅 ${momentData.status === "PAST" ? "↩" : "→"} ${momentData.title}`);
