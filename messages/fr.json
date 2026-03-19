@@ -182,6 +182,12 @@
       "host": "Organisateur",
       "player": "Participant"
     },
+    "pendingRequests": {
+      "membershipsTitle": "Demandes de membership en attente",
+      "registrationsTitle": "Inscriptions en attente de validation",
+      "approve": "Approuver",
+      "reject": "Refuser"
+    },
     "registrationStatus": {
       "registered": "Inscrit",
       "waitlisted": "Liste d'attente",

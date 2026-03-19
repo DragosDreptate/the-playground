@@ -18,6 +18,7 @@ import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
+import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
 import { getCircleUserInitials } from "@/lib/display-name";
@@ -88,7 +89,7 @@ export default async function CircleDetailPage({
     circle = result.circle;
   }
 
-  const [hosts, players, allMoments] = await Promise.all([
+  const [hosts, players, allMoments, pendingMemberships] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
@@ -97,6 +98,7 @@ export default async function CircleDetailPage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
+    isHost ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
   ]);
 
   const totalMembers = hosts.length + players.length;
@@ -426,6 +428,19 @@ export default async function CircleDetailPage({
                 emailMaxReached: t("invite.emailMaxReached", { max: 10 }),
               }}
             />
+          )}
+
+          {/* Demandes en attente — visible Organisateurs uniquement */}
+          {isHost && pendingMemberships.length > 0 && (
+            <>
+              <div className="border-border border-t" />
+              <div className="border-border bg-card rounded-2xl border p-6">
+                <PendingMembershipsList
+                  circleId={circle.id}
+                  pendingMemberships={pendingMemberships}
+                />
+              </div>
+            </>
           )}
 
           {/* Séparateur */}

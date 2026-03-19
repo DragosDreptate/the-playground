@@ -347,6 +347,22 @@ export type AdminNewUserEmailData = {
   };
 };
 
+// --- Approval notification types ---
+
+export type ApprovalNotificationEmailData = {
+  to: string;
+  recipientName: string;
+  entityName: string;
+  entitySlug: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -372,4 +388,5 @@ export interface EmailService {
   sendRegistrationReminderBatch(data: RegistrationReminderEmailData[]): Promise<void>;
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
+  sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
 }

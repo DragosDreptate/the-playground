@@ -182,6 +182,12 @@
       "host": "Organizer",
       "player": "Member"
     },
+    "pendingRequests": {
+      "membershipsTitle": "Pending membership requests",
+      "registrationsTitle": "Pending registration requests",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
     "registrationStatus": {
       "registered": "Joined",
       "waitlisted": "Waitlisted",

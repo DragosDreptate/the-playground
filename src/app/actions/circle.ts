@@ -589,6 +589,28 @@ export async function approveCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
+    // Fire-and-forget: notify approved member
+    const [circle, user] = await Promise.all([
+      prismaCircleRepository.findById(circleId),
+      prismaUserRepository.findById(memberUserId),
+    ]);
+    if (circle && user) {
+      const playerName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+      emailService.sendApprovalNotification({
+        to: user.email,
+        recipientName: playerName,
+        entityName: circle.name,
+        entitySlug: `circles/${circle.slug}`,
+        strings: {
+          subject: `Vous êtes maintenant membre de ${circle.name}`,
+          heading: "Membership approuvée",
+          message: `Votre demande pour rejoindre la Communauté « ${circle.name} » a été acceptée.`,
+          ctaLabel: "Voir la Communauté",
+          footer: "The Playground",
+        },
+      }).catch((err) => Sentry.captureException(err));
+    }
+
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -613,6 +635,28 @@ export async function rejectCircleMembershipAction(
       { circleId, memberUserId, hostUserId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
+
+    // Fire-and-forget: notify rejected member
+    const [circle, user] = await Promise.all([
+      prismaCircleRepository.findById(circleId),
+      prismaUserRepository.findById(memberUserId),
+    ]);
+    if (circle && user) {
+      const playerName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+      emailService.sendApprovalNotification({
+        to: user.email,
+        recipientName: playerName,
+        entityName: circle.name,
+        entitySlug: `circles/${circle.slug}`,
+        strings: {
+          subject: `Votre demande de membership a été refusée — ${circle.name}`,
+          heading: "Demande refusée",
+          message: `Votre demande pour rejoindre la Communauté « ${circle.name} » n'a pas été acceptée.`,
+          ctaLabel: "Voir la Communauté",
+          footer: "The Playground",
+        },
+      }).catch((err) => Sentry.captureException(err));
+    }
 
     return { success: true, data: undefined };
   } catch (error) {

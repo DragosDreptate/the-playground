@@ -50,12 +50,13 @@ export default async function MomentDetailPage({
 
   const isHost = membership.role === "HOST";
 
-  const [allAttendees, comments] = await Promise.all([
+  const [allAttendees, comments, pendingRegistrations] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
     getMomentComments(
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
+    isHost ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
   ]);
   const registeredCount = allAttendees.filter(
     (r) => r.status === "REGISTERED"
@@ -145,6 +146,7 @@ export default async function MomentDetailPage({
         slug: moment.slug,
       }}
       appUrl={appUrl}
+      pendingRegistrations={pendingRegistrations}
     />
   );
 }

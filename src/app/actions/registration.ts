@@ -475,6 +475,15 @@ export async function approveMomentRegistrationAction(
       }
     );
 
+    // Fire-and-forget: send confirmation email to approved participant
+    const reg = result.registration;
+    const locale = await getLocale();
+    const t = await getTranslations("Email");
+    sendRegistrationEmails(reg.momentId, reg.userId, reg, t, locale).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
+
     return { success: true, data: result.registration };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -502,6 +511,28 @@ export async function rejectMomentRegistrationAction(
         circleRepository: prismaCircleRepository,
       }
     );
+
+    // Fire-and-forget: notify participant of rejection
+    const [user, moment] = await Promise.all([
+      prismaUserRepository.findById(result.userId),
+      prismaMomentRepository.findById(result.momentId),
+    ]);
+    if (user && moment) {
+      const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+      emailService.sendApprovalNotification({
+        to: user.email,
+        recipientName: playerName,
+        entityName: moment.title,
+        entitySlug: `m/${moment.slug}`,
+        strings: {
+          subject: `Votre demande d'inscription a été refusée — ${moment.title}`,
+          heading: "Demande refusée",
+          message: `Votre demande d'inscription à l'événement « ${moment.title} » n'a pas été acceptée.`,
+          ctaLabel: "Voir l'événement",
+          footer: "The Playground",
+        },
+      }).catch((err) => Sentry.captureException(err));
+    }
 
     return { success: true, data: result };
   } catch (error) {

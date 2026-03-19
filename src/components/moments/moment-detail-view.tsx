@@ -7,6 +7,7 @@ import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dia
 import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { RegistrationsList } from "@/components/moments/registrations-list";
+import { PendingRegistrationsList } from "@/components/circles/pending-requests-list";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
@@ -56,6 +57,7 @@ type HostViewProps = CommonProps & {
   publicUrl: string;
   calendarData?: CalendarEventData;
   appUrl?: string;
+  pendingRegistrations?: RegistrationWithUser[];
 };
 
 type PublicViewProps = CommonProps & {
@@ -622,6 +624,15 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 />
               </div>
             )
+          )}
+
+          {/* Demandes en attente — Host uniquement */}
+          {isHostView && props.variant === "host" && props.pendingRegistrations && props.pendingRegistrations.length > 0 && (
+            <div className="border-border bg-card rounded-2xl border p-6">
+              <PendingRegistrationsList
+                pendingRegistrations={props.pendingRegistrations}
+              />
+            </div>
           )}
 
           {/* Liste des participants */}
