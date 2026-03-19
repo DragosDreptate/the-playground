@@ -172,8 +172,7 @@ export async function updateMomentAction(
   const priceRaw = formData.get("price") as string | null;
   const currency = formData.get("currency") as string | null;
   const status = formData.get("status") as string | null;
-  const requiresApprovalRaw = formData.get("requiresApproval");
-  const requiresApprovalUpdate = requiresApprovalRaw !== null ? requiresApprovalRaw === "on" : undefined;
+  const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
   if (title !== null && !title.trim()) {
     return { success: false, error: "Title cannot be empty", code: "VALIDATION" };
@@ -210,7 +209,7 @@ export async function updateMomentAction(
         ...(price !== undefined && { price }),
         ...(currency && { currency }),
         ...(status && { status: status as Moment["status"] }),
-        ...(requiresApprovalUpdate !== undefined && { requiresApproval: requiresApprovalUpdate }),
+        requiresApproval: requiresApprovalUpdate,
       },
       {
         momentRepository: prismaMomentRepository,

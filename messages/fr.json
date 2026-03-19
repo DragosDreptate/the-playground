@@ -258,6 +258,7 @@
       "pastMoments": "Événements passés",
       "noUpcomingMoments": "Aucun événement à venir.",
       "noPastMoments": "Aucun événement passé.",
+      "noPendingMemberships": "Validation activée — aucune demande en attente.",
       "today": "Aujourd'hui",
       "manageMoment": "Gérer cet événement",
       "join": "Rejoindre",
@@ -497,6 +498,7 @@
       "waitlisted": "{count} en liste d'attente",
       "capacity": "{count} places",
       "empty": "Aucune inscription pour le moment.",
+      "noPendingApprovals": "Validation activée — aucune demande en attente.",
       "status": {
         "registered": "Inscrit",
         "waitlisted": "Liste d'attente"

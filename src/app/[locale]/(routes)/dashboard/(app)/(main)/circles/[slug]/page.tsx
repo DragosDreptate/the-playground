@@ -34,6 +34,7 @@ import {
   CalendarIcon,
   ChevronRight,
   MapPin,
+  ShieldCheck,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -430,19 +431,6 @@ export default async function CircleDetailPage({
             />
           )}
 
-          {/* Demandes en attente — visible Organisateurs uniquement */}
-          {isHost && pendingMemberships.length > 0 && (
-            <>
-              <div className="border-border border-t" />
-              <div className="border-border bg-card rounded-2xl border p-6">
-                <PendingMembershipsList
-                  circleId={circle.id}
-                  pendingMemberships={pendingMemberships}
-                />
-              </div>
-            </>
-          )}
-
           {/* Séparateur */}
           <div className="border-border border-t" />
 
@@ -481,6 +469,23 @@ export default async function CircleDetailPage({
 
           {/* Séparateur */}
           <div className="border-border border-t" />
+
+          {/* Demandes en attente — visible Organisateurs uniquement si requiresApproval */}
+          {isHost && circle.requiresApproval && (
+            <div className="border-border bg-card rounded-2xl border p-6">
+              {pendingMemberships.length > 0 ? (
+                <PendingMembershipsList
+                  circleId={circle.id}
+                  pendingMemberships={pendingMemberships}
+                />
+              ) : (
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <ShieldCheck className="size-5 shrink-0" />
+                  <p className="text-sm">{t("detail.noPendingMemberships")}</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Membres */}
           <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
