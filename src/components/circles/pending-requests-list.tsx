@@ -19,33 +19,36 @@ import {
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 
-type PendingMembershipsListProps = {
-  circleId: string;
-  pendingMemberships: CircleMemberWithUser[];
+// ── Generic row + list ────────────────────────────────────────
+
+type PendingItem = {
+  key: string;
+  displayName: string;
+  email: string;
+  image: string | null;
 };
 
-export function PendingMembershipsList({
-  circleId,
-  pendingMemberships,
-}: PendingMembershipsListProps) {
-  const t = useTranslations("Dashboard");
-  const router = useRouter();
+function PendingRequestsListBase({
+  title,
+  items,
+  onAction,
+}: {
+  title: string;
+  items: PendingItem[];
+  onAction: (key: string, action: "approve" | "reject") => Promise<boolean>;
+}) {
+  const t = useTranslations("Dashboard.pendingRequests");
   const [processed, setProcessed] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
-  if (pendingMemberships.length === 0) return null;
-
-  const visible = pendingMemberships.filter((m) => !processed.has(m.userId));
+  const visible = items.filter((item) => !processed.has(item.key));
   if (visible.length === 0) return null;
 
-  function handleAction(memberUserId: string, action: "approve" | "reject") {
+  function handleAction(key: string, action: "approve" | "reject") {
     startTransition(async () => {
-      const result = action === "approve"
-        ? await approveCircleMembershipAction(circleId, memberUserId)
-        : await rejectCircleMembershipAction(circleId, memberUserId);
-      if (result.success) {
-        setProcessed((prev) => new Set(prev).add(memberUserId));
-        router.refresh();
+      const success = await onAction(key, action);
+      if (success) {
+        setProcessed((prev) => new Set(prev).add(key));
       }
     });
   }
@@ -53,148 +56,98 @@ export function PendingMembershipsList({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">{t("pendingRequests.membershipsTitle")}</h2>
+        <h2 className="text-lg font-semibold">{title}</h2>
         <Badge variant="secondary" className="gap-1">
           <Clock className="size-3" />
           {visible.length}
         </Badge>
       </div>
       <div className="divide-border divide-y">
-        {visible.map((membership) => {
-          const displayName = getDisplayName(
-            membership.user.firstName,
-            membership.user.lastName,
-            membership.user.email
-          );
-          return (
-            <div key={membership.userId} className="flex items-center gap-3 py-2.5">
-              <UserAvatar
-                name={displayName}
-                email={membership.user.email}
-                image={membership.user.image}
-                size="sm"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium leading-snug">{displayName}</p>
-                <p className="text-muted-foreground truncate text-xs">
-                  {membership.user.email}
-                </p>
-              </div>
-              <div className="flex gap-1.5 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isPending}
-                  onClick={() => handleAction(membership.userId, "approve")}
-                  className="gap-1"
-                >
-                  <Check className="size-3.5" />
-                  {t("pendingRequests.approve")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isPending}
-                  onClick={() => handleAction(membership.userId, "reject")}
-                  className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
-                >
-                  <X className="size-3.5" />
-                  {t("pendingRequests.reject")}
-                </Button>
-              </div>
+        {visible.map((item) => (
+          <div key={item.key} className="flex items-center gap-3 py-2.5">
+            <UserAvatar name={item.displayName} email={item.email} image={item.image} size="sm" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium leading-snug">{item.displayName}</p>
+              <p className="text-muted-foreground truncate text-xs">{item.email}</p>
             </div>
-          );
-        })}
+            <div className="flex gap-1.5 shrink-0">
+              <Button variant="outline" size="sm" disabled={isPending} onClick={() => handleAction(item.key, "approve")} className="gap-1">
+                <Check className="size-3.5" />
+                {t("approve")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isPending}
+                onClick={() => handleAction(item.key, "reject")}
+                className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
+              >
+                <X className="size-3.5" />
+                {t("reject")}
+              </Button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
+}
+
+// ── Typed wrappers ────────────────────────────────────────────
+
+type PendingMembershipsListProps = {
+  circleId: string;
+  pendingMemberships: CircleMemberWithUser[];
+};
+
+export function PendingMembershipsList({ circleId, pendingMemberships }: PendingMembershipsListProps) {
+  const t = useTranslations("Dashboard.pendingRequests");
+  const router = useRouter();
+
+  if (pendingMemberships.length === 0) return null;
+
+  const items: PendingItem[] = pendingMemberships.map((m) => ({
+    key: m.userId,
+    displayName: getDisplayName(m.user.firstName, m.user.lastName, m.user.email),
+    email: m.user.email,
+    image: m.user.image,
+  }));
+
+  async function handleAction(userId: string, action: "approve" | "reject") {
+    const result = action === "approve"
+      ? await approveCircleMembershipAction(circleId, userId)
+      : await rejectCircleMembershipAction(circleId, userId);
+    if (result.success) router.refresh();
+    return result.success;
+  }
+
+  return <PendingRequestsListBase title={t("membershipsTitle")} items={items} onAction={handleAction} />;
 }
 
 type PendingRegistrationsListProps = {
   pendingRegistrations: RegistrationWithUser[];
 };
 
-export function PendingRegistrationsList({
-  pendingRegistrations,
-}: PendingRegistrationsListProps) {
-  const t = useTranslations("Dashboard");
+export function PendingRegistrationsList({ pendingRegistrations }: PendingRegistrationsListProps) {
+  const t = useTranslations("Dashboard.pendingRequests");
   const router = useRouter();
-  const [processed, setProcessed] = useState<Set<string>>(new Set());
-  const [isPending, startTransition] = useTransition();
 
   if (pendingRegistrations.length === 0) return null;
 
-  const visible = pendingRegistrations.filter((r) => !processed.has(r.id));
-  if (visible.length === 0) return null;
+  const items: PendingItem[] = pendingRegistrations.map((r) => ({
+    key: r.id,
+    displayName: getDisplayName(r.user.firstName, r.user.lastName, r.user.email),
+    email: r.user.email,
+    image: r.user.image,
+  }));
 
-  function handleAction(registrationId: string, action: "approve" | "reject") {
-    startTransition(async () => {
-      const result = action === "approve"
-        ? await approveMomentRegistrationAction(registrationId)
-        : await rejectMomentRegistrationAction(registrationId);
-      if (result.success) {
-        setProcessed((prev) => new Set(prev).add(registrationId));
-        router.refresh();
-      }
-    });
+  async function handleAction(registrationId: string, action: "approve" | "reject") {
+    const result = action === "approve"
+      ? await approveMomentRegistrationAction(registrationId)
+      : await rejectMomentRegistrationAction(registrationId);
+    if (result.success) router.refresh();
+    return result.success;
   }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">{t("pendingRequests.registrationsTitle")}</h2>
-        <Badge variant="secondary" className="gap-1">
-          <Clock className="size-3" />
-          {visible.length}
-        </Badge>
-      </div>
-      <div className="divide-border divide-y">
-        {visible.map((reg) => {
-          const displayName = getDisplayName(
-            reg.user.firstName,
-            reg.user.lastName,
-            reg.user.email
-          );
-          return (
-            <div key={reg.id} className="flex items-center gap-3 py-2.5">
-              <UserAvatar
-                name={displayName}
-                email={reg.user.email}
-                image={reg.user.image}
-                size="sm"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium leading-snug">{displayName}</p>
-                <p className="text-muted-foreground truncate text-xs">
-                  {reg.user.email}
-                </p>
-              </div>
-              <div className="flex gap-1.5 shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isPending}
-                  onClick={() => handleAction(reg.id, "approve")}
-                  className="gap-1"
-                >
-                  <Check className="size-3.5" />
-                  {t("pendingRequests.approve")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={isPending}
-                  onClick={() => handleAction(reg.id, "reject")}
-                  className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive gap-1"
-                >
-                  <X className="size-3.5" />
-                  {t("pendingRequests.reject")}
-                </Button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <PendingRequestsListBase title={t("registrationsTitle")} items={items} onAction={handleAction} />;
 }

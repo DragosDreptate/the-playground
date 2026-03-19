@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
@@ -512,29 +513,35 @@ export async function rejectMomentRegistrationAction(
       }
     );
 
-    // Fire-and-forget: notify participant of rejection
-    const [user, moment] = await Promise.all([
-      prismaUserRepository.findById(result.userId),
-      prismaMomentRepository.findById(result.momentId),
-    ]);
-    if (user && moment) {
-      const playerName = getDisplayName(user.firstName, user.lastName, user.email);
-      emailService.sendApprovalNotification({
-        to: user.email,
-        recipientName: playerName,
-        entityName: moment.title,
-        entitySlug: `m/${moment.slug}`,
-        strings: {
-          subject: `Votre demande d'inscription a été refusée — ${moment.title}`,
-          heading: "Demande refusée",
-          message: `Votre demande d'inscription à l'événement « ${moment.title} » n'a pas été acceptée.`,
-          ctaLabel: "Voir l'événement",
-          footer: "The Playground",
-        },
-      }).catch((err) => Sentry.captureException(err));
-    }
+    const rejectedResult = result;
+    const t2 = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [user, moment] = await Promise.all([
+          prismaUserRepository.findById(rejectedResult.userId),
+          prismaMomentRepository.findById(rejectedResult.momentId),
+        ]);
+        if (!user || !moment) return;
+        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        await emailService.sendApprovalNotification({
+          to: user.email,
+          recipientName: playerName,
+          entityName: moment.title,
+          entitySlug: `m/${moment.slug}`,
+          strings: {
+            subject: t2("approvalNotification.registrationRejectedSubject", { momentTitle: moment.title }),
+            heading: t2("approvalNotification.rejectedHeading"),
+            message: t2("approvalNotification.registrationRejectedMessage", { momentTitle: moment.title }),
+            ctaLabel: t2("approvalNotification.viewMomentCta"),
+            footer: t2("common.footer"),
+          },
+        });
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
 
-    return { success: true, data: result };
+    return { success: true, data: rejectedResult };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };

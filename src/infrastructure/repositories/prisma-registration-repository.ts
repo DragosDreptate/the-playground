@@ -435,4 +435,12 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       where: { momentId, status: "PENDING_APPROVAL" },
     });
   },
+
+  async rejectAllPendingApprovals(momentId: string): Promise<number> {
+    const result = await prisma.registration.updateMany({
+      where: { momentId, status: "PENDING_APPROVAL" },
+      data: { status: "REJECTED" },
+    });
+    return result.count;
+  },
 };

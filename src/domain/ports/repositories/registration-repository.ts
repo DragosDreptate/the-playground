@@ -59,4 +59,6 @@ export interface RegistrationRepository {
   findPendingApprovals(momentId: string): Promise<RegistrationWithUser[]>;
   /** Compte les inscriptions en attente d'approbation pour un Moment. */
   countPendingApprovals(momentId: string): Promise<number>;
+  /** Rejette en masse toutes les inscriptions PENDING_APPROVAL d'un Moment. */
+  rejectAllPendingApprovals(momentId: string): Promise<number>;
 }

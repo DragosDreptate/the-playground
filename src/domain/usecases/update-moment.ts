@@ -68,10 +68,7 @@ export async function updateMoment(
 
   // D13: auto-reject PENDING_APPROVAL registrations when moment is cancelled
   if (input.status === "CANCELLED" && deps.registrationRepository) {
-    const pendingRegs = await deps.registrationRepository.findPendingApprovals(input.momentId);
-    for (const reg of pendingRegs) {
-      await deps.registrationRepository.update(reg.id, { status: "REJECTED" });
-    }
+    await deps.registrationRepository.rejectAllPendingApprovals(input.momentId);
   }
 
   return { moment };

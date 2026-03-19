@@ -114,7 +114,7 @@ export default async function PublicCirclePage({
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
     ReturnType<typeof getCircleMoments>,
     ReturnType<typeof prismaCircleRepository.countMembers>,
-    Promise<"active" | "pending" | null>,
+    Promise<import("@/domain/models/circle").MembershipStatus | null>,
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
@@ -126,7 +126,7 @@ export default async function PublicCirclePage({
     ),
     prismaCircleRepository.countMembers(circle.id),
     session?.user?.id
-      ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status === "ACTIVE" ? "active" : m?.status === "PENDING" ? "pending" : null)
+      ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status ?? null)
       : Promise.resolve(null),
     // Players chargés uniquement pour les connectés (section membres)
     session?.user?.id
@@ -137,8 +137,8 @@ export default async function PublicCirclePage({
   const [hosts, allMoments, memberCount, isMemberResult, players] =
     await measureTime("circle-page:data", () => Promise.all(parallelQueries));
 
-  const isMember = isMemberResult === "active";
-  const isPendingMember = isMemberResult === "pending";
+  const isMember = isMemberResult === "ACTIVE";
+  const isPendingMember = isMemberResult === "PENDING";
   const isHost = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;

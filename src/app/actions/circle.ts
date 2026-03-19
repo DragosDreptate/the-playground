@@ -589,27 +589,32 @@ export async function approveCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Fire-and-forget: notify approved member
-    const [circle, user] = await Promise.all([
-      prismaCircleRepository.findById(circleId),
-      prismaUserRepository.findById(memberUserId),
-    ]);
-    if (circle && user) {
-      const playerName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-      emailService.sendApprovalNotification({
-        to: user.email,
-        recipientName: playerName,
-        entityName: circle.name,
-        entitySlug: `circles/${circle.slug}`,
-        strings: {
-          subject: `Vous êtes maintenant membre de ${circle.name}`,
-          heading: "Membership approuvée",
-          message: `Votre demande pour rejoindre la Communauté « ${circle.name} » a été acceptée.`,
-          ctaLabel: "Voir la Communauté",
-          footer: "The Playground",
-        },
-      }).catch((err) => Sentry.captureException(err));
-    }
+    const t = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [circle, user] = await Promise.all([
+          prismaCircleRepository.findById(circleId),
+          prismaUserRepository.findById(memberUserId),
+        ]);
+        if (!circle || !user) return;
+        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        await emailService.sendApprovalNotification({
+          to: user.email,
+          recipientName: playerName,
+          entityName: circle.name,
+          entitySlug: `circles/${circle.slug}`,
+          strings: {
+            subject: t("approvalNotification.membershipApprovedSubject", { circleName: circle.name }),
+            heading: t("approvalNotification.membershipApprovedHeading"),
+            message: t("approvalNotification.membershipApprovedMessage", { circleName: circle.name }),
+            ctaLabel: t("approvalNotification.viewCircleCta"),
+            footer: t("common.footer"),
+          },
+        });
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
 
     return { success: true, data: result };
   } catch (error) {
@@ -636,27 +641,32 @@ export async function rejectCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Fire-and-forget: notify rejected member
-    const [circle, user] = await Promise.all([
-      prismaCircleRepository.findById(circleId),
-      prismaUserRepository.findById(memberUserId),
-    ]);
-    if (circle && user) {
-      const playerName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-      emailService.sendApprovalNotification({
-        to: user.email,
-        recipientName: playerName,
-        entityName: circle.name,
-        entitySlug: `circles/${circle.slug}`,
-        strings: {
-          subject: `Votre demande de membership a été refusée — ${circle.name}`,
-          heading: "Demande refusée",
-          message: `Votre demande pour rejoindre la Communauté « ${circle.name} » n'a pas été acceptée.`,
-          ctaLabel: "Voir la Communauté",
-          footer: "The Playground",
-        },
-      }).catch((err) => Sentry.captureException(err));
-    }
+    const t = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [circle, user] = await Promise.all([
+          prismaCircleRepository.findById(circleId),
+          prismaUserRepository.findById(memberUserId),
+        ]);
+        if (!circle || !user) return;
+        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        await emailService.sendApprovalNotification({
+          to: user.email,
+          recipientName: playerName,
+          entityName: circle.name,
+          entitySlug: `circles/${circle.slug}`,
+          strings: {
+            subject: t("approvalNotification.membershipRejectedSubject", { circleName: circle.name }),
+            heading: t("approvalNotification.rejectedHeading"),
+            message: t("approvalNotification.membershipRejectedMessage", { circleName: circle.name }),
+            ctaLabel: t("approvalNotification.viewCircleCta"),
+            footer: t("common.footer"),
+          },
+        });
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
 
     return { success: true, data: undefined };
   } catch (error) {
