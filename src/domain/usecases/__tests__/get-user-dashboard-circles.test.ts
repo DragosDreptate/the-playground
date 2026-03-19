@@ -12,6 +12,7 @@ function makeDashboardCircle(
   return {
     ...makeCircle(),
     memberRole: "HOST",
+    membershipStatus: "ACTIVE",
     memberCount: 0,
     upcomingMomentCount: 0,
     nextMoment: null,

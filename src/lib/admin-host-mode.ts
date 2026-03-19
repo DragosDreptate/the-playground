@@ -51,7 +51,7 @@ function withAdminHostMode(
           userId: string
         ): Promise<CircleMembership | null> => {
           if (userId === adminUserId) {
-            return { id: "admin-override", userId, circleId, role: "HOST", joinedAt: new Date() };
+            return { id: "admin-override", userId, circleId, role: "HOST", status: "ACTIVE", joinedAt: new Date() };
           }
           return target.findMembership(circleId, userId);
         };

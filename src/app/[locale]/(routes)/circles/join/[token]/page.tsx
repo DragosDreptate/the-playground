@@ -57,9 +57,11 @@ export default async function JoinCircleByInvitePage({
   ]);
 
   let alreadyMember = false;
+  let pendingApproval = false;
   if (session?.user?.id) {
     const membership = await prismaCircleRepository.findMembership(circle.id, session.user.id);
-    alreadyMember = !!membership;
+    alreadyMember = membership?.status === "ACTIVE";
+    pendingApproval = membership?.status === "PENDING";
   }
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
@@ -176,11 +178,15 @@ export default async function JoinCircleByInvitePage({
               token={token}
               isAuthenticated={!!session?.user?.id}
               alreadyMember={alreadyMember}
+              pendingApproval={pendingApproval}
+              requiresApproval={circle.requiresApproval}
               circleSlug={circle.slug}
               t={{
                 joinButton: t("invite.joinButton"),
+                joinRequiresApproval: t("invite.joinRequiresApproval"),
                 joinSignIn: t("invite.joinSignIn"),
                 alreadyMember: t("invite.alreadyMember"),
+                pendingApproval: t("invite.pendingApproval"),
                 viewCircle: t("invite.viewCircle"),
               }}
             />

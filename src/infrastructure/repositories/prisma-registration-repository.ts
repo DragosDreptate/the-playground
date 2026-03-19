@@ -179,7 +179,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     const records = await prisma.registration.findMany({
       where: {
         userId,
-        status: { in: ["REGISTERED", "WAITLISTED"] },
+        status: { in: ["REGISTERED", "WAITLISTED", "PENDING_APPROVAL"] },
         moment: {
           status: "PUBLISHED",
           startsAt: { gt: new Date() },
@@ -326,7 +326,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       JOIN circles c ON c.id = m."circleId"
       WHERE r."userId" = ${userId}
         AND (
-          (r.status IN ('REGISTERED', 'WAITLISTED') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
+          (r.status IN ('REGISTERED', 'WAITLISTED', 'PENDING_APPROVAL') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
           OR
           (r.status IN ('REGISTERED', 'CHECKED_IN') AND m.status = 'PAST')
         )
@@ -412,5 +412,35 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     });
 
     return before + 1;
+  },
+
+  async findPendingApprovals(momentId: string): Promise<RegistrationWithUser[]> {
+    const records = await prisma.registration.findMany({
+      where: { momentId, status: "PENDING_APPROVAL" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { registeredAt: "asc" },
+    });
+    return records.map((r) => ({
+      ...toDomainRegistration(r),
+      user: r.user,
+    }));
+  },
+
+  async countPendingApprovals(momentId: string): Promise<number> {
+    return prisma.registration.count({
+      where: { momentId, status: "PENDING_APPROVAL" },
+    });
+  },
+
+  async rejectAllPendingApprovals(momentId: string): Promise<number> {
+    const result = await prisma.registration.updateMany({
+      where: { momentId, status: "PENDING_APPROVAL" },
+      data: { status: "REJECTED" },
+    });
+    return result.count;
   },
 };

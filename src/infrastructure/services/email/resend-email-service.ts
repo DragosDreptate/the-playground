@@ -21,6 +21,7 @@ import type {
   HostNewCircleMemberEmailData,
   MemberRemovedFromCircleEmailData,
   RegistrationRemovedByHostEmailData,
+  ApprovalNotificationEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -38,6 +39,7 @@ import { HostNewCircleMemberEmail } from "./templates/host-new-circle-member";
 import { RegistrationReminderEmail } from "./templates/registration-reminder";
 import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-circle";
 import { RegistrationRemovedByHostEmail } from "./templates/registration-removed-by-host";
+import { ApprovalNotificationEmail } from "./templates/approval-notification";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -353,6 +355,23 @@ export function createResendEmailService(): EmailService {
           }),
         }))
       );
+    },
+
+    async sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void> {
+      const baseUrl = getBaseUrl();
+      await send({
+        from: getSender(),
+        to: data.to,
+        subject: data.strings.subject,
+        react: ApprovalNotificationEmail({
+          recipientName: data.recipientName,
+          heading: data.strings.heading,
+          message: data.strings.message,
+          ctaLabel: data.strings.ctaLabel,
+          ctaUrl: `${baseUrl}/${data.entitySlug}`,
+          footer: data.strings.footer,
+        }),
+      });
     },
   };
 }

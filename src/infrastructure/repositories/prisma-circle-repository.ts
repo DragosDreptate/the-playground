@@ -10,7 +10,7 @@ import type {
   FeaturedCircle,
 } from "@/domain/ports/repositories/circle-repository";
 import { seededShuffle } from "@/lib/seeded-shuffle";
-import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
@@ -31,6 +31,7 @@ function toDomainCircle(record: PrismaCircle): Circle {
     city: record.city ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
     inviteToken: record.inviteToken ?? null,
+    requiresApproval: record.requiresApproval,
     isDemo: record.isDemo,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
@@ -43,6 +44,7 @@ function toDomainMembership(record: PrismaMembership): CircleMembership {
     userId: record.userId,
     circleId: record.circleId,
     role: record.role,
+    status: record.status,
     joinedAt: record.joinedAt,
   };
 }
@@ -65,6 +67,7 @@ export const prismaCircleRepository: CircleRepository = {
               ? Prisma.DbNull
               : input.coverImageAttribution,
         }),
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainCircle(record);
@@ -92,6 +95,7 @@ export const prismaCircleRepository: CircleRepository = {
                 ? Prisma.DbNull
                 : input.coverImageAttribution,
           }),
+          ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
         },
       });
       await tx.circleMembership.create({
@@ -119,7 +123,7 @@ export const prismaCircleRepository: CircleRepository = {
 
   async findByUserId(userId: string, role: CircleMemberRole): Promise<Circle[]> {
     const memberships = await prisma.circleMembership.findMany({
-      where: { userId, role },
+      where: { userId, role, status: "ACTIVE" },
       include: { circle: true },
     });
     return memberships.map((m) => toDomainCircle(m.circle));
@@ -143,6 +147,7 @@ export const prismaCircleRepository: CircleRepository = {
               : input.coverImageAttribution,
         }),
         ...(input.inviteToken !== undefined && { inviteToken: input.inviteToken }),
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainCircle(record);
@@ -160,17 +165,50 @@ export const prismaCircleRepository: CircleRepository = {
   async addMembership(
     circleId: string,
     userId: string,
-    role: CircleMemberRole
+    role: CircleMemberRole,
+    status: MembershipStatus = "ACTIVE"
   ): Promise<CircleMembership> {
     const record = await prisma.circleMembership.create({
-      data: { circleId, userId, role },
+      data: { circleId, userId, role, status },
     });
     return toDomainMembership(record);
   },
 
+  async updateMembershipStatus(
+    circleId: string,
+    userId: string,
+    status: MembershipStatus
+  ): Promise<CircleMembership> {
+    const record = await prisma.circleMembership.update({
+      where: { userId_circleId: { userId, circleId } },
+      data: { status },
+    });
+    return toDomainMembership(record);
+  },
+
+  async findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]> {
+    const records = await prisma.circleMembership.findMany({
+      where: { circleId, status: "PENDING" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { joinedAt: "asc" },
+    });
+    return records.map((r) => ({
+      ...toDomainMembership(r),
+      user: r.user,
+    }));
+  },
+
+  async countPendingMemberships(circleId: string): Promise<number> {
+    return prisma.circleMembership.count({ where: { circleId, status: "PENDING" } });
+  },
+
   async findAllByUserId(userId: string): Promise<CircleWithRole[]> {
     const memberships = await prisma.circleMembership.findMany({
-      where: { userId },
+      where: { userId, status: "ACTIVE" },
       include: { circle: true },
       orderBy: { joinedAt: "desc" },
     });
@@ -186,6 +224,7 @@ export const prismaCircleRepository: CircleRepository = {
     type Row = {
       membershipId: string;
       role: CircleMemberRole;
+      membershipStatus: MembershipStatus;
       joinedAt: Date;
       id: string;
       slug: string;
@@ -200,6 +239,7 @@ export const prismaCircleRepository: CircleRepository = {
       city: string | null;
       stripeConnectAccountId: string | null;
       inviteToken: string | null;
+      requiresApproval: boolean;
       isDemo: boolean;
       createdAt: Date;
       updatedAt: Date;
@@ -212,6 +252,7 @@ export const prismaCircleRepository: CircleRepository = {
       SELECT
         cm.id                     AS "membershipId",
         cm.role                   AS "role",
+        cm.status                 AS "membershipStatus",
         cm."joinedAt"             AS "joinedAt",
         c.id                      AS "id",
         c.slug                    AS "slug",
@@ -226,10 +267,11 @@ export const prismaCircleRepository: CircleRepository = {
         c.city                    AS "city",
         c."stripeConnectAccountId" AS "stripeConnectAccountId",
         c.invite_token            AS "inviteToken",
+        c.requires_approval       AS "requiresApproval",
         c."isDemo"                AS "isDemo",
         c."createdAt"             AS "createdAt",
         c."updatedAt"             AS "updatedAt",
-        (SELECT COUNT(*)::int FROM circle_memberships WHERE "circleId" = c.id)
+        (SELECT COUNT(*)::int FROM circle_memberships WHERE "circleId" = c.id AND status = 'ACTIVE')
           AS "memberCount",
         (SELECT COUNT(*)::int FROM moments
           WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW())
@@ -243,7 +285,7 @@ export const prismaCircleRepository: CircleRepository = {
         ) x) AS "nextMoment"
       FROM circle_memberships cm
       JOIN circles c ON c.id = cm."circleId"
-      WHERE cm."userId" = ${userId}
+      WHERE cm."userId" = ${userId} AND cm.status IN ('ACTIVE', 'PENDING')
       ORDER BY cm."joinedAt" DESC
     `;
 
@@ -261,10 +303,12 @@ export const prismaCircleRepository: CircleRepository = {
       city: row.city,
       stripeConnectAccountId: row.stripeConnectAccountId,
       inviteToken: row.inviteToken,
+      requiresApproval: row.requiresApproval ?? false,
       isDemo: row.isDemo ?? false,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       memberRole: row.role,
+      membershipStatus: row.membershipStatus,
       memberCount: row.memberCount,
       upcomingMomentCount: row.upcomingMomentCount,
       nextMoment: row.nextMoment
@@ -290,7 +334,7 @@ export const prismaCircleRepository: CircleRepository = {
     role: CircleMemberRole
   ): Promise<CircleMemberWithUser[]> {
     const records = await prisma.circleMembership.findMany({
-      where: { circleId, role },
+      where: { circleId, role, status: "ACTIVE" },
       include: {
         user: {
           select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
@@ -305,7 +349,7 @@ export const prismaCircleRepository: CircleRepository = {
   },
 
   async countMembers(circleId: string): Promise<number> {
-    return prisma.circleMembership.count({ where: { circleId } });
+    return prisma.circleMembership.count({ where: { circleId, status: "ACTIVE" } });
   },
 
   async countMoments(circleId: string): Promise<number> {
@@ -317,7 +361,7 @@ export const prismaCircleRepository: CircleRepository = {
     // Requête GROUP BY : une seule requête pour N Circles (évite le N+1 du dashboard)
     const counts = await prisma.circleMembership.groupBy({
       by: ["circleId"],
-      where: { circleId: { in: circleIds } },
+      where: { circleId: { in: circleIds }, status: "ACTIVE" },
       _count: { _all: true },
     });
     return new Map(counts.map((c) => [c.circleId, c._count._all]));
@@ -339,7 +383,7 @@ export const prismaCircleRepository: CircleRepository = {
         OR: [
           {
             memberships: {
-              some: { role: { in: ["HOST", "PLAYER"] } },
+              some: { role: { in: ["HOST", "PLAYER"] }, status: "ACTIVE" },
             },
           },
           {
@@ -356,7 +400,7 @@ export const prismaCircleRepository: CircleRepository = {
         // Comptes SQL précis — aucun enregistrement Moment chargé en mémoire pour le count
         _count: {
           select: {
-            memberships: true,
+            memberships: { where: { status: "ACTIVE" } },
             moments: {
               where: { status: "PUBLISHED", startsAt: { gte: now } },
             },
@@ -412,7 +456,7 @@ export const prismaCircleRepository: CircleRepository = {
     excludeUserId: string
   ): Promise<CircleFollowerInfo[]> {
     const rows = await prisma.circleMembership.findMany({
-      where: { circleId, userId: { not: excludeUserId }, user: { role: { not: "ADMIN" } } },
+      where: { circleId, userId: { not: excludeUserId }, status: "ACTIVE", user: { role: { not: "ADMIN" } } },
       include: {
         user: {
           select: { email: true, firstName: true, lastName: true },
@@ -464,7 +508,7 @@ export const prismaCircleRepository: CircleRepository = {
         coverImageAttribution: true,
         _count: {
           select: {
-            memberships: true,
+            memberships: { where: { status: "ACTIVE" } },
             moments: {
               where: { status: "PUBLISHED", startsAt: { gte: now } },
             },
@@ -497,7 +541,7 @@ export const prismaCircleRepository: CircleRepository = {
 
   async getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]> {
     const memberships = await prisma.circleMembership.findMany({
-      where: { userId, circle: { visibility: "PUBLIC" } },
+      where: { userId, status: "ACTIVE", circle: { visibility: "PUBLIC" } },
       include: {
         circle: {
           select: {

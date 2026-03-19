@@ -28,6 +28,9 @@ export function createMockCircleRepository(
     findByInviteToken: vi.fn<CircleRepository["findByInviteToken"]>().mockResolvedValue(null),
     getPublicCirclesForUser: vi.fn<CircleRepository["getPublicCirclesForUser"]>().mockResolvedValue([]),
     findFeatured: vi.fn<CircleRepository["findFeatured"]>().mockResolvedValue([]),
+    updateMembershipStatus: vi.fn<CircleRepository["updateMembershipStatus"]>().mockResolvedValue(makeMembership()),
+    findPendingMemberships: vi.fn<CircleRepository["findPendingMemberships"]>().mockResolvedValue([]),
+    countPendingMemberships: vi.fn<CircleRepository["countPendingMemberships"]>().mockResolvedValue(0),
     ...overrides,
   };
 }
@@ -47,6 +50,7 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     city: null,
     stripeConnectAccountId: null,
     inviteToken: null,
+    requiresApproval: false,
     isDemo: false,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
@@ -62,6 +66,7 @@ export function makeMembership(
     userId: "user-1",
     circleId: "circle-1",
     role: "HOST",
+    status: "ACTIVE",
     joinedAt: new Date("2026-01-01"),
     ...overrides,
   };

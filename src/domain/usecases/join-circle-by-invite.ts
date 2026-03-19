@@ -14,6 +14,7 @@ type Deps = {
 type Output = {
   circle: Circle;
   alreadyMember: boolean;
+  pendingApproval: boolean;
 };
 
 export async function joinCircleByInvite(
@@ -27,11 +28,24 @@ export async function joinCircleByInvite(
   if (!circle) throw new InvalidInviteTokenError();
 
   const membership = await circleRepository.findMembership(circle.id, userId);
-  if (membership) {
-    return { circle, alreadyMember: true };
+
+  // Already ACTIVE member
+  if (membership && membership.status === "ACTIVE") {
+    return { circle, alreadyMember: true, pendingApproval: false };
   }
 
-  await circleRepository.addMembership(circle.id, userId, "PLAYER");
+  // Already PENDING
+  if (membership && membership.status === "PENDING") {
+    return { circle, alreadyMember: false, pendingApproval: true };
+  }
 
-  return { circle, alreadyMember: false };
+  // New membership
+  const status = circle.requiresApproval ? "PENDING" : "ACTIVE";
+  await circleRepository.addMembership(circle.id, userId, "PLAYER", status);
+
+  return {
+    circle,
+    alreadyMember: false,
+    pendingApproval: status === "PENDING",
+  };
 }

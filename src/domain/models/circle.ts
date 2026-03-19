@@ -7,6 +7,8 @@ export type CoverImageAttribution = {
 
 export type CircleMemberRole = "HOST" | "PLAYER";
 
+export type MembershipStatus = "PENDING" | "ACTIVE";
+
 export type CircleCategory =
   | "TECH"
   | "DESIGN"
@@ -31,6 +33,7 @@ export type Circle = {
   city: string | null;
   stripeConnectAccountId: string | null;
   inviteToken: string | null;
+  requiresApproval: boolean;
   isDemo: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -41,6 +44,7 @@ export type CircleMembership = {
   userId: string;
   circleId: string;
   role: CircleMemberRole;
+  status: MembershipStatus;
   joinedAt: Date;
 };
 
@@ -60,6 +64,7 @@ export type CircleMemberWithUser = CircleMembership & {
 };
 
 export type DashboardCircle = CircleWithRole & {
+  membershipStatus: MembershipStatus;
   memberCount: number;
   upcomingMomentCount: number;
   nextMoment: { title: string; startsAt: Date } | null;

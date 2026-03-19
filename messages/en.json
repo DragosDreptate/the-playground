@@ -182,9 +182,17 @@
       "host": "Organizer",
       "player": "Member"
     },
+    "pendingRequests": {
+      "membershipsTitle": "Pending membership requests",
+      "registrationsTitle": "Pending registration requests",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
     "registrationStatus": {
       "registered": "Joined",
-      "waitlisted": "Waitlisted"
+      "waitlisted": "Waitlisted",
+      "pending_approval": "Pending approval",
+      "rejected": "Rejected"
     },
     "online": "Online",
     "hybrid": "Hybrid",
@@ -215,6 +223,8 @@
       "namePlaceholder": "My awesome community",
       "description": "Description",
       "descriptionPlaceholder": "Tell people what your Community is about...",
+      "requiresApproval": "Membership approval",
+      "requiresApprovalDescription": "New members must be approved manually from your dashboard.",
       "visibility": "Visibility",
       "visibilityPublic": "Public — anyone can discover this Community",
       "visibilityPrivate": "Private — only accessible via invitation",
@@ -251,7 +261,9 @@
       "today": "Today",
       "manageMoment": "Manage this Event",
       "join": "Join",
+      "joinRequiresApproval": "Join (subject to approval)",
       "joined": "Member",
+      "pendingApproval": "Request pending approval",
       "isMember": "You are a member",
       "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community",
@@ -291,6 +303,8 @@
       "joinButton": "Join this Community",
       "joinSignIn": "Sign in to join",
       "alreadyMember": "You are already a member",
+      "pendingApproval": "Your request is pending approval by the organizer.",
+      "joinRequiresApproval": "Join (subject to approval)",
       "invalidToken": "This invite link is no longer valid",
       "joined": "Welcome to the Community!",
       "viewCircle": "View Community",
@@ -378,7 +392,9 @@
       "pickDate": "Pick a date",
       "endBeforeStart": "The end date must be after the start date.",
       "createMoment": "Save draft",
-      "pastDateReadOnly": "Date is read-only — this event is in the past."
+      "pastDateReadOnly": "Date is read-only — this event is in the past.",
+      "requiresApproval": "Registration approval",
+      "requiresApprovalDescription": "Requests must be approved manually from your dashboard."
     },
     "radar": {
       "title": "Planning Radar",
@@ -434,10 +450,13 @@
       "free": "Free",
       "spotsAvailable": "{count} spots",
       "registerFree": "Join",
+      "requestToJoin": "Join (subject to approval)",
       "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
       "registered": "Joined",
       "registeredBannerTitle": "You're attending this event",
+      "pendingApprovalBannerTitle": "Request sent",
+      "pendingApprovalBannerDescription": "The organizer will review your request manually.",
       "waitlisted": "Waitlisted",
       "waitlistedBannerTitle": "You're on the waitlist",
       "joinWaitlist": "Join the waitlist",
@@ -585,7 +604,8 @@
       "nextMoment": "Next Event",
       "roleBadge": {
         "host": "Organizer",
-        "member": "Member"
+        "member": "Member",
+        "pending": "Pending approval"
       },
       "demo": "Demo"
     },
@@ -827,6 +847,22 @@
       "message": "The organizer of {circleName} has invalidated your membership in this Community.",
       "cancelledRegistrationsMessage": "Your {count} upcoming registration(s) in this Community have also been cancelled.",
       "ctaLabel": "Discover other Communities"
+    },
+    "approvalNotification": {
+      "membershipApprovedSubject": "You are now a member of {circleName}",
+      "membershipApprovedHeading": "Membership approved",
+      "membershipApprovedMessage": "Your request to join the Community \"{circleName}\" has been accepted.",
+      "membershipRejectedSubject": "Your membership request was declined — {circleName}",
+      "membershipRejectedMessage": "Your request to join the Community \"{circleName}\" was not accepted.",
+      "registrationRejectedSubject": "Your registration request was declined — {momentTitle}",
+      "registrationRejectedMessage": "Your registration request for the Event \"{momentTitle}\" was not accepted.",
+      "rejectedHeading": "Request declined",
+      "viewCircleCta": "View Community",
+      "viewMomentCta": "View Event",
+      "hostPendingRegistrationSubject": "New registration request — {momentTitle}",
+      "hostPendingRegistrationHeading": "New registration request",
+      "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
+      "manageCta": "Manage requests"
     },
     "common": {
       "dateLabel": "Date",

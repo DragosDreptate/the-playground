@@ -3,9 +3,10 @@
 import { useActionState, useState, useEffect } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
-import { AlignLeft, MapPin, Globe, Lock, Tag } from "lucide-react";
+import { AlignLeft, MapPin, Globe, Lock, Tag, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -264,6 +265,26 @@ export function CircleForm({ circle, action }: CircleFormProps) {
               </div>
             </div>
 
+          </div>
+
+          {/* Validation des inscriptions */}
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <ShieldCheck className="text-primary size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="requiresApproval" className="text-sm font-medium cursor-pointer">
+                {t("form.requiresApproval")}
+              </label>
+              <p className="text-muted-foreground text-xs">
+                {t("form.requiresApprovalDescription")}
+              </p>
+            </div>
+            <Switch
+              id="requiresApproval"
+              name="requiresApproval"
+              defaultChecked={circle?.requiresApproval ?? false}
+            />
           </div>
 
           {/* Séparateur */}

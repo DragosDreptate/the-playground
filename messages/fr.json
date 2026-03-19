@@ -182,9 +182,17 @@
       "host": "Organisateur",
       "player": "Participant"
     },
+    "pendingRequests": {
+      "membershipsTitle": "Demandes de membership en attente",
+      "registrationsTitle": "Inscriptions en attente de validation",
+      "approve": "Approuver",
+      "reject": "Refuser"
+    },
     "registrationStatus": {
       "registered": "Inscrit",
-      "waitlisted": "Liste d'attente"
+      "waitlisted": "Liste d'attente",
+      "pending_approval": "En attente de validation",
+      "rejected": "Refusée"
     },
     "online": "En ligne",
     "hybrid": "Hybride",
@@ -215,6 +223,8 @@
       "namePlaceholder": "Ma super communauté",
       "description": "Description",
       "descriptionPlaceholder": "Décrivez votre Communauté en quelques mots...",
+      "requiresApproval": "Validation des inscriptions",
+      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",
       "visibility": "Visibilité",
       "visibilityPublic": "Publique — tout le monde peut découvrir cette Communauté",
       "visibilityPrivate": "Privée — accessible uniquement sur invitation",
@@ -251,7 +261,9 @@
       "today": "Aujourd'hui",
       "manageMoment": "Gérer cet événement",
       "join": "Rejoindre",
+      "joinRequiresApproval": "Rejoindre (soumis à validation)",
       "joined": "Membre",
+      "pendingApproval": "Demande en cours de validation",
       "isMember": "Vous êtes membre",
       "isHost": "Vous êtes Organisateur",
       "manageCircle": "Gérer cette Communauté",
@@ -291,6 +303,8 @@
       "joinButton": "Rejoindre cette Communauté",
       "joinSignIn": "Se connecter pour rejoindre",
       "alreadyMember": "Vous êtes déjà membre",
+      "pendingApproval": "Votre demande est en cours de validation par l'Organisateur.",
+      "joinRequiresApproval": "Rejoindre (soumis à validation)",
       "invalidToken": "Ce lien d'invitation n'est plus valide",
       "joined": "Bienvenue dans la Communauté !",
       "viewCircle": "Voir la Communauté",
@@ -378,7 +392,9 @@
       "pickDate": "Choisir une date",
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Enregistrer le brouillon",
-      "pastDateReadOnly": "Date non modifiable — l'événement est passé."
+      "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
+      "requiresApproval": "Validation des inscriptions",
+      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace."
     },
     "radar": {
       "title": "Radar de planification",
@@ -434,10 +450,13 @@
       "free": "Gratuit",
       "spotsAvailable": "{count} places",
       "registerFree": "S'inscrire",
+      "requestToJoin": "S'inscrire (soumis à validation)",
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
       "registered": "Inscrit",
       "registeredBannerTitle": "Vous participez à cet événement",
+      "pendingApprovalBannerTitle": "Demande envoyée",
+      "pendingApprovalBannerDescription": "L'Organisateur validera votre demande manuellement.",
       "waitlisted": "Liste d'attente",
       "waitlistedBannerTitle": "Vous êtes sur liste d'attente",
       "joinWaitlist": "S'inscrire sur la liste d'attente",
@@ -585,7 +604,8 @@
       "nextMoment": "Prochain événement",
       "roleBadge": {
         "host": "Organisateur",
-        "member": "Membre"
+        "member": "Membre",
+        "pending": "En attente de validation"
       },
       "demo": "Démo"
     },
@@ -827,6 +847,22 @@
       "message": "L'organisateur de {circleName} a invalidé votre inscription à cette Communauté.",
       "cancelledRegistrationsMessage": "Vos {count} inscription(s) à venir dans cette Communauté ont également été annulées.",
       "ctaLabel": "Découvrir d'autres Communautés"
+    },
+    "approvalNotification": {
+      "membershipApprovedSubject": "Vous êtes maintenant membre de {circleName}",
+      "membershipApprovedHeading": "Membership approuvée",
+      "membershipApprovedMessage": "Votre demande pour rejoindre la Communauté « {circleName} » a été acceptée.",
+      "membershipRejectedSubject": "Votre demande de membership a été refusée — {circleName}",
+      "membershipRejectedMessage": "Votre demande pour rejoindre la Communauté « {circleName} » n'a pas été acceptée.",
+      "registrationRejectedSubject": "Votre demande d'inscription a été refusée — {momentTitle}",
+      "registrationRejectedMessage": "Votre demande d'inscription à l'événement « {momentTitle} » n'a pas été acceptée.",
+      "rejectedHeading": "Demande refusée",
+      "viewCircleCta": "Voir la Communauté",
+      "viewMomentCta": "Voir l'événement",
+      "hostPendingRegistrationSubject": "Nouvelle demande d'inscription — {momentTitle}",
+      "hostPendingRegistrationHeading": "Nouvelle demande d'inscription",
+      "hostPendingRegistrationMessage": "{playerName} souhaite s'inscrire à l'événement « {momentTitle} ». Cette inscription nécessite votre validation.",
+      "manageCta": "Gérer les demandes"
     },
     "common": {
       "dateLabel": "Date",

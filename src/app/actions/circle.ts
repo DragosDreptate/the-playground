@@ -20,9 +20,11 @@ import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { revokeCircleInviteToken } from "@/domain/usecases/revoke-circle-invite-token";
 import { joinCircleByInvite } from "@/domain/usecases/join-circle-by-invite";
+import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
+import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import { DomainError } from "@/domain/errors";
-import type { CircleVisibility, CircleCategory } from "@/domain/models/circle";
+import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { processCoverImage } from "./cover-image";
@@ -53,6 +55,7 @@ export async function createCircleAction(
     formData.get("customCategory") as string | null
   );
   const city = (formData.get("city") as string)?.trim() || undefined;
+  const requiresApproval = formData.get("requiresApproval") === "on";
 
   if (!name?.trim()) {
     return { success: false, error: "Name is required", code: "VALIDATION" };
@@ -83,6 +86,7 @@ export async function createCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        requiresApproval,
         userId: session.user.id,
         ...coverData,
       },
@@ -157,6 +161,8 @@ export async function updateCircleAction(
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
   const customCategoryRaw = formData.get("customCategory") as string | null;
+  const requiresApprovalRaw = formData.get("requiresApproval");
+  const requiresApprovalUpdate = requiresApprovalRaw !== null ? requiresApprovalRaw === "on" : undefined;
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
@@ -195,6 +201,7 @@ export async function updateCircleAction(
         ...(customCategory !== undefined && { customCategory }),
         city,
         ...coverData,
+        ...(requiresApprovalUpdate !== undefined && { requiresApproval: requiresApprovalUpdate }),
       },
       { circleRepository: circleRepo }
     );
@@ -248,19 +255,19 @@ export async function deleteCircleAction(
 
 export async function joinCircleDirectlyAction(
   circleId: string
-): Promise<ActionResult<{ alreadyMember: boolean }>> {
+): Promise<ActionResult<{ alreadyMember: boolean; pendingApproval: boolean }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
   try {
-    const { alreadyMember } = await joinCircleDirectly(
+    const { alreadyMember, pendingApproval } = await joinCircleDirectly(
       { circleId, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember) {
+    if (!alreadyMember && !pendingApproval) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
       after(async () => {
@@ -296,7 +303,7 @@ export async function joinCircleDirectlyAction(
       });
     }
 
-    return { success: true, data: { alreadyMember } };
+    return { success: true, data: { alreadyMember, pendingApproval } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
@@ -453,19 +460,19 @@ export async function revokeCircleInviteTokenAction(
 
 export async function joinCircleByInviteAction(
   token: string
-): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean }>> {
+): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean; pendingApproval: boolean }>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
   try {
-    const { circle, alreadyMember } = await joinCircleByInvite(
+    const { circle, alreadyMember, pendingApproval } = await joinCircleByInvite(
       { token, userId: session.user.id },
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember) {
+    if (!alreadyMember && !pendingApproval) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
       after(async () => {
@@ -498,7 +505,7 @@ export async function joinCircleByInviteAction(
       });
     }
 
-    return { success: true, data: { circleSlug: circle.slug, alreadyMember } };
+    return { success: true, data: { circleSlug: circle.slug, alreadyMember, pendingApproval } };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
@@ -554,6 +561,110 @@ export async function inviteToCircleByEmailAction(
         });
       } catch (e) {
         Sentry.captureException(e);
+      }
+    });
+
+    return { success: true, data: undefined };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function approveCircleMembershipAction(
+  circleId: string,
+  memberUserId: string
+): Promise<ActionResult<CircleMembership>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    const result = await approveCircleMembership(
+      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+
+    const t = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [circle, user] = await Promise.all([
+          prismaCircleRepository.findById(circleId),
+          prismaUserRepository.findById(memberUserId),
+        ]);
+        if (!circle || !user) return;
+        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        await emailService.sendApprovalNotification({
+          to: user.email,
+          recipientName: playerName,
+          entityName: circle.name,
+          entitySlug: `circles/${circle.slug}`,
+          strings: {
+            subject: t("approvalNotification.membershipApprovedSubject", { circleName: circle.name }),
+            heading: t("approvalNotification.membershipApprovedHeading"),
+            message: t("approvalNotification.membershipApprovedMessage", { circleName: circle.name }),
+            ctaLabel: t("approvalNotification.viewCircleCta"),
+            footer: t("common.footer"),
+          },
+        });
+      } catch (err) {
+        Sentry.captureException(err);
+      }
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function rejectCircleMembershipAction(
+  circleId: string,
+  memberUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  try {
+    await rejectCircleMembership(
+      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleRepository: prismaCircleRepository }
+    );
+
+    const t = await getTranslations("Email");
+    after(async () => {
+      try {
+        const [circle, user] = await Promise.all([
+          prismaCircleRepository.findById(circleId),
+          prismaUserRepository.findById(memberUserId),
+        ]);
+        if (!circle || !user) return;
+        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        await emailService.sendApprovalNotification({
+          to: user.email,
+          recipientName: playerName,
+          entityName: circle.name,
+          entitySlug: `circles/${circle.slug}`,
+          strings: {
+            subject: t("approvalNotification.membershipRejectedSubject", { circleName: circle.name }),
+            heading: t("approvalNotification.rejectedHeading"),
+            message: t("approvalNotification.membershipRejectedMessage", { circleName: circle.name }),
+            ctaLabel: t("approvalNotification.viewCircleCta"),
+            footer: t("common.footer"),
+          },
+        });
+      } catch (err) {
+        Sentry.captureException(err);
       }
     });
 

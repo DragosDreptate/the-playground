@@ -25,6 +25,7 @@ export function createMockEmailService(
     sendRegistrationReminderBatch: vi.fn().mockResolvedValue(undefined),
     sendMemberRemovedFromCircle: vi.fn().mockResolvedValue(undefined),
     sendRegistrationRemovedByHost: vi.fn().mockResolvedValue(undefined),
+    sendApprovalNotification: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

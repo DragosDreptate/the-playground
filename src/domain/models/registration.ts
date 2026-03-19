@@ -1,10 +1,12 @@
 import type { LocationType } from "@/domain/models/moment";
 
 export type RegistrationStatus =
+  | "PENDING_APPROVAL"
   | "REGISTERED"
   | "WAITLISTED"
   | "CANCELLED"
-  | "CHECKED_IN";
+  | "CHECKED_IN"
+  | "REJECTED";
 
 export type PaymentStatus = "NONE" | "PENDING" | "PAID" | "REFUNDED";
 

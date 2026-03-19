@@ -24,7 +24,7 @@ export async function recalculateCircleScore(circleId: string): Promise<void> {
       overrideScore: true,
       _count: {
         select: {
-          memberships: { where: { role: "PLAYER" } },
+          memberships: { where: { role: "PLAYER", status: "ACTIVE" } },
         },
       },
       moments: {

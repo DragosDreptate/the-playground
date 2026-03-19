@@ -35,6 +35,7 @@ export async function addCommentAction(
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
+        registrationRepository: prismaRegistrationRepository,
       }
     );
 

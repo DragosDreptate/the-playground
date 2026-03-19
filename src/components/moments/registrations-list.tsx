@@ -66,7 +66,7 @@ export function RegistrationsList({
       r.user.firstName ?? "",
       r.user.lastName ?? "",
       r.user.email,
-      t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted"}`),
+      t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted" | "pending_approval" | "rejected"}`),
       new Date(r.registeredAt).toLocaleDateString(),
     ]);
     const csv = [metaRow, headers, ...rows]

@@ -517,7 +517,7 @@ export const prismaAdminRepository: AdminRepository = {
     const records = await prisma.circle.findMany({
       where: circleWhere(filters),
       include: {
-        _count: { select: { memberships: true, moments: true } },
+        _count: { select: { memberships: { where: { status: "ACTIVE" } }, moments: true } },
         memberships: {
           where: { role: "HOST" },
           take: 1,
@@ -556,7 +556,7 @@ export const prismaAdminRepository: AdminRepository = {
     const record = await prisma.circle.findUnique({
       where: { id },
       include: {
-        _count: { select: { memberships: true, moments: true } },
+        _count: { select: { memberships: { where: { status: "ACTIVE" } }, moments: true } },
         memberships: {
           where: { role: "HOST" },
           include: {
@@ -873,6 +873,7 @@ export const prismaAdminRepository: AdminRepository = {
     const since = daysAgo(days);
     const where: Prisma.CircleMembershipWhereInput = {
       role: "PLAYER",
+      status: "ACTIVE",
       joinedAt: { gte: since },
       user: realUserWhere(),
       circle: realCircleWhere(),

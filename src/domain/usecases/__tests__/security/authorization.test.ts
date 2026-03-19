@@ -684,6 +684,7 @@ describe("Security — RBAC", () => {
       const circleRepo = createMockCircleRepository({
         // Pas de membership existant
         findMembership: vi.fn().mockResolvedValue(null),
+        findById: vi.fn().mockResolvedValue(makeCircle({ id: "circle-1", requiresApproval: false })),
         addMembership: vi.fn().mockResolvedValue(makeMembership({ userId: "new-user", role: "PLAYER" })),
       });
 
@@ -696,8 +697,8 @@ describe("Security — RBAC", () => {
         }
       );
 
-      // addMembership DOIT être appelé avec le rôle PLAYER
-      expect(circleRepo.addMembership).toHaveBeenCalledWith("circle-1", "new-user", "PLAYER");
+      // addMembership DOIT être appelé avec le rôle PLAYER et status ACTIVE
+      expect(circleRepo.addMembership).toHaveBeenCalledWith("circle-1", "new-user", "PLAYER", "ACTIVE");
     });
   });
 

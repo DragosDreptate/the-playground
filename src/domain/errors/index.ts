@@ -7,6 +7,7 @@ export {
   NotMemberOfCircleError,
   CannotRemoveHostError,
   CannotRemoveSelfError,
+  MembershipNotPendingError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,
@@ -31,5 +32,6 @@ export {
   UnauthorizedRegistrationActionError,
   HostCannotCancelRegistrationError,
   CannotRemoveHostRegistrationError,
+  RegistrationNotPendingApprovalError,
 } from "./registration-errors";
 export { AdminUnauthorizedError } from "./admin-errors";

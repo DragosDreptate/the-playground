@@ -3,9 +3,10 @@
 import { useActionState, useState } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
-import { AlignLeft } from "lucide-react";
+import { AlignLeft, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -350,6 +351,26 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onCapacityOpenChange={setCapacityOpen}
             defaultCapacity={moment?.capacity}
           />
+
+          {/* Validation des inscriptions */}
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <ShieldCheck className="text-primary size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="requiresApproval" className="text-sm font-medium cursor-pointer">
+                {t("form.requiresApproval")}
+              </label>
+              <p className="text-muted-foreground text-xs">
+                {t("form.requiresApprovalDescription")}
+              </p>
+            </div>
+            <Switch
+              id="requiresApproval"
+              name="requiresApproval"
+              defaultChecked={moment?.requiresApproval ?? false}
+            />
+          </div>
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">

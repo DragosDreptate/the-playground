@@ -40,22 +40,27 @@ export default async function MomentDetailPage({
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
-  // Parallélise membership + hosts (dépendent tous deux de circle.id)
-  const [membership, hosts] = await Promise.all([
+  // Parallélise membership + hosts + registration (indépendants)
+  const [membership, hosts, userRegistration] = await Promise.all([
     circleRepo.findMembership(circle.id, session.user.id),
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 
-  if (!membership) notFound();
+  // Accès autorisé si : membre ACTIVE du Circle OU inscrit à l'événement
+  const hasActiveMembership = membership?.status === "ACTIVE";
+  const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
+  if (!hasActiveMembership && !hasActiveRegistration) notFound();
 
-  const isHost = membership.role === "HOST";
+  const isHost = hasActiveMembership && membership!.role === "HOST";
 
-  const [allAttendees, comments] = await Promise.all([
+  const [allAttendees, comments, pendingRegistrations] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
     getMomentComments(
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
+    isHost ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
   ]);
   const registeredCount = allAttendees.filter(
     (r) => r.status === "REGISTERED"
@@ -145,6 +150,7 @@ export default async function MomentDetailPage({
         slug: moment.slug,
       }}
       appUrl={appUrl}
+      pendingRegistrations={pendingRegistrations}
     />
   );
 }

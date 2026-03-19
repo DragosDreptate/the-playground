@@ -22,8 +22,9 @@ describe("JoinCircleByInvite", () => {
       const result = await joinCircleByInvite({ token, userId }, { circleRepository: repo });
 
       expect(result.alreadyMember).toBe(false);
+      expect(result.pendingApproval).toBe(false);
       expect(result.circle.id).toBe(circleId);
-      expect(repo.addMembership).toHaveBeenCalledWith(circleId, userId, "PLAYER");
+      expect(repo.addMembership).toHaveBeenCalledWith(circleId, userId, "PLAYER", "ACTIVE");
     });
 
     it("should return the circle data", async () => {
@@ -89,6 +90,25 @@ describe("JoinCircleByInvite", () => {
 
       expect(result.alreadyMember).toBe(true);
       expect(repo.addMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given valid token and Circle with requiresApproval=true", () => {
+    it("should add membership as PENDING and return pendingApproval=true", async () => {
+      const circle = makeCircle({ id: circleId, inviteToken: token, requiresApproval: true });
+      const membership = makeMembership({ circleId, userId, role: "PLAYER", status: "PENDING" });
+
+      const repo = createMockCircleRepository({
+        findByInviteToken: vi.fn().mockResolvedValue(circle),
+        findMembership: vi.fn().mockResolvedValue(null),
+        addMembership: vi.fn().mockResolvedValue(membership),
+      });
+
+      const result = await joinCircleByInvite({ token, userId }, { circleRepository: repo });
+
+      expect(result.alreadyMember).toBe(false);
+      expect(result.pendingApproval).toBe(true);
+      expect(repo.addMembership).toHaveBeenCalledWith(circleId, userId, "PLAYER", "PENDING");
     });
   });
 
