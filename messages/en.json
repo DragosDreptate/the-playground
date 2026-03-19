@@ -1144,7 +1144,8 @@
       "radar": "The Radar",
       "share": "Share your event",
       "members": "Manage members",
-      "inviteMembers": "Invite members"
+      "inviteMembers": "Invite members",
+      "approvalRegistrations": "Approve registrations"
     },
     "participant": {
       "sectionTitle": "Member",
@@ -1157,7 +1158,8 @@
         "step2": "Click <strong>Join</strong>",
         "step3": "If you don't have an account yet, you can sign in in seconds (magic link by email or via Google / GitHub) — no form to fill out",
         "step4": "Once registered, you receive a <strong>confirmation email</strong> with the details and a link to add the event to your calendar (Google Calendar, Apple Calendar, or .ics file)",
-        "callout": "No prior account is needed to view an event page. Registration takes less than a minute."
+        "callout": "No prior account is needed to view an event page. Registration takes less than a minute.",
+        "approvalNote": "Some events require <strong>approval by the Organizer</strong>. In that case, the button reads \u201cJoin (subject to approval)\u201d. Your request is sent to the Organizer, and you receive a confirmation email once it is accepted. If your request is declined, you are notified by email. While your request is pending, it appears in <strong>Dashboard</strong> with the status \u201cPending approval\u201d."
       },
       "join": {
         "title": "Join a Community",
@@ -1243,6 +1245,20 @@
         "item2": "The <strong>waitlist</strong> (attendees waiting for a spot)",
         "item3": "The <strong>remaining spots counter</strong> and real-time registrant count",
         "item4": "<strong>CSV export</strong> of the full list"
+      },
+      "approvalRegistrations": {
+        "title": "Approve registrations",
+        "intro": "You can enable <strong>registration approval</strong> on each event and/or each Community independently, from the creation or edit settings.",
+        "eventLabel": "For an event with approval enabled:",
+        "event1": "When a Member clicks Join, their request is sent to the Organizer (no automatic registration)",
+        "event2": "You receive an email for each new request",
+        "event3": "From the event dashboard, a <strong>Pending requests</strong> section lists all requests with <strong>Approve</strong> or <strong>Decline</strong> options",
+        "event4": "If you approve: the Member receives a confirmation email and is registered (or placed on the waitlist if the event is full)",
+        "event5": "If you decline: the Member receives a notification email",
+        "communityLabel": "For a Community with approval enabled:",
+        "community1": "Membership requests (from the Community page or via invite link) are subject to your approval",
+        "community2": "From the Community dashboard, a <strong>Pending requests</strong> section lets you approve or decline each request",
+        "callout": "Approval is independent on each entity — enabling approval on a Community does not automatically enable it on its events, and vice versa."
       },
       "contact": {
         "title": "Contact your members",

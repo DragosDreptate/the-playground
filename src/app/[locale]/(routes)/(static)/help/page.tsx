@@ -96,6 +96,7 @@ export default async function HelpPage() {
         { id: "share", label: t("sidebar.share") },
         { id: "members", label: t("sidebar.members") },
         { id: "inviteMembers", label: t("sidebar.inviteMembers") },
+        { id: "approvalRegistrations", label: t("sidebar.approvalRegistrations") },
       ],
     },
     { id: "faq", label: t("sidebar.faqLabel"), children: [] },
@@ -176,6 +177,9 @@ export default async function HelpPage() {
                 ))}
               </ol>
               <Callout>{t("participant.inscription.callout")}</Callout>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.inscription.approvalNote")}
+              </p>
             </div>
 
             <hr className="border-border" />
@@ -476,6 +480,39 @@ export default async function HelpPage() {
                 ))}
               </ol>
               <Callout>{t.rich("organizer.inviteMembers.callout", rich)}</Callout>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Valider les inscriptions */}
+            <div className="space-y-4">
+              <SectionH3 id="approvalRegistrations">{t("organizer.approvalRegistrations.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("organizer.approvalRegistrations.intro")}
+              </p>
+              <p className="text-sm font-medium">{t("organizer.approvalRegistrations.eventLabel")}</p>
+              <ol className="space-y-2">
+                {(["event1", "event2", "event3", "event4", "event5"] as const).map((step, i) => (
+                  <li key={step} className="flex items-start gap-3">
+                    <StepNumber n={i + 1} />
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      {t(`organizer.approvalRegistrations.${step}`)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <p className="text-sm font-medium">{t("organizer.approvalRegistrations.communityLabel")}</p>
+              <ol className="space-y-2">
+                {(["community1", "community2"] as const).map((step, i) => (
+                  <li key={step} className="flex items-start gap-3">
+                    <StepNumber n={i + 1} />
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      {t(`organizer.approvalRegistrations.${step}`)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <Callout>{t("organizer.approvalRegistrations.callout")}</Callout>
             </div>
           </section>
 
