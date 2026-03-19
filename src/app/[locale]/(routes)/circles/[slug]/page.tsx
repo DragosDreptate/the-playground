@@ -35,6 +35,7 @@ import {
   MapPin,
   ExternalLink,
   Crown,
+  Clock,
 } from "lucide-react";
 
 export const revalidate = 60;
@@ -334,6 +335,14 @@ export default async function PublicCirclePage({
           {/* Bouton Quitter — visible pour les membres non-Organisateurs */}
           {showMemberBadge && (
             <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
+          )}
+
+          {/* Badge en attente — visible quand la demande est en cours de validation */}
+          {isPendingMember && (
+            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-sm font-medium text-amber-600">
+              <Clock className="size-4" />
+              {t("detail.pendingApproval")}
+            </div>
           )}
 
           {/* Bouton Rejoindre — visible uniquement pour les utilisateurs connectés non-membres */}
