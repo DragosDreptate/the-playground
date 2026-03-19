@@ -1144,7 +1144,8 @@
       "radar": "Le Radar",
       "share": "Partager l'événement",
       "members": "Gérer les membres",
-      "inviteMembers": "Inviter des membres"
+      "inviteMembers": "Inviter des membres",
+      "approvalRegistrations": "Valider les inscriptions"
     },
     "participant": {
       "sectionTitle": "Participant",
@@ -1157,7 +1158,8 @@
         "step2": "Cliquez sur <strong>S'inscrire</strong>",
         "step3": "Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google / GitHub) — aucun formulaire à remplir",
         "step4": "Une fois inscrit, vous recevez un <strong>email de confirmation</strong> avec les détails et un lien pour ajouter l'événement à votre calendrier (Google Calendar, Apple Calendar, ou fichier .ics)",
-        "callout": "Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute."
+        "callout": "Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute.",
+        "approvalNote": "Certains événements requièrent une validation par l'Organisateur. Dans ce cas, le bouton affiche « S'inscrire (soumis à validation) ». Votre demande est transmise à l'Organisateur, et vous recevez un email de confirmation dès qu'elle est acceptée. Si votre demande est refusée, vous en êtes notifié par email. Tant que votre demande est en attente, elle apparaît dans Mon espace avec le statut « En attente de validation »."
       },
       "join": {
         "title": "Rejoindre une Communauté",
@@ -1243,6 +1245,20 @@
         "item2": "La <strong>liste d'attente</strong> (participants en attente d'une place)",
         "item3": "Le <strong>nombre de places restantes</strong> et le compteur d'inscrits en temps réel",
         "item4": "L'<strong>export CSV</strong> de la liste complète"
+      },
+      "approvalRegistrations": {
+        "title": "Valider les inscriptions",
+        "intro": "Vous pouvez activer la validation des inscriptions sur chaque événement et/ou chaque Communauté indépendamment, depuis les paramètres de création ou de modification.",
+        "eventLabel": "Pour un événement avec validation activée :",
+        "event1": "Quand un Participant clique sur S'inscrire, sa demande est transmise à l'Organisateur (pas d'inscription automatique)",
+        "event2": "Vous recevez un email pour chaque nouvelle demande",
+        "event3": "Depuis le tableau de bord de l'événement, une section « Demandes en attente » liste toutes les demandes avec les options Approuver ou Refuser",
+        "event4": "Si vous approuvez : le Participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
+        "event5": "Si vous refusez : le Participant reçoit un email de notification",
+        "communityLabel": "Pour une Communauté avec validation activée :",
+        "community1": "Les demandes de membership (depuis la page Communauté ou via lien d'invitation) sont soumises à votre approbation",
+        "community2": "Depuis le tableau de bord de la Communauté, une section « Demandes en attente » vous permet d'approuver ou refuser chaque demande",
+        "callout": "La validation est indépendante sur chaque entité — activer la validation sur une Communauté n'active pas automatiquement la validation sur ses événements, et inversement."
       },
       "contact": {
         "title": "Contacter vos participants",
