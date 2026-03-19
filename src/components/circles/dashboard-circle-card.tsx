@@ -56,18 +56,13 @@ export async function DashboardCircleCard({ circle }: Props) {
             {/* Badges — catégorie + rôle */}
             <div className="flex items-center gap-2">
               {categoryLabel && <CategoryBadge label={categoryLabel} />}
-              {circle.membershipStatus === "PENDING" ? (
-                <Badge variant="secondary" className="shrink-0 gap-1 text-xs text-amber-600">
-                  <Clock className="size-3" />
-                  {t("circleCard.roleBadge.pending")}
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                  {circle.memberRole === "HOST"
+              <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
+                {circle.membershipStatus === "PENDING"
+                  ? <><Clock className="size-3" />{t("circleCard.roleBadge.pending")}</>
+                  : circle.memberRole === "HOST"
                     ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
                     : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
-                </Badge>
-              )}
+              </Badge>
             </div>
             {/* Titre — pleine largeur */}
             <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
