@@ -78,13 +78,12 @@ export async function approveMomentRegistration(
   let circleAutoJoined = false;
   let circleJoinPending = false;
 
-  const existingMembership = await circleRepository.findMembership(
-    moment.circleId,
-    registration.userId
-  );
+  const [existingMembership, circle] = await Promise.all([
+    circleRepository.findMembership(moment.circleId, registration.userId),
+    circleRepository.findById(moment.circleId),
+  ]);
 
   if (!existingMembership) {
-    const circle = await circleRepository.findById(moment.circleId);
     const membershipStatus = circle?.requiresApproval ? "PENDING" : "ACTIVE";
     await circleRepository.addMembership(
       moment.circleId,

@@ -108,13 +108,13 @@ export async function joinMoment(
       });
 
   // Auto-join Circle as PLAYER (idempotent)
-  const membership = await circleRepository.findMembership(
-    moment.circleId,
-    input.userId
-  );
+  // Parallelize: membership check + circle load (circle needed for requiresApproval)
+  const [membership, circle] = await Promise.all([
+    circleRepository.findMembership(moment.circleId, input.userId),
+    circleRepository.findById(moment.circleId),
+  ]);
   if (!membership) {
     // D2 Option A: if Circle requires approval → PENDING, else ACTIVE
-    const circle = await circleRepository.findById(moment.circleId);
     const membershipStatus = circle?.requiresApproval ? "PENDING" : "ACTIVE";
     await circleRepository.addMembership(
       moment.circleId,

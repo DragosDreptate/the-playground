@@ -94,11 +94,14 @@ export async function joinMomentAction(
             prismaMomentRepository.findById(momentId),
           ]);
           if (!user || !moment) return;
-          const circle = await prismaCircleRepository.findById(moment.circleId);
+
+          const [circle, hosts] = await Promise.all([
+            prismaCircleRepository.findById(moment.circleId),
+            prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+          ]);
           if (!circle) return;
 
           const playerName = getDisplayName(user.firstName, user.lastName, user.email);
-          const hosts = await prismaCircleRepository.findMembersByRole(moment.circleId, "HOST");
           const hostUserIds = hosts.map((h) => h.userId);
           const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
 
@@ -555,13 +558,12 @@ export async function rejectMomentRegistrationAction(
       }
     );
 
-    const rejectedResult = result;
-    const t2 = await getTranslations("Email");
+    const t = await getTranslations("Email");
     after(async () => {
       try {
         const [user, moment] = await Promise.all([
-          prismaUserRepository.findById(rejectedResult.userId),
-          prismaMomentRepository.findById(rejectedResult.momentId),
+          prismaUserRepository.findById(result.userId),
+          prismaMomentRepository.findById(result.momentId),
         ]);
         if (!user || !moment) return;
         const playerName = getDisplayName(user.firstName, user.lastName, user.email);
@@ -571,11 +573,11 @@ export async function rejectMomentRegistrationAction(
           entityName: moment.title,
           entitySlug: `m/${moment.slug}`,
           strings: {
-            subject: t2("approvalNotification.registrationRejectedSubject", { momentTitle: moment.title }),
-            heading: t2("approvalNotification.rejectedHeading"),
-            message: t2("approvalNotification.registrationRejectedMessage", { momentTitle: moment.title }),
-            ctaLabel: t2("approvalNotification.viewMomentCta"),
-            footer: t2("common.footer"),
+            subject: t("approvalNotification.registrationRejectedSubject", { momentTitle: moment.title }),
+            heading: t("approvalNotification.rejectedHeading"),
+            message: t("approvalNotification.registrationRejectedMessage", { momentTitle: moment.title }),
+            ctaLabel: t("approvalNotification.viewMomentCta"),
+            footer: t("common.footer"),
           },
         });
       } catch (err) {
@@ -583,7 +585,7 @@ export async function rejectMomentRegistrationAction(
       }
     });
 
-    return { success: true, data: rejectedResult };
+    return { success: true, data: result };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
