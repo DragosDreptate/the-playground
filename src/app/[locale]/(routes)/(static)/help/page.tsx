@@ -371,7 +371,7 @@ export default async function HelpPage() {
                   </li>
                 ))}
               </ul>
-              <Callout>{t("organizer.createEvent.callout")}</Callout>
+              <Callout>{t.rich("organizer.createEvent.callout", rich)}</Callout>
             </div>
 
             <hr className="border-border" />
