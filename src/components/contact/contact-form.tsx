@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { sendContactMessageAction } from "@/app/actions/contact";
 
 type FormState = { success: true } | { success: false; error: string } | null;
@@ -10,16 +11,18 @@ const inputClassName =
 
 const labelClassName = "text-sm font-medium text-foreground";
 
-const SUBJECT_OPTIONS = [
-  { value: "", label: "Choisir un sujet — facultatif" },
-  { value: "Question générale", label: "Question générale" },
-  { value: "Je veux organiser des événements", label: "Je veux organiser des événements" },
-  { value: "Problème technique", label: "Problème technique" },
-  { value: "Suggestion / Idée", label: "Suggestion / Idée" },
-  { value: "Autre", label: "Autre" },
-];
-
 export function ContactForm() {
+  const t = useTranslations("Contact");
+
+  const subjectOptions = [
+    { value: "", label: t("subjectDefault") },
+    { value: "General question", label: t("subjectGeneral") },
+    { value: "I want to organize events", label: t("subjectOrganize") },
+    { value: "Technical issue", label: t("subjectTechnical") },
+    { value: "Suggestion / Idea", label: t("subjectSuggestion") },
+    { value: "Other", label: t("subjectOther") },
+  ];
+
   async function handleSubmit(_prev: FormState, formData: FormData): Promise<FormState> {
     const result = await sendContactMessageAction(formData);
     if (result.success) return { success: true };
@@ -43,10 +46,8 @@ export function ContactForm() {
           </svg>
         </div>
         <div className="space-y-1.5">
-          <p className="text-base font-semibold text-foreground">Message envoyé !</p>
-          <p className="text-sm text-muted-foreground">
-            Merci pour votre message. On vous répond personnellement sous 24h.
-          </p>
+          <p className="text-base font-semibold text-foreground">{t("successTitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("successDescription")}</p>
         </div>
       </div>
     );
@@ -61,7 +62,7 @@ export function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <label htmlFor="firstName" className={labelClassName}>
-            Prénom
+            {t("firstNameLabel")}
           </label>
           <input
             id="firstName"
@@ -70,13 +71,13 @@ export function ContactForm() {
             required
             autoComplete="given-name"
             className={inputClassName}
-            placeholder="Marie"
+            placeholder={t("firstNamePlaceholder")}
             disabled={pending}
           />
         </div>
         <div className="space-y-1.5">
           <label htmlFor="lastName" className={labelClassName}>
-            Nom
+            {t("lastNameLabel")}
           </label>
           <input
             id="lastName"
@@ -85,7 +86,7 @@ export function ContactForm() {
             required
             autoComplete="family-name"
             className={inputClassName}
-            placeholder="Dupont"
+            placeholder={t("lastNamePlaceholder")}
             disabled={pending}
           />
         </div>
@@ -94,7 +95,7 @@ export function ContactForm() {
       {/* Email */}
       <div className="space-y-1.5">
         <label htmlFor="email" className={labelClassName}>
-          Email
+          {t("emailLabel")}
         </label>
         <input
           id="email"
@@ -103,7 +104,7 @@ export function ContactForm() {
           required
           autoComplete="email"
           className={inputClassName}
-          placeholder="marie@exemple.fr"
+          placeholder={t("emailPlaceholder")}
           disabled={pending}
         />
       </div>
@@ -111,8 +112,8 @@ export function ContactForm() {
       {/* Sujet */}
       <div className="space-y-1.5">
         <label htmlFor="subject" className={labelClassName}>
-          Sujet{" "}
-          <span className="text-xs font-normal text-muted-foreground">(facultatif)</span>
+          {t("subjectLabel")}{" "}
+          <span className="text-xs font-normal text-muted-foreground">{t("subjectOptional")}</span>
         </label>
         <select
           id="subject"
@@ -121,7 +122,7 @@ export function ContactForm() {
           disabled={pending}
           defaultValue=""
         >
-          {SUBJECT_OPTIONS.map((opt) => (
+          {subjectOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -132,7 +133,7 @@ export function ContactForm() {
       {/* Message */}
       <div className="space-y-1.5">
         <label htmlFor="message" className={labelClassName}>
-          Message
+          {t("messageLabel")}
         </label>
         <textarea
           id="message"
@@ -140,7 +141,7 @@ export function ContactForm() {
           required
           rows={5}
           className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Décrivez votre demande..."
+          placeholder={t("messagePlaceholder")}
           disabled={pending}
         />
       </div>
@@ -177,10 +178,10 @@ export function ContactForm() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Envoi en cours…
+            {t("sending")}
           </>
         ) : (
-          "Envoyer le message"
+          t("submit")
         )}
       </button>
     </form>

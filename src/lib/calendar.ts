@@ -21,7 +21,8 @@ function formatLocation(data: CalendarEventData): string {
 
 export function buildGoogleCalendarUrl(
   data: CalendarEventData,
-  appUrl: string
+  appUrl: string,
+  translations: { join: string; organizedBy: string }
 ): string {
   const start = formatGoogleDate(data.startsAt);
   const end = formatGoogleDate(
@@ -29,8 +30,8 @@ export function buildGoogleCalendarUrl(
   );
 
   const detailsParts = [];
-  if (data.videoLink) detailsParts.push(`Rejoindre : ${data.videoLink}`);
-  detailsParts.push(`Organisé par ${data.circleName} — The Playground`);
+  if (data.videoLink) detailsParts.push(`${translations.join} : ${data.videoLink}`);
+  detailsParts.push(`${translations.organizedBy} ${data.circleName} — The Playground`);
   detailsParts.push(`${appUrl}/m/${data.slug}`);
 
   const params = new URLSearchParams({

@@ -513,7 +513,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     <div className="flex shrink-0 gap-1.5">
                       <Button variant="outline" size="sm" asChild>
                         <a
-                          href={buildGoogleCalendarUrl(props.calendarData, props.appUrl)}
+                          href={buildGoogleCalendarUrl(props.calendarData, props.appUrl, { join: t("public.addToCalendar.calendarJoin"), organizedBy: t("public.addToCalendar.calendarOrganizedBy") })}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

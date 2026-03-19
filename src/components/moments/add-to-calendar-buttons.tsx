@@ -25,7 +25,10 @@ type Props = {
 export function AddToCalendarButtons({ data, appUrl }: Props) {
   const t = useTranslations("Moment.public");
 
-  const googleUrl = buildGoogleCalendarUrl(data, appUrl);
+  const googleUrl = buildGoogleCalendarUrl(data, appUrl, {
+    join: t("addToCalendar.calendarJoin"),
+    organizedBy: t("addToCalendar.calendarOrganizedBy"),
+  });
   const icsUrl = `/api/moments/${data.slug}/calendar`;
 
   return (

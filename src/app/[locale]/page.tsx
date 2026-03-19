@@ -155,7 +155,7 @@ export default async function HomePage() {
                   {/* Contenu */}
                   <div className="pt-1 md:pt-3">
                     <p className="text-primary mb-1 text-xs font-semibold uppercase tracking-widest">
-                      Étape {step}
+                      {t("stepLabel")} {step}
                     </p>
                     <h3 className="text-xl font-bold md:text-2xl">{title}</h3>
                     <p className="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
@@ -236,20 +236,20 @@ export default async function HomePage() {
         <section className="bg-muted/60 px-4 py-16">
           <div className="mx-auto flex max-w-lg flex-col items-center text-center">
             <h2 className="text-xl font-bold tracking-tight">
-              Vous avez une question avant de vous lancer&nbsp;?
+              {t("contactTitle")}
             </h2>
             <p className="text-muted-foreground mt-2 text-sm">
-              On répond personnellement sous 24h.
+              {t("contactSubtitle")}
             </p>
             <Button asChild variant="outline" size="sm" className="mt-6">
-              <Link href="/contact">Écrire un message →</Link>
+              <Link href="/contact">{t("contactCta")}</Link>
             </Button>
             <p className="text-muted-foreground mt-3 text-xs">
-              Ou consultez la{" "}
+              {t("contactHelpPrefix")}{" "}
               <Link href="/help" className="underline underline-offset-2 hover:text-foreground transition-colors">
-                page Aide
+                {t("contactHelpLink")}
               </Link>{" "}
-              pour les questions fréquentes.
+              {t("contactHelpSuffix")}
             </p>
           </div>
         </section>

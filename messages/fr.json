@@ -41,7 +41,14 @@
     "heroBranded1": "Communauté",
     "heroBranded2": "événements",
     "heroRestPrefix1": "votre",
-    "heroRestPrefix2": "vos"
+    "heroRestPrefix2": "vos",
+    "stepLabel": "Étape",
+    "contactTitle": "Vous avez une question avant de vous lancer ?",
+    "contactSubtitle": "On répond personnellement sous 24h.",
+    "contactCta": "Écrire un message →",
+    "contactHelpPrefix": "Ou consultez la",
+    "contactHelpLink": "page Aide",
+    "contactHelpSuffix": "pour les questions fréquentes."
   },
   "Common": {
     "loading": "Chargement...",
@@ -414,7 +421,9 @@
       "addToCalendar": {
         "label": "Ajouter à mon calendrier",
         "google": "Google Calendar",
-        "ics": "Fichier .ics"
+        "ics": "Fichier .ics",
+        "calendarJoin": "Rejoindre",
+        "calendarOrganizedBy": "Organisé par"
       },
       "waitlistPosition": "Vous êtes {position}° sur la liste d'attente",
       "draftNotice": "Cet événement est en cours de préparation et n'est pas encore publié.",
@@ -1237,5 +1246,34 @@
       "success": "Message envoyé ! Nous vous répondrons dans les meilleurs délais.",
       "error": "Une erreur est survenue. Veuillez réessayer ou nous contacter directement à hello@the-playground.fr"
     }
+  },
+  "Contact": {
+    "pageTitle": "Contact — The Playground",
+    "pageDescription": "Contactez l’équipe The Playground. On répond personnellement sous 24h.",
+    "heroTitle": "Contactez-nous",
+    "heroDescription": "Une question, une idée, un retour ? On lit tous les messages et on répond personnellement sous 24h.",
+    "firstNameLabel": "Prénom",
+    "firstNamePlaceholder": "Marie",
+    "lastNameLabel": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "emailLabel": "Email",
+    "emailPlaceholder": "marie@exemple.fr",
+    "subjectLabel": "Sujet",
+    "subjectOptional": "(facultatif)",
+    "subjectDefault": "Choisir un sujet — facultatif",
+    "subjectGeneral": "Question générale",
+    "subjectOrganize": "Je veux organiser des événements",
+    "subjectTechnical": "Problème technique",
+    "subjectSuggestion": "Suggestion / Idée",
+    "subjectOther": "Autre",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Décrivez votre demande...",
+    "submit": "Envoyer le message",
+    "sending": "Envoi en cours…",
+    "successTitle": "Message envoyé !",
+    "successDescription": "Merci pour votre message. On vous répond personnellement sous 24h.",
+    "notePrefix": "Pas de compte nécessaire. Pour les questions fréquentes, consultez la",
+    "noteHelpLink": "page Aide",
+    "noteSuffix": "."
   }
 }
