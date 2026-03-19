@@ -364,21 +364,23 @@ test.describe("Cross-flow D2 — event no approval + Circle with approval", () =
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test.describe.serial("Double approval — event + Circle both require approval", () => {
-  test("should show approval CTA for event in approval Circle", async ({ browser }) => {
+  test("should show approval CTA and submit request", async ({ browser }) => {
     // Use PLAYER3 who is now ACTIVE member of APPROVAL_CIRCLE (from section 1)
     const ctx = await browser.newContext({ storageState: AUTH.PLAYER3 });
     const page = await ctx.newPage();
     await navigateToMoment(page, SLUGS.MOMENT_BOTH_APPROVAL);
 
     const main = page.locator("main").first();
-    await expect(main.getByRole("button", { name: /soumis à validation|subject to approval/i })).toBeVisible();
+    const cta = main.getByRole("button", { name: /soumis à validation|subject to approval/i });
+    await expect(cta).toBeVisible({ timeout: 15000 });
+
+    // Submit the request in the same test to avoid serial state issues
+    await cta.click();
+    await expect(main.getByText(/demande envoyée|request sent/i)).toBeVisible({ timeout: 10000 });
     await ctx.close();
   });
 
-  test("submit request and Host approves event — registration confirmed", async ({ browser }) => {
-    // Player submits event request
-    await ensurePlayer3PendingOnMoment(browser, SLUGS.MOMENT_BOTH_APPROVAL);
-
+  test("Host approves event — registration confirmed", async ({ browser }) => {
     // Host approves event
     const hostCtx = await browser.newContext({ storageState: AUTH.HOST });
     const hostPage = await hostCtx.newPage();
@@ -386,9 +388,9 @@ test.describe.serial("Double approval — event + Circle both require approval",
     await hostPage.waitForLoadState("networkidle");
 
     const approveButton = hostPage.getByRole("button", { name: /approuver|approve/i }).first();
-    if (await approveButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await approveButton.click();
-    }
+    await expect(approveButton).toBeVisible({ timeout: 10000 });
+    await approveButton.click();
+    await expect(approveButton).not.toBeVisible({ timeout: 10000 });
     await hostCtx.close();
 
     // Player is now registered
