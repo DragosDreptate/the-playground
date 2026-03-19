@@ -13,6 +13,7 @@ import {
 } from "./helpers/mock-moment-repository";
 import {
   createMockCircleRepository,
+  makeCircle,
   makeMembership,
 } from "./helpers/mock-circle-repository";
 import {
@@ -58,7 +59,7 @@ describe("JoinMoment", () => {
       expect(result.registration.status).toBe("REGISTERED");
     });
 
-    it("should auto-join the user to the Circle as PLAYER", async () => {
+    it("should auto-join the user to the Circle as PLAYER with ACTIVE status", async () => {
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(
           makeMoment({ status: "PUBLISHED", circleId: "circle-1", price: 0 })
@@ -70,6 +71,7 @@ describe("JoinMoment", () => {
       });
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(null),
+        findById: vi.fn().mockResolvedValue(makeCircle({ id: "circle-1", requiresApproval: false })),
       });
 
       await joinMoment(defaultInput, {
@@ -81,7 +83,8 @@ describe("JoinMoment", () => {
       expect(circleRepo.addMembership).toHaveBeenCalledWith(
         "circle-1",
         "user-2",
-        "PLAYER"
+        "PLAYER",
+        "ACTIVE"
       );
     });
   });
@@ -452,6 +455,147 @@ describe("JoinMoment", () => {
       });
 
       expect(circleRepo.addMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a Moment with requiresApproval=true", () => {
+    it("should create a PENDING_APPROVAL registration", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0, requiresApproval: true })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "PENDING_APPROVAL" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      const result = await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(registrationRepo.create).toHaveBeenCalledWith({
+        momentId: "moment-1",
+        userId: "user-2",
+        status: "PENDING_APPROVAL",
+      });
+      expect(result.registration.status).toBe("PENDING_APPROVAL");
+      expect(result.pendingApproval).toBe(true);
+    });
+
+    it("should NOT auto-join the Circle", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0, requiresApproval: true })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(null),
+        create: vi.fn().mockResolvedValue(
+          makeRegistration({ status: "PENDING_APPROVAL" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(circleRepo.addMembership).not.toHaveBeenCalled();
+      expect(circleRepo.findMembership).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given an existing PENDING_APPROVAL registration", () => {
+    it("should return idempotently with pendingApproval=true", async () => {
+      const pendingReg = makeRegistration({ status: "PENDING_APPROVAL" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0 })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(pendingReg),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      const result = await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(result.registration.status).toBe("PENDING_APPROVAL");
+      expect(result.pendingApproval).toBe(true);
+      expect(registrationRepo.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a previously REJECTED registration on a Moment with requiresApproval", () => {
+    it("should re-activate as PENDING_APPROVAL", async () => {
+      const rejectedReg = makeRegistration({ id: "reg-existing", status: "REJECTED" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", price: 0, requiresApproval: true })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(rejectedReg),
+        update: vi.fn().mockResolvedValue(
+          makeRegistration({ id: "reg-existing", status: "PENDING_APPROVAL" })
+        ),
+      });
+      const circleRepo = createMockCircleRepository();
+
+      const result = await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(registrationRepo.update).toHaveBeenCalledWith("reg-existing", {
+        status: "PENDING_APPROVAL",
+        cancelledAt: null,
+      });
+      expect(result.pendingApproval).toBe(true);
+    });
+  });
+
+  describe("given a Circle with requiresApproval=true (cross-flow D2 Option A)", () => {
+    it("should auto-join Circle as PENDING when Moment has no approval", async () => {
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(
+          makeMoment({ status: "PUBLISHED", circleId: "circle-1", price: 0, requiresApproval: false })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        findByMomentAndUser: vi.fn().mockResolvedValue(null),
+        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(null),
+        findById: vi.fn().mockResolvedValue(makeCircle({ id: "circle-1", requiresApproval: true })),
+      });
+
+      await joinMoment(defaultInput, {
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        circleRepository: circleRepo,
+      });
+
+      expect(circleRepo.addMembership).toHaveBeenCalledWith(
+        "circle-1",
+        "user-2",
+        "PLAYER",
+        "PENDING"
+      );
     });
   });
 

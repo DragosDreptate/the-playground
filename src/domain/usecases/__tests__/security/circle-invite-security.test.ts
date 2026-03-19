@@ -322,8 +322,9 @@ describe("Security — joinCircleByInvite — token global (comportement voulu)"
       );
 
       expect(result.alreadyMember).toBe(false);
+      expect(result.pendingApproval).toBe(false);
       expect(result.circle.id).toBe("circle-a");
-      expect(repo.addMembership).toHaveBeenCalledWith("circle-a", "user-from-anywhere", "PLAYER");
+      expect(repo.addMembership).toHaveBeenCalledWith("circle-a", "user-from-anywhere", "PLAYER", "ACTIVE");
     });
   });
 

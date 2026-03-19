@@ -23,6 +23,7 @@ type JoinMomentDeps = {
 
 type JoinMomentResult = {
   registration: Registration;
+  pendingApproval: boolean;
 };
 
 export async function joinMoment(
@@ -48,14 +49,42 @@ export async function joinMoment(
     throw new PaidMomentNotSupportedError(input.momentId);
   }
 
+  // Check existing registration
   const existing = await registrationRepository.findByMomentAndUser(
     input.momentId,
     input.userId
   );
-  if (existing && existing.status !== "CANCELLED") {
-    throw new AlreadyRegisteredError(input.momentId, input.userId);
+
+  if (existing) {
+    // Already active → error
+    if (existing.status === "REGISTERED" || existing.status === "WAITLISTED" || existing.status === "CHECKED_IN") {
+      throw new AlreadyRegisteredError(input.momentId, input.userId);
+    }
+    // Already pending → idempotent return
+    if (existing.status === "PENDING_APPROVAL") {
+      return { registration: existing, pendingApproval: true };
+    }
+    // CANCELLED or REJECTED → re-activate below
   }
 
+  // Determine registration status
+  if (moment.requiresApproval) {
+    // Requires approval → PENDING_APPROVAL, no auto-join Circle
+    const registration = existing && (existing.status === "CANCELLED" || existing.status === "REJECTED")
+      ? await registrationRepository.update(existing.id, {
+          status: "PENDING_APPROVAL",
+          cancelledAt: null,
+        })
+      : await registrationRepository.create({
+          momentId: input.momentId,
+          userId: input.userId,
+          status: "PENDING_APPROVAL",
+        });
+
+    return { registration, pendingApproval: true };
+  }
+
+  // No approval required → normal flow
   const registeredCount = await registrationRepository.countByMomentIdAndStatus(
     input.momentId,
     "REGISTERED"
@@ -66,8 +95,8 @@ export async function joinMoment(
       ? "WAITLISTED"
       : "REGISTERED";
 
-  // Re-activate cancelled registration or create a new one
-  const registration = existing?.status === "CANCELLED"
+  // Re-activate cancelled/rejected registration or create a new one
+  const registration = existing && (existing.status === "CANCELLED" || existing.status === "REJECTED")
     ? await registrationRepository.update(existing.id, {
         status,
         cancelledAt: null,
@@ -84,12 +113,16 @@ export async function joinMoment(
     input.userId
   );
   if (!membership) {
+    // D2 Option A: if Circle requires approval → PENDING, else ACTIVE
+    const circle = await circleRepository.findById(moment.circleId);
+    const membershipStatus = circle?.requiresApproval ? "PENDING" : "ACTIVE";
     await circleRepository.addMembership(
       moment.circleId,
       input.userId,
-      "PLAYER"
+      "PLAYER",
+      membershipStatus
     );
   }
 
-  return { registration };
+  return { registration, pendingApproval: false };
 }
