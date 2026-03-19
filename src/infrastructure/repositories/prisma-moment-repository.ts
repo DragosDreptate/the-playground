@@ -64,6 +64,7 @@ export const prismaMomentRepository: MomentRepository = {
         price: input.price,
         currency: input.currency,
         status: input.status,
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainMoment(record);
@@ -108,6 +109,7 @@ export const prismaMomentRepository: MomentRepository = {
         ...(input.price !== undefined && { price: input.price }),
         ...(input.currency !== undefined && { currency: input.currency }),
         ...(input.status !== undefined && { status: input.status }),
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainMoment(record);

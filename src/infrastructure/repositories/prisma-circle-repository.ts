@@ -67,6 +67,7 @@ export const prismaCircleRepository: CircleRepository = {
               ? Prisma.DbNull
               : input.coverImageAttribution,
         }),
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainCircle(record);
