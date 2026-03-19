@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
 import { Link as NextIntlLink } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,8 +32,8 @@ type Props = {
     linkGenerate: string;
     linkRevoke: string;
     linkRevoked: string;
-    copyLink: string;
-    copied: string;
+    emailAddMore: string;
+    emailMaxReached: string;
   };
 };
 
@@ -45,7 +44,6 @@ function isValidEmail(email: string): boolean {
 }
 
 export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
-  const tInvite = useTranslations("Circle.invite");
   const router = useRouter();
 
   // ── Email state ──
@@ -164,7 +162,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               <div key={idx} className="flex items-center gap-2">
                 <Input
                   type="email"
-                  placeholder={idx === 0 ? t.emailPlaceholder : tInvite("emailAddMore")}
+                  placeholder={idx === 0 ? t.emailPlaceholder : t.emailAddMore}
                   value={field}
                   onChange={(e) => handleEmailChange(idx, e.target.value)}
                   className="h-8 flex-1 text-sm"
@@ -193,11 +191,11 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
               className="text-primary mb-3 inline-flex items-center gap-1.5 text-xs font-medium hover:opacity-80"
             >
               <Plus className="size-3" />
-              {tInvite("emailAddMore")}
+              {t.emailAddMore}
             </button>
           ) : (
             <p className="text-muted-foreground mb-3 text-xs">
-              {tInvite("emailMaxReached", { max: MAX_EMAIL_FIELDS })}
+              {t.emailMaxReached}
             </p>
           )}
 
@@ -245,7 +243,7 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
                 <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
                   {inviteUrl.replace(/^https?:\/\//, "")}
                 </div>
-                <InlineCopyButton value={inviteUrl} />
+                <CopyLinkButton value={inviteUrl} />
               </div>
               <button
                 type="button"
@@ -271,33 +269,5 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
         </div>
       </div>
     </div>
-  );
-}
-
-function InlineCopyButton({ value }: { value: string }) {
-  const t = useTranslations("Circle.invite");
-  const [copied, setCopied] = useState(false);
-
-  async function handleCopy() {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="sm"
-      className="h-8 shrink-0 gap-1.5 px-3"
-      onClick={handleCopy}
-    >
-      {copied ? (
-        <Check className="size-3.5 text-green-500" />
-      ) : (
-        <Copy className="size-3.5" />
-      )}
-      {copied ? t("copied") : t("copyLink")}
-    </Button>
   );
 }

@@ -561,7 +561,10 @@ export function MomentFormRadar({
               {events !== null && !noCity && !loading && (
                 <>
                   <Search className="size-3.5" />
-                  {t("totalFound", { count: events.length })}
+                  {t.rich("totalFound", {
+                    count: events.length,
+                    bold: (chunks) => <strong className="text-foreground font-semibold">{chunks}</strong>,
+                  })}
                 </>
               )}
             </span>

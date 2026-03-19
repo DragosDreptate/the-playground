@@ -403,7 +403,7 @@
       "dateConnector": " around ",
       "eventCount": "{count, plural, one {# event} other {# events}}",
       "otherCount": "{count, plural, one {# other} other {# others}}",
-      "totalFound": "{count, plural, one {# event found} other {# events found}}"
+      "totalFound": "{count, plural, one {<bold>#</bold> event found} other {<bold>#</bold> events found}}"
     },
     "delete": {
       "title": "Delete Event",
