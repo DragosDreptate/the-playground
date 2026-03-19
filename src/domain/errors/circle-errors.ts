@@ -58,6 +58,14 @@ export class CannotRemoveSelfError extends DomainError {
   }
 }
 
+export class MembershipNotPendingError extends DomainError {
+  readonly code = "MEMBERSHIP_NOT_PENDING";
+
+  constructor(circleId: string, userId: string) {
+    super(`Membership for user ${userId} in circle ${circleId} is not pending approval`);
+  }
+}
+
 export class InvalidInviteTokenError extends DomainError {
   readonly code = "INVALID_INVITE_TOKEN";
 

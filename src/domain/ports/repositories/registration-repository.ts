@@ -55,4 +55,8 @@ export interface RegistrationRepository {
   countWaitlistPosition(momentId: string, userId: string): Promise<number>;
   /** Renvoie les inscriptions actives (REGISTERED ou WAITLIST) à venir pour un User dans un Circle. */
   findFutureActiveByUserAndCircle(userId: string, circleId: string): Promise<Registration[]>;
+  /** Renvoie les inscriptions en attente d'approbation pour un Moment. */
+  findPendingApprovals(momentId: string): Promise<RegistrationWithUser[]>;
+  /** Compte les inscriptions en attente d'approbation pour un Moment. */
+  countPendingApprovals(momentId: string): Promise<number>;
 }

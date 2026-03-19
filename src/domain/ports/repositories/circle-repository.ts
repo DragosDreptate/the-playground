@@ -1,4 +1,4 @@
-import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 
 export type CreateCircleInput = {
@@ -89,7 +89,10 @@ export interface CircleRepository {
   update(id: string, input: UpdateCircleInput): Promise<Circle>;
   delete(id: string): Promise<void>;
   slugExists(slug: string): Promise<boolean>;
-  addMembership(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
+  addMembership(circleId: string, userId: string, role: CircleMemberRole, status?: MembershipStatus): Promise<CircleMembership>;
+  updateMembershipStatus(circleId: string, userId: string, status: MembershipStatus): Promise<CircleMembership>;
+  findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]>;
+  countPendingMemberships(circleId: string): Promise<number>;
   findAllByUserId(userId: string): Promise<CircleWithRole[]>;
   findAllByUserIdWithStats(userId: string): Promise<DashboardCircle[]>;
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;

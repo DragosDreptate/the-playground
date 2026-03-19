@@ -413,4 +413,26 @@ export const prismaRegistrationRepository: RegistrationRepository = {
 
     return before + 1;
   },
+
+  async findPendingApprovals(momentId: string): Promise<RegistrationWithUser[]> {
+    const records = await prisma.registration.findMany({
+      where: { momentId, status: "PENDING_APPROVAL" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { registeredAt: "asc" },
+    });
+    return records.map((r) => ({
+      ...toDomainRegistration(r),
+      user: r.user,
+    }));
+  },
+
+  async countPendingApprovals(momentId: string): Promise<number> {
+    return prisma.registration.count({
+      where: { momentId, status: "PENDING_APPROVAL" },
+    });
+  },
 };

@@ -56,6 +56,14 @@ export class HostCannotCancelRegistrationError extends DomainError {
   }
 }
 
+export class RegistrationNotPendingApprovalError extends DomainError {
+  readonly code = "REGISTRATION_NOT_PENDING_APPROVAL";
+
+  constructor(registrationId: string) {
+    super(`Registration ${registrationId} is not pending approval`);
+  }
+}
+
 export class CannotRemoveHostRegistrationError extends DomainError {
   readonly code = "CANNOT_REMOVE_HOST_REGISTRATION";
 

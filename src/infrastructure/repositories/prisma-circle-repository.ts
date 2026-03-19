@@ -10,7 +10,7 @@ import type {
   FeaturedCircle,
 } from "@/domain/ports/repositories/circle-repository";
 import { seededShuffle } from "@/lib/seeded-shuffle";
-import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle } from "@/domain/models/circle";
+import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
 import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
 
@@ -162,12 +162,45 @@ export const prismaCircleRepository: CircleRepository = {
   async addMembership(
     circleId: string,
     userId: string,
-    role: CircleMemberRole
+    role: CircleMemberRole,
+    status: MembershipStatus = "ACTIVE"
   ): Promise<CircleMembership> {
     const record = await prisma.circleMembership.create({
-      data: { circleId, userId, role },
+      data: { circleId, userId, role, status },
     });
     return toDomainMembership(record);
+  },
+
+  async updateMembershipStatus(
+    circleId: string,
+    userId: string,
+    status: MembershipStatus
+  ): Promise<CircleMembership> {
+    const record = await prisma.circleMembership.update({
+      where: { userId_circleId: { userId, circleId } },
+      data: { status },
+    });
+    return toDomainMembership(record);
+  },
+
+  async findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]> {
+    const records = await prisma.circleMembership.findMany({
+      where: { circleId, status: "PENDING" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { joinedAt: "asc" },
+    });
+    return records.map((r) => ({
+      ...toDomainMembership(r),
+      user: r.user,
+    }));
+  },
+
+  async countPendingMemberships(circleId: string): Promise<number> {
+    return prisma.circleMembership.count({ where: { circleId, status: "PENDING" } });
   },
 
   async findAllByUserId(userId: string): Promise<CircleWithRole[]> {
