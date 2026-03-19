@@ -21,7 +21,7 @@ export async function revokeCircleInviteToken(
   if (!circle) throw new CircleNotFoundError(circleId);
 
   const membership = await circleRepository.findMembership(circleId, userId);
-  if (!membership || membership.role !== "HOST") {
+  if (!membership || membership.role !== "HOST" || membership.status !== "ACTIVE") {
     throw new UnauthorizedCircleActionError(userId, circleId);
   }
 

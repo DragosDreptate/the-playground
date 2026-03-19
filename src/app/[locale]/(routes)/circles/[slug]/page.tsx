@@ -114,7 +114,7 @@ export default async function PublicCirclePage({
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
     ReturnType<typeof getCircleMoments>,
     ReturnType<typeof prismaCircleRepository.countMembers>,
-    Promise<boolean | null>,
+    Promise<"active" | "pending" | null>,
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
@@ -126,7 +126,7 @@ export default async function PublicCirclePage({
     ),
     prismaCircleRepository.countMembers(circle.id),
     session?.user?.id
-      ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m !== null)
+      ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status === "ACTIVE" ? "active" : m?.status === "PENDING" ? "pending" : null)
       : Promise.resolve(null),
     // Players chargés uniquement pour les connectés (section membres)
     session?.user?.id
@@ -137,14 +137,15 @@ export default async function PublicCirclePage({
   const [hosts, allMoments, memberCount, isMemberResult, players] =
     await measureTime("circle-page:data", () => Promise.all(parallelQueries));
 
-  const isMember = isMemberResult === true;
+  const isMember = isMemberResult === "active";
+  const isPendingMember = isMemberResult === "pending";
   const isHost = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;
   const isConnected = !!session?.user?.id;
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
-  const showJoinButton = !!session?.user?.id && !isMember;
+  const showJoinButton = !!session?.user?.id && !isMember && !isPendingMember;
   const showMemberBadge = isMember && !isHost;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
@@ -337,7 +338,7 @@ export default async function PublicCirclePage({
 
           {/* Bouton Rejoindre — visible uniquement pour les utilisateurs connectés non-membres */}
           {showJoinButton && (
-            <JoinCircleButton circleId={circle.id} />
+            <JoinCircleButton circleId={circle.id} requiresApproval={circle.requiresApproval} />
           )}
         </div>
 
