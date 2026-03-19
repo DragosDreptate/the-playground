@@ -217,6 +217,8 @@
       "namePlaceholder": "Ma super communauté",
       "description": "Description",
       "descriptionPlaceholder": "Décrivez votre Communauté en quelques mots...",
+      "requiresApproval": "Validation des inscriptions",
+      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",
       "visibility": "Visibilité",
       "visibilityPublic": "Publique — tout le monde peut découvrir cette Communauté",
       "visibilityPrivate": "Privée — accessible uniquement sur invitation",
@@ -380,7 +382,9 @@
       "pickDate": "Choisir une date",
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Enregistrer le brouillon",
-      "pastDateReadOnly": "Date non modifiable — l'événement est passé."
+      "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
+      "requiresApproval": "Validation des inscriptions",
+      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace."
     },
     "radar": {
       "title": "Radar de planification",

@@ -217,6 +217,8 @@
       "namePlaceholder": "My awesome community",
       "description": "Description",
       "descriptionPlaceholder": "Tell people what your Community is about...",
+      "requiresApproval": "Membership approval",
+      "requiresApprovalDescription": "New members must be approved manually from your dashboard.",
       "visibility": "Visibility",
       "visibilityPublic": "Public — anyone can discover this Community",
       "visibilityPrivate": "Private — only accessible via invitation",
@@ -380,7 +382,9 @@
       "pickDate": "Pick a date",
       "endBeforeStart": "The end date must be after the start date.",
       "createMoment": "Save draft",
-      "pastDateReadOnly": "Date is read-only — this event is in the past."
+      "pastDateReadOnly": "Date is read-only — this event is in the past.",
+      "requiresApproval": "Registration approval",
+      "requiresApprovalDescription": "Requests must be approved manually from your dashboard."
     },
     "radar": {
       "title": "Planning Radar",

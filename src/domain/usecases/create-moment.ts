@@ -25,6 +25,7 @@ type CreateMomentInput = {
   capacity: number | null;
   price: number;
   currency: string;
+  requiresApproval?: boolean;
 };
 
 type CreateMomentDeps = {
@@ -85,6 +86,7 @@ export async function createMoment(
     price: input.price,
     currency: input.currency,
     status: "DRAFT",
+    ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 
   // L'organisateur est automatiquement inscrit en tant que Participant

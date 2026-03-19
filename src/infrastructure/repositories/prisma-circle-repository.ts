@@ -94,6 +94,7 @@ export const prismaCircleRepository: CircleRepository = {
                 ? Prisma.DbNull
                 : input.coverImageAttribution,
           }),
+          ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
         },
       });
       await tx.circleMembership.create({
@@ -145,6 +146,7 @@ export const prismaCircleRepository: CircleRepository = {
               : input.coverImageAttribution,
         }),
         ...(input.inviteToken !== undefined && { inviteToken: input.inviteToken }),
+        ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
     return toDomainCircle(record);

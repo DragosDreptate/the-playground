@@ -12,6 +12,7 @@ type CreateCircleInput = {
   city?: string;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
+  requiresApproval?: boolean;
   userId: string;
 };
 
@@ -54,6 +55,7 @@ export async function createCircle(
       ...(input.coverImageAttribution !== undefined && {
         coverImageAttribution: input.coverImageAttribution,
       }),
+      ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
     },
     input.userId
   );

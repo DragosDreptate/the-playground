@@ -179,7 +179,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     const records = await prisma.registration.findMany({
       where: {
         userId,
-        status: { in: ["REGISTERED", "WAITLISTED"] },
+        status: { in: ["REGISTERED", "WAITLISTED", "PENDING_APPROVAL"] },
         moment: {
           status: "PUBLISHED",
           startsAt: { gt: new Date() },
@@ -326,7 +326,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       JOIN circles c ON c.id = m."circleId"
       WHERE r."userId" = ${userId}
         AND (
-          (r.status IN ('REGISTERED', 'WAITLISTED') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
+          (r.status IN ('REGISTERED', 'WAITLISTED', 'PENDING_APPROVAL') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
           OR
           (r.status IN ('REGISTERED', 'CHECKED_IN') AND m.status = 'PAST')
         )

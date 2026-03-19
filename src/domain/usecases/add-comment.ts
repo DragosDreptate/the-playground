@@ -1,6 +1,7 @@
 import type { Comment } from "@/domain/models/comment";
 import type { CommentRepository } from "@/domain/ports/repositories/comment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
   MomentNotFoundError,
   CommentContentEmptyError,
@@ -18,6 +19,7 @@ type AddCommentInput = {
 type AddCommentDeps = {
   commentRepository: CommentRepository;
   momentRepository: MomentRepository;
+  registrationRepository?: RegistrationRepository;
 };
 
 type AddCommentResult = {
@@ -43,6 +45,17 @@ export async function addComment(
   const moment = await momentRepository.findById(input.momentId);
   if (!moment) {
     throw new MomentNotFoundError(input.momentId);
+  }
+
+  // D11: block comments from users with PENDING_APPROVAL registration
+  if (deps.registrationRepository) {
+    const registration = await deps.registrationRepository.findByMomentAndUser(
+      input.momentId,
+      input.userId
+    );
+    if (registration?.status === "PENDING_APPROVAL") {
+      throw new MomentNotFoundError(input.momentId);
+    }
   }
 
   const comment = await commentRepository.create({

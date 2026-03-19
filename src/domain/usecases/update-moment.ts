@@ -1,6 +1,7 @@
 import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
   MomentNotFoundError,
   MomentPastDateError,
@@ -29,6 +30,7 @@ type UpdateMomentInput = {
 type UpdateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  registrationRepository?: RegistrationRepository;
 };
 
 type UpdateMomentResult = {
@@ -63,6 +65,14 @@ export async function updateMoment(
   const { momentId: _, userId: __, ...updates } = input;
 
   const moment = await momentRepository.update(input.momentId, updates);
+
+  // D13: auto-reject PENDING_APPROVAL registrations when moment is cancelled
+  if (input.status === "CANCELLED" && deps.registrationRepository) {
+    const pendingRegs = await deps.registrationRepository.findPendingApprovals(input.momentId);
+    for (const reg of pendingRegs) {
+      await deps.registrationRepository.update(reg.id, { status: "REJECTED" });
+    }
+  }
 
   return { moment };
 }

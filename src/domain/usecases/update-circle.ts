@@ -13,6 +13,7 @@ type UpdateCircleInput = {
   city?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
+  requiresApproval?: boolean;
 };
 
 type UpdateCircleDeps = {
@@ -53,6 +54,7 @@ export async function updateCircle(
     ...(input.coverImageAttribution !== undefined && {
       coverImageAttribution: input.coverImageAttribution,
     }),
+    ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 
   return { circle: updated };

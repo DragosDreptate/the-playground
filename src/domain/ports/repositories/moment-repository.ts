@@ -21,6 +21,7 @@ export type CreateMomentInput = {
   price: number;
   currency: string;
   status: MomentStatus;
+  requiresApproval?: boolean;
 };
 
 export type UpdateMomentInput = {
@@ -38,6 +39,7 @@ export type UpdateMomentInput = {
   price?: number;
   currency?: string;
   status?: MomentStatus;
+  requiresApproval?: boolean;
 };
 
 export type PublicMomentFilters = {

@@ -11,6 +11,7 @@ export type CreateCircleInput = {
   city?: string;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
+  requiresApproval?: boolean;
 };
 
 export type UpdateCircleInput = {
@@ -23,6 +24,7 @@ export type UpdateCircleInput = {
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
   inviteToken?: string | null;
+  requiresApproval?: boolean;
 };
 
 export type ExplorerSortBy = "date" | "popular" | "members";

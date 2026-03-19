@@ -55,6 +55,7 @@ export async function createCircleAction(
     formData.get("customCategory") as string | null
   );
   const city = (formData.get("city") as string)?.trim() || undefined;
+  const requiresApproval = formData.get("requiresApproval") === "on";
 
   if (!name?.trim()) {
     return { success: false, error: "Name is required", code: "VALIDATION" };
@@ -85,6 +86,7 @@ export async function createCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        requiresApproval,
         userId: session.user.id,
         ...coverData,
       },
@@ -159,6 +161,8 @@ export async function updateCircleAction(
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
   const customCategoryRaw = formData.get("customCategory") as string | null;
+  const requiresApprovalRaw = formData.get("requiresApproval");
+  const requiresApprovalUpdate = requiresApprovalRaw !== null ? requiresApprovalRaw === "on" : undefined;
 
   if (name !== null && !name.trim()) {
     return { success: false, error: "Name cannot be empty", code: "VALIDATION" };
@@ -197,6 +201,7 @@ export async function updateCircleAction(
         ...(customCategory !== undefined && { customCategory }),
         city,
         ...coverData,
+        ...(requiresApprovalUpdate !== undefined && { requiresApproval: requiresApprovalUpdate }),
       },
       { circleRepository: circleRepo }
     );
