@@ -4,6 +4,8 @@ import type { CalendarEventData } from "@/lib/calendar";
 
 const APP_URL = "https://theplayground.community";
 
+const TRANSLATIONS = { join: "Join", organizedBy: "Organized by" };
+
 function makeEvent(overrides: Partial<CalendarEventData> = {}): CalendarEventData {
   return {
     title: "Apéro JS #12",
@@ -21,30 +23,30 @@ function makeEvent(overrides: Partial<CalendarEventData> = {}): CalendarEventDat
 describe("buildGoogleCalendarUrl", () => {
   describe("given a physical event with start and end dates", () => {
     it("should return a valid Google Calendar URL", () => {
-      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
+      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL, TRANSLATIONS);
       expect(url).toContain("https://calendar.google.com/calendar/render");
       expect(url).toContain("action=TEMPLATE");
     });
 
     it("should include the event title", () => {
-      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
+      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL, TRANSLATIONS);
       // URLSearchParams encode les espaces en "+" (pas %20)
       expect(url).toContain("text=Ap%C3%A9ro+JS+%2312");
     });
 
     it("should include formatted dates", () => {
-      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
+      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL, TRANSLATIONS);
       expect(url).toContain("20260305T190000Z");
       expect(url).toContain("20260305T213000Z");
     });
 
     it("should include the physical location", () => {
-      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
+      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL, TRANSLATIONS);
       expect(url).toContain("Station+F");
     });
 
     it("should include the organizer and app URL in details", () => {
-      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL);
+      const url = buildGoogleCalendarUrl(makeEvent(), APP_URL, TRANSLATIONS);
       expect(url).toContain("Paris+JS");
       expect(url).toContain(encodeURIComponent(APP_URL));
     });
@@ -54,7 +56,8 @@ describe("buildGoogleCalendarUrl", () => {
     it("should set location to empty string", () => {
       const url = buildGoogleCalendarUrl(
         makeEvent({ locationType: "ONLINE", locationName: null, locationAddress: null }),
-        APP_URL
+        APP_URL,
+        TRANSLATIONS
       );
       expect(url).toContain("location=");
       expect(url).not.toContain("Station+F");
@@ -70,7 +73,8 @@ describe("buildGoogleCalendarUrl", () => {
           locationAddress: null,
           videoLink: "https://meet.google.com/abc-defg-hij",
         }),
-        APP_URL
+        APP_URL,
+        TRANSLATIONS
       );
       expect(url).toContain(encodeURIComponent("https://meet.google.com/abc-defg-hij"));
     });
@@ -83,9 +87,10 @@ describe("buildGoogleCalendarUrl", () => {
           locationAddress: null,
           videoLink: "https://meet.google.com/abc-defg-hij",
         }),
-        APP_URL
+        APP_URL,
+        TRANSLATIONS
       );
-      expect(url).toContain("Rejoindre");
+      expect(url).toContain("Join");
       expect(url).toContain(encodeURIComponent("https://meet.google.com/abc-defg-hij"));
     });
   });
@@ -95,7 +100,8 @@ describe("buildGoogleCalendarUrl", () => {
       const startsAt = new Date("2026-03-05T19:00:00Z");
       const url = buildGoogleCalendarUrl(
         makeEvent({ startsAt, endsAt: null }),
-        APP_URL
+        APP_URL,
+        TRANSLATIONS
       );
       // 19:00 + 2h = 21:00
       expect(url).toContain("20260305T190000Z%2F20260305T210000Z");

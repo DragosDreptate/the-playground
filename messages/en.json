@@ -421,7 +421,9 @@
       "addToCalendar": {
         "label": "Add to calendar",
         "google": "Google Calendar",
-        "ics": ".ics file"
+        "ics": ".ics file",
+        "calendarJoin": "Join",
+        "calendarOrganizedBy": "Organized by"
       },
       "waitlistPosition": "You're #{position} on the waitlist",
       "draftNotice": "This event is being prepared and has not been published yet.",
