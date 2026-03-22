@@ -5,6 +5,7 @@ import {
 } from "@/infrastructure/repositories";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
+import { isValidSlug } from "@/lib/slug";
 
 export const runtime = "nodejs";
 export const alt = "Event — The Playground";
@@ -17,6 +18,7 @@ export default async function OgImage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
+  if (!isValidSlug(slug)) return new Response("Not found", { status: 404 });
 
   let moment;
   try {

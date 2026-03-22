@@ -26,6 +26,7 @@ import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import Image from "next/image";
+import { isValidSlug } from "@/lib/slug";
 import {
   Globe,
   Lock,
@@ -59,6 +60,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  if (!isValidSlug(slug)) return {};
   try {
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
@@ -103,6 +105,8 @@ export default async function PublicCirclePage({
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
+
+  if (!isValidSlug(slug)) notFound();
 
   const activeTab = tab === "past" ? "past" : "upcoming";
 
