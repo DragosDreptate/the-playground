@@ -34,6 +34,17 @@ const USERS = [
   { key: "player4", email: "player4@test.playground", firstName: "Manon",   lastName: "Rousseau", dashboardMode: "PARTICIPANT" as const, publicId: "manon-rousseau-1005" },
 ];
 
+// ── Dates dynamiques (relatives à la date d'exécution) ───────────────────────
+// Les dates PAST sont dans le passé, les dates PUBLISHED/CANCELLED dans le futur.
+// Cela évite que les tests E2E ne cassent quand les dates fixes deviennent périmées.
+
+function daysFromNow(days: number, hour: number, minute = 0): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
+
 // ── Données réalistes ────────────────────────────────────────────────────────
 
 const SEED_DATA = [
@@ -53,8 +64,8 @@ const SEED_DATA = [
           "Une soirée décontractée autour de JavaScript ! Au programme : deux lightning talks " +
           "(React Server Components et Bun vs Node.js), pizza party et networking. " +
           "Tous niveaux bienvenus, venez nombreux !",
-        startsAt: new Date("2026-01-15T19:00:00"),
-        endsAt: new Date("2026-01-15T22:00:00"),
+        startsAt: daysFromNow(-60, 19),
+        endsAt: daysFromNow(-60, 22),
         locationType: "IN_PERSON" as const,
         locationName: "Le Wagon Paris",
         locationAddress: "16 Villa Gaudelet, 75011 Paris",
@@ -75,8 +86,8 @@ const SEED_DATA = [
           "Deep dive dans React 19 : Server Actions, hook use(), form actions et les nouveaux patterns " +
           "de data fetching. Session pratique avec exercices en live coding. " +
           "Pensez à apporter votre ordinateur.",
-        startsAt: new Date("2026-02-05T18:30:00"),
-        endsAt: new Date("2026-02-05T21:00:00"),
+        startsAt: daysFromNow(-30, 18, 30),
+        endsAt: daysFromNow(-30, 21),
         locationType: "IN_PERSON" as const,
         locationName: "NUMA Paris",
         locationAddress: "39 Rue du Caire, 75002 Paris",
@@ -95,8 +106,8 @@ const SEED_DATA = [
           "Comment les outils d'IA transforment-ils les métiers créatifs ? " +
           "Retours d'expérience de designers, développeurs et artistes. " +
           "Table ronde + démonstrations live. Entrée libre.",
-        startsAt: new Date("2026-03-20T19:00:00"),
-        endsAt: new Date("2026-03-20T21:30:00"),
+        startsAt: daysFromNow(7, 19),
+        endsAt: daysFromNow(7, 21, 30),
         locationType: "IN_PERSON" as const,
         locationName: "Station F",
         locationAddress: "5 Parvis Alan Turing, 75013 Paris",
@@ -111,8 +122,8 @@ const SEED_DATA = [
         description:
           "Webinaire sur les types avancés TypeScript : generics, mapped types, conditional types. " +
           "Malheureusement annulé suite à un imprévu de l'intervenant.",
-        startsAt: new Date("2026-03-10T18:00:00"),
-        endsAt: new Date("2026-03-10T19:30:00"),
+        startsAt: daysFromNow(14, 18),
+        endsAt: daysFromNow(14, 19, 30),
         locationType: "ONLINE" as const,
         locationName: "Zoom",
         locationAddress: null,
@@ -127,8 +138,8 @@ const SEED_DATA = [
         description:
           "Atelier pratique sur la création d'un Design System avec Figma et Tailwind. " +
           "Places très limitées pour garantir un suivi personnalisé.",
-        startsAt: new Date("2026-04-15T14:00:00"),
-        endsAt: new Date("2026-04-15T17:00:00"),
+        startsAt: daysFromNow(21, 14),
+        endsAt: daysFromNow(21, 17),
         locationType: "IN_PERSON" as const,
         locationName: "NUMA Paris",
         locationAddress: "39 Rue du Caire, 75002 Paris",
@@ -145,8 +156,8 @@ const SEED_DATA = [
           "48h pour construire un projet autour du thème « Tech for Good ». " +
           "Équipes de 3 à 5 personnes. Prix : mentorat, visibilité et bien sûr la gloire ! " +
           "Repas et boissons inclus. Places limitées.",
-        startsAt: new Date("2026-04-04T09:00:00"),
-        endsAt: new Date("2026-04-05T18:00:00"),
+        startsAt: daysFromNow(28, 9),
+        endsAt: daysFromNow(29, 18),
         locationType: "IN_PERSON" as const,
         locationName: "Hôtel de Ville de Paris",
         locationAddress: "Place de l'Hôtel de Ville, 75004 Paris",
@@ -161,8 +172,8 @@ const SEED_DATA = [
         description:
           "Masterclass avancée sur l'architecture hexagonale en TypeScript. " +
           "Places limitées, sélection sur dossier.",
-        startsAt: new Date("2026-04-25T14:00:00"),
-        endsAt: new Date("2026-04-25T17:00:00"),
+        startsAt: daysFromNow(35, 14),
+        endsAt: daysFromNow(35, 17),
         locationType: "IN_PERSON" as const,
         locationName: "Le Wagon Paris",
         locationAddress: "16 Villa Gaudelet, 75011 Paris",
@@ -191,8 +202,8 @@ const SEED_DATA = [
           "Séance de yoga Flow pour bien commencer la semaine. " +
           "Apportez votre tapis et une bouteille d'eau. " +
           "Venez vous ressourcer dans l'air frais du parc, tous niveaux acceptés.",
-        startsAt: new Date("2026-01-19T10:00:00"),
-        endsAt: new Date("2026-01-19T11:30:00"),
+        startsAt: daysFromNow(-45, 10),
+        endsAt: daysFromNow(-45, 11, 30),
         locationType: "IN_PERSON" as const,
         locationName: "Parc de la Butte Montmartre",
         locationAddress: "Butte Montmartre, 75018 Paris",
@@ -211,8 +222,8 @@ const SEED_DATA = [
           "Techniques de respiration (pranayama) et méditation guidée. " +
           "Idéal pour gérer le stress et retrouver de l'énergie au quotidien. " +
           "Débutants et confirmés bienvenus. Prévoir une tenue confortable.",
-        startsAt: new Date("2026-03-09T09:00:00"),
-        endsAt: new Date("2026-03-09T11:00:00"),
+        startsAt: daysFromNow(10, 9),
+        endsAt: daysFromNow(10, 11),
         locationType: "IN_PERSON" as const,
         locationName: "Studio Montmartre Yoga",
         locationAddress: "12 Rue Lepic, 75018 Paris",
@@ -228,8 +239,8 @@ const SEED_DATA = [
           "Weekend immersif en Normandie : yoga matin et soir, ateliers bien-être, cuisine végétarienne. " +
           "Hébergement en gîte à la campagne. Tarif tout compris. " +
           "Un vrai bol d'air pour recharger les batteries avant l'été.",
-        startsAt: new Date("2026-04-19T14:00:00"),
-        endsAt: new Date("2026-04-20T17:00:00"),
+        startsAt: daysFromNow(42, 14),
+        endsAt: daysFromNow(43, 17),
         locationType: "IN_PERSON" as const,
         locationName: "Gîte La Ferme du Soleil",
         locationAddress: "Route des Champs, 27200 Vernon, Normandie",
@@ -256,8 +267,8 @@ const SEED_DATA = [
         description:
           "Session de pratique d'entretiens techniques frontend. " +
           "React, TypeScript, architecture composants.",
-        startsAt: new Date("2026-04-15T18:00:00"),
-        endsAt: new Date("2026-04-15T20:00:00"),
+        startsAt: daysFromNow(21, 18),
+        endsAt: daysFromNow(21, 20),
         locationType: "ONLINE" as const,
         locationName: null,
         locationAddress: null,
@@ -273,8 +284,8 @@ const SEED_DATA = [
         description:
           "Coaching individuel pour entretiens système design. " +
           "Places limitées, validation manuelle requise.",
-        startsAt: new Date("2026-04-20T14:00:00"),
-        endsAt: new Date("2026-04-20T16:00:00"),
+        startsAt: daysFromNow(28, 14),
+        endsAt: daysFromNow(28, 16),
         locationType: "IN_PERSON" as const,
         locationName: "WeWork La Fayette",
         locationAddress: "33 Rue La Fayette, 75009 Paris",

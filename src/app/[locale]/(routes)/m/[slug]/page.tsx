@@ -2,6 +2,7 @@ import { cache } from "react";
 import { after } from "next/server";
 import { notFound } from "next/navigation";
 import { measureTime } from "@/lib/perf-logger";
+import { isValidSlug } from "@/lib/slug";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -88,6 +89,7 @@ export default async function PublicMomentPage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
+  if (!isValidSlug(slug)) notFound();
 
   // Transition PUBLISHED → PAST for ended Moments — fire-and-forget après la réponse
   after(() => prismaMomentRepository.transitionPastMoments());

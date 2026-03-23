@@ -26,6 +26,7 @@ import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import Image from "next/image";
+import { isValidSlug } from "@/lib/slug";
 import {
   Globe,
   Lock,
@@ -93,9 +94,11 @@ export default async function PublicCirclePage({
   params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, session] =
+  const { slug, locale } = await params;
+  if (!isValidSlug(slug)) notFound();
+
+  const [{ tab }, t, tExplorer, tCategory, session] =
     await Promise.all([
-      params,
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
