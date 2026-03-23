@@ -46,7 +46,6 @@ export async function generateMetadata({
   params: Promise<{ slug: string; locale: string }>;
 }): Promise<Metadata> {
   const { slug, locale } = await params;
-  if (!isValidSlug(slug)) return {};
   const moment = await getMoment(slug);
   if (!moment || moment.status === "CANCELLED" || moment.status === "DRAFT") return {};
 

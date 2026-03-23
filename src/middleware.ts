@@ -2,42 +2,23 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { isValidSlug } from "./lib/slug";
+import { BLOCKED_BOTS } from "./lib/blocked-bots";
 
 const intlMiddleware = createMiddleware(routing);
 
-// Slug validation regex — matches output of generateSlug()
-const VALID_SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const MAX_SLUG_LENGTH = 120;
-
-// Known aggressive bot User-Agents (case-insensitive partial match)
-const BLOCKED_BOTS = [
-  "ahrefsbot",
-  "semrushbot",
-  "dotbot",
-  "mj12bot",
-  "blexbot",
-  "dataforseo",
-  "bytespider",
-  "gptbot",
-  "claudebot",
-  "ccbot",
-  "zoominfobot",
-  "petalbot",
-];
+// Build locale-aware regex dynamically from routing config
+const localeAlt = routing.locales.join("|");
+const slugRouteRe = new RegExp(
+  `^(?:\\/(?:${localeAlt}))?\\/(?:m|circles)\\/([^/]+)(?:\\/|$)`
+);
 
 function isBlockedBot(ua: string): boolean {
   const lower = ua.toLowerCase();
   return BLOCKED_BOTS.some((bot) => lower.includes(bot));
 }
 
-function isValidSlug(slug: string): boolean {
-  if (!slug || slug.length > MAX_SLUG_LENGTH) return false;
-  return VALID_SLUG_RE.test(slug);
-}
-
 export default function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
   // 1. Block known aggressive bots early (Edge, zero serverless cost)
   const ua = request.headers.get("user-agent") ?? "";
   if (ua && isBlockedBot(ua)) {
@@ -45,11 +26,7 @@ export default function middleware(request: NextRequest) {
   }
 
   // 2. Validate slugs on public routes before any processing
-  //    Patterns: /m/{slug}, /en/m/{slug}, /fr/m/{slug},
-  //              /circles/{slug}, /en/circles/{slug}, /fr/circles/{slug}
-  const slugMatch = pathname.match(
-    /^(?:\/(?:fr|en))?\/(?:m|circles)\/([^/]+)(?:\/|$)/
-  );
+  const slugMatch = request.nextUrl.pathname.match(slugRouteRe);
   if (slugMatch) {
     const slug = decodeURIComponent(slugMatch[1]);
     if (!isValidSlug(slug)) {

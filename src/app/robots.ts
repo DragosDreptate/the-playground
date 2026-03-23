@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BLOCKED_BOTS } from "@/lib/blocked-bots";
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -10,22 +11,8 @@ export default function robots(): MetadataRoute.Robots {
         allow: ["/", "/m/", "/circles/"],
         disallow: ["/dashboard/", "/admin/", "/api/", "/auth/"],
       },
-      // Block aggressive crawlers that ignore rate limits
       {
-        userAgent: [
-          "AhrefsBot",
-          "SemrushBot",
-          "DotBot",
-          "MJ12bot",
-          "BLEXBot",
-          "DataForSeoBot",
-          "Bytespider",
-          "GPTBot",
-          "ClaudeBot",
-          "CCBot",
-          "ZoominfoBot",
-          "PetalBot",
-        ],
+        userAgent: BLOCKED_BOTS,
         disallow: "/",
       },
     ],

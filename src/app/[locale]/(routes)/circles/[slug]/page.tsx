@@ -60,7 +60,6 @@ export async function generateMetadata({
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  if (!isValidSlug(slug)) return {};
   try {
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
@@ -95,9 +94,11 @@ export default async function PublicCirclePage({
   params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug, locale }, { tab }, t, tExplorer, tCategory, session] =
+  const { slug, locale } = await params;
+  if (!isValidSlug(slug)) notFound();
+
+  const [{ tab }, t, tExplorer, tCategory, session] =
     await Promise.all([
-      params,
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
@@ -105,8 +106,6 @@ export default async function PublicCirclePage({
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
-
-  if (!isValidSlug(slug)) notFound();
 
   const activeTab = tab === "past" ? "past" : "upcoming";
 
