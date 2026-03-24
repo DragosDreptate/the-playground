@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Check, Clock, Download } from "lucide-react";
@@ -102,6 +102,7 @@ export function RegistrationButton({
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [localStatus, setLocalStatus] = useState<RegistrationStatus | null>(
@@ -163,7 +164,7 @@ export function RegistrationButton({
             {isPending
               ? tCommon("loading")
               : t("public.registerPaid", {
-                  price: formatPrice(price, currency),
+                  price: formatPrice(price, currency, locale),
                   currency,
                 })}
           </Button>
