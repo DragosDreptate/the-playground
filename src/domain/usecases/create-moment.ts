@@ -25,6 +25,7 @@ type CreateMomentInput = {
   capacity: number | null;
   price: number;
   currency: string;
+  refundable?: boolean;
   requiresApproval?: boolean;
 };
 
@@ -86,6 +87,7 @@ export async function createMoment(
     price: input.price,
     currency: input.currency,
     status: "DRAFT",
+    ...(input.refundable !== undefined && { refundable: input.refundable }),
     ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 

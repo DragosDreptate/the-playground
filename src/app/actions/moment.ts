@@ -75,6 +75,7 @@ export async function createMomentAction(
   const priceRaw = formData.get("price") as string | null;
   const currency = (formData.get("currency") as string) || "EUR";
   const requiresApproval = formData.get("requiresApproval") === "on";
+  const refundable = formData.get("refundable") === "on";
 
   if (!title?.trim()) {
     return { success: false, error: "Title is required", code: "VALIDATION" };
@@ -111,6 +112,7 @@ export async function createMomentAction(
         capacity,
         price,
         currency,
+        refundable,
         requiresApproval,
       },
       {
@@ -173,6 +175,8 @@ export async function updateMomentAction(
   const currency = formData.get("currency") as string | null;
   const status = formData.get("status") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
+  const refundableRaw = formData.get("refundable");
+  const refundable = refundableRaw !== null ? refundableRaw === "on" : undefined;
 
   if (title !== null && !title.trim()) {
     return { success: false, error: "Title cannot be empty", code: "VALIDATION" };
@@ -209,6 +213,7 @@ export async function updateMomentAction(
         ...(price !== undefined && { price }),
         ...(currency && { currency }),
         ...(status && { status: status as Moment["status"] }),
+        ...(refundable !== undefined && { refundable }),
         requiresApproval: requiresApprovalUpdate,
       },
       {
