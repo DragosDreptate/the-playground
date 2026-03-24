@@ -607,17 +607,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
             ) : (
               <div className="border-border bg-card rounded-2xl border p-6">
-                {moment.price > 0 && (
-                  <div className="text-muted-foreground mb-4 space-y-1 text-xs">
-                    <p>{t("public.priceTtc")}</p>
-                    <p>
-                      {moment.refundable
-                        ? t("public.refundPolicyRefundable")
-                        : t("public.refundPolicyNonRefundable")}
-                    </p>
-                    <p>{t("public.refundPolicyCancellation")}</p>
-                  </div>
-                )}
                 <RegistrationButton
                   momentId={moment.id}
                   slug={moment.slug}
@@ -638,6 +627,15 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   requiresApproval={moment.requiresApproval}
                   refundable={moment.refundable}
                 />
+                {moment.price > 0 && (
+                  <p className="text-muted-foreground mt-3 text-center text-xs">
+                    {t("public.priceTtc")}
+                    {" · "}
+                    {moment.refundable
+                      ? t("public.refundPolicyRefundableShort")
+                      : t("public.refundPolicyNonRefundableShort")}
+                  </p>
+                )}
               </div>
             )
           )}
