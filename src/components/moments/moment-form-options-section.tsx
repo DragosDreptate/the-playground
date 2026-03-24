@@ -179,8 +179,8 @@ export function MomentFormOptionsSection({
         {/* Refundable toggle — visible only when price > 0, confirmed (not editing), and Stripe active */}
         {stripeConnectActive && hasPaidPrice && !priceOpen && (
           <div className="flex items-center gap-3 py-1">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
-              <RefreshCw className="size-4 text-green-500" />
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <RefreshCw className="text-primary size-4" />
             </div>
             <div className="min-w-0 flex-1">
               <label htmlFor="refundable" className="text-sm font-medium cursor-pointer">
