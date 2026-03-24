@@ -371,8 +371,7 @@ function StripeConnectInline({
   const [error, setError] = useState<string | null>(null);
 
   const isActive = hasAccount && status === "active";
-  const isPendingOrRestricted =
-    hasAccount && (status === "pending" || status === "restricted");
+  const needsAction = hasAccount && !isActive;
 
   function handleActivate() {
     setError(null);
@@ -411,7 +410,7 @@ function StripeConnectInline({
       {isPending ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
       {t("stripeConnect.activate")}
     </Button>
-  ) : isPendingOrRestricted ? (
+  ) : needsAction ? (
     <Button
       type="button"
       variant="outline"
@@ -451,7 +450,7 @@ function StripeConnectInline({
                 {t("stripeConnect.description")}
               </p>
             )}
-            {isPendingOrRestricted && (
+            {needsAction && (
               <div className="flex items-center gap-1.5 text-xs text-amber-500">
                 <AlertCircle className="size-3.5 shrink-0" />
                 <span>{t("stripeConnect.pending")}</span>
