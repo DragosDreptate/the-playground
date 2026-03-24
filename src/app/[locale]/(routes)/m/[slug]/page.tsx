@@ -23,6 +23,7 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { PaymentSuccessBanner } from "@/components/moments/payment-success-banner";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -85,10 +86,13 @@ export async function generateMetadata({
 
 export default async function PublicMomentPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string; locale: string }>;
+  searchParams: Promise<{ payment?: string }>;
 }) {
   const { slug, locale } = await params;
+  const { payment } = await searchParams;
   if (!isValidSlug(slug)) notFound();
 
   // Transition PUBLISHED → PAST for ended Moments — fire-and-forget après la réponse
@@ -208,6 +212,9 @@ export default async function PublicMomentPage({
         circleName={circle.name}
         status={moment.status}
       />
+      {payment === "success" && (
+        <PaymentSuccessBanner />
+      )}
       <MomentDetailView
         variant="public"
         moment={moment}

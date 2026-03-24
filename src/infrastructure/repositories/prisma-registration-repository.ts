@@ -63,6 +63,9 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         momentId: input.momentId,
         userId: input.userId,
         status: input.status,
+        ...(input.paymentStatus && { paymentStatus: input.paymentStatus }),
+        ...(input.stripePaymentIntentId && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeReceiptUrl && { stripeReceiptUrl: input.stripeReceiptUrl }),
       },
     });
     return toDomainRegistration(record);
@@ -446,5 +449,12 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       data: { status: "REJECTED" },
     });
     return result.count;
+  },
+
+  async findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null> {
+    const record = await prisma.registration.findFirst({
+      where: { stripePaymentIntentId: paymentIntentId },
+    });
+    return record ? toDomainRegistration(record) : null;
   },
 };

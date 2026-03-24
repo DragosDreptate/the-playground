@@ -9,10 +9,14 @@ export type CreateRegistrationInput = {
   momentId: string;
   userId: string;
   status: RegistrationStatus;
+  paymentStatus?: "NONE" | "PENDING" | "PAID" | "REFUNDED";
+  stripePaymentIntentId?: string | null;
+  stripeReceiptUrl?: string | null;
 };
 
 export type UpdateRegistrationInput = {
   status?: RegistrationStatus;
+  paymentStatus?: "NONE" | "PENDING" | "PAID" | "REFUNDED";
   cancelledAt?: Date | null;
   checkedInAt?: Date | null;
 };
@@ -61,4 +65,6 @@ export interface RegistrationRepository {
   countPendingApprovals(momentId: string): Promise<number>;
   /** Rejette en masse toutes les inscriptions PENDING_APPROVAL d'un Moment. */
   rejectAllPendingApprovals(momentId: string): Promise<number>;
+  /** Trouve une inscription par stripePaymentIntentId (pour l'idempotence webhook). */
+  findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
 }

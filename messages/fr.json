@@ -468,6 +468,8 @@
       "requestToJoin": "S'inscrire (soumis à validation)",
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
+      "paymentSuccessTitle": "Votre inscription est confirmée !",
+      "paymentSuccessDescription": "Vous recevrez un email de confirmation avec votre reçu de paiement.",
       "registered": "Inscrit",
       "registeredBannerTitle": "Vous participez à cet événement",
       "pendingApprovalBannerTitle": "Demande envoyée",
