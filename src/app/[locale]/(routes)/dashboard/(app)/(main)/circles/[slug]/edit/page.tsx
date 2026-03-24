@@ -40,21 +40,33 @@ export default async function EditCirclePage({
   const isHost = membership?.role === "HOST";
 
   let stripeConnect;
-  if (isHost && session?.user?.id) {
-    try {
-      const stripeStatus = await getStripeConnectStatus(
-        { circleId: circle.id, userId: session.user.id },
-        { circleRepository: prismaCircleRepository, paymentService: createStripePaymentService() }
-      );
-      stripeConnect = {
-        circleId: circle.id,
-        circleSlug: circle.slug,
-        hasAccount: stripeStatus.hasAccount,
-        status: stripeStatus.status,
-      };
-    } catch {
-      // Stripe API error — silently ignore, section won't show
+  if (isHost) {
+    // Default: no account (shows "Activer les paiements" button)
+    let hasAccount = false;
+    let status = null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null;
+
+    // If circle already has a Stripe account, fetch its status
+    if (circle.stripeConnectAccountId && session?.user?.id) {
+      try {
+        const stripeStatus = await getStripeConnectStatus(
+          { circleId: circle.id, userId: session.user.id },
+          { circleRepository: prismaCircleRepository, paymentService: createStripePaymentService() }
+        );
+        hasAccount = stripeStatus.hasAccount;
+        status = stripeStatus.status;
+      } catch {
+        // Stripe API error — show as "has account but unknown status"
+        hasAccount = true;
+        status = "pending";
+      }
     }
+
+    stripeConnect = {
+      circleId: circle.id,
+      circleSlug: circle.slug,
+      hasAccount,
+      status,
+    };
   }
 
   const tDashboard = await getTranslations("Dashboard");
