@@ -345,6 +345,15 @@
       "removeCover": "Supprimer la couverture",
       "cancel": "Annuler",
       "apply": "Appliquer"
+    },
+    "stripeConnect": {
+      "title": "Paiements",
+      "description": "Activez les paiements pour proposer des événements payants. Les frais Stripe (~2,9% + 0,30 €) sont déduits de vos revenus. The Playground ne prend aucune commission.",
+      "activate": "Activer les paiements",
+      "resume": "Reprendre l'activation",
+      "active": "Paiements activés",
+      "pending": "Activation en cours — complétez votre profil Stripe",
+      "viewDashboard": "Voir mes paiements"
     }
   },
   "Moment": {

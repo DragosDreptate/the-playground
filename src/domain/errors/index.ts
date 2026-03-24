@@ -35,3 +35,7 @@ export {
   RegistrationNotPendingApprovalError,
 } from "./registration-errors";
 export { AdminUnauthorizedError } from "./admin-errors";
+export {
+  StripeConnectNotActiveError,
+  StripeConnectAlreadyActiveError,
+} from "./stripe-errors";

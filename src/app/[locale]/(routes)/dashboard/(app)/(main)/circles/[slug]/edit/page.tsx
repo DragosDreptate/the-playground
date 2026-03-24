@@ -1,9 +1,13 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
+import { createStripePaymentService } from "@/infrastructure/services";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
+import { getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect";
 import { CircleNotFoundError } from "@/domain/errors";
 import { CircleForm } from "@/components/circles/circle-form";
+import { StripeConnectSection } from "@/components/circles/stripe-connect-section";
 import { updateCircleAction } from "@/app/actions/circle";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
@@ -29,8 +33,28 @@ export default async function EditCirclePage({
 
   const boundAction = updateCircleAction.bind(null, circle.id);
 
+  // Load Stripe Connect status for the HOST
+  const session = await auth();
+  let stripeStatus = { hasAccount: false, status: null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null };
+  if (session?.user?.id) {
+    try {
+      stripeStatus = await getStripeConnectStatus(
+        { circleId: circle.id, userId: session.user.id },
+        { circleRepository: prismaCircleRepository, paymentService: createStripePaymentService() }
+      );
+    } catch {
+      // Non-HOST users or errors — silently ignore, section won't show
+    }
+  }
+
   const tDashboard = await getTranslations("Dashboard");
   const tCommon = await getTranslations("Common");
+
+  // Only show Stripe section to HOSTs
+  const membership = session?.user?.id
+    ? await prismaCircleRepository.findMembership(circle.id, session.user.id)
+    : null;
+  const isHost = membership?.role === "HOST";
 
   return (
     <div className="space-y-6">
@@ -51,6 +75,14 @@ export default async function EditCirclePage({
         </span>
       </div>
       <CircleForm circle={circle} action={boundAction} />
+      {isHost && (
+        <StripeConnectSection
+          circleId={circle.id}
+          circleSlug={circle.slug}
+          hasAccount={stripeStatus.hasAccount}
+          status={stripeStatus.status}
+        />
+      )}
     </div>
   );
 }

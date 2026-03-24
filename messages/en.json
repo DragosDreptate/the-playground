@@ -345,6 +345,15 @@
       "removeCover": "Remove cover",
       "cancel": "Cancel",
       "apply": "Apply"
+    },
+    "stripeConnect": {
+      "title": "Payments",
+      "description": "Enable payments to offer paid events. Stripe fees (~2.9% + $0.30) are deducted from your earnings. The Playground takes no commission.",
+      "activate": "Enable payments",
+      "resume": "Resume activation",
+      "active": "Payments enabled",
+      "pending": "Activation in progress — complete your Stripe profile",
+      "viewDashboard": "View my payments"
     }
   },
   "Moment": {
