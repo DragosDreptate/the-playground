@@ -627,15 +627,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   requiresApproval={moment.requiresApproval}
                   refundable={moment.refundable}
                 />
-                {moment.price > 0 && (
-                  <p className="text-muted-foreground mt-3 text-xs">
-                    {t("public.priceTtc")}
-                    {" · "}
-                    {moment.refundable
-                      ? t("public.refundPolicyRefundableShort")
-                      : t("public.refundPolicyNonRefundableShort")}
-                  </p>
-                )}
               </div>
             )
           )}
