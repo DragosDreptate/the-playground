@@ -399,76 +399,82 @@ function StripeConnectInline({
     });
   }
 
+  const actionButton = !hasAccount ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleActivate}
+      disabled={isPending}
+    >
+      {isPending ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
+      {t("stripeConnect.activate")}
+    </Button>
+  ) : isPendingOrRestricted ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleActivate}
+      disabled={isPending}
+    >
+      {isPending && <Loader2 className="size-4 animate-spin" />}
+      {t("stripeConnect.resume")}
+    </Button>
+  ) : isActive ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleViewDashboard}
+      disabled={isPending}
+    >
+      {isPending ? <Loader2 className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
+      {t("stripeConnect.viewDashboard")}
+    </Button>
+  ) : null;
+
   return (
     <div className="flex items-start gap-3">
-      <div className={`flex size-9 shrink-0 items-center justify-center rounded-lg ${isActive ? "bg-green-500/10" : "bg-primary/10"}`}>
+      <div className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg ${isActive ? "bg-green-500/10" : "bg-primary/10"}`}>
         <CreditCard className={`size-4 ${isActive ? "text-green-500" : "text-primary"}`} />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">{t("stripeConnect.title")}</p>
-
-        {!hasAccount && (
-          <>
-            <p className="text-muted-foreground text-xs">
-              {t("stripeConnect.description")}
-            </p>
-            <div className="mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleActivate}
-                disabled={isPending}
-              >
-                {isPending ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
-                {t("stripeConnect.activate")}
-              </Button>
-            </div>
-          </>
-        )}
-
-        {isPendingOrRestricted && (
-          <>
-            <div className="mt-1 flex items-center gap-1.5 text-xs text-amber-500">
-              <AlertCircle className="size-3.5" />
-              <span>{t("stripeConnect.pending")}</span>
-            </div>
-            <div className="mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleActivate}
-                disabled={isPending}
-              >
-                {isPending && <Loader2 className="size-4 animate-spin" />}
-                {t("stripeConnect.resume")}
-              </Button>
-            </div>
-          </>
-        )}
-
-        {isActive && (
-          <div className="mt-1 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-green-500">
-              <CheckCircle2 className="size-3.5" />
-              <span>{t("stripeConnect.active")}</span>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleViewDashboard}
-              disabled={isPending}
-            >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
-              {t("stripeConnect.viewDashboard")}
-            </Button>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">{t("stripeConnect.title")}</p>
+            {!hasAccount && (
+              <p className="text-muted-foreground text-xs">
+                {t("stripeConnect.description")}
+              </p>
+            )}
+            {isPendingOrRestricted && (
+              <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                <AlertCircle className="size-3.5 shrink-0" />
+                <span>{t("stripeConnect.pending")}</span>
+              </div>
+            )}
+            {isActive && (
+              <div className="flex items-center gap-1.5 text-xs text-green-500">
+                <CheckCircle2 className="size-3.5 shrink-0" />
+                <span>{t("stripeConnect.active")}</span>
+              </div>
+            )}
           </div>
-        )}
-
+          {/* Desktop: button aligned right */}
+          <div className="hidden sm:block">
+            {actionButton}
+          </div>
+        </div>
+        {/* Mobile: button below text */}
+        <div className="mt-2 sm:hidden">
+          {actionButton}
+        </div>
         {error && (
-          <p className="mt-2 text-xs text-red-500">{error}</p>
+          <p className="mt-1 text-xs text-red-500">{error}</p>
         )}
       </div>
     </div>
