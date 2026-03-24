@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
+import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -7,6 +8,7 @@ import {
 } from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
 import { handlePaymentWebhook } from "@/domain/usecases/handle-payment-webhook";
+import { sendRegistrationEmails } from "@/app/actions/registration";
 
 const paymentService = createStripePaymentService();
 
@@ -34,6 +36,16 @@ export async function POST(request: Request) {
     );
 
     if (result.handled) {
+      // Send confirmation email (fire-and-forget — don't block the webhook response)
+      const t = await getTranslations("Email");
+      sendRegistrationEmails(
+        result.registration.momentId,
+        result.registration.userId,
+        result.registration,
+        t,
+        "fr" // Default locale for webhook-triggered emails
+      ).catch((error) => Sentry.captureException(error));
+
       return NextResponse.json({
         received: true,
         registrationId: result.registration.id,

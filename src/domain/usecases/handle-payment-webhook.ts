@@ -2,7 +2,6 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService, PaymentEvent } from "@/domain/ports/services/payment-service";
-import type { EmailService } from "@/domain/ports/services/email-service";
 import type { Registration } from "@/domain/models/registration";
 
 type HandlePaymentWebhookInput = {

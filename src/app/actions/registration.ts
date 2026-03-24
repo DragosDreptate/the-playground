@@ -187,7 +187,7 @@ export async function cancelRegistrationAction(
 
 type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
 
-async function sendRegistrationEmails(
+export async function sendRegistrationEmails(
   momentId: string,
   userId: string,
   registration: Registration,
