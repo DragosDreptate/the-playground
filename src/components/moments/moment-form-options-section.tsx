@@ -19,6 +19,7 @@ type MomentFormOptionsSectionProps = {
   defaultPrice?: number;
   defaultCurrency?: string;
   stripeConnectActive?: boolean;
+  priceLocked?: boolean;
   // Refundable
   defaultRefundable?: boolean;
   // Capacity
@@ -45,6 +46,7 @@ export function MomentFormOptionsSection({
   defaultPrice = 0,
   defaultCurrency = "EUR",
   stripeConnectActive = false,
+  priceLocked = false,
   defaultRefundable = true,
   capacityOpen,
   onCapacityOpenChange,
@@ -168,6 +170,22 @@ export function MomentFormOptionsSection({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
+        ) : priceLocked ? (
+          // Price locked — show value, no edit
+          <div className="py-1">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <Ticket className="text-primary size-4" />
+              </div>
+              <span className="flex-1 text-sm font-medium">
+                {t("form.ticketPrice")}
+              </span>
+              <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
+                <span>{formatPriceEur(priceCents)} {defaultCurrency}</span>
+                <Lock className="size-3.5" />
+              </span>
+            </div>
+          </div>
         ) : (
           // Stripe active — editable price
           <div>

@@ -33,6 +33,7 @@ type MomentFormProps = {
   circleDescription?: string;
   circleCoverImage?: string | null;
   stripeConnectActive?: boolean;
+  priceLocked?: boolean;
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -52,7 +53,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
@@ -349,6 +350,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             defaultPrice={moment?.price ?? 0}
             defaultCurrency={moment?.currency ?? "EUR"}
             stripeConnectActive={stripeConnectActive}
+            priceLocked={priceLocked}
             defaultRefundable={moment?.refundable ?? true}
             capacityOpen={capacityOpen}
             onCapacityOpenChange={setCapacityOpen}

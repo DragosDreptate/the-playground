@@ -17,6 +17,8 @@ export {
   MomentAlreadyPublishedError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
+  PriceLockedError,
+  CannotMakePaidWithRegistrationsError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {

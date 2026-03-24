@@ -2,12 +2,16 @@ import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
+import type { PaymentService } from "@/domain/ports/services/payment-service";
+import { refundRegistration } from "./refund-registration";
 import {
   MomentNotFoundError,
   MomentPastDateError,
   UnauthorizedMomentActionError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
+  PriceLockedError,
+  CannotMakePaidWithRegistrationsError,
 } from "@/domain/errors";
 
 type UpdateMomentInput = {
@@ -27,6 +31,7 @@ type UpdateMomentInput = {
   price?: number;
   currency?: string;
   status?: MomentStatus;
+  refundable?: boolean;
   requiresApproval?: boolean;
 };
 
@@ -34,6 +39,7 @@ type UpdateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
   registrationRepository?: RegistrationRepository;
+  paymentService?: PaymentService;
 };
 
 type UpdateMomentResult = {
@@ -71,6 +77,58 @@ export async function updateMoment(
     const circle = await circleRepository.findById(existing.circleId);
     if (!circle?.stripeConnectAccountId) {
       throw new PaidMomentRequiresStripeError(existing.circleId);
+    }
+  }
+
+  // Price locking rules (only when price is being changed)
+  if (input.price !== undefined && input.price !== existing.price && deps.registrationRepository) {
+    const registeredCount = await deps.registrationRepository.countByMomentIdAndStatus(
+      input.momentId,
+      "REGISTERED"
+    );
+    const checkedInCount = await deps.registrationRepository.countByMomentIdAndStatus(
+      input.momentId,
+      "CHECKED_IN"
+    );
+    const hasRegistrations = registeredCount + checkedInCount > 0;
+
+    if (hasRegistrations) {
+      const wasFree = existing.price === 0;
+      const becomingPaid = input.price > 0;
+      const wasPaid = existing.price > 0;
+      const becomingFree = input.price === 0;
+      const priceChanging = wasPaid && becomingPaid && input.price !== existing.price;
+
+      // Gratuit → payant avec inscrits : interdit
+      if (wasFree && becomingPaid) {
+        throw new CannotMakePaidWithRegistrationsError();
+      }
+
+      // Payant → payant (changement de prix) avec inscrits : interdit
+      if (priceChanging) {
+        throw new PriceLockedError();
+      }
+
+      // Payant → gratuit avec inscrits payants : autorisé, remboursement batch
+      if (wasPaid && becomingFree && deps.paymentService) {
+        const registrations = await deps.registrationRepository.findActiveByMomentId(
+          input.momentId
+        );
+        const paidRegistrations = registrations.filter(
+          (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
+        );
+        await Promise.all(
+          paidRegistrations.map((r) =>
+            refundRegistration(
+              { registration: r, moment: existing, force: true },
+              {
+                registrationRepository: deps.registrationRepository!,
+                paymentService: deps.paymentService!,
+              }
+            )
+          )
+        );
+      }
     }
   }
 

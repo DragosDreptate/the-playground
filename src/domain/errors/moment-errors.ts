@@ -57,3 +57,19 @@ export class PaidMomentRequiresStripeError extends DomainError {
     );
   }
 }
+
+export class PriceLockedError extends DomainError {
+  readonly code = "PRICE_LOCKED";
+
+  constructor() {
+    super("Price is locked after the first paid registration");
+  }
+}
+
+export class CannotMakePaidWithRegistrationsError extends DomainError {
+  readonly code = "CANNOT_MAKE_PAID_WITH_REGISTRATIONS";
+
+  constructor() {
+    super("Cannot change a free event to paid when participants are already registered");
+  }
+}
