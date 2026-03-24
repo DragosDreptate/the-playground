@@ -149,8 +149,8 @@ export default async function PublicCirclePage({
   const isConnected = !!session?.user?.id;
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
-  const showJoinButton = !!session?.user?.id && !isMember && !isPendingMember;
-  const showSignInToJoin = !session?.user?.id;
+  const showJoinButton = isConnected && !isMember && !isPendingMember;
+  const showSignInToJoin = !isConnected;
   const showMemberBadge = isMember && !isHost;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
