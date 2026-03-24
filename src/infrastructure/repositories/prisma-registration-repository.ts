@@ -457,4 +457,31 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     });
     return record ? toDomainRegistration(record) : null;
   },
+
+  async getPaymentSummary(momentId: string) {
+    const [paidResult, refundedResult] = await Promise.all([
+      prisma.registration.aggregate({
+        where: { momentId, paymentStatus: "PAID" },
+        _count: true,
+      }),
+      prisma.registration.aggregate({
+        where: { momentId, paymentStatus: "REFUNDED" },
+        _count: true,
+      }),
+    ]);
+
+    // Total amount = count of PAID registrations × moment price
+    // We need the moment price for this, but we only have registration data here.
+    // Instead, sum from the moment price joined with count.
+    const moment = await prisma.moment.findUnique({
+      where: { id: momentId },
+      select: { price: true },
+    });
+
+    return {
+      paidCount: paidResult._count,
+      totalAmount: (paidResult._count) * (moment?.price ?? 0),
+      refundedCount: refundedResult._count,
+    };
+  },
 };

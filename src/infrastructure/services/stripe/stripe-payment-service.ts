@@ -110,6 +110,14 @@ export function createStripePaymentService(): PaymentService {
         cancel_url: cancelUrl,
         expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes (Stripe minimum)
         allow_promotion_codes: true,
+        custom_text: {
+          terms_of_service_acceptance: {
+            message: `En procédant au paiement, vous acceptez les [CGU](${process.env.NEXT_PUBLIC_APP_URL || "https://the-playground.fr"}/legal/cgu).`,
+          },
+        },
+        consent_collection: {
+          terms_of_service: "required",
+        },
       });
 
       return { url: session.url!, sessionId: session.id };

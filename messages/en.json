@@ -538,6 +538,12 @@
         "registeredAt": "Registration date"
       }
     },
+    "host": {
+      "ticketingSummary": "Ticketing",
+      "paidRegistrations": "{count, plural, one {# paid registration} other {# paid registrations}}",
+      "beforeStripeFees": "before Stripe fees",
+      "refundedRegistrations": "{count, plural, one {# refunded} other {# refunded}}"
+    },
     "comments": {
       "title": "Comments",
       "count": "{count} comment(s)",
@@ -1039,6 +1045,10 @@
       "pricing": {
         "title": "Pricing",
         "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Events, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
+      },
+      "payments": {
+        "title": "Payments and transactions",
+        "content": "The Playground acts as a technical intermediary via Stripe Connect. The platform facilitates the transaction between the Host and the Member but is not a party to the sale. Payment data is processed exclusively by Stripe and is never stored by The Playground. The refund policy is set by each Host when creating the event: either refundable (full refund on cancellation) or non-refundable. If an event is cancelled by the Host, a full refund is always issued regardless of the refund policy. In case of dispute, the Member should contact the Host. As a last resort, a chargeback can be filed with their bank."
       },
       "liability": {
         "title": "Limitation of liability",

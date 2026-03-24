@@ -259,6 +259,10 @@ export async function sendRegistrationEmails(
     circleSlug: circle.slug,
     status: registration.status,
     icsContent,
+    ...(registration.paymentStatus === "PAID" && moment.price > 0 && {
+      amountPaid: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(moment.price / 100) + " " + moment.currency,
+    }),
+    ...(registration.stripeReceiptUrl && { receiptUrl: registration.stripeReceiptUrl }),
     strings: {
       subject: t(`${stringPrefix}.subject`, { momentTitle: moment.title }),
       heading: t(`${stringPrefix}.heading`),

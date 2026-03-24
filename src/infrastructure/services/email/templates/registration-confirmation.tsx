@@ -25,6 +25,8 @@ export function RegistrationConfirmationEmail({
   momentDateMonth,
   momentDateDay,
   locationText,
+  amountPaid,
+  receiptUrl,
   baseUrl,
   strings,
 }: Props) {
@@ -52,6 +54,22 @@ export function RegistrationConfirmationEmail({
           <span style={metaValue}>{locationText}</span>
         </Text>
       </Section>
+
+      {amountPaid && (
+        <Section style={paymentSection}>
+          <Text style={paymentText}>
+            Paiement confirmé — {amountPaid}
+            {receiptUrl && (
+              <>
+                {" · "}
+                <Link href={receiptUrl} style={receiptLink}>
+                  Voir mon reçu
+                </Link>
+              </>
+            )}
+          </Text>
+        </Section>
+      )}
 
       <Section style={ctaSection}>
         <Button style={ctaButton} href={momentUrl}>
@@ -106,4 +124,23 @@ const dashboardLinkAnchor: React.CSSProperties = {
   color: "#71717a",
   fontSize: "12px",
   textDecoration: "none",
+};
+
+const paymentSection: React.CSSProperties = {
+  backgroundColor: "#f0fdf4",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "24px",
+};
+
+const paymentText: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#166534",
+  margin: "0",
+  lineHeight: "20px",
+};
+
+const receiptLink: React.CSSProperties = {
+  color: "#166534",
+  textDecoration: "underline",
 };

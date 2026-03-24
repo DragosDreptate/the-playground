@@ -15,6 +15,8 @@ export type RegistrationConfirmationEmailData = {
   circleSlug: string;
   status: RegistrationStatus; // REGISTERED or WAITLISTED
   icsContent?: string; // iCalendar (.ics) attachment — only for REGISTERED
+  amountPaid?: string; // Pre-formatted price (e.g. "15,00 €") — only for paid events
+  receiptUrl?: string; // Stripe receipt URL — only for paid events
   strings: {
     subject: string;
     heading: string;
@@ -148,6 +150,7 @@ export type MomentCancelledEmailData = {
   locationText: string;
   circleName: string;
   circleSlug: string;
+  refundMessage?: string; // e.g. "Vous serez remboursé de 15,00 € sous 5-10 jours"
   strings: {
     subject: string;
     heading: string;

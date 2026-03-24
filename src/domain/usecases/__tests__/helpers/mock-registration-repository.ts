@@ -25,6 +25,7 @@ export function createMockRegistrationRepository(
     countPendingApprovals: vi.fn<RegistrationRepository["countPendingApprovals"]>().mockResolvedValue(0),
     rejectAllPendingApprovals: vi.fn<RegistrationRepository["rejectAllPendingApprovals"]>().mockResolvedValue(0),
     findByStripePaymentIntentId: vi.fn<RegistrationRepository["findByStripePaymentIntentId"]>().mockResolvedValue(null),
+    getPaymentSummary: vi.fn<RegistrationRepository["getPaymentSummary"]>().mockResolvedValue({ paidCount: 0, totalAmount: 0, refundedCount: 0 }),
     ...overrides,
   };
 }

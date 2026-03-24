@@ -67,4 +67,6 @@ export interface RegistrationRepository {
   rejectAllPendingApprovals(momentId: string): Promise<number>;
   /** Trouve une inscription par stripePaymentIntentId (pour l'idempotence webhook). */
   findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
+  /** Résumé billetterie pour un événement payant. */
+  getPaymentSummary(momentId: string): Promise<{ paidCount: number; totalAmount: number; refundedCount: number }>;
 }

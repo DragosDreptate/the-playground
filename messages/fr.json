@@ -538,6 +538,12 @@
         "registeredAt": "Date d'inscription"
       }
     },
+    "host": {
+      "ticketingSummary": "Billetterie",
+      "paidRegistrations": "{count, plural, one {# inscrit payant} other {# inscrits payants}}",
+      "beforeStripeFees": "avant frais Stripe",
+      "refundedRegistrations": "{count, plural, one {# remboursé} other {# remboursés}}"
+    },
     "comments": {
       "title": "Commentaires",
       "count": "{count} commentaire(s)",
@@ -1039,6 +1045,10 @@
       "pricing": {
         "title": "Gratuité et tarification",
         "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'Organisateur."
+      },
+      "payments": {
+        "title": "Paiements et transactions",
+        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'Organisateur et le Participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque Organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'Organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le Participant est invité à contacter l'Organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
       },
       "liability": {
         "title": "Limitation de responsabilité",
