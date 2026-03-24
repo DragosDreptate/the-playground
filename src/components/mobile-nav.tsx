@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { usePathname as useFullPathname } from "next/navigation";
 import { Menu, Compass, LayoutDashboard, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,7 @@ export function MobileNav({ isAuthenticated, dashboardHref = "/dashboard" }: Mob
   const tDashboard = useTranslations("Dashboard");
   const tAuth = useTranslations("Auth");
   const pathname = usePathname();
+  const fullPathname = useFullPathname();
 
   return (
     <DropdownMenu>
@@ -51,7 +53,7 @@ export function MobileNav({ isAuthenticated, dashboardHref = "/dashboard" }: Mob
           </>
         ) : (
           <DropdownMenuItem asChild>
-            <Link href="/auth/sign-in" className="cursor-pointer">
+            <Link href={`/auth/sign-in?callbackUrl=${encodeURIComponent(fullPathname)}`} className="cursor-pointer">
               <LogIn className="mr-2 size-4" />
               {tAuth("signIn.title")}
             </Link>

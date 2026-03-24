@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { usePathname as useFullPathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
@@ -20,6 +21,7 @@ export function SiteHeader() {
   const user = session?.user;
   const dashboardHref = user?.dashboardMode == null ? "/dashboard/welcome" : "/dashboard";
   const pathname = usePathname();
+  const fullPathname = useFullPathname();
   const [isPWA, setIsPWA] = useState(false);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function SiteHeader() {
             <UserMenu user={user} />
           ) : (
             <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
-              <Link href="/auth/sign-in">{t("signIn.title")}</Link>
+              <Link href={`/auth/sign-in?callbackUrl=${encodeURIComponent(fullPathname)}`}>{t("signIn.title")}</Link>
             </Button>
           )}
           <MobileNav isAuthenticated={!!user} dashboardHref={dashboardHref} />
