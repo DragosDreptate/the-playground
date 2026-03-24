@@ -9,6 +9,7 @@ import {
   createMockRegistrationRepository,
   makeRegistration,
 } from "./helpers/mock-registration-repository";
+import { createMockPaymentService } from "./helpers/mock-payment-service";
 import {
   createMockMomentRepository,
   makeMoment,
@@ -268,6 +269,117 @@ describe("CancelRegistration", () => {
       );
 
       expect(result.registration.status).toBe("CANCELLED");
+    });
+  });
+
+  describe("given a PAID registration on a refundable event", () => {
+    it("should refund via PaymentService before cancelling", async () => {
+      const paidReg = makeRegistration({
+        status: "REGISTERED",
+        paymentStatus: "PAID",
+        stripePaymentIntentId: "pi_test_refund",
+      });
+      const paidMoment = makeMoment({ price: 1500, refundable: true });
+      const paymentService = createMockPaymentService();
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(paidReg),
+        update: vi.fn().mockResolvedValue({ ...paidReg, status: "CANCELLED" }),
+      });
+      const deps = makeDeps({
+        registrationRepo,
+        momentRepo: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(paidMoment),
+        }),
+      });
+
+      await cancelRegistration(defaultInput, { ...deps, paymentService });
+
+      expect(paymentService.refund).toHaveBeenCalledWith("pi_test_refund");
+    });
+  });
+
+  describe("given a PAID registration on a non-refundable event", () => {
+    it("should NOT refund but still cancel the registration", async () => {
+      const paidReg = makeRegistration({
+        status: "REGISTERED",
+        paymentStatus: "PAID",
+        stripePaymentIntentId: "pi_test_no_refund",
+      });
+      const nonRefundableMoment = makeMoment({ price: 1500, refundable: false });
+      const paymentService = createMockPaymentService();
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(paidReg),
+        update: vi.fn().mockResolvedValue({ ...paidReg, status: "CANCELLED" }),
+      });
+      const deps = makeDeps({
+        registrationRepo,
+        momentRepo: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(nonRefundableMoment),
+        }),
+      });
+
+      await cancelRegistration(defaultInput, { ...deps, paymentService });
+
+      expect(paymentService.refund).not.toHaveBeenCalled();
+      expect(registrationRepo.update).toHaveBeenCalledWith(
+        defaultInput.registrationId,
+        expect.objectContaining({ status: "CANCELLED" })
+      );
+    });
+  });
+
+  describe("given a free registration (paymentStatus=NONE)", () => {
+    it("should NOT call PaymentService at all", async () => {
+      const freeReg = makeRegistration({
+        status: "REGISTERED",
+        paymentStatus: "NONE",
+      });
+      const freeMoment = makeMoment({ price: 0 });
+      const paymentService = createMockPaymentService();
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(freeReg),
+        update: vi.fn().mockResolvedValue({ ...freeReg, status: "CANCELLED" }),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(null),
+      });
+      const deps = makeDeps({
+        registrationRepo,
+        momentRepo: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(freeMoment),
+        }),
+      });
+
+      await cancelRegistration(defaultInput, { ...deps, paymentService });
+
+      expect(paymentService.refund).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("given a PAID event cancellation — waitlist should NOT be promoted", () => {
+    it("should not promote waitlisted users for paid events", async () => {
+      const paidReg = makeRegistration({
+        status: "REGISTERED",
+        paymentStatus: "PAID",
+        stripePaymentIntentId: "pi_test_no_promote",
+      });
+      const paidMoment = makeMoment({ price: 1500, refundable: true });
+      const waitlistedReg = makeRegistration({ id: "waitlisted-1", status: "WAITLISTED" });
+      const paymentService = createMockPaymentService();
+      const registrationRepo = createMockRegistrationRepository({
+        findById: vi.fn().mockResolvedValue(paidReg),
+        update: vi.fn().mockResolvedValue({ ...paidReg, status: "CANCELLED" }),
+        findFirstWaitlisted: vi.fn().mockResolvedValue(waitlistedReg),
+      });
+      const deps = makeDeps({
+        registrationRepo,
+        momentRepo: createMockMomentRepository({
+          findById: vi.fn().mockResolvedValue(paidMoment),
+        }),
+      });
+
+      const result = await cancelRegistration(defaultInput, { ...deps, paymentService });
+
+      expect(result.promotedRegistration).toBeNull();
+      expect(registrationRepo.findFirstWaitlisted).not.toHaveBeenCalled();
     });
   });
 });

@@ -43,6 +43,7 @@ type RegistrationButtonProps = {
   appUrl?: string;
   waitlistPosition?: number;
   requiresApproval?: boolean;
+  refundable?: boolean;
 };
 
 function StatsColumn({
@@ -99,6 +100,7 @@ export function RegistrationButton({
   appUrl,
   waitlistPosition,
   requiresApproval = false,
+  refundable = true,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -268,6 +270,11 @@ export function RegistrationButton({
                   {t("public.cancelConfirmDescription")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              {price > 0 && !refundable && existingRegistration?.paymentStatus === "PAID" && (
+                <div className="rounded-md bg-amber-500/10 p-3 text-sm text-amber-500">
+                  {t("public.cancelNonRefundableWarning")}
+                </div>
+              )}
               {error && (
                 <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
                   {error}

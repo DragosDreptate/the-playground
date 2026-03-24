@@ -624,6 +624,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   appUrl={props.appUrl}
                   waitlistPosition={props.waitlistPosition}
                   requiresApproval={moment.requiresApproval}
+                  refundable={moment.refundable}
                 />
               </div>
             )

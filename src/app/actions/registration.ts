@@ -16,7 +16,7 @@ import {
   prismaRegistrationRepository,
   prismaUserRepository,
 } from "@/infrastructure/repositories";
-import { createResendEmailService } from "@/infrastructure/services";
+import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
@@ -29,6 +29,7 @@ import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
+const paymentService = createStripePaymentService();
 
 function getDateFnsLocale(locale: string) {
   return locale === "fr" ? fr : enUS;
@@ -157,6 +158,7 @@ export async function cancelRegistrationAction(
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        paymentService,
       }
     );
 
