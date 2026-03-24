@@ -104,7 +104,7 @@ export function createStripePaymentService(): PaymentService {
         },
         success_url: successUrl,
         cancel_url: cancelUrl,
-        expires_at: Math.floor(Date.now() / 1000) + 15 * 60, // 15 minutes
+        expires_at: Math.floor(Date.now() / 1000) + 30 * 60, // 30 minutes (Stripe minimum)
         allow_promotion_codes: true,
       });
 
