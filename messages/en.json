@@ -269,7 +269,8 @@
       "isHost": "You are an Organizer",
       "manageCircle": "Manage this Community",
       "shareableLink": "Shareable link",
-      "signInToSeeMembers": "Sign in to see the members of this community"
+      "signInToSeeMembers": "Sign in to see the members of this community",
+      "signInToJoin": "Sign in to join"
     },
     "removeMember": {
       "action": "Remove from Community",

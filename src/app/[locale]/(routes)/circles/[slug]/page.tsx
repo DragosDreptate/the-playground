@@ -150,6 +150,7 @@ export default async function PublicCirclePage({
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
   const showJoinButton = !!session?.user?.id && !isMember && !isPendingMember;
+  const showSignInToJoin = !session?.user?.id;
   const showMemberBadge = isMember && !isHost;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
@@ -351,6 +352,16 @@ export default async function PublicCirclePage({
           {/* Bouton Rejoindre — visible uniquement pour les utilisateurs connectés non-membres */}
           {showJoinButton && (
             <JoinCircleButton circleId={circle.id} requiresApproval={circle.requiresApproval} />
+          )}
+
+          {/* CTA Se connecter — visible pour les visiteurs non-authentifiés */}
+          {showSignInToJoin && (
+            <Button variant="default" size="sm" asChild className="w-full gap-2">
+              <a href={`/${locale}/auth/sign-in?callbackUrl=/${locale}/circles/${slug}`}>
+                <Users className="size-4" />
+                {t("detail.signInToJoin")}
+              </a>
+            </Button>
           )}
         </div>
 

@@ -269,7 +269,8 @@
       "isHost": "Vous êtes Organisateur",
       "manageCircle": "Gérer cette Communauté",
       "shareableLink": "Lien partageable",
-      "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté"
+      "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté",
+      "signInToJoin": "Se connecter pour rejoindre"
     },
     "removeMember": {
       "action": "Retirer de la Communauté",
