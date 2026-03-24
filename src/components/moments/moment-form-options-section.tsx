@@ -68,8 +68,11 @@ export function MomentFormOptionsSection({
       </p>
 
       <div className="space-y-3">
-        {/* Hidden input for actual price in cents */}
+        {/* Hidden inputs — always in the DOM regardless of inline edit state */}
         <input type="hidden" name="price" value={priceCents} />
+        {!capacityOpen && (
+          <input type="hidden" name="capacity" value={capacityValue} />
+        )}
 
         {/* Capacity row */}
         <div className="py-1">
