@@ -9,7 +9,24 @@ import type {
 import type { Circle } from "@/domain/models/circle";
 
 export function createStripePaymentService(): PaymentService {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    // Return a stub that throws on any call — prevents crash at module load
+    const notConfigured = () => {
+      throw new Error("Stripe is not configured: STRIPE_SECRET_KEY is missing");
+    };
+    return {
+      createConnectAccount: notConfigured,
+      createOnboardingLink: notConfigured,
+      createLoginLink: notConfigured,
+      getConnectAccountStatus: notConfigured,
+      createCheckoutSession: notConfigured,
+      handleWebhookEvent: notConfigured,
+      refund: notConfigured,
+    } as unknown as PaymentService;
+  }
+
+  const stripe = new Stripe(apiKey, {
     apiVersion: "2026-02-25.clover",
   });
 
