@@ -21,7 +21,6 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
-import { refundRegistration } from "@/domain/usecases/refund-registration";
 import { DomainError } from "@/domain/errors";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
@@ -399,26 +398,13 @@ export async function deleteMomentAction(
       resolveCircleRepository(session, prismaCircleRepository),
     ]);
 
-    // Refund all PAID registrations before deletion (force=true: Organisateur cancellation always refunds)
-    if (momentToDelete && momentToDelete.price > 0) {
-      const paidRegistrations = registrationsToNotify.filter(
-        (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
-      );
-      await Promise.all(
-        paidRegistrations.map((r) =>
-          refundRegistration(
-            { registration: r, moment: momentToDelete, force: true },
-            { registrationRepository: prismaRegistrationRepository, paymentService }
-          )
-        )
-      );
-    }
-
     await deleteMoment(
       { momentId, userId: session.user.id },
       {
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
+        registrationRepository: prismaRegistrationRepository,
+        paymentService,
       }
     );
 
