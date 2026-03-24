@@ -20,15 +20,18 @@ import {
   joinMomentAction,
   cancelRegistrationAction,
 } from "@/app/actions/registration";
+import { createCheckoutAction } from "@/app/actions/checkout";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
 
 type RegistrationButtonProps = {
   momentId: string;
+  slug: string;
   circleId: string;
   circleName: string;
   price: number;
+  currency: string;
   isAuthenticated: boolean;
   existingRegistration: Registration | null;
   signInUrl: string;
@@ -71,11 +74,20 @@ function StatsColumn({
   );
 }
 
+function formatPrice(cents: number, currency: string, locale: string = "fr-FR"): string {
+  return new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(cents / 100);
+}
+
 export function RegistrationButton({
   momentId,
+  slug,
   circleId,
   circleName,
   price,
+  currency,
   isAuthenticated,
   existingRegistration,
   signInUrl,
@@ -100,19 +112,7 @@ export function RegistrationButton({
   );
   const [error, setError] = useState<string | null>(null);
 
-  // Paid Moments: disabled "Coming soon"
-  if (price > 0) {
-    return (
-      <div className="flex items-center justify-between gap-3">
-        <Button className="rounded-full" disabled>
-          {t("public.comingSoon")}
-        </Button>
-        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
-    );
-  }
-
-  // Not authenticated: link to sign-in
+  // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
@@ -120,6 +120,60 @@ export function RegistrationButton({
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
+    );
+  }
+
+  // Paid events: redirect to Stripe Checkout (no waitlist)
+  if (price > 0 && !localStatus) {
+    if (isFull) {
+      return (
+        <div className="flex items-center justify-between gap-3">
+          <Button className="rounded-full" disabled>
+            {t("public.eventFull")}
+          </Button>
+          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            className="rounded-full md:px-7"
+            disabled={isPending}
+            onClick={() => {
+              startTransition(async () => {
+                setError(null);
+                const baseUrl = window.location.origin;
+                const result = await createCheckoutAction(
+                  momentId,
+                  `${baseUrl}/m/${slug}?payment=success`,
+                  `${baseUrl}/m/${slug}?payment=cancelled`
+                );
+                if (result.success) {
+                  window.location.href = result.data.url;
+                } else {
+                  setError(result.error);
+                }
+              });
+            }}
+          >
+            {isPending
+              ? tCommon("loading")
+              : t("public.registerPaid", {
+                  price: formatPrice(price, currency),
+                  currency,
+                })}
+          </Button>
+          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        </div>
+        {error && (
+          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+            {error}
+          </div>
+        )}
       </div>
     );
   }
