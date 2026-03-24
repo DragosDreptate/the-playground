@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { CheckIcon, Github, Star } from "lucide-react";
+import {
+  CheckIcon,
+  Github,
+  Star,
+  Users,
+  CalendarCheck,
+  Bell,
+  CreditCard,
+  MessageCircle,
+  ListChecks,
+  Globe,
+  Radar,
+} from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("About");
@@ -27,8 +39,8 @@ export default async function AboutPage() {
           <span className="text-violet-500">✦</span>
           <span>
             {isFr
-              ? "Expérience Claude Code · The Playground"
-              : "A Claude Code Experiment · The Playground"}
+              ? "Construit avec Claude Code · The Playground"
+              : "Built with Claude Code · The Playground"}
           </span>
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight leading-tight">
@@ -52,8 +64,8 @@ export default async function AboutPage() {
         </h1>
         <p className="text-lg leading-relaxed text-muted-foreground">
           {isFr
-            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais une plateforme qui fonctionne et je me pose la question de l'ouvrir au public et de lui donner une chance de trouver sa place."
-            : "A pretext to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working platform and was seriously wondering whether to open it to the public."}
+            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais un MVP fonctionnel. Quelques semaines plus tard, une plateforme complète en production — avec ses communautés, ses événements, ses utilisateurs."
+            : "A pretext to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working MVP. A few weeks later, a full platform in production — with real communities, events, and users."}
         </p>
       </section>
 
@@ -170,6 +182,43 @@ export default async function AboutPage() {
             ? "Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d'abonnement, pas de commission plateforme."
             : "Meetup's community model + Luma's experience + 100% free. No subscription, no platform commission."}
         </p>
+
+        {/* ── Fonctionnalités concrètes ── */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+          {(isFr
+            ? [
+                { icon: Users, label: "Communautés persistantes", desc: "Membres, rôles, invitations par lien" },
+                { icon: CalendarCheck, label: "Événements partageables", desc: "Pages autonomes, brouillons, ajout calendrier" },
+                { icon: Bell, label: "Notifications automatiques", desc: "Confirmations, rappels, mises à jour" },
+                { icon: CreditCard, label: "Billetterie intégrée", desc: "Paiements via Stripe, 0% commission plateforme" },
+                { icon: MessageCircle, label: "Commentaires", desc: "Fil de discussion sur chaque événement" },
+                { icon: ListChecks, label: "Liste d'attente", desc: "Promotion automatique sur désistement" },
+                { icon: Globe, label: "Explorer", desc: "Répertoire public de communautés" },
+                { icon: Radar, label: "Radar IA", desc: "Détection d'événements similaires via Claude" },
+              ]
+            : [
+                { icon: Users, label: "Persistent communities", desc: "Members, roles, invite links" },
+                { icon: CalendarCheck, label: "Shareable events", desc: "Standalone pages, drafts, calendar sync" },
+                { icon: Bell, label: "Automated notifications", desc: "Confirmations, reminders, updates" },
+                { icon: CreditCard, label: "Built-in ticketing", desc: "Stripe payments, 0% platform fee" },
+                { icon: MessageCircle, label: "Comments", desc: "Discussion thread on every event" },
+                { icon: ListChecks, label: "Waitlist", desc: "Auto-promotion on cancellation" },
+                { icon: Globe, label: "Explore", desc: "Public community directory" },
+                { icon: Radar, label: "AI Radar", desc: "Similar event detection via Claude" },
+              ]
+          ).map(({ icon: Icon, label, desc }) => (
+            <div
+              key={label}
+              className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3"
+            >
+              <Icon className="size-5 shrink-0 text-primary mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">{label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       <hr className="border-border" />
@@ -278,8 +327,8 @@ export default async function AboutPage() {
         </h2>
         <p className="text-[17px] leading-relaxed text-muted-foreground">
           {isFr
-            ? "Construit en moins d'une semaine avec Claude Code (Anthropic). Architecture hexagonale, TypeScript strict, tout déployé en Europe."
-            : "Built in under a week with Claude Code (Anthropic). Hexagonal architecture, strict TypeScript, everything deployed in Europe."}
+            ? "Entièrement construit avec Claude Code (Anthropic). Architecture hexagonale, TypeScript strict, tout déployé en Europe."
+            : "Entirely built with Claude Code (Anthropic). Hexagonal architecture, strict TypeScript, everything deployed in Europe."}
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {[
@@ -289,11 +338,13 @@ export default async function AboutPage() {
             { name: "Prisma", desc: isFr ? "ORM + migrations" : "ORM + migrations" },
             { name: "Auth.js v5", desc: isFr ? "Magic link + OAuth" : "Magic link + OAuth" },
             { name: "Tailwind + shadcn", desc: isFr ? "Design system" : "Design system" },
+            { name: "Stripe Connect", desc: isFr ? "Paiements sécurisés" : "Secure payments" },
             { name: "Resend", desc: isFr ? "Emails transactionnels" : "Transactional emails" },
+            { name: "Sentry", desc: isFr ? "Monitoring d'erreurs" : "Error monitoring" },
             { name: "Vercel", desc: isFr ? "Déploiement EU" : "Edge deployment (EU)" },
             { name: "PostHog", desc: isFr ? "Product analytics" : "Product analytics" },
-            { name: "Claude Code", desc: isFr ? "Propulsé par l'IA" : "AI-powered dev" },
-            { name: "Anthropic SDK", desc: isFr ? "IA embarquée (Claude)" : "Embedded AI (Claude)" },
+            { name: "Claude Code", desc: isFr ? "Développement IA" : "AI-powered dev" },
+            { name: "Anthropic SDK", desc: isFr ? "IA embarquée (Radar)" : "Embedded AI (Radar)" },
           ].map(({ name, desc }) => (
             <div
               key={name}
@@ -308,7 +359,31 @@ export default async function AboutPage() {
 
       <hr className="border-border" />
 
-      {/* ── Section 6 — Code source ── */}
+      {/* ── Section 6 — En chiffres ── */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold tracking-tight">
+          {isFr ? "En chiffres" : "By the numbers"}
+        </h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {[
+            { value: "1 200+", label: isFr ? "commits" : "commits" },
+            { value: "250+", label: isFr ? "pull requests" : "pull requests" },
+            { value: "45", label: isFr ? "cas d'usage" : "use cases" },
+            { value: "830+", label: isFr ? "tests" : "tests" },
+          ].map(({ value, label }) => (
+            <div key={label} className="text-center">
+              <p className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
+                {value}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">{label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <hr className="border-border" />
+
+      {/* ── Section 7 — Code source ── */}
       <section className="space-y-6">
         <h2 className="text-2xl font-bold tracking-tight">
           {isFr ? "Le code" : "The code"}
@@ -339,8 +414,6 @@ export default async function AboutPage() {
           </span>
         </a>
       </section>
-
-
 
     </div>
   );
