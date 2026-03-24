@@ -7,7 +7,6 @@ import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect";
 import { CircleNotFoundError } from "@/domain/errors";
 import { CircleForm } from "@/components/circles/circle-form";
-import { StripeConnectSection } from "@/components/circles/stripe-connect-section";
 import { updateCircleAction } from "@/app/actions/circle";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
@@ -35,26 +34,31 @@ export default async function EditCirclePage({
 
   // Load Stripe Connect status for the HOST
   const session = await auth();
-  let stripeStatus = { hasAccount: false, status: null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null };
-  if (session?.user?.id) {
+  const membership = session?.user?.id
+    ? await prismaCircleRepository.findMembership(circle.id, session.user.id)
+    : null;
+  const isHost = membership?.role === "HOST";
+
+  let stripeConnect;
+  if (isHost && session?.user?.id) {
     try {
-      stripeStatus = await getStripeConnectStatus(
+      const stripeStatus = await getStripeConnectStatus(
         { circleId: circle.id, userId: session.user.id },
         { circleRepository: prismaCircleRepository, paymentService: createStripePaymentService() }
       );
+      stripeConnect = {
+        circleId: circle.id,
+        circleSlug: circle.slug,
+        hasAccount: stripeStatus.hasAccount,
+        status: stripeStatus.status,
+      };
     } catch {
-      // Non-HOST users or errors — silently ignore, section won't show
+      // Stripe API error — silently ignore, section won't show
     }
   }
 
   const tDashboard = await getTranslations("Dashboard");
   const tCommon = await getTranslations("Common");
-
-  // Only show Stripe section to HOSTs
-  const membership = session?.user?.id
-    ? await prismaCircleRepository.findMembership(circle.id, session.user.id)
-    : null;
-  const isHost = membership?.role === "HOST";
 
   return (
     <div className="space-y-6">
@@ -74,15 +78,7 @@ export default async function EditCirclePage({
           {tCommon("edit")}
         </span>
       </div>
-      <CircleForm circle={circle} action={boundAction} />
-      {isHost && (
-        <StripeConnectSection
-          circleId={circle.id}
-          circleSlug={circle.slug}
-          hasAccount={stripeStatus.hasAccount}
-          status={stripeStatus.status}
-        />
-      )}
+      <CircleForm circle={circle} action={boundAction} stripeConnect={stripeConnect} />
     </div>
   );
 }
