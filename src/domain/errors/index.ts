@@ -15,6 +15,8 @@ export {
   UnauthorizedMomentActionError,
   MomentPastDateError,
   MomentAlreadyPublishedError,
+  InvalidPriceError,
+  PaidMomentRequiresStripeError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {

@@ -39,3 +39,21 @@ export class MomentAlreadyPublishedError extends DomainError {
     super(`Moment is already published: ${momentId}`);
   }
 }
+
+export class InvalidPriceError extends DomainError {
+  readonly code = "INVALID_PRICE";
+
+  constructor() {
+    super("Price must be 0 (free) or at least 50 cents (0.50 EUR)");
+  }
+}
+
+export class PaidMomentRequiresStripeError extends DomainError {
+  readonly code = "PAID_MOMENT_REQUIRES_STRIPE";
+
+  constructor(circleId: string) {
+    super(
+      `Cannot set a price without Stripe Connect activated on circle ${circleId}`
+    );
+  }
+}

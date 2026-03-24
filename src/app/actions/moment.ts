@@ -75,7 +75,6 @@ export async function createMomentAction(
   const priceRaw = formData.get("price") as string | null;
   const currency = (formData.get("currency") as string) || "EUR";
   const requiresApproval = formData.get("requiresApproval") === "on";
-  const refundable = formData.get("refundable") === "on";
 
   if (!title?.trim()) {
     return { success: false, error: "Title is required", code: "VALIDATION" };
@@ -91,6 +90,8 @@ export async function createMomentAction(
   const endsAt = endsAtRaw ? new Date(endsAtRaw) : null;
   const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : null;
   const price = priceRaw ? parseInt(priceRaw, 10) || 0 : 0;
+  // Refundable only meaningful for paid events; default to true for free events
+  const refundable = price > 0 ? formData.get("refundable") === "on" : true;
 
   try {
     const coverData = await processCoverImage(formData);
@@ -175,8 +176,6 @@ export async function updateMomentAction(
   const currency = formData.get("currency") as string | null;
   const status = formData.get("status") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
-  const refundableRaw = formData.get("refundable");
-  const refundable = refundableRaw !== null ? refundableRaw === "on" : undefined;
 
   if (title !== null && !title.trim()) {
     return { success: false, error: "Title cannot be empty", code: "VALIDATION" };
@@ -184,6 +183,10 @@ export async function updateMomentAction(
 
   const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : undefined;
   const price = priceRaw !== null ? parseInt(priceRaw, 10) || 0 : undefined;
+  // Refundable only meaningful for paid events; default to true when price becomes 0
+  const refundable = price !== undefined
+    ? (price > 0 ? formData.get("refundable") === "on" : true)
+    : undefined;
 
   try {
     // Récupère l'ancienne cover pour cleanup si besoin
