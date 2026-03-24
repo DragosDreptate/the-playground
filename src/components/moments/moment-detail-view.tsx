@@ -628,7 +628,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   refundable={moment.refundable}
                 />
                 {moment.price > 0 && (
-                  <p className="text-muted-foreground mt-3 text-center text-xs">
+                  <p className="text-muted-foreground mt-3 text-xs">
                     {t("public.priceTtc")}
                     {" · "}
                     {moment.refundable
