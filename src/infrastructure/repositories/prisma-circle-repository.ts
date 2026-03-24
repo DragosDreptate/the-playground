@@ -148,6 +148,7 @@ export const prismaCircleRepository: CircleRepository = {
         }),
         ...(input.inviteToken !== undefined && { inviteToken: input.inviteToken }),
         ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
+        ...(input.stripeConnectAccountId !== undefined && { stripeConnectAccountId: input.stripeConnectAccountId }),
       },
     });
     return toDomainCircle(record);
