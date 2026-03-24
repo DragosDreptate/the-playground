@@ -35,6 +35,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     price: record.price,
     currency: record.currency,
     status: record.status,
+    refundable: record.refundable,
     requiresApproval: record.requiresApproval,
     broadcastSentAt: record.broadcastSentAt,
     reminder24hSentAt: record.reminder24hSentAt,

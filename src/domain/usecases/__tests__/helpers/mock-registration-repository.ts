@@ -38,6 +38,7 @@ export function makeRegistration(
     status: "REGISTERED",
     paymentStatus: "NONE",
     stripePaymentIntentId: null,
+    stripeReceiptUrl: null,
     registeredAt: new Date("2026-02-15"),
     cancelledAt: null,
     checkedInAt: null,

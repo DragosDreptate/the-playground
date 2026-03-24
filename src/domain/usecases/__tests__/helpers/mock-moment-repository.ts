@@ -47,6 +47,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     price: 0,
     currency: "EUR",
     status: "PUBLISHED",
+    refundable: true,
     requiresApproval: false,
     broadcastSentAt: null,
     reminder24hSentAt: null,

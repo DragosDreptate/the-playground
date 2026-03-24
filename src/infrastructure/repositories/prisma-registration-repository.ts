@@ -22,6 +22,7 @@ function toDomainRegistration(record: PrismaRegistration): Registration {
     status: record.status,
     paymentStatus: record.paymentStatus,
     stripePaymentIntentId: record.stripePaymentIntentId,
+    stripeReceiptUrl: record.stripeReceiptUrl,
     registeredAt: record.registeredAt,
     cancelledAt: record.cancelledAt,
     checkedInAt: record.checkedInAt,
@@ -277,6 +278,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: string;
       paymentStatus: string;
       stripePaymentIntentId: string | null;
+      stripeReceiptUrl: string | null;
       registeredAt: Date;
       cancelledAt: Date | null;
       checkedInAt: Date | null;
@@ -303,6 +305,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         r.status,
         r."paymentStatus",
         r."stripePaymentIntentId",
+        r."stripeReceiptUrl",
         r."registeredAt",
         r."cancelledAt",
         r."checkedInAt",
@@ -340,6 +343,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: row.status as RegistrationStatus,
       paymentStatus: row.paymentStatus as PaymentStatus,
       stripePaymentIntentId: row.stripePaymentIntentId,
+      stripeReceiptUrl: row.stripeReceiptUrl ?? null,
       registeredAt: row.registeredAt,
       cancelledAt: row.cancelledAt,
       checkedInAt: row.checkedInAt,
