@@ -67,15 +67,24 @@ export async function handlePaymentWebhook(
     }
   }
 
-  // Create the Registration with PAID status
-  const registration = await registrationRepository.create({
-    momentId,
-    userId,
-    status: "REGISTERED",
-    paymentStatus: "PAID",
-    stripePaymentIntentId: paymentIntentId || null,
-    stripeReceiptUrl: receiptUrl || null,
-  });
+  // Create or update the Registration with PAID status
+  // (the user may already have a Registration, e.g. from auto-inscription as Host)
+  const existingRegistration = await registrationRepository.findByMomentAndUser(momentId, userId);
+  let registration;
+  if (existingRegistration && existingRegistration.status !== "CANCELLED") {
+    registration = await registrationRepository.update(existingRegistration.id, {
+      paymentStatus: "PAID",
+    });
+  } else {
+    registration = await registrationRepository.create({
+      momentId,
+      userId,
+      status: "REGISTERED",
+      paymentStatus: "PAID",
+      stripePaymentIntentId: paymentIntentId || null,
+      stripeReceiptUrl: receiptUrl || null,
+    });
+  }
 
   // Auto-join Circle if not already a member
   const membership = await circleRepository.findMembership(circleId, userId);

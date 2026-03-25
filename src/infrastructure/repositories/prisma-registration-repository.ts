@@ -461,7 +461,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
   async getPaymentSummary(momentId: string) {
     const [paidResult, refundedResult] = await Promise.all([
       prisma.registration.aggregate({
-        where: { momentId, paymentStatus: "PAID" },
+        where: { momentId, paymentStatus: "PAID", status: { not: "CANCELLED" } },
         _count: true,
       }),
       prisma.registration.aggregate({

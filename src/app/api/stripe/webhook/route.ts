@@ -35,6 +35,8 @@ export async function POST(request: Request) {
       }
     );
 
+    console.log("[stripe-webhook] Result:", JSON.stringify({ handled: result.handled, reason: !result.handled ? result.reason : undefined }));
+
     if (result.handled) {
       // Send confirmation email (fire-and-forget — don't block the webhook response)
       const t = await getTranslations("Email");
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
     // Not handled but not an error (idempotence, ignored event type, etc.)
     return NextResponse.json({ received: true, reason: result.reason });
   } catch (error) {
+    console.error("[stripe-webhook] Error:", error);
     Sentry.captureException(error);
     // Always return 200 to Stripe to prevent retries on our errors
     // (Stripe retries on 4xx/5xx, which could cause duplicate processing)
