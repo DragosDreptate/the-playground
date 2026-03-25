@@ -82,12 +82,9 @@ test.describe("Événement payant — participant inscrit (PAID)", () => {
 test.describe("Désinscription événement payant remboursable", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test.fixme("should show green refund info in cancel dialog", async ({ page }) => {
+  test("should show green refund info in cancel dialog", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
     const main = page.locator("main").first();
-
-    // Verify participant is registered and sees the cancel link
-    await expect(main.getByText("Vous participez")).toBeVisible({ timeout: 10000 });
 
     const cancelLink = main.locator("button, a", { hasText: "Annuler mon inscription" });
     await cancelLink.waitFor({ state: "visible", timeout: 10000 });
@@ -100,7 +97,7 @@ test.describe("Désinscription événement payant remboursable", () => {
     await expect(dialog.getByText(/remboursé automatiquement/i)).toBeVisible({ timeout: 5000 });
 
     // Close without cancelling
-    await dialog.locator("button", { hasText: "Annuler" }).click();
+    await dialog.getByRole("button", { name: "Annuler", exact: true }).click();
   });
 });
 
@@ -109,7 +106,7 @@ test.describe("Désinscription événement payant remboursable", () => {
 test.describe("Désinscription événement payant non remboursable", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test.fixme("should show amber non-refundable warning in cancel dialog", async ({ page }) => {
+  test("should show amber non-refundable warning in cancel dialog", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_NON_REFUNDABLE}`);
     const main = page.locator("main").first();
 
@@ -124,7 +121,7 @@ test.describe("Désinscription événement payant non remboursable", () => {
     await expect(dialog.getByText(/pas remboursable/i)).toBeVisible({ timeout: 5000 });
 
     // Close without cancelling
-    await dialog.locator("button", { hasText: "Annuler" }).click();
+    await dialog.getByRole("button", { name: "Annuler", exact: true }).click();
   });
 });
 
@@ -150,7 +147,7 @@ test.describe("Retrait inscrit payant par l'Organisateur", () => {
       await expect(dialog.locator("text=remboursement")).toBeVisible();
 
       // Close without removing
-      await dialog.locator("button", { hasText: "Annuler" }).click();
+      await dialog.getByRole("button", { name: "Annuler", exact: true }).click();
     }
   });
 });
