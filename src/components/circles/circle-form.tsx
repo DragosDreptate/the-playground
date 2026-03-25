@@ -368,7 +368,9 @@ function StripeConnectInline({
 }: StripeConnectProps) {
   const t = useTranslations("Circle");
   const [isPending, startTransition] = useTransition();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const busy = isPending || isRedirecting;
 
   const isActive = hasAccount && status === "active";
   const needsAction = hasAccount && !isActive;
@@ -379,6 +381,7 @@ function StripeConnectInline({
       const returnUrl = `${window.location.origin}/dashboard/circles/${circleSlug}/edit`;
       const result = await onboardStripeConnectAction(circleId, returnUrl);
       if (result.success) {
+        setIsRedirecting(true);
         window.location.href = result.data.onboardingUrl;
       } else {
         setError(result.error);
@@ -405,9 +408,9 @@ function StripeConnectInline({
       size="sm"
       className="shrink-0"
       onClick={handleActivate}
-      disabled={isPending}
+      disabled={busy}
     >
-      {isPending ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
+      {busy ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
       {t("stripeConnect.activate")}
     </Button>
   ) : needsAction ? (
@@ -417,9 +420,9 @@ function StripeConnectInline({
       size="sm"
       className="shrink-0"
       onClick={handleActivate}
-      disabled={isPending}
+      disabled={busy}
     >
-      {isPending && <Loader2 className="size-4 animate-spin" />}
+      {busy && <Loader2 className="size-4 animate-spin" />}
       {t("stripeConnect.resume")}
     </Button>
   ) : isActive ? (
@@ -429,9 +432,9 @@ function StripeConnectInline({
       size="sm"
       className="shrink-0"
       onClick={handleViewDashboard}
-      disabled={isPending}
+      disabled={busy}
     >
-      {isPending ? <Loader2 className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
+      {busy ? <Loader2 className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
       {t("stripeConnect.viewDashboard")}
     </Button>
   ) : null;
