@@ -408,8 +408,13 @@ export async function deleteMomentAction(
       }
     );
 
-    // Fire-and-forget : notifier les participants de l'annulation (sauf si admin)
-    if (momentToDelete && registrationsToNotify.length > 0 && !isAdminUser(session)) {
+    // Fire-and-forget : notifier les participants de l'annulation
+    // Skip only when admin deletes someone else's event (admin moderation, not own event)
+    const isHostOfEvent = momentToDelete
+      ? (await prismaCircleRepository.findMembership(momentToDelete.circleId, session.user.id))?.role === "HOST"
+      : false;
+    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isHostOfEvent);
+    if (shouldNotify) {
       sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
         (err) => Sentry.captureException(err)
       );
