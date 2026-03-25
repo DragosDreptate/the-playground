@@ -17,6 +17,8 @@ export type CreateRegistrationInput = {
 export type UpdateRegistrationInput = {
   status?: RegistrationStatus;
   paymentStatus?: "NONE" | "PENDING" | "PAID" | "REFUNDED";
+  stripePaymentIntentId?: string | null;
+  stripeReceiptUrl?: string | null;
   cancelledAt?: Date | null;
   checkedInAt?: Date | null;
 };

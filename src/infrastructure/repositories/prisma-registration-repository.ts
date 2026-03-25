@@ -169,6 +169,8 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       data: {
         ...(input.status !== undefined && { status: input.status }),
         ...(input.paymentStatus !== undefined && { paymentStatus: input.paymentStatus }),
+        ...(input.stripePaymentIntentId !== undefined && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeReceiptUrl !== undefined && { stripeReceiptUrl: input.stripeReceiptUrl }),
         ...(input.cancelledAt !== undefined && {
           cancelledAt: input.cancelledAt,
         }),

@@ -77,6 +77,8 @@ export async function handlePaymentWebhook(
     registration = await registrationRepository.update(existingRegistration.id, {
       status: "REGISTERED",
       paymentStatus: "PAID",
+      stripePaymentIntentId: paymentIntentId || null,
+      stripeReceiptUrl: receiptUrl || null,
       cancelledAt: null,
     });
   } else {
