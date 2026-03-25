@@ -28,6 +28,7 @@ export async function onboardStripeConnectAction(
 
     return { success: true, data: result };
   } catch (error) {
+    console.error("[onboardStripeConnect] Error:", error);
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }
@@ -81,6 +82,31 @@ export async function getStripeLoginLinkAction(
 
     const { url } = await paymentService.createLoginLink(circle.stripeConnectAccountId);
     return { success: true, data: { url } };
+  } catch (error) {
+    if (error instanceof DomainError) {
+      return { success: false, error: error.message, code: error.code };
+    }
+    Sentry.captureException(error);
+    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+export async function cancelStripeConnectAction(
+  circleId: string
+): Promise<ActionResult> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+    }
+
+    const membership = await prismaCircleRepository.findMembership(circleId, session.user.id);
+    if (!membership || membership.role !== "HOST") {
+      return { success: false, error: "Not authorized", code: "UNAUTHORIZED_CIRCLE_ACTION" };
+    }
+
+    await prismaCircleRepository.update(circleId, { stripeConnectAccountId: null });
+    return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };

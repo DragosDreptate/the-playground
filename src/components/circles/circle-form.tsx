@@ -20,7 +20,7 @@ import type { ConnectAccountStatus } from "@/domain/ports/services/payment-servi
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
-import { onboardStripeConnectAction, getStripeLoginLinkAction } from "@/app/actions/stripe";
+import { onboardStripeConnectAction, getStripeLoginLinkAction, cancelStripeConnectAction } from "@/app/actions/stripe";
 
 type StripeConnectProps = {
   circleId: string;
@@ -454,9 +454,29 @@ function StripeConnectInline({
               </p>
             )}
             {needsAction && (
-              <div className="flex items-center gap-1.5 text-xs text-amber-500">
-                <AlertCircle className="size-3.5 shrink-0" />
-                <span>{t("stripeConnect.pending")}</span>
+              <div>
+                <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                  <AlertCircle className="size-3.5 shrink-0" />
+                  <span>{t("stripeConnect.pending")}</span>
+                </div>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground mt-1 text-xs underline underline-offset-2 transition-colors"
+                  disabled={busy}
+                  onClick={() => {
+                    setError(null);
+                    startTransition(async () => {
+                      const result = await cancelStripeConnectAction(circleId);
+                      if (result.success) {
+                        window.location.reload();
+                      } else {
+                        setError(result.error);
+                      }
+                    });
+                  }}
+                >
+                  {t("stripeConnect.cancel")}
+                </button>
               </div>
             )}
             {isActive && (

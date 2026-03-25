@@ -353,7 +353,8 @@
       "resume": "Reprendre l'activation",
       "active": "Paiements activés",
       "pending": "Activation en cours — complétez votre profil Stripe",
-      "viewDashboard": "Voir mes paiements"
+      "viewDashboard": "Voir mes paiements",
+      "cancel": "Annuler l'activation"
     }
   },
   "Moment": {
