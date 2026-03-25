@@ -1,7 +1,7 @@
 # Feature : événements payants (Stripe Connect)
 
-> **Statut** : exploration / design
-> **Date** : 2026-03-19
+> **Statut** : implémenté (feature branch `feat/stripe-connect`, en attente de MEP)
+> **Date** : 2026-03-19 (exploration) → 2026-03-25 (implémentation)
 
 ## Contexte
 
@@ -68,7 +68,7 @@ Destination charges (vs. Direct charges) : le paiement passe par la plateforme p
 ### Organisateur — onboarding Stripe
 
 1. Paramètres de la Communauté → bouton "Activer les paiements"
-2. Appel API : `stripe.accounts.create({ type: "express" })` → crée un compte connecté
+2. Appel API : `stripe.accounts.create({ type: "express", capabilities: { card_payments, transfers } })` → crée un compte connecté avec les capabilities nécessaires pour les destination charges
 3. Appel API : `stripe.accountLinks.create({ account: "acct_xxx", ... })` → URL d'onboarding
 4. Redirection vers la page Stripe (formulaire hébergé : nom, adresse, IBAN, pièce d'identité)
 5. Stripe gère le KYC (vérification d'identité)
@@ -83,16 +83,16 @@ Destination charges (vs. Direct charges) : le paiement passe par la plateforme p
 
 1. Page événement → bouton "S'inscrire — 15,00 €"
 2. Le Participant est authentifié (magic link / OAuth si pas connecté)
-3. Server Action crée une Stripe Checkout Session (destination charge, metadata: `userId`, `momentId`, `circleId`, expiration: 15 minutes)
+3. Server Action crée une Stripe Checkout Session (destination charge, metadata: `userId`, `momentId`, `circleId`, expiration: 30 minutes)
 4. Redirection vers Stripe Checkout (page hébergée Stripe)
 5. Le Participant entre sa CB et paie
 6. Stripe envoie le webhook `checkout.session.completed`
-7. Webhook handler crée la `Registration` avec `paymentStatus: PAID`, `stripePaymentIntentId`, `stripeReceiptUrl`
+7. Webhook handler crée ou met à jour la `Registration` avec `paymentStatus: PAID`, `stripePaymentIntentId`, `stripeReceiptUrl` (mise à jour si la Registration existe déjà, ex: réinscription après annulation ou Host auto-inscrit)
 8. Inscription automatique au Circle (comme pour un événement gratuit)
 9. Email de confirmation envoyé (avec lien vers le reçu Stripe)
 10. Stripe redirige le Participant vers `/m/[slug]?payment=success`
 
-**Page de retour `?payment=success`** : pas de banner dédié — le webhook traite le paiement avant le redirect, donc le Participant voit directement l'état "Vous participez à cet événement" avec les boutons calendrier. Le banner optimiste initialement prévu a été retiré car redondant avec l'état d'inscription qui s'affiche déjà.
+**Page de retour après paiement** : Stripe redirige vers `/api/stripe/checkout-return?slug=...&userId=...&momentId=...` qui poll la DB (max 10s, toutes les 500ms) jusqu'à ce que la Registration existe avec `status=REGISTERED` + `paymentStatus=PAID`, puis redirige vers `/m/[slug]`. Le Participant voit toujours l'état "Vous participez à cet événement" grâce à cette attente. Pas de banner dédié.
 
 **Abandon Stripe Checkout** : le Participant ferme l'onglet ou clique "Retour" → Stripe redirige vers `/m/[slug]?payment=cancelled`. On affiche la page événement normalement, pas de message d'erreur. Le Participant peut réessayer. Pas de Registration créée, pas de place réservée. La Checkout Session expire automatiquement après 30 minutes (minimum imposé par Stripe, initialement prévu à 15 minutes).
 
@@ -110,7 +110,8 @@ Destination charges (vs. Direct charges) : le paiement passe par la plateforme p
 - Remboursement total uniquement (pas de remboursement partiel au MVP)
 - Via `stripe.refunds.create()` → `paymentStatus` passe à `REFUNDED`
 - Le champ `refundable` ne s'applique qu'aux désinscriptions volontaires des Participants
-- **UX non remboursable** : le Participant peut toujours se désinscrire, mais une modale de confirmation l'avertit explicitement : "Cet événement n'est pas remboursable. Vous ne serez pas remboursé." Sa place est libérée pour quelqu'un d'autre.
+- **UX non remboursable** : le Participant peut toujours se désinscrire, mais une modale de confirmation affiche un avertissement amber : "Cet événement n'est pas remboursable. Vous ne serez pas remboursé."
+- **UX remboursable** : la modale de désinscription affiche un message vert : "Vous serez remboursé automatiquement sous 5 à 10 jours."
 
 ### Politique de remboursement (prévention disputes)
 
@@ -174,7 +175,7 @@ Calculé depuis nos données (Registration), pas d'appel API Stripe :
 
 ### Notifications email — événements payants (décision MVP)
 
-On enrichit les emails existants avec des mentions conditionnelles. Un nouveau template est créé pour la notification de désinscription à l'Organisateur (événements payants uniquement).
+On enrichit les emails existants avec des mentions conditionnelles. Un nouveau template `HostPaidCancellationEmail` est créé pour la notification à l'Organisateur lors d'une désinscription payante ou d'un retrait par l'Organisateur.
 
 **Nouveau champ** : `stripeReceiptUrl: String?` sur `Registration` — stocké au moment du webhook, inclus dans l'email de confirmation.
 
@@ -190,7 +191,9 @@ On enrichit les emails existants avec des mentions conditionnelles. Un nouveau t
 
 #### Côté Organisateur
 
-Pas d'email pour chaque inscription (trop de bruit). Mais **notification de désinscription pour les événements payants** — l'Organisateur reçoit un email quand un Participant se désinscrit d'un événement payant, avec mention du remboursement effectué ou non. C'est impactant financièrement, l'Organisateur doit le savoir.
+Pas d'email pour chaque inscription (trop de bruit). Mais **notification de désinscription pour les événements payants** — l'Organisateur reçoit un email quand un Participant se désinscrit d'un événement payant, avec mention du remboursement (basé sur `moment.refundable`). Note : cette notification n'est pas envoyée quand l'Organisateur retire lui-même un inscrit (il est à l'origine de l'action).
+
+**Notifications d'annulation d'événement** — envoyées à tous les inscrits quand l'événement est supprimé. Exception : quand un admin supprime l'événement d'un autre Organisateur (modération), les notifications ne sont pas envoyées. Quand un admin supprime son propre événement (il est HOST), les notifications sont envoyées normalement.
 
 #### Reçu Stripe
 
@@ -459,7 +462,7 @@ Simuler un événement : `stripe trigger checkout.session.completed`
 - [x] **Disputes** → pas de code custom au MVP. Politique de remboursement visible sur la page événement (prévention). Gestion dans le dashboard Stripe Express. Post-MVP : webhook notification.
 - [x] **Affichage du prix** → prix affiché = prix payé (TTC). Frais Stripe déduits côté Organisateur. Montant net estimé visible dans le formulaire de création.
 - [x] **Dashboard Organisateur** → résumé billetterie (inscrits, montant brut, remboursés) par événement dans The Playground. Lien vers Stripe Express Dashboard dans les paramètres de la Communauté. Pas de dashboard paiements custom au MVP.
-- [x] **Notifications** → pas de nouveaux templates. Mentions conditionnelles dans les emails existants (montant payé + lien reçu Stripe, remboursement, non-remboursement). Nouveau champ `stripeReceiptUrl` sur Registration. Pas d'email Organisateur par transaction.
+- [x] **Notifications** → enrichissement des templates existants (montant payé + lien reçu Stripe). Nouveau template `HostPaidCancellationEmail` pour notifier l'Organisateur des désinscriptions payantes. Nouveau champ `stripeReceiptUrl` sur Registration.
 - [x] **Tests** → unitaire = mock du port PaymentService. Intégration = API Stripe mode test. E2E = mock du redirect + simulation webhook. Dev manuel = Stripe CLI.
 - [x] **Codes de réduction** → `allow_promotion_codes: true` sur Stripe Checkout. Zéro code côté The Playground. L'Organisateur crée ses codes dans son dashboard Stripe Express (supporte -100% pour invitations gratuites). UI de gestion dans The Playground = post-MVP.
 - [x] **Plusieurs types de billets** → un seul prix par événement au MVP. Les codes promo couvrent les cas simples (early bird, tarif réduit). Multi-catégories (modèle `TicketType`) = post-MVP.
@@ -475,6 +478,14 @@ Simuler un événement : `stripe trigger checkout.session.completed`
 - [x] **Politique de remboursement page publique** → retirée (redondante). Couverte par la modale de désinscription + CGU. À revoir dans un redesign global CTA + Participants.
 - [x] **Retrait par l'Organisateur** → refund automatique (force=true) quand l'Organisateur retire un inscrit payant. Avertissement amber dans la modale de confirmation. Pas de promotion waitlist pour les payants.
 - [x] **Notification Organisateur (désinscription payante)** → email à l'Organisateur quand un Participant se désinscrit d'un événement payant, avec mention du remboursement ou non.
+- [x] **Route checkout-return** → `/api/stripe/checkout-return` poll la DB (max 10s) avant de rediriger vers la page événement. Garantit que le Participant voit toujours son inscription.
+- [x] **Webhook : update si registration existante** → si l'utilisateur a déjà une Registration (Host auto-inscrit ou réinscription après annulation), le webhook met à jour au lieu de créer (évite la contrainte unique).
+- [x] **Capabilities Connect** → `card_payments` + `transfers` demandées à la création du compte Express (requis pour les destination charges).
+- [x] **Stub Stripe sans clé API** → quand `STRIPE_SECRET_KEY` est absente, `createStripePaymentService()` retourne un stub qui throw à l'appel (évite le crash au chargement du module).
+- [x] **Admin + notifications d'annulation** → les notifications sont envoyées même quand l'admin supprime son propre événement (il est HOST). Seule la modération admin (événement d'un autre) est silencieuse.
+- [x] **Modale désinscription remboursable** → message vert "Vous serez remboursé automatiquement sous 5 à 10 jours" (en plus de l'amber pour non-remboursable).
+- [x] **Refund failure non-bloquant** → si le remboursement Stripe échoue, l'annulation/retrait de l'inscription continue (l'erreur est capturée par la couche app).
+- [x] **`formatPrice` centralisé** → utilitaire `src/lib/format-price.ts` partagé (évite 5 duplications).
 
 ## Plan d'implémentation
 
