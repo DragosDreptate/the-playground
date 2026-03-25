@@ -891,6 +891,14 @@
       "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
       "manageCta": "Manage requests"
     },
+    "paidCancellation": {
+      "subject": "Cancellation: {playerName} — {momentTitle}",
+      "heading": "Paid event cancellation",
+      "message": "{playerName} cancelled their registration for {momentTitle}.",
+      "refunded": "A refund of {amount} was processed automatically.",
+      "notRefunded": "No refund issued (non-refundable event).",
+      "manageCta": "Manage registrations"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",

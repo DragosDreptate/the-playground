@@ -53,6 +53,24 @@ export type WaitlistPromotionEmailData = {
   };
 };
 
+export type HostPaidCancellationEmailData = {
+  to: string;
+  hostName: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  circleSlug: string;
+  amountRefunded: string | null; // Pre-formatted: "15,00 EUR" or null if non-refundable
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    refundMessage: string | null;
+    manageRegistrationsCta: string;
+    footer: string;
+  };
+};
+
 export type HostNewRegistrationEmailData = {
   to: string;
   hostName: string;
@@ -392,4 +410,5 @@ export interface EmailService {
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
+  sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void>;
 }

@@ -891,6 +891,14 @@
       "hostPendingRegistrationMessage": "{playerName} souhaite s'inscrire à l'événement « {momentTitle} ». Cette inscription nécessite votre validation.",
       "manageCta": "Gérer les demandes"
     },
+    "paidCancellation": {
+      "subject": "Désinscription : {playerName} — {momentTitle}",
+      "heading": "Désinscription d'un événement payant",
+      "message": "{playerName} s'est désinscrit de {momentTitle}.",
+      "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
+      "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
+      "manageCta": "Gérer les inscriptions"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Lieu",
