@@ -1176,6 +1176,7 @@
       "comments": "Comments",
       "mySpace": "My Dashboard",
       "notifications": "Manage notifications",
+      "paidEvents": "Paid events",
       "leave": "Leave a Community",
       "createCommunity": "Create your Community",
       "createEvent": "Create an event",
@@ -1186,7 +1187,8 @@
       "share": "Share your event",
       "members": "Manage members",
       "inviteMembers": "Invite members",
-      "approvalRegistrations": "Approve registrations"
+      "approvalRegistrations": "Approve registrations",
+      "payments": "Enable payments"
     },
     "participant": {
       "sectionTitle": "Member",
@@ -1222,6 +1224,19 @@
         "step1": "Go to the event in question",
         "step2": "Click <strong>Cancel my registration</strong>",
         "outro": "If you were on the waitlist, your spot is simply removed."
+      },
+      "paidEvents": {
+        "title": "Paid events",
+        "intro": "Some events require payment. The price is shown on the registration button (e.g. <strong>Join — 15.00 EUR</strong>).",
+        "stepsLabel": "How it works:",
+        "step1": "Click the registration button — you'll be redirected to a <strong>secure Stripe payment page</strong>",
+        "step2": "Enter your card details and confirm",
+        "step3": "You're automatically registered and receive a <strong>confirmation email</strong> with your payment receipt",
+        "refundLabel": "Refund policy:",
+        "refund1": "Each event is either <strong>refundable</strong> (automatic refund on cancellation) or <strong>non-refundable</strong> (no refund if you cancel)",
+        "refund2": "If the <strong>event is cancelled by the Organizer</strong>, you are always refunded regardless of the policy",
+        "refund3": "Refunds are processed within <strong>5 to 10 business days</strong> to your card",
+        "callout": "The Playground takes no commission. Your payment data is handled by Stripe and is never stored by the platform."
       },
       "comments": {
         "title": "Comments",
@@ -1334,6 +1349,23 @@
         "step3": "The person clicks the link, signs in, and instantly joins your Community.",
         "step4": "They appear immediately in the member list — you receive an email notification.",
         "callout": "The invite link is <strong>revocable at any time</strong> — click Revoke to deactivate it. Members who already joined are not affected. The same link can be used by multiple people."
+      },
+      "payments": {
+        "title": "Enable payments",
+        "intro": "You can offer paid events by enabling payments on your Community via <strong>Stripe Connect</strong>.",
+        "stepsLabel": "To enable payments:",
+        "step1": "Go to <strong>Edit</strong> your Community",
+        "step2": "In the <strong>Payments</strong> section, click <strong>Enable payments</strong>",
+        "step3": "You'll be redirected to Stripe to complete your profile (name, address, bank details, ID)",
+        "step4": "Back on The Playground, the status changes to <strong>Payments enabled</strong>",
+        "priceLabel": "To set a price on an event:",
+        "price1": "In the creation/edit form, the <strong>Ticket price</strong> section is now editable",
+        "price2": "Enter the price in euros — an estimated net amount (after Stripe fees) is displayed",
+        "price3": "Toggle <strong>Refundable</strong> on or off to set the refund policy",
+        "billingLabel": "Payment tracking:",
+        "billing1": "Each paid event's dashboard shows a <strong>Ticketing</strong> summary (paid registrations, amount collected, refunded)",
+        "billing2": "For full details, click <strong>View my payments</strong> in the Community settings — this opens the Stripe Express dashboard",
+        "callout": "The Playground takes <strong>no commission</strong>. Only Stripe fees (~2.9% + $0.30) are deducted from your earnings. The full remaining amount is transferred to you."
       }
     },
     "faq": {
@@ -1365,6 +1397,10 @@
       "q7": {
         "question": "How do I report inappropriate content?",
         "answer": "Contact us directly by email at hello@the-playground.fr, describing the content in question (link to the page, description of the issue). We review every report as quickly as possible."
+      },
+      "q8": {
+        "question": "How do paid events work?",
+        "answer": "The Organizer enables payments via Stripe Connect in their Community settings, then sets a price on their events. The Member pays the displayed price through a secure Stripe page. The Playground takes no commission — only Stripe fees (~2.9% + $0.30) are charged and borne by the Organizer. The refund policy (refundable or non-refundable) is set by the Organizer. If the event is cancelled, refunds are always automatic."
       }
     },
     "contact": {

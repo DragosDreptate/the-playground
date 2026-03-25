@@ -1176,6 +1176,7 @@
       "comments": "Les commentaires",
       "mySpace": "Mon espace",
       "notifications": "Gérer ses notifications",
+      "paidEvents": "Événements payants",
       "leave": "Quitter une Communauté",
       "createCommunity": "Créer sa Communauté",
       "createEvent": "Créer un événement",
@@ -1186,7 +1187,8 @@
       "share": "Partager l'événement",
       "members": "Gérer les membres",
       "inviteMembers": "Inviter des membres",
-      "approvalRegistrations": "Valider les inscriptions"
+      "approvalRegistrations": "Valider les inscriptions",
+      "payments": "Activer les paiements"
     },
     "participant": {
       "sectionTitle": "Participant",
@@ -1222,6 +1224,19 @@
         "step1": "Allez sur l'événement concerné",
         "step2": "Cliquez sur <strong>Annuler mon inscription</strong>",
         "outro": "Si vous étiez sur liste d'attente, votre place est simplement supprimée."
+      },
+      "paidEvents": {
+        "title": "Événements payants",
+        "intro": "Certains événements sont payants. Le prix est affiché sur le bouton d'inscription (ex : <strong>S'inscrire — 15,00 EUR</strong>).",
+        "stepsLabel": "Comment ça marche :",
+        "step1": "Cliquez sur le bouton d'inscription — vous êtes redirigé vers une <strong>page de paiement sécurisée Stripe</strong>",
+        "step2": "Entrez vos informations de carte bancaire et validez",
+        "step3": "Vous êtes automatiquement inscrit et recevez un <strong>email de confirmation</strong> avec votre reçu de paiement",
+        "refundLabel": "Politique de remboursement :",
+        "refund1": "Chaque événement est soit <strong>remboursable</strong> (remboursement automatique en cas de désinscription), soit <strong>non remboursable</strong> (pas de remboursement si vous vous désinscrivez)",
+        "refund2": "En cas d'<strong>annulation de l'événement par l'Organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
+        "refund3": "Les remboursements sont effectués sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
+        "callout": "The Playground ne prend aucune commission. Vos données bancaires sont traitées par Stripe et ne sont jamais stockées par la plateforme."
       },
       "comments": {
         "title": "Les commentaires",
@@ -1334,6 +1349,23 @@
         "step3": "La personne clique sur le lien, se connecte, et rejoint instantanément votre Communauté.",
         "step4": "Elle apparaît aussitôt dans la liste des membres — vous recevez une notification par email.",
         "callout": "Le lien d'invitation est <strong>révocable à tout moment</strong> — cliquez sur Révoquer pour le désactiver. Les membres déjà rejoints ne sont pas affectés. Un même lien peut être utilisé par plusieurs personnes."
+      },
+      "payments": {
+        "title": "Activer les paiements",
+        "intro": "Vous pouvez proposer des événements payants en activant les paiements sur votre Communauté via <strong>Stripe Connect</strong>.",
+        "stepsLabel": "Pour activer les paiements :",
+        "step1": "Allez dans <strong>Modifier</strong> votre Communauté",
+        "step2": "Dans la section <strong>Paiements</strong>, cliquez sur <strong>Activer les paiements</strong>",
+        "step3": "Vous êtes redirigé vers Stripe pour compléter votre profil (nom, adresse, IBAN, pièce d'identité) — en mode test, des données fictives suffisent",
+        "step4": "De retour sur The Playground, le statut passe à <strong>Paiements activés</strong>",
+        "priceLabel": "Pour définir un prix sur un événement :",
+        "price1": "Dans le formulaire de création/modification, la section <strong>Prix du billet</strong> est maintenant éditable",
+        "price2": "Saisissez le prix en euros — une estimation du montant net (après frais Stripe) s'affiche",
+        "price3": "Activez ou désactivez le toggle <strong>Remboursable</strong> pour choisir la politique de remboursement",
+        "billingLabel": "Suivi des paiements :",
+        "billing1": "Le tableau de bord de chaque événement payant affiche un résumé <strong>Billetterie</strong> (inscrits payants, montant collecté, remboursés)",
+        "billing2": "Pour le détail complet, cliquez sur <strong>Voir mes paiements</strong> dans les paramètres de la Communauté — vous accédez au dashboard Stripe Express",
+        "callout": "The Playground ne prend <strong>aucune commission</strong>. Seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et déduits de vos revenus. L'intégralité du montant restant vous est reversée."
       }
     },
     "faq": {
@@ -1365,6 +1397,10 @@
       "q7": {
         "question": "Comment signaler un contenu inapproprié ?",
         "answer": "Contactez-nous directement par email à hello@the-playground.fr en décrivant le contenu concerné (lien de la page, description du problème). Nous traitons chaque signalement dans les meilleurs délais."
+      },
+      "q8": {
+        "question": "Comment fonctionnent les événements payants ?",
+        "answer": "L'Organisateur active les paiements via Stripe Connect dans les paramètres de sa Communauté, puis définit un prix sur ses événements. Le Participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'Organisateur. La politique de remboursement (remboursable ou non) est définie par l'Organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
       }
     },
     "contact": {
