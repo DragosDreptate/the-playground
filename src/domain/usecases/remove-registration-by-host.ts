@@ -64,11 +64,16 @@ export async function removeRegistrationByHost(
   const wasRegistered = registration.status === "REGISTERED";
 
   // 4. Refund if paid (Host removing = force refund, like event cancellation)
+  // Refund failure must not block the removal
   if (deps.paymentService && registration.paymentStatus === "PAID") {
-    await refundRegistration(
-      { registration, moment, force: true },
-      { registrationRepository, paymentService: deps.paymentService }
-    );
+    try {
+      await refundRegistration(
+        { registration, moment, force: true },
+        { registrationRepository, paymentService: deps.paymentService }
+      );
+    } catch (error) {
+      console.error("[removeRegistrationByHost] Refund failed, proceeding with removal:", error);
+    }
   }
 
   // 5. Annule la registration

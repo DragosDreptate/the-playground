@@ -59,11 +59,16 @@ export async function cancelRegistration(
   const wasRegistered = registration.status === "REGISTERED";
 
   // Refund if paid event + PaymentService available
+  // Refund failure must not block the cancellation
   if (moment && deps.paymentService && registration.paymentStatus === "PAID") {
-    await refundRegistration(
-      { registration, moment },
-      { registrationRepository, paymentService: deps.paymentService }
-    );
+    try {
+      await refundRegistration(
+        { registration, moment },
+        { registrationRepository, paymentService: deps.paymentService }
+      );
+    } catch (error) {
+      console.error("[cancelRegistration] Refund failed, proceeding with cancellation:", error);
+    }
   }
 
   const cancelled = await registrationRepository.update(
