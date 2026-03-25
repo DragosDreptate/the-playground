@@ -527,6 +527,7 @@
       "removeTitle": "Retirer {name} ?",
       "removeDescription": "L'inscription de {name} à cet événement sera annulée. Si une liste d'attente existe, le premier inscrit sera promu automatiquement.",
       "removeConfirm": "Retirer",
+      "removeRefundWarning": "{name} a payé pour cet événement. Un remboursement sera effectué automatiquement.",
       "removeCancel": "Annuler",
       "csvHeaders": {
         "eventName": "Événement",

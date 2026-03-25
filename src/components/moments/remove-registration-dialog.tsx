@@ -20,6 +20,7 @@ type RemoveRegistrationDialogProps = {
   playerName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  willRefund?: boolean;
 };
 
 export function RemoveRegistrationDialog({
@@ -27,6 +28,7 @@ export function RemoveRegistrationDialog({
   playerName,
   open,
   onOpenChange,
+  willRefund = false,
 }: RemoveRegistrationDialogProps) {
   const router = useRouter();
   const t = useTranslations("Moment.registrations");
@@ -57,6 +59,11 @@ export function RemoveRegistrationDialog({
             {t("removeDescription", { name: playerName })}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {willRefund && (
+          <div className="rounded-md bg-amber-500/10 p-3 text-sm text-amber-500">
+            {t("removeRefundWarning", { name: playerName })}
+          </div>
+        )}
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
             {error}

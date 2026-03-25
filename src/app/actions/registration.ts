@@ -481,6 +481,7 @@ export async function removeRegistrationByHostAction(
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        paymentService,
       }
     );
 
