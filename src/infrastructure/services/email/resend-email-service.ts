@@ -56,7 +56,8 @@ function getSender(): string {
 }
 
 function isDemoEmail(email: string): boolean {
-  return email.toLowerCase().endsWith("@demo.playground");
+  const lower = email.toLowerCase();
+  return lower.endsWith("@demo.playground") || lower.endsWith("@test.playground");
 }
 
 export function createResendEmailService(): EmailService {
