@@ -110,6 +110,7 @@ export const prismaMomentRepository: MomentRepository = {
         ...(input.price !== undefined && { price: input.price }),
         ...(input.currency !== undefined && { currency: input.currency }),
         ...(input.status !== undefined && { status: input.status }),
+        ...(input.refundable !== undefined && { refundable: input.refundable }),
         ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });
