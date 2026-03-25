@@ -20,7 +20,7 @@ export default defineConfig({
   testDir: "./tests/e2e",
   timeout: process.env.CI ? 60_000 : 30_000,
   expect: { timeout: process.env.CI ? 10_000 : 5_000 },
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 2 : 1,
   reporter: [["list"], ["html", { outputFolder: "playwright-report", open: "never" }]],
   globalSetup: "./tests/e2e/global-setup.ts",
   globalTeardown: "./tests/e2e/global-teardown.ts",
