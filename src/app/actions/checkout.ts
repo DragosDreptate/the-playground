@@ -17,7 +17,7 @@ const paymentService = createStripePaymentService();
 
 export async function createCheckoutAction(
   momentId: string,
-  successUrl: string,
+  momentSlug: string,
   cancelUrl: string
 ): Promise<ActionResult<{ url: string }>> {
   try {
@@ -30,6 +30,10 @@ export async function createCheckoutAction(
     if (!user) {
       return { success: false, error: "User not found", code: "USER_NOT_FOUND" };
     }
+
+    // Build success URL through our checkout-return route (waits for webhook)
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const successUrl = `${baseUrl}/api/stripe/checkout-return?slug=${encodeURIComponent(momentSlug)}&userId=${encodeURIComponent(session.user.id)}&momentId=${encodeURIComponent(momentId)}`;
 
     const result = await createCheckoutSession(
       { momentId, user, successUrl, cancelUrl },

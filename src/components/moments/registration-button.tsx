@@ -152,8 +152,8 @@ export function RegistrationButton({
                 const baseUrl = window.location.origin;
                 const result = await createCheckoutAction(
                   momentId,
-                  `${baseUrl}/m/${slug}?payment=success`,
-                  `${baseUrl}/m/${slug}?payment=cancelled`
+                  slug,
+                  `${baseUrl}/m/${slug}`
                 );
                 if (result.success) {
                   window.location.href = result.data.url;
