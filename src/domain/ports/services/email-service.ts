@@ -26,6 +26,8 @@ export type RegistrationConfirmationEmailData = {
     viewMomentCta: string;
     cancelLink: string;
     dashboardLink: string;
+    paymentConfirmed?: string; // e.g. "Paiement confirmé"
+    viewReceipt?: string; // e.g. "Voir mon reçu"
     footer: string;
   };
 };

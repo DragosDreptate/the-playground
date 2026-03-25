@@ -333,6 +333,8 @@ export async function sendRegistrationEmails(
       viewMomentCta: t("common.viewMomentCta"),
       cancelLink: t("common.cancelLink"),
       dashboardLink: t("common.dashboardLink"),
+      paymentConfirmed: t("common.paymentConfirmed"),
+      viewReceipt: t("common.viewReceipt"),
       footer: t("common.footer"),
     },
   });

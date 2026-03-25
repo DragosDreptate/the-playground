@@ -97,6 +97,12 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return records.map(toDomainRegistration);
   },
 
+  async countActiveByMomentId(momentId: string): Promise<number> {
+    return prisma.registration.count({
+      where: { momentId, status: { in: ["REGISTERED", "CHECKED_IN"] } },
+    });
+  },
+
   async findActiveWithUserByMomentId(
     momentId: string
   ): Promise<RegistrationWithUser[]> {

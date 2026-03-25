@@ -56,9 +56,8 @@ export async function handlePaymentWebhook(
 
   // Race condition: check capacity — if full, refund and return
   if (moment.capacity !== null) {
-    const registered = await registrationRepository.countByMomentIdAndStatus(momentId, "REGISTERED");
-    const checkedIn = await registrationRepository.countByMomentIdAndStatus(momentId, "CHECKED_IN");
-    if (registered + checkedIn >= moment.capacity) {
+    const activeCount = await registrationRepository.countActiveByMomentId(momentId);
+    if (activeCount >= moment.capacity) {
       // Event is full — refund the payment
       if (paymentIntentId) {
         await paymentService.refund(paymentIntentId);

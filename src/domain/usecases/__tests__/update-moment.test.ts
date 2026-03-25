@@ -291,7 +291,7 @@ describe("UpdateMoment", () => {
         findById: vi.fn().mockResolvedValue(circle),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
       });
 
       const result = await updateMoment(
@@ -315,7 +315,7 @@ describe("UpdateMoment", () => {
         findById: vi.fn().mockResolvedValue(circle),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(5),
+        countActiveByMomentId: vi.fn().mockResolvedValue(5),
       });
 
       await expect(
@@ -341,7 +341,7 @@ describe("UpdateMoment", () => {
         findById: vi.fn().mockResolvedValue(circle),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
       });
 
       const result = await updateMoment(
@@ -365,7 +365,7 @@ describe("UpdateMoment", () => {
         findById: vi.fn().mockResolvedValue(circle),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(3),
+        countActiveByMomentId: vi.fn().mockResolvedValue(3),
       });
 
       await expect(
@@ -389,7 +389,7 @@ describe("UpdateMoment", () => {
         findMembership: vi.fn().mockResolvedValue(makeMembership()),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
       });
 
       const result = await updateMoment(
@@ -416,7 +416,7 @@ describe("UpdateMoment", () => {
         findMembership: vi.fn().mockResolvedValue(makeMembership()),
       });
       const registrationRepo = createMockRegistrationRepository({
-        countByMomentIdAndStatus: vi.fn().mockResolvedValue(2),
+        countActiveByMomentId: vi.fn().mockResolvedValue(2),
         findActiveByMomentId: vi.fn().mockResolvedValue([paidReg, freeReg]),
       });
       const paymentService = createMockPaymentService();

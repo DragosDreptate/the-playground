@@ -48,7 +48,7 @@ describe("handlePaymentWebhook", () => {
         },
         registrationRepository: {
           findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
-          countByMomentIdAndStatus: vi.fn().mockResolvedValue(5),
+          countActiveByMomentId: vi.fn().mockResolvedValue(5),
           create: vi.fn().mockResolvedValue(registration),
         },
         circleRepository: {
@@ -114,9 +114,7 @@ describe("handlePaymentWebhook", () => {
         },
         registrationRepository: {
           findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
-          countByMomentIdAndStatus: vi.fn()
-            .mockResolvedValueOnce(8)   // REGISTERED
-            .mockResolvedValueOnce(2),  // CHECKED_IN → total 10 = capacity
+          countActiveByMomentId: vi.fn().mockResolvedValue(10), // capacity = 10 → full
         },
       });
 
@@ -186,7 +184,7 @@ describe("handlePaymentWebhook", () => {
         },
         registrationRepository: {
           findByStripePaymentIntentId: vi.fn().mockResolvedValue(null),
-          countByMomentIdAndStatus: vi.fn().mockResolvedValue(5),
+          countActiveByMomentId: vi.fn().mockResolvedValue(5),
           create: vi.fn().mockResolvedValue(makeRegistration()),
         },
         circleRepository: {

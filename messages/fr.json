@@ -907,6 +907,8 @@
       "viewMomentCta": "Voir l'événement",
       "cancelLink": "Annuler mon inscription",
       "dashboardLink": "Retrouvez tous vos événements dans Mon espace →",
+      "paymentConfirmed": "Paiement confirmé",
+      "viewReceipt": "Voir mon reçu",
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     }
   },

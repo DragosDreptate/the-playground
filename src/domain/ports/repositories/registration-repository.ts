@@ -32,6 +32,8 @@ export interface RegistrationRepository {
     userId: string
   ): Promise<Registration | null>;
   findActiveByMomentId(momentId: string): Promise<Registration[]>;
+  /** Count REGISTERED + CHECKED_IN registrations in a single query. */
+  countActiveByMomentId(momentId: string): Promise<number>;
   findActiveWithUserByMomentId(
     momentId: string
   ): Promise<RegistrationWithUser[]>;

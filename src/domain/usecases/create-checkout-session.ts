@@ -75,15 +75,8 @@ export async function createCheckoutSession(
 
   // Check capacity (no waitlist for paid events)
   if (moment.capacity !== null) {
-    const registered = await registrationRepository.countByMomentIdAndStatus(
-      input.momentId,
-      "REGISTERED"
-    );
-    const checkedIn = await registrationRepository.countByMomentIdAndStatus(
-      input.momentId,
-      "CHECKED_IN"
-    );
-    if (registered + checkedIn >= moment.capacity) {
+    const activeCount = await registrationRepository.countActiveByMomentId(input.momentId);
+    if (activeCount >= moment.capacity) {
       throw new MomentNotOpenForRegistrationError(input.momentId);
     }
   }

@@ -58,12 +58,12 @@ export function RegistrationConfirmationEmail({
       {amountPaid && (
         <Section style={paymentSection}>
           <Text style={paymentText}>
-            Paiement confirmé — {amountPaid}
-            {receiptUrl && (
+            {strings.paymentConfirmed ?? "Paiement confirmé"} — {amountPaid}
+            {receiptUrl && strings.viewReceipt && (
               <>
                 {" · "}
                 <Link href={receiptUrl} style={receiptLink}>
-                  Voir mon reçu
+                  {strings.viewReceipt}
                 </Link>
               </>
             )}

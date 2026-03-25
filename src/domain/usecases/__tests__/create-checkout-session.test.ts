@@ -45,7 +45,7 @@ describe("createCheckoutSession", () => {
         },
         registrationRepository: {
           findByMomentAndUser: vi.fn().mockResolvedValue(null),
-          countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+          countActiveByMomentId: vi.fn().mockResolvedValue(0),
         },
         paymentService: {
           getConnectAccountStatus: vi.fn().mockResolvedValue("active"),
@@ -174,7 +174,7 @@ describe("createCheckoutSession", () => {
         },
         registrationRepository: {
           findByMomentAndUser: vi.fn().mockResolvedValue(makeRegistration({ status: "CANCELLED" })),
-          countByMomentIdAndStatus: vi.fn().mockResolvedValue(0),
+          countActiveByMomentId: vi.fn().mockResolvedValue(0),
         },
       });
 
@@ -197,9 +197,7 @@ describe("createCheckoutSession", () => {
         paymentService: { getConnectAccountStatus: vi.fn().mockResolvedValue("active") },
         registrationRepository: {
           findByMomentAndUser: vi.fn().mockResolvedValue(null),
-          countByMomentIdAndStatus: vi.fn()
-            .mockResolvedValueOnce(8)  // REGISTERED
-            .mockResolvedValueOnce(2), // CHECKED_IN → total 10 = capacity
+          countActiveByMomentId: vi.fn().mockResolvedValue(10), // capacity = 10 → full
         },
       });
 
@@ -231,7 +229,7 @@ describe("createCheckoutSession", () => {
       );
 
       expect(result.url).toBe("https://checkout.stripe.com/pay/cs_test_789");
-      expect(deps.registrationRepository.countByMomentIdAndStatus).not.toHaveBeenCalled();
+      expect(deps.registrationRepository.countActiveByMomentId).not.toHaveBeenCalled();
     });
   });
 });

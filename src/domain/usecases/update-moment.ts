@@ -82,15 +82,8 @@ export async function updateMoment(
 
   // Price locking rules (only when price is being changed)
   if (input.price !== undefined && input.price !== existing.price && deps.registrationRepository) {
-    const registeredCount = await deps.registrationRepository.countByMomentIdAndStatus(
-      input.momentId,
-      "REGISTERED"
-    );
-    const checkedInCount = await deps.registrationRepository.countByMomentIdAndStatus(
-      input.momentId,
-      "CHECKED_IN"
-    );
-    const hasRegistrations = registeredCount + checkedInCount > 0;
+    const activeCount = await deps.registrationRepository.countActiveByMomentId(input.momentId);
+    const hasRegistrations = activeCount > 0;
 
     if (hasRegistrations) {
       const wasFree = existing.price === 0;
