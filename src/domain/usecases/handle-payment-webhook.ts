@@ -68,12 +68,16 @@ export async function handlePaymentWebhook(
   }
 
   // Create or update the Registration with PAID status
-  // (the user may already have a Registration, e.g. from auto-inscription as Host)
+  // Cases: (1) no existing registration → create
+  //        (2) existing CANCELLED registration → reactivate
+  //        (3) existing active registration (e.g. Host auto-inscription) → update paymentStatus
   const existingRegistration = await registrationRepository.findByMomentAndUser(momentId, userId);
   let registration;
-  if (existingRegistration && existingRegistration.status !== "CANCELLED") {
+  if (existingRegistration) {
     registration = await registrationRepository.update(existingRegistration.id, {
+      status: "REGISTERED",
       paymentStatus: "PAID",
+      cancelledAt: null,
     });
   } else {
     registration = await registrationRepository.create({

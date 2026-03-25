@@ -168,6 +168,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       where: { id },
       data: {
         ...(input.status !== undefined && { status: input.status }),
+        ...(input.paymentStatus !== undefined && { paymentStatus: input.paymentStatus }),
         ...(input.cancelledAt !== undefined && {
           cancelledAt: input.cancelledAt,
         }),
