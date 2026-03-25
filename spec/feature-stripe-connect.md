@@ -174,7 +174,7 @@ Calculé depuis nos données (Registration), pas d'appel API Stripe :
 
 ### Notifications email — événements payants (décision MVP)
 
-Pas de nouveaux templates. On enrichit les emails existants avec des mentions conditionnelles.
+On enrichit les emails existants avec des mentions conditionnelles. Un nouveau template est créé pour la notification de désinscription à l'Organisateur (événements payants uniquement).
 
 **Nouveau champ** : `stripeReceiptUrl: String?` sur `Registration` — stocké au moment du webhook, inclus dans l'email de confirmation.
 
@@ -190,7 +190,7 @@ Pas de nouveaux templates. On enrichit les emails existants avec des mentions co
 
 #### Côté Organisateur
 
-Pas d'email par transaction (trop de bruit). L'Organisateur a le résumé billetterie dans la gestion de l'événement et le détail dans Stripe Express.
+Pas d'email pour chaque inscription (trop de bruit). Mais **notification de désinscription pour les événements payants** — l'Organisateur reçoit un email quand un Participant se désinscrit d'un événement payant, avec mention du remboursement effectué ou non. C'est impactant financièrement, l'Organisateur doit le savoir.
 
 #### Reçu Stripe
 
