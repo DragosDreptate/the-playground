@@ -218,7 +218,7 @@ async function sendHostPaidCancellationEmail(
   const t = await getTranslations("Email");
   const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ") || player.email;
 
-  const wasRefunded = registration.paymentStatus === "REFUNDED";
+  const isRefundable = moment.refundable;
   const amountFormatted = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(moment.price / 100) + " " + moment.currency;
 
   for (const host of hosts) {
@@ -230,12 +230,12 @@ async function sendHostPaidCancellationEmail(
       momentTitle: moment.title,
       momentSlug: moment.slug,
       circleSlug: circle.slug,
-      amountRefunded: wasRefunded ? amountFormatted : null,
+      amountRefunded: isRefundable ? amountFormatted : null,
       strings: {
         subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
         heading: t("paidCancellation.heading"),
         message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
-        refundMessage: wasRefunded
+        refundMessage: isRefundable
           ? t("paidCancellation.refunded", { amount: amountFormatted })
           : t("paidCancellation.notRefunded"),
         manageRegistrationsCta: t("paidCancellation.manageCta"),
