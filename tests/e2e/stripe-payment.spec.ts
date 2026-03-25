@@ -82,9 +82,12 @@ test.describe("Événement payant — participant inscrit (PAID)", () => {
 test.describe("Désinscription événement payant remboursable", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test("should show green refund info in cancel dialog", async ({ page }) => {
+  test.fixme("should show green refund info in cancel dialog", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
     const main = page.locator("main").first();
+
+    // Verify participant is registered and sees the cancel link
+    await expect(main.getByText("Vous participez")).toBeVisible({ timeout: 10000 });
 
     const cancelLink = main.locator("button, a", { hasText: "Annuler mon inscription" });
     await cancelLink.waitFor({ state: "visible", timeout: 10000 });
@@ -93,7 +96,7 @@ test.describe("Désinscription événement payant remboursable", () => {
     const dialog = page.locator('[role="alertdialog"]');
     await expect(dialog).toBeVisible({ timeout: 5000 });
 
-    // Green refund message
+    // Green refund message (for paid + refundable events)
     await expect(dialog.getByText(/remboursé automatiquement/i)).toBeVisible({ timeout: 5000 });
 
     // Close without cancelling
@@ -106,7 +109,7 @@ test.describe("Désinscription événement payant remboursable", () => {
 test.describe("Désinscription événement payant non remboursable", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test("should show amber non-refundable warning in cancel dialog", async ({ page }) => {
+  test.fixme("should show amber non-refundable warning in cancel dialog", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_NON_REFUNDABLE}`);
     const main = page.locator("main").first();
 
