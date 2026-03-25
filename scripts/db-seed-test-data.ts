@@ -252,6 +252,57 @@ const SEED_DATA = [
     ],
   },
   {
+    // ── Circle : paid events (Stripe) ─────────────────────────────────────────
+    slug: "test-paid-events",
+    name: "Workshop Pro Paris",
+    description:
+      "Workshops professionnels payants — design, dev, product. " +
+      "Petits groupes, intervenants experts, format intensif.",
+    visibility: "PUBLIC" as const,
+    stripeConnectAccountId: "acct_test_e2e_fake",
+    moments: [
+      {
+        slug: "test-workshop-payant",
+        title: "Workshop Design System Avancé",
+        description:
+          "Workshop intensif de 3h sur la création d'un design system complet. " +
+          "Tokens, composants, documentation et gouvernance. " +
+          "Places limitées, petit groupe pour un maximum d'interaction.",
+        startsAt: daysFromNow(14, 14),
+        endsAt: daysFromNow(14, 17),
+        locationType: "IN_PERSON" as const,
+        locationName: "Espace Coworking République",
+        locationAddress: "42 Rue du Temple, 75004 Paris",
+        capacity: 10,
+        price: 1500, // 15,00 EUR
+        refundable: true,
+        status: "PUBLISHED" as const,
+        registrations: ["host"],
+        paidRegistrations: ["player1"], // player1 inscrit avec paymentStatus: PAID
+        comments: [],
+      },
+      {
+        slug: "test-workshop-non-remboursable",
+        title: "Masterclass Product Management",
+        description:
+          "Une journée complète avec un PM senior de startup licorne. " +
+          "Discovery, delivery, metrics et stakeholder management.",
+        startsAt: daysFromNow(21, 9),
+        endsAt: daysFromNow(21, 17),
+        locationType: "IN_PERSON" as const,
+        locationName: "Station F",
+        locationAddress: "5 Parvis Alan Turing, 75013 Paris",
+        capacity: 8,
+        price: 2500, // 25,00 EUR
+        refundable: false,
+        status: "PUBLISHED" as const,
+        registrations: ["host"],
+        paidRegistrations: ["player1"],
+        comments: [],
+      },
+    ],
+  },
+  {
     // ── Circle 3 : approval test ──────────────────────────────────────────────
     slug: "test-approval-circle",
     name: "Tech Interviews Paris",
@@ -341,6 +392,7 @@ async function main() {
     console.log(`\n⭕ Circle: ${circleData.name}`);
 
     const circleRequiresApproval = (circleData as { requiresApproval?: boolean }).requiresApproval ?? false;
+    const circleStripeId = (circleData as { stripeConnectAccountId?: string }).stripeConnectAccountId ?? null;
     const circle = await prisma.circle.upsert({
       where: { slug: circleData.slug },
       create: {
@@ -349,12 +401,14 @@ async function main() {
         description: circleData.description,
         visibility: circleData.visibility,
         requiresApproval: circleRequiresApproval,
+        ...(circleStripeId && { stripeConnectAccountId: circleStripeId }),
       },
       update: {
         name: circleData.name,
         description: circleData.description,
         visibility: circleData.visibility,
         requiresApproval: circleRequiresApproval,
+        ...(circleStripeId && { stripeConnectAccountId: circleStripeId }),
       },
     });
 
@@ -369,6 +423,8 @@ async function main() {
 
     for (const momentData of circleData.moments) {
       const momentRequiresApproval = (momentData as { requiresApproval?: boolean }).requiresApproval ?? false;
+      const momentPrice = (momentData as { price?: number }).price ?? 0;
+      const momentRefundable = (momentData as { refundable?: boolean }).refundable ?? true;
       const moment = await prisma.moment.upsert({
         where: { slug: momentData.slug },
         create: {
@@ -383,8 +439,9 @@ async function main() {
           locationName: momentData.locationName,
           locationAddress: momentData.locationAddress ?? null,
           capacity: momentData.capacity,
-          price: 0,
+          price: momentPrice,
           currency: "EUR",
+          refundable: momentRefundable,
           status: momentData.status,
           requiresApproval: momentRequiresApproval,
         },
@@ -395,6 +452,8 @@ async function main() {
           endsAt: momentData.endsAt ?? null,
           status: momentData.status,
           capacity: momentData.capacity,
+          price: momentPrice,
+          refundable: momentRefundable,
           broadcastSentAt: null,
           requiresApproval: momentRequiresApproval,
         },
@@ -409,6 +468,25 @@ async function main() {
           where: { momentId_userId: { momentId: moment.id, userId } },
           create: { momentId: moment.id, userId, status: "REGISTERED", paymentStatus: "NONE" },
           update: { status: "REGISTERED" },
+        });
+        if (userKey !== "host") playersInCircle.add(userId);
+      }
+
+      // Paid registrations (REGISTERED + paymentStatus: PAID)
+      const paidRegistrations = (momentData as { paidRegistrations?: string[] }).paidRegistrations ?? [];
+      for (const userKey of paidRegistrations) {
+        const userId = userMap[userKey];
+        if (!userId) continue;
+        await prisma.registration.upsert({
+          where: { momentId_userId: { momentId: moment.id, userId } },
+          create: {
+            momentId: moment.id,
+            userId,
+            status: "REGISTERED",
+            paymentStatus: "PAID",
+            stripePaymentIntentId: `pi_test_seed_${moment.id}_${userId}`,
+          },
+          update: { status: "REGISTERED", paymentStatus: "PAID" },
         });
         if (userKey !== "host") playersInCircle.add(userId);
       }

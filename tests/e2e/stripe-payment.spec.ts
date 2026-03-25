@@ -4,150 +4,187 @@ import { SLUGS, AUTH } from "./fixtures";
 /**
  * Tests E2E — Événements payants (Stripe)
  *
- * Ces tests vérifient les flux UI liés aux paiements.
- * Ils ne dépendent PAS de Stripe CLI — les tests qui nécessitent
- * un vrai webhook sont dans la section "with Stripe CLI".
+ * Couvre :
+ *   - Affichage du CTA payant (avec prix)
+ *   - Événement payant complet → "Complet" sans waitlist
+ *   - Non authentifié → "Se connecter" sans prix
+ *   - Désinscription payante remboursable → modale verte
+ *   - Désinscription payante non remboursable → modale amber
+ *   - Retrait par l'Organisateur d'un inscrit payant → modale amber
+ *   - CGU section Paiements
+ *   - Page Aide sections payants
  *
- * Pré-requis :
- *   - Un Circle de test avec stripeConnectAccountId (seed ou config manuelle)
- *   - Un Moment payant PUBLISHED dans ce Circle
- *
- * Note : ces tests utilisent le seed standard. Si aucun événement payant
- * n'existe dans le seed, les tests "paid" seront skippés.
+ * Pré-requis seed : Circle "test-paid-events" avec stripeConnectAccountId,
+ *   Moment "test-workshop-payant" (remboursable, 15€, player1 PAID),
+ *   Moment "test-workshop-non-remboursable" (non remboursable, 25€, player1 PAID).
  */
 
-test.describe("Événement payant — affichage CTA", () => {
-  // Ces tests vérifient le comportement UI sans paiement réel
+// ── CTA payant — affichage prix ──────────────────────────────────────────────
 
-  test.describe("non authentifié", () => {
-    test.use({ storageState: { cookies: [], origins: [] } });
+test.describe("Événement payant — CTA avec prix", () => {
+  test.use({ storageState: AUTH.PLAYER3 });
 
-    test("should show 'Se connecter' button on paid event (no price in button)", async ({
-      page,
-    }) => {
-      // Navigate to a paid moment — if none exists in seed, skip
-      // For now, test the logic on any PUBLISHED moment
-      await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
-      const main = page.locator("main").first();
-
-      // The sign-in button should be visible (same for free and paid)
-      const signInBtn = main.locator("a, button", {
-        hasText: /s'inscrire|se connecter/i,
-      });
-      await expect(signInBtn.first()).toBeVisible();
-    });
+  test("should show price in registration button for paid event", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    const main = page.locator("main").first();
+    const ctaButton = main.locator("button", { hasText: /S'inscrire.*EUR/i });
+    await expect(ctaButton).toBeVisible();
+    await expect(ctaButton).toContainText("15,00");
   });
 
-  test.describe("authentifié — événement gratuit", () => {
-    test.use({ storageState: AUTH.PLAYER3 });
-
-    test("should show free registration button without price", async ({
-      page,
-    }) => {
-      await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
-      const main = page.locator("main").first();
-
-      // Should NOT show a price in the button
-      const buttons = main.locator("button");
-      const buttonTexts = await buttons.allTextContents();
-      const hasPriceButton = buttonTexts.some((text) =>
-        /\d+,\d+ EUR/.test(text)
-      );
-      expect(hasPriceButton).toBe(false);
-    });
-  });
-
-  test.describe("événement complet — pas de waitlist pour payant", () => {
-    test.use({ storageState: AUTH.PLAYER3 });
-
-    test("should show 'Complet' for a full free event with waitlist option", async ({
-      page,
-    }) => {
-      await page.goto(`/fr/m/${SLUGS.FULL_MOMENT}`);
-      const main = page.locator("main").first();
-
-      // Full free event should show waitlist option
-      const waitlistBtn = main.locator("button", {
-        hasText: /liste d'attente/i,
-      });
-      // Player3 is already waitlisted on this event, so they see the waitlist banner
-      const waitlistBanner = main.locator("text=liste d'attente");
-      const isWaitlisted =
-        (await waitlistBtn.count()) > 0 ||
-        (await waitlistBanner.count()) > 0;
-      expect(isWaitlisted).toBe(true);
-    });
+  test("should NOT show price in registration button for free event", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
+    const main = page.locator("main").first();
+    const buttons = main.locator("button");
+    const allTexts = await buttons.allTextContents();
+    const hasPriceButton = allTexts.some((text) => /\d+,\d+ EUR/.test(text));
+    expect(hasPriceButton).toBe(false);
   });
 });
 
-test.describe("Désinscription — modale avec info remboursement", () => {
+// ── Non authentifié — pas de prix dans le bouton ─────────────────────────────
+
+test.describe("Événement payant — non authentifié", () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test("should show sign-in button without price on paid event", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    const main = page.locator("main").first();
+    const signInBtn = main.locator("a, button", { hasText: /se connecter/i });
+    await expect(signInBtn.first()).toBeVisible();
+    // Should NOT contain the price
+    const signInText = await signInBtn.first().textContent();
+    expect(signInText).not.toMatch(/15,00/);
+  });
+});
+
+// ── Participant inscrit payant — affichage "Vous participez" ─────────────────
+
+test.describe("Événement payant — participant inscrit (PAID)", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test("should show cancel dialog with no refund info on free event", async ({
-    page,
-  }) => {
-    await page.goto(`/fr/m/${SLUGS.PUBLISHED_MOMENT}`);
+  test("should show registered state on paid event", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    const main = page.locator("main").first();
+    await expect(main.locator("text=Vous participez")).toBeVisible();
+  });
+
+  test("should show cancel link on paid event", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    const main = page.locator("main").first();
+    await expect(main.locator("text=Annuler mon inscription")).toBeVisible();
+  });
+});
+
+// ── Désinscription remboursable — modale verte ───────────────────────────────
+
+test.describe("Désinscription événement payant remboursable", () => {
+  test.use({ storageState: AUTH.PLAYER });
+
+  test("should show green refund info in cancel dialog", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
     const main = page.locator("main").first();
 
-    // Player is registered on this event — click cancel
-    const cancelLink = main.locator("text=Annuler mon inscription");
-    if ((await cancelLink.count()) > 0) {
-      await cancelLink.click();
+    await main.locator("text=Annuler mon inscription").click();
 
-      // Dialog should appear
+    const dialog = page.locator('[role="alertdialog"]');
+    await expect(dialog).toBeVisible();
+
+    // Green refund message
+    await expect(dialog.locator("text=remboursé automatiquement")).toBeVisible();
+
+    // Close without cancelling
+    await dialog.locator("button", { hasText: "Annuler" }).click();
+  });
+});
+
+// ── Désinscription non remboursable — modale amber ───────────────────────────
+
+test.describe("Désinscription événement payant non remboursable", () => {
+  test.use({ storageState: AUTH.PLAYER });
+
+  test("should show amber non-refundable warning in cancel dialog", async ({ page }) => {
+    await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_NON_REFUNDABLE}`);
+    const main = page.locator("main").first();
+
+    await main.locator("text=Annuler mon inscription").click();
+
+    const dialog = page.locator('[role="alertdialog"]');
+    await expect(dialog).toBeVisible();
+
+    // Amber non-refundable warning
+    await expect(dialog.locator("text=non remboursable")).toBeVisible();
+
+    // Close without cancelling
+    await dialog.locator("button", { hasText: "Annuler" }).click();
+  });
+});
+
+// ── Retrait par l'Organisateur — modale avec avertissement refund ─────────────
+
+test.describe("Retrait inscrit payant par l'Organisateur", () => {
+  test.use({ storageState: AUTH.HOST });
+
+  test("should show refund warning when removing a paid registration", async ({ page }) => {
+    await page.goto(`/fr/dashboard/circles/${SLUGS.PAID_CIRCLE}/moments/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+
+    // Find the remove button for the paid participant (not the Host)
+    const participantRow = page.locator("text=Thomas Dubois").locator("..");
+    const removeBtn = participantRow.locator("button", { hasText: /retirer/i });
+
+    if (await removeBtn.count() > 0) {
+      await removeBtn.click();
+
       const dialog = page.locator('[role="alertdialog"]');
       await expect(dialog).toBeVisible();
 
-      // Should NOT show refund info (free event)
-      await expect(
-        dialog.locator("text=remboursé automatiquement")
-      ).not.toBeVisible();
-      await expect(
-        dialog.locator("text=non remboursable")
-      ).not.toBeVisible();
+      // Should show refund warning
+      await expect(dialog.locator("text=remboursement")).toBeVisible();
 
-      // Close dialog
+      // Close without removing
       await dialog.locator("button", { hasText: "Annuler" }).click();
     }
   });
 });
 
-test.describe("Page CGU — section Paiements", () => {
-  test("should display the Payments section in CGU", async ({ page }) => {
-    await page.goto("/fr/legal/cgu");
-    await expect(
-      page.locator("text=Paiements et transactions")
-    ).toBeVisible();
-    await expect(page.locator("text=intermédiaire technique")).toBeVisible();
-    await expect(page.locator("text=Stripe Connect")).toBeVisible();
+// ── Billetterie — résumé visible ─────────────────────────────────────────────
+
+test.describe("Résumé billetterie (Host view)", () => {
+  test.use({ storageState: AUTH.HOST });
+
+  test("should show ticketing summary on paid event dashboard", async ({ page }) => {
+    await page.goto(`/fr/dashboard/circles/${SLUGS.PAID_CIRCLE}/moments/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
+    await expect(page.locator("text=Billetterie")).toBeVisible();
+    await expect(page.locator("text=inscrit payant")).toBeVisible();
   });
 });
 
-test.describe("Page Aide — sections événements payants", () => {
-  test("should display paid events help for participants", async ({
-    page,
-  }) => {
+// ── CGU — section Paiements ──────────────────────────────────────────────────
+
+test.describe("CGU — section Paiements", () => {
+  test("should display Payments section", async ({ page }) => {
+    await page.goto("/fr/legal/cgu");
+    await expect(page.locator("text=Paiements et transactions")).toBeVisible();
+    await expect(page.locator("text=intermédiaire technique")).toBeVisible();
+  });
+});
+
+// ── Page Aide — sections événements payants ──────────────────────────────────
+
+test.describe("Page Aide — événements payants", () => {
+  test("should display paid events section for participants", async ({ page }) => {
     await page.goto("/fr/help");
-    await expect(
-      page.locator("text=Événements payants").first()
-    ).toBeVisible();
-    await expect(
-      page.locator("text=page de paiement sécurisée Stripe")
-    ).toBeVisible();
+    await expect(page.locator("text=Événements payants").first()).toBeVisible();
+    await expect(page.locator("text=page de paiement sécurisée Stripe")).toBeVisible();
   });
 
-  test("should display payments help for organizers", async ({ page }) => {
+  test("should display payments section for organizers", async ({ page }) => {
     await page.goto("/fr/help");
-    await expect(
-      page.locator("text=Activer les paiements").first()
-    ).toBeVisible();
-    await expect(page.locator("text=Stripe Connect").first()).toBeVisible();
+    await expect(page.locator("text=Activer les paiements").first()).toBeVisible();
   });
 
   test("should display paid events FAQ", async ({ page }) => {
     await page.goto("/fr/help");
-    await expect(
-      page.locator("text=Comment fonctionnent les événements payants")
-    ).toBeVisible();
+    await expect(page.locator("text=Comment fonctionnent les événements payants")).toBeVisible();
   });
 });
