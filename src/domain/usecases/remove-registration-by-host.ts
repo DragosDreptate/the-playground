@@ -71,8 +71,8 @@ export async function removeRegistrationByHost(
         { registration, moment, force: true },
         { registrationRepository, paymentService: deps.paymentService }
       );
-    } catch (error) {
-      console.error("[removeRegistrationByHost] Refund failed, proceeding with removal:", error);
+    } catch {
+      // Refund failure must not block removal — error is captured by the caller
     }
   }
 

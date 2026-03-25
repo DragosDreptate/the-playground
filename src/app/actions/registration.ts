@@ -25,6 +25,7 @@ import { approveMomentRegistration } from "@/domain/usecases/approve-moment-regi
 import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-registration";
 import { DomainError } from "@/domain/errors";
 import { getDisplayName } from "@/lib/display-name";
+import { formatPrice } from "@/lib/format-price";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
@@ -216,13 +217,13 @@ async function sendHostPaidCancellationEmail(
 
   const locale = await getLocale();
   const t = await getTranslations("Email");
-  const playerName = [player.firstName, player.lastName].filter(Boolean).join(" ") || player.email;
+  const playerName = getDisplayName(player.firstName, player.lastName, player.email);
 
   const isRefundable = moment.refundable;
-  const amountFormatted = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(moment.price / 100) + " " + moment.currency;
+  const amountFormatted = formatPrice(moment.price, moment.currency, locale);
 
   for (const host of hosts) {
-    const hostName = [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") || host.user.email;
+    const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
     await emailService.sendHostPaidCancellation({
       to: host.user.email,
       hostName,
@@ -318,7 +319,7 @@ export async function sendRegistrationEmails(
     status: registration.status,
     icsContent,
     ...(registration.paymentStatus === "PAID" && moment.price > 0 && {
-      amountPaid: new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(moment.price / 100) + " " + moment.currency,
+      amountPaid: formatPrice(moment.price, moment.currency, locale),
     }),
     ...(registration.stripeReceiptUrl && { receiptUrl: registration.stripeReceiptUrl }),
     strings: {

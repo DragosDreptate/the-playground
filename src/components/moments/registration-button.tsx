@@ -21,6 +21,7 @@ import {
   cancelRegistrationAction,
 } from "@/app/actions/registration";
 import { createCheckoutAction } from "@/app/actions/checkout";
+import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
@@ -73,13 +74,6 @@ function StatsColumn({
       )}
     </div>
   );
-}
-
-function formatPrice(cents: number, currency: string, locale: string = "fr-FR"): string {
-  return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(cents / 100);
 }
 
 export function RegistrationButton({

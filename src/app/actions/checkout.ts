@@ -47,7 +47,6 @@ export async function createCheckoutAction(
 
     return { success: true, data: { url: result.url } };
   } catch (error) {
-    console.error("[createCheckoutSession] Error:", error);
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }

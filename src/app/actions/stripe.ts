@@ -28,7 +28,6 @@ export async function onboardStripeConnectAction(
 
     return { success: true, data: result };
   } catch (error) {
-    console.error("[onboardStripeConnect] Error:", error);
     if (error instanceof DomainError) {
       return { success: false, error: error.message, code: error.code };
     }

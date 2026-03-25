@@ -11,6 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatPrice } from "@/lib/format-price";
 
 type MomentFormOptionsSectionProps = {
   // Price
@@ -28,16 +29,9 @@ type MomentFormOptionsSectionProps = {
   defaultCapacity?: number | null;
 };
 
-function formatPriceEur(cents: number): string {
-  return new Intl.NumberFormat("fr-FR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(cents / 100);
-}
-
-function estimateNet(cents: number): string {
+function estimateNet(cents: number, currency: string): string {
   const net = cents - Math.round(cents * 0.029 + 30);
-  return formatPriceEur(Math.max(0, net));
+  return formatPrice(Math.max(0, net), currency);
 }
 
 export function MomentFormOptionsSection({
@@ -181,7 +175,7 @@ export function MomentFormOptionsSection({
                 {t("form.ticketPrice")}
               </span>
               <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
-                <span>{formatPriceEur(priceCents)} {defaultCurrency}</span>
+                <span>{formatPrice(priceCents, defaultCurrency)}</span>
                 <Lock className="size-3.5" />
               </span>
             </div>
@@ -205,7 +199,7 @@ export function MomentFormOptionsSection({
                   >
                     <span>
                       {hasPaidPrice
-                        ? `${formatPriceEur(priceCents)} ${defaultCurrency}`
+                        ? formatPrice(priceCents, defaultCurrency)
                         : t("form.free")}
                     </span>
                     <Pencil className="size-3.5" />
@@ -257,7 +251,7 @@ export function MomentFormOptionsSection({
             {hasPaidPrice && (
               <p className="text-muted-foreground mt-1 pl-12 text-xs">
                 {t("form.priceEstimation", {
-                  net: estimateNet(priceCents),
+                  net: estimateNet(priceCents, defaultCurrency),
                   currency: defaultCurrency,
                 })}
               </p>

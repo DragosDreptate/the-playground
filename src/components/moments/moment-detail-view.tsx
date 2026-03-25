@@ -19,6 +19,7 @@ import type { CommentWithUser } from "@/domain/models/comment";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
 import { formatDateRange } from "@/lib/format-date";
+import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import Image from "next/image";
 import {
@@ -660,7 +661,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 <p>
                   {t("host.paidRegistrations", { count: props.paymentSummary.paidCount })}
                   {" · "}
-                  {new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(props.paymentSummary.totalAmount / 100)} {moment.currency}
+                  {formatPrice(props.paymentSummary.totalAmount, moment.currency)}
                   {" "}
                   <span className="text-muted-foreground text-xs">({t("host.beforeStripeFees")})</span>
                 </p>

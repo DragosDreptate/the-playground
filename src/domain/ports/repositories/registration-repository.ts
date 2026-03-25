@@ -1,6 +1,7 @@
 import type {
   Registration,
   RegistrationStatus,
+  PaymentStatus,
   RegistrationWithMoment,
   RegistrationWithUser,
 } from "@/domain/models/registration";
@@ -9,14 +10,14 @@ export type CreateRegistrationInput = {
   momentId: string;
   userId: string;
   status: RegistrationStatus;
-  paymentStatus?: "NONE" | "PENDING" | "PAID" | "REFUNDED";
+  paymentStatus?: PaymentStatus;
   stripePaymentIntentId?: string | null;
   stripeReceiptUrl?: string | null;
 };
 
 export type UpdateRegistrationInput = {
   status?: RegistrationStatus;
-  paymentStatus?: "NONE" | "PENDING" | "PAID" | "REFUNDED";
+  paymentStatus?: PaymentStatus;
   stripePaymentIntentId?: string | null;
   stripeReceiptUrl?: string | null;
   cancelledAt?: Date | null;

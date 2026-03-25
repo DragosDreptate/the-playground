@@ -66,8 +66,8 @@ export async function cancelRegistration(
         { registration, moment },
         { registrationRepository, paymentService: deps.paymentService }
       );
-    } catch (error) {
-      console.error("[cancelRegistration] Refund failed, proceeding with cancellation:", error);
+    } catch {
+      // Refund failure must not block cancellation — error is captured by the caller
     }
   }
 
