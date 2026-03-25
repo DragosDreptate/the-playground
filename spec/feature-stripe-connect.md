@@ -473,6 +473,8 @@ Simuler un événement : `stripe trigger checkout.session.completed`
 - [x] **Page `?payment=success`** → pas de banner dédié. Le webhook traite avant le redirect, l'état "inscrit" s'affiche directement.
 - [x] **Onboarding abandonné** → lien "Annuler l'activation" sous le message pending. Reset le `stripeConnectAccountId` à null.
 - [x] **Politique de remboursement page publique** → retirée (redondante). Couverte par la modale de désinscription + CGU. À revoir dans un redesign global CTA + Participants.
+- [x] **Retrait par l'Organisateur** → refund automatique (force=true) quand l'Organisateur retire un inscrit payant. Avertissement amber dans la modale de confirmation. Pas de promotion waitlist pour les payants.
+- [x] **Notification Organisateur (désinscription payante)** → email à l'Organisateur quand un Participant se désinscrit d'un événement payant, avec mention du remboursement ou non.
 
 ## Plan d'implémentation
 
