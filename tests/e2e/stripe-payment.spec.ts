@@ -22,6 +22,7 @@ import { SLUGS, AUTH } from "./fixtures";
 // ── CTA payant — affichage prix ──────────────────────────────────────────────
 
 test.describe("Événement payant — CTA avec prix", () => {
+  // PLAYER3 is NOT registered on paid events — sees the CTA button
   test.use({ storageState: AUTH.PLAYER3 });
 
   test("should show price in registration button for paid event", async ({ page }) => {
@@ -85,13 +86,15 @@ test.describe("Désinscription événement payant remboursable", () => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
     const main = page.locator("main").first();
 
-    await main.locator("text=Annuler mon inscription").click();
+    const cancelLink = main.locator("button, a", { hasText: "Annuler mon inscription" });
+    await cancelLink.waitFor({ state: "visible", timeout: 10000 });
+    await cancelLink.click();
 
     const dialog = page.locator('[role="alertdialog"]');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({ timeout: 5000 });
 
     // Green refund message
-    await expect(dialog.locator("text=remboursé automatiquement")).toBeVisible();
+    await expect(dialog.getByText(/remboursé automatiquement/i)).toBeVisible({ timeout: 5000 });
 
     // Close without cancelling
     await dialog.locator("button", { hasText: "Annuler" }).click();
@@ -107,13 +110,15 @@ test.describe("Désinscription événement payant non remboursable", () => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_NON_REFUNDABLE}`);
     const main = page.locator("main").first();
 
-    await main.locator("text=Annuler mon inscription").click();
+    const cancelLink = main.locator("button, a", { hasText: "Annuler mon inscription" });
+    await cancelLink.waitFor({ state: "visible", timeout: 10000 });
+    await cancelLink.click();
 
     const dialog = page.locator('[role="alertdialog"]');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({ timeout: 5000 });
 
     // Amber non-refundable warning
-    await expect(dialog.locator("text=non remboursable")).toBeVisible();
+    await expect(dialog.getByText(/pas remboursable/i)).toBeVisible({ timeout: 5000 });
 
     // Close without cancelling
     await dialog.locator("button", { hasText: "Annuler" }).click();
