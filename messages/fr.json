@@ -482,6 +482,7 @@
       "cancelRegistration": "Annuler mon inscription",
       "cancelConfirmTitle": "Annuler l'inscription",
       "cancelConfirmDescription": "Êtes-vous sûr de vouloir annuler votre inscription à cet événement ?",
+      "cancelRefundableInfo": "Vous serez remboursé automatiquement sous 5 à 10 jours.",
       "cancelNonRefundableWarning": "Cet événement n'est pas remboursable. Vous ne serez pas remboursé.",
       "confirmCancel": "Oui, annuler",
       "spotsRemaining": "{count} places restantes",

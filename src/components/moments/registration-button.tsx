@@ -270,9 +270,11 @@ export function RegistrationButton({
                   {t("public.cancelConfirmDescription")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              {price > 0 && !refundable && existingRegistration?.paymentStatus === "PAID" && (
-                <div className="rounded-md bg-amber-500/10 p-3 text-sm text-amber-500">
-                  {t("public.cancelNonRefundableWarning")}
+              {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
+                <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
+                  {refundable
+                    ? t("public.cancelRefundableInfo")
+                    : t("public.cancelNonRefundableWarning")}
                 </div>
               )}
               {error && (

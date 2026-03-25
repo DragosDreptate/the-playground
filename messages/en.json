@@ -482,6 +482,7 @@
       "cancelRegistration": "Cancel my registration",
       "cancelConfirmTitle": "Cancel registration",
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
+      "cancelRefundableInfo": "You will be refunded automatically within 5 to 10 business days.",
       "cancelNonRefundableWarning": "This event is non-refundable. You will not be refunded.",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
