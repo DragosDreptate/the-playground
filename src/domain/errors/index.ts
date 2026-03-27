@@ -15,6 +15,10 @@ export {
   UnauthorizedMomentActionError,
   MomentPastDateError,
   MomentAlreadyPublishedError,
+  InvalidPriceError,
+  PaidMomentRequiresStripeError,
+  PriceLockedError,
+  CannotMakePaidWithRegistrationsError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {
@@ -35,3 +39,7 @@ export {
   RegistrationNotPendingApprovalError,
 } from "./registration-errors";
 export { AdminUnauthorizedError } from "./admin-errors";
+export {
+  StripeConnectNotActiveError,
+  StripeConnectAlreadyActiveError,
+} from "./stripe-errors";

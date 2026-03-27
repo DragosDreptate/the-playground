@@ -25,6 +25,7 @@ export type UpdateCircleInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   inviteToken?: string | null;
   requiresApproval?: boolean;
+  stripeConnectAccountId?: string | null;
 };
 
 export type ExplorerSortBy = "date" | "popular" | "members";

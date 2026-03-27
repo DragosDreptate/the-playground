@@ -15,7 +15,7 @@ import {
   prismaUserRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
-import { createResendEmailService } from "@/infrastructure/services";
+import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
@@ -33,6 +33,7 @@ import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 
 const emailService = createResendEmailService();
+const paymentService = createStripePaymentService();
 
 function getDateFnsLocale(locale: string) {
   return locale === "fr" ? fr : enUS;
@@ -90,6 +91,8 @@ export async function createMomentAction(
   const endsAt = endsAtRaw ? new Date(endsAtRaw) : null;
   const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : null;
   const price = priceRaw ? parseInt(priceRaw, 10) || 0 : 0;
+  // Refundable only meaningful for paid events; default to true for free events
+  const refundable = price > 0 ? formData.get("refundable") === "on" : true;
 
   try {
     const coverData = await processCoverImage(formData);
@@ -111,6 +114,7 @@ export async function createMomentAction(
         capacity,
         price,
         currency,
+        refundable,
         requiresApproval,
       },
       {
@@ -180,6 +184,10 @@ export async function updateMomentAction(
 
   const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : undefined;
   const price = priceRaw !== null ? parseInt(priceRaw, 10) || 0 : undefined;
+  // Refundable only meaningful for paid events; default to true when price becomes 0
+  const refundable = price !== undefined
+    ? (price > 0 ? formData.get("refundable") === "on" : true)
+    : undefined;
 
   try {
     // Récupère l'ancienne cover pour cleanup si besoin
@@ -209,6 +217,7 @@ export async function updateMomentAction(
         ...(price !== undefined && { price }),
         ...(currency && { currency }),
         ...(status && { status: status as Moment["status"] }),
+        ...(refundable !== undefined && { refundable }),
         requiresApproval: requiresApprovalUpdate,
       },
       {
@@ -394,11 +403,18 @@ export async function deleteMomentAction(
       {
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
+        registrationRepository: prismaRegistrationRepository,
+        paymentService,
       }
     );
 
-    // Fire-and-forget : notifier les participants de l'annulation (sauf si admin)
-    if (momentToDelete && registrationsToNotify.length > 0 && !isAdminUser(session)) {
+    // Fire-and-forget : notifier les participants de l'annulation
+    // Skip only when admin deletes someone else's event (admin moderation, not own event)
+    const isHostOfEvent = momentToDelete
+      ? (await prismaCircleRepository.findMembership(momentToDelete.circleId, session.user.id))?.role === "HOST"
+      : false;
+    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isHostOfEvent);
+    if (shouldNotify) {
       sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
         (err) => Sentry.captureException(err)
       );

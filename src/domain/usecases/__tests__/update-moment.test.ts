@@ -3,6 +3,8 @@ import { updateMoment } from "@/domain/usecases/update-moment";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
+  PriceLockedError,
+  CannotMakePaidWithRegistrationsError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -10,8 +12,14 @@ import {
 } from "./helpers/mock-moment-repository";
 import {
   createMockCircleRepository,
+  makeCircle,
   makeMembership,
 } from "./helpers/mock-circle-repository";
+import {
+  createMockRegistrationRepository,
+  makeRegistration,
+} from "./helpers/mock-registration-repository";
+import { createMockPaymentService } from "./helpers/mock-payment-service";
 
 describe("UpdateMoment", () => {
   const defaultInput = {
@@ -264,6 +272,163 @@ describe("UpdateMoment", () => {
           circleRepository: circleRepo,
         })
       ).rejects.toThrow(UnauthorizedMomentActionError);
+    });
+  });
+
+  // ── Price locking transitions ──
+
+  describe("given a free event with no registrations → making it paid", () => {
+    it("should allow the transition", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 0 });
+      const updated = makeMoment({ id: "moment-1", price: 1500 });
+      const circle = makeCircle({ id: "circle-1", stripeConnectAccountId: "acct_123" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(circle),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 1500 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+      );
+
+      expect(result.moment.price).toBe(1500);
+    });
+  });
+
+  describe("given a free event with registrations → making it paid", () => {
+    it("should throw CannotMakePaidWithRegistrationsError", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 0 });
+      const circle = makeCircle({ id: "circle-1", stripeConnectAccountId: "acct_123" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(circle),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(5),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", price: 1500 },
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+        )
+      ).rejects.toThrow(CannotMakePaidWithRegistrationsError);
+    });
+  });
+
+  describe("given a paid event with no registrations → changing price", () => {
+    it("should allow the transition", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const updated = makeMoment({ id: "moment-1", price: 2000 });
+      const circle = makeCircle({ id: "circle-1", stripeConnectAccountId: "acct_123" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(circle),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 2000 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+      );
+
+      expect(result.moment.price).toBe(2000);
+    });
+  });
+
+  describe("given a paid event with registrations → changing price", () => {
+    it("should throw PriceLockedError", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const circle = makeCircle({ id: "circle-1", stripeConnectAccountId: "acct_123" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(circle),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(3),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", price: 2000 },
+          { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+        )
+      ).rejects.toThrow(PriceLockedError);
+    });
+  });
+
+  describe("given a paid event with no registrations → making it free", () => {
+    it("should allow the transition", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const updated = makeMoment({ id: "moment-1", price: 0 });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(0),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo }
+      );
+
+      expect(result.moment.price).toBe(0);
+    });
+  });
+
+  describe("given a paid event with paid registrations → making it free", () => {
+    it("should refund all PAID registrations and allow the transition", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500 });
+      const updated = makeMoment({ id: "moment-1", price: 0 });
+      const paidReg = makeRegistration({ id: "reg-1", paymentStatus: "PAID", stripePaymentIntentId: "pi_1" });
+      const freeReg = makeRegistration({ id: "reg-2", paymentStatus: "NONE" });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const registrationRepo = createMockRegistrationRepository({
+        countActiveByMomentId: vi.fn().mockResolvedValue(2),
+        findActiveByMomentId: vi.fn().mockResolvedValue([paidReg, freeReg]),
+      });
+      const paymentService = createMockPaymentService();
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0 },
+        { momentRepository: momentRepo, circleRepository: circleRepo, registrationRepository: registrationRepo, paymentService }
+      );
+
+      expect(result.moment.price).toBe(0);
+      expect(paymentService.refund).toHaveBeenCalledWith("pi_1");
+      expect(paymentService.refund).toHaveBeenCalledTimes(1); // Only the PAID one, not the free one
     });
   });
 });

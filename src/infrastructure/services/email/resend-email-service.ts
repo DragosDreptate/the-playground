@@ -22,6 +22,7 @@ import type {
   MemberRemovedFromCircleEmailData,
   RegistrationRemovedByHostEmailData,
   ApprovalNotificationEmailData,
+  HostPaidCancellationEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -40,6 +41,7 @@ import { RegistrationReminderEmail } from "./templates/registration-reminder";
 import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-circle";
 import { RegistrationRemovedByHostEmail } from "./templates/registration-removed-by-host";
 import { ApprovalNotificationEmail } from "./templates/approval-notification";
+import { HostPaidCancellationEmail } from "./templates/host-paid-cancellation";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -54,7 +56,8 @@ function getSender(): string {
 }
 
 function isDemoEmail(email: string): boolean {
-  return email.toLowerCase().endsWith("@demo.playground");
+  const lower = email.toLowerCase();
+  return lower.endsWith("@demo.playground") || lower.endsWith("@test.playground");
 }
 
 export function createResendEmailService(): EmailService {
@@ -371,6 +374,17 @@ export function createResendEmailService(): EmailService {
           ctaUrl: `${baseUrl}/${data.entitySlug}`,
           footer: data.strings.footer,
         }),
+      });
+    },
+
+    async sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void> {
+      if (isDemoEmail(data.to)) return;
+      const baseUrl = getBaseUrl();
+      await send({
+        from: getSender(),
+        to: data.to,
+        subject: data.strings.subject,
+        react: HostPaidCancellationEmail({ ...data, baseUrl }),
       });
     },
   };

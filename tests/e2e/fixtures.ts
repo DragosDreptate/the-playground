@@ -20,6 +20,12 @@ export const SLUGS = {
   CIRCLE: "paris-creative-tech",
   /** Circle public pour les tests Explorer (yoga-montmartre) */
   PUBLIC_CIRCLE: "yoga-montmartre",
+  /** Circle avec Stripe Connect activé (fake stripeConnectAccountId) */
+  PAID_CIRCLE: "test-paid-events",
+  /** Moment payant remboursable (15,00 EUR, capacity 10) — player1 inscrit PAID */
+  PAID_MOMENT_REFUNDABLE: "test-workshop-payant",
+  /** Moment payant NON remboursable (25,00 EUR, capacity 8) — player1 inscrit PAID */
+  PAID_MOMENT_NON_REFUNDABLE: "test-workshop-non-remboursable",
   /** Circle avec requiresApproval=true */
   APPROVAL_CIRCLE: "test-approval-circle",
   /** Moment avec requiresApproval=true dans paris-creative-tech (Circle sans approval) */

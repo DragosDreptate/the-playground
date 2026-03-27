@@ -1,6 +1,7 @@
 import type {
   Registration,
   RegistrationStatus,
+  PaymentStatus,
   RegistrationWithMoment,
   RegistrationWithUser,
 } from "@/domain/models/registration";
@@ -9,10 +10,16 @@ export type CreateRegistrationInput = {
   momentId: string;
   userId: string;
   status: RegistrationStatus;
+  paymentStatus?: PaymentStatus;
+  stripePaymentIntentId?: string | null;
+  stripeReceiptUrl?: string | null;
 };
 
 export type UpdateRegistrationInput = {
   status?: RegistrationStatus;
+  paymentStatus?: PaymentStatus;
+  stripePaymentIntentId?: string | null;
+  stripeReceiptUrl?: string | null;
   cancelledAt?: Date | null;
   checkedInAt?: Date | null;
 };
@@ -25,6 +32,8 @@ export interface RegistrationRepository {
     userId: string
   ): Promise<Registration | null>;
   findActiveByMomentId(momentId: string): Promise<Registration[]>;
+  /** Count REGISTERED + CHECKED_IN registrations in a single query. */
+  countActiveByMomentId(momentId: string): Promise<number>;
   findActiveWithUserByMomentId(
     momentId: string
   ): Promise<RegistrationWithUser[]>;
@@ -61,4 +70,8 @@ export interface RegistrationRepository {
   countPendingApprovals(momentId: string): Promise<number>;
   /** Rejette en masse toutes les inscriptions PENDING_APPROVAL d'un Moment. */
   rejectAllPendingApprovals(momentId: string): Promise<number>;
+  /** Trouve une inscription par stripePaymentIntentId (pour l'idempotence webhook). */
+  findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
+  /** Résumé billetterie pour un événement payant. */
+  getPaymentSummary(momentId: string): Promise<{ paidCount: number; totalAmount: number; refundedCount: number }>;
 }

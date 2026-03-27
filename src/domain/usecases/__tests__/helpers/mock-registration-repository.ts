@@ -24,6 +24,9 @@ export function createMockRegistrationRepository(
     findPendingApprovals: vi.fn<RegistrationRepository["findPendingApprovals"]>().mockResolvedValue([]),
     countPendingApprovals: vi.fn<RegistrationRepository["countPendingApprovals"]>().mockResolvedValue(0),
     rejectAllPendingApprovals: vi.fn<RegistrationRepository["rejectAllPendingApprovals"]>().mockResolvedValue(0),
+    countActiveByMomentId: vi.fn<RegistrationRepository["countActiveByMomentId"]>().mockResolvedValue(0),
+    findByStripePaymentIntentId: vi.fn<RegistrationRepository["findByStripePaymentIntentId"]>().mockResolvedValue(null),
+    getPaymentSummary: vi.fn<RegistrationRepository["getPaymentSummary"]>().mockResolvedValue({ paidCount: 0, totalAmount: 0, refundedCount: 0 }),
     ...overrides,
   };
 }
@@ -38,6 +41,7 @@ export function makeRegistration(
     status: "REGISTERED",
     paymentStatus: "NONE",
     stripePaymentIntentId: null,
+    stripeReceiptUrl: null,
     registeredAt: new Date("2026-02-15"),
     cancelledAt: null,
     checkedInAt: null,

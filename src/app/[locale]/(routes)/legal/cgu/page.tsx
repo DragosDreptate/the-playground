@@ -41,6 +41,9 @@ export default async function TermsPage() {
       <h2>{t("terms.pricing.title")}</h2>
       <p>{t("terms.pricing.content")}</p>
 
+      <h2>{t("terms.payments.title")}</h2>
+      <p>{t("terms.payments.content")}</p>
+
       <h2>{t("terms.liability.title")}</h2>
       <p>{t("terms.liability.content")}</p>
 

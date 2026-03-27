@@ -2,6 +2,8 @@ import type { Registration } from "@/domain/models/registration";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { PaymentService } from "@/domain/ports/services/payment-service";
+import { refundRegistration } from "./refund-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
@@ -17,6 +19,7 @@ type CancelRegistrationDeps = {
   registrationRepository: RegistrationRepository;
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  paymentService?: PaymentService;
 };
 
 type CancelRegistrationResult = {
@@ -55,6 +58,19 @@ export async function cancelRegistration(
 
   const wasRegistered = registration.status === "REGISTERED";
 
+  // Refund if paid event + PaymentService available
+  // Refund failure must not block the cancellation
+  if (moment && deps.paymentService && registration.paymentStatus === "PAID") {
+    try {
+      await refundRegistration(
+        { registration, moment },
+        { registrationRepository, paymentService: deps.paymentService }
+      );
+    } catch {
+      // Refund failure must not block cancellation — error is captured by the caller
+    }
+  }
+
   const cancelled = await registrationRepository.update(
     input.registrationId,
     {
@@ -63,9 +79,10 @@ export async function cancelRegistration(
     }
   );
 
+  // Waitlist promotion — only for free events (no waitlist for paid events)
   let promotedRegistration: Registration | null = null;
 
-  if (wasRegistered) {
+  if (wasRegistered && moment && moment.price === 0) {
     const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
       registration.momentId
     );

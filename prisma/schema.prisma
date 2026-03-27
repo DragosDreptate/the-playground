@@ -237,6 +237,7 @@ model Moment {
   price                 Int          @default(0)
   currency              String       @default("EUR")
   status                MomentStatus @default(PUBLISHED)
+  refundable            Boolean      @default(true)
   requiresApproval     Boolean      @default(false) @map("requires_approval")
   broadcastSentAt       DateTime?
   reminder24hSentAt     DateTime?
@@ -271,6 +272,7 @@ model Registration {
   status                RegistrationStatus @default(REGISTERED)
   paymentStatus         PaymentStatus      @default(NONE)
   stripePaymentIntentId String?
+  stripeReceiptUrl      String?
   registeredAt          DateTime           @default(now())
   cancelledAt           DateTime?
   checkedInAt           DateTime?

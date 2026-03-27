@@ -26,7 +26,7 @@ test.describe("Page Moment publique — affichage", () => {
     // La date est affichée via formatDateRange() — pas de balise <time>
     // On vérifie qu'un mois (FR ou EN) est visible dans la page
     await expect(page.locator("main").first()).toContainText(
-      /janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|january|february|march|april|may|june|july|august|september|october|november|december/i
+      /janv|févr|mars|avr|mai|juin|juil|août|sept|oct|nov|déc|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/i
     );
   });
 

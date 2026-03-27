@@ -124,6 +124,12 @@ export default async function MomentDetailPage({
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
+  // Payment summary for paid events
+  let paymentSummary;
+  if (moment.price > 0) {
+    paymentSummary = await prismaRegistrationRepository.getPaymentSummary(moment.id);
+  }
+
   return (
     <MomentDetailView
       variant="host"
@@ -151,6 +157,7 @@ export default async function MomentDetailPage({
       }}
       appUrl={appUrl}
       pendingRegistrations={pendingRegistrations}
+      paymentSummary={paymentSummary}
     />
   );
 }

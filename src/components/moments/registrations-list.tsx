@@ -44,7 +44,7 @@ export function RegistrationsList({
   const tDashboard = useTranslations("Dashboard");
 
   const [showAll, setShowAll] = useState(false);
-  const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string } | null>(null);
+  const [removeTarget, setRemoveTarget] = useState<{ id: string; name: string; isPaid: boolean } | null>(null);
 
   function handleExportCsv() {
     const momentDate = momentStartsAt ? new Date(momentStartsAt) : null;
@@ -174,7 +174,7 @@ export function RegistrationsList({
                       variant="outline"
                       size="sm"
                       className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive shrink-0"
-                      onClick={() => setRemoveTarget({ id: reg.id, name: displayName })}
+                      onClick={() => setRemoveTarget({ id: reg.id, name: displayName, isPaid: reg.paymentStatus === "PAID" })}
                     >
                       <UserMinus className="size-3.5" />
                       {t("registrations.removeAction")}
@@ -203,6 +203,7 @@ export function RegistrationsList({
           playerName={removeTarget.name}
           open
           onOpenChange={(open) => { if (!open) setRemoveTarget(null); }}
+          willRefund={removeTarget.isPaid}
         />
       )}
     </div>

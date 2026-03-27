@@ -77,6 +77,7 @@ export default async function HelpPage() {
         { id: "rejoindre", label: t("sidebar.rejoindre") },
         { id: "waitlist", label: t("sidebar.waitlist") },
         { id: "cancel", label: t("sidebar.cancel") },
+        { id: "paidEvents", label: t("sidebar.paidEvents") },
         { id: "comments", label: t("sidebar.comments") },
         { id: "mySpace", label: t("sidebar.mySpace") },
         { id: "notifications", label: t("sidebar.notifications") },
@@ -97,6 +98,7 @@ export default async function HelpPage() {
         { id: "members", label: t("sidebar.members") },
         { id: "inviteMembers", label: t("sidebar.inviteMembers") },
         { id: "approvalRegistrations", label: t("sidebar.approvalRegistrations") },
+        { id: "payments", label: t("sidebar.payments") },
       ],
     },
     { id: "faq", label: t("sidebar.faqLabel"), children: [] },
@@ -110,6 +112,7 @@ export default async function HelpPage() {
     { question: t("faq.q5.question"), answer: t("faq.q5.answer") },
     { question: t("faq.q6.question"), answer: t("faq.q6.answer") },
     { question: t("faq.q7.question"), answer: t("faq.q7.answer") },
+    { question: t("faq.q8.question"), answer: t("faq.q8.answer") },
   ];
 
   const rich = {
@@ -237,6 +240,33 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t("participant.cancel.outro")}
               </p>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Événements payants */}
+            <div className="space-y-4">
+              <SectionH3 id="paidEvents">{t("participant.paidEvents.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("participant.paidEvents.intro", rich)}
+              </p>
+              <p className="text-sm font-medium">{t("participant.paidEvents.stepsLabel")}</p>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                {(["step1", "step2", "step3"] as const).map((step) => (
+                  <li key={step}>
+                    {t.rich(`participant.paidEvents.${step}`, rich)}
+                  </li>
+                ))}
+              </ol>
+              <p className="text-sm font-medium">{t("participant.paidEvents.refundLabel")}</p>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {(["refund1", "refund2", "refund3"] as const).map((item) => (
+                  <li key={item}>
+                    {t.rich(`participant.paidEvents.${item}`, rich)}
+                  </li>
+                ))}
+              </ul>
+              <Callout>{t("participant.paidEvents.callout")}</Callout>
             </div>
 
             <hr className="border-border" />
@@ -513,6 +543,41 @@ export default async function HelpPage() {
                 ))}
               </ol>
               <Callout>{t("organizer.approvalRegistrations.callout")}</Callout>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Activer les paiements */}
+            <div className="space-y-4">
+              <SectionH3 id="payments">{t("organizer.payments.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.payments.intro", rich)}
+              </p>
+              <p className="text-sm font-medium">{t("organizer.payments.stepsLabel")}</p>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                {(["step1", "step2", "step3", "step4"] as const).map((step) => (
+                  <li key={step}>
+                    {t.rich(`organizer.payments.${step}`, rich)}
+                  </li>
+                ))}
+              </ol>
+              <p className="text-sm font-medium">{t("organizer.payments.priceLabel")}</p>
+              <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+                {(["price1", "price2", "price3"] as const).map((item) => (
+                  <li key={item}>
+                    {t.rich(`organizer.payments.${item}`, rich)}
+                  </li>
+                ))}
+              </ol>
+              <p className="text-sm font-medium">{t("organizer.payments.billingLabel")}</p>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {(["billing1", "billing2"] as const).map((item) => (
+                  <li key={item}>
+                    {t.rich(`organizer.payments.${item}`, rich)}
+                  </li>
+                ))}
+              </ul>
+              <Callout>{t.rich("organizer.payments.callout", rich)}</Callout>
             </div>
           </section>
 

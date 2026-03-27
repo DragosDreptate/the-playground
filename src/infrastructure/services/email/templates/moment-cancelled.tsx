@@ -15,6 +15,7 @@ export function MomentCancelledEmail({
   momentDateDay,
   circleName,
   circleSlug,
+  refundMessage,
   baseUrl,
   strings,
 }: Props) {
@@ -28,6 +29,12 @@ export function MomentCancelledEmail({
 
       <Text style={heading}>{strings.heading}</Text>
       <Text style={message}>{strings.message}</Text>
+
+      {refundMessage && (
+        <Section style={refundSection}>
+          <Text style={refundText}>{refundMessage}</Text>
+        </Section>
+      )}
 
       <Section style={ctaSection}>
         <Button style={ctaButton} href={circleUrl}>
@@ -53,6 +60,20 @@ const message: React.CSSProperties = {
   color: "#52525b",
   margin: "0 0 24px 0",
   lineHeight: "22px",
+};
+
+const refundSection: React.CSSProperties = {
+  backgroundColor: "#f0fdf4",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "24px",
+};
+
+const refundText: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#166534",
+  margin: "0",
+  lineHeight: "20px",
 };
 
 const ctaSection: React.CSSProperties = {

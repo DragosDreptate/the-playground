@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Check, Clock, Download } from "lucide-react";
@@ -20,15 +20,19 @@ import {
   joinMomentAction,
   cancelRegistrationAction,
 } from "@/app/actions/registration";
+import { createCheckoutAction } from "@/app/actions/checkout";
+import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
 
 type RegistrationButtonProps = {
   momentId: string;
+  slug: string;
   circleId: string;
   circleName: string;
   price: number;
+  currency: string;
   isAuthenticated: boolean;
   existingRegistration: Registration | null;
   signInUrl: string;
@@ -40,6 +44,7 @@ type RegistrationButtonProps = {
   appUrl?: string;
   waitlistPosition?: number;
   requiresApproval?: boolean;
+  refundable?: boolean;
 };
 
 function StatsColumn({
@@ -73,9 +78,11 @@ function StatsColumn({
 
 export function RegistrationButton({
   momentId,
+  slug,
   circleId,
   circleName,
   price,
+  currency,
   isAuthenticated,
   existingRegistration,
   signInUrl,
@@ -87,9 +94,11 @@ export function RegistrationButton({
   appUrl,
   waitlistPosition,
   requiresApproval = false,
+  refundable = true,
 }: RegistrationButtonProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [localStatus, setLocalStatus] = useState<RegistrationStatus | null>(
@@ -100,19 +109,7 @@ export function RegistrationButton({
   );
   const [error, setError] = useState<string | null>(null);
 
-  // Paid Moments: disabled "Coming soon"
-  if (price > 0) {
-    return (
-      <div className="flex items-center justify-between gap-3">
-        <Button className="rounded-full" disabled>
-          {t("public.comingSoon")}
-        </Button>
-        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
-    );
-  }
-
-  // Not authenticated: link to sign-in
+  // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
@@ -120,6 +117,60 @@ export function RegistrationButton({
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+      </div>
+    );
+  }
+
+  // Paid events: redirect to Stripe Checkout (no waitlist)
+  if (price > 0 && !localStatus) {
+    if (isFull) {
+      return (
+        <div className="flex items-center justify-between gap-3">
+          <Button className="rounded-full" disabled>
+            {t("public.eventFull")}
+          </Button>
+          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            className="rounded-full md:px-7"
+            disabled={isPending}
+            onClick={() => {
+              startTransition(async () => {
+                setError(null);
+                const baseUrl = window.location.origin;
+                const result = await createCheckoutAction(
+                  momentId,
+                  slug,
+                  `${baseUrl}/m/${slug}`
+                );
+                if (result.success) {
+                  window.location.href = result.data.url;
+                } else {
+                  setError(result.error);
+                }
+              });
+            }}
+          >
+            {isPending
+              ? tCommon("loading")
+              : t("public.registerPaid", {
+                  price: formatPrice(price, currency, locale),
+                  currency,
+                })}
+          </Button>
+          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        </div>
+        {error && (
+          <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+            {error}
+          </div>
+        )}
       </div>
     );
   }
@@ -213,6 +264,13 @@ export function RegistrationButton({
                   {t("public.cancelConfirmDescription")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
+              {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
+                <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
+                  {refundable
+                    ? t("public.cancelRefundableInfo")
+                    : t("public.cancelNonRefundableWarning")}
+                </div>
+              )}
               {error && (
                 <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
                   {error}

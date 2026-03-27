@@ -17,6 +17,7 @@ export type Registration = {
   status: RegistrationStatus;
   paymentStatus: PaymentStatus;
   stripePaymentIntentId: string | null;
+  stripeReceiptUrl: string | null;
   registeredAt: Date;
   cancelledAt: Date | null;
   checkedInAt: Date | null;

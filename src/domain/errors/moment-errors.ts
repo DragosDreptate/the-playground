@@ -39,3 +39,37 @@ export class MomentAlreadyPublishedError extends DomainError {
     super(`Moment is already published: ${momentId}`);
   }
 }
+
+export class InvalidPriceError extends DomainError {
+  readonly code = "INVALID_PRICE";
+
+  constructor() {
+    super("Price must be 0 (free) or at least 50 cents (0.50 EUR)");
+  }
+}
+
+export class PaidMomentRequiresStripeError extends DomainError {
+  readonly code = "PAID_MOMENT_REQUIRES_STRIPE";
+
+  constructor(circleId: string) {
+    super(
+      `Cannot set a price without Stripe Connect activated on circle ${circleId}`
+    );
+  }
+}
+
+export class PriceLockedError extends DomainError {
+  readonly code = "PRICE_LOCKED";
+
+  constructor() {
+    super("Price is locked after the first paid registration");
+  }
+}
+
+export class CannotMakePaidWithRegistrationsError extends DomainError {
+  readonly code = "CANNOT_MAKE_PAID_WITH_REGISTRATIONS";
+
+  constructor() {
+    super("Cannot change a free event to paid when participants are already registered");
+  }
+}

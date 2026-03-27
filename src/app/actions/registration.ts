@@ -16,7 +16,7 @@ import {
   prismaRegistrationRepository,
   prismaUserRepository,
 } from "@/infrastructure/repositories";
-import { createResendEmailService } from "@/infrastructure/services";
+import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
 import { generateIcs } from "@/infrastructure/services/email/generate-ics";
 import { joinMoment } from "@/domain/usecases/join-moment";
 import { cancelRegistration } from "@/domain/usecases/cancel-registration";
@@ -25,10 +25,12 @@ import { approveMomentRegistration } from "@/domain/usecases/approve-moment-regi
 import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-registration";
 import { DomainError } from "@/domain/errors";
 import { getDisplayName } from "@/lib/display-name";
+import { formatPrice } from "@/lib/format-price";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
+const paymentService = createStripePaymentService();
 
 function getDateFnsLocale(locale: string) {
   return locale === "fr" ? fr : enUS;
@@ -157,6 +159,7 @@ export async function cancelRegistrationAction(
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        paymentService,
       }
     );
 
@@ -173,6 +176,14 @@ export async function cancelRegistrationAction(
       );
     }
 
+    // Notify Host when a paid event registration is cancelled
+    const cancelledReg = result.registration;
+    if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
+      sendHostPaidCancellationEmail(registrationId, session.user.id).catch(
+        (err) => Sentry.captureException(err)
+      );
+    }
+
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -185,9 +196,59 @@ export async function cancelRegistrationAction(
 
 // --- Fire-and-forget email helpers ---
 
+async function sendHostPaidCancellationEmail(
+  registrationId: string,
+  cancellingUserId: string
+): Promise<void> {
+  const registration = await prismaRegistrationRepository.findById(registrationId);
+  if (!registration) return;
+
+  const [moment, player] = await Promise.all([
+    prismaMomentRepository.findById(registration.momentId),
+    prismaUserRepository.findById(cancellingUserId),
+  ]);
+  if (!moment || !player) return;
+
+  const circle = await prismaCircleRepository.findById(moment.circleId);
+  if (!circle) return;
+
+  const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
+  if (hosts.length === 0) return;
+
+  const locale = await getLocale();
+  const t = await getTranslations("Email");
+  const playerName = getDisplayName(player.firstName, player.lastName, player.email);
+
+  const isRefundable = moment.refundable;
+  const amountFormatted = formatPrice(moment.price, moment.currency, locale);
+
+  for (const host of hosts) {
+    const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+    await emailService.sendHostPaidCancellation({
+      to: host.user.email,
+      hostName,
+      playerName,
+      momentTitle: moment.title,
+      momentSlug: moment.slug,
+      circleSlug: circle.slug,
+      amountRefunded: isRefundable ? amountFormatted : null,
+      strings: {
+        subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
+        heading: t("paidCancellation.heading"),
+        message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
+        refundMessage: isRefundable
+          ? t("paidCancellation.refunded", { amount: amountFormatted })
+          : t("paidCancellation.notRefunded"),
+        manageRegistrationsCta: t("paidCancellation.manageCta"),
+        footer: t("common.footer"),
+      },
+    });
+  }
+}
+
 type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
 
-async function sendRegistrationEmails(
+export async function sendRegistrationEmails(
   momentId: string,
   userId: string,
   registration: Registration,
@@ -257,6 +318,10 @@ async function sendRegistrationEmails(
     circleSlug: circle.slug,
     status: registration.status,
     icsContent,
+    ...(registration.paymentStatus === "PAID" && moment.price > 0 && {
+      amountPaid: formatPrice(moment.price, moment.currency, locale),
+    }),
+    ...(registration.stripeReceiptUrl && { receiptUrl: registration.stripeReceiptUrl }),
     strings: {
       subject: t(`${stringPrefix}.subject`, { momentTitle: moment.title }),
       heading: t(`${stringPrefix}.heading`),
@@ -268,6 +333,8 @@ async function sendRegistrationEmails(
       viewMomentCta: t("common.viewMomentCta"),
       cancelLink: t("common.cancelLink"),
       dashboardLink: t("common.dashboardLink"),
+      paymentConfirmed: t("common.paymentConfirmed"),
+      viewReceipt: t("common.viewReceipt"),
       footer: t("common.footer"),
     },
   });
@@ -417,6 +484,7 @@ export async function removeRegistrationByHostAction(
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        paymentService,
       }
     );
 

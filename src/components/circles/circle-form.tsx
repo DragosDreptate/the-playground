@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, useTransition } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
-import { AlignLeft, MapPin, Globe, Lock, Tag, ShieldCheck } from "lucide-react";
+import { AlignLeft, MapPin, Globe, Lock, Tag, ShieldCheck, CreditCard, ExternalLink, Loader2, CheckCircle2, AlertCircle, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -16,13 +16,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Circle, CircleVisibility, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
+import type { ConnectAccountStatus } from "@/domain/ports/services/payment-service";
 import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
+import { onboardStripeConnectAction, getStripeLoginLinkAction, cancelStripeConnectAction } from "@/app/actions/stripe";
+
+type StripeConnectProps = {
+  circleId: string;
+  circleSlug: string;
+  hasAccount: boolean;
+  status: ConnectAccountStatus | null;
+};
 
 type CircleFormProps = {
   circle?: Circle;
   action: (formData: FormData) => Promise<ActionResult<Circle>>;
+  stripeConnect?: StripeConnectProps;
 };
 
 type FormState = {
@@ -40,7 +50,7 @@ const CIRCLE_CATEGORIES: CircleCategory[] = [
   "OTHER",
 ];
 
-export function CircleForm({ circle, action }: CircleFormProps) {
+export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
   const t = useTranslations("Circle");
   const tCategory = useTranslations("CircleCategory");
   const tCommon = useTranslations("Common");
@@ -267,26 +277,6 @@ export function CircleForm({ circle, action }: CircleFormProps) {
 
           </div>
 
-          {/* Validation des inscriptions */}
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <ShieldCheck className="text-primary size-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <label htmlFor="requiresApproval" className="text-sm font-medium cursor-pointer">
-                {t("form.requiresApproval")}
-              </label>
-              <p className="text-muted-foreground text-xs">
-                {t("form.requiresApprovalDescription")}
-              </p>
-            </div>
-            <Switch
-              id="requiresApproval"
-              name="requiresApproval"
-              defaultChecked={circle?.requiresApproval ?? false}
-            />
-          </div>
-
           {/* Séparateur */}
           <div className="border-border border-t" />
 
@@ -317,6 +307,34 @@ export function CircleForm({ circle, action }: CircleFormProps) {
           {/* Séparateur */}
           <div className="border-border border-t" />
 
+          {/* Validation des inscriptions */}
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <ShieldCheck className="text-primary size-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <label htmlFor="requiresApproval" className="text-sm font-medium cursor-pointer">
+                {t("form.requiresApproval")}
+              </label>
+              <p className="text-muted-foreground text-xs">
+                {t("form.requiresApprovalDescription")}
+              </p>
+            </div>
+            <Switch
+              id="requiresApproval"
+              name="requiresApproval"
+              defaultChecked={circle?.requiresApproval ?? false}
+            />
+          </div>
+
+          {/* Paiements Stripe — visible uniquement en mode édition avec props */}
+          {stripeConnect && (
+            <StripeConnectInline {...stripeConnect} />
+          )}
+
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
           {/* Boutons */}
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={isPending} className="flex-1">
@@ -337,5 +355,150 @@ export function CircleForm({ circle, action }: CircleFormProps) {
         </div>
       </div>
     </form>
+  );
+}
+
+// --- Stripe Connect inline section ---
+
+function StripeConnectInline({
+  circleId,
+  circleSlug,
+  hasAccount,
+  status,
+}: StripeConnectProps) {
+  const t = useTranslations("Circle");
+  const [isPending, startTransition] = useTransition();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const busy = isPending || isRedirecting;
+
+  const isActive = hasAccount && status === "active";
+  const needsAction = hasAccount && !isActive;
+
+  function handleActivate() {
+    setError(null);
+    startTransition(async () => {
+      const returnUrl = `${window.location.origin}/dashboard/circles/${circleSlug}/edit`;
+      const result = await onboardStripeConnectAction(circleId, returnUrl);
+      if (result.success) {
+        setIsRedirecting(true);
+        window.location.href = result.data.onboardingUrl;
+      } else {
+        setError(result.error);
+      }
+    });
+  }
+
+  function handleViewDashboard() {
+    setError(null);
+    startTransition(async () => {
+      const result = await getStripeLoginLinkAction(circleId);
+      if (result.success) {
+        window.open(result.data.url, "_blank");
+      } else {
+        setError(result.error);
+      }
+    });
+  }
+
+  const actionButton = !hasAccount ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleActivate}
+      disabled={busy}
+    >
+      {busy ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
+      {t("stripeConnect.activate")}
+    </Button>
+  ) : needsAction ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleActivate}
+      disabled={busy}
+    >
+      {busy && <Loader2 className="size-4 animate-spin" />}
+      {t("stripeConnect.resume")}
+    </Button>
+  ) : isActive ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      className="shrink-0"
+      onClick={handleViewDashboard}
+      disabled={busy}
+    >
+      {busy ? <Loader2 className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
+      {t("stripeConnect.viewDashboard")}
+    </Button>
+  ) : null;
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className={`mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg ${isActive ? "bg-green-500/10" : "bg-primary/10"}`}>
+        <CreditCard className={`size-4 ${isActive ? "text-green-500" : "text-primary"}`} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">{t("stripeConnect.title")}</p>
+            {!hasAccount && (
+              <p className="text-muted-foreground text-xs">
+                {t("stripeConnect.description")}
+              </p>
+            )}
+            {needsAction && (
+              <div>
+                <div className="flex items-center gap-1.5 text-xs text-amber-500">
+                  <AlertCircle className="size-3.5 shrink-0" />
+                  <span>{t("stripeConnect.pending")}</span>
+                </div>
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground mt-1 text-xs underline underline-offset-2 transition-colors"
+                  disabled={busy}
+                  onClick={() => {
+                    setError(null);
+                    startTransition(async () => {
+                      const result = await cancelStripeConnectAction(circleId);
+                      if (result.success) {
+                        window.location.reload();
+                      } else {
+                        setError(result.error);
+                      }
+                    });
+                  }}
+                >
+                  {t("stripeConnect.cancel")}
+                </button>
+              </div>
+            )}
+            {isActive && (
+              <div className="flex items-center gap-1.5 text-xs text-green-500">
+                <CheckCircle2 className="size-3.5 shrink-0" />
+                <span>{t("stripeConnect.active")}</span>
+              </div>
+            )}
+          </div>
+          {/* Desktop: button aligned right */}
+          <div className="hidden sm:block">
+            {actionButton}
+          </div>
+        </div>
+        {/* Mobile: button below text */}
+        <div className="mt-2 sm:hidden">
+          {actionButton}
+        </div>
+        {error && (
+          <p className="mt-1 text-xs text-red-500">{error}</p>
+        )}
+      </div>
+    </div>
   );
 }

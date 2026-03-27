@@ -19,6 +19,7 @@ import type { CommentWithUser } from "@/domain/models/comment";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
 import { formatDateRange } from "@/lib/format-date";
+import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -59,6 +60,7 @@ type HostViewProps = CommonProps & {
   calendarData?: CalendarEventData;
   appUrl?: string;
   pendingRegistrations?: RegistrationWithUser[];
+  paymentSummary?: { paidCount: number; totalAmount: number; refundedCount: number };
 };
 
 type PublicViewProps = CommonProps & {
@@ -608,9 +610,11 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="border-border bg-card rounded-2xl border p-6">
                 <RegistrationButton
                   momentId={moment.id}
+                  slug={moment.slug}
                   circleId={circle.id}
                   circleName={circle.name}
                   price={moment.price}
+                  currency={moment.currency}
                   isAuthenticated={props.isAuthenticated}
                   existingRegistration={props.existingRegistration}
                   signInUrl={props.signInUrl}
@@ -622,6 +626,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   appUrl={props.appUrl}
                   waitlistPosition={props.waitlistPosition}
                   requiresApproval={moment.requiresApproval}
+                  refundable={moment.refundable}
                 />
               </div>
             )
@@ -640,6 +645,27 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   <p className="text-sm">{t("registrations.noPendingApprovals")}</p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Résumé billetterie — Host uniquement, événements payants */}
+          {isHostView && props.variant === "host" && props.paymentSummary && moment.price > 0 && (
+            <div className="border-border bg-card rounded-2xl border p-6">
+              <h3 className="mb-3 text-base font-semibold">{t("host.ticketingSummary")}</h3>
+              <div className="text-sm">
+                <p>
+                  {t("host.paidRegistrations", { count: props.paymentSummary.paidCount })}
+                  {" · "}
+                  {formatPrice(props.paymentSummary.totalAmount, moment.currency)}
+                  {" "}
+                  <span className="text-muted-foreground text-xs">({t("host.beforeStripeFees")})</span>
+                </p>
+                {props.paymentSummary.refundedCount > 0 && (
+                  <p className="text-muted-foreground">
+                    {t("host.refundedRegistrations", { count: props.paymentSummary.refundedCount })}
+                  </p>
+                )}
+              </div>
             </div>
           )}
 

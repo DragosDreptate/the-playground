@@ -22,6 +22,7 @@ function toDomainRegistration(record: PrismaRegistration): Registration {
     status: record.status,
     paymentStatus: record.paymentStatus,
     stripePaymentIntentId: record.stripePaymentIntentId,
+    stripeReceiptUrl: record.stripeReceiptUrl,
     registeredAt: record.registeredAt,
     cancelledAt: record.cancelledAt,
     checkedInAt: record.checkedInAt,
@@ -62,6 +63,9 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         momentId: input.momentId,
         userId: input.userId,
         status: input.status,
+        ...(input.paymentStatus && { paymentStatus: input.paymentStatus }),
+        ...(input.stripePaymentIntentId && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeReceiptUrl && { stripeReceiptUrl: input.stripeReceiptUrl }),
       },
     });
     return toDomainRegistration(record);
@@ -91,6 +95,12 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       orderBy: { registeredAt: "asc" },
     });
     return records.map(toDomainRegistration);
+  },
+
+  async countActiveByMomentId(momentId: string): Promise<number> {
+    return prisma.registration.count({
+      where: { momentId, status: { in: ["REGISTERED", "CHECKED_IN"] } },
+    });
   },
 
   async findActiveWithUserByMomentId(
@@ -164,6 +174,9 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       where: { id },
       data: {
         ...(input.status !== undefined && { status: input.status }),
+        ...(input.paymentStatus !== undefined && { paymentStatus: input.paymentStatus }),
+        ...(input.stripePaymentIntentId !== undefined && { stripePaymentIntentId: input.stripePaymentIntentId }),
+        ...(input.stripeReceiptUrl !== undefined && { stripeReceiptUrl: input.stripeReceiptUrl }),
         ...(input.cancelledAt !== undefined && {
           cancelledAt: input.cancelledAt,
         }),
@@ -277,6 +290,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: string;
       paymentStatus: string;
       stripePaymentIntentId: string | null;
+      stripeReceiptUrl: string | null;
       registeredAt: Date;
       cancelledAt: Date | null;
       checkedInAt: Date | null;
@@ -303,6 +317,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         r.status,
         r."paymentStatus",
         r."stripePaymentIntentId",
+        r."stripeReceiptUrl",
         r."registeredAt",
         r."cancelledAt",
         r."checkedInAt",
@@ -340,6 +355,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       status: row.status as RegistrationStatus,
       paymentStatus: row.paymentStatus as PaymentStatus,
       stripePaymentIntentId: row.stripePaymentIntentId,
+      stripeReceiptUrl: row.stripeReceiptUrl ?? null,
       registeredAt: row.registeredAt,
       cancelledAt: row.cancelledAt,
       checkedInAt: row.checkedInAt,
@@ -442,5 +458,35 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       data: { status: "REJECTED" },
     });
     return result.count;
+  },
+
+  async findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null> {
+    const record = await prisma.registration.findFirst({
+      where: { stripePaymentIntentId: paymentIntentId },
+    });
+    return record ? toDomainRegistration(record) : null;
+  },
+
+  async getPaymentSummary(momentId: string) {
+    const [paidResult, refundedResult, moment] = await Promise.all([
+      prisma.registration.aggregate({
+        where: { momentId, paymentStatus: "PAID", status: { not: "CANCELLED" } },
+        _count: true,
+      }),
+      prisma.registration.aggregate({
+        where: { momentId, paymentStatus: "REFUNDED" },
+        _count: true,
+      }),
+      prisma.moment.findUnique({
+        where: { id: momentId },
+        select: { price: true },
+      }),
+    ]);
+
+    return {
+      paidCount: paidResult._count,
+      totalAmount: (paidResult._count) * (moment?.price ?? 0),
+      refundedCount: refundedResult._count,
+    };
   },
 };

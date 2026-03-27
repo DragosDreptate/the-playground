@@ -35,6 +35,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     price: record.price,
     currency: record.currency,
     status: record.status,
+    refundable: record.refundable,
     requiresApproval: record.requiresApproval,
     broadcastSentAt: record.broadcastSentAt,
     reminder24hSentAt: record.reminder24hSentAt,
@@ -109,6 +110,7 @@ export const prismaMomentRepository: MomentRepository = {
         ...(input.price !== undefined && { price: input.price }),
         ...(input.currency !== undefined && { currency: input.currency }),
         ...(input.status !== undefined && { status: input.status }),
+        ...(input.refundable !== undefined && { refundable: input.refundable }),
         ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
       },
     });

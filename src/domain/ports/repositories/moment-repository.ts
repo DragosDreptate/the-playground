@@ -21,6 +21,7 @@ export type CreateMomentInput = {
   price: number;
   currency: string;
   status: MomentStatus;
+  refundable?: boolean;
   requiresApproval?: boolean;
 };
 
@@ -39,6 +40,7 @@ export type UpdateMomentInput = {
   price?: number;
   currency?: string;
   status?: MomentStatus;
+  refundable?: boolean;
   requiresApproval?: boolean;
 };
 

@@ -345,6 +345,16 @@
       "removeCover": "Remove cover",
       "cancel": "Cancel",
       "apply": "Apply"
+    },
+    "stripeConnect": {
+      "title": "Payments",
+      "description": "Enable payments to offer paid events. Stripe fees (~2.9% + $0.30) are deducted from your earnings. The Playground takes no commission.",
+      "activate": "Enable payments",
+      "resume": "Resume activation",
+      "active": "Payments enabled",
+      "pending": "Activation in progress — complete your Stripe profile",
+      "viewDashboard": "View my payments",
+      "cancel": "Cancel activation"
     }
   },
   "Moment": {
@@ -378,6 +388,10 @@
       "eventOptions": "Event options",
       "ticketPrice": "Ticket price",
       "priceSoon": "Coming soon",
+      "priceRequiresStripe": "Enable payments in your Community settings",
+      "priceEstimation": "You will receive ~{net} {currency} after Stripe fees (2.9% + 0.30 {currency})",
+      "refundable": "Refundable",
+      "refundableDescription": "Members can unregister and get an automatic refund.",
       "free": "Free",
       "capacity": "Capacity",
       "capacityLabel": "Capacity",
@@ -455,6 +469,9 @@
       "requestToJoin": "Join (subject to approval)",
       "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
+      "priceTtc": "All taxes included",
+      "refundPolicyRefundableShort": "Refundable",
+      "refundPolicyNonRefundableShort": "Non-refundable",
       "registered": "Joined",
       "registeredBannerTitle": "You're attending this event",
       "pendingApprovalBannerTitle": "Request sent",
@@ -465,6 +482,8 @@
       "cancelRegistration": "Cancel my registration",
       "cancelConfirmTitle": "Cancel registration",
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
+      "cancelRefundableInfo": "You will be refunded automatically within 5 to 10 business days.",
+      "cancelNonRefundableWarning": "This event is non-refundable. You will not be refunded.",
       "confirmCancel": "Yes, cancel",
       "spotsRemaining": "{count} spots remaining",
       "signInToRegister": "Sign in to join",
@@ -509,6 +528,7 @@
       "removeTitle": "Remove {name}?",
       "removeDescription": "{name}'s registration for this event will be cancelled. If a waitlist exists, the first person on it will be automatically promoted.",
       "removeConfirm": "Remove",
+      "removeRefundWarning": "{name} paid for this event. A refund will be processed automatically.",
       "removeCancel": "Cancel",
       "csvHeaders": {
         "eventName": "Event",
@@ -519,6 +539,12 @@
         "status": "Status",
         "registeredAt": "Registration date"
       }
+    },
+    "host": {
+      "ticketingSummary": "Ticketing",
+      "paidRegistrations": "{count, plural, one {# paid registration} other {# paid registrations}}",
+      "beforeStripeFees": "before Stripe fees",
+      "refundedRegistrations": "{count, plural, one {# refunded} other {# refunded}}"
     },
     "comments": {
       "title": "Comments",
@@ -867,12 +893,22 @@
       "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
       "manageCta": "Manage requests"
     },
+    "paidCancellation": {
+      "subject": "Cancellation: {playerName} — {momentTitle}",
+      "heading": "Paid event cancellation",
+      "message": "{playerName} cancelled their registration for {momentTitle}.",
+      "refunded": "A refund of {amount} was processed automatically.",
+      "notRefunded": "No refund issued (non-refundable event).",
+      "manageCta": "Manage registrations"
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",
       "viewMomentCta": "View Event",
       "cancelLink": "Cancel my registration",
       "dashboardLink": "Find all your events in your Dashboard →",
+      "paymentConfirmed": "Payment confirmed",
+      "viewReceipt": "View receipt",
       "footer": "Powered by The Playground — Launch your community, for free."
     }
   },
@@ -1022,6 +1058,10 @@
         "title": "Pricing",
         "content": "The Playground is entirely free to use. No commission is charged by the platform. For paid Events, only Stripe transaction fees (approximately 2.9% + $0.30) apply and are borne by the Host."
       },
+      "payments": {
+        "title": "Payments and transactions",
+        "content": "The Playground acts as a technical intermediary via Stripe Connect. The platform facilitates the transaction between the Host and the Member but is not a party to the sale. Payment data is processed exclusively by Stripe and is never stored by The Playground. The refund policy is set by each Host when creating the event: either refundable (full refund on cancellation) or non-refundable. If an event is cancelled by the Host, a full refund is always issued regardless of the refund policy. In case of dispute, the Member should contact the Host. As a last resort, a chargeback can be filed with their bank."
+      },
       "liability": {
         "title": "Limitation of liability",
         "content": "The Spark SASU shall not be liable for any direct or indirect damages resulting from the use of the service, including but not limited to service interruption, data loss or disputes between Hosts and Members."
@@ -1138,6 +1178,7 @@
       "comments": "Comments",
       "mySpace": "My Dashboard",
       "notifications": "Manage notifications",
+      "paidEvents": "Paid events",
       "leave": "Leave a Community",
       "createCommunity": "Create your Community",
       "createEvent": "Create an event",
@@ -1148,7 +1189,8 @@
       "share": "Share your event",
       "members": "Manage members",
       "inviteMembers": "Invite members",
-      "approvalRegistrations": "Approve registrations"
+      "approvalRegistrations": "Approve registrations",
+      "payments": "Enable payments"
     },
     "participant": {
       "sectionTitle": "Member",
@@ -1184,6 +1226,19 @@
         "step1": "Go to the event in question",
         "step2": "Click <strong>Cancel my registration</strong>",
         "outro": "If you were on the waitlist, your spot is simply removed."
+      },
+      "paidEvents": {
+        "title": "Paid events",
+        "intro": "Some events require payment. The price is shown on the registration button (e.g. <strong>Join — 15.00 EUR</strong>).",
+        "stepsLabel": "How it works:",
+        "step1": "Click the registration button — you'll be redirected to a <strong>secure Stripe payment page</strong>",
+        "step2": "Enter your card details and confirm",
+        "step3": "You're automatically registered and receive a <strong>confirmation email</strong> with your payment receipt",
+        "refundLabel": "Refund policy:",
+        "refund1": "Each event is either <strong>refundable</strong> (automatic refund on cancellation) or <strong>non-refundable</strong> (no refund if you cancel)",
+        "refund2": "If the <strong>event is cancelled by the Organizer</strong>, you are always refunded regardless of the policy",
+        "refund3": "Refunds are processed within <strong>5 to 10 business days</strong> to your card",
+        "callout": "The Playground takes no commission. Your payment data is handled by Stripe and is never stored by the platform."
       },
       "comments": {
         "title": "Comments",
@@ -1296,6 +1351,23 @@
         "step3": "The person clicks the link, signs in, and instantly joins your Community.",
         "step4": "They appear immediately in the member list — you receive an email notification.",
         "callout": "The invite link is <strong>revocable at any time</strong> — click Revoke to deactivate it. Members who already joined are not affected. The same link can be used by multiple people."
+      },
+      "payments": {
+        "title": "Enable payments",
+        "intro": "You can offer paid events by enabling payments on your Community via <strong>Stripe Connect</strong>.",
+        "stepsLabel": "To enable payments:",
+        "step1": "Go to <strong>Edit</strong> your Community",
+        "step2": "In the <strong>Payments</strong> section, click <strong>Enable payments</strong>",
+        "step3": "You'll be redirected to Stripe to complete your profile (name, address, bank details, ID)",
+        "step4": "Back on The Playground, the status changes to <strong>Payments enabled</strong>",
+        "priceLabel": "To set a price on an event:",
+        "price1": "In the creation/edit form, the <strong>Ticket price</strong> section is now editable",
+        "price2": "Enter the price in euros — an estimated net amount (after Stripe fees) is displayed",
+        "price3": "Toggle <strong>Refundable</strong> on or off to set the refund policy",
+        "billingLabel": "Payment tracking:",
+        "billing1": "Each paid event's dashboard shows a <strong>Ticketing</strong> summary (paid registrations, amount collected, refunded)",
+        "billing2": "For full details, click <strong>View my payments</strong> in the Community settings — this opens the Stripe Express dashboard",
+        "callout": "The Playground takes <strong>no commission</strong>. Only Stripe fees (~2.9% + $0.30) are deducted from your earnings. The full remaining amount is transferred to you."
       }
     },
     "faq": {
@@ -1327,6 +1399,10 @@
       "q7": {
         "question": "How do I report inappropriate content?",
         "answer": "Contact us directly by email at hello@the-playground.fr, describing the content in question (link to the page, description of the issue). We review every report as quickly as possible."
+      },
+      "q8": {
+        "question": "How do paid events work?",
+        "answer": "The Organizer enables payments via Stripe Connect in their Community settings, then sets a price on their events. The Member pays the displayed price through a secure Stripe page. The Playground takes no commission — only Stripe fees (~2.9% + $0.30) are charged and borne by the Organizer. The refund policy (refundable or non-refundable) is set by the Organizer. If the event is cancelled, refunds are always automatic."
       }
     },
     "contact": {

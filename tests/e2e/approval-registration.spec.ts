@@ -24,6 +24,28 @@ async function ensurePlayer3PendingOnCircle(browser: import("@playwright/test").
   const ctx = await browser.newContext({ storageState: AUTH.PLAYER3 });
   const page = await ctx.newPage();
   await navigateToCircle(page, SLUGS.APPROVAL_CIRCLE);
+
+  // If already a member (from a previous run), leave first
+  const leaveButton = page.getByRole("button", { name: /quitter|leave/i });
+  if (await leaveButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await leaveButton.click();
+    const confirmLeave = page.getByRole("button", { name: /quitter la communauté|leave/i }).last();
+    if (await confirmLeave.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await confirmLeave.click();
+      await page.waitForLoadState("networkidle");
+    }
+    // Navigate back to see the join button
+    await navigateToCircle(page, SLUGS.APPROVAL_CIRCLE);
+  }
+
+  // If pending approval banner is showing, we're already pending — done
+  const pendingBanner = page.getByText(/en attente de validation|pending/i);
+  if (await pendingBanner.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await ctx.close();
+    return;
+  }
+
+  // Submit the join request
   const joinButton = page.getByRole("button", { name: /soumis à validation|subject to approval/i });
   if (await joinButton.isVisible({ timeout: 3000 }).catch(() => false)) {
     await joinButton.click();

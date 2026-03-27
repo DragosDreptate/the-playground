@@ -6,6 +6,8 @@ import {
   MomentSlugAlreadyExistsError,
   MomentPastDateError,
   UnauthorizedMomentActionError,
+  InvalidPriceError,
+  PaidMomentRequiresStripeError,
 } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
 
@@ -25,6 +27,7 @@ type CreateMomentInput = {
   capacity: number | null;
   price: number;
   currency: string;
+  refundable?: boolean;
   requiresApproval?: boolean;
 };
 
@@ -51,6 +54,19 @@ export async function createMoment(
 
   if (!membership || membership.role !== "HOST") {
     throw new UnauthorizedMomentActionError();
+  }
+
+  // Price validation: free (0) or at least 50 cents (Stripe minimum)
+  if (input.price !== 0 && input.price < 50) {
+    throw new InvalidPriceError();
+  }
+
+  // Paid events require Stripe Connect on the Circle
+  if (input.price > 0) {
+    const circle = await circleRepository.findById(input.circleId);
+    if (!circle?.stripeConnectAccountId) {
+      throw new PaidMomentRequiresStripeError(input.circleId);
+    }
   }
 
   if (input.startsAt < new Date()) {
@@ -86,6 +102,7 @@ export async function createMoment(
     price: input.price,
     currency: input.currency,
     status: "DRAFT",
+    ...(input.refundable !== undefined && { refundable: input.refundable }),
     ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 

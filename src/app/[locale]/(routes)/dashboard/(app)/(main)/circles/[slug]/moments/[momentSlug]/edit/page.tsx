@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
@@ -49,6 +50,13 @@ export default async function EditMomentPage({
 
   const boundAction = updateMomentAction.bind(null, moment.id);
 
+  // Check if price is locked (paid event with registrations)
+  let priceLocked = false;
+  if (moment.price > 0) {
+    const activeCount = await prismaRegistrationRepository.countActiveByMomentId(moment.id);
+    priceLocked = activeCount > 0;
+  }
+
   const tDashboard = await getTranslations("Dashboard");
   const tCommon = await getTranslations("Common");
 
@@ -77,7 +85,7 @@ export default async function EditMomentPage({
           {tCommon("edit")}
         </span>
       </div>
-      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCoverImage={circle.coverImage} action={boundAction} />
+      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCoverImage={circle.coverImage} stripeConnectActive={!!circle.stripeConnectAccountId} priceLocked={priceLocked} action={boundAction} />
     </div>
   );
 }

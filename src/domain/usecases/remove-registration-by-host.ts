@@ -2,6 +2,8 @@ import type { Registration } from "@/domain/models/registration";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { PaymentService } from "@/domain/ports/services/payment-service";
+import { refundRegistration } from "./refund-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedCircleActionError,
@@ -17,6 +19,7 @@ type RemoveRegistrationByHostDeps = {
   registrationRepository: RegistrationRepository;
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  paymentService?: PaymentService;
 };
 
 type RemoveRegistrationByHostResult = {
@@ -60,15 +63,28 @@ export async function removeRegistrationByHost(
 
   const wasRegistered = registration.status === "REGISTERED";
 
+  // 4. Refund if paid (Host removing = force refund, like event cancellation)
+  // Refund failure must not block the removal
+  if (deps.paymentService && registration.paymentStatus === "PAID") {
+    try {
+      await refundRegistration(
+        { registration, moment, force: true },
+        { registrationRepository, paymentService: deps.paymentService }
+      );
+    } catch {
+      // Refund failure must not block removal — error is captured by the caller
+    }
+  }
+
   // 5. Annule la registration
   const cancelledRegistration = await registrationRepository.update(
     input.registrationId,
     { status: "CANCELLED", cancelledAt: new Date() }
   );
 
-  // 6. Promeut le premier WAITLISTED si une place se libère
+  // 6. Promeut le premier WAITLISTED si une place se libère (free events only)
   let promotedRegistration: Registration | null = null;
-  if (wasRegistered) {
+  if (wasRegistered && moment.price === 0) {
     const firstWaitlisted = await registrationRepository.findFirstWaitlisted(
       registration.momentId
     );

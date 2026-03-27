@@ -15,6 +15,8 @@ export type RegistrationConfirmationEmailData = {
   circleSlug: string;
   status: RegistrationStatus; // REGISTERED or WAITLISTED
   icsContent?: string; // iCalendar (.ics) attachment — only for REGISTERED
+  amountPaid?: string; // Pre-formatted price (e.g. "15,00 €") — only for paid events
+  receiptUrl?: string; // Stripe receipt URL — only for paid events
   strings: {
     subject: string;
     heading: string;
@@ -24,6 +26,8 @@ export type RegistrationConfirmationEmailData = {
     viewMomentCta: string;
     cancelLink: string;
     dashboardLink: string;
+    paymentConfirmed?: string; // e.g. "Paiement confirmé"
+    viewReceipt?: string; // e.g. "Voir mon reçu"
     footer: string;
   };
 };
@@ -47,6 +51,24 @@ export type WaitlistPromotionEmailData = {
     dateLabel: string;
     locationLabel: string;
     viewMomentCta: string;
+    footer: string;
+  };
+};
+
+export type HostPaidCancellationEmailData = {
+  to: string;
+  hostName: string;
+  playerName: string;
+  momentTitle: string;
+  momentSlug: string;
+  circleSlug: string;
+  amountRefunded: string | null; // Pre-formatted: "15,00 EUR" or null if non-refundable
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    refundMessage: string | null;
+    manageRegistrationsCta: string;
     footer: string;
   };
 };
@@ -148,6 +170,7 @@ export type MomentCancelledEmailData = {
   locationText: string;
   circleName: string;
   circleSlug: string;
+  refundMessage?: string; // e.g. "Vous serez remboursé de 15,00 € sous 5-10 jours"
   strings: {
     subject: string;
     heading: string;
@@ -389,4 +412,5 @@ export interface EmailService {
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
+  sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void>;
 }
