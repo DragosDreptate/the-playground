@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, Lock, ShieldCheck } from "lucide-react";
@@ -151,10 +151,19 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
       return {};
     }
 
-    return { error: result.error };
+    const translatedError = result.code && t.has(`errors.${result.code}`)
+      ? t(`errors.${result.code}`)
+      : result.error;
+    return { error: translatedError };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (state.error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [state.error]);
 
   const circleGradient = getMomentGradient(circleName);
 
@@ -173,7 +182,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     <form action={formAction} className="mx-auto max-w-5xl">
       {/* Error banner */}
       {state.error && (
-        <div className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
+        <div ref={errorRef} className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
           {state.error}
         </div>
       )}
@@ -395,7 +404,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending || isEndBeforeStart} className="flex-1">
+            <Button type="submit" disabled={isPending || isEndBeforeStart || !startDate || !endDate} className="flex-1">
               {isPending
                 ? tCommon("loading")
                 : moment

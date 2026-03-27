@@ -406,6 +406,8 @@
       "startLabel": "Début",
       "endLabel": "Fin",
       "pickDate": "Choisir une date",
+      "startDateRequired": "La date de début est obligatoire.",
+      "endDateRequired": "La date de fin est obligatoire.",
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Enregistrer le brouillon",
       "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
@@ -589,7 +591,15 @@
       "unauthorized": "Vous n'avez pas la permission de gérer cet événement",
       "createFailed": "Échec de la création de l'événement",
       "updateFailed": "Échec de la mise à jour de l'événement",
-      "deleteFailed": "Échec de la suppression de l'événement"
+      "deleteFailed": "Échec de la suppression de l'événement",
+      "MOMENT_PAST_DATE": "La date de début ne peut pas être dans le passé.",
+      "INVALID_PRICE": "Le prix doit être de 0 (gratuit) ou d'au moins 0,50 €.",
+      "PAID_MOMENT_REQUIRES_STRIPE": "Activez les paiements sur votre Communauté pour définir un prix.",
+      "PRICE_LOCKED": "Le prix ne peut plus être modifié car des Participants ont déjà payé.",
+      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des Participants sont déjà inscrits.",
+      "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Les événements payants ne peuvent pas avoir la validation des inscriptions.",
+      "MOMENT_SLUG_EXISTS": "Un événement avec un titre similaire existe déjà.",
+      "INTERNAL_ERROR": "Une erreur inattendue est survenue."
     }
   },
   "CircleCategory": {

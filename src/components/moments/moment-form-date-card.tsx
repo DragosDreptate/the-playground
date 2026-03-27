@@ -142,8 +142,8 @@ export function MomentFormDateCard({
 
   /** Cas A: start date changes → endDate follows; adjust endTime if needed. */
   function handleStartDateChange(d: Date | undefined) {
+    if (!d) return; // Prevent deselection — start date is required
     onStartDateChange(d);
-    if (!d) return;
     onEndDateChange(d);
     adjustEndIfNeeded(d, startTime);
   }
@@ -155,9 +155,10 @@ export function MomentFormDateCard({
     adjustEndIfNeeded(startDate, newTime);
   }
 
-  /** Cas C: end date changes → block dates before startDate. */
+  /** Cas C: end date changes → block dates before startDate. Prevent deselection. */
   function handleEndDateChange(d: Date | undefined) {
-    if (!d || !startDate) { onEndDateChange(d); return; }
+    if (!d) return; // Prevent deselection — end date is required
+    if (!startDate) { onEndDateChange(d); return; }
     if (dayOf(d) < dayOf(startDate)) {
       // Snap back to startDate and adjust time if needed
       onEndDateChange(startDate);
@@ -229,7 +230,17 @@ export function MomentFormDateCard({
         )}
       </div>
 
-      {/* End before start warning */}
+      {/* Date warnings */}
+      {!disabled && !startDate && (
+        <p className="text-destructive pl-12 text-xs">
+          {t("form.startDateRequired")}
+        </p>
+      )}
+      {!disabled && !endDate && startDate && (
+        <p className="text-destructive pl-12 text-xs">
+          {t("form.endDateRequired")}
+        </p>
+      )}
       {!disabled && isEndBeforeStart && (
         <p className="text-destructive pl-12 text-xs">
           {t("form.endBeforeStart")}
