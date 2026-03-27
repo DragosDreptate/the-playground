@@ -89,9 +89,10 @@ export async function updateMoment(
   }
 
   // Price locking rules (only when price is being changed)
+  // activeCount > 1 because the host is always auto-registered (count = 1 minimum)
   if (input.price !== undefined && input.price !== existing.price && deps.registrationRepository) {
     const activeCount = await deps.registrationRepository.countActiveByMomentId(input.momentId);
-    const hasRegistrations = activeCount > 0;
+    const hasRegistrations = activeCount > 1;
 
     if (hasRegistrations) {
       const wasFree = existing.price === 0;
