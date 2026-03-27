@@ -151,7 +151,10 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
       return {};
     }
 
-    return { error: result.error };
+    const translatedError = result.code && t.has(`errors.${result.code}`)
+      ? t(`errors.${result.code}`)
+      : result.error;
+    return { error: translatedError };
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});

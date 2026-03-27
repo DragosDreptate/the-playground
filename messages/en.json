@@ -589,7 +589,15 @@
       "unauthorized": "You don't have permission to manage this Event",
       "createFailed": "Failed to create Event",
       "updateFailed": "Failed to update Event",
-      "deleteFailed": "Failed to delete Event"
+      "deleteFailed": "Failed to delete Event",
+      "MOMENT_PAST_DATE": "The start date cannot be in the past.",
+      "INVALID_PRICE": "Price must be 0 (free) or at least €0.50.",
+      "PAID_MOMENT_REQUIRES_STRIPE": "Enable payments on your Community to set a price.",
+      "PRICE_LOCKED": "Price can no longer be changed as members have already paid.",
+      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Cannot make this event paid: members are already registered.",
+      "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Paid events cannot require registration approval.",
+      "MOMENT_SLUG_EXISTS": "An event with a similar title already exists.",
+      "INTERNAL_ERROR": "An unexpected error occurred."
     }
   },
   "CircleCategory": {
