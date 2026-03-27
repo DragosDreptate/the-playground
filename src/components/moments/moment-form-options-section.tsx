@@ -27,6 +27,9 @@ type MomentFormOptionsSectionProps = {
   capacityOpen: boolean;
   onCapacityOpenChange: (open: boolean) => void;
   defaultCapacity?: number | null;
+  // Approval interaction
+  approvalEnabled?: boolean;
+  onPriceCentsChange?: (cents: number) => void;
 };
 
 function estimateNet(cents: number, currency: string): string {
@@ -45,6 +48,8 @@ export function MomentFormOptionsSection({
   capacityOpen,
   onCapacityOpenChange,
   defaultCapacity = null,
+  approvalEnabled = false,
+  onPriceCentsChange,
 }: MomentFormOptionsSectionProps) {
   const t = useTranslations("Moment");
   const [capacityValue, setCapacityValue] = useState<string>(
@@ -65,7 +70,7 @@ export function MomentFormOptionsSection({
 
       <div className="space-y-3">
         {/* Hidden inputs — always in the DOM regardless of inline edit state */}
-        <input type="hidden" name="price" value={priceCents} />
+        <input type="hidden" name="price" value={approvalEnabled ? 0 : priceCents} />
         {!capacityOpen && (
           <input type="hidden" name="capacity" value={capacityValue} />
         )}
@@ -139,7 +144,32 @@ export function MomentFormOptionsSection({
         </div>
 
         {/* Ticket price row */}
-        {!stripeConnectActive ? (
+        {approvalEnabled ? (
+          // Approval active — price not allowed
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="cursor-not-allowed py-1 opacity-50 select-none">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                      <Ticket className="text-primary size-4" />
+                    </div>
+                    <span className="flex-1 text-sm font-medium">
+                      {t("form.ticketPrice")}
+                    </span>
+                    <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
+                      <span>{t("form.free")}</span>
+                      <Lock className="size-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t("form.priceDisabledByApproval")}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ) : !stripeConnectActive ? (
           // Stripe not active — show disabled row with tooltip
           <TooltipProvider>
             <Tooltip>
@@ -213,7 +243,11 @@ export function MomentFormOptionsSection({
                       placeholder="0"
                       aria-label={t("form.ticketPrice")}
                       value={priceValue}
-                      onChange={(e) => setPriceValue(e.target.value)}
+                      onChange={(e) => {
+                        setPriceValue(e.target.value);
+                        const cents = Math.round((parseFloat(e.target.value) || 0) * 100);
+                        onPriceCentsChange?.(cents);
+                      }}
                       className="h-7 w-20 text-right text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -238,6 +272,7 @@ export function MomentFormOptionsSection({
                       className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                       onClick={() => {
                         setPriceValue("");
+                        onPriceCentsChange?.(0);
                         onPriceOpenChange(false);
                       }}
                     >

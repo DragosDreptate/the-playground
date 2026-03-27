@@ -3,6 +3,7 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import {
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
+  PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -241,6 +242,74 @@ describe("CreateMoment", () => {
           registrationRepository: registrationRepo,
         })
       ).rejects.toThrow(MomentSlugAlreadyExistsError);
+    });
+  });
+
+  describe("given a paid event with requiresApproval", () => {
+    it("should throw PaidMomentCannotRequireApprovalError", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository();
+      const registrationRepo = createMockRegistrationRepository();
+
+      await expect(
+        createMoment(
+          { ...defaultInput, price: 1500, requiresApproval: true },
+          {
+            momentRepository: momentRepo,
+            circleRepository: circleRepo,
+            registrationRepository: registrationRepo,
+          }
+        )
+      ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
+    });
+
+    it("should allow a paid event without requiresApproval", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue({ id: "circle-1", stripeConnectAccountId: "acct_123" }),
+      });
+      const momentRepo = createMockMomentRepository({
+        create: vi.fn().mockResolvedValue(
+          makeMoment({ price: 1500, requiresApproval: false })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      const result = await createMoment(
+        { ...defaultInput, price: 1500, requiresApproval: false },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(result.moment.price).toBe(1500);
+    });
+
+    it("should allow a free event with requiresApproval", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository({
+        create: vi.fn().mockResolvedValue(
+          makeMoment({ price: 0, requiresApproval: true })
+        ),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      const result = await createMoment(
+        { ...defaultInput, price: 0, requiresApproval: true },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(result.moment.price).toBe(0);
     });
   });
 });

@@ -8,6 +8,7 @@ import {
   UnauthorizedMomentActionError,
   InvalidPriceError,
   PaidMomentRequiresStripeError,
+  PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
 import { generateSlug } from "@/lib/slug";
 
@@ -59,6 +60,11 @@ export async function createMoment(
   // Price validation: free (0) or at least 50 cents (Stripe minimum)
   if (input.price !== 0 && input.price < 50) {
     throw new InvalidPriceError();
+  }
+
+  // Paid events cannot require approval
+  if (input.price > 0 && input.requiresApproval) {
+    throw new PaidMomentCannotRequireApprovalError();
   }
 
   // Paid events require Stripe Connect on the Circle

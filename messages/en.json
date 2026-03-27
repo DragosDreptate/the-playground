@@ -410,7 +410,9 @@
       "createMoment": "Save draft",
       "pastDateReadOnly": "Date is read-only — this event is in the past.",
       "requiresApproval": "Registration approval",
-      "requiresApprovalDescription": "Requests must be approved manually from your dashboard."
+      "requiresApprovalDescription": "Requests must be approved manually from your dashboard.",
+      "approvalDisabledByPrice": "Not available for paid events.",
+      "priceDisabledByApproval": "Disable registration approval to set a price."
     },
     "radar": {
       "title": "Planning Radar",

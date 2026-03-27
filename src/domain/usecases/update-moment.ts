@@ -12,6 +12,7 @@ import {
   PaidMomentRequiresStripeError,
   PriceLockedError,
   CannotMakePaidWithRegistrationsError,
+  PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
 
 type UpdateMomentInput = {
@@ -70,6 +71,13 @@ export async function updateMoment(
   // Price validation: free (0) or at least 50 cents (Stripe minimum)
   if (input.price !== undefined && input.price !== 0 && input.price < 50) {
     throw new InvalidPriceError();
+  }
+
+  // Paid events cannot require approval (check resulting state)
+  const resultingPrice = input.price ?? existing.price;
+  const resultingApproval = input.requiresApproval ?? existing.requiresApproval;
+  if (resultingPrice > 0 && resultingApproval) {
+    throw new PaidMomentCannotRequireApprovalError();
   }
 
   // Paid events require Stripe Connect on the Circle

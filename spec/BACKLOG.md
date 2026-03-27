@@ -479,3 +479,4 @@
 | 4 | Sécuriser checkout-return URL | Remplacer `userId`/`momentId` dans les query params par le Stripe Checkout Session ID. Récupérer les metadata côté serveur via l'API Stripe. |
 | 5 | Renommer `isDemoEmail` | Le nom est trompeur maintenant qu'il filtre aussi `@test.playground`. Renommer en `isFilteredEmail` ou `isNonDeliverableEmail`. |
 | 6 | Frais Stripe non remboursés | Stripe ne rembourse pas ses frais (~0,59€/transaction). Si abus de désinscriptions, ajouter une limite temporelle (ex: remboursable jusqu'à 24h avant l'événement). |
+| 7 | Guard payant + approbation | Interdire la combinaison `price > 0 AND requiresApproval=true`. Actuellement le flag `requiresApproval` est silencieusement ignoré pour les événements payants (le webhook crée REGISTERED directement, bypass l'approbation). Court terme : guard dans `createMoment` + désactiver le switch UI. Long terme : supporter le flow "payer puis attendre approbation" avec remboursement si refusé. |

@@ -410,7 +410,9 @@
       "createMoment": "Enregistrer le brouillon",
       "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
       "requiresApproval": "Validation des inscriptions",
-      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace."
+      "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",
+      "approvalDisabledByPrice": "Non disponible pour les événements payants.",
+      "priceDisabledByApproval": "Désactivez la validation des inscriptions pour définir un prix."
     },
     "radar": {
       "title": "Radar de planification",
