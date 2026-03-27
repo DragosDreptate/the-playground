@@ -19,6 +19,7 @@ export {
   PaidMomentRequiresStripeError,
   PriceLockedError,
   CannotMakePaidWithRegistrationsError,
+  PaidMomentCannotRequireApprovalError,
 } from "./moment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {

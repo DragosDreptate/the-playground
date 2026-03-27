@@ -73,3 +73,11 @@ export class CannotMakePaidWithRegistrationsError extends DomainError {
     super("Cannot change a free event to paid when participants are already registered");
   }
 }
+
+export class PaidMomentCannotRequireApprovalError extends DomainError {
+  readonly code = "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL";
+
+  constructor() {
+    super("Paid events cannot require registration approval");
+  }
+}

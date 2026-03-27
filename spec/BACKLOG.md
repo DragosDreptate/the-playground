@@ -464,3 +464,19 @@
 | 2026-02-28 | **Données démo enrichies** : `thomas@demo.playground` ajouté dans `db-seed-demo-data.ts` — user "blank slate" avec `dashboardMode: null` (reset à chaque run du seed). Permet de tester le flux welcome page en prod sans créer un compte. |
 | 2026-03-03 | **Broadcast — cooldown 24h** : le verrou permanent "envoi unique par événement" a été remplacé par un cooldown 24h (`COOLDOWN_MS = 24 * 60 * 60 * 1000`). Après expiration du cooldown, l'Organisateur peut renvoyer l'invitation. Pendant le cooldown, le bouton affiche "Envoyée" (disabled) avec un tooltip Radix indiquant le temps restant avant le prochain envoi possible. `broadcastSentAt` est écrasé à chaque envoi (timestamp mis à jour). |
 | 2026-03-13 | Terminologie FR : "Découvrir" → **"Explorer"** pour aligner FR et EN (Explore). Nom de page plus cohérent entre les deux langues. Clé i18n `Explorer` et route `/explorer` inchangées. |
+
+---
+
+## Améliorations futures — Stripe / Événements payants
+
+> Issues identifiées pendant l'implémentation Stripe Connect (mars 2026). Non bloquantes pour le MVP.
+
+| # | Sujet | Détail |
+|---|-------|--------|
+| 1 | Redesign bloc CTA + Participants | Dédupliquer les stats (inscrits + places) entre le bloc CTA et le bloc Participants sur la page événement publique. Intégrer la mention de politique de remboursement dans ce redesign. |
+| 2 | Section Paiements à la création de Communauté | Afficher la section "Paiements" en mode désactivé sur la page de création (pas seulement sur la page modifier). Message : "Disponible après la création de votre Communauté". |
+| 3 | Banner vert confirmation inscription | Changer la couleur du banner "Vous participez à cet événement" de rose à vert pour mieux communiquer "confirmé". |
+| 4 | Sécuriser checkout-return URL | Remplacer `userId`/`momentId` dans les query params par le Stripe Checkout Session ID. Récupérer les metadata côté serveur via l'API Stripe. |
+| 5 | Renommer `isDemoEmail` | Le nom est trompeur maintenant qu'il filtre aussi `@test.playground`. Renommer en `isFilteredEmail` ou `isNonDeliverableEmail`. |
+| 6 | Frais Stripe non remboursés | Stripe ne rembourse pas ses frais (~0,59€/transaction). Si abus de désinscriptions, ajouter une limite temporelle (ex: remboursable jusqu'à 24h avant l'événement). |
+| 7 | Guard payant + approbation | Interdire la combinaison `price > 0 AND requiresApproval=true`. Actuellement le flag `requiresApproval` est silencieusement ignoré pour les événements payants (le webhook crée REGISTERED directement, bypass l'approbation). Court terme : guard dans `createMoment` + désactiver le switch UI. Long terme : supporter le flow "payer puis attendre approbation" avec remboursement si refusé. |

@@ -5,6 +5,7 @@ import {
   UnauthorizedMomentActionError,
   PriceLockedError,
   CannotMakePaidWithRegistrationsError,
+  PaidMomentCannotRequireApprovalError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -429,6 +430,100 @@ describe("UpdateMoment", () => {
       expect(result.moment.price).toBe(0);
       expect(paymentService.refund).toHaveBeenCalledWith("pi_1");
       expect(paymentService.refund).toHaveBeenCalledTimes(1); // Only the PAID one, not the free one
+    });
+  });
+
+  describe("given paid event + requiresApproval (mutual exclusion)", () => {
+    it("should throw when creating a paid event with requiresApproval=true", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 0, requiresApproval: false });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(makeCircle({ stripeConnectAccountId: "acct_123" })),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", price: 1500, requiresApproval: true },
+          { momentRepository: momentRepo, circleRepository: circleRepo }
+        )
+      ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
+    });
+
+    it("should throw when enabling approval on an existing paid event", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500, requiresApproval: false });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", requiresApproval: true },
+          { momentRepository: momentRepo, circleRepository: circleRepo }
+        )
+      ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
+    });
+
+    it("should throw when adding a price to an event with approval enabled", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 0, requiresApproval: true });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(makeCircle({ stripeConnectAccountId: "acct_123" })),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", price: 1500 },
+          { momentRepository: momentRepo, circleRepository: circleRepo }
+        )
+      ).rejects.toThrow(PaidMomentCannotRequireApprovalError);
+    });
+
+    it("should allow disabling approval and adding a price simultaneously", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 0, requiresApproval: true });
+      const updated = makeMoment({ id: "moment-1", price: 1500, requiresApproval: false });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findById: vi.fn().mockResolvedValue(makeCircle({ stripeConnectAccountId: "acct_123" })),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 1500, requiresApproval: false },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(result.moment.price).toBe(1500);
+    });
+
+    it("should allow removing price and enabling approval simultaneously", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", price: 1500, requiresApproval: false });
+      const updated = makeMoment({ id: "moment-1", price: 0, requiresApproval: true });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      const result = await updateMoment(
+        { momentId: "moment-1", userId: "user-1", price: 0, requiresApproval: true },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      expect(result.moment.requiresApproval).toBe(true);
     });
   });
 });
