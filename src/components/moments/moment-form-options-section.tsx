@@ -145,30 +145,23 @@ export function MomentFormOptionsSection({
 
         {/* Ticket price row */}
         {approvalEnabled ? (
-          // Approval active — price not allowed
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="cursor-not-allowed py-1 opacity-50 select-none">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                      <Ticket className="text-primary size-4" />
-                    </div>
-                    <span className="flex-1 text-sm font-medium">
-                      {t("form.ticketPrice")}
-                    </span>
-                    <span className="text-muted-foreground flex items-center gap-1.5 text-sm">
-                      <span>{t("form.free")}</span>
-                      <Lock className="size-3.5" />
-                    </span>
-                  </div>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t("form.priceDisabledByApproval")}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          // Approval active — price not allowed (message under label, same pattern as approval disabled state)
+          <div className="py-1 opacity-50">
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <Ticket className="text-primary size-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-sm font-medium">
+                  {t("form.ticketPrice")}
+                </span>
+                <p className="text-muted-foreground text-xs">
+                  {t("form.priceDisabledByApproval")}
+                </p>
+              </div>
+              <Lock className="text-muted-foreground size-4 shrink-0" />
+            </div>
+          </div>
         ) : !stripeConnectActive ? (
           // Stripe not active — show disabled row with tooltip
           <TooltipProvider>
