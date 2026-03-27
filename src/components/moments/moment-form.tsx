@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, Lock, ShieldCheck } from "lucide-react";
@@ -158,6 +158,12 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (state.error && errorRef.current) {
+      errorRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [state.error]);
 
   const circleGradient = getMomentGradient(circleName);
 
@@ -176,7 +182,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
     <form action={formAction} className="mx-auto max-w-5xl">
       {/* Error banner */}
       {state.error && (
-        <div className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
+        <div ref={errorRef} className="bg-destructive/10 text-destructive mb-6 rounded-md p-3 text-sm">
           {state.error}
         </div>
       )}
