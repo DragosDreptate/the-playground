@@ -404,7 +404,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending || isEndBeforeStart} className="flex-1">
+            <Button type="submit" disabled={isPending || isEndBeforeStart || !startDate || !endDate} className="flex-1">
               {isPending
                 ? tCommon("loading")
                 : moment

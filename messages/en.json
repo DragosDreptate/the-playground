@@ -406,6 +406,8 @@
       "startLabel": "Start",
       "endLabel": "End",
       "pickDate": "Pick a date",
+      "startDateRequired": "Start date is required.",
+      "endDateRequired": "End date is required.",
       "endBeforeStart": "The end date must be after the start date.",
       "createMoment": "Save draft",
       "pastDateReadOnly": "Date is read-only — this event is in the past.",
