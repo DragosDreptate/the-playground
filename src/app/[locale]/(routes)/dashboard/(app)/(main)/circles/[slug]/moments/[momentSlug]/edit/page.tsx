@@ -50,11 +50,11 @@ export default async function EditMomentPage({
 
   const boundAction = updateMomentAction.bind(null, moment.id);
 
-  // Check if price is locked (paid event with registrations)
+  // Check if price is locked (paid event with paid registrations — excludes host auto-registration)
   let priceLocked = false;
   if (moment.price > 0) {
-    const activeCount = await prismaRegistrationRepository.countActiveByMomentId(moment.id);
-    priceLocked = activeCount > 0;
+    const { paidCount } = await prismaRegistrationRepository.getPaymentSummary(moment.id);
+    priceLocked = paidCount > 0;
   }
 
   const tDashboard = await getTranslations("Dashboard");
