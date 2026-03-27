@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useCallback, useState } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { AlignLeft, Lock, ShieldCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
@@ -111,6 +112,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const [currentPriceCents, setCurrentPriceCents] = useState(moment?.price ?? 0);
   const [approvalEnabled, setApprovalEnabled] = useState(moment?.requiresApproval ?? false);
   const hasPaidPrice = currentPriceCents > 0;
+  const handlePriceCentsChange = useCallback((cents: number) => setCurrentPriceCents(cents), []);
 
   // --- Form submission ---
   async function handleSubmit(
@@ -361,16 +363,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onCapacityOpenChange={setCapacityOpen}
             defaultCapacity={moment?.capacity}
             approvalEnabled={approvalEnabled}
-            onPriceCentsChange={setCurrentPriceCents}
+            onPriceCentsChange={handlePriceCentsChange}
           />
 
           {/* Validation des inscriptions */}
-          <div className={`flex items-center gap-3${hasPaidPrice ? " opacity-50" : ""}`}>
+          <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>
             <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
               <ShieldCheck className="text-primary size-4" />
             </div>
             <div className="min-w-0 flex-1">
-              <label htmlFor="requiresApproval" className={`text-sm font-medium${hasPaidPrice ? "" : " cursor-pointer"}`}>
+              <label htmlFor="requiresApproval" className={cn("text-sm font-medium", !hasPaidPrice && "cursor-pointer")}>
                 {t("form.requiresApproval")}
               </label>
               <p className="text-muted-foreground text-xs">
