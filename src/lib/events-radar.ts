@@ -279,6 +279,42 @@ export async function fetchMeetupData(url: string): Promise<string> {
   }
 }
 
+// --- Meetup — extraction Claude ---
+
+export async function extractMeetupEventsWithClaude(
+  aiCall: (prompt: string, maxTokens: number) => Promise<string | null>,
+  meetupRaw: string,
+  ville: string,
+  dateFrom: string,
+  dateEnd: string,
+  keyword: string
+): Promise<EventResult[]> {
+  if (meetupRaw.length < 50) return [];
+
+  const kw = keyword || "tous";
+  const prompt = `Meetup ${ville} ${dateFrom}→${dateEnd} mots-clés OR: ${kw}
+Données:
+${meetupRaw}
+JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
+
+  const text = await aiCall(prompt, 1500);
+  if (!text) return [];
+
+  try {
+    const cb = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    const clean = cb ? cb[1].trim() : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const parsed = JSON.parse(clean) as { events: EventResult[] };
+    const kwList = keyword ? keyword.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
+    return (parsed.events ?? []).filter((e) => {
+      if (!e.date || e.date < dateFrom || e.date > dateEnd) return false;
+      if (kwList.length === 0) return true;
+      return kwList.some((kw) => e.title.toLowerCase().includes(kw));
+    });
+  } catch {
+    return [];
+  }
+}
+
 // --- Utilitaire : semaine (lundi → dimanche) ---
 
 export function getWeekRange(dateStr: string): { weekFrom: string; weekTo: string } {

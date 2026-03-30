@@ -35,10 +35,8 @@ type EventResult = {
 
 type StreamEvent =
   | { type: "status"; message: string }
-  | { type: "tool_call"; message: string }
-  | { type: "tool_result"; message: string }
   | { type: "events"; events: EventResult[]; summary: string }
-  | { type: "error"; message: string; raw?: string }
+  | { type: "error"; message: string }
   | { type: "done" };
 
 // --- Config ---
@@ -108,8 +106,6 @@ export default function EventsRadarPage() {
             const event = JSON.parse(chunk.slice(6)) as StreamEvent;
             switch (event.type) {
               case "status":
-              case "tool_call":
-              case "tool_result":
                 addLog(event.message);
                 break;
               case "events":
@@ -119,7 +115,6 @@ export default function EventsRadarPage() {
                 break;
               case "error":
                 setError(event.message);
-                if (event.raw) addLog(`Réponse brute : ${event.raw}`);
                 break;
               case "done":
                 break;
@@ -152,7 +147,7 @@ export default function EventsRadarPage() {
             Radar d&apos;événements
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Agent IA — Luma + Meetup + Eventbrite via Claude ·{" "}
+            Luma + Eventbrite + Meetup (via Claude) ·{" "}
             <code className="rounded bg-zinc-800 px-1 py-0.5 text-xs text-zinc-300">
               /lab/events-radar
             </code>
@@ -287,7 +282,6 @@ const SOURCE_COLORS: Record<string, string> = {
   luma: "border-violet-800 text-violet-400",
   meetup: "border-red-800 text-red-400",
   eventbrite: "border-orange-800 text-orange-400",
-  mobilizon: "border-emerald-800 text-emerald-400",
 };
 
 function EventCard({ event }: { event: EventResult }) {

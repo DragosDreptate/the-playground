@@ -4,20 +4,20 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { prisma } from "@/infrastructure/db/prisma";
 import { UserRole } from "@prisma/client";
 
-const DAILY_LIMIT = 25;
 import {
   fetchAndFilterLumaEvents,
   fetchAndFilterEventbriteEvents,
   fetchMeetupData,
   buildMeetupUrl,
+  extractMeetupEventsWithClaude,
   deduplicateByUrl,
   getWeekRange,
   LUMA_LOCATION_TERMS,
   EVENTBRITE_COUNTRY,
-  type EventResult,
 } from "@/lib/events-radar";
 
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
+const DAILY_LIMIT = 25;
 
 type RadarRequest = {
   title: string;
@@ -77,47 +77,6 @@ Règles :
   }
 }
 
-async function extractMeetupEventsWithClaude(
-  client: Anthropic,
-  meetupRaw: string,
-  ville: string,
-  dateFrom: string,
-  dateEnd: string,
-  keywords: string
-): Promise<EventResult[]> {
-  if (meetupRaw.length < 50) return [];
-
-  const kw = keywords || "tous";
-  const prompt = `Meetup ${ville} ${dateFrom}→${dateEnd} mots-clés OR: ${kw}
-Données:
-${meetupRaw}
-JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
-
-  const resp = await client.messages.create({
-    model: ANTHROPIC_MODEL,
-    max_tokens: 1500,
-    messages: [{ role: "user", content: prompt }],
-  });
-
-  const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
-  if (!tb) return [];
-
-  try {
-    const raw = tb.text;
-    const cb = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
-    const clean = cb ? cb[1].trim() : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
-    const parsed = JSON.parse(clean) as { events: EventResult[] };
-    const kwList = keywords ? keywords.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
-    return (parsed.events ?? []).filter((e) => {
-      if (!e.date || e.date < dateFrom || e.date > dateEnd) return false;
-      if (kwList.length === 0) return true;
-      return kwList.some((kw) => e.title.toLowerCase().includes(kw));
-    });
-  } catch {
-    return [];
-  }
-}
-
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -164,6 +123,15 @@ export async function POST(request: NextRequest) {
 
       try {
         const client = new Anthropic({ apiKey });
+        const aiCall = async (prompt: string, maxTokens: number) => {
+          const resp = await client.messages.create({
+            model: ANTHROPIC_MODEL,
+            max_tokens: maxTokens,
+            messages: [{ role: "user", content: prompt }],
+          });
+          const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
+          return tb?.text ?? null;
+        };
 
         // Étape 1 : extraction mots-clés + ville via Claude Haiku
         // Si overrideKeywords fournis, on saute l'extraction (re-lancement après édition)
@@ -204,7 +172,7 @@ export async function POST(request: NextRequest) {
           Promise.all(
             meetupKws.map(async (kw) => {
               const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
-              return extractMeetupEventsWithClaude(client, raw, city!, weekFrom, weekTo, kw);
+              return extractMeetupEventsWithClaude(aiCall, raw, city!, weekFrom, weekTo, kw);
             })
           ),
         ]);
