@@ -83,11 +83,12 @@ export async function fetchAndFilterLumaEvents(
           .filter((e) => {
             const d = e.event.start_at.slice(0, 10);
             if (d < dateFrom || d > dateEnd) return false;
+            // Exclure les événements online — le radar cherche les conflits physiques
+            if (e.event.location_type !== "offline") return false;
             const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
             if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
             const loc = e.event.geo_address_info?.city_state?.toLowerCase();
             if (loc) return locationTerms.some((t) => loc.includes(t));
-            if (e.event.location_type !== "offline") return true;
             return false;
           })
           .map((e) => ({
@@ -163,15 +164,15 @@ function extractEventbriteEvents(
         if (item["@type"] !== "Event" || !item.startDate || !item.url) continue;
         const date = item.startDate.slice(0, 10);
         if (date < dateFrom || date > dateEnd) continue;
+        // Exclure les événements online — le radar cherche les conflits physiques
         const isOnline = item.eventAttendanceMode?.includes("Online") || item.eventAttendanceMode?.includes("Mixed");
+        if (isOnline) continue;
         const country = item.location?.address?.addressCountry?.toLowerCase() ?? "";
         const locality = item.location?.address?.addressLocality?.toLowerCase() ?? "";
         const region = item.location?.address?.addressRegion?.toLowerCase() ?? "";
         const locText = `${locality} ${region}`;
-        if (!isOnline) {
-          if (country && country !== expectedCountry) continue;
-          if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
-        }
+        if (country && country !== expectedCountry) continue;
+        if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
         events.push({
           title: item.name ?? "Sans titre",
           date,
@@ -290,7 +291,8 @@ export async function extractMeetupEventsWithClaude(
 ): Promise<EventResult[]> {
   if (meetupRaw.length < 50) return [];
 
-  const prompt = `Extrais les 10 premiers événements Meetup de ces données.
+  const prompt = `Extrais les 10 premiers événements Meetup EN PRÉSENTIEL (physiques) de ces données.
+Exclure les événements en ligne / online / virtual.
 Ville: ${ville}, période: ${dateFrom}→${dateEnd}
 Données:
 ${meetupRaw}
