@@ -69,7 +69,7 @@ export async function fetchAndFilterLumaEvents(
   const results = await Promise.all(
     queries.map(async (kw): Promise<EventResult[]> => {
       try {
-        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "50" });
+        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "10" });
         if (kw) params.set("query", kw);
         const res = await fetch(`https://api.lu.ma/discover/get-paginated-events?${params}`, {
           headers: { Accept: "application/json" },
@@ -105,7 +105,7 @@ export async function fetchAndFilterLumaEvents(
     })
   );
 
-  return deduplicateByUrl(results.flat());
+  return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
 // --- Eventbrite — une requête par mot-clé en parallèle ---
@@ -219,7 +219,7 @@ export async function fetchAndFilterEventbriteEvents(
     })
   );
 
-  return deduplicateByUrl(results.flat());
+  return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
 // --- Meetup — scraping HTML ---
@@ -286,13 +286,12 @@ export async function extractMeetupEventsWithClaude(
   meetupRaw: string,
   ville: string,
   dateFrom: string,
-  dateEnd: string,
-  keyword: string
+  dateEnd: string
 ): Promise<EventResult[]> {
   if (meetupRaw.length < 50) return [];
 
-  const kw = keyword || "tous";
-  const prompt = `Meetup ${ville} ${dateFrom}→${dateEnd} mots-clés OR: ${kw}
+  const prompt = `Extrais les 10 premiers événements Meetup de ces données.
+Ville: ${ville}, période: ${dateFrom}→${dateEnd}
 Données:
 ${meetupRaw}
 JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
@@ -304,12 +303,9 @@ JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null
     const cb = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
     const clean = cb ? cb[1].trim() : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(clean) as { events: EventResult[] };
-    const kwList = keyword ? keyword.toLowerCase().split(/[\s,]+/).filter(Boolean) : [];
-    return (parsed.events ?? []).filter((e) => {
-      if (!e.date || e.date < dateFrom || e.date > dateEnd) return false;
-      if (kwList.length === 0) return true;
-      return kwList.some((kw) => e.title.toLowerCase().includes(kw));
-    });
+    return (parsed.events ?? [])
+      .filter((e) => e.date && e.date >= dateFrom && e.date <= dateEnd)
+      .slice(0, 10);
   } catch {
     return [];
   }

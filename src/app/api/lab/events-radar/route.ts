@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
           Promise.all(
             meetupKws.map(async (kw) => {
               const raw = await fetchMeetupData(buildMeetupUrl(ville, dateFrom, dateEnd, kw));
-              return extractMeetupEventsWithClaude(aiCall, raw, ville, dateFrom, dateEnd, kw);
+              return extractMeetupEventsWithClaude(aiCall, raw, ville, dateFrom, dateEnd);
             })
           ),
         ]);

@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           Promise.all(
             meetupKws.map(async (kw) => {
               const raw = await fetchMeetupData(buildMeetupUrl(city!, weekFrom, weekTo, kw));
-              return extractMeetupEventsWithClaude(aiCall, raw, city!, weekFrom, weekTo, kw);
+              return extractMeetupEventsWithClaude(aiCall, raw, city!, weekFrom, weekTo);
             })
           ),
         ]);
