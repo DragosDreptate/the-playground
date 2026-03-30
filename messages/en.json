@@ -429,6 +429,7 @@
       "modalTitle": "Planning Radar",
       "keywords": "Detected keywords",
       "editKeywords": "Edit",
+      "addKeyword": "Add…",
       "relaunch": "Re-run",
       "conflictsSection": "That day",
       "weekSection": "That week",

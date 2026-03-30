@@ -429,6 +429,7 @@
       "modalTitle": "Radar de planification",
       "keywords": "Mots-clés détectés",
       "editKeywords": "Modifier",
+      "addKeyword": "Ajouter…",
       "relaunch": "Relancer",
       "conflictsSection": "Ce jour-là",
       "weekSection": "Cette semaine",
