@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
           return tb?.text ?? null;
         };
 
-        const kwArray = keywords ? keywords.split(/[\s,]+/).map((k) => k.trim()).filter(Boolean) : [];
+        const kwArray = keywords ? keywords.split(",").map((k) => k.trim()).filter(Boolean) : [];
         const locationTerms = LUMA_LOCATION_TERMS[ville.toLowerCase()] ?? [ville.toLowerCase()];
         const expectedCountry = EVENTBRITE_COUNTRY[ville.toLowerCase()] ?? "fr";
         const meetupKws = kwArray.length > 0 ? kwArray : [""];
