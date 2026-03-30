@@ -69,7 +69,7 @@ export async function fetchAndFilterLumaEvents(
   const results = await Promise.all(
     queries.map(async (kw): Promise<EventResult[]> => {
       try {
-        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "50" });
+        const params = new URLSearchParams({ near: LUMA_CITY[villeKey] ?? ville, pagination_limit: "10" });
         if (kw) params.set("query", kw);
         const res = await fetch(`https://api.lu.ma/discover/get-paginated-events?${params}`, {
           headers: { Accept: "application/json" },
@@ -83,11 +83,12 @@ export async function fetchAndFilterLumaEvents(
           .filter((e) => {
             const d = e.event.start_at.slice(0, 10);
             if (d < dateFrom || d > dateEnd) return false;
+            // Exclure les événements online — le radar cherche les conflits physiques
+            if (e.event.location_type !== "offline") return false;
             const featuredSlug = e.featured_city?.slug?.toLowerCase() ?? "";
             if (featuredSlug && (featuredSlug === villeKey || featuredSlug === LUMA_CITY[villeKey]?.toLowerCase())) return true;
             const loc = e.event.geo_address_info?.city_state?.toLowerCase();
             if (loc) return locationTerms.some((t) => loc.includes(t));
-            if (e.event.location_type !== "offline") return true;
             return false;
           })
           .map((e) => ({
@@ -105,7 +106,7 @@ export async function fetchAndFilterLumaEvents(
     })
   );
 
-  return deduplicateByUrl(results.flat());
+  return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
 // --- Eventbrite — une requête par mot-clé en parallèle ---
@@ -163,15 +164,15 @@ function extractEventbriteEvents(
         if (item["@type"] !== "Event" || !item.startDate || !item.url) continue;
         const date = item.startDate.slice(0, 10);
         if (date < dateFrom || date > dateEnd) continue;
+        // Exclure les événements online — le radar cherche les conflits physiques
         const isOnline = item.eventAttendanceMode?.includes("Online") || item.eventAttendanceMode?.includes("Mixed");
+        if (isOnline) continue;
         const country = item.location?.address?.addressCountry?.toLowerCase() ?? "";
         const locality = item.location?.address?.addressLocality?.toLowerCase() ?? "";
         const region = item.location?.address?.addressRegion?.toLowerCase() ?? "";
         const locText = `${locality} ${region}`;
-        if (!isOnline) {
-          if (country && country !== expectedCountry) continue;
-          if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
-        }
+        if (country && country !== expectedCountry) continue;
+        if (locality && !locationTerms.some((t) => locText.includes(t))) continue;
         events.push({
           title: item.name ?? "Sans titre",
           date,
@@ -219,7 +220,7 @@ export async function fetchAndFilterEventbriteEvents(
     })
   );
 
-  return deduplicateByUrl(results.flat());
+  return deduplicateByUrl(results.flat()).slice(0, 10);
 }
 
 // --- Meetup — scraping HTML ---
@@ -276,6 +277,39 @@ export async function fetchMeetupData(url: string): Promise<string> {
     return extractMeetupData(await res.text());
   } catch {
     return "";
+  }
+}
+
+// --- Meetup — extraction Claude ---
+
+export async function extractMeetupEventsWithClaude(
+  aiCall: (prompt: string, maxTokens: number) => Promise<string | null>,
+  meetupRaw: string,
+  ville: string,
+  dateFrom: string,
+  dateEnd: string
+): Promise<EventResult[]> {
+  if (meetupRaw.length < 50) return [];
+
+  const prompt = `Extrais les 10 premiers événements Meetup EN PRÉSENTIEL (physiques) de ces données.
+Exclure les événements en ligne / online / virtual.
+Ville: ${ville}, période: ${dateFrom}→${dateEnd}
+Données:
+${meetupRaw}
+JSON UNIQUEMENT:{"events":[{"title":"...","date":"YYYY-MM-DD","time":"HH:MM|null","location":"...|null","url":"https://meetup.com/...","source":"meetup","description":"...|null"}]}`;
+
+  const text = await aiCall(prompt, 1500);
+  if (!text) return [];
+
+  try {
+    const cb = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    const clean = cb ? cb[1].trim() : text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const parsed = JSON.parse(clean) as { events: EventResult[] };
+    return (parsed.events ?? [])
+      .filter((e) => e.date && e.date >= dateFrom && e.date <= dateEnd)
+      .slice(0, 10);
+  } catch {
+    return [];
   }
 }
 

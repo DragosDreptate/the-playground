@@ -429,13 +429,14 @@
       "modalTitle": "Radar de planification",
       "keywords": "Mots-clés détectés",
       "editKeywords": "Modifier",
+      "addKeyword": "Ajouter…",
       "relaunch": "Relancer",
       "conflictsSection": "Ce jour-là",
       "weekSection": "Cette semaine",
       "noResults": "Aucun événement trouvé pour ces critères.",
       "errorNoCity": "Ville non détectée. Ajoutez une adresse plus précise.",
       "rateLimitReached": "Limite atteinte — {limit} analyses par jour maximum. Revenez demain.",
-      "sources": "Sources : Luma · Eventbrite · Meetup · Mobilizon",
+      "sources": "Sources : Luma · Eventbrite · Meetup",
       "close": "Fermer",
       "cityLabel": "dans {city}",
       "badgeNew": "NOUVEAU",
@@ -1348,7 +1349,8 @@
       },
       "radar": {
         "title": "Le Radar — éviter les conflits",
-        "intro": "Le <strong>Radar</strong> est un outil disponible dans le formulaire de création d'événement. Une fois le titre, la date et le lieu renseignés, il scanne les événements existants (Luma, Eventbrite, Meetup) dans votre ville pendant la semaine choisie, pour vous aider à détecter les conflits et choisir le meilleur créneau.",
+        "intro": "Le <strong>Radar</strong> est disponible dans le formulaire de création et de modification d'événement. Une fois le titre, la date et le lieu physique renseignés, il scanne les événements <strong>en présentiel</strong> (Luma, Eventbrite, Meetup) dans votre ville pendant la semaine choisie, pour vous aider à détecter les conflits et choisir le meilleur créneau.",
+        "keywords": "Les mots-clés sont détectés automatiquement depuis votre titre et description. Vous pouvez <strong>ajouter, supprimer ou modifier</strong> les mots-clés puis relancer l'analyse pour affiner les résultats.",
         "limit": "Vous avez <strong>25 analyses par jour</strong>."
       },
       "share": {

@@ -429,13 +429,14 @@
       "modalTitle": "Planning Radar",
       "keywords": "Detected keywords",
       "editKeywords": "Edit",
+      "addKeyword": "Add…",
       "relaunch": "Re-run",
       "conflictsSection": "That day",
       "weekSection": "That week",
       "noResults": "No events found for these criteria.",
       "errorNoCity": "City not detected. Add a more precise address.",
       "rateLimitReached": "Daily limit reached — {limit} analyses maximum per day. Come back tomorrow.",
-      "sources": "Sources: Luma · Eventbrite · Meetup · Mobilizon",
+      "sources": "Sources: Luma · Eventbrite · Meetup",
       "close": "Close",
       "cityLabel": "in {city}",
       "badgeNew": "NEW",
@@ -1348,7 +1349,8 @@
       },
       "radar": {
         "title": "The Radar — avoid scheduling conflicts",
-        "intro": "The <strong>Radar</strong> is a tool available in the event creation form. Once you have filled in the title, date, and location, it scans existing events (Luma, Eventbrite, Meetup) in your city during the selected week, helping you detect scheduling conflicts and pick the best time slot.",
+        "intro": "The <strong>Radar</strong> is available in the event creation and edit forms. Once you have filled in the title, date, and physical location, it scans <strong>in-person events</strong> (Luma, Eventbrite, Meetup) in your city during the selected week, helping you detect scheduling conflicts and pick the best time slot.",
+        "keywords": "Keywords are automatically detected from your title and description. You can <strong>add, remove, or edit</strong> keywords then re-run the analysis to refine results.",
         "limit": "You have <strong>25 analyses per day</strong>."
       },
       "share": {

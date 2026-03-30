@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { Radar, Search, X, ExternalLink, Clock, MapPin, Calendar, Pencil } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -353,10 +353,34 @@ export function MomentFormRadar({
     setNoCity(false);
     setError(null);
     setEditingKeywords(false);
+    setNewKeyword("");
   }
+
+  const [newKeyword, setNewKeyword] = useState("");
+  const keywordInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingKeywords) {
+      keywordInputRef.current?.focus();
+    }
+  }, [editingKeywords]);
 
   function removeKeyword(kw: string) {
     setKeywords((prev) => prev.filter((k) => k !== kw));
+  }
+
+  function addKeyword(raw: string) {
+    const kw = raw.trim().slice(0, 50);
+    if (!kw) return;
+    setKeywords((prev) => (prev.includes(kw) ? prev : [...prev, kw]));
+    setNewKeyword("");
+  }
+
+  function handleKeywordInputKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addKeyword(newKeyword);
+    }
   }
 
   const dayEvents = events?.filter((e) => e.date === targetDate) ?? [];
@@ -370,11 +394,8 @@ export function MomentFormRadar({
           <Radar className="text-primary size-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 text-sm font-semibold">
+          <p className="text-sm font-semibold">
             {t("title")}
-            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-              {t("badgeNew")}
-            </span>
           </p>
           <p className="text-muted-foreground text-xs leading-relaxed">
             {lastCity || startsAt ? (
@@ -397,7 +418,6 @@ export function MomentFormRadar({
         </div>
         <Button
           type="button"
-          variant="outline"
           size="sm"
           disabled={!canActivate}
           onClick={handleOpen}
@@ -437,7 +457,7 @@ export function MomentFormRadar({
           </DialogHeader>
 
           {/* Keywords — label uppercase + icône Pencil sur Modifier */}
-          {!loading && keywords.length > 0 && (
+          {!loading && (keywords.length > 0 || editingKeywords) && (
             <div className="border-border border-b px-5 py-3">
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-muted-foreground mr-0.5 shrink-0 text-[11px] font-semibold uppercase tracking-wider">
@@ -461,6 +481,19 @@ export function MomentFormRadar({
                     )}
                   </span>
                 ))}
+                {editingKeywords && (
+                  <input
+                    ref={keywordInputRef}
+                    type="text"
+                    value={newKeyword}
+                    onChange={(e) => setNewKeyword(e.target.value)}
+                    onKeyDown={handleKeywordInputKeyDown}
+                    onBlur={() => addKeyword(newKeyword)}
+                    placeholder={t("addKeyword")}
+                    maxLength={50}
+                    className="border-border bg-transparent text-foreground placeholder:text-muted-foreground inline-flex h-[26px] w-28 rounded-full border border-dashed px-2.5 text-xs outline-none focus:border-primary"
+                  />
+                )}
                 {!editingKeywords ? (
                   <button
                     type="button"
@@ -474,8 +507,14 @@ export function MomentFormRadar({
                   <button
                     type="button"
                     onClick={() => {
+                      const pending = newKeyword.trim().slice(0, 50);
+                      const finalKw = pending && !keywords.includes(pending)
+                        ? [...keywords, pending]
+                        : keywords;
+                      setKeywords(finalKw);
+                      setNewKeyword("");
                       setEditingKeywords(false);
-                      runRadar(keywords);
+                      runRadar(finalKw);
                     }}
                     className="bg-primary text-primary-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium transition-opacity hover:opacity-90"
                   >

@@ -1,11 +1,87 @@
-# Local Events Watcher — Exploration produit
+# Local Events Watcher — Radar d'événements
 
-> Fonctionnalité exploratoire : radar d'événements concurrents pour les Organisateurs.
-> Ce document trace toutes les discussions, hypothèses et décisions prises sur ce sujet.
-> **Aucune implémentation n'est liée à ce document pour l'instant.**
+> Radar d'événements concurrents en présentiel pour les Organisateurs.
+> Ce document trace l'exploration initiale et les décisions, suivi de l'état de l'implémentation actuelle.
 >
-> Statut : **En pause** — à reprendre quand l'état DRAFT est implémenté
-> Dernière mise à jour : 2026-02-25
+> Statut : **Implémenté et en production**
+> Dernière mise à jour : 2026-03-30
+
+---
+
+## Implémentation actuelle (production)
+
+### Vue d'ensemble
+
+Le Radar est intégré au formulaire de **création et modification** d'événement. Il scanne les événements **en présentiel uniquement** sur 3 plateformes (Luma, Eventbrite, Meetup) pour détecter les conflits de créneau.
+
+### Sources et stratégie de scraping
+
+| Source | Méthode | Filtrage |
+|---|---|---|
+| **Luma** | API REST (`api.lu.ma/discover/get-paginated-events`) | Par ville (`near`), par mot-clé (`query`), filtrage date + localisation côté serveur |
+| **Eventbrite** | Scraping HTML + extraction JSON-LD (schema.org) | Par ville (URL path), par mot-clé (`?q=`), filtrage date + localisation + pays côté serveur |
+| **Meetup** | Scraping HTML + extraction `__NEXT_DATA__` + parsing Claude Haiku | Par ville (`location`), par mot-clé (`keywords`), extraction IA des événements structurés |
+
+**Mobilizon** a été retiré (source marginale, maintenance complexe).
+
+### Flux de données
+
+1. L'Organisateur remplit titre + date + lieu physique → bouton "Analyser" activé
+2. Claude Haiku extrait **mots-clés** (2-3) + **ville** depuis les données du formulaire
+3. **1 requête par mot-clé** en parallèle sur chaque plateforme (stratégie OR)
+4. Résultats fusionnés, dédupliqués par URL, triés par date
+5. Limité à **10 résultats par plateforme** (confiance au ranking des plateformes)
+6. Affichage dans une modale : "Ce jour-là" (rouge) + "Cette semaine" (orange)
+
+### Filtrage
+
+- **Événements online exclus** — le radar cherche les conflits physiques uniquement
+  - Luma : `location_type !== "offline"` → exclu
+  - Eventbrite : `eventAttendanceMode` contient "Online" ou "Mixed" → exclu
+  - Meetup : instruction Claude d'exclure les événements en ligne
+- **Pas de post-filtre par mot-clé** — les plateformes filtrent par pertinence via leurs query params, on fait confiance à leur ranking
+- **Fenêtre temporelle** : semaine complète (lundi → dimanche) autour de la date de l'événement
+
+### Gestion des mots-clés
+
+- Extraction automatique par Claude Haiku depuis titre + description + lieu
+- L'utilisateur peut **ajouter** (input inline, validation sur Entrée ou virgule), **supprimer** (clic X), puis **relancer** l'analyse
+- Les mots composés sont supportés ("product management", "vibe coding")
+- Séparateur dans le lab : virgule
+
+### Rate limiting
+
+- **25 analyses/jour** par utilisateur (table `RadarUsage` en DB)
+- Admins exemptés
+- Compteur par date UTC
+
+### Fichiers
+
+| Fichier | Rôle |
+|---|---|
+| `src/lib/events-radar.ts` | Librairie partagée : scraping, dédup, extraction Meetup/Claude, utilitaires |
+| `src/components/moments/moment-form-radar.tsx` | Composant UI (modale, keywords, résultats) |
+| `src/app/api/moments/radar/route.ts` | API SSE production (auth + rate limit + extraction keywords Claude + scraping) |
+| `src/app/api/lab/events-radar/route.ts` | API SSE lab admin (même code de scraping, sans extraction keywords) |
+
+### Décisions d'implémentation
+
+| Décision | Raison |
+|---|---|
+| Scraping direct (pas SerpAPI) | Gratuit, suffisant pour le volume MVP |
+| Claude Haiku pour extraction keywords + Meetup | Rapide et peu coûteux |
+| 1 requête par keyword (OR) | Plus de résultats qu'un AND, couverture élargie |
+| 10 résultats max par plateforme | Confiance au ranking des plateformes, évite le bruit |
+| Physique uniquement | Le radar sert à éviter les conflits de créneau local |
+| Modale (option C) | UX retenue après mockups A/B/C |
+| Lab et production partagent le même code | `events-radar.ts` = source unique de vérité |
+
+---
+
+## Exploration initiale (historique)
+
+> Les sections ci-dessous documentent l'exploration produit initiale (février 2026).
+> Elles sont conservées pour traçabilité mais ne reflètent plus l'état actuel.
 
 ---
 
@@ -448,17 +524,24 @@ Meetup pour la richesse des données communautaires (catégories, membres, group
 | — | Fenêtre temporelle | À décider | — |
 | — | Fraîcheur données / cache | À décider | — |
 | 2026-02-25 | Sources MVP | **Meetup + SerpAPI (Option D)** — free tier SerpAPI (250 req/mois) viable pour le MVP avec cache 24h | Couverture max à coût $0 |
+| 2026-03-30 | Sources implémentées | **Luma API + Eventbrite scraping + Meetup scraping** — SerpAPI non retenu | Scraping direct gratuit et suffisant pour le MVP |
+| 2026-03-30 | Mobilizon retiré | Source marginale supprimée | Peu d'adoption en France, maintenance complexe |
+| 2026-03-30 | UX retenue | **Modale (option C)** dans le formulaire création/édition | Mockups A/B/C testés |
+| 2026-03-30 | Événements online | **Exclus** — physique uniquement | Le radar sert à éviter les conflits de créneau local |
+| 2026-03-30 | Post-filtre supprimé | Confiance au ranking des plateformes, 10 résultats max/plateforme | Évite de filtrer des résultats pertinents dont le titre ne contient pas littéralement le mot-clé |
+| 2026-03-30 | Keywords éditables | L'utilisateur peut ajouter/supprimer des mots-clés et relancer | Flexibilité pour affiner les résultats |
+| 2026-03-30 | Code mutualisé | Lab et production partagent `events-radar.ts` | Zéro duplication, cohérence garantie |
 
 ---
 
 ## Points bloquants identifiés
 
-1. ~~Légalité du scraping~~ → **résolu** : APIs officielles uniquement
-2. **Couverture limitée** — Luma (concurrent direct) est inaccessible via API. Eventbrite Search API supprimée définitivement. On couvre surtout l'écosystème Meetup (communautés), moins l'écosystème pro/corporate.
-3. **Weezevent à confirmer** — la recherche géographique via leur API est documentée de façon floue. Nécessite un test technique.
-4. **Rayon géographique** — le lieu saisi par l'Organisateur peut être une adresse, une ville, ou "en ligne". Il faut un geocoding (lat/lon) pour requêter Meetup. Quel service de geocoding ? (Google Maps Geocoding, Nominatim/OpenStreetMap, etc.)
-5. **Événements "en ligne"** — out of scope du radar géographique ? À clarifier.
-6. **Décision sources MVP** — Meetup seul suffisant, ou besoin de SerpAPI pour couvrir Luma/Eventbrite ?
+1. ~~Légalité du scraping~~ → **résolu** : scraping à faible volume sur données publiques
+2. ~~Couverture limitée~~ → **résolu** : Luma API + Eventbrite JSON-LD + Meetup scraping couvrent l'essentiel du marché FR
+3. ~~Événements "en ligne"~~ → **résolu** : exclus du radar (physique uniquement)
+4. ~~Décision sources MVP~~ → **résolu** : scraping direct sans SerpAPI
+5. **Meetup scraping fragile** — parsing `__NEXT_DATA__` dépend de la structure HTML Next.js qui peut changer
+6. **Pas de cache** — chaque recherche = 3 fetches réseau. Cache court-terme (1-4h) à envisager pour les performances
 
 ---
 
