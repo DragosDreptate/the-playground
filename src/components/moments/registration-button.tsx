@@ -47,7 +47,7 @@ type RegistrationButtonProps = {
   refundable?: boolean;
 };
 
-function StatsColumn({
+function StatsInfo({
   count,
   spotsRemaining,
   isFull,
@@ -58,7 +58,7 @@ function StatsColumn({
 }) {
   const t = useTranslations("Moment");
   return (
-    <div className="flex flex-col items-end gap-0.5 shrink-0">
+    <div className="hidden shrink-0 flex-col items-end gap-0.5">
       <span className="text-sm font-semibold">
         {t("public.registrantsCount", { count })}
       </span>
@@ -113,10 +113,10 @@ export function RegistrationButton({
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
-        <Button className="rounded-full md:px-7" asChild>
+        <Button className="w-full rounded-full" size="lg" asChild>
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
-        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
       </div>
     );
   }
@@ -126,10 +126,10 @@ export function RegistrationButton({
     if (isFull) {
       return (
         <div className="flex items-center justify-between gap-3">
-          <Button className="rounded-full" disabled>
+          <Button className="w-full rounded-full" size="lg" disabled>
             {t("public.eventFull")}
           </Button>
-          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
         </div>
       );
     }
@@ -138,7 +138,8 @@ export function RegistrationButton({
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3">
           <Button
-            className="rounded-full md:px-7"
+            className="w-full rounded-full"
+            size="lg"
             disabled={isPending}
             onClick={() => {
               startTransition(async () => {
@@ -164,7 +165,7 @@ export function RegistrationButton({
                   currency,
                 })}
           </Button>
-          <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
         </div>
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
@@ -317,7 +318,8 @@ export function RegistrationButton({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <Button
-          className={`rounded-full${!isFull ? " md:px-7" : ""}`}
+          className="w-full rounded-full"
+          size="lg"
           disabled={isPending}
           onClick={() => {
             startTransition(async () => {
@@ -347,7 +349,7 @@ export function RegistrationButton({
                 ? t("public.joinWaitlist")
                 : t("public.registerFree")}
         </Button>
-        <StatsColumn count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
+        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
       </div>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
