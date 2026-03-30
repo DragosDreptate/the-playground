@@ -77,7 +77,9 @@
       "emailPlaceholder": "votre@email.com",
       "magicLink": "Envoyer un lien magique",
       "or": "ou",
-      "linkedin": "Continuer avec LinkedIn"
+      "linkedin": "Continuer avec LinkedIn",
+      "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous — elle fonctionne partout.",
+      "webviewTooltip": "Non disponible depuis un navigateur intégré. Utilisez la connexion par email."
     },
     "verifyRequest": {
       "title": "Vérifiez votre email",
@@ -85,7 +87,10 @@
     },
     "error": {
       "title": "Erreur d'authentification",
-      "backToSignIn": "Retour à la connexion"
+      "backToSignIn": "Retour à la connexion",
+      "webviewExplanation": "Google et GitHub bloquent la connexion depuis les navigateurs intégrés (LinkedIn, Instagram, Facebook...).",
+      "webviewAction": "Utilisez la connexion par email, ou ouvrez le site dans votre navigateur.",
+      "openInBrowser": "Ouvrir dans le navigateur"
     },
     "errors": {
       "Configuration": "Erreur de configuration du serveur.",

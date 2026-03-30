@@ -1,13 +1,20 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Github, Loader2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Github, Loader2, Mail } from "lucide-react";
 import { signInWithGitHub, signInWithGoogle, signInWithEmail } from "@/app/actions/auth";
+import { isInAppBrowser } from "@/lib/detect-webview";
 
 function GoogleIcon() {
   return (
@@ -38,40 +45,97 @@ function SubmitButton({
   );
 }
 
+function DisabledOAuthButton({
+  label,
+  icon,
+  tooltip,
+}: {
+  label: string;
+  icon: ReactNode;
+  tooltip: string;
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button variant="outline" className="w-full opacity-50 cursor-not-allowed" type="button" disabled>
+          {icon}
+          {label}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-64 text-center">
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
 type SignInFormProps = {
   callbackUrl?: string;
 };
 
 export function SignInForm({ callbackUrl }: SignInFormProps) {
   const t = useTranslations("Auth");
+  const [webview, setWebview] = useState(false);
+
+  useEffect(() => {
+    setWebview(isInAppBrowser());
+  }, []);
 
   return (
-    <div className="space-y-4">
-      <form action={signInWithGoogle}>
-        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-        <SubmitButton label={t("signIn.google")} icon={<GoogleIcon />} variant="outline" />
-      </form>
-      <form action={signInWithGitHub}>
-        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-        <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
-      </form>
+    <TooltipProvider>
+      <div className="space-y-4">
+        {webview && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
+            <div className="flex items-start gap-2">
+              <Mail className="size-4 shrink-0 mt-0.5 text-primary" />
+              <p>{t("signIn.webviewNotice")}</p>
+            </div>
+          </div>
+        )}
 
-      <div className="flex items-center gap-3">
-        <Separator className="flex-1" />
-        <span className="text-muted-foreground text-xs uppercase">{t("signIn.or")}</span>
-        <Separator className="flex-1" />
+        {webview ? (
+          <>
+            <DisabledOAuthButton
+              label={t("signIn.google")}
+              icon={<GoogleIcon />}
+              tooltip={t("signIn.webviewTooltip")}
+            />
+            <DisabledOAuthButton
+              label={t("signIn.github")}
+              icon={<Github className="size-4" />}
+              tooltip={t("signIn.webviewTooltip")}
+            />
+          </>
+        ) : (
+          <>
+            <form action={signInWithGoogle}>
+              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+              <SubmitButton label={t("signIn.google")} icon={<GoogleIcon />} variant="outline" />
+            </form>
+            <form action={signInWithGitHub}>
+              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+              <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
+            </form>
+          </>
+        )}
+
+        <div className="flex items-center gap-3">
+          <Separator className="flex-1" />
+          <span className="text-muted-foreground text-xs uppercase">{t("signIn.or")}</span>
+          <Separator className="flex-1" />
+        </div>
+
+        <form action={signInWithEmail} className="space-y-3">
+          {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+          <Input
+            name="email"
+            type="email"
+            placeholder={t("signIn.emailPlaceholder")}
+            required
+          />
+          <SubmitButton label={t("signIn.magicLink")} />
+        </form>
       </div>
-
-      <form action={signInWithEmail} className="space-y-3">
-        {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-        <Input
-          name="email"
-          type="email"
-          placeholder={t("signIn.emailPlaceholder")}
-          required
-        />
-        <SubmitButton label={t("signIn.magicLink")} />
-      </form>
-    </div>
+    </TooltipProvider>
   );
 }
