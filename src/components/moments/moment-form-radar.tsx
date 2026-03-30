@@ -394,11 +394,8 @@ export function MomentFormRadar({
           <Radar className="text-primary size-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 text-sm font-semibold">
+          <p className="text-sm font-semibold">
             {t("title")}
-            <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-              {t("badgeNew")}
-            </span>
           </p>
           <p className="text-muted-foreground text-xs leading-relaxed">
             {lastCity || startsAt ? (
