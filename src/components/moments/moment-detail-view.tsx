@@ -607,28 +607,26 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </Link>
               </div>
             ) : (
-              <div className="border-border bg-card rounded-2xl border p-6">
-                <RegistrationButton
-                  momentId={moment.id}
-                  slug={moment.slug}
-                  circleId={circle.id}
-                  circleName={circle.name}
-                  price={moment.price}
-                  currency={moment.currency}
-                  isAuthenticated={props.isAuthenticated}
-                  existingRegistration={props.existingRegistration}
-                  signInUrl={props.signInUrl}
-                  isFull={props.isFull}
-                  spotsRemaining={props.spotsRemaining}
-                  registrationCount={registeredCount}
-                  isHost={props.isHost}
-                  calendarData={props.calendarData}
-                  appUrl={props.appUrl}
-                  waitlistPosition={props.waitlistPosition}
-                  requiresApproval={moment.requiresApproval}
-                  refundable={moment.refundable}
-                />
-              </div>
+              <RegistrationButton
+                momentId={moment.id}
+                slug={moment.slug}
+                circleId={circle.id}
+                circleName={circle.name}
+                price={moment.price}
+                currency={moment.currency}
+                isAuthenticated={props.isAuthenticated}
+                existingRegistration={props.existingRegistration}
+                signInUrl={props.signInUrl}
+                isFull={props.isFull}
+                spotsRemaining={props.spotsRemaining}
+                registrationCount={registeredCount}
+                isHost={props.isHost}
+                calendarData={props.calendarData}
+                appUrl={props.appUrl}
+                waitlistPosition={props.waitlistPosition}
+                requiresApproval={moment.requiresApproval}
+                refundable={moment.refundable}
+              />
             )
           )}
 
