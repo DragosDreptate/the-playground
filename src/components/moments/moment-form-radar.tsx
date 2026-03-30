@@ -418,7 +418,6 @@ export function MomentFormRadar({
         </div>
         <Button
           type="button"
-          variant="outline"
           size="sm"
           disabled={!canActivate}
           onClick={handleOpen}
