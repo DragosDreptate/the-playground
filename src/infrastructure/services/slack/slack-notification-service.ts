@@ -1,5 +1,9 @@
 const WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
 
+export function isAdminEmailEnabled(): boolean {
+  return process.env.ADMIN_NOTIFICATIONS_EMAIL !== "false";
+}
+
 export async function sendSlackAdminNotification(text: string): Promise<void> {
   if (!WEBHOOK_URL) return;
 

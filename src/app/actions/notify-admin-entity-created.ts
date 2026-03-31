@@ -2,7 +2,7 @@
 
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
-import { sendSlackAdminNotification } from "@/infrastructure/services/slack/slack-notification-service";
+import { sendSlackAdminNotification, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 
 const emailService = createResendEmailService();
 
@@ -45,29 +45,31 @@ export async function notifyAdminEntityCreated(
     footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
   };
 
-  const results = await Promise.allSettled(
-    recipients.map((to) =>
-      emailService.sendAdminEntityCreated({
-        to,
-        entityType: params.entityType,
-        entityName: params.entityName,
-        creatorName: params.creatorName,
-        creatorEmail: params.creatorEmail,
-        circleName: params.circleName,
-        entityUrl,
-        strings,
-      })
-    )
-  );
+  if (isAdminEmailEnabled()) {
+    const results = await Promise.allSettled(
+      recipients.map((to) =>
+        emailService.sendAdminEntityCreated({
+          to,
+          entityType: params.entityType,
+          entityName: params.entityName,
+          creatorName: params.creatorName,
+          creatorEmail: params.creatorEmail,
+          circleName: params.circleName,
+          entityUrl,
+          strings,
+        })
+      )
+    );
 
-  results.forEach((result, i) => {
-    if (result.status === "rejected") {
-      console.error(
-        `[notifyAdminEntityCreated] Échec envoi email admin ${recipients[i]}:`,
-        result.reason
-      );
-    }
-  });
+    results.forEach((result, i) => {
+      if (result.status === "rejected") {
+        console.error(
+          `[notifyAdminEntityCreated] Échec envoi email admin ${recipients[i]}:`,
+          result.reason
+        );
+      }
+    });
+  }
 
   const icon = isCircle ? "🟣" : "📅";
   await sendSlackAdminNotification(

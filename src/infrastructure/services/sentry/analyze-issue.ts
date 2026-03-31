@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
-import { sendSlackAdminNotification } from "@/infrastructure/services/slack/slack-notification-service";
+import { sendSlackAdminNotification, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
 
 const SENTRY_REGION = "https://de.sentry.io";
@@ -206,8 +206,7 @@ async function sendAnalysisEmail(
 
 export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   const token = process.env.SENTRY_AUTH_TOKEN;
-  const resendKey = process.env.AUTH_RESEND_KEY;
-  if (!token || !resendKey) return;
+  if (!token) return;
 
   const sentryOrg = process.env.SENTRY_ORG ?? "the-playground-id";
 
@@ -218,10 +217,10 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   // 2. Analyze with Claude
   const analysis = await analyzeWithClaude(issue, stacktrace);
 
-  // 3. Send email + Slack
+  // 3. Send Slack + email (if enabled)
   const sentryUrl = `https://${sentryOrg}.sentry.io/issues/${issue.issueId}/`;
   await Promise.all([
-    sendAnalysisEmail(issue, analysis, sentryUrl),
+    isAdminEmailEnabled() ? sendAnalysisEmail(issue, analysis, sentryUrl) : Promise.resolve(),
     sendSlackAdminNotification(
       `🚨 *[Sentry ${URGENCY_LABELS[analysis.urgency] ?? "INCONNUE"}]* ${issue.issueShortId} — ${issue.issueTitle}\n*Culprit:* ${issue.culprit}\n*Impact:* ${analysis.impact}\n*Diagnostic:* ${analysis.diagnosis}\n*Remediation:* ${analysis.remediation}\n${sentryUrl}`
     ),
