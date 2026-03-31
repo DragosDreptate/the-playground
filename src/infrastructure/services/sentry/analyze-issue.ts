@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
+import { sendSlackAdminNotification } from "@/infrastructure/services/slack/slack-notification-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
 
 const SENTRY_REGION = "https://de.sentry.io";
@@ -217,7 +218,12 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   // 2. Analyze with Claude
   const analysis = await analyzeWithClaude(issue, stacktrace);
 
-  // 3. Send email
+  // 3. Send email + Slack
   const sentryUrl = `https://${sentryOrg}.sentry.io/issues/${issue.issueId}/`;
-  await sendAnalysisEmail(issue, analysis, sentryUrl);
+  await Promise.all([
+    sendAnalysisEmail(issue, analysis, sentryUrl),
+    sendSlackAdminNotification(
+      `🚨 *[Sentry ${URGENCY_LABELS[analysis.urgency] ?? "INCONNUE"}]* ${issue.issueShortId} — ${issue.issueTitle}\n*Culprit:* ${issue.culprit}\n*Impact:* ${analysis.impact}\n*Diagnostic:* ${analysis.diagnosis}\n*Remediation:* ${analysis.remediation}\n${sentryUrl}`
+    ),
+  ]);
 }

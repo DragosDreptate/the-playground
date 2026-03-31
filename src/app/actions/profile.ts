@@ -14,6 +14,7 @@ import { after } from "next/server";
 import { createResendEmailService } from "@/infrastructure/services";
 import { formatLongDate } from "@/lib/format-date";
 import { getDisplayName } from "@/lib/display-name";
+import { sendSlackAdminNotification } from "@/infrastructure/services/slack/slack-notification-service";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 
@@ -128,6 +129,10 @@ async function notifyAdminNewUser(user: User): Promise<void> {
       console.error(`[notifyAdminNewUser] Échec envoi email admin ${recipients[i]}:`, result.reason);
     }
   });
+
+  await sendSlackAdminNotification(
+    `👤 *Nouvel utilisateur* — ${userName}\n${user.email}\nInscrit le ${registeredAt}\n${adminUsersUrl}`
+  );
 }
 
 export async function deleteAccountAction(): Promise<ActionResult> {
