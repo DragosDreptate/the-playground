@@ -182,7 +182,7 @@ async function sendAnalysisEmail(
   if (!resendKey) return;
 
   const resend = new Resend(resendKey);
-  const adminEmail = process.env.SENTRY_ALERT_EMAIL ?? "dragos@theplayground.fr";
+  const adminEmail = process.env.SENTRY_ALERT_EMAIL ?? "ddreptate@gmail.com";
   const urgencyLabel = URGENCY_LABELS[analysis.urgency] ?? "INCONNUE";
 
   await resend.emails.send({
