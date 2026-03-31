@@ -2,7 +2,7 @@
 
 import { prismaUserRepository } from "@/infrastructure/repositories";
 import { createResendEmailService } from "@/infrastructure/services";
-import { sendSlackAdminNotification, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
+import { notifySlackNewEntity, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 
 const emailService = createResendEmailService();
 
@@ -71,8 +71,12 @@ export async function notifyAdminEntityCreated(
     });
   }
 
-  const icon = isCircle ? "🟣" : "📅";
-  await sendSlackAdminNotification(
-    `${icon} *Nouveau${isCircle ? "lle" : ""} ${entityLabel}* — ${params.entityName}\nPar ${params.creatorName} (${params.creatorEmail})${params.circleName ? `\nCommunaute : ${params.circleName}` : ""}\n${entityUrl}`
-  );
+  await notifySlackNewEntity({
+    entityType: params.entityType,
+    entityName: params.entityName,
+    creatorName: params.creatorName,
+    creatorEmail: params.creatorEmail,
+    circleName: params.circleName,
+    entityUrl,
+  });
 }

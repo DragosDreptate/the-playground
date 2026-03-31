@@ -4,17 +4,99 @@ export function isAdminEmailEnabled(): boolean {
   return process.env.ADMIN_NOTIFICATIONS_EMAIL !== "false";
 }
 
-export async function sendSlackAdminNotification(text: string): Promise<void> {
+type SlackBlock =
+  | { type: "header"; text: { type: "plain_text"; text: string; emoji: true } }
+  | { type: "section"; text: { type: "mrkdwn"; text: string }; fields?: undefined }
+  | { type: "section"; fields: { type: "mrkdwn"; text: string }[]; text?: undefined }
+  | { type: "divider" }
+  | { type: "context"; elements: { type: "mrkdwn"; text: string }[] }
+  | { type: "actions"; elements: { type: "button"; text: { type: "plain_text"; text: string }; url: string; style?: "primary" | "danger" }[] };
+
+async function sendSlack(payload: { text: string; blocks?: SlackBlock[] }): Promise<void> {
   if (!WEBHOOK_URL) return;
 
   try {
     await fetch(WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify(payload),
       signal: AbortSignal.timeout(5000),
     });
   } catch {
     // Silent failure — Slack is best-effort, never block the main flow
   }
+}
+
+// --- Notifications admin ---
+
+export async function notifySlackNewEntity(params: {
+  entityType: "circle" | "moment";
+  entityName: string;
+  creatorName: string;
+  creatorEmail: string;
+  circleName?: string;
+  entityUrl: string;
+}): Promise<void> {
+  const isCircle = params.entityType === "circle";
+  const icon = isCircle ? "🟣" : "📅";
+  const label = isCircle ? "Nouvelle Communaute" : "Nouvel evenement";
+
+  const bodyParts = [`*${params.entityName}*`, `Par ${params.creatorName} (${params.creatorEmail})`];
+  if (params.circleName) bodyParts.push(`Communaute : ${params.circleName}`);
+
+  await sendSlack({
+    text: `${icon} ${label} — ${params.entityName}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: `${icon} ${label}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: bodyParts.join("\n") } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans le dashboard" }, url: params.entityUrl }] },
+    ],
+  });
+}
+
+export async function notifySlackNewUser(params: {
+  userName: string;
+  userEmail: string;
+  registeredAt: string;
+  adminUsersUrl: string;
+}): Promise<void> {
+  await sendSlack({
+    text: `👤 Nouvel utilisateur — ${params.userName}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "👤 Nouvel utilisateur", emoji: true } },
+      { type: "section", fields: [
+        { type: "mrkdwn", text: `*Nom*\n${params.userName}` },
+        { type: "mrkdwn", text: `*Email*\n${params.userEmail}` },
+      ]},
+      { type: "context", elements: [{ type: "mrkdwn", text: `Inscrit le ${params.registeredAt}` }] },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir les utilisateurs" }, url: params.adminUsersUrl }] },
+    ],
+  });
+}
+
+export async function notifySlackSentryIssue(params: {
+  issueShortId: string;
+  issueTitle: string;
+  culprit: string;
+  urgencyLabel: string;
+  impact: string;
+  diagnosis: string;
+  remediation: string;
+  sentryUrl: string;
+}): Promise<void> {
+  await sendSlack({
+    text: `🚨 [Sentry ${params.urgencyLabel}] ${params.issueShortId} — ${params.issueTitle}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${params.urgencyLabel}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.issueShortId}*\n${params.issueTitle}` } },
+      { type: "divider" },
+      { type: "section", fields: [
+        { type: "mrkdwn", text: `*Culprit*\n\`${params.culprit}\`` },
+        { type: "mrkdwn", text: `*Impact*\n${params.impact}` },
+      ]},
+      { type: "section", text: { type: "mrkdwn", text: `*Diagnostic*\n${params.diagnosis}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Remediation*\n${params.remediation}` } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: params.sentryUrl, style: "danger" }] },
+    ],
+  });
 }
