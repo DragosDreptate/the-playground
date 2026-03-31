@@ -212,6 +212,6 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   const analysis = await analyzeWithClaude(issue, stacktrace);
 
   // 3. Send email
-  const sentryUrl = `${SENTRY_REGION}/organizations/${SENTRY_ORG}/issues/${issue.issueId}/`;
+  const sentryUrl = `https://${SENTRY_ORG}.sentry.io/issues/${issue.issueId}/`;
   await sendAnalysisEmail(issue, analysis, sentryUrl);
 }

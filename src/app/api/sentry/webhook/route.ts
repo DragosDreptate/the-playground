@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { after } from "next/server";
+import { createHmac, timingSafeEqual } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 import { analyzeSentryIssue } from "@/infrastructure/services/sentry/analyze-issue";
 
@@ -7,7 +8,8 @@ function verifySignature(body: string, signature: string, secret: string): boole
   const hmac = createHmac("sha256", secret);
   hmac.update(body, "utf8");
   const digest = hmac.digest("hex");
-  return digest === signature;
+  if (digest.length !== signature.length) return false;
+  return timingSafeEqual(Buffer.from(digest), Buffer.from(signature));
 }
 
 type SentryIssueWebhook = {
@@ -55,27 +57,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, skipped: "not an issue event" });
   }
 
-  const payload = JSON.parse(body) as SentryIssueWebhook;
+  let payload: SentryIssueWebhook;
+  try {
+    payload = JSON.parse(body) as SentryIssueWebhook;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
   if (payload.action !== "created") {
     return NextResponse.json({ received: true, skipped: `action: ${payload.action}` });
   }
 
-  // Respond 200 immediately, analyze in background (Sentry requires < 1s response)
-  const issueId = payload.data.issue.id;
-  const issueTitle = payload.data.issue.title;
-  const issueShortId = payload.data.issue.shortId;
+  // Schedule analysis after response is sent (Sentry requires < 1s response)
+  // after() keeps the serverless function alive on Vercel until the work completes
+  after(async () => {
+    try {
+      await analyzeSentryIssue({
+        issueId: payload.data.issue.id,
+        issueShortId: payload.data.issue.shortId,
+        issueTitle: payload.data.issue.title,
+        culprit: payload.data.issue.culprit,
+        level: payload.data.issue.level,
+        platform: payload.data.issue.platform,
+        projectSlug: payload.data.issue.project.slug,
+        metadata: payload.data.issue.metadata,
+      });
+    } catch (err) {
+      Sentry.captureException(err);
+    }
+  });
 
-  analyzeSentryIssue({
-    issueId,
-    issueShortId,
-    issueTitle,
-    culprit: payload.data.issue.culprit,
-    level: payload.data.issue.level,
-    platform: payload.data.issue.platform,
-    projectSlug: payload.data.issue.project.slug,
-    metadata: payload.data.issue.metadata,
-  }).catch((err) => Sentry.captureException(err));
-
-  return NextResponse.json({ received: true, issueId: issueShortId });
+  return NextResponse.json({ received: true, issueId: payload.data.issue.shortId });
 }
