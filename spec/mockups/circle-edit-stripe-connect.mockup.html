@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Communauté — Section Paiements Stripe — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Dark mode par défaut (match le screenshot utilisateur) */
+  --primary: #e8457a;
+  --primary-10: rgba(232, 69, 122, 0.10);
+  --primary-foreground: #ffffff;
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --muted: #222336;
+  --muted-foreground: #8b8fa8;
+  --border: #383a55;
+  --input-bg: #2a2b42;
+  --radius: 0.5rem;
+  --green: #22c55e;
+  --amber: #f59e0b;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+}
+
+/* Header */
+.site-header {
+  height: 56px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.site-logo {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.site-logo .the { color: var(--foreground); }
+.site-logo .playground { color: var(--primary); }
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: 48px;
+}
+.header-nav a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Layout */
+.dashboard { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin-bottom: 24px;
+}
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+.breadcrumb svg { width: 12px; height: 12px; }
+
+/* Form layout — 2 columns */
+.form-layout {
+  display: flex;
+  gap: 32px;
+}
+
+/* Left column — cover image */
+.cover-column {
+  width: 340px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 88px;
+  align-self: flex-start;
+}
+.cover-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 16px;
+  object-fit: cover;
+  background: var(--muted);
+}
+.cover-attribution {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 8px;
+  padding: 0 4px;
+}
+.cover-attribution a { color: var(--muted-foreground); }
+.cover-attribution a:hover { color: var(--foreground); }
+
+/* Right column — fields */
+.fields-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Heading input */
+.heading-input {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  outline: none;
+  width: 100%;
+}
+.heading-input::placeholder { color: var(--muted-foreground); opacity: 0.5; }
+
+/* Separator */
+.separator { border-top: 1px solid var(--border); }
+
+/* Option row — icon + label + control */
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.option-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--primary-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.option-icon svg { width: 16px; height: 16px; color: var(--primary); }
+.option-label {
+  width: 112px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+.option-control { flex: 1; min-width: 0; }
+
+/* Input / Select appearance */
+.form-input, .form-select {
+  height: 36px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  color: var(--foreground);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 0 12px;
+  outline: none;
+}
+.form-select { appearance: none; cursor: pointer; }
+
+/* Switch row — icon + content + switch */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.switch-content { flex: 1; min-width: 0; }
+.switch-label {
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.switch-description {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 1px;
+}
+
+/* Switch control */
+.switch {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.switch.on { background: var(--primary); }
+.switch-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.switch.on .switch-thumb { transform: translateX(20px); }
+
+/* Textarea */
+.form-textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--input-bg);
+  color: var(--foreground);
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 12px;
+  outline: none;
+  resize: none;
+  line-height: 1.5;
+}
+
+/* Description section */
+.desc-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.desc-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.desc-label { font-size: 14px; font-weight: 500; }
+.desc-hint { font-size: 12px; color: var(--muted-foreground); }
+
+/* Buttons */
+.btn-row { display: flex; gap: 12px; padding-top: 8px; }
+.btn-primary {
+  flex: 1;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--primary), #d63384);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.btn-outline {
+  height: 40px;
+  padding: 0 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ====== STRIPE CONNECT STATUS VARIANTS ====== */
+
+/* Active state badge */
+.stripe-active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--green);
+  font-weight: 500;
+}
+.stripe-active-badge svg { width: 16px; height: 16px; }
+
+/* Pending state badge */
+.stripe-pending-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--amber);
+  font-weight: 500;
+}
+.stripe-pending-badge svg { width: 16px; height: 16px; }
+
+/* Small outline button (for Stripe actions) */
+.btn-sm-outline {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--foreground);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-sm-outline:hover { border-color: var(--muted-foreground); }
+.btn-sm-outline svg { width: 14px; height: 14px; }
+
+/* ====== CHANGE INDICATOR ====== */
+.new-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary);
+  background: var(--primary-10);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin-top: 64px;
+}
+.site-footer a { color: var(--muted-foreground); text-decoration: none; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="site-logo"><span class="the">the</span><span class="playground">playground</span></div>
+  <nav class="header-nav">
+    <a href="#">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+      Explorer
+    </a>
+    <a href="#">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Mon espace
+    </a>
+  </nav>
+  <div class="header-right">
+    <span style="font-size:13px;color:var(--muted-foreground)">FR</span>
+    <div class="nav-avatar">D</div>
+  </div>
+</header>
+
+<!-- Dashboard content -->
+<div class="dashboard">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    <a href="#">Art & Photo Collective</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    <span class="current">Modifier</span>
+  </div>
+
+  <!-- Form layout -->
+  <div class="form-layout">
+
+    <!-- Left column — Cover image -->
+    <div class="cover-column">
+      <img class="cover-image" src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=600&h=600&fit=crop" alt="Cover">
+      <p class="cover-attribution">Photo par <a href="#">Nonsap Visuals</a> sur Unsplash</p>
+    </div>
+
+    <!-- Right column — Fields -->
+    <div class="fields-column">
+
+      <!-- Nom -->
+      <input class="heading-input" value="Art & Photo Collective" placeholder="Nom de la Communauté">
+
+      <div class="separator"></div>
+
+      <!-- Options : Thématique / Ville / Visibilité -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+
+        <!-- Thématique -->
+        <div class="option-row">
+          <div class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <span class="option-label">Thematique</span>
+          <div class="option-control">
+            <select class="form-select">
+              <option selected>Art & Culture</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Ville -->
+        <div class="option-row">
+          <div class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <span class="option-label">Ville</span>
+          <div class="option-control">
+            <input class="form-input" value="Paris">
+          </div>
+        </div>
+
+        <!-- Visibilite -->
+        <div class="option-row">
+          <div class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <span class="option-label">Visibilite</span>
+          <div class="option-control">
+            <select class="form-select">
+              <option selected>Publique — tout le monde peut decouvrir cette Communaute</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- Description -->
+      <div class="desc-row">
+        <div class="option-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+        </div>
+        <div class="desc-content">
+          <div>
+            <div class="desc-label">Description</div>
+            <div class="desc-hint">Decrivez votre Communaute en quelques mots...</div>
+          </div>
+          <textarea class="form-textarea" rows="4">test validation</textarea>
+        </div>
+      </div>
+
+      <div class="separator"></div>
+
+      <!-- Validation des inscriptions -->
+      <div class="switch-row">
+        <div class="option-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div class="switch-content">
+          <div class="switch-label">Validation des inscriptions</div>
+          <div class="switch-description">Les demandes devront etre approuvees manuellement depuis votre espace.</div>
+        </div>
+        <div class="switch">
+          <div class="switch-thumb"></div>
+        </div>
+      </div>
+
+      <!-- ====== NOUVEAU : Paiements Stripe ====== -->
+      <div class="switch-row" style="border: 1px dashed var(--primary); border-radius: 12px; padding: 12px; margin: -4px -12px;">
+        <div class="option-icon">
+          <!-- CreditCard icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="switch-content">
+          <div class="switch-label">
+            Paiements
+            <span class="new-indicator">nouveau</span>
+          </div>
+          <div class="switch-description">Activez les paiements pour proposer des evenements payants. Frais Stripe uniquement (~2,9% + 0,30 EUR). Aucune commission plateforme.</div>
+
+          <!-- === ETAT 1 : Pas encore active (defaut) === -->
+          <div style="margin-top: 10px;">
+            <button class="btn-sm-outline">
+              <!-- Zap icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Activer les paiements
+            </button>
+          </div>
+
+        </div>
+      </div>
+      <!-- ====== FIN NOUVEAU ====== -->
+
+      <div class="separator"></div>
+
+      <!-- Boutons -->
+      <div class="btn-row">
+        <button class="btn-primary">Enregistrer</button>
+        <button class="btn-outline">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       VARIANTES D'ETAT — Stripe Connect
+       (3 etats possibles pour la section Paiements)
+       ==================================================================== -->
+
+  <div style="margin-top: 80px; padding-top: 32px; border-top: 2px solid var(--border);">
+    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--primary);">Variantes de la section Paiements</h2>
+    <p style="font-size: 13px; color: var(--muted-foreground); margin-bottom: 32px;">Les 3 etats possibles du composant StripeConnectSection, integre dans le formulaire.</p>
+
+    <!-- ETAT 1 : Pas de compte -->
+    <div style="margin-bottom: 32px;">
+      <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em;">Etat 1 — Pas encore active</h3>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
+        <div class="switch-row">
+          <div class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="switch-content">
+            <div class="switch-label">Paiements</div>
+            <div class="switch-description">Activez les paiements pour proposer des evenements payants. Frais Stripe uniquement (~2,9% + 0,30 EUR). Aucune commission plateforme.</div>
+            <div style="margin-top: 10px;">
+              <button class="btn-sm-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Activer les paiements
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAT 2 : En cours d'activation (pending) -->
+    <div style="margin-bottom: 32px;">
+      <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em;">Etat 2 — Activation en cours (pending/restricted)</h3>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
+        <div class="switch-row">
+          <div class="option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="switch-content">
+            <div class="switch-label">Paiements</div>
+            <div style="margin-top: 6px;">
+              <div class="stripe-pending-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Activation en cours — completez votre profil Stripe
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <button class="btn-sm-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                Reprendre l'activation
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAT 3 : Actif -->
+    <div style="margin-bottom: 32px;">
+      <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em;">Etat 3 — Paiements actifs</h3>
+      <div style="background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
+        <div class="switch-row">
+          <div class="option-icon" style="background: rgba(34, 197, 94, 0.10);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div class="switch-content">
+            <div class="switch-label">Paiements</div>
+            <div style="margin-top: 6px; display: flex; align-items: center; justify-content: space-between;">
+              <div class="stripe-active-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Paiements actives
+              </div>
+              <button class="btn-sm-outline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                Voir mes paiements
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <span><span class="site-logo" style="font-size:13px"><span class="the">the</span><span class="playground">playground</span></span> &copy; 2026 &middot; v1.17.0</span>
+  <div style="margin-top: 8px;">
+    <a href="#">A propos</a>
+    <a href="#">Aide</a>
+    <a href="#">Contact</a>
+    <a href="#">Changelog</a>
+    <a href="#">Mentions legales</a>
+    <a href="#">Confidentialite</a>
+    <a href="#">CGU</a>
+  </div>
+</footer>
+
+</body>
+</html>
