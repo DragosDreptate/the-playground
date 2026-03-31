@@ -1,11 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { Resend } from "resend";
+import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
 
-const SENTRY_ORG = "the-playground-id";
 const SENTRY_REGION = "https://de.sentry.io";
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
-const ADMIN_EMAIL = "dragos@theplayground.fr";
 
 type IssueInput = {
   issueId: string;
@@ -82,7 +81,6 @@ function extractStacktraceSummary(event: SentryEvent): string {
     }
   }
 
-  // Tags
   const url = event.tags.find((t) => t.key === "url")?.value;
   const browser = event.tags.find((t) => t.key === "browser")?.value;
   const os = event.tags.find((t) => t.key === "os")?.value;
@@ -157,11 +155,23 @@ Règles:
   try {
     const raw = tb.text.trim();
     const jsonStr = raw.startsWith("{") ? raw : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
-    return JSON.parse(jsonStr) as AnalysisResult;
+    const parsed = JSON.parse(jsonStr) as AnalysisResult;
+    if (!parsed.urgency || !parsed.impact || !parsed.diagnosis || !parsed.remediation) {
+      return { urgency: "medium", impact: "Analyse incomplète", diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
+    }
+    return parsed;
   } catch {
     return { urgency: "medium", impact: "Analyse malformée", diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
   }
 }
+
+const URGENCY_LABELS: Record<string, string> = {
+  critical: "CRITIQUE",
+  high: "HAUTE",
+  medium: "MOYENNE",
+  low: "BASSE",
+  noise: "BRUIT",
+};
 
 async function sendAnalysisEmail(
   issue: IssueInput,
@@ -172,26 +182,19 @@ async function sendAnalysisEmail(
   if (!resendKey) return;
 
   const resend = new Resend(resendKey);
-  const from = process.env.EMAIL_FROM || process.env.AUTH_EMAIL_FROM || "onboarding@resend.dev";
-
-  const urgencyLabels: Record<string, string> = {
-    critical: "CRITIQUE",
-    high: "HAUTE",
-    medium: "MOYENNE",
-    low: "BASSE",
-    noise: "BRUIT",
-  };
+  const adminEmail = process.env.SENTRY_ALERT_EMAIL ?? "dragos@theplayground.fr";
+  const urgencyLabel = URGENCY_LABELS[analysis.urgency] ?? "INCONNUE";
 
   await resend.emails.send({
-    from,
-    to: ADMIN_EMAIL,
-    subject: `[Sentry ${urgencyLabels[analysis.urgency]}] ${issue.issueShortId} — ${issue.issueTitle.slice(0, 80)}`,
+    from: getSender(),
+    to: adminEmail,
+    subject: `[Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle.slice(0, 80)}`,
     react: SentryIssueAnalysisEmail({
       issueShortId: issue.issueShortId,
       issueTitle: issue.issueTitle,
       culprit: issue.culprit,
       urgency: analysis.urgency,
-      urgencyLabel: urgencyLabels[analysis.urgency] ?? analysis.urgency,
+      urgencyLabel,
       impact: analysis.impact,
       diagnosis: analysis.diagnosis,
       remediation: analysis.remediation,
@@ -202,7 +205,10 @@ async function sendAnalysisEmail(
 
 export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   const token = process.env.SENTRY_AUTH_TOKEN;
-  if (!token) return;
+  const resendKey = process.env.AUTH_RESEND_KEY;
+  if (!token || !resendKey) return;
+
+  const sentryOrg = process.env.SENTRY_ORG ?? "the-playground-id";
 
   // 1. Fetch latest event with stacktrace
   const event = await fetchLatestEvent(issue.issueId, token);
@@ -212,6 +218,6 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   const analysis = await analyzeWithClaude(issue, stacktrace);
 
   // 3. Send email
-  const sentryUrl = `https://${SENTRY_ORG}.sentry.io/issues/${issue.issueId}/`;
+  const sentryUrl = `https://${sentryOrg}.sentry.io/issues/${issue.issueId}/`;
   await sendAnalysisEmail(issue, analysis, sentryUrl);
 }

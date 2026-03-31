@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  // Only process new issues
   if (resource !== "issue") {
     return NextResponse.json({ received: true, skipped: "not an issue event" });
   }
@@ -68,24 +67,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, skipped: `action: ${payload.action}` });
   }
 
-  // Schedule analysis after response is sent (Sentry requires < 1s response)
-  // after() keeps the serverless function alive on Vercel until the work completes
+  const issue = payload.data?.issue;
+  if (!issue?.id || !issue?.shortId || !issue?.title) {
+    return NextResponse.json({ error: "Missing issue data" }, { status: 400 });
+  }
+
+  // after() keeps the serverless function alive on Vercel after the response is sent
   after(async () => {
     try {
       await analyzeSentryIssue({
-        issueId: payload.data.issue.id,
-        issueShortId: payload.data.issue.shortId,
-        issueTitle: payload.data.issue.title,
-        culprit: payload.data.issue.culprit,
-        level: payload.data.issue.level,
-        platform: payload.data.issue.platform,
-        projectSlug: payload.data.issue.project.slug,
-        metadata: payload.data.issue.metadata,
+        issueId: issue.id,
+        issueShortId: issue.shortId,
+        issueTitle: issue.title,
+        culprit: issue.culprit,
+        level: issue.level,
+        platform: issue.platform,
+        projectSlug: issue.project?.slug ?? "",
+        metadata: issue.metadata ?? {},
       });
     } catch (err) {
       Sentry.captureException(err);
     }
   });
 
-  return NextResponse.json({ received: true, issueId: payload.data.issue.shortId });
+  return NextResponse.json({ received: true, issueId: issue.shortId });
 }

@@ -47,7 +47,7 @@ function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 }
 
-function getSender(): string {
+export function getSender(): string {
   return (
     process.env.EMAIL_FROM ||
     process.env.AUTH_EMAIL_FROM ||
