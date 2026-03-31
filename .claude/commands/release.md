@@ -12,8 +12,8 @@ Gère la montée de version de The Playground de bout en bout, en suivant la pro
 1. Vérifie que le CI sur main est vert (pré-requis)
 2. Vérifie que la page Aide est à jour avec les features de la release
 3. Trouve la PR Release Please en attente
-4. Déclenche le CI via commit vide (branch protection l'exige — `workflow_dispatch` ne satisfait pas les PR checks)
-5. Attend la stabilisation du HEAD (race condition avec "Humanize Changelog")
+4. Attend que "Humanize Changelog" ait fini (s'il tourne)
+5. Déclenche le CI via commit vide (branch protection l'exige — `workflow_dispatch` ne satisfait pas les PR checks)
 6. Attend le CI vert
 7. Vérifie le schema Prisma avant le merge
 8. Merge la PR avec `--admin` (les CI checks ne s'enregistrent pas comme PR status checks sur ce repo)
@@ -68,49 +68,48 @@ gh pr view NUMBER --json title,body
 
 Extraire et afficher la version proposée depuis le titre.
 
-### Étape 5 — Déclencher le CI via commit vide
+### Étape 5 — Attendre que "Humanize Changelog" ait fini
 
-Le `workflow_dispatch` ne satisfait pas les branch protection checks de GitHub — il faut un commit sur la branche pour déclencher le CI dans le contexte PR.
+Avant de pousser le commit vide, s'assurer que le workflow "Humanize Changelog" n'est pas en cours sur la branche. S'il tourne encore, il pourrait pousser un commit après le CI, invalidant les checks.
+
+```bash
+gh run list --workflow="Humanize Changelog" --branch NOM_BRANCHE --limit 1 --json databaseId,status,conclusion
+```
+
+- Si `status == "in_progress"` ou `status == "queued"` → attendre la fin :
+
+```bash
+gh run watch RUN_ID_HUMANIZE
+```
+
+- Si `status == "completed"` ou aucun run trouvé → continuer.
+
+Après la fin de Humanize, toujours récupérer le HEAD le plus récent :
 
 ```bash
 git fetch origin NOM_BRANCHE
 git checkout NOM_BRANCHE
+git reset --hard origin/NOM_BRANCHE
+```
+
+### Étape 6 — Déclencher le CI via commit vide
+
+Le `workflow_dispatch` ne satisfait pas les branch protection checks de GitHub — il faut un commit sur la branche pour déclencher le CI dans le contexte PR.
+
+```bash
 git commit --allow-empty -m "ci: trigger CI checks for release PR"
 git push origin NOM_BRANCHE
 ```
 
-Récupérer l'ID du run déclenché :
+> Le workflow "Humanize Changelog" sera re-déclenché par le push (event `synchronize`), mais il détectera que CHANGELOG.md n'a pas changé et sortira immédiatement sans pousser de commit. Aucune race condition possible.
+
+Récupérer l'ID du run CI déclenché :
 
 ```bash
 gh run list --workflow=CI --branch NOM_BRANCHE --limit 1 --json databaseId,status
 ```
 
 Afficher le lien vers le run GitHub Actions.
-
-### Étape 6 — Attendre la stabilisation du HEAD (race condition "Humanize Changelog")
-
-"Humanize Changelog" peut pousser un commit après le déclenchement du CI, changeant le HEAD SHA et invalidant les checks. Son commit contient `[skip ci]` donc aucun nouveau CI n'est déclenché automatiquement — il faut détecter ça et repousser un commit vide.
-
-**Attendre 60 secondes**, puis boucler jusqu'à stabilisation :
-
-```bash
-# Capturer le HEAD SHA actuel
-CURRENT_SHA=$(gh pr view NUMBER --json headRefOid --jq '.headRefOid')
-
-# Comparer avec le SHA du run CI en cours
-RUN_SHA=$(gh run view RUN_ID --json headSha --jq '.headSha')
-```
-
-Si `CURRENT_SHA != RUN_SHA` → Humanize Changelog a poussé après le déclenchement du CI. **Il faut resynchroniser et repousser un commit vide** :
-
-```bash
-git fetch origin NOM_BRANCHE
-git reset --hard origin/NOM_BRANCHE
-git commit --allow-empty -m "ci: trigger CI checks for release PR"
-git push origin NOM_BRANCHE
-```
-
-Récupérer le nouvel ID de run et reprendre depuis l'étape 6. Répéter jusqu'à `CURRENT_SHA == RUN_SHA` (HEAD stable).
 
 > ⚠️ Ne jamais utiliser `gh workflow run CI --ref BRANCHE` pour redéclencher — ça ne génère pas de PR status checks.
 
@@ -186,7 +185,7 @@ Release Please contrôle cette branche — elle peut être force-pushée à tout
 3. Créer une branche de fix : `git checkout -b fix/nom-du-fix`
 4. Corriger le problème + commit + push + PR + merge sur main
 5. Attendre que Release Please mette à jour la PR de release automatiquement (elle incorpore les nouveaux commits de main)
-6. Reprendre la procédure release à l'étape 4 (déclencher le CI)
+6. Reprendre la procédure release à l'étape 5 (attendre Humanize + déclencher le CI)
 
 ## En cas de problème
 
@@ -194,7 +193,7 @@ Release Please contrôle cette branche — elle peut être force-pushée à tout
 |---|---|---|
 | Aucune PR trouvée | Pas de feat/fix depuis la dernière release | Normal — pas de release à faire |
 | Version calculée = 1.0.0 | Manifest key incorrecte | Vérifier `.release-please-manifest.json` → clé doit être `"."` |
-| HEAD SHA instable après 60s | Humanize Changelog lent | Attendre 30s supplémentaires et revérifier |
+| Humanize Changelog encore en cours | L'utilisateur a lancé /release juste après un merge sur main | Étape 5 attend automatiquement la fin via `gh run watch` |
 | Merge échoue malgré CI vert | PR status checks non enregistrés | Utiliser `--admin` |
 | `package.json` modifié localement | Stash auto à la checkout de la branche release | `git stash pop` après `git checkout main` |
 | `--search "chore(main): release"` ne trouve pas la PR | Parenthèses dans la query GitHub Search | Utiliser `--head "release-please--branches--..."` |
