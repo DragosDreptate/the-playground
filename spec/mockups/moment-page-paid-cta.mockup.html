@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page événement payant — Bouton CTA — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-10: rgba(232, 69, 122, 0.10);
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --muted: #222336;
+  --muted-foreground: #8b8fa8;
+  --border: #383a55;
+  --radius: 0.5rem;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; color: var(--foreground); background: var(--background); padding: 40px 24px; }
+.container { max-width: 500px; margin: 0 auto; }
+h2 { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+.subtitle { font-size: 13px; color: var(--muted-foreground); margin-bottom: 32px; }
+.variant-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.variant-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); margin-bottom: 16px; }
+.new-indicator { display: inline-flex; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); background: var(--primary-10); padding: 2px 8px; border-radius: 4px; margin-left: 6px; }
+
+/* CTA row layout */
+.cta-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+.stats-count { font-size: 14px; font-weight: 600; }
+.stats-spots { font-size: 12px; color: var(--muted-foreground); }
+.stats-full { font-size: 12px; color: #f59e0b; }
+
+/* Buttons */
+.btn-primary {
+  height: 40px; padding: 0 28px;
+  border: none; border-radius: 9999px;
+  background: var(--primary); color: white;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  cursor: pointer; white-space: nowrap;
+}
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-outline {
+  height: 40px; padding: 0 20px;
+  border: 1px solid var(--border); border-radius: 9999px;
+  background: transparent; color: var(--foreground);
+  font-size: 14px; font-weight: 500; font-family: inherit;
+  cursor: pointer; white-space: nowrap;
+}
+.btn-link {
+  background: none; border: none; color: var(--muted-foreground);
+  font-size: 12px; font-family: inherit; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 2px;
+  width: 100%; text-align: center; margin-top: 12px;
+}
+
+/* Sign-in link styled as primary button */
+.btn-signin {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 40px; padding: 0 28px;
+  border: none; border-radius: 9999px;
+  background: var(--primary); color: white;
+  font-size: 14px; font-weight: 600; font-family: inherit;
+  text-decoration: none; white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h2>Page événement — Bouton CTA payant</h2>
+  <p class="subtitle">Modification de <code>registration-button.tsx</code>. Si <code>price > 0</code>, le bouton affiche le prix et redirige vers Stripe Checkout au lieu d'appeler <code>joinMoment</code>. Pas de waitlist pour les événements payants.</p>
+
+  <!-- ÉTAT 1 : Non authentifié + événement payant -->
+  <div class="variant-card">
+    <div class="variant-title">État 1 — Non authentifié <span class="new-indicator">nouveau</span></div>
+    <div class="cta-row">
+      <a class="btn-signin" href="#">S'inscrire — 15,00 €</a>
+      <div class="stats">
+        <span class="stats-count">12 inscrits</span>
+        <span class="stats-spots">18 places restantes</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted-foreground);margin-top:8px">Clic → redirection vers la page de connexion, puis retour sur l'événement.</p>
+  </div>
+
+  <!-- ÉTAT 2 : Authentifié + événement payant (places dispo) -->
+  <div class="variant-card" style="border-color: var(--primary); border-style: dashed;">
+    <div class="variant-title">État 2 — Authentifié, places disponibles <span class="new-indicator">résultat principal</span></div>
+    <div class="cta-row">
+      <button class="btn-primary">S'inscrire — 15,00 €</button>
+      <div class="stats">
+        <span class="stats-count">12 inscrits</span>
+        <span class="stats-spots">18 places restantes</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted-foreground);margin-top:8px">Clic → <code>createCheckoutAction</code> → redirection vers Stripe Checkout.</p>
+  </div>
+
+  <!-- ÉTAT 3 : Événement payant complet (pas de waitlist) -->
+  <div class="variant-card">
+    <div class="variant-title">État 3 — Événement complet <span class="new-indicator">nouveau</span></div>
+    <div class="cta-row">
+      <button class="btn-primary" disabled>Complet</button>
+      <div class="stats">
+        <span class="stats-count">30 inscrits</span>
+        <span class="stats-full">Complet</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted-foreground);margin-top:8px">Pas de waitlist pour les événements payants. Le bouton est désactivé.</p>
+  </div>
+
+  <!-- ÉTAT 4 : Comparaison — événement GRATUIT complet (waitlist) -->
+  <div class="variant-card">
+    <div class="variant-title">Comparaison — Événement GRATUIT complet (waitlist maintenue)</div>
+    <div class="cta-row">
+      <button class="btn-primary">Rejoindre la liste d'attente</button>
+      <div class="stats">
+        <span class="stats-count">30 inscrits</span>
+        <span class="stats-full">Complet</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted-foreground);margin-top:8px">Pour les événements gratuits, la waitlist est toujours disponible (comportement inchangé).</p>
+  </div>
+
+  <!-- ÉTAT 5 : Déjà inscrit (payant) -->
+  <div class="variant-card">
+    <div class="variant-title">État 5 — Déjà inscrit (événement payant)</div>
+    <div style="background: var(--primary-10); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px;">
+      <div style="width:36px;height:36px;border-radius:50%;background:rgba(232,69,122,0.15);display:flex;align-items:center;justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div>
+        <p style="font-size:14px;font-weight:600">Inscription confirmée</p>
+        <p style="font-size:12px;color:var(--muted-foreground)">12 inscrits · 18 places restantes</p>
+      </div>
+    </div>
+    <button class="btn-link">Se désinscrire</button>
+    <p style="font-size:11px;color:var(--muted-foreground);margin-top:8px">Même affichage que les événements gratuits (comportement inchangé pour cette phase).</p>
+  </div>
+
+</div>
+
+</body>
+</html>

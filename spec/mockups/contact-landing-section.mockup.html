@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Landing page · Section contact</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── Design tokens — dark (défaut) ─────────────────────── */
+    :root {
+      --background:       #0c0c14;
+      --foreground:       #f0f0f5;
+      --card:             #13131f;
+      --muted:            #18182a;
+      --muted-foreground: #8385a0;
+      --border:           #2a2b40;
+      --primary:          #e8457a;
+      --radius:           0.5rem;
+    }
+
+    /* ─── Design tokens — light ──────────────────────────────── */
+    body.light {
+      --background:       #f5f5fa;
+      --foreground:       #1a1b2e;
+      --card:             #ffffff;
+      --muted:            #eeeef6;
+      --muted-foreground: #6b6f87;
+      --border:           #dcdce8;
+      --primary:          #e8457a;
+    }
+
+    /* ─── Wrapper mockup ─────────────────────────────────────── */
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #07070f;
+      color: var(--foreground);
+      min-height: 100vh;
+      padding: 32px 24px 80px;
+      transition: background 0.2s;
+    }
+    body.light { background: #e2e2ec; }
+
+    /* ─── Header mockup ──────────────────────────────────────── */
+    .mockup-header {
+      max-width: 1100px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .mockup-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8385a0;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 8px;
+    }
+    body.light .mockup-badge {
+      color: #6b6f87;
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.1);
+    }
+    .mockup-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f0f0f5;
+      margin-bottom: 4px;
+    }
+    body.light .mockup-title { color: #1a1b2e; }
+    .mockup-subtitle {
+      font-size: 13px;
+      color: #8385a0;
+    }
+    body.light .mockup-subtitle { color: #6b6f87; }
+    .toggle-btn {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: #8385a0;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .toggle-btn:hover { color: #f0f0f5; border-color: rgba(255,255,255,0.25); }
+    body.light .toggle-btn {
+      color: #6b6f87;
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.15);
+    }
+    body.light .toggle-btn:hover { color: #1a1b2e; }
+
+    /* ─── Annotation ─────────────────────────────────────────── */
+    .annotation {
+      max-width: 1100px;
+      margin: 0 auto 14px;
+      padding: 8px 14px;
+      background: rgba(232,69,122,0.07);
+      border: 1px dashed rgba(232,69,122,0.35);
+      border-radius: 6px;
+      font-size: 11px;
+      color: #e8457a;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .annotation-dot { width: 7px; height: 7px; border-radius: 50%; background: #e8457a; flex-shrink: 0; }
+
+    /* ─── Viewport simulé ────────────────────────────────────── */
+    .viewport {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--background);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+      overflow: hidden;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    /* Barre navigateur */
+    .browser-bar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .browser-dots { display: flex; gap: 5px; }
+    .browser-dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .browser-url {
+      flex: 1;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted-foreground);
+    }
+
+    /* ─── Header du site ─────────────────────────────────────── */
+    .site-header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .logo-name { font-size: 13px; font-weight: 800; color: var(--foreground); letter-spacing: -0.3px; }
+    .logo-name span { color: var(--primary); }
+    .header-nav { display: flex; align-items: center; gap: 2px; }
+    .nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--foreground); background: var(--muted); }
+    .btn-sm-outline {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--foreground);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-sm-outline:hover { background: var(--muted); }
+
+    /* ─── Sections landing ───────────────────────────────────── */
+
+    /* Label de section (annotation interne) */
+    .section-label {
+      display: block;
+      text-align: center;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-foreground);
+      opacity: 0.6;
+      margin-bottom: 4px;
+    }
+
+    /* 1 — Hero */
+    .section-hero {
+      background: var(--background);
+      padding: 56px 24px 48px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-h1 {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1.3;
+      color: var(--foreground);
+      margin-bottom: 12px;
+      letter-spacing: -0.04em;
+    }
+    .hero-gradient {
+      background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 24px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .btn-gradient {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 24px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(90deg, #ec4899, #a855f7, #8b5cf6);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* 2 — Comment ça marche */
+    .section-how {
+      background: var(--muted);
+      padding: 48px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-how h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--foreground);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .steps { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .step { display: flex; gap: 16px; align-items: flex-start; }
+    .step-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px; font-weight: 700; color: white;
+    }
+    .step-body { padding-top: 2px; }
+    .step-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 2px; }
+    .step-title { font-size: 14px; font-weight: 700; color: var(--foreground); margin-bottom: 3px; }
+    .step-desc { font-size: 12px; color: var(--muted-foreground); line-height: 1.5; }
+
+    /* 3 — 3 piliers */
+    .section-pillars {
+      background: var(--background);
+      padding: 48px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-pillars h2 {
+      font-size: 20px; font-weight: 700; color: var(--foreground); text-align: center; margin-bottom: 28px;
+    }
+    .pillar-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; max-width: 760px; margin: 0 auto; }
+    .pillar-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 16px;
+    }
+    .pillar-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+    .pillar-title { font-size: 13px; font-weight: 700; color: var(--foreground); margin-bottom: 6px; }
+    .pillar-desc { font-size: 11px; color: var(--muted-foreground); line-height: 1.5; }
+
+    /* 4 — CTA final */
+    .section-cta-final {
+      background: var(--muted);
+      padding: 64px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-cta-final h2 { font-size: 24px; font-weight: 800; color: var(--foreground); margin-bottom: 10px; }
+    .section-cta-final p { font-size: 14px; color: var(--muted-foreground); margin-bottom: 24px; }
+
+    /* 5 — PWA */
+    .section-pwa {
+      background: var(--background);
+      padding: 40px 24px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-pwa h2 { font-size: 18px; font-weight: 700; color: var(--foreground); margin-bottom: 8px; }
+    .section-pwa p { font-size: 12px; color: var(--muted-foreground); margin-bottom: 18px; }
+    .pwa-btns { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .btn-pwa {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+      color: var(--foreground); background: var(--card);
+      border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; cursor: pointer;
+    }
+
+    /* 6 — Section Contact (NOUVELLE — mise en valeur) */
+    .section-contact-wrapper {
+      position: relative;
+    }
+    .new-badge {
+      position: absolute;
+      top: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #ec4899, #8b5cf6);
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 12px;
+      border-radius: 0 0 8px 8px;
+      white-space: nowrap;
+    }
+    .section-contact {
+      background: var(--muted);
+      padding: 56px 24px 48px;
+      text-align: center;
+      border-top: 2px solid #e8457a;
+      border-bottom: 1px solid var(--border);
+    }
+    .contact-inner { max-width: 480px; margin: 0 auto; }
+    .contact-pill { display: none; }
+    .contact-pill-dot { display: none; }
+    .contact-title { font-size: 19px; font-weight: 700; color: var(--foreground); line-height: 1.35; margin-bottom: 8px; }
+    .contact-sub { font-size: 13px; color: var(--muted-foreground); margin-bottom: 22px; }
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      color: var(--foreground); background: transparent;
+      border: 1px solid var(--border); border-radius: 7px; padding: 9px 20px;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+      margin-bottom: 14px;
+    }
+    .btn-outline:hover { background: var(--muted); border-color: var(--muted-foreground); }
+    .contact-note { font-size: 11px; color: var(--muted-foreground); }
+    .contact-note a { color: var(--muted-foreground); text-decoration: underline; text-underline-offset: 2px; }
+    .contact-note a:hover { color: var(--foreground); }
+
+    /* 7 — Footer */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 11px 16px;
+      background: var(--background);
+    }
+    .footer-inner {
+      max-width: 960px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 8px; }
+    .footer-name { font-size: 13px; font-weight: 700; color: var(--foreground); }
+    .footer-name span { color: var(--primary); }
+    .footer-copy { font-size: 11px; color: var(--muted-foreground); }
+    .footer-links { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+    .footer-links a { font-size: 11px; color: var(--muted-foreground); text-decoration: none; padding: 2px 5px; border-radius: 3px; transition: color 0.15s; }
+    .footer-links a:hover { color: var(--foreground); }
+    .footer-links a.primary-link { color: var(--primary); font-weight: 500; }
+    .footer-sep { font-size: 10px; color: var(--border); user-select: none; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header mockup ───────────────────────────────────────── -->
+  <div class="mockup-header">
+    <div>
+      <div class="mockup-badge">Mockup · The Playground</div>
+      <div class="mockup-title">Landing page — Section contact</div>
+      <div class="mockup-subtitle">Vue complète de la landing · la nouvelle section est mise en évidence</div>
+    </div>
+    <button class="toggle-btn" onclick="document.body.classList.toggle('light')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="4"/>
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+      </svg>
+      Toggle light / dark
+    </button>
+  </div>
+
+  <div class="annotation">
+    <div class="annotation-dot"></div>
+    Structure complète de la landing — la section contact (encadrée en rose) s'insère juste après la section PWA, avant le footer
+  </div>
+
+  <!-- ── Viewport ────────────────────────────────────────────── -->
+  <div class="viewport">
+
+    <!-- Barre navigateur -->
+    <div class="browser-bar">
+      <div class="browser-dots">
+        <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+      </div>
+      <div class="browser-url">the-playground.fr</div>
+    </div>
+
+    <!-- Header du site -->
+    <header class="site-header">
+      <a href="#" class="header-logo">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#ec4899"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="20" height="20" rx="4" fill="url(#lg1)"/>
+          <polygon points="6,4 16,10 6,16" fill="white"/>
+        </svg>
+        <span class="logo-name">the&thinsp;<span>playground</span></span>
+      </a>
+      <nav class="header-nav">
+        <a href="#" class="nav-link">Découvrir</a>
+        <a href="#" class="nav-link">À propos</a>
+        <a href="#" class="nav-link">Aide</a>
+      </nav>
+      <button class="btn-sm-outline">Se connecter</button>
+    </header>
+
+    <!-- ① Hero -->
+    <section class="section-hero">
+      <span class="section-label">① Hero</span>
+      <h1 class="hero-h1">
+        <span class="hero-gradient">Lancez</span> votre communauté.<br/>
+        <span class="hero-gradient">Organisez</span> vos événements.<br/>
+        <span class="hero-gradient">Animez</span> votre réseau.
+      </h1>
+      <p class="hero-sub">La plateforme communautaire gratuite — Créez votre communauté, organisez des événements, fidélisez vos membres.</p>
+      <a href="#" class="btn-gradient">
+        Créer ma communauté
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+    <!-- ② Comment ça marche -->
+    <section class="section-how">
+      <span class="section-label">② Comment ça marche</span>
+      <h2>Comment ça marche ?</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon">1</div>
+          <div class="step-body">
+            <div class="step-label">Étape 1</div>
+            <div class="step-title">Créez votre communauté</div>
+            <div class="step-desc">En quelques minutes, configurez votre espace avec votre identité.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">2</div>
+          <div class="step-body">
+            <div class="step-label">Étape 2</div>
+            <div class="step-title">Organisez des événements</div>
+            <div class="step-desc">Créez des pages événements partageables, gérez les inscriptions.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">3</div>
+          <div class="step-body">
+            <div class="step-label">Étape 3</div>
+            <div class="step-title">Fidélisez vos membres</div>
+            <div class="step-desc">Les participants deviennent automatiquement membres de votre communauté.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③ Les 3 piliers -->
+    <section class="section-pillars">
+      <span class="section-label">③ Les 3 piliers</span>
+      <h2>Pourquoi The Playground ?</h2>
+      <div class="pillar-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="pillar-title">Liens partageables</div>
+          <div class="pillar-desc">Chaque événement a sa page publique partageable instantanément.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div class="pillar-title">IA intégrée</div>
+          <div class="pillar-desc">Descriptions d'événements, emails d'invitation générés automatiquement.</div>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div class="pillar-title">100% gratuit</div>
+          <div class="pillar-desc">Aucune commission, aucun abonnement. Toujours gratuit pour les organisateurs.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ CTA final -->
+    <section class="section-cta-final">
+      <span class="section-label">④ CTA final</span>
+      <h2>Prêt à lancer votre communauté ?</h2>
+      <p>Rejoignez les organisateurs qui font confiance à The Playground.</p>
+      <a href="#" class="btn-gradient">
+        Créer ma communauté gratuitement
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </section>
+
+    <!-- ⑤ PWA -->
+    <section class="section-pwa">
+      <span class="section-label">⑤ Section PWA</span>
+      <h2>Téléchargez l'application</h2>
+      <p>Disponible sur iOS et Android — accédez à votre communauté depuis votre téléphone.</p>
+      <div class="pwa-btns">
+        <button class="btn-pwa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11"/></svg>
+          App Store
+        </button>
+        <button class="btn-pwa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.18 23.76c.26.15.56.2.87.12l12.19-7.03-2.68-2.69-10.38 9.6zm16.31-10.36L16.85 11l2.66-2.66c.46.26.77.74.77 1.34 0 .6-.31 1.09-.79 1.72zM2.28.28A.9.9 0 0 0 2 .95v22.1c0 .3.1.57.28.78L13.6 12 2.28.28zm12.68 7.31L3.05.35c-.3-.18-.64-.2-.93-.08l10.54 9.8 2.3-2.48z"/></svg>
+          Google Play
+        </button>
+      </div>
+    </section>
+
+    <!-- ⑥ Section Contact — NOUVELLE -->
+    <div class="section-contact-wrapper">
+      <div class="new-badge">⑥ Nouvelle section</div>
+      <section class="section-contact">
+        <div class="contact-inner">
+          <h3 class="contact-title">Vous avez une question avant de vous lancer&nbsp;?</h3>
+          <p class="contact-sub">On répond personnellement sous 24h.</p>
+          <div>
+            <a href="#" class="btn-outline">
+              Écrire un message
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+          <p class="contact-note">
+            Ou consultez la <a href="#">page Aide</a> pour les questions fréquentes.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <defs>
+              <linearGradient id="lg2" x1="0" y1="0" x2="20" y2="20" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#ec4899"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+            <rect width="20" height="20" rx="4" fill="url(#lg2)"/>
+            <polygon points="6,4 16,10 6,16" fill="white"/>
+          </svg>
+          <span class="footer-name">the&thinsp;<span>playground</span></span>
+          <span class="footer-copy">© 2026 · v1.x</span>
+        </div>
+        <nav class="footer-links">
+          <a href="#">À propos</a><span class="footer-sep">·</span>
+          <a href="#">Aide</a><span class="footer-sep">·</span>
+          <a href="#" class="primary-link">Contact</a><span class="footer-sep">·</span>
+          <a href="#">Changelog</a><span class="footer-sep">·</span>
+          <a href="#">Mentions légales</a><span class="footer-sep">·</span>
+          <a href="#">Confidentialité</a><span class="footer-sep">·</span>
+          <a href="#">CGU</a>
+        </nav>
+      </div>
+    </footer>
+
+  </div><!-- /viewport -->
+
+</body>
+</html>
