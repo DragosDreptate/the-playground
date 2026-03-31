@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mention RGPD — Zone d'inscription</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --radius: 0.5rem;
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  min-height: 100vh;
+  padding: 40px 16px 80px;
+}
+
+/* Page header */
+.page-header {
+  max-width: 760px;
+  margin: 0 auto 40px;
+}
+.page-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+  margin-bottom: 6px;
+}
+.page-desc {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+/* Compare grid */
+.compare {
+  max-width: 760px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 600px) {
+  .compare { grid-template-columns: 1fr; }
+}
+
+/* Column labels */
+.col-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.col-label.current { color: var(--muted-foreground); }
+.col-label.proposed { color: var(--primary); }
+.col-label .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* The card — rounded-2xl border border-border bg-card p-6 */
+.reg-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+/* Button row — flex items-center justify-between gap-3 */
+.btn-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Primary button — rounded-full */
+.btn-primary {
+  padding: 9px 22px;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+/* StatsColumn — flex flex-col items-end gap-0.5 shrink-0 */
+.stats-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.stats-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+.stats-spots {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+/* RGPD mention */
+.rgpd-mention {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  text-align: center;
+  line-height: 1.5;
+}
+.rgpd-mention a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* Highlight ring on proposed card */
+.reg-card.proposed {
+  border-color: rgba(232, 69, 122, 0.35);
+  box-shadow: 0 0 0 3px rgba(232, 69, 122, 0.07);
+}
+
+/* New badge */
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(232, 69, 122, 0.1);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Annotation arrow */
+.annotation {
+  margin-top: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(232, 69, 122, 0.05);
+  border: 1px dashed rgba(232, 69, 122, 0.3);
+  border-radius: 10px;
+}
+.annotation-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.annotation-text {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.annotation-text strong { color: var(--foreground); }
+
+/* Dark toggle */
+.dark-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Proposition RGPD — Zone d'inscription</div>
+  <div class="page-desc">
+    Ajout d'une mention de transparence sous le bouton S'inscrire (état : authentifié, pas encore inscrit).
+  </div>
+</div>
+
+<div class="compare">
+
+  <!-- AVANT -->
+  <div>
+    <div class="col-label current">
+      <span class="dot"></span>
+      État actuel
+    </div>
+    <div class="reg-card">
+      <div class="btn-row">
+        <button class="btn-primary">S'inscrire</button>
+        <div class="stats-col">
+          <span class="stats-count">34 inscrits</span>
+          <span class="stats-spots">16 places restantes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APRÈS -->
+  <div>
+    <div class="col-label proposed">
+      <span class="dot"></span>
+      Proposition
+      <span class="new-badge">nouveau</span>
+    </div>
+    <div class="reg-card proposed">
+      <div class="btn-row">
+        <button class="btn-primary">S'inscrire</button>
+        <div class="stats-col">
+          <span class="stats-count">34 inscrits</span>
+          <span class="stats-spots">16 places restantes</span>
+        </div>
+      </div>
+      <!-- Mention RGPD ajoutée ici -->
+      <p class="rgpd-mention">
+        Votre nom sera visible par l'organisateur.
+        <a href="#">Politique de confidentialité</a>
+      </p>
+    </div>
+
+    <div class="annotation">
+      <span class="annotation-icon">↑</span>
+      <p class="annotation-text">
+        <strong>1 ligne ajoutée</strong> sous le bouton, dans le même card.
+        Texte 12px, couleur muted, lien inline vers <code>/legal/confidentialite</code>.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- Mobile view -->
+<div style="max-width:360px;margin:48px auto 0;">
+  <div class="page-title" style="text-align:center;margin-bottom:12px;">Vue mobile</div>
+  <div class="reg-card proposed">
+    <div class="btn-row">
+      <button class="btn-primary">S'inscrire</button>
+      <div class="stats-col">
+        <span class="stats-count">34 inscrits</span>
+        <span class="stats-spots">16 places restantes</span>
+      </div>
+    </div>
+    <p class="rgpd-mention">
+      Votre nom sera visible par l'organisateur.
+      <a href="#">Politique de confidentialité</a>
+    </p>
+  </div>
+</div>
+
+<button class="dark-toggle" onclick="document.documentElement.classList.toggle('dark')">🌓</button>
+</body>
+</html>

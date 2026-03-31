@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>OG Image v2 — Mockup</title>
+  <style>
+    body {
+      margin: 0;
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      gap: 16px;
+      font-family: sans-serif;
+    }
+    p {
+      color: #888;
+      font-size: 13px;
+      margin: 0;
+    }
+
+    /* OG canvas : 1200x630, affiché à 50% = 600x315 */
+    .og {
+      position: relative;
+      width: 1200px;
+      height: 630px;
+      transform: scale(0.65);
+      transform-origin: top center;
+      margin-bottom: -220px;
+      overflow: hidden;
+      background: #0c0c1c;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    /* Bandeau gradient haut */
+    .og .bar-top {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #ec4899, #d946ef, #a855f7);
+      z-index: 10;
+    }
+
+    /* Bandeau gradient bas */
+    .og .bar-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #a855f7, #d946ef, #ec4899);
+      z-index: 10;
+    }
+
+    /* Colonne gauche — texte */
+    .og .left {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      width: 680px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 64px 0 64px 64px;
+      box-sizing: border-box;
+    }
+
+    /* Logo */
+    .og .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .og .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .og .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+    }
+    .og .logo-text .the { color: rgba(255,255,255,0.55); }
+    .og .logo-text .playground { color: #e8457a; }
+
+    /* H1 */
+    .og .h1 {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 36px;
+    }
+    .og .h1-line {
+      font-size: 50px;
+      font-weight: 700;
+      letter-spacing: -2px;
+      line-height: 1.2;
+      display: flex;
+      gap: 14px;
+    }
+    .og .grad {
+      background: linear-gradient(90deg, #ec4899, #d946ef, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .og .white { color: white; }
+
+    /* Subtitle */
+    .og .subtitle {
+      font-size: 19px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+      max-width: 480px;
+      font-weight: 400;
+    }
+
+    /* Colonne droite — téléphone */
+    .og .right {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 520px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .og .right img {
+      width: 420px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <p>OG Image — aperçu (affiché à 65% / taille réelle 1200×630)</p>
+
+  <div class="og">
+    <!-- Bandeaux gradient -->
+    <div class="bar-top"></div>
+    <div class="bar-bottom"></div>
+
+    <!-- Gauche : texte -->
+    <div class="left">
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="16" height="19" viewBox="0 0 13 15" fill="none">
+            <polygon points="0,0 0,15 13,7.5" fill="white"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="the">the&thinsp;</span><span class="playground">playground</span>
+        </div>
+      </div>
+
+      <!-- H1 -->
+      <div class="h1">
+        <div class="h1-line"><span class="grad">Lancez</span><span class="white">votre communauté.</span></div>
+        <div class="h1-line"><span class="grad">Organisez</span><span class="white">vos événements.</span></div>
+        <div class="h1-line"><span class="grad">Animez</span><span class="white">votre réseau.</span></div>
+      </div>
+
+      <!-- Subtitle -->
+      <div class="subtitle">La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.</div>
+    </div>
+
+    <!-- Droite : téléphone -->
+    <div class="right">
+      <img src="../../public/hero-phone.png" alt="mockup" />
+    </div>
+  </div>
+
+  <p style="margin-top: 8px;">→ Les deux bandeaux gradient (haut/bas) et le logo seront ajoutés à l'image OG dynamique.</p>
+</body>
+</html>
