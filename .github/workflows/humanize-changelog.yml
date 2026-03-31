@@ -26,24 +26,41 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
+      # Skip rapide : les commits vides poussés par /release pour déclencher le CI
+      # ne modifient pas CHANGELOG.md — inutile d'installer les deps et d'appeler Claude.
+      - name: Vérifier si CHANGELOG.md a changé
+        id: check-changelog
+        run: |
+          if git diff HEAD~1 --name-only | grep -q "^CHANGELOG.md$"; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "CHANGELOG.md inchangé — skip."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: pnpm/action-setup@v4
+        if: steps.check-changelog.outputs.changed == 'true'
         with:
           version: 10.30.0
 
       - uses: actions/setup-node@v4
+        if: steps.check-changelog.outputs.changed == 'true'
         with:
           node-version: "22"
           cache: "pnpm"
 
       - name: Installer les dépendances
+        if: steps.check-changelog.outputs.changed == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Réécrire la nouvelle section en langage utilisateur
+        if: steps.check-changelog.outputs.changed == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: pnpm tsx scripts/humanize-changelog.ts
 
       - name: Committer si des changements ont eu lieu
+        if: steps.check-changelog.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
