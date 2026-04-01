@@ -109,10 +109,11 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {categoryLabel}
-              {cityLabel}
-            </div>
+            {categoryLabel && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {categoryLabel}
+              </div>
+            )}
             <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
               {moment.circle.name}
             </span>
