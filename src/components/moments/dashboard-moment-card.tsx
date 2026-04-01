@@ -230,7 +230,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
               {/* Community */}
               <span
-                className={`inline-flex max-w-full truncate rounded-full border bg-muted/50 px-2 py-0.5 text-[11px] ${
+                className={`inline-flex max-w-full truncate rounded-full border bg-muted/50 px-2 py-0.5 text-xs ${
                   isPast ? "border-border/50 text-muted-foreground/60" : "border-border text-muted-foreground"
                 }`}
               >
