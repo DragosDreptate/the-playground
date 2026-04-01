@@ -156,7 +156,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
             }`}
           >
             {/* Content — LEFT */}
-            <div className="min-w-0 flex-1 space-y-1">
+            <div className="min-w-0 flex-1 space-y-1.5">
               {/* Time + badge */}
               <div className="flex items-center gap-2">
                 <p
