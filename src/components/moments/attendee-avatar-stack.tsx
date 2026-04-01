@@ -37,15 +37,11 @@ export function AttendeeAvatarStack({
             <div
               key={i}
               className="ring-card flex size-[22px] shrink-0 items-center justify-center rounded-full text-[0.55rem] font-semibold text-white ring-2"
-              style={
-                a.user.image
-                  ? {
-                      backgroundImage: `url(${a.user.image})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }
-                  : { background: gradient }
-              }
+              style={{
+                background: a.user.image
+                  ? `url(${a.user.image}) center/cover no-repeat, ${gradient}`
+                  : gradient,
+              }}
             >
               {!a.user.image && initials}
             </div>
