@@ -6,6 +6,8 @@ import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format
 import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
+import type { Attendee } from "@/components/moments/attendee-avatar-stack";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
@@ -19,6 +21,8 @@ type Props = {
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
   variant?: "dashboard" | "public";
+  /** Premiers inscrits pour l'avatar stack (variant public). */
+  topAttendees?: Attendee[];
 };
 
 export async function MomentTimelineItem({
@@ -29,6 +33,7 @@ export async function MomentTimelineItem({
   isHost,
   isLast,
   variant = "dashboard",
+  topAttendees = [],
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
@@ -113,7 +118,7 @@ export async function MomentTimelineItem({
             {/* Corps de la carte */}
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="min-w-0 flex-1 space-y-1.5">
                 {/* Time */}
                 <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
@@ -148,11 +153,24 @@ export async function MomentTimelineItem({
                   </p>
                 )}
 
-                {/* Inscrits — dashboard uniquement */}
-                {!isCancelled && variant === "dashboard" && registrationCount > 0 && (
+                {/* Inscrits */}
+                {!isCancelled && registrationCount > 0 && variant === "dashboard" && (
                   <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                     <Users className="size-3 shrink-0" />
                     <span>{t("registrations.registered", { count: registrationCount })}</span>
+                  </div>
+                )}
+                {!isCancelled && registrationCount > 0 && variant === "public" && (
+                  <div className={isPast ? "opacity-60" : ""}>
+                    <AttendeeAvatarStack
+                      attendees={topAttendees}
+                      totalCount={registrationCount}
+                      label={
+                        topAttendees.length < registrationCount
+                          ? t("registrations.moreRegistered", { count: registrationCount - topAttendees.length })
+                          : t("registrations.registered", { count: registrationCount })
+                      }
+                    />
                   </div>
                 )}
 
@@ -170,13 +188,13 @@ export async function MomentTimelineItem({
                 <Image
                   src={moment.coverImage}
                   alt={moment.title}
-                  width={90}
-                  height={90}
-                  className={`size-[90px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  width={100}
+                  height={100}
+                  className={`size-[100px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[90px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[100px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}

@@ -15,6 +15,7 @@ function makeDashboardCircle(
     membershipStatus: "ACTIVE",
     memberCount: 0,
     upcomingMomentCount: 0,
+    topMembers: [],
     nextMoment: null,
     ...overrides,
   };

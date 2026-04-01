@@ -6,10 +6,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Check, Clock, Crown, Users } from "lucide-react";
+import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
-import { CircleAvatar } from "@/components/circles/circle-avatar";
+
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
 
@@ -54,6 +55,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleName: props.moment.circle.name,
         circleCoverImage: props.moment.circle.coverImage,
         registrationCount: props.moment.registrationCount,
+        topAttendees: props.moment.topAttendees,
       }
     : {
         slug: props.registration.moment.slug,
@@ -66,6 +68,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleName: props.registration.moment.circleName,
         circleCoverImage: props.registration.moment.circleCoverImage,
         registrationCount: props.registration.moment.registrationCount,
+        topAttendees: props.registration.moment.topAttendees,
       };
 
   const [isToday, setIsToday] = useState(false);
@@ -104,6 +107,25 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
       : momentData.locationType === "HYBRID"
         ? t("hybrid")
         : momentData.locationName;
+
+  const roleBadge = !isPast && !isDraft ? (
+    isOrganizer || isHost ? (
+      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+        <Crown className="size-3" />
+        {t("role.host")}
+      </Badge>
+    ) : isRegistered ? (
+      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+        <Check className="size-3" />
+        {t("registrationStatus.registered")}
+      </Badge>
+    ) : isWaitlisted ? (
+      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+        <Clock className="size-3" />
+        {t("registrationStatus.waitlisted")}
+      </Badge>
+    ) : null
+  ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
@@ -153,8 +175,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
             }`}
           >
             {/* Content — LEFT */}
-            <div className="min-w-0 flex-1 space-y-1">
-              {/* Time + badge */}
+            <div className="min-w-0 flex-1 space-y-1.5">
+              {/* Time + community pill */}
               <div className="flex items-center gap-2">
                 <p
                   className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
@@ -162,31 +184,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 >
                   {timeStr}
                 </p>
-                {!isPast && (
-                  isDraft ? (
-                    <DraftBadge label={tMoment("status.draft")} />
-                  ) : isOrganizer ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                    </Badge>
-                  ) : isHost ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                    </Badge>
-                  ) : isRegistered ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Check className="size-3" />
-                      {t("registrationStatus.registered")}
-                    </Badge>
-                  ) : isWaitlisted ? (
-                    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                      <Clock className="size-3" />
-                      {t("registrationStatus.waitlisted")}
-                    </Badge>
-                  ) : null
-                )}
+                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                <span
+                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
+                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
+                  }`}
+                >
+                  {momentData.circleName}
+                </span>
               </div>
 
               {/* Title */}
@@ -197,14 +202,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               >
                 {momentData.title}
               </p>
-
-              {/* Inscrits */}
-              {momentData.registrationCount > 0 && (
-                <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                  <Users className="size-3 shrink-0" />
-                  <span>{tMoment("registrations.registered", { count: momentData.registrationCount })}</span>
-                </div>
-              )}
 
               {/* Location */}
               {locationLabel && (
@@ -218,19 +215,23 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </div>
               )}
 
-              {/* Community */}
-              <span
-                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
-                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                }`}
-              >
-                <CircleAvatar
-                  name={momentData.circleName}
-                  image={momentData.circleCoverImage}
-                  size="xs"
-                />
-                <span className="truncate">{momentData.circleName}</span>
-              </span>
+              {/* Inscrits + badge rôle */}
+              {(momentData.registrationCount > 0 || roleBadge) && (
+                <div className={`flex items-center gap-2 ${isPast ? "opacity-60" : ""}`}>
+                  {momentData.registrationCount > 0 && (
+                    <AttendeeAvatarStack
+                      attendees={momentData.topAttendees}
+                      totalCount={momentData.registrationCount}
+                      label={
+                        momentData.topAttendees.length < momentData.registrationCount
+                          ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+                          : tMoment("registrations.registered", { count: momentData.registrationCount })
+                      }
+                    />
+                  )}
+                  {roleBadge}
+                </div>
+              )}
             </div>
 
             {/* Cover — RIGHT, alignée avec le titre */}
@@ -238,13 +239,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               <Image
                 src={momentData.coverImage}
                 alt={momentData.title}
-                width={90}
-                height={90}
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                width={100}
+                height={100}
+                className={`mt-[26px] size-[100px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[100px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}

@@ -525,6 +525,7 @@
     "registrations": {
       "title": "Participants",
       "registered": "{count} inscrit(s)",
+      "moreRegistered": "+{count} inscrit(s)",
       "waitlisted": "{count} en liste d'attente",
       "capacity": "{count} places",
       "empty": "Aucune inscription pour le moment.",
@@ -646,6 +647,7 @@
     },
     "circleCard": {
       "members": "{count} membres",
+      "moreMembers": "+{count} membres",
       "upcomingMoments": "{count} événement(s) à venir",
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",
@@ -660,6 +662,7 @@
       "free": "Gratuit",
       "spotsRemaining": "{count} places restantes",
       "registeredCount": "{count} inscrit(s)",
+      "moreRegistered": "+{count} inscrit(s)",
       "online": "En ligne",
       "roleBadge": {
         "host": "Organisateur",

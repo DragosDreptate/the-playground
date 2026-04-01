@@ -230,6 +230,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
         registrationCount: 0,
+        topAttendees: [],
       },
     }));
   },
@@ -275,6 +276,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
         registrationCount: 0,
+        topAttendees: [],
       },
     }));
   },
@@ -307,6 +309,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       cSlug: string;
       cCoverImage: string | null;
       mRegistrationCount: bigint;
+      mTopAttendees: { firstName: string | null; lastName: string | null; email: string; image: string | null }[];
     };
 
     const rows = await prisma.$queryRaw<Row[]>`
@@ -335,7 +338,15 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         c."coverImage"          AS "cCoverImage",
         (SELECT COUNT(*) FROM registrations r2
          WHERE r2."momentId" = m.id
-           AND r2.status IN ('REGISTERED', 'CHECKED_IN')) AS "mRegistrationCount"
+           AND r2.status IN ('REGISTERED', 'CHECKED_IN')) AS "mRegistrationCount",
+        (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
+          SELECT u."firstName", u."lastName", u.email, u.image
+          FROM registrations r3
+          JOIN users u ON u.id = r3."userId"
+          WHERE r3."momentId" = m.id AND r3.status = 'REGISTERED'
+          ORDER BY r3."registeredAt" ASC
+          LIMIT 3
+        ) sub) AS "mTopAttendees"
       FROM registrations r
       JOIN moments m ON m.id = r."momentId"
       JOIN circles c ON c.id = m."circleId"
@@ -372,6 +383,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         circleSlug: row.cSlug,
         circleCoverImage: row.cCoverImage,
         registrationCount: Number(row.mRegistrationCount),
+        topAttendees: (row.mTopAttendees ?? []).map((u) => ({ user: u })),
       },
     });
 
@@ -465,6 +477,27 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       where: { stripePaymentIntentId: paymentIntentId },
     });
     return record ? toDomainRegistration(record) : null;
+  },
+
+  async findTopRegistrantsByMomentIds(momentIds: string[], limit: number): Promise<Map<string, RegistrationWithUser[]>> {
+    if (momentIds.length === 0) return new Map();
+    // N requêtes parallèles bornées (take: limit) — évite de charger tous les inscrits
+    const entries = await Promise.all(
+      momentIds.map(async (id) => {
+        const records = await prisma.registration.findMany({
+          where: { momentId: id, status: "REGISTERED" },
+          include: {
+            user: {
+              select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+            },
+          },
+          orderBy: { registeredAt: "asc" },
+          take: limit,
+        });
+        return [id, records.map(toDomainRegistrationWithUser)] as const;
+      })
+    );
+    return new Map(entries);
   },
 
   async getPaymentSummary(momentId: string) {

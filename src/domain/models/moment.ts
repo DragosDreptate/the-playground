@@ -1,10 +1,13 @@
 import type { CoverImageAttribution } from "@/domain/models/circle";
+import type { UserAvatarInfo } from "@/domain/models/user";
 
 export type { CoverImageAttribution };
 
 export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
 export type MomentStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "PAST";
+
+export type MomentTopAttendee = { user: UserAvatarInfo };
 
 export type HostMomentSummary = {
   id: string;
@@ -17,6 +20,7 @@ export type HostMomentSummary = {
   locationName: string | null;
   status: MomentStatus;
   registrationCount: number;
+  topAttendees: MomentTopAttendee[];
   circle: {
     slug: string;
     name: string;

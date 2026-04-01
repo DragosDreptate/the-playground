@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
+  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -159,6 +160,13 @@ export default async function PublicCirclePage({
   );
   const displayedMoments =
     activeTab === "past" ? pastMoments : upcomingMoments;
+
+  // Fetch registration counts + top attendees (avatars) pour les moments affichés
+  const displayedMomentIds = displayedMoments.map((m) => m.id);
+  const [countByMomentId, topAttendeesByMomentId] = await Promise.all([
+    prismaRegistrationRepository.findRegisteredCountsByMomentIds(displayedMomentIds),
+    prismaRegistrationRepository.findTopRegistrantsByMomentIds(displayedMomentIds, 3),
+  ]);
 
   const gradient = getMomentGradient(circle.name);
 
@@ -544,11 +552,12 @@ export default async function PublicCirclePage({
                     key={moment.id}
                     moment={moment}
                     circleSlug={circle.slug}
-                    registrationCount={0}
+                    registrationCount={countByMomentId.get(moment.id) ?? 0}
                     userRegistrationStatus={null}
                     isHost={false}
                     isLast={i === displayedMoments.length - 1}
                     variant="public"
+                    topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                   />
                 ))}
               </div>

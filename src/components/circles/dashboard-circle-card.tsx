@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon, MapPin, Crown, Clock } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
@@ -32,38 +33,33 @@ export async function DashboardCircleCard({ circle }: Props) {
   return (
     <Link href={circle.membershipStatus === "PENDING" ? `/circles/${circle.slug}` : `/dashboard/circles/${circle.slug}`} className="group block min-w-0">
       <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
 
           {/* Thumbnail */}
           <div
-            className="size-[90px] shrink-0 overflow-hidden rounded-xl"
+            className="size-[100px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={90}
-                height={90}
+                width={120}
+                height={120}
                 className="size-full object-cover"
-                sizes="90px"
+                sizes="120px"
               />
             )}
           </div>
 
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1">
-            {/* Badges — catégorie + rôle */}
-            <div className="flex items-center gap-2">
-              {categoryLabel && <CategoryBadge label={categoryLabel} />}
-              <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
-                {circle.membershipStatus === "PENDING"
-                  ? <><Clock className="size-3" />{t("circleCard.roleBadge.pending")}</>
-                  : circle.memberRole === "HOST"
-                    ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
-                    : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
-              </Badge>
-            </div>
+            {/* Badges — catégorie */}
+            {categoryLabel && (
+              <div className="flex items-center gap-2">
+                <CategoryBadge label={categoryLabel} />
+              </div>
+            )}
             {/* Titre — pleine largeur */}
             <h3 className="truncate text-sm font-semibold leading-snug group-hover:underline">
               {circle.name}
@@ -78,16 +74,32 @@ export async function DashboardCircleCard({ circle }: Props) {
                   <span>{circle.city}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1">
-                <Users className="size-3.5 shrink-0" />
-                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-              </div>
               {circle.upcomingMomentCount > 0 && (
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="size-3.5 shrink-0" />
                   <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
                 </div>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              {circle.memberCount > 0 && (
+                <AttendeeAvatarStack
+                  attendees={circle.topMembers}
+                  totalCount={circle.memberCount}
+                  label={
+                    circle.topMembers.length < circle.memberCount
+                      ? t("circleCard.moreMembers", { count: circle.memberCount - circle.topMembers.length })
+                      : t("circleCard.members", { count: circle.memberCount })
+                  }
+                />
+              )}
+              <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
+                {circle.membershipStatus === "PENDING"
+                  ? <><Clock className="size-3" />{t("circleCard.roleBadge.pending")}</>
+                  : circle.memberRole === "HOST"
+                    ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
+                    : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
+              </Badge>
             </div>
           </div>
 

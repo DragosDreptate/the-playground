@@ -1,5 +1,5 @@
 import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
-import type { PublicCircleMembership } from "@/domain/models/user";
+import type { PublicCircleMembership, UserAvatarInfo } from "@/domain/models/user";
 
 export type CreateCircleInput = {
   name: string;
@@ -37,6 +37,8 @@ export type PublicCircleFilters = {
   offset?: number;
 };
 
+export type PublicCircleMember = { user: UserAvatarInfo };
+
 export type PublicCircle = {
   id: string;
   slug: string;
@@ -49,6 +51,7 @@ export type PublicCircle = {
   coverImageAttribution: CoverImageAttribution | null;
   memberCount: number;
   upcomingMomentCount: number;
+  topMembers: PublicCircleMember[];
   nextMoment: {
     title: string;
     startsAt: Date;
@@ -76,6 +79,7 @@ export type FeaturedCircle = {
   coverImageAttribution: CoverImageAttribution | null;
   memberCount: number;
   upcomingMomentCount: number;
+  topMembers: PublicCircleMember[];
 };
 
 export interface CircleRepository {

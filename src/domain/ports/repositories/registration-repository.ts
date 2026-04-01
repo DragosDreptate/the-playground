@@ -74,4 +74,9 @@ export interface RegistrationRepository {
   findByStripePaymentIntentId(paymentIntentId: string): Promise<Registration | null>;
   /** Résumé billetterie pour un événement payant. */
   getPaymentSummary(momentId: string): Promise<{ paidCount: number; totalAmount: number; refundedCount: number }>;
+  /**
+   * Renvoie une Map momentId → premiers inscrits (REGISTERED) avec données user, pour affichage avatar.
+   * Une seule requête batch (évite le N+1). Résultats triés par date d'inscription croissante.
+   */
+  findTopRegistrantsByMomentIds(momentIds: string[], limit: number): Promise<Map<string, RegistrationWithUser[]>>;
 }

@@ -25,6 +25,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
       isDemo: false,
     },
     explorerScore: 0,
+    topAttendees: [],
     ...overrides,
   };
 }
