@@ -27,6 +27,7 @@ export function ContactForm() {
     MISSING_FIELDS: t("errorMissingFields"),
     INVALID_EMAIL: t("errorInvalidEmail"),
     SEND_ERROR: t("errorSendFailed"),
+    RATE_LIMITED: t("errorRateLimited"),
   };
 
   async function handleSubmit(_prev: FormState, formData: FormData): Promise<FormState> {

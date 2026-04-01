@@ -1584,7 +1584,8 @@
     "noteSuffix": ".",
     "errorMissingFields": "Champs requis manquants",
     "errorInvalidEmail": "Email invalide",
-    "errorSendFailed": "Erreur d'envoi"
+    "errorSendFailed": "Erreur d'envoi",
+    "errorRateLimited": "Trop de messages envoyés. Veuillez réessayer dans quelques minutes."
   },
   "About": {
     "pageTitle": "À propos · The Playground",

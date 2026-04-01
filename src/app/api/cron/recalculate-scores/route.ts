@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { recalculateAllScores } from "@/infrastructure/services/recalculate-all-scores";
+import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 
 /**
  * POST /api/cron/recalculate-scores
@@ -25,7 +26,14 @@ export async function POST(request: NextRequest) {
     console.log(
       `[recalculate-scores] ${result.circles} Communautés, ${result.moments} événements mis à jour en ${result.durationMs}ms`
     );
-    return NextResponse.json({ success: true, ...result });
+
+    // Purge des entrées de rate limiting expirées (> 1 heure)
+    const purged = await prismaRateLimiter.purgeExpired(60 * 60 * 1000);
+    if (purged > 0) {
+      console.log(`[recalculate-scores] ${purged} entrée(s) rate_limits purgée(s)`);
+    }
+
+    return NextResponse.json({ success: true, ...result, rateLimitsPurged: purged });
   } catch (error) {
     console.error("[recalculate-scores] Erreur :", error);
     return NextResponse.json({ error: "Score recalculation failed" }, { status: 500 });

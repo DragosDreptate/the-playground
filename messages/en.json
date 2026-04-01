@@ -1584,7 +1584,8 @@
     "noteSuffix": ".",
     "errorMissingFields": "Required fields are missing",
     "errorInvalidEmail": "Invalid email address",
-    "errorSendFailed": "Failed to send message"
+    "errorSendFailed": "Failed to send message",
+    "errorRateLimited": "Too many messages sent. Please try again in a few minutes."
   },
   "About": {
     "pageTitle": "About · The Playground",
