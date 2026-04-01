@@ -36,14 +36,20 @@ export function AttendeeAvatarStack({
           return (
             <div
               key={i}
-              className="ring-card flex size-[22px] shrink-0 items-center justify-center rounded-full text-[0.55rem] font-semibold text-white ring-2"
-              style={{
-                background: a.user.image
-                  ? `url(${a.user.image}) center/cover no-repeat, ${gradient}`
-                  : gradient,
-              }}
+              className="ring-card relative flex size-[22px] shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
+              style={{ background: gradient }}
             >
-              {!a.user.image && initials}
+              {a.user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={a.user.image}
+                  alt=""
+                  referrerPolicy="no-referrer"
+                  className="absolute inset-0 size-full object-cover"
+                />
+              ) : (
+                initials
+              )}
             </div>
           );
         })}
