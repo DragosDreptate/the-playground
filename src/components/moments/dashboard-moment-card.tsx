@@ -112,17 +112,17 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     isOrganizer || isHost ? (
       <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
         <Crown className="size-3" />
-        {t("role.host")}
+        <span className="hidden sm:inline">{t("role.host")}</span>
       </Badge>
     ) : isRegistered ? (
       <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
         <Check className="size-3" />
-        {t("registrationStatus.registered")}
+        <span className="hidden sm:inline">{t("registrationStatus.registered")}</span>
       </Badge>
     ) : isWaitlisted ? (
       <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
         <Clock className="size-3" />
-        {t("registrationStatus.waitlisted")}
+        <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
       </Badge>
     ) : null
   ) : null;
@@ -241,11 +241,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 alt={momentData.title}
                 width={100}
                 height={100}
-                className={`mt-[26px] size-[100px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-16 shrink-0 rounded-xl object-cover sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`mt-[26px] size-[100px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-16 shrink-0 rounded-xl sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}

@@ -35,7 +35,6 @@ import {
   Users,
   ArrowRight,
   ShieldCheck,
-  FileEdit,
 } from "lucide-react";
 
 // ── Types ────────────────────────────────────────────────────
@@ -86,27 +85,22 @@ type MomentCoverBlockProps = {
   title: string;
   status: Moment["status"];
   isDemo: boolean;
-  isHostView: boolean;
   gradient: string;
   sizes: string;
-  statusLabel: string;
   demoLabel: string;
 };
 
-const coverStatusStyle: Record<string, string> = {
-  DRAFT: "border-muted-foreground/70 text-muted-foreground",
-  PUBLISHED: "border-emerald-400/70 text-emerald-400",
-  CANCELLED: "border-red-400/70 text-red-400",
-  PAST: "border-white/60 text-white",
+const breadcrumbStatusStyle: Record<string, string> = {
+  DRAFT: "border-muted-foreground/40 text-muted-foreground",
+  PUBLISHED: "border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
+  CANCELLED: "border-destructive/40 text-destructive",
+  PAST: "border-muted-foreground/40 text-muted-foreground",
 };
 
 function MomentCoverBlock({
-  coverImage, coverImageAttribution, title, status, isDemo, isHostView, gradient,
-  sizes, statusLabel, demoLabel,
+  coverImage, coverImageAttribution, title, status, isDemo, gradient,
+  sizes, demoLabel,
 }: MomentCoverBlockProps) {
-  const showStatusBadge = isHostView && status !== "PAST";
-  const showPastBadge = status === "PAST";
-
   return (
     <div className="flex flex-col gap-2">
       <div className="relative">
@@ -129,28 +123,11 @@ function MomentCoverBlock({
             </>
           )}
 
-          {/* Top-left badge stack — status + demo, no overlap */}
-          {(showStatusBadge || isDemo) && (
-            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
-              {showStatusBadge && (
-                <span className={`inline-flex items-center gap-1 rounded-md border bg-black/80 px-2.5 py-1 text-sm leading-none backdrop-blur-sm ${coverStatusStyle[status]}`}>
-                  {status === "DRAFT" && <FileEdit className="size-3.5" />}
-                  {statusLabel}
-                </span>
-              )}
-              {isDemo && (
-                <span className="inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary backdrop-blur-sm">
-                  {demoLabel}
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Bottom-left — past badge (visible to everyone) */}
-          {showPastBadge && (
-            <div className="absolute bottom-3 left-3">
-              <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                {statusLabel}
+          {/* Demo badge on cover */}
+          {isDemo && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary backdrop-blur-sm">
+                {demoLabel}
               </span>
             </div>
           )}
@@ -243,25 +220,28 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
   return (
     <div className="space-y-8">
-      {/* Breadcrumb — Host only */}
+      {/* Breadcrumb + status badge — Host only */}
       {isHostView && (
-        <div className="text-muted-foreground flex items-center gap-1 text-sm">
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
           <Link
             href="/dashboard"
-            className="hover:text-foreground transition-colors"
+            className="hover:text-foreground shrink-0 transition-colors"
           >
             {tDashboard("title")}
           </Link>
-          <ChevronRight className="size-3.5" />
+          <ChevronRight className="size-3.5 shrink-0" />
           <Link
             href={`/dashboard/circles/${props.circleSlug}`}
-            className="hover:text-foreground transition-colors"
+            className="hover:text-foreground shrink-0 transition-colors"
           >
             {circle.name}
           </Link>
-          <ChevronRight className="size-3.5" />
-          <span className="text-foreground truncate font-medium">
+          <ChevronRight className="size-3.5 shrink-0" />
+          <span className="text-foreground font-medium">
             {moment.title}
+          </span>
+          <span className={`shrink-0 rounded-md border px-2 py-0.5 text-xs font-medium ${breadcrumbStatusStyle[moment.status]}`}>
+            {t(`status.${moment.status.toLowerCase()}`)}
           </span>
         </div>
       )}
@@ -279,10 +259,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             title={moment.title}
             status={moment.status}
             isDemo={circle.isDemo}
-            isHostView={isHostView}
             gradient={gradient}
             sizes="(max-width: 1024px) 100vw, 340px"
-            statusLabel={t(`status.${moment.status.toLowerCase()}`)}
             demoLabel={tCommon("demo")}
           />
 
@@ -393,10 +371,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               title={moment.title}
               status={moment.status}
               isDemo={circle.isDemo}
-              isHostView={isHostView}
               gradient={gradient}
               sizes="calc(100vw - 32px)"
-              statusLabel={t(`status.${moment.status.toLowerCase()}`)}
               demoLabel={tCommon("demo")}
             />
           </div>

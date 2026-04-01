@@ -125,19 +125,17 @@ export default async function CircleDetailPage({
     <div className="space-y-8">
 
       {/* Breadcrumb + role badge */}
-      <div className="space-y-1">
-        <div className="text-muted-foreground flex items-center gap-1 text-sm">
-          <Link
-            href="/dashboard"
-            className="hover:text-foreground transition-colors"
-          >
-            {tDashboard("title")}
-          </Link>
-          <ChevronRight className="size-3.5" />
-          <span className="text-foreground truncate font-medium">
-            {circle.name}
-          </span>
-        </div>
+      <div className="text-muted-foreground flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
+        <Link
+          href="/dashboard"
+          className="hover:text-foreground shrink-0 transition-colors"
+        >
+          {tDashboard("title")}
+        </Link>
+        <ChevronRight className="size-3.5 shrink-0" />
+        <span className="text-foreground font-medium">
+          {circle.name}
+        </span>
         <Badge
           variant={isHost ? "outline" : "secondary"}
           className={isHost ? "border-primary/40 text-primary" : ""}

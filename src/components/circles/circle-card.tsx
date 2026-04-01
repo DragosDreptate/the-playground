@@ -92,7 +92,7 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
         <div className="flex shrink-0 flex-col items-end justify-center gap-2">
           <Badge variant="outline" className="gap-1 border-primary/40 text-primary">
             <Crown className="size-3" />
-            {tDashboard("role.host")}
+            <span className="hidden sm:inline">{tDashboard("role.host")}</span>
           </Badge>
           <Button asChild size="sm" className="h-7 px-3 text-xs">
             <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>

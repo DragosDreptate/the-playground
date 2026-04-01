@@ -48,17 +48,17 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   const roleBadge = isOrganizer ? (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       <Crown className="size-3" />
-      {t("momentCard.roleBadge.host")}
+      <span className="hidden sm:inline">{t("momentCard.roleBadge.host")}</span>
     </Badge>
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       <Check className="size-3" />
-      {t("momentCard.roleBadge.registered")}
+      <span className="hidden sm:inline">{t("momentCard.roleBadge.registered")}</span>
     </Badge>
   ) : registrationStatus === "WAITLISTED" ? (
     <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
       <Clock className="size-3" />
-      {t("momentCard.roleBadge.waitlisted")}
+      <span className="hidden sm:inline">{t("momentCard.roleBadge.waitlisted")}</span>
     </Badge>
   ) : null;
 
