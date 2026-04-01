@@ -999,49 +999,162 @@
     },
     "privacy": {
       "title": "Politique de confidentialité",
-      "metaDescription": "Politique de confidentialité de The Playground — données collectées, finalités, droits RGPD et cookies.",
-      "intro": "The Playground, édité par The Spark SASU, s'engage à protéger la vie privée de ses utilisateurs. Cette politique décrit les données que nous collectons, pourquoi nous les utilisons et quels sont vos droits.",
+      "metaDescription": "Politique de confidentialité de The Playground — données collectées, finalités, bases légales, sous-traitants, droits RGPD et cookies.",
+      "intro": "The Playground est édité par The Spark SASU (SIRET 93482575300015), dont le siège social est situé au 10 rue de la Paix, 75002 Paris. Nous nous engageons à protéger la vie privée de nos utilisateurs conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés. Cette politique décrit les données que nous collectons, les finalités de leur traitement, vos droits et les moyens de les exercer.",
+      "controller": {
+        "title": "Responsable du traitement",
+        "content": "Le responsable du traitement est The Spark SASU, représentée par Dragos Dreptate.",
+        "contact": "Pour toute question relative à la protection de vos données personnelles, vous pouvez nous contacter :",
+        "contactEmail": "Par email : privacy@the-playground.fr",
+        "contactMail": "Par courrier : The Spark SASU, 10 rue de la Paix, 75002 Paris",
+        "dpo": "The Spark SASU n'a pas désigné de Délégué à la Protection des Données (DPO) conformément à l'article 37 du RGPD (moins de 250 salariés, traitement non à grande échelle). Le contact ci-dessus assure cette fonction."
+      },
       "dataCollected": {
         "title": "Données collectées",
-        "items": {
+        "identity": {
+          "title": "Données d'identité et de compte",
           "email": "Adresse email (connexion via magic link ou OAuth)",
-          "name": "Prénom et nom (renseignés lors de l'onboarding)",
+          "name": "Prénom et nom (renseignés lors de la création du profil)",
+          "photo": "Photo de profil (importée depuis Google/GitHub ou uploadée manuellement)",
+          "publicId": "Identifiant public de profil"
+        },
+        "auth": {
+          "title": "Données d'authentification",
           "oauth": "Identifiant du compte OAuth (Google, GitHub) — uniquement pour l'authentification",
-          "usage": "Données d'utilisation anonymisées (Vercel Analytics)"
+          "session": "Tokens de session (cookies de session)"
+        },
+        "usage": {
+          "title": "Données d'utilisation du service",
+          "circles": "Communautés créées ou rejointes",
+          "moments": "Événements créés, inscriptions, présences",
+          "comments": "Commentaires publiés",
+          "prefs": "Préférences de notification"
+        },
+        "payment": {
+          "title": "Données de paiement (événements payants uniquement)",
+          "stripe": "Les données bancaires (numéro de carte, date d'expiration, CVV) sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground",
+          "ref": "Nous conservons uniquement la référence de la transaction Stripe et l'URL du reçu"
+        },
+        "analytics": {
+          "title": "Données de navigation et d'analyse",
+          "pages": "Pages visitées, durée de visite, événements de navigation",
+          "identifier": "Identifiant technique (pseudonymisé pour les visiteurs non connectés, associé au compte pour les utilisateurs connectés)",
+          "technical": "Données techniques : type de navigateur, système d'exploitation"
+        },
+        "errors": {
+          "title": "Données collectées automatiquement en cas d'erreur",
+          "traces": "Traces techniques d'erreur (stack traces) pour le diagnostic et la correction de bugs"
         }
       },
       "purpose": {
-        "title": "Finalités du traitement",
+        "title": "Finalités et bases légales du traitement",
+        "headers": {
+          "purpose": "Finalité",
+          "data": "Données concernées",
+          "legal": "Base légale"
+        },
         "items": {
           "auth": "Authentification et gestion de votre compte",
-          "service": "Fourniture du service (création de communautés, inscription aux événements)",
-          "email": "Envoi d'emails transactionnels (confirmations d'inscription, notifications)",
-          "analytics": "Amélioration du service via des statistiques anonymisées"
+          "authData": "Email, nom, prénom, identifiant OAuth, photo de profil",
+          "authLegal": "Exécution du contrat (Art. 6.1.b)",
+          "service": "Fourniture du service (communautés, événements, inscriptions)",
+          "serviceData": "Données de compte, données d'utilisation",
+          "serviceLegal": "Exécution du contrat (Art. 6.1.b)",
+          "email": "Envoi d'emails transactionnels (confirmations, rappels, annulations)",
+          "emailData": "Email, prénom",
+          "emailLegal": "Exécution du contrat (Art. 6.1.b)",
+          "notifications": "Envoi de notifications de la communauté (nouveaux événements, messages de l'organisateur)",
+          "notificationsData": "Email, prénom, préférences de notification",
+          "notificationsLegal": "Intérêt légitime (Art. 6.1.f) — vous pouvez vous désinscrire à tout moment depuis votre profil",
+          "payment": "Traitement des paiements pour les événements payants",
+          "paymentData": "Référence de transaction Stripe",
+          "paymentLegal": "Exécution du contrat (Art. 6.1.b)",
+          "analytics": "Analyse d'utilisation et amélioration du service",
+          "analyticsData": "Données de navigation pseudonymisées",
+          "analyticsLegal": "Intérêt légitime (Art. 6.1.f) — amélioration continue du service, données hébergées en UE",
+          "bugs": "Diagnostic et correction de bugs",
+          "bugsData": "Traces d'erreur techniques",
+          "bugsLegal": "Intérêt légitime (Art. 6.1.f) — assurer la stabilité du service"
         }
-      },
-      "sharing": {
-        "title": "Partage des données",
-        "content": "Vos données personnelles ne sont jamais vendues ni partagées avec des tiers à des fins commerciales. Elles peuvent être transmises à nos sous-traitants techniques (hébergement, envoi d'emails) uniquement pour assurer le fonctionnement du service."
       },
       "cookies": {
         "title": "Cookies",
-        "content": "The Playground utilise uniquement des cookies strictement nécessaires au fonctionnement du site (session d'authentification). Aucun cookie publicitaire ou de tracking tiers n'est utilisé."
+        "necessary": {
+          "title": "Cookies strictement nécessaires (déposés sans consentement)",
+          "session": "Maintien de votre session d'authentification",
+          "sessionDuration": "30 jours",
+          "callback": "Redirection après connexion",
+          "callbackDuration": "30 minutes",
+          "note": "Ces cookies sont indispensables au fonctionnement du site. Ils ne peuvent pas être désactivés."
+        },
+        "analytics": {
+          "title": "Cookies d'analyse",
+          "posthog": "Analyse d'utilisation du service (pages visitées, parcours utilisateur)",
+          "posthogProvider": "PostHog (serveurs UE)",
+          "posthogDuration": "1 an",
+          "note": "Ces cookies nous permettent de comprendre comment le service est utilisé afin de l'améliorer. Les données collectées sont hébergées en Union européenne. Vous pouvez désactiver ces cookies via les paramètres de votre navigateur."
+        },
+        "noAds": "Aucun cookie publicitaire n'est utilisé par The Playground."
+      },
+      "subprocessors": {
+        "title": "Sous-traitants et destinataires des données",
+        "intro": "Vos données personnelles peuvent être transmises aux sous-traitants suivants, uniquement pour les finalités décrites ci-dessus :",
+        "headers": {
+          "name": "Sous-traitant",
+          "purpose": "Finalité",
+          "hq": "Siège",
+          "hosting": "Hébergement des données",
+          "safeguards": "Garanties"
+        },
+        "vercel": { "purpose": "Hébergement de l'application", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Vercel, données hébergées en UE" },
+        "neon": { "purpose": "Hébergement de la base de données", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Neon, données hébergées en UE" },
+        "posthog": { "purpose": "Analyse d'utilisation du service", "hq": "États-Unis", "hosting": "Union européenne (eu.posthog.com)", "safeguards": "DPA PostHog, données hébergées en UE" },
+        "sentry": { "purpose": "Surveillance des erreurs techniques", "hq": "États-Unis", "hosting": "Union européenne (Allemagne, de.sentry.io)", "safeguards": "DPA Sentry, données hébergées en UE" },
+        "resend": { "purpose": "Envoi d'emails transactionnels et de notifications", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Resend, clauses contractuelles types UE" },
+        "stripe": { "purpose": "Traitement des paiements (événements payants)", "hq": "États-Unis", "hosting": "États-Unis / Union européenne (infrastructure globale)", "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE" },
+        "anthropic": { "purpose": "Fonctionnalités d'intelligence artificielle (génération de descriptions)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Anthropic, clauses contractuelles types UE" },
+        "slack": { "purpose": "Notifications internes d'administration (nouveaux utilisateurs, nouvelles communautés)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Slack/Salesforce, clauses contractuelles types UE" },
+        "noSale": "Vos données ne sont jamais vendues ni partagées avec des tiers à des fins commerciales ou publicitaires."
+      },
+      "transfers": {
+        "title": "Transferts hors Union européenne",
+        "intro": "La majorité de nos sous-traitants hébergent vos données en Union européenne, même lorsque leur siège social est aux États-Unis :",
+        "eu": "Données hébergées en UE : Vercel (Frankfurt), Neon (Frankfurt), PostHog (UE), Sentry (Allemagne)",
+        "us": "Données hébergées aux États-Unis : Resend (envoi d'emails), Stripe (traitement des paiements), Anthropic (fonctionnalités IA), Slack (notifications internes)",
+        "safeguards": "Les transferts vers les États-Unis sont encadrés par :",
+        "scc": "Les clauses contractuelles types adoptées par la Commission européenne (décision d'exécution 2021/914)",
+        "dpa": "Les engagements contractuels de chaque sous-traitant (Data Processing Agreements)",
+        "conclusion": "Les données principales (base de données utilisateurs, hébergement applicatif, analytics, monitoring) sont stockées en Union européenne."
       },
       "rights": {
         "title": "Vos droits (RGPD)",
-        "content": "Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :",
+        "content": "Conformément au RGPD, vous disposez des droits suivants :",
         "items": {
-          "access": "Droit d'accès à vos données personnelles",
-          "rectification": "Droit de rectification des données inexactes",
-          "deletion": "Droit à l'effacement de vos données",
-          "portability": "Droit à la portabilité de vos données",
-          "opposition": "Droit d'opposition au traitement"
+          "access": "Droit d'accès (Art. 15) : obtenir la confirmation du traitement de vos données et en recevoir une copie",
+          "rectification": "Droit de rectification (Art. 16) : corriger des données inexactes ou incomplètes",
+          "deletion": "Droit à l'effacement (Art. 17) : demander la suppression de vos données. Vous pouvez supprimer votre compte directement depuis votre profil (suppression immédiate et irréversible)",
+          "portability": "Droit à la portabilité (Art. 20) : recevoir vos données dans un format structuré et lisible par machine",
+          "opposition": "Droit d'opposition (Art. 21) : vous opposer au traitement fondé sur l'intérêt légitime",
+          "consent": "Droit de retrait du consentement (Art. 7.3) : lorsque le traitement est fondé sur votre consentement, le retirer à tout moment sans affecter la licéité du traitement effectué avant le retrait"
         },
-        "contact": "Pour exercer ces droits, contactez-nous via LinkedIn : linkedin.com/in/dragosdreptate."
+        "exerciseTitle": "Pour exercer vos droits :",
+        "contactEmail": "Par email : privacy@the-playground.fr",
+        "contactMail": "Par courrier : The Spark SASU, 10 rue de la Paix, 75002 Paris",
+        "delay": "Nous nous engageons à répondre à votre demande dans un délai d'un mois à compter de sa réception (Art. 12.3 RGPD).",
+        "complaint": "Si vous estimez que le traitement de vos données constitue une violation du RGPD, vous avez le droit d'introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) : www.cnil.fr."
       },
       "retention": {
         "title": "Conservation des données",
-        "content": "Vos données sont conservées tant que votre compte est actif. En cas de suppression de compte, vos données personnelles sont effacées dans un délai de 30 jours."
+        "account": "Données de compte (email, nom, profil) — tant que le compte est actif",
+        "usage": "Données d'utilisation (inscriptions, commentaires) — tant que le compte est actif",
+        "payment": "Données de paiement (références Stripe) — 5 ans après la transaction (obligation légale comptable)",
+        "analytics": "Cookies d'analyse (PostHog) — 1 an maximum",
+        "errors": "Traces d'erreur (Sentry) — 90 jours",
+        "deletion": "En cas de suppression de votre compte, vos données personnelles sont effacées immédiatement (suppression irréversible). Les données liées à des obligations légales (références de paiement) sont conservées conformément aux durées légales applicables."
+      },
+      "changes": {
+        "title": "Modification de cette politique",
+        "content": "Nous pouvons modifier cette politique pour refléter les évolutions de nos pratiques ou de la réglementation. En cas de modification substantielle, nous vous en informerons par email ou par notification sur la plateforme. La date de dernière mise à jour est indiquée en haut de cette page."
       }
     },
     "terms": {

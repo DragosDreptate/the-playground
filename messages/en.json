@@ -999,49 +999,162 @@
     },
     "privacy": {
       "title": "Privacy policy",
-      "metaDescription": "Privacy policy for The Playground — data collected, purposes, GDPR rights and cookies.",
-      "intro": "The Playground, published by The Spark SASU, is committed to protecting the privacy of its users. This policy describes the data we collect, why we use it and what your rights are.",
+      "metaDescription": "Privacy policy for The Playground — data collected, purposes, legal bases, sub-processors, GDPR rights and cookies.",
+      "intro": "The Playground is published by The Spark SASU (SIRET 93482575300015), with registered offices at 10 rue de la Paix, 75002 Paris, France. We are committed to protecting the privacy of our users in accordance with the General Data Protection Regulation (GDPR). This policy describes the data we collect, the purposes of processing, your rights and how to exercise them.",
+      "controller": {
+        "title": "Data controller",
+        "content": "The data controller is The Spark SASU, represented by Dragos Dreptate.",
+        "contact": "For any questions regarding the protection of your personal data, you can contact us:",
+        "contactEmail": "By email: privacy@the-playground.fr",
+        "contactMail": "By mail: The Spark SASU, 10 rue de la Paix, 75002 Paris, France",
+        "dpo": "The Spark SASU has not appointed a Data Protection Officer (DPO) in accordance with Article 37 of the GDPR (fewer than 250 employees, no large-scale processing). The contact above fulfills this function."
+      },
       "dataCollected": {
         "title": "Data collected",
-        "items": {
+        "identity": {
+          "title": "Identity and account data",
           "email": "Email address (sign-in via magic link or OAuth)",
-          "name": "First and last name (provided during onboarding)",
+          "name": "First and last name (provided during profile setup)",
+          "photo": "Profile picture (imported from Google/GitHub or uploaded manually)",
+          "publicId": "Public profile identifier"
+        },
+        "auth": {
+          "title": "Authentication data",
           "oauth": "OAuth account identifier (Google, GitHub) — for authentication only",
-          "usage": "Anonymized usage data (Vercel Analytics)"
+          "session": "Session tokens (session cookies)"
+        },
+        "usage": {
+          "title": "Service usage data",
+          "circles": "Communities created or joined",
+          "moments": "Events created, registrations, attendance",
+          "comments": "Comments posted",
+          "prefs": "Notification preferences"
+        },
+        "payment": {
+          "title": "Payment data (paid events only)",
+          "stripe": "Payment details (card number, expiration date, CVV) are processed exclusively by Stripe and are never stored by The Playground",
+          "ref": "We only retain the Stripe transaction reference and receipt URL"
+        },
+        "analytics": {
+          "title": "Browsing and analytics data",
+          "pages": "Pages visited, visit duration, navigation events",
+          "identifier": "Technical identifier (pseudonymized for non-authenticated visitors, linked to account for signed-in users)",
+          "technical": "Technical data: browser type, operating system"
+        },
+        "errors": {
+          "title": "Data collected automatically in case of errors",
+          "traces": "Technical error traces (stack traces) for bug diagnosis and resolution"
         }
       },
       "purpose": {
-        "title": "Purpose of data processing",
+        "title": "Purposes and legal basis",
+        "headers": {
+          "purpose": "Purpose",
+          "data": "Data concerned",
+          "legal": "Legal basis"
+        },
         "items": {
           "auth": "Authentication and account management",
-          "service": "Service delivery (creating Communities, joining Events)",
-          "email": "Sending transactional emails (registration confirmations, notifications)",
-          "analytics": "Service improvement through anonymized statistics"
+          "authData": "Email, name, OAuth identifier, profile picture",
+          "authLegal": "Performance of contract (Art. 6.1.b)",
+          "service": "Service delivery (Communities, Events, registrations)",
+          "serviceData": "Account data, usage data",
+          "serviceLegal": "Performance of contract (Art. 6.1.b)",
+          "email": "Sending transactional emails (confirmations, reminders, cancellations)",
+          "emailData": "Email, first name",
+          "emailLegal": "Performance of contract (Art. 6.1.b)",
+          "notifications": "Sending Community notifications (new Events, Host messages)",
+          "notificationsData": "Email, first name, notification preferences",
+          "notificationsLegal": "Legitimate interest (Art. 6.1.f) — you can unsubscribe at any time from your profile",
+          "payment": "Processing payments for paid Events",
+          "paymentData": "Stripe transaction reference",
+          "paymentLegal": "Performance of contract (Art. 6.1.b)",
+          "analytics": "Usage analysis and service improvement",
+          "analyticsData": "Pseudonymized browsing data",
+          "analyticsLegal": "Legitimate interest (Art. 6.1.f) — continuous service improvement, data hosted in EU",
+          "bugs": "Bug diagnosis and resolution",
+          "bugsData": "Technical error traces",
+          "bugsLegal": "Legitimate interest (Art. 6.1.f) — ensuring service stability"
         }
-      },
-      "sharing": {
-        "title": "Data sharing",
-        "content": "Your personal data is never sold or shared with third parties for commercial purposes. It may be transmitted to our technical subcontractors (hosting, email delivery) solely to ensure the operation of the service."
       },
       "cookies": {
         "title": "Cookies",
-        "content": "The Playground only uses cookies strictly necessary for the operation of the site (authentication session). No advertising or third-party tracking cookies are used."
+        "necessary": {
+          "title": "Strictly necessary cookies (set without consent)",
+          "session": "Maintaining your authentication session",
+          "sessionDuration": "30 days",
+          "callback": "Post-login redirect",
+          "callbackDuration": "30 minutes",
+          "note": "These cookies are essential for the website to function. They cannot be disabled."
+        },
+        "analytics": {
+          "title": "Analytics cookies",
+          "posthog": "Service usage analysis (pages visited, user journeys)",
+          "posthogProvider": "PostHog (EU servers)",
+          "posthogDuration": "1 year",
+          "note": "These cookies help us understand how the service is used in order to improve it. Collected data is hosted in the European Union. You can disable these cookies through your browser settings."
+        },
+        "noAds": "No advertising cookies are used by The Playground."
+      },
+      "subprocessors": {
+        "title": "Sub-processors and data recipients",
+        "intro": "Your personal data may be shared with the following sub-processors, solely for the purposes described above:",
+        "headers": {
+          "name": "Sub-processor",
+          "purpose": "Purpose",
+          "hq": "Headquarters",
+          "hosting": "Data hosting",
+          "safeguards": "Safeguards"
+        },
+        "vercel": { "purpose": "Application hosting", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Vercel DPA, data hosted in EU" },
+        "neon": { "purpose": "Database hosting", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Neon DPA, data hosted in EU" },
+        "posthog": { "purpose": "Service usage analytics", "hq": "United States", "hosting": "European Union (eu.posthog.com)", "safeguards": "PostHog DPA, data hosted in EU" },
+        "sentry": { "purpose": "Technical error monitoring", "hq": "United States", "hosting": "European Union (Germany, de.sentry.io)", "safeguards": "Sentry DPA, data hosted in EU" },
+        "resend": { "purpose": "Transactional and notification emails", "hq": "United States", "hosting": "United States", "safeguards": "Resend DPA, EU standard contractual clauses" },
+        "stripe": { "purpose": "Payment processing (paid Events)", "hq": "United States", "hosting": "United States / European Union (global infrastructure)", "safeguards": "PCI-DSS certified, Stripe DPA, EU standard contractual clauses" },
+        "anthropic": { "purpose": "AI features (description generation)", "hq": "United States", "hosting": "United States", "safeguards": "Anthropic DPA, EU standard contractual clauses" },
+        "slack": { "purpose": "Internal administration notifications (new users, new Communities)", "hq": "United States", "hosting": "United States", "safeguards": "Slack/Salesforce DPA, EU standard contractual clauses" },
+        "noSale": "Your data is never sold or shared with third parties for commercial or advertising purposes."
+      },
+      "transfers": {
+        "title": "Transfers outside the European Union",
+        "intro": "Most of our sub-processors host your data in the European Union, even when their headquarters are in the United States:",
+        "eu": "Data hosted in EU: Vercel (Frankfurt), Neon (Frankfurt), PostHog (EU), Sentry (Germany)",
+        "us": "Data hosted in United States: Resend (email delivery), Stripe (payment processing), Anthropic (AI features), Slack (internal notifications)",
+        "safeguards": "Transfers to the United States are governed by:",
+        "scc": "Standard contractual clauses adopted by the European Commission (implementing decision 2021/914)",
+        "dpa": "Contractual commitments from each sub-processor (Data Processing Agreements)",
+        "conclusion": "Core data (user database, application hosting, analytics, monitoring) is stored in the European Union."
       },
       "rights": {
         "title": "Your rights (GDPR)",
-        "content": "In accordance with the General Data Protection Regulation (GDPR), you have the following rights:",
+        "content": "Under the GDPR, you have the following rights:",
         "items": {
-          "access": "Right to access your personal data",
-          "rectification": "Right to rectify inaccurate data",
-          "deletion": "Right to erasure of your data",
-          "portability": "Right to data portability",
-          "opposition": "Right to object to processing"
+          "access": "Right of access (Art. 15): obtain confirmation of data processing and receive a copy",
+          "rectification": "Right to rectification (Art. 16): correct inaccurate or incomplete data",
+          "deletion": "Right to erasure (Art. 17): request deletion of your data. You can delete your account directly from your profile (immediate and irreversible deletion)",
+          "portability": "Right to data portability (Art. 20): receive your data in a structured, machine-readable format",
+          "opposition": "Right to object (Art. 21): object to processing based on legitimate interest",
+          "consent": "Right to withdraw consent (Art. 7.3): where processing is based on your consent, withdraw it at any time without affecting the lawfulness of processing carried out before withdrawal"
         },
-        "contact": "To exercise these rights, contact us via LinkedIn: linkedin.com/in/dragosdreptate."
+        "exerciseTitle": "To exercise your rights:",
+        "contactEmail": "By email: privacy@the-playground.fr",
+        "contactMail": "By mail: The Spark SASU, 10 rue de la Paix, 75002 Paris, France",
+        "delay": "We commit to responding to your request within one month of receipt (Art. 12.3 GDPR).",
+        "complaint": "If you believe that the processing of your data constitutes a violation of the GDPR, you have the right to lodge a complaint with the French data protection authority (CNIL): www.cnil.fr."
       },
       "retention": {
         "title": "Data retention",
-        "content": "Your data is retained as long as your account is active. If your account is deleted, your personal data will be erased within 30 days."
+        "account": "Account data (email, name, profile) — as long as the account is active",
+        "usage": "Usage data (registrations, comments) — as long as the account is active",
+        "payment": "Payment data (Stripe references) — 5 years after the transaction (legal accounting obligation)",
+        "analytics": "Analytics cookies (PostHog) — 1 year maximum",
+        "errors": "Error traces (Sentry) — 90 days",
+        "deletion": "When you delete your account, your personal data is erased immediately (irreversible deletion). Data related to legal obligations (payment references) is retained in accordance with applicable legal requirements."
+      },
+      "changes": {
+        "title": "Changes to this policy",
+        "content": "We may update this policy to reflect changes in our practices or regulations. In the event of a substantial change, we will notify you by email or by notification on the platform. The date of the last update is indicated at the top of this page."
       }
     },
     "terms": {
