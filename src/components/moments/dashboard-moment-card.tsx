@@ -108,6 +108,25 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName;
 
+  const roleBadge = !isPast && !isDraft ? (
+    isOrganizer || isHost ? (
+      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+        <Crown className="size-3" />
+        {t("role.host")}
+      </Badge>
+    ) : isRegistered ? (
+      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+        <Check className="size-3" />
+        {t("registrationStatus.registered")}
+      </Badge>
+    ) : isWaitlisted ? (
+      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+        <Clock className="size-3" />
+        {t("registrationStatus.waitlisted")}
+      </Badge>
+    ) : null
+  ) : null;
+
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
   return (
@@ -157,7 +176,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Time + badge */}
+              {/* Time */}
               <div className="flex items-center gap-2">
                 <p
                   className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
@@ -165,31 +184,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 >
                   {timeStr}
                 </p>
-                {!isPast && (
-                  isDraft ? (
-                    <DraftBadge label={tMoment("status.draft")} />
-                  ) : isOrganizer ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                    </Badge>
-                  ) : isHost ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Crown className="size-3" />
-                      {t("role.host")}
-                    </Badge>
-                  ) : isRegistered ? (
-                    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                      <Check className="size-3" />
-                      {t("registrationStatus.registered")}
-                    </Badge>
-                  ) : isWaitlisted ? (
-                    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                      <Clock className="size-3" />
-                      {t("registrationStatus.waitlisted")}
-                    </Badge>
-                  ) : null
-                )}
+                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
               </div>
 
               {/* Title */}
@@ -201,18 +196,21 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 {momentData.title}
               </p>
 
-              {/* Inscrits */}
-              {momentData.registrationCount > 0 && (
-                <div className={isPast ? "opacity-60" : ""}>
-                  <AttendeeAvatarStack
-                    attendees={momentData.topAttendees}
-                    totalCount={momentData.registrationCount}
-                    label={
-                      momentData.topAttendees.length < momentData.registrationCount
-                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
-                        : tMoment("registrations.registered", { count: momentData.registrationCount })
-                    }
-                  />
+              {/* Inscrits + badge rôle */}
+              {(momentData.registrationCount > 0 || roleBadge) && (
+                <div className={`flex items-center gap-2 ${isPast ? "opacity-60" : ""}`}>
+                  {momentData.registrationCount > 0 && (
+                    <AttendeeAvatarStack
+                      attendees={momentData.topAttendees}
+                      totalCount={momentData.registrationCount}
+                      label={
+                        momentData.topAttendees.length < momentData.registrationCount
+                          ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+                          : tMoment("registrations.registered", { count: momentData.registrationCount })
+                      }
+                    />
+                  )}
+                  {roleBadge}
                 </div>
               )}
 
