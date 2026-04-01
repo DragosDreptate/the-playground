@@ -661,6 +661,7 @@
       "free": "Free",
       "spotsRemaining": "{count} spots remaining",
       "registeredCount": "{count} joined",
+      "moreRegistered": "+{count} more",
       "online": "Online",
       "roleBadge": {
         "host": "Organizer",

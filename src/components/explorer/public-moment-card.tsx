@@ -5,12 +5,13 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatShortDate, formatTime } from "@/lib/format-date";
-import { MapPin, Globe, Users, Crown, Clock, Check } from "lucide-react";
+import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 import { DemoBadge } from "@/components/badges/demo-badge";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
@@ -37,10 +38,11 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
   const LocationIcon = isOnline ? Globe : MapPin;
 
-  const spotsRemaining =
-    moment.capacity !== null
-      ? moment.capacity - moment.registrationCount
-      : null;
+  const overflow = moment.registrationCount - moment.topAttendees.length;
+  const attendeeLabel =
+    overflow > 0
+      ? t("momentCard.moreRegistered", { count: overflow })
+      : t("momentCard.registeredCount", { count: moment.registrationCount });
 
   // Badge rôle — inline dans la meta row
   const roleBadge = isOrganizer ? (
@@ -128,15 +130,14 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
                   <span className="truncate">{locationLabel}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1 shrink-0">
-                <Users className="size-3 shrink-0" />
-                {spotsRemaining !== null && spotsRemaining > 0 ? (
-                  <span>{t("momentCard.spotsRemaining", { count: spotsRemaining })}</span>
-                ) : (
-                  <span>{t("momentCard.registeredCount", { count: moment.registrationCount })}</span>
-                )}
-              </div>
             </div>
+            {moment.registrationCount > 0 && (
+              <AttendeeAvatarStack
+                attendees={moment.topAttendees}
+                totalCount={moment.registrationCount}
+                label={attendeeLabel}
+              />
+            )}
           </div>
 
           {/* Right column — desktop only */}

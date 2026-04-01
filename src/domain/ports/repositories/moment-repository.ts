@@ -51,6 +51,15 @@ export type PublicMomentFilters = {
   offset?: number;
 };
 
+export type PublicMomentAttendee = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
 export type PublicMoment = {
   id: string;
   slug: string;
@@ -64,6 +73,7 @@ export type PublicMoment = {
   registrationCount: number;
   capacity: number | null;
   explorerScore: number;
+  topAttendees: PublicMomentAttendee[];
   circle: {
     slug: string;
     name: string;

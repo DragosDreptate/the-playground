@@ -661,6 +661,7 @@
       "free": "Gratuit",
       "spotsRemaining": "{count} places restantes",
       "registeredCount": "{count} inscrit(s)",
+      "moreRegistered": "+{count} inscrit(s)",
       "online": "En ligne",
       "roleBadge": {
         "host": "Organisateur",
