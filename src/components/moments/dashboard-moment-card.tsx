@@ -10,7 +10,7 @@ import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
-import { CircleAvatar } from "@/components/circles/circle-avatar";
+
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
 
@@ -229,18 +229,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               )}
 
               {/* Community */}
-              <span
-                className={`flex min-w-0 items-center gap-1.5 pt-0.5 text-xs ${
+              <p
+                className={`truncate text-xs ${
                   isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                 }`}
               >
-                <CircleAvatar
-                  name={momentData.circleName}
-                  image={momentData.circleCoverImage}
-                  size="xs"
-                />
-                <span className="truncate">{momentData.circleName}</span>
-              </span>
+                {momentData.circleName}
+              </p>
             </div>
 
             {/* Cover — RIGHT, alignée avec le titre */}
