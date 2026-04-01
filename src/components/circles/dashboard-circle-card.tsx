@@ -95,10 +95,10 @@ export async function DashboardCircleCard({ circle }: Props) {
               )}
               <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
                 {circle.membershipStatus === "PENDING"
-                  ? <><Clock className="size-3" />{t("circleCard.roleBadge.pending")}</>
+                  ? <><Clock className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span></>
                   : circle.memberRole === "HOST"
-                    ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
-                    : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
+                    ? <><Crown className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span></>
+                    : <><Users className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span></>}
               </Badge>
             </div>
           </div>

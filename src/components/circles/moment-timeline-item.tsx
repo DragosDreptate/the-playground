@@ -119,34 +119,38 @@ export async function MomentTimelineItem({
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1.5">
-                {/* Time */}
-                <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
+                {/* Time + badge rôle — sur la même ligne */}
+                <div className="flex items-center gap-2">
+                  <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
+                  {!isCancelled && variant === "dashboard" && (
+                    <>
+                      {isDraft ? (
+                        <DraftBadge label={t("status.draft")} />
+                      ) : isHost ? (
+                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                          <Crown className="size-3" />
+                          <span className="hidden sm:inline">{tDashboard("role.host")}</span>
+                        </Badge>
+                      ) : isRegistered ? (
+                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
+                          <Check className="size-3" />
+                          <span className="hidden sm:inline">{tDashboard("registrationStatus.registered")}</span>
+                        </Badge>
+                      ) : isWaitlisted ? (
+                        <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+                          <Clock className="size-3" />
+                          <span className="hidden sm:inline">{tDashboard("registrationStatus.waitlisted")}</span>
+                        </Badge>
+                      ) : null}
+                    </>
+                  )}
+                </div>
 
-                {/* Title + badge — dashboard uniquement */}
+                {/* Title */}
                 {!isCancelled && variant === "dashboard" ? (
-                  <div className="flex items-baseline gap-3">
-                    <p className={`min-w-0 flex-1 truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
-                      {moment.title}
-                    </p>
-                    {isDraft ? (
-                      <DraftBadge label={t("status.draft")} />
-                    ) : isHost ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                        <Crown className="size-3" />
-                        {tDashboard("role.host")}
-                      </Badge>
-                    ) : isRegistered ? (
-                      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                        <Check className="size-3" />
-                        {tDashboard("registrationStatus.registered")}
-                      </Badge>
-                    ) : isWaitlisted ? (
-                      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                        <Clock className="size-3" />
-                        {tDashboard("registrationStatus.waitlisted")}
-                      </Badge>
-                    ) : null}
-                  </div>
+                  <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                    {moment.title}
+                  </p>
                 ) : (
                   <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
                     {moment.title}

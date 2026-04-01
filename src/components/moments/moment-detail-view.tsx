@@ -21,8 +21,6 @@ import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-re
 import { formatDateRange } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
-import { DemoBadge } from "@/components/badges/demo-badge";
-import { DraftBadge } from "@/components/badges/draft-badge";
 import Image from "next/image";
 import {
   CalendarIcon,
@@ -81,20 +79,6 @@ export type MomentDetailViewProps = HostViewProps | PublicViewProps;
 
 // ── Helpers ──────────────────────────────────────────────────
 
-const statusVariant = {
-  DRAFT: "outline",
-  PUBLISHED: "default",
-  CANCELLED: "outline",
-  PAST: "outline",
-} as const;
-
-const statusClassName = {
-  DRAFT: "border-muted-foreground/40 text-muted-foreground",
-  PUBLISHED: "",
-  CANCELLED: "border-destructive/40 text-destructive",
-  PAST: "",
-} as const;
-
 type MomentCoverBlockProps = {
   coverImage: Moment["coverImage"];
   coverImageAttribution: Moment["coverImageAttribution"];
@@ -103,14 +87,19 @@ type MomentCoverBlockProps = {
   isDemo: boolean;
   gradient: string;
   sizes: string;
-  draftLabel: string;
   demoLabel: string;
-  pastLabel: string;
+};
+
+const breadcrumbStatusStyle: Record<string, string> = {
+  DRAFT: "border-muted-foreground/40 text-muted-foreground",
+  PUBLISHED: "border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
+  CANCELLED: "border-destructive/40 text-destructive",
+  PAST: "border-muted-foreground/40 text-muted-foreground",
 };
 
 function MomentCoverBlock({
   coverImage, coverImageAttribution, title, status, isDemo, gradient,
-  sizes, draftLabel, demoLabel, pastLabel,
+  sizes, demoLabel,
 }: MomentCoverBlockProps) {
   return (
     <div className="flex flex-col gap-2">
@@ -120,7 +109,6 @@ function MomentCoverBlock({
           className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" ? "opacity-70 grayscale" : ""}`}
           style={{ aspectRatio: "1 / 1" }}
         >
-          {status === "DRAFT" && <DraftBadge label={draftLabel} variant="cover" />}
           {coverImage ? (
             <Image src={coverImage} alt={title} fill className="object-cover" sizes={sizes} priority />
           ) : (
@@ -134,11 +122,12 @@ function MomentCoverBlock({
               </div>
             </>
           )}
-          {isDemo && <DemoBadge label={demoLabel} size="lg" />}
-          {status === "PAST" && (
-            <div className="absolute bottom-3 left-3">
-              <span className="rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                {pastLabel}
+
+          {/* Demo badge on cover */}
+          {isDemo && (
+            <div className="absolute top-3 left-3 z-10">
+              <span className="inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary backdrop-blur-sm">
+                {demoLabel}
               </span>
             </div>
           )}
@@ -233,31 +222,27 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
     <div className="space-y-8">
       {/* Breadcrumb + status badge — Host only */}
       {isHostView && (
-        <div className="space-y-1">
-          <div className="text-muted-foreground flex items-center gap-1 text-sm">
-            <Link
-              href="/dashboard"
-              className="hover:text-foreground transition-colors"
-            >
-              {tDashboard("title")}
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <Link
-              href={`/dashboard/circles/${props.circleSlug}`}
-              className="hover:text-foreground transition-colors"
-            >
-              {circle.name}
-            </Link>
-            <ChevronRight className="size-3.5" />
-            <span className="text-foreground truncate font-medium">
-              {moment.title}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={statusVariant[moment.status]} className={statusClassName[moment.status]}>
-              {t(`status.${moment.status.toLowerCase()}`)}
-            </Badge>
-          </div>
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
+          <Link
+            href="/dashboard"
+            className="hover:text-foreground shrink-0 transition-colors"
+          >
+            {tDashboard("title")}
+          </Link>
+          <ChevronRight className="size-3.5 shrink-0" />
+          <Link
+            href={`/dashboard/circles/${props.circleSlug}`}
+            className="hover:text-foreground shrink-0 transition-colors"
+          >
+            {circle.name}
+          </Link>
+          <ChevronRight className="size-3.5 shrink-0" />
+          <span className="text-foreground font-medium">
+            {moment.title}
+          </span>
+          <span className={`shrink-0 rounded-md border px-2 py-0.5 text-xs font-medium ${breadcrumbStatusStyle[moment.status]}`}>
+            {t(`status.${moment.status.toLowerCase()}`)}
+          </span>
         </div>
       )}
 
@@ -276,9 +261,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             isDemo={circle.isDemo}
             gradient={gradient}
             sizes="(max-width: 1024px) 100vw, 340px"
-            draftLabel={t("status.draft")}
             demoLabel={tCommon("demo")}
-            pastLabel={t("status.past")}
           />
 
           {/* Circle — cliquable */}
@@ -390,9 +373,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               isDemo={circle.isDemo}
               gradient={gradient}
               sizes="calc(100vw - 32px)"
-              draftLabel={t("status.draft")}
               demoLabel={tCommon("demo")}
-              pastLabel={t("status.past")}
             />
           </div>
 

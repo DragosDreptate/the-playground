@@ -42,8 +42,8 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const roleBadge = membershipRole && (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       {membershipRole === "HOST"
-        ? <><Crown className="size-3" />{t("circleCard.roleBadge.host")}</>
-        : <><Users className="size-3" />{t("circleCard.roleBadge.member")}</>}
+        ? <><Crown className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span></>
+        : <><Users className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span></>}
     </Badge>
   );
 
