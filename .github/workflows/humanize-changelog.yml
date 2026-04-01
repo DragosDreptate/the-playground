@@ -28,10 +28,11 @@ jobs:
 
       # Skip rapide : les commits vides poussés par /release pour déclencher le CI
       # ne modifient pas CHANGELOG.md — inutile d'installer les deps et d'appeler Claude.
+      # On compare avec origin/main (la base de la PR), pas HEAD~1 qui ne voit que le dernier commit.
       - name: Vérifier si CHANGELOG.md a changé
         id: check-changelog
         run: |
-          if git diff HEAD~1 --name-only | grep -q "^CHANGELOG.md$"; then
+          if git diff origin/main --name-only | grep -q "^CHANGELOG.md$"; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "CHANGELOG.md inchangé — skip."
