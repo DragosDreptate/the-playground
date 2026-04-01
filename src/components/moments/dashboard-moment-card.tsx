@@ -248,13 +248,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               <Image
                 src={momentData.coverImage}
                 alt={momentData.title}
-                width={90}
-                height={90}
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                width={100}
+                height={100}
+                className={`mt-[26px] size-[100px] shrink-0 rounded-xl object-cover sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`mt-[26px] size-[90px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`mt-[26px] size-[100px] shrink-0 rounded-xl sm:mt-0 ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}
