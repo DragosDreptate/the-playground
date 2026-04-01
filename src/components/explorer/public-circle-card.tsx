@@ -74,10 +74,9 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           {/* Body */}
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
             {/* Badges — catégorie + rôle */}
-            {(categoryBadge || roleBadge) && (
+            {categoryBadge && (
               <div className="flex items-center gap-2">
                 {categoryBadge}
-                {roleBadge}
               </div>
             )}
             {/* Titre — pleine largeur */}
@@ -101,12 +100,17 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 </div>
               )}
             </div>
-            {circle.memberCount > 0 && (
-              <AttendeeAvatarStack
-                attendees={circle.topMembers}
-                totalCount={circle.memberCount}
-                label={memberLabel}
-              />
+            {(circle.memberCount > 0 || roleBadge) && (
+              <div className="flex items-center gap-2">
+                {circle.memberCount > 0 && (
+                  <AttendeeAvatarStack
+                    attendees={circle.topMembers}
+                    totalCount={circle.memberCount}
+                    label={memberLabel}
+                  />
+                )}
+                {roleBadge}
+              </div>
             )}
           </div>
 
