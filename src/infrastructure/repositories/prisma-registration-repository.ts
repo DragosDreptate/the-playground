@@ -467,6 +467,28 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return record ? toDomainRegistration(record) : null;
   },
 
+  async findTopRegistrantsByMomentIds(momentIds: string[], limit: number): Promise<Map<string, RegistrationWithUser[]>> {
+    if (momentIds.length === 0) return new Map();
+    // Une seule requête batch — on charge les N premiers REGISTERED par moment
+    const records = await prisma.registration.findMany({
+      where: { momentId: { in: momentIds }, status: "REGISTERED" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { registeredAt: "asc" },
+    });
+    const result = new Map<string, RegistrationWithUser[]>(momentIds.map((id) => [id, []]));
+    for (const record of records) {
+      const list = result.get(record.momentId)!;
+      if (list.length < limit) {
+        list.push(toDomainRegistrationWithUser(record));
+      }
+    }
+    return result;
+  },
+
   async getPaymentSummary(momentId: string) {
     const [paidResult, refundedResult, moment] = await Promise.all([
       prisma.registration.aggregate({

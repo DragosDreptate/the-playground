@@ -525,6 +525,7 @@
     "registrations": {
       "title": "Attendees",
       "registered": "{count} joined",
+      "moreRegistered": "+{count} more",
       "waitlisted": "{count} waitlisted",
       "capacity": "{count} capacity",
       "empty": "No one has joined yet.",

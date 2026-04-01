@@ -6,8 +6,18 @@ import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format
 import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
+
+type Attendee = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
 
 type Props = {
   moment: Moment;
@@ -19,6 +29,8 @@ type Props = {
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
   variant?: "dashboard" | "public";
+  /** Premiers inscrits pour l'avatar stack (variant public). */
+  topAttendees?: Attendee[];
 };
 
 export async function MomentTimelineItem({
@@ -29,6 +41,7 @@ export async function MomentTimelineItem({
   isHost,
   isLast,
   variant = "dashboard",
+  topAttendees = [],
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
@@ -148,11 +161,24 @@ export async function MomentTimelineItem({
                   </p>
                 )}
 
-                {/* Inscrits — dashboard uniquement */}
-                {!isCancelled && variant === "dashboard" && registrationCount > 0 && (
+                {/* Inscrits */}
+                {!isCancelled && registrationCount > 0 && variant === "dashboard" && (
                   <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                     <Users className="size-3 shrink-0" />
                     <span>{t("registrations.registered", { count: registrationCount })}</span>
+                  </div>
+                )}
+                {!isCancelled && registrationCount > 0 && variant === "public" && (
+                  <div className={isPast ? "opacity-60" : ""}>
+                    <AttendeeAvatarStack
+                      attendees={topAttendees}
+                      totalCount={registrationCount}
+                      label={
+                        topAttendees.length < registrationCount
+                          ? t("registrations.moreRegistered", { count: registrationCount - topAttendees.length })
+                          : t("registrations.registered", { count: registrationCount })
+                      }
+                    />
                   </div>
                 )}
 
