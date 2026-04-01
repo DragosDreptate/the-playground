@@ -86,6 +86,7 @@ export type FeaturedCircle = {
   coverImageAttribution: CoverImageAttribution | null;
   memberCount: number;
   upcomingMomentCount: number;
+  topMembers: PublicCircleMember[];
 };
 
 export interface CircleRepository {

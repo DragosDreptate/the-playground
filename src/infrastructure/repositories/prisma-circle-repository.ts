@@ -523,6 +523,12 @@ export const prismaCircleRepository: CircleRepository = {
             },
           },
         },
+        memberships: {
+          where: { status: "ACTIVE" },
+          orderBy: { joinedAt: "asc" },
+          take: 3,
+          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+        },
       },
     });
 
@@ -544,6 +550,7 @@ export const prismaCircleRepository: CircleRepository = {
         coverImageAttribution: c.coverImageAttribution as CoverImageAttribution | null,
         memberCount: c._count.memberships,
         upcomingMomentCount: c._count.moments,
+        topMembers: c.memberships.map((m) => ({ user: m.user })),
       }];
     });
   },

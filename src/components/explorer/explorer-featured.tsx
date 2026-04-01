@@ -4,7 +4,8 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
-import { Users, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { FeaturedCircle } from "@/domain/ports/repositories/circle-repository";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
@@ -89,19 +90,25 @@ export function ExplorerFeatured({ circles }: Props) {
                   <p className="truncate text-base font-bold text-foreground group-hover:underline">
                     {circle.name}
                   </p>
-                  {/* Ligne 3 : ville + membres */}
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-                    {circle.city && (
-                      <div className="flex items-center gap-1">
-                        <MapPin className="size-3 shrink-0" />
-                        <span className="truncate">{circle.city}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <Users className="size-3 shrink-0" />
-                      <span>{t("circleCard.members", { count: circle.memberCount })}</span>
+                  {/* Ligne 3 : ville */}
+                  {circle.city && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <MapPin className="size-3 shrink-0" />
+                      <span className="truncate">{circle.city}</span>
                     </div>
-                  </div>
+                  )}
+                  {/* Ligne 4 : avatars membres */}
+                  {circle.memberCount > 0 && (
+                    <AttendeeAvatarStack
+                      attendees={circle.topMembers}
+                      totalCount={circle.memberCount}
+                      label={
+                        circle.memberCount > circle.topMembers.length
+                          ? t("circleCard.moreMembers", { count: circle.memberCount - circle.topMembers.length })
+                          : t("circleCard.members", { count: circle.memberCount })
+                      }
+                    />
+                  )}
                 </div>
               </Link>
             );

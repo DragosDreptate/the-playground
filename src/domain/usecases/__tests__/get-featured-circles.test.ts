@@ -16,6 +16,7 @@ function makeFeaturedCircle(overrides: Partial<FeaturedCircle> = {}): FeaturedCi
     coverImageAttribution: null,
     memberCount: 42,
     upcomingMomentCount: 3,
+    topMembers: [],
     ...overrides,
   };
 }
