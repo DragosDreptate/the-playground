@@ -25,6 +25,7 @@ describe("GetUserUpcomingMoments", () => {
             circleSlug: "yoga-circle",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         },
         {
@@ -42,6 +43,7 @@ describe("GetUserUpcomingMoments", () => {
             circleSlug: "dev-community",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         },
       ];
@@ -104,6 +106,7 @@ describe("GetUserUpcomingMoments", () => {
             circleSlug: "popular-circle",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         },
       ];
@@ -174,6 +177,7 @@ describe("GetUserUpcomingMoments", () => {
             circleSlug: "alice-circle",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         },
       ];

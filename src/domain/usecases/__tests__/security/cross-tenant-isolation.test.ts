@@ -750,6 +750,7 @@ function makeDashboardCircleForSecurity(
     memberCount: 1,
     upcomingMomentCount: 0,
     nextMoment: null,
+    topMembers: [],
     ...overrides,
   };
 }

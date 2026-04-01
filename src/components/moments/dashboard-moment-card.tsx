@@ -6,7 +6,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Check, Clock, Crown, Users } from "lucide-react";
+import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 import { CircleAvatar } from "@/components/circles/circle-avatar";
@@ -54,6 +55,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleName: props.moment.circle.name,
         circleCoverImage: props.moment.circle.coverImage,
         registrationCount: props.moment.registrationCount,
+        topAttendees: props.moment.topAttendees,
       }
     : {
         slug: props.registration.moment.slug,
@@ -66,6 +68,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         circleName: props.registration.moment.circleName,
         circleCoverImage: props.registration.moment.circleCoverImage,
         registrationCount: props.registration.moment.registrationCount,
+        topAttendees: props.registration.moment.topAttendees,
       };
 
   const [isToday, setIsToday] = useState(false);
@@ -200,9 +203,16 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
               {/* Inscrits */}
               {momentData.registrationCount > 0 && (
-                <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                  <Users className="size-3 shrink-0" />
-                  <span>{tMoment("registrations.registered", { count: momentData.registrationCount })}</span>
+                <div className={isPast ? "opacity-60" : ""}>
+                  <AttendeeAvatarStack
+                    attendees={momentData.topAttendees}
+                    totalCount={momentData.registrationCount}
+                    label={
+                      momentData.topAttendees.length < momentData.registrationCount
+                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+                        : tMoment("registrations.registered", { count: momentData.registrationCount })
+                    }
+                  />
                 </div>
               )}
 

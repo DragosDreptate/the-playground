@@ -34,6 +34,15 @@ export type RegistrationWithUser = Registration & {
   };
 };
 
+export type RegistrationMomentAttendee = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
 export type RegistrationWithMoment = Registration & {
   moment: {
     id: string;
@@ -48,5 +57,6 @@ export type RegistrationWithMoment = Registration & {
     circleSlug: string;
     circleCoverImage: string | null;
     registrationCount: number;
+    topAttendees: RegistrationMomentAttendee[];
   };
 };

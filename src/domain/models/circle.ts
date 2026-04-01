@@ -63,9 +63,19 @@ export type CircleMemberWithUser = CircleMembership & {
   };
 };
 
+export type DashboardCircleMember = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
 export type DashboardCircle = CircleWithRole & {
   membershipStatus: MembershipStatus;
   memberCount: number;
   upcomingMomentCount: number;
+  topMembers: DashboardCircleMember[];
   nextMoment: { title: string; startsAt: Date } | null;
 };

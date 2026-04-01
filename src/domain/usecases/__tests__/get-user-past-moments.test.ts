@@ -24,6 +24,7 @@ function makeRegistrationWithMoment(
       circleSlug: "tech-paris",
       circleCoverImage: null,
       registrationCount: 0,
+      topAttendees: [],
     },
     ...overrides,
   };
@@ -49,6 +50,7 @@ describe("GetUserPastMoments", () => {
             circleSlug: "yoga-circle",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         }),
         makeRegistrationWithMoment({
@@ -67,6 +69,7 @@ describe("GetUserPastMoments", () => {
             circleSlug: "dev-community",
             circleCoverImage: null,
             registrationCount: 0,
+            topAttendees: [],
           },
         }),
       ];
@@ -132,6 +135,7 @@ describe("GetUserPastMoments", () => {
           circleSlug: "remote-circle",
           circleCoverImage: null,
           registrationCount: 0,
+          topAttendees: [],
         },
       });
       const registrationRepository = createMockRegistrationRepository({

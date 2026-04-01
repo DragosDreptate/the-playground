@@ -247,6 +247,7 @@ export const prismaCircleRepository: CircleRepository = {
       memberCount: number;
       upcomingMomentCount: number;
       nextMoment: { title: string; startsAt: string } | null;
+      topMembers: { firstName: string | null; lastName: string | null; email: string; image: string | null }[];
     };
 
     const rows = await prisma.$queryRaw<Row[]>`
@@ -283,7 +284,15 @@ export const prismaCircleRepository: CircleRepository = {
           WHERE "circleId" = c.id AND status = 'PUBLISHED' AND "startsAt" >= NOW()
           ORDER BY "startsAt" ASC
           LIMIT 1
-        ) x) AS "nextMoment"
+        ) x) AS "nextMoment",
+        (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
+          SELECT u."firstName", u."lastName", u.email, u.image
+          FROM circle_memberships cm2
+          JOIN users u ON u.id = cm2."userId"
+          WHERE cm2."circleId" = c.id AND cm2.status = 'ACTIVE'
+          ORDER BY cm2."joinedAt" ASC
+          LIMIT 3
+        ) sub) AS "topMembers"
       FROM circle_memberships cm
       JOIN circles c ON c.id = cm."circleId"
       WHERE cm."userId" = ${userId} AND cm.status IN ('ACTIVE', 'PENDING')
@@ -312,6 +321,7 @@ export const prismaCircleRepository: CircleRepository = {
       membershipStatus: row.membershipStatus,
       memberCount: row.memberCount,
       upcomingMomentCount: row.upcomingMomentCount,
+      topMembers: (row.topMembers ?? []).map((u) => ({ user: u })),
       nextMoment: row.nextMoment
         ? { title: row.nextMoment.title, startsAt: new Date(row.nextMoment.startsAt) }
         : null,

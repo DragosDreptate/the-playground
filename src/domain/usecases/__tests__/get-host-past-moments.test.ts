@@ -17,6 +17,7 @@ function makeHostMomentSummary(
     locationName: "Café Central",
     status: "PAST",
     registrationCount: 30,
+    topAttendees: [],
     circle: {
       slug: "tech-paris",
       name: "Tech Paris",

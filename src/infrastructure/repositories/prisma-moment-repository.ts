@@ -277,6 +277,7 @@ export const prismaMomentRepository: MomentRepository = {
       locationName: m.locationName,
       status: m.status,
       registrationCount: m._count.registrations,
+      topAttendees: [],
       circle: {
         slug: m.circle.slug,
         name: m.circle.name,
@@ -307,6 +308,12 @@ export const prismaMomentRepository: MomentRepository = {
         status: true,
         circle: { select: { slug: true, name: true, coverImage: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
+        registrations: {
+          where: { status: "REGISTERED" },
+          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+          orderBy: { registeredAt: "asc" },
+          take: 3,
+        },
       },
       orderBy: { startsAt: "asc" },
     });
@@ -322,6 +329,7 @@ export const prismaMomentRepository: MomentRepository = {
       locationName: m.locationName,
       status: m.status,
       registrationCount: m._count.registrations,
+      topAttendees: m.registrations.map((r) => ({ user: r.user })),
       circle: { slug: m.circle.slug, name: m.circle.name, coverImage: m.circle.coverImage ?? null },
     });
 
@@ -379,6 +387,7 @@ export const prismaMomentRepository: MomentRepository = {
       locationName: m.locationName,
       status: m.status,
       registrationCount: m._count.registrations,
+      topAttendees: [],
       circle: {
         slug: m.circle.slug,
         name: m.circle.name,

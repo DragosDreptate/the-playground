@@ -6,6 +6,15 @@ export type LocationType = "IN_PERSON" | "ONLINE" | "HYBRID";
 
 export type MomentStatus = "DRAFT" | "PUBLISHED" | "CANCELLED" | "PAST";
 
+export type MomentTopAttendee = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
 export type HostMomentSummary = {
   id: string;
   slug: string;
@@ -17,6 +26,7 @@ export type HostMomentSummary = {
   locationName: string | null;
   status: MomentStatus;
   registrationCount: number;
+  topAttendees: MomentTopAttendee[];
   circle: {
     slug: string;
     name: string;

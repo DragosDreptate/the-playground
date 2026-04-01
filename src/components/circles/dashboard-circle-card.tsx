@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { Users, CalendarIcon, MapPin, Crown, Clock } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
@@ -78,10 +79,6 @@ export async function DashboardCircleCard({ circle }: Props) {
                   <span>{circle.city}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1">
-                <Users className="size-3.5 shrink-0" />
-                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-              </div>
               {circle.upcomingMomentCount > 0 && (
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="size-3.5 shrink-0" />
@@ -89,6 +86,17 @@ export async function DashboardCircleCard({ circle }: Props) {
                 </div>
               )}
             </div>
+            {circle.memberCount > 0 && (
+              <AttendeeAvatarStack
+                attendees={circle.topMembers}
+                totalCount={circle.memberCount}
+                label={
+                  circle.topMembers.length < circle.memberCount
+                    ? t("circleCard.moreMembers", { count: circle.memberCount - circle.topMembers.length })
+                    : t("circleCard.members", { count: circle.memberCount })
+                }
+              />
+            )}
           </div>
 
           {/* Colonne droite — desktop uniquement */}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
@@ -48,21 +49,23 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type Props = {
-  searchParams: Promise<{ home?: string }>;
-};
-
-export default async function HomePage({ searchParams }: Props) {
+export default async function HomePage() {
   const session = await getCachedSession();
   const t = await getTranslations("HomePage");
 
-  // Redirect connectés vers Explorer ou Dashboard (sauf clic logo → ?home)
-  const { home } = await searchParams;
-  if (session?.user?.id && home === undefined) {
-    const membershipCount = await prisma.circleMembership.count({
-      where: { userId: session.user.id },
-    });
-    redirect(membershipCount > 0 ? "/dashboard" : "/explorer");
+  // Redirect connectés vers Explorer ou Dashboard
+  // Sauf si navigation interne (clic logo, footer, etc.) détectée via Referer
+  if (session?.user?.id) {
+    const referer = (await headers()).get("referer");
+    const appHost = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+    const isInternalNav = referer?.startsWith(appHost);
+
+    if (!isInternalNav) {
+      const membershipCount = await prisma.circleMembership.count({
+        where: { userId: session.user.id },
+      });
+      redirect(membershipCount > 0 ? "/dashboard" : "/explorer");
+    }
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
