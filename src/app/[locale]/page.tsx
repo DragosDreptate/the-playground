@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
+import { prisma } from "@/infrastructure/db/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Link } from "@/i18n/navigation";
@@ -16,7 +18,8 @@ import {
   Gift,
 } from "lucide-react";
 
-export const revalidate = 3600;
+// Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
@@ -45,9 +48,22 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function HomePage() {
+type Props = {
+  searchParams: Promise<{ home?: string }>;
+};
+
+export default async function HomePage({ searchParams }: Props) {
   const session = await getCachedSession();
   const t = await getTranslations("HomePage");
+
+  // Redirect connectés vers Explorer ou Dashboard (sauf clic logo → ?home)
+  const { home } = await searchParams;
+  if (session?.user?.id && home === undefined) {
+    const membershipCount = await prisma.circleMembership.count({
+      where: { userId: session.user.id },
+    });
+    redirect(membershipCount > 0 ? "/dashboard" : "/explorer");
+  }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
 
