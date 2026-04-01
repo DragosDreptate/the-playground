@@ -111,7 +111,6 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
           <div className="min-w-0 flex-1 space-y-1 sm:space-y-1.5">
             <div className="flex flex-wrap items-center gap-1.5">
               {categoryLabel}
-              {roleBadge}
               {cityLabel}
             </div>
             <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
@@ -134,12 +133,17 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
                 </div>
               )}
             </div>
-            {moment.registrationCount > 0 && (
-              <AttendeeAvatarStack
-                attendees={moment.topAttendees}
-                totalCount={moment.registrationCount}
-                label={attendeeLabel}
-              />
+            {(moment.registrationCount > 0 || roleBadge) && (
+              <div className="flex items-center gap-2">
+                {moment.registrationCount > 0 && (
+                  <AttendeeAvatarStack
+                    attendees={moment.topAttendees}
+                    totalCount={moment.registrationCount}
+                    label={attendeeLabel}
+                  />
+                )}
+                {roleBadge}
+              </div>
             )}
           </div>
 
