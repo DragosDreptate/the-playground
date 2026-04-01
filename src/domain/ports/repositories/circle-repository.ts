@@ -37,6 +37,15 @@ export type PublicCircleFilters = {
   offset?: number;
 };
 
+export type PublicCircleMember = {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    image: string | null;
+  };
+};
+
 export type PublicCircle = {
   id: string;
   slug: string;
@@ -49,6 +58,7 @@ export type PublicCircle = {
   coverImageAttribution: CoverImageAttribution | null;
   memberCount: number;
   upcomingMomentCount: number;
+  topMembers: PublicCircleMember[];
   nextMoment: {
     title: string;
     startsAt: Date;

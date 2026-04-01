@@ -414,6 +414,13 @@ export const prismaCircleRepository: CircleRepository = {
           take: 1,
           select: { title: true, startsAt: true },
         },
+        // 3 premiers membres pour l'avatar stack
+        memberships: {
+          where: { status: "ACTIVE" },
+          orderBy: { joinedAt: "asc" },
+          take: 3,
+          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+        },
       },
       orderBy:
         filters.sortBy === "date"
@@ -440,6 +447,7 @@ export const prismaCircleRepository: CircleRepository = {
       memberCount: c._count.memberships,
       // upcomingMomentCount issu du _count SQL, pas de moments.length
       upcomingMomentCount: c._count.moments,
+      topMembers: c.memberships.map((m) => ({ user: m.user })),
       nextMoment: c.moments[0] ?? null,
       isDemo: c.isDemo,
       explorerScore: c.explorerScore,

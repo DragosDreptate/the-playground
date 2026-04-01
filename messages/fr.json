@@ -647,6 +647,7 @@
     },
     "circleCard": {
       "members": "{count} membres",
+      "moreMembers": "+{count} membres",
       "upcomingMoments": "{count} événement(s) à venir",
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",

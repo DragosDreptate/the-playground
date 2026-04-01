@@ -5,7 +5,8 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin, Crown } from "lucide-react";
+import { CalendarIcon, MapPin, Crown, Users } from "lucide-react";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { Badge } from "@/components/ui/badge";
@@ -30,8 +31,13 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
 
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
-
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
+
+  const memberOverflow = circle.memberCount - circle.topMembers.length;
+  const memberLabel =
+    memberOverflow > 0
+      ? t("circleCard.moreMembers", { count: memberOverflow })
+      : t("circleCard.members", { count: circle.memberCount });
 
   const roleBadge = membershipRole && (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
@@ -45,21 +51,21 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-4 sm:gap-5">
+        <div className="flex items-center gap-5 sm:gap-6">
 
-          {/* Cover — 72px mobile / 120px desktop */}
+          {/* Cover — 80px mobile / 140px desktop */}
           <div
-            className="relative size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[80px] sm:size-[140px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={120}
-                height={120}
+                width={140}
+                height={140}
                 className="size-full object-cover"
-                sizes="120px"
+                sizes="140px"
               />
             )}
             {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
@@ -88,10 +94,6 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                   <span>{circle.city}</span>
                 </div>
               )}
-              <div className="flex items-center gap-1">
-                <Users className="size-3.5 shrink-0" />
-                <span>{t("circleCard.members", { count: circle.memberCount })}</span>
-              </div>
               {circle.upcomingMomentCount > 0 && (
                 <div className="flex items-center gap-1">
                   <CalendarIcon className="size-3.5 shrink-0" />
@@ -99,6 +101,13 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
                 </div>
               )}
             </div>
+            {circle.memberCount > 0 && (
+              <AttendeeAvatarStack
+                attendees={circle.topMembers}
+                totalCount={circle.memberCount}
+                label={memberLabel}
+              />
+            )}
           </div>
 
           {/* Right column — desktop only */}
