@@ -1,5 +1,13 @@
 export type UserRole = "USER" | "ADMIN";
 
+/** Sous-ensemble minimal d'un User pour l'affichage d'avatar (initiales + gradient ou image). */
+export type UserAvatarInfo = {
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  image: string | null;
+};
+
 export type PublicUser = {
   publicId: string;
   firstName: string;

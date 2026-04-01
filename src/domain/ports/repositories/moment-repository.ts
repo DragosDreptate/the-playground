@@ -1,7 +1,7 @@
 import type { Moment, LocationType, MomentStatus, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
 import type { CircleCategory } from "@/domain/models/circle";
 import type { ExplorerSortBy } from "./circle-repository";
-import type { PublicMomentRegistration } from "@/domain/models/user";
+import type { PublicMomentRegistration, UserAvatarInfo } from "@/domain/models/user";
 
 export type CreateMomentInput = {
   slug: string;
@@ -51,14 +51,7 @@ export type PublicMomentFilters = {
   offset?: number;
 };
 
-export type PublicMomentAttendee = {
-  user: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    image: string | null;
-  };
-};
+export type PublicMomentAttendee = { user: UserAvatarInfo };
 
 export type PublicMoment = {
   id: string;

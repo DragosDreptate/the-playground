@@ -1,5 +1,5 @@
 import type { Circle, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CircleCategory, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
-import type { PublicCircleMembership } from "@/domain/models/user";
+import type { PublicCircleMembership, UserAvatarInfo } from "@/domain/models/user";
 
 export type CreateCircleInput = {
   name: string;
@@ -37,14 +37,7 @@ export type PublicCircleFilters = {
   offset?: number;
 };
 
-export type PublicCircleMember = {
-  user: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    image: string | null;
-  };
-};
+export type PublicCircleMember = { user: UserAvatarInfo };
 
 export type PublicCircle = {
   id: string;

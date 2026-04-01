@@ -1,4 +1,5 @@
 import type { LocationType } from "@/domain/models/moment";
+import type { UserAvatarInfo } from "@/domain/models/user";
 
 export type RegistrationStatus =
   | "PENDING_APPROVAL"
@@ -34,14 +35,7 @@ export type RegistrationWithUser = Registration & {
   };
 };
 
-export type RegistrationMomentAttendee = {
-  user: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    image: string | null;
-  };
-};
+export type RegistrationMomentAttendee = { user: UserAvatarInfo };
 
 export type RegistrationWithMoment = Registration & {
   moment: {

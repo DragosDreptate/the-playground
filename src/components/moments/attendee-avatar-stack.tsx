@@ -1,14 +1,8 @@
 import { getCircleUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
+import type { UserAvatarInfo } from "@/domain/models/user";
 
-export type Attendee = {
-  user: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    image: string | null;
-  };
-};
+export type Attendee = { user: UserAvatarInfo };
 
 type Props = {
   attendees: Attendee[];
