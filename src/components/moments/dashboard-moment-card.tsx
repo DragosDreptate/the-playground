@@ -230,8 +230,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
               {/* Community */}
               <span
-                className={`inline-flex max-w-full truncate rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                  isPast ? "bg-muted/50 text-muted-foreground/60" : "bg-muted text-foreground"
+                className={`inline-flex max-w-full truncate rounded-full border px-2 py-0.5 text-[11px] ${
+                  isPast ? "border-border/50 text-muted-foreground/60" : "border-border text-muted-foreground"
                 }`}
               >
                 {momentData.circleName}
