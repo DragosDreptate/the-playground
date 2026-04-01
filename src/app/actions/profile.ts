@@ -14,6 +14,7 @@ import { after } from "next/server";
 import { createResendEmailService } from "@/infrastructure/services";
 import { formatLongDate } from "@/lib/format-date";
 import { getDisplayName } from "@/lib/display-name";
+import { notifySlackNewUser, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
 
@@ -104,30 +105,34 @@ async function notifyAdminNewUser(user: User): Promise<void> {
   const userName = getDisplayName(user.firstName, user.lastName, user.email);
   const registeredAt = formatLongDate(new Date(), "fr");
 
-  const results = await Promise.allSettled(
-    recipients.map((to) =>
-      emailService.sendAdminNewUser({
-        to,
-        userName,
-        userEmail: user.email,
-        registeredAt,
-        adminUsersUrl,
-        strings: {
-          subject: `[Admin] Nouvel utilisateur — ${userName}`,
-          heading: "Nouvel utilisateur sur The Playground",
-          message: `${userName} vient de compléter son inscription.`,
-          ctaLabel: "Voir les utilisateurs dans l'admin",
-          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
-        },
-      })
-    )
-  );
+  if (isAdminEmailEnabled()) {
+    const results = await Promise.allSettled(
+      recipients.map((to) =>
+        emailService.sendAdminNewUser({
+          to,
+          userName,
+          userEmail: user.email,
+          registeredAt,
+          adminUsersUrl,
+          strings: {
+            subject: `[Admin] Nouvel utilisateur — ${userName}`,
+            heading: "Nouvel utilisateur sur The Playground",
+            message: `${userName} vient de compléter son inscription.`,
+            ctaLabel: "Voir les utilisateurs dans l'admin",
+            footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+          },
+        })
+      )
+    );
 
-  results.forEach((result, i) => {
-    if (result.status === "rejected") {
-      console.error(`[notifyAdminNewUser] Échec envoi email admin ${recipients[i]}:`, result.reason);
-    }
-  });
+    results.forEach((result, i) => {
+      if (result.status === "rejected") {
+        console.error(`[notifyAdminNewUser] Échec envoi email admin ${recipients[i]}:`, result.reason);
+      }
+    });
+  }
+
+  await notifySlackNewUser({ userName, userEmail: user.email, registeredAt, adminUsersUrl });
 }
 
 export async function deleteAccountAction(): Promise<ActionResult> {
