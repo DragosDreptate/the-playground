@@ -136,7 +136,7 @@ describe("Security — RBAC", () => {
       userId: "user-x",
       title: "Test Moment",
       description: "Description",
-      startsAt: new Date("2026-04-01T18:00:00Z"),
+      startsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       endsAt: null,
       locationType: "IN_PERSON" as const,
       locationName: null,
