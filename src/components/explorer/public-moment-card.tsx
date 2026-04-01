@@ -86,19 +86,19 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-4 sm:gap-5">
 
-          {/* Cover — 72px mobile / 120px desktop */}
+          {/* Cover — 80px mobile / 140px desktop */}
           <div
-            className="relative size-[72px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[80px] sm:size-[140px] shrink-0 overflow-hidden rounded-xl"
             style={moment.coverImage ? undefined : { background: gradient }}
           >
             {moment.coverImage && (
               <Image
                 src={moment.coverImage}
                 alt={moment.title}
-                width={120}
-                height={120}
+                width={140}
+                height={140}
                 className="size-full object-cover"
-                sizes="120px"
+                sizes="140px"
               />
             )}
             {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
