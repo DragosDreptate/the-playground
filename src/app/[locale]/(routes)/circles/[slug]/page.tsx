@@ -557,7 +557,7 @@ export default async function PublicCirclePage({
                     isHost={false}
                     isLast={i === displayedMoments.length - 1}
                     variant="public"
-                    topAttendees={topAttendeesByMomentId.get(moment.id) ?? []}
+                    topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                   />
                 ))}
               </div>

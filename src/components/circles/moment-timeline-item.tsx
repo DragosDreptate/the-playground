@@ -7,17 +7,9 @@ import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
+import type { Attendee } from "@/components/moments/attendee-avatar-stack";
 import type { Moment } from "@/domain/models/moment";
 import type { RegistrationStatus } from "@/domain/models/registration";
-
-type Attendee = {
-  user: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    image: string | null;
-  };
-};
 
 type Props = {
   moment: Moment;

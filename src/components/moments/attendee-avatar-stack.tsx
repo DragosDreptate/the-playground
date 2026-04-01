@@ -1,7 +1,7 @@
 import { getCircleUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 
-type Attendee = {
+export type Attendee = {
   user: {
     firstName: string | null;
     lastName: string | null;
@@ -14,7 +14,6 @@ type Props = {
   attendees: Attendee[];
   totalCount: number;
   label: string;
-  /** Nombre max d'avatars affichés (défaut : 3) */
   maxAvatars?: number;
 };
 
