@@ -66,7 +66,10 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
   const categoryLabel = categoryLabelText ? <CategoryBadge label={categoryLabelText} /> : null;
 
   const cityLabel = moment.circle.city && (
-    <span className="text-muted-foreground text-xs">{moment.circle.city}</span>
+    <span className="flex items-center gap-1 text-muted-foreground text-xs">
+      <MapPin className="size-3 shrink-0" />
+      {moment.circle.city}
+    </span>
   );
 
   // Colonne droite desktop : toujours le badge date
