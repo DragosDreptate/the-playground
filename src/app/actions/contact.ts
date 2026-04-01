@@ -1,7 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { Resend } from "resend";
+import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 import type { ActionResult } from "./types";
+
+const CONTACT_MAX_REQUESTS = 5;
+const CONTACT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 export async function sendContactMessageAction(
   formData: FormData
@@ -10,6 +15,18 @@ export async function sendContactMessageAction(
   const honeypot = (formData.get("_info") as string | null) ?? "";
   if (honeypot) {
     return { success: true, data: undefined };
+  }
+
+  // Rate limiting par IP
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const { allowed } = await prismaRateLimiter.checkLimit(
+    `contact:${ip}`,
+    CONTACT_MAX_REQUESTS,
+    CONTACT_WINDOW_MS
+  );
+  if (!allowed) {
+    return { success: false, error: "RATE_LIMITED", code: "RATE_LIMITED" };
   }
 
   const firstName = (formData.get("firstName") as string | null)?.trim() ?? "";

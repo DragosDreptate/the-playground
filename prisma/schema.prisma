@@ -319,3 +319,12 @@ model RadarUsage {
   @@map("radar_usage")
 }
 
+model RateLimit {
+  id          String   @id @default(cuid())
+  key         String   @unique // ex: "contact:192.168.1.1"
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+
+  @@map("rate_limits")
+}
+
