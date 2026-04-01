@@ -33,21 +33,21 @@ export async function DashboardCircleCard({ circle }: Props) {
   return (
     <Link href={circle.membershipStatus === "PENDING" ? `/circles/${circle.slug}` : `/dashboard/circles/${circle.slug}`} className="group block min-w-0">
       <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
 
           {/* Thumbnail */}
           <div
-            className="size-[90px] shrink-0 overflow-hidden rounded-xl"
+            className="size-[100px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={90}
-                height={90}
+                width={120}
+                height={120}
                 className="size-full object-cover"
-                sizes="90px"
+                sizes="120px"
               />
             )}
           </div>
