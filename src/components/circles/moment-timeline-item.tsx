@@ -126,7 +126,7 @@ export async function MomentTimelineItem({
             {/* Corps de la carte */}
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-1">
+              <div className="min-w-0 flex-1 space-y-1.5">
                 {/* Time */}
                 <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
 
