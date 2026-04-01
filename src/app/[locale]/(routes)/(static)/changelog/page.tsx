@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getChangelog } from "@/lib/parse-changelog";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
