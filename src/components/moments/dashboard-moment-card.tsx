@@ -176,7 +176,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Time */}
+              {/* Time + community pill */}
               <div className="flex items-center gap-2">
                 <p
                   className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
@@ -185,6 +185,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   {timeStr}
                 </p>
                 {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                <span
+                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
+                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
+                  }`}
+                >
+                  {momentData.circleName}
+                </span>
               </div>
 
               {/* Title */}
@@ -195,6 +202,18 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               >
                 {momentData.title}
               </p>
+
+              {/* Location */}
+              {locationLabel && (
+                <div
+                  className={`flex items-center gap-1.5 text-xs ${
+                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                  }`}
+                >
+                  <LocationIcon className="size-3 shrink-0" />
+                  <span className="truncate">{locationLabel}</span>
+                </div>
+              )}
 
               {/* Inscrits + badge rôle */}
               {(momentData.registrationCount > 0 || roleBadge) && (
@@ -213,27 +232,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                   {roleBadge}
                 </div>
               )}
-
-              {/* Location */}
-              {locationLabel && (
-                <div
-                  className={`flex items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                  }`}
-                >
-                  <LocationIcon className="size-3 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
-                </div>
-              )}
-
-              {/* Community */}
-              <span
-                className={`inline-flex max-w-full truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
-                  isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
-                }`}
-              >
-                {momentData.circleName}
-              </span>
             </div>
 
             {/* Cover — RIGHT, alignée avec le titre */}
