@@ -229,13 +229,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               )}
 
               {/* Community */}
-              <p
-                className={`truncate text-xs ${
-                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+              <span
+                className={`inline-flex max-w-full truncate rounded-full border px-2 py-0.5 text-[11px] ${
+                  isPast ? "border-border/50 text-muted-foreground/60" : "border-border text-muted-foreground"
                 }`}
               >
                 {momentData.circleName}
-              </p>
+              </span>
             </div>
 
             {/* Cover — RIGHT, alignée avec le titre */}
