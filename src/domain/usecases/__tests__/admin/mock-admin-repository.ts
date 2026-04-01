@@ -116,6 +116,9 @@ export function makeAdminUserDetail(
     circles: [
       { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST" },
     ],
+    moments: [
+      { id: "moment-1", title: "Meetup JS", slug: "meetup-js", startsAt: new Date("2099-06-01T18:00:00Z"), status: "PUBLISHED", circleName: "Tech Paris" },
+    ],
     ...overrides,
   };
 }

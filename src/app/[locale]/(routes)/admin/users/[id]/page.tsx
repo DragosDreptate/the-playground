@@ -90,8 +90,51 @@ export default async function AdminUserDetailPage({ params }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Moments list */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("userDetail.moments")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {user.moments.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("userDetail.noMoments")}</p>
+          ) : (
+            <div className="space-y-2">
+              {user.moments.map((moment) => (
+                <div key={moment.id} className="flex items-center justify-between rounded-md border px-3 py-2">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/m/${moment.slug}`}
+                      className="text-sm font-medium hover:underline"
+                    >
+                      {moment.title}
+                    </Link>
+                    <p className="text-xs text-muted-foreground">
+                      {moment.circleName} — {moment.startsAt.toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Badge variant={statusVariant(moment.status)} className="ml-2 text-xs">
+                    {moment.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
+}
+
+function statusVariant(status: string): "default" | "secondary" | "outline" | "destructive" {
+  switch (status) {
+    case "PUBLISHED": return "default";
+    case "DRAFT": return "secondary";
+    case "CANCELLED": return "destructive";
+    case "PAST": return "outline";
+    default: return "outline";
+  }
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {

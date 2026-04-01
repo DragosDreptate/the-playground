@@ -714,7 +714,9 @@
       "pending": "En attente",
       "memberSince": "Membre depuis",
       "circles": "Communautés",
-      "noCircles": "Aucune Communauté."
+      "noCircles": "Aucune Communauté.",
+      "moments": "Événements",
+      "noMoments": "Aucun événement."
     },
     "circleDetail": {
       "title": "Détail Communauté",

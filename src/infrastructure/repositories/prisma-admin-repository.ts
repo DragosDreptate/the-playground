@@ -449,6 +449,14 @@ export const prismaAdminRepository: AdminRepository = {
         memberships: {
           include: { circle: { select: { id: true, name: true, slug: true } } },
         },
+        registrations: {
+          include: {
+            moment: {
+              select: { id: true, title: true, slug: true, startsAt: true, status: true, circle: { select: { name: true } } },
+            },
+          },
+          orderBy: { moment: { startsAt: "desc" } },
+        },
       },
     });
     if (!record) return null;
@@ -470,6 +478,14 @@ export const prismaAdminRepository: AdminRepository = {
         name: m.circle.name,
         slug: m.circle.slug,
         role: m.role,
+      })),
+      moments: record.registrations.map((r) => ({
+        id: r.moment.id,
+        title: r.moment.title,
+        slug: r.moment.slug,
+        startsAt: r.moment.startsAt,
+        status: r.moment.status,
+        circleName: r.moment.circle.name,
       })),
     };
   },

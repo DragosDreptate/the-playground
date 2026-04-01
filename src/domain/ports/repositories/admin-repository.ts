@@ -56,6 +56,14 @@ export type AdminUserDetail = AdminUserRow & {
     slug: string;
     role: string;
   }>;
+  moments: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    startsAt: Date;
+    status: string;
+    circleName: string;
+  }>;
 };
 
 // ─────────────────────────────────────────────
