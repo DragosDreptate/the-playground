@@ -111,9 +111,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
               {roleBadge}
               {cityLabel}
             </div>
-            <p className="truncate text-xs font-semibold text-foreground">
+            <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
               {moment.circle.name}
-            </p>
+            </span>
             <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:underline">
               {moment.title}
             </h3>
