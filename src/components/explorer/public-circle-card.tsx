@@ -53,19 +53,19 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
       <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-6 sm:gap-7">
 
-          {/* Cover — 100px mobile / 170px desktop */}
+          {/* Cover — 88px mobile / 150px desktop */}
           <div
-            className="relative size-[100px] sm:size-[170px] shrink-0 overflow-hidden rounded-xl"
+            className="relative size-[88px] sm:size-[150px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={170}
-                height={170}
+                width={150}
+                height={150}
                 className="size-full object-cover"
-                sizes="170px"
+                sizes="150px"
               />
             )}
             {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
