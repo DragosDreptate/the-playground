@@ -30,12 +30,17 @@ export function parseChangelog(content: string): ChangelogEntry[] {
     const lines = block.split("\n");
     const firstLine = lines[0].trim();
 
-    // Handles both formats:
-    //   [0.9.0] — 2026-02-23 — Title   (existing format, em dash)
-    //   [0.9.0] - 2026-02-23            (Keep a Changelog / release-please)
-    const match = firstLine.match(
-      /^\[(\d+\.\d+\.\d+)\]\s*[—–-]+\s*(\d{4}-\d{2}-\d{2})(?:\s*[—–-]+\s*(.+))?/
-    );
+    // Handles three formats:
+    //   [0.9.0] — 2026-02-23 — Title       (manual format, em dash)
+    //   [0.9.0] - 2026-02-23               (Keep a Changelog)
+    //   [0.9.0](url) (2026-02-23)          (release-please with link)
+    const match =
+      firstLine.match(
+        /^\[(\d+\.\d+\.\d+)\]\s*[—–-]+\s*(\d{4}-\d{2}-\d{2})(?:\s*[—–-]+\s*(.+))?/
+      ) ??
+      firstLine.match(
+        /^\[(\d+\.\d+\.\d+)\]\([^)]*\)\s*\((\d{4}-\d{2}-\d{2})\)/
+      );
     if (!match) continue; // skip [Unreleased]
 
     const version = match[1];
@@ -62,13 +67,15 @@ export function parseChangelog(content: string): ChangelogEntry[] {
         continue;
       }
 
-      const changeMatch = line.match(/^- (.+)/);
+      const changeMatch = line.match(/^[-*] (.+)/);
       if (changeMatch && currentSection) {
-        // Strip markdown bold/italic/code for plain text display
+        // Strip markdown formatting for plain text display
         const text = changeMatch[1]
           .replace(/\*\*(.+?)\*\*/g, "$1")
           .replace(/\*(.+?)\*/g, "$1")
-          .replace(/`(.+?)`/g, "$1");
+          .replace(/`(.+?)`/g, "$1")
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+          .replace(/\s*\([\da-f]{7,}\)$/i, "");
         currentSection.changes.push(text);
       }
     }

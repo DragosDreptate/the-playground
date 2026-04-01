@@ -6,9 +6,10 @@ import { parseChangelog } from "@/lib/parse-changelog";
  *
  * Règle métier : parse un fichier CHANGELOG.md au format conventionnel
  * et retourne un tableau structuré d'entrées versionnées.
- * Supporte deux formats de premier ligne :
- *   [0.9.0] — 2026-02-23 — Titre (tirets em)
- *   [0.9.0] - 2026-02-23         (Keep a Changelog)
+ * Supporte trois formats de première ligne :
+ *   [0.9.0] — 2026-02-23 — Titre       (tirets em, format manuel)
+ *   [0.9.0] - 2026-02-23               (Keep a Changelog)
+ *   [0.9.0](url) (2026-02-23)          (release-please avec lien)
  */
 
 describe("parseChangelog", () => {
@@ -177,6 +178,57 @@ describe("parseChangelog", () => {
     it("should strip inline code markdown from change text", () => {
       const result = parseChangelog(content);
       expect(result[0].sections[0].changes[2]).toBe("code snippet added");
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  // Format release-please — [version](url) (date) + astérisques
+  // ─────────────────────────────────────────────────────────────
+
+  describe("given an entry in release-please format", () => {
+    const content = `
+## [2.2.0](https://github.com/org/repo/compare/v2.1.0...v2.2.0) (2026-04-01)
+
+
+### Added
+
+* **sentry:** analyse automatique des nouvelles issues via webhook ([1243963](https://github.com/org/repo/commit/1243963))
+* **slack:** notifications admin via Slack ([301b186](https://github.com/org/repo/commit/301b186))
+
+### Fixed
+
+* **release:** éliminer la race condition ([83afb5f](https://github.com/org/repo/commit/83afb5f))
+`;
+
+    it("should parse version and date from release-please format", () => {
+      const result = parseChangelog(content);
+      expect(result).toHaveLength(1);
+      expect(result[0].version).toBe("2.2.0");
+      expect(result[0].date).toBe("2026-04-01");
+    });
+
+    it("should have no title for release-please entries", () => {
+      const result = parseChangelog(content);
+      expect(result[0].title).toBeUndefined();
+    });
+
+    it("should parse asterisk-prefixed items", () => {
+      const result = parseChangelog(content);
+      expect(result[0].sections).toHaveLength(2);
+      expect(result[0].sections[0].title).toBe("Added");
+      expect(result[0].sections[0].changes).toHaveLength(2);
+      expect(result[0].sections[1].title).toBe("Fixed");
+      expect(result[0].sections[1].changes).toHaveLength(1);
+    });
+
+    it("should strip commit links and hashes from change text", () => {
+      const result = parseChangelog(content);
+      expect(result[0].sections[0].changes[0]).toBe(
+        "sentry: analyse automatique des nouvelles issues via webhook"
+      );
+      expect(result[0].sections[1].changes[0]).toBe(
+        "release: éliminer la race condition"
+      );
     });
   });
 
