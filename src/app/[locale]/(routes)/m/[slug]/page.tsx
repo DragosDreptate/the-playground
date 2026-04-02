@@ -68,13 +68,22 @@ export async function generateMetadata({
   const connector = locale === "fr" ? " à " : " at ";
   const description = `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`;
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
   return {
     title: moment.title,
     description,
+    alternates: {
+      canonical: `${appUrl}/m/${slug}`,
+      languages: {
+        fr: `${appUrl}/m/${slug}`,
+        en: `${appUrl}/en/m/${slug}`,
+      },
+    },
     openGraph: {
       title: moment.title,
       description,
-      type: "article",
+      type: "website",
     },
     twitter: {
       title: moment.title,
@@ -163,33 +172,78 @@ export default async function PublicMomentPage({
     slug: moment.slug,
   };
 
+  const eventAttendanceMode =
+    moment.locationType === "ONLINE"
+      ? "https://schema.org/OnlineEventAttendanceMode"
+      : moment.locationType === "HYBRID"
+        ? "https://schema.org/MixedEventAttendanceMode"
+        : "https://schema.org/OfflineEventAttendanceMode";
+
+  const eventLocation = (() => {
+    if (moment.locationType === "ONLINE") {
+      return {
+        "@type": "VirtualLocation" as const,
+        ...(moment.videoLink && { url: moment.videoLink }),
+      };
+    }
+    if (moment.locationType === "HYBRID") {
+      return [
+        {
+          "@type": "Place" as const,
+          name: moment.locationName ?? moment.locationAddress ?? undefined,
+          address: moment.locationAddress ?? undefined,
+        },
+        {
+          "@type": "VirtualLocation" as const,
+          ...(moment.videoLink && { url: moment.videoLink }),
+        },
+      ];
+    }
+    return {
+      "@type": "Place" as const,
+      name: moment.locationName ?? moment.locationAddress ?? undefined,
+      address: moment.locationAddress ?? undefined,
+    };
+  })();
+
+  const offerAvailability =
+    moment.capacity !== null && registeredCount >= moment.capacity
+      ? "https://schema.org/SoldOut"
+      : "https://schema.org/InStock";
+
   const jsonLd =
     moment.status === "PUBLISHED" || moment.status === "PAST"
       ? {
           "@context": "https://schema.org",
           "@type": "Event",
           name: moment.title,
+          description: moment.description,
+          image: `${appUrl}/m/${moment.slug}/opengraph-image`,
           startDate: moment.startsAt.toISOString(),
           ...(moment.endsAt && { endDate: moment.endsAt.toISOString() }),
-          location:
-            moment.locationType === "ONLINE"
-              ? { "@type": "VirtualLocation" }
-              : {
-                  "@type": "Place",
-                  name: moment.locationName ?? moment.locationAddress ?? undefined,
-                  address: moment.locationAddress ?? undefined,
-                },
-          organizer: { "@type": "Organization", name: circle.name },
+          location: eventLocation,
+          organizer: {
+            "@type": "Organization",
+            name: circle.name,
+            url: `${appUrl}/circles/${circle.slug}`,
+          },
           url: `${appUrl}/m/${moment.slug}`,
-          eventStatus: "https://schema.org/EventScheduled",
-          eventAttendanceMode:
-            moment.locationType === "ONLINE"
-              ? "https://schema.org/OnlineEventAttendanceMode"
-              : "https://schema.org/OfflineEventAttendanceMode",
+          eventStatus:
+            moment.status === "PAST"
+              ? "https://schema.org/EventCompleted"
+              : "https://schema.org/EventScheduled",
+          eventAttendanceMode,
           ...(moment.capacity !== null && {
             maximumAttendeeCapacity: moment.capacity,
             remainingAttendeeCapacity: Math.max(0, moment.capacity - registeredCount),
           }),
+          offers: {
+            "@type": "Offer",
+            price: (moment.price / 100).toFixed(2),
+            priceCurrency: moment.currency.toUpperCase(),
+            availability: offerAvailability,
+            url: `${appUrl}/m/${moment.slug}`,
+          },
         }
       : null;
 

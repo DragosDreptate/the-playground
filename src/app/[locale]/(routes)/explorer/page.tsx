@@ -26,9 +26,17 @@ const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function generateMetadata() {
   const t = await getTranslations("Explorer");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   return {
     title: t("title"),
     description: t("description"),
+    alternates: {
+      canonical: `${appUrl}/explorer`,
+      languages: {
+        fr: `${appUrl}/explorer`,
+        en: `${appUrl}/en/explorer`,
+      },
+    },
     openGraph: {
       title: t("title"),
       description: t("description"),
