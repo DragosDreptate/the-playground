@@ -1,6 +1,5 @@
 "use server";
 
-import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
@@ -86,51 +85,15 @@ export async function joinMomentAction(
         Sentry.captureException(err);
       });
     } else {
-      // Pending approval: notify host that a new request needs review
+      // Pending approval: notify hosts that a new request needs review
+      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
       const t = await getTranslations("Email");
       const userId = session.user.id;
-      if (!isAdminUser(session)) after(async () => {
-        try {
-          const [user, moment] = await Promise.all([
-            prismaUserRepository.findById(userId),
-            prismaMomentRepository.findById(momentId),
-          ]);
-          if (!user || !moment) return;
-
-          const [circle, hosts] = await Promise.all([
-            prismaCircleRepository.findById(moment.circleId),
-            prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
-          ]);
-          if (!circle) return;
-
-          const playerName = getDisplayName(user.firstName, user.lastName, user.email);
-          const hostUserIds = hosts.map((h) => h.userId);
-          const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
-
-          await Promise.all(
-            hosts.map(async (host) => {
-              const prefs = prefsMap.get(host.userId);
-              if (!prefs?.notifyNewRegistration) return;
-              const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-              return emailService.sendApprovalNotification({
-                to: host.user.email,
-                recipientName: hostName,
-                entityName: moment.title,
-                entitySlug: `dashboard/circles/${circle.slug}/moments/${moment.slug}`,
-                strings: {
-                  subject: t("approvalNotification.hostPendingRegistrationSubject", { playerName, momentTitle: moment.title }),
-                  heading: t("approvalNotification.hostPendingRegistrationHeading"),
-                  message: t("approvalNotification.hostPendingRegistrationMessage", { playerName, momentTitle: moment.title }),
-                  ctaLabel: t("approvalNotification.manageCta"),
-                  footer: t("common.footer"),
-                },
-              });
-            })
-          );
-        } catch (err) {
-          console.error(err);
-          Sentry.captureException(err);
-        }
+      if (!isAdminUser(session)) notifyHostsPendingApproval(
+        momentId, userId, t
+      ).catch((err) => {
+        console.error("[approval-notification] Error:", err);
+        Sentry.captureException(err);
       });
     }
 
@@ -627,30 +590,12 @@ export async function rejectMomentRegistrationAction(
     );
 
     const t = await getTranslations("Email");
-    after(async () => {
-      try {
-        const [user, moment] = await Promise.all([
-          prismaUserRepository.findById(result.userId),
-          prismaMomentRepository.findById(result.momentId),
-        ]);
-        if (!user || !moment) return;
-        const playerName = getDisplayName(user.firstName, user.lastName, user.email);
-        await emailService.sendApprovalNotification({
-          to: user.email,
-          recipientName: playerName,
-          entityName: moment.title,
-          entitySlug: `m/${moment.slug}`,
-          strings: {
-            subject: t("approvalNotification.registrationRejectedSubject", { momentTitle: moment.title }),
-            heading: t("approvalNotification.rejectedHeading"),
-            message: t("approvalNotification.registrationRejectedMessage", { momentTitle: moment.title }),
-            ctaLabel: t("approvalNotification.viewMomentCta"),
-            footer: t("common.footer"),
-          },
-        });
-      } catch (err) {
-        Sentry.captureException(err);
-      }
+    // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
+    notifyPlayerRejection(
+      result.userId, result.momentId, t
+    ).catch((err) => {
+      console.error("[rejection-notification] Error:", err);
+      Sentry.captureException(err);
     });
 
     return { success: true, data: result };
@@ -661,4 +606,75 @@ export async function rejectMomentRegistrationAction(
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
   }
+}
+
+// ── Notification helpers (fire-and-forget, pas de after()) ────
+
+async function notifyHostsPendingApproval(
+  momentId: string,
+  userId: string,
+  t: Awaited<ReturnType<typeof getTranslations<"Email">>>
+): Promise<void> {
+  const [user, moment] = await Promise.all([
+    prismaUserRepository.findById(userId),
+    prismaMomentRepository.findById(momentId),
+  ]);
+  if (!user || !moment) return;
+
+  const [circle, hosts] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+  ]);
+  if (!circle) return;
+
+  const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+  const hostUserIds = hosts.map((h) => h.userId);
+  const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+
+  await Promise.all(
+    hosts.map(async (host) => {
+      const prefs = prefsMap.get(host.userId);
+      if (!prefs?.notifyNewRegistration) return;
+      const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+      return emailService.sendApprovalNotification({
+        to: host.user.email,
+        recipientName: hostName,
+        entityName: moment.title,
+        entitySlug: `dashboard/circles/${circle.slug}/moments/${moment.slug}`,
+        strings: {
+          subject: t("approvalNotification.hostPendingRegistrationSubject", { playerName, momentTitle: moment.title }),
+          heading: t("approvalNotification.hostPendingRegistrationHeading"),
+          message: t("approvalNotification.hostPendingRegistrationMessage", { playerName, momentTitle: moment.title }),
+          ctaLabel: t("approvalNotification.manageCta"),
+          footer: t("common.footer"),
+        },
+      });
+    })
+  );
+}
+
+async function notifyPlayerRejection(
+  userId: string,
+  momentId: string,
+  t: Awaited<ReturnType<typeof getTranslations<"Email">>>
+): Promise<void> {
+  const [user, moment] = await Promise.all([
+    prismaUserRepository.findById(userId),
+    prismaMomentRepository.findById(momentId),
+  ]);
+  if (!user || !moment) return;
+  const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+  await emailService.sendApprovalNotification({
+    to: user.email,
+    recipientName: playerName,
+    entityName: moment.title,
+    entitySlug: `m/${moment.slug}`,
+    strings: {
+      subject: t("approvalNotification.registrationRejectedSubject", { momentTitle: moment.title }),
+      heading: t("approvalNotification.rejectedHeading"),
+      message: t("approvalNotification.registrationRejectedMessage", { momentTitle: moment.title }),
+      ctaLabel: t("approvalNotification.viewMomentCta"),
+      footer: t("common.footer"),
+    },
+  });
 }
