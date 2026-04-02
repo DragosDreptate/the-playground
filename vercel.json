@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; fi; git diff --quiet HEAD~1 -- ':!CHANGELOG.md' ':!spec/**' ':!*.md' ':!.github/**'",
   "crons": [
     {
       "path": "/api/cron/recalculate-scores",
