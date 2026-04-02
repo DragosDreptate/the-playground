@@ -266,39 +266,13 @@ export async function joinCircleDirectlyAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember && !pendingApproval) {
+    if (!alreadyMember) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
-      after(async () => {
-        try {
-          const [circle, user] = await Promise.all([
-            prismaCircleRepository.findById(circleId),
-            prismaUserRepository.findById(userId),
-          ]);
-          if (!circle || !user) return;
-
-          const playerName =
-            [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-
-          await notifyHostNewCircleMember(
-            circleId,
-            circle.slug,
-            circle.name,
-            userId,
-            playerName,
-            (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
-            {
-              subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
-              heading: t("hostCircleMemberNotification.heading"),
-              message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
-              manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
-              footer: t("common.footer"),
-            }
-          );
-        } catch (err) {
-          console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
-          Sentry.captureException(err);
-        }
+      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
+      notifyHostCircleJoin(circleId, userId, pendingApproval, t).catch((err) => {
+        console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
+        Sentry.captureException(err);
       });
     }
 
@@ -471,36 +445,13 @@ export async function joinCircleByInviteAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    if (!alreadyMember && !pendingApproval) {
+    if (!alreadyMember) {
       const t = await getTranslations("Email");
       const userId = session.user.id;
-      after(async () => {
-        try {
-          const user = await prismaUserRepository.findById(userId);
-          if (!user) return;
-
-          const playerName =
-            [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
-
-          await notifyHostNewCircleMember(
-            circle.id,
-            circle.slug,
-            circle.name,
-            userId,
-            playerName,
-            (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
-            {
-              subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
-              heading: t("hostCircleMemberNotification.heading"),
-              message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
-              manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
-              footer: t("common.footer"),
-            }
-          );
-        } catch (err) {
-          console.error("[joinCircleByInviteAction] Erreur notification host :", err);
-          Sentry.captureException(err);
-        }
+      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
+      notifyHostCircleJoin(circle.id, userId, pendingApproval, t, circle.slug, circle.name).catch((err) => {
+        console.error("[joinCircleByInviteAction] Erreur notification host :", err);
+        Sentry.captureException(err);
       });
     }
 
@@ -674,6 +625,74 @@ export async function rejectCircleMembershipAction(
     }
     Sentry.captureException(error);
     return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
+  }
+}
+
+// ── Notification helper : nouveau membre ou demande d'adhésion ──
+
+async function notifyHostCircleJoin(
+  circleId: string,
+  userId: string,
+  pendingApproval: boolean,
+  t: Awaited<ReturnType<typeof getTranslations<"Email">>>,
+  circleSlug?: string,
+  circleName?: string,
+): Promise<void> {
+  const [circle, user] = await Promise.all([
+    circleSlug && circleName
+      ? Promise.resolve({ id: circleId, slug: circleSlug, name: circleName })
+      : prismaCircleRepository.findById(circleId),
+    prismaUserRepository.findById(userId),
+  ]);
+  if (!circle || !user) return;
+
+  const playerName =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
+
+  if (pendingApproval) {
+    // Demande d'adhésion en attente → notifier les HOSTs
+    const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
+    const hostUserIds = hosts.map((h) => h.userId);
+    const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
+
+    await Promise.allSettled(
+      hosts.map(async (host) => {
+        const prefs = prefsMap.get(host.userId);
+        if (!prefs?.notifyNewRegistration) return;
+        const hostName =
+          [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") || host.user.email;
+        return emailService.sendApprovalNotification({
+          to: host.user.email,
+          recipientName: hostName,
+          entityName: circle.name,
+          entitySlug: `dashboard/circles/${circle.slug}`,
+          strings: {
+            subject: t("approvalNotification.hostPendingMembershipSubject", { playerName, circleName: circle.name }),
+            heading: t("approvalNotification.hostPendingMembershipHeading"),
+            message: t("approvalNotification.hostPendingMembershipMessage", { playerName, circleName: circle.name }),
+            ctaLabel: t("approvalNotification.manageCta"),
+            footer: t("common.footer"),
+          },
+        });
+      })
+    );
+  } else {
+    // Membre accepté directement → notification classique
+    await notifyHostNewCircleMember(
+      circleId,
+      circle.slug,
+      circle.name,
+      userId,
+      playerName,
+      (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
+      {
+        subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
+        heading: t("hostCircleMemberNotification.heading"),
+        message: t("hostCircleMemberNotification.message", { playerName, circleName: circle.name }),
+        manageMembersCta: t("hostCircleMemberNotification.manageMembersCta"),
+        footer: t("common.footer"),
+      }
+    );
   }
 }
 
