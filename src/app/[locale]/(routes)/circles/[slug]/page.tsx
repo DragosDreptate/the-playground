@@ -65,9 +65,17 @@ export async function generateMetadata({
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
     const isPrivate = circle.visibility !== "PUBLIC";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
     return {
       title: circle.name,
       description: circle.description,
+      alternates: {
+        canonical: `${appUrl}/circles/${slug}`,
+        languages: {
+          fr: `${appUrl}/circles/${slug}`,
+          en: `${appUrl}/en/circles/${slug}`,
+        },
+      },
       ...(isPrivate && { robots: { index: false, follow: false } }),
       ...(!isPrivate && {
         openGraph: {
