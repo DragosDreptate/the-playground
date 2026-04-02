@@ -6,14 +6,6 @@ import { getMomentGradient } from "@/lib/gradient";
 
 const DESC_MAX_CHARS = 200;
 
-const PLACEHOLDER_AVATAR_COLORS = [
-  "linear-gradient(135deg,#ec4899,#f97316)",
-  "linear-gradient(135deg,#8b5cf6,#06b6d4)",
-  "linear-gradient(135deg,#10b981,#3b82f6)",
-  "linear-gradient(135deg,#f59e0b,#ef4444)",
-  "linear-gradient(135deg,#6366f1,#8b5cf6)",
-];
-
 function truncate(desc: string): { text: string; truncated: boolean } {
   const s = desc.trim();
   if (s.length <= DESC_MAX_CHARS) return { text: s, truncated: false };
@@ -44,15 +36,9 @@ export function CircleInvitationEmail({
   const circleUrl = circleSlug ? `${baseUrl}/circles/${circleSlug}` : inviteUrl;
   const initials = inviterName.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
   const showSocial = (memberCount ?? 0) > 0;
-  const avatarCount = Math.min(5, memberCount ?? 0);
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
-
-      {/* Badge */}
-      <Section style={badgeSection}>
-        <span style={badgeStyle}>Invitation</span>
-      </Section>
 
       {/* Cover : image réelle ou carré dégradé */}
       <Section style={coverSection}>
@@ -108,31 +94,21 @@ export function CircleInvitationEmail({
         <Section style={statsBox}>
           <table cellPadding="0" cellSpacing="0" role="presentation" style={{ display: "inline-table" }}>
             <tbody><tr>
+              <td style={statEmoji}>👥</td>
               <td style={statCell}>
-                👥&nbsp;<strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
+                <strong>{memberCount}</strong>&nbsp;membre{(memberCount ?? 0) > 1 ? "s" : ""}
               </td>
               {(momentCount ?? 0) > 0 && (
                 <>
                   <td style={statDivider}>|</td>
+                  <td style={statEmoji}>📅</td>
                   <td style={statCell}>
-                    📅&nbsp;<strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
+                    <strong>{momentCount}</strong>&nbsp;événement{(momentCount ?? 0) > 1 ? "s" : ""}
                   </td>
                 </>
               )}
             </tr></tbody>
           </table>
-        </Section>
-      )}
-
-      {/* Member avatars */}
-      {showSocial && avatarCount > 0 && (
-        <Section style={avatarSection}>
-          {PLACEHOLDER_AVATAR_COLORS.slice(0, avatarCount).map((bg, i) => (
-            <span key={i} style={avatarDot(bg, i)} />
-          ))}
-          <span style={avatarLabel}>
-            Rejoignez&nbsp;<strong style={{ color: "#374151" }}>{memberCount}</strong>&nbsp;membres
-          </span>
         </Section>
       )}
 
@@ -148,20 +124,6 @@ export function CircleInvitationEmail({
 }
 
 // ── Styles ──────────────────────────────────────────────
-
-const badgeSection: React.CSSProperties = {
-  textAlign: "center" as const,
-  marginBottom: "20px",
-};
-
-const badgeStyle: React.CSSProperties = {
-  fontSize: "11px",
-  fontWeight: 600,
-  color: "#ec4899",
-  backgroundColor: "#fde8f0",
-  padding: "3px 10px",
-  borderRadius: "20px",
-};
 
 const coverSection: React.CSSProperties = {
   textAlign: "center" as const,
@@ -241,42 +203,25 @@ const statsBox: React.CSSProperties = {
   textAlign: "center" as const,
 };
 
+const statEmoji: React.CSSProperties = {
+  fontSize: "14px",
+  lineHeight: "1",
+  verticalAlign: "middle",
+  paddingRight: "4px",
+};
+
 const statCell: React.CSSProperties = {
   fontSize: "13px",
   color: "#374151",
   fontWeight: 500,
   whiteSpace: "nowrap",
+  verticalAlign: "middle",
 };
 
 const statDivider: React.CSSProperties = {
   padding: "0 10px",
   color: "#d1d5db",
   fontSize: "13px",
-};
-
-const avatarSection: React.CSSProperties = {
-  textAlign: "center" as const,
-  marginBottom: "20px",
-};
-
-function avatarDot(bg: string, index: number): React.CSSProperties {
-  return {
-    display: "inline-block",
-    width: "26px",
-    height: "26px",
-    borderRadius: "50%",
-    background: bg,
-    border: "2px solid #fff",
-    marginLeft: index === 0 ? "0" : "-7px",
-    verticalAlign: "middle",
-  };
-}
-
-const avatarLabel: React.CSSProperties = {
-  fontSize: "12px",
-  color: "#6b7280",
-  verticalAlign: "middle",
-  marginLeft: "8px",
 };
 
 const ctaSection: React.CSSProperties = {
