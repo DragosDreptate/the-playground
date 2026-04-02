@@ -12,6 +12,7 @@ import type { DashboardMode } from "@/domain/models/user";
 import { Link } from "@/i18n/navigation";
 import { OrganizerOnboardingGuide } from "./organizer-onboarding-guide";
 import { OrganizerMomentsOnboardingGuide } from "./organizer-moments-onboarding-guide";
+import { PastEventsList } from "./past-events-list";
 
 export async function DashboardContent({
   userId,
@@ -91,15 +92,17 @@ export async function DashboardContent({
                 </p>
               )}
 
-              {hostPast.map((moment, i) => (
-                <DashboardMomentCard
-                  key={moment.id}
-                  variant="organizer"
-                  moment={moment}
-                  isLast={i === hostPast.length - 1}
-                  isPast
-                />
-              ))}
+              <PastEventsList>
+                {hostPast.map((moment, i) => (
+                  <DashboardMomentCard
+                    key={moment.id}
+                    variant="organizer"
+                    moment={moment}
+                    isLast={i === hostPast.length - 1}
+                    isPast
+                  />
+                ))}
+              </PastEventsList>
             </div>
           )}
         </section>
@@ -182,16 +185,18 @@ export async function DashboardContent({
               </p>
             )}
 
-            {participantPast.map((reg, i) => (
-              <DashboardMomentCard
-                key={reg.id}
-                variant="participant"
-                registration={reg}
-                isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
-                isLast={i === participantPast.length - 1}
-                isPast
-              />
-            ))}
+            <PastEventsList>
+              {participantPast.map((reg, i) => (
+                <DashboardMomentCard
+                  key={reg.id}
+                  variant="participant"
+                  registration={reg}
+                  isHost={hostCircleSlugs.has(reg.moment.circleSlug)}
+                  isLast={i === participantPast.length - 1}
+                  isPast
+                />
+              ))}
+            </PastEventsList>
           </div>
         )}
       </section>
