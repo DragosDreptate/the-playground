@@ -21,7 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Checkout de la branche PR (pas main) pour pouvoir modifier et pousser
           ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
@@ -54,18 +53,45 @@ jobs:
         if: steps.check-changelog.outputs.changed == 'true'
         run: pnpm install --frozen-lockfile
 
-      - name: Réécrire la nouvelle section en langage utilisateur
+      # Boucle retry : Release Please peut force-push la branche pendant que
+      # ce workflow tourne, causant un rejet du push. On recommence à zéro
+      # (fetch + reset + humanise + commit + push) jusqu'à 3 fois.
+      - name: Humaniser et committer (avec retry)
         if: steps.check-changelog.outputs.changed == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: pnpm tsx scripts/humanize-changelog.ts
-
-      - name: Committer si des changements ont eu lieu
-        if: steps.check-changelog.outputs.changed == 'true'
+          BRANCH: ${{ github.head_ref }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git diff --quiet && echo "Changelog déjà au format utilisateur — rien à committer." && exit 0
-          git add CHANGELOG.md
-          git commit -m "docs(changelog): réécriture automatique en langage utilisateur [skip ci]"
-          git push
+
+          for i in 1 2 3; do
+            echo "=== Tentative $i/3 ==="
+
+            # Repartir du HEAD distant (en cas de force-push entre-temps)
+            git fetch origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+
+            # Humaniser
+            pnpm tsx scripts/humanize-changelog.ts
+
+            # Vérifier si le script a modifié quelque chose
+            if git diff --quiet; then
+              echo "Changelog déjà au format utilisateur — rien à committer."
+              exit 0
+            fi
+
+            # Committer et pousser
+            git add CHANGELOG.md
+            git commit -m "docs(changelog): réécriture automatique en langage utilisateur [skip ci]"
+
+            if git push origin "$BRANCH"; then
+              echo "Push réussi à la tentative $i."
+              exit 0
+            fi
+
+            echo "Push rejeté — Release Please a probablement force-push entre-temps."
+          done
+
+          echo "Échec après 3 tentatives."
+          exit 1
