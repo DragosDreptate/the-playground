@@ -914,6 +914,9 @@
       "hostPendingRegistrationSubject": "New registration request — {momentTitle}",
       "hostPendingRegistrationHeading": "New registration request",
       "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
+      "hostPendingMembershipSubject": "New membership request — {circleName}",
+      "hostPendingMembershipHeading": "New membership request",
+      "hostPendingMembershipMessage": "{playerName} wants to join your Community \"{circleName}\". This request requires your approval.",
       "manageCta": "Manage requests"
     },
     "paidCancellation": {

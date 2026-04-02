@@ -914,6 +914,9 @@
       "hostPendingRegistrationSubject": "Nouvelle demande d'inscription — {momentTitle}",
       "hostPendingRegistrationHeading": "Nouvelle demande d'inscription",
       "hostPendingRegistrationMessage": "{playerName} souhaite s'inscrire à l'événement « {momentTitle} ». Cette inscription nécessite votre validation.",
+      "hostPendingMembershipSubject": "Nouvelle demande d'adhésion — {circleName}",
+      "hostPendingMembershipHeading": "Nouvelle demande d'adhésion",
+      "hostPendingMembershipMessage": "{playerName} souhaite rejoindre votre Communauté « {circleName} ». Cette demande nécessite votre validation.",
       "manageCta": "Gérer les demandes"
     },
     "paidCancellation": {
