@@ -32,6 +32,18 @@ const TRANSIENT_PRISMA_CODES = new Set([
   "P2024", // Timed out fetching a new connection from the pool
 ]);
 
+// Opérations de lecture — safe to retry (idempotentes par nature)
+const READ_OPERATIONS = new Set([
+  "findUnique",
+  "findUniqueOrThrow",
+  "findFirst",
+  "findFirstOrThrow",
+  "findMany",
+  "count",
+  "aggregate",
+  "groupBy",
+]);
+
 function isTransientError(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return TRANSIENT_PRISMA_CODES.has(error.code);
@@ -79,12 +91,13 @@ const globalForPrisma = globalThis as unknown as {
 const _baseClient: PrismaClient = globalForPrisma.prisma ?? createClient();
 globalForPrisma.prisma = _baseClient;
 
-// Extension : retry connexions transitoires + log slow queries
+// Extension : retry connexions transitoires (reads only) + log slow queries
 export const prisma = _baseClient.$extends({
   query: {
     $allModels: {
       async $allOperations({ model, operation, args, query }) {
         const start = performance.now();
+        const canRetry = READ_OPERATIONS.has(operation);
         let lastError: unknown;
 
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -106,7 +119,8 @@ export const prisma = _baseClient.$extends({
             return result;
           } catch (error) {
             lastError = error;
-            if (attempt < MAX_RETRIES && isTransientError(error)) {
+
+            if (canRetry && attempt < MAX_RETRIES && isTransientError(error)) {
               const delay = BASE_DELAY_MS * 2 ** attempt; // 100, 200, 400ms
               console.warn(
                 JSON.stringify({
@@ -122,11 +136,28 @@ export const prisma = _baseClient.$extends({
               await sleep(delay);
               continue;
             }
+
+            // Log durée totale pour les requêtes qui échouent définitivement
+            const duration = Math.round(performance.now() - start);
+            if (duration > 100) {
+              console.warn(
+                JSON.stringify({
+                  level: "warn",
+                  type: "slow_query_failed",
+                  model,
+                  operation,
+                  duration,
+                  ...(attempt > 0 && { retries: attempt }),
+                  error: error instanceof Error ? error.message : String(error),
+                })
+              );
+            }
             throw error;
           }
         }
 
-        throw lastError;
+        // Unreachable en pratique — garde défensive
+        throw lastError ?? new Error("Unexpected retry exhaustion");
       },
     },
   },
