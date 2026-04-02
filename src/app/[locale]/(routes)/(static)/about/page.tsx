@@ -367,7 +367,7 @@ export default async function AboutPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
             { value: "1 400+", label: isFr ? "commits" : "commits" },
-            { value: "280+", label: isFr ? "pull requests" : "pull requests" },
+            { value: "300+", label: isFr ? "pull requests" : "pull requests" },
             { value: "65", label: isFr ? "cas d'usage" : "use cases" },
             { value: "880+", label: isFr ? "tests" : "tests" },
           ].map(({ value, label }) => (
