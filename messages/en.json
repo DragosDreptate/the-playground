@@ -44,11 +44,9 @@
     "heroRestPrefix2": "your",
     "stepLabel": "Step",
     "contactTitle": "Have a question before getting started?",
-    "contactSubtitle": "We reply personally within 24h.",
-    "contactCta": "Send a message →",
-    "contactHelpPrefix": "Or check our",
-    "contactHelpLink": "Help page",
-    "contactHelpSuffix": "for frequently asked questions."
+    "contactSubtitle": "We reply within 24h, or check our",
+    "contactCta": "Get in touch",
+    "contactHelpLink": "Help page"
   },
   "Common": {
     "loading": "Loading...",

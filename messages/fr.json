@@ -44,11 +44,9 @@
     "heroRestPrefix2": "vos",
     "stepLabel": "Étape",
     "contactTitle": "Vous avez une question avant de vous lancer ?",
-    "contactSubtitle": "On répond personnellement sous 24h.",
-    "contactCta": "Écrire un message →",
-    "contactHelpPrefix": "Ou consultez la",
-    "contactHelpLink": "page Aide",
-    "contactHelpSuffix": "pour les questions fréquentes."
+    "contactSubtitle": "On répond sous 24h, ou consultez notre",
+    "contactCta": "Contactez-nous",
+    "contactHelpLink": "page Aide"
   },
   "Common": {
     "loading": "Chargement...",

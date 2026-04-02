@@ -17,6 +17,7 @@ import {
   Link as LinkIcon,
   Sparkles,
   Gift,
+  Mail,
 } from "lucide-react";
 
 // Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
@@ -258,18 +259,17 @@ export default async function HomePage() {
               {t("contactTitle")}
             </h2>
             <p className="text-muted-foreground mt-2 text-sm">
-              {t("contactSubtitle")}
-            </p>
-            <Button asChild variant="outline" size="sm" className="mt-6">
-              <Link href="/contact">{t("contactCta")}</Link>
-            </Button>
-            <p className="text-muted-foreground mt-3 text-xs">
-              {t("contactHelpPrefix")}{" "}
+              {t("contactSubtitle")}{" "}
               <Link href="/help" className="underline underline-offset-2 hover:text-foreground transition-colors">
                 {t("contactHelpLink")}
-              </Link>{" "}
-              {t("contactHelpSuffix")}
+              </Link>
             </p>
+            <Button asChild size="lg" className="mt-6 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
+              <Link href="/contact">
+                <Mail className="size-4" />
+                {t("contactCta")}
+              </Link>
+            </Button>
           </div>
         </section>
       </main>
