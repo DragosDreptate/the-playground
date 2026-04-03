@@ -21,6 +21,7 @@ const TRANSIENT_PATTERNS = [
   "ECONNREFUSED",
   "ETIMEDOUT",
   "ENOTFOUND",
+  "timeout exceeded when trying to connect",
 ];
 
 // Prisma error codes for connection issues
@@ -66,7 +67,7 @@ function createClient(): PrismaClient {
       connectionString: process.env.DATABASE_URL!,
       max: 5,
       idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000,
+      connectionTimeoutMillis: 15_000,
     },
     {
       onPoolError: (err) => {
