@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landing — Section Comparaison (mockup SEO 2.2)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #ffffff;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f5f5fa;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.75rem;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Collapsed sections (context only) ── */
+    .collapsed-section {
+      background: var(--muted);
+      padding: 48px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .collapsed-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .collapsed-section p {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+      opacity: 0.6;
+    }
+
+    /* ── Comparison section ── */
+    .comparison-section {
+      padding: 96px 16px;
+      background: var(--muted);
+    }
+    .comparison-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .comparison-section h2 {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .comparison-section .subtitle {
+      text-align: center;
+      color: var(--muted-foreground);
+      font-size: 17px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 48px;
+    }
+
+    /* ── Table ── */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 14px;
+    }
+    .comparison-table thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted-foreground);
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table thead th:first-child {
+      width: 200px;
+    }
+    .comparison-table thead th.highlight {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: white;
+      text-align: center;
+    }
+    .comparison-table thead th:not(:first-child):not(.highlight) {
+      text-align: center;
+    }
+    .comparison-table tbody td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .comparison-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .comparison-table tbody td:first-child {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--foreground);
+    }
+    .comparison-table tbody td:not(:first-child) {
+      text-align: center;
+    }
+    .comparison-table tbody td.highlight-col {
+      background: rgba(236, 72, 153, 0.04);
+    }
+
+    /* Check / Cross / Partial */
+    .check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #10b98120;
+      color: #10b981;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .cross {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ef444420;
+      color: #ef4444;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .partial {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #f59e0b20;
+      color: #f59e0b;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .check-label, .cross-label, .partial-label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+    }
+
+    /* ── Bottom text (SEO content) ── */
+    .comparison-text {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+    .comparison-text strong {
+      color: var(--foreground);
+      font-weight: 600;
+    }
+
+    /* ── CTA ── */
+    .cta-wrapper {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ec4899, #d946ef, #a855f7);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .cta-btn:hover { opacity: 0.9; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .comparison-section { padding: 64px 16px; }
+      .comparison-section h2 { font-size: 26px; }
+      .comparison-section .subtitle { font-size: 15px; margin-bottom: 32px; }
+
+      /* Scroll horizontal sur mobile */
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius);
+      }
+      .comparison-table {
+        min-width: 600px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : Hero (contexte)                   -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Section Hero</h3>
+    <p>Lancez votre communauté. Organisez vos événements. Animez votre réseau.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : Comment ça marche (contexte)      -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Section "Comment ça marche"</h3>
+    <p>3 étapes — Créer, Lancer, Grandir</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : 3 piliers (contexte)              -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section" style="border-bottom: none;">
+    <h3>Section "Ce qui rend The Playground différent"</h3>
+    <p>Communauté d'abord · Ownership · 100% gratuit</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- NOUVELLE SECTION : Comparaison (SEO 2.2)            -->
+  <!-- Position : entre les 3 piliers et le CTA final      -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="comparison-section">
+    <div class="comparison-inner">
+
+      <h2>Pourquoi choisir The Playground ?</h2>
+      <p class="subtitle">
+        Il existe plusieurs plateformes pour organiser des événements. Aucune ne combine
+        communauté persistante, expérience premium et gratuité totale.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="highlight">The Playground</th>
+              <th>Meetup</th>
+              <th>Luma</th>
+              <th>Eventbrite</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Communauté persistante</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Membres fidélisés</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+                <span class="check-label">Groupes</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">Événement isolé</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">Événement isolé</span>
+              </td>
+            </tr>
+            <tr>
+              <td>100% gratuit</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Aucun frais</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">Abo organisateur</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Commission</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Freemium limité</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Pages événement premium</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Design soigné</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">UX datée</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+                <span class="check-label">Référence UX</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Standard</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Inscription sans friction</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Magic link</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">Compte obligatoire</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Formulaire long</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Ownership des données</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Export complet</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+                <span class="cross-label">Lock-in</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Export limité</span>
+              </td>
+              <td>
+                <span class="partial">~</span>
+                <span class="partial-label">Export limité</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Billetterie intégrée</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Via Stripe</span>
+              </td>
+              <td>
+                <span class="cross">&#10005;</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+            </tr>
+            <tr>
+              <td>Liste d'attente automatique</td>
+              <td class="highlight-col">
+                <span class="check">&#10003;</span>
+                <span class="check-label">Promotion auto</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+              <td>
+                <span class="check">&#10003;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="comparison-text">
+        <strong>The Playground</strong> est la plateforme gratuite pour les organisateurs
+        de communautés qui veulent plus qu'un simple outil d'événements. Contrairement à
+        <strong>Meetup</strong> (abonnement organisateur obligatoire) ou <strong>Luma</strong>
+        (événements isolés, aucune rétention), The Playground combine une
+        <strong>communauté persistante</strong>, des <strong>pages événement premium</strong>
+        et une <strong>gratuité totale</strong> — sans commission plateforme, sans abonnement,
+        sans limite artificielle.
+      </p>
+
+      <div class="cta-wrapper">
+        <a href="#" class="cta-btn">Commencer gratuitement</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : CTA final (contexte)              -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Section CTA final</h3>
+    <p>Prêt à lancer votre communauté ?</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : PWA + Contact (contexte)          -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Sections PWA + Contact + Footer</h3>
+    <p>(sections existantes inchangées)</p>
+  </div>
+
+</body>
+</html>

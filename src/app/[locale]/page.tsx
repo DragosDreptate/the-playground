@@ -19,6 +19,7 @@ import {
   Gift,
   Mail,
 } from "lucide-react";
+import { ComparisonSection } from "@/components/landing/comparison-section";
 
 // Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
 export const dynamic = "force-dynamic";
@@ -219,8 +220,11 @@ export default async function HomePage() {
           </div>
         </section>
 
+        {/* Comparaison — SEO section */}
+        <ComparisonSection isLoggedIn={!!session?.user} />
+
         {/* CTA final */}
-        <section className="bg-muted/60 px-4 py-24 md:py-32">
+        <section className="px-4 py-24 md:py-32">
           <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
             <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
               {t("ctaFinalTitle")}

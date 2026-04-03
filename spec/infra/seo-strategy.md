@@ -155,8 +155,8 @@ Il n'est pas possible de servir des images différentes selon la plateforme via 
 - Axes : communauté persistante, gratuit, UX premium, ownership des données, inscription sans friction
 - Texte d'introduction naturel avec les mots-clés cibles
 
-**Décision** : —
-**Statut** : À faire
+**Décision** : composant `ComparisonSection` dans `components/landing/`, intégré entre les 3 piliers et le CTA final. Fond `bg-muted/60` alternant avec la section précédente (piliers sur fond blanc).
+**Statut** : **Fait**
 
 ### 2.3 FAQ avec JSON-LD FAQPage
 
