@@ -35,7 +35,7 @@ export function FaqSection() {
   };
 
   return (
-    <section className="px-4 py-24 md:py-32">
+    <section className="px-4 pt-24 pb-12 md:pt-32 md:pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
