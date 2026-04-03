@@ -1,7 +1,7 @@
 ---
 title: "Comment organiser un meetup gratuit en 2026 — guide complet"
 description: "Tout ce qu'il faut savoir pour organiser un meetup gratuit : lieu, promotion, inscription, outils. Guide pratique étape par étape."
-date: "2026-03-12"
+date: "2026-03-05"
 keywords:
   - organiser meetup gratuit
   - créer meetup

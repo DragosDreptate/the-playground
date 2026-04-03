@@ -1,7 +1,7 @@
 ---
 title: "How to organise a free meetup in 2026 — complete guide"
 description: "Everything you need to know to organise a free meetup: venue, promotion, registration, tools. A practical step-by-step guide."
-date: "2026-03-12"
+date: "2026-03-05"
 keywords:
   - organise free meetup
   - create meetup

@@ -1,7 +1,7 @@
 ---
 title: "Pourquoi les événements seuls ne suffisent pas — le modèle communautaire"
 description: "Vous organisez des événements mais vos participants ne reviennent pas ? Le problème n'est pas l'événement, c'est l'absence de communauté."
-date: "2026-03-24"
+date: "2026-03-18"
 keywords:
   - plateforme événementielle
   - rétention communauté
