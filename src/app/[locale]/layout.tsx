@@ -89,6 +89,12 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
+      </head>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-X2P6YGQWE1"
           strategy="afterInteractive"
@@ -101,12 +107,6 @@ export default async function LocaleLayout({
             gtag('config', 'G-X2P6YGQWE1');
           `}
         </Script>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-        />
-      </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SessionProvider session={session}>
             <PostHogProvider>
