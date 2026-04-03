@@ -7,6 +7,7 @@
     "heroRest2": "vos événements.",
     "heroHighlight3": "Animez",
     "heroRest3": "votre réseau.",
+    "metaTitle": "Lancez votre communauté, organisez vos événements",
     "heroSubtitle": "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
     "cta": "Lancez votre communauté",
     "mockupCircleName": "Product & AI",
@@ -1593,7 +1594,7 @@
     "errorRateLimited": "Trop de messages envoyés. Veuillez réessayer dans quelques minutes."
   },
   "About": {
-    "pageTitle": "À propos · The Playground",
+    "pageTitle": "À propos",
     "pageDescription": "L'histoire de The Playground — pourquoi, comment, et ce qui vient."
   }
 }

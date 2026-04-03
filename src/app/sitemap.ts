@@ -40,9 +40,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     withAlternates(baseUrl, "legal/cgu", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
   ];
 
-  // Public circles
+  // Exclude circles owned by test/demo users
+  const testDemoMemberships = await prisma.circleMembership.findMany({
+    where: {
+      role: "HOST",
+      user: {
+        OR: [
+          { email: { endsWith: "@test.playground" } },
+          { email: { endsWith: "@demo.playground" } },
+        ],
+      },
+    },
+    select: { circleId: true },
+  });
+  const excludeCircleIds = testDemoMemberships.map((m) => m.circleId);
+
+  // Public circles (excluding test/demo)
   const circles = await prisma.circle.findMany({
-    where: { visibility: "PUBLIC" },
+    where: {
+      visibility: "PUBLIC",
+      id: { notIn: excludeCircleIds },
+    },
     select: { slug: true, updatedAt: true },
   });
 
@@ -54,9 +72,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  // Published + past moments (CANCELLED excluded — they return 404)
+  // Published + past moments (CANCELLED excluded — they return 404, test/demo excluded)
   const moments = await prisma.moment.findMany({
-    where: { status: { in: ["PUBLISHED", "PAST"] } },
+    where: {
+      status: { in: ["PUBLISHED", "PAST"] },
+      circleId: { notIn: excludeCircleIds },
+    },
     select: { slug: true, updatedAt: true },
   });
 

@@ -16,9 +16,17 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("About");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),
+    alternates: {
+      canonical: `${appUrl}/about`,
+      languages: {
+        fr: `${appUrl}/about`,
+        en: `${appUrl}/en/about`,
+      },
+    },
     openGraph: {
       title: t("pageTitle"),
       description: t("pageDescription"),

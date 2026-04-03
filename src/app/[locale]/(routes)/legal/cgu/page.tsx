@@ -3,9 +3,17 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Legal");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
   return {
     title: t("terms.title"),
     description: t("terms.metaDescription"),
+    alternates: {
+      canonical: `${appUrl}/legal/cgu`,
+      languages: {
+        fr: `${appUrl}/legal/cgu`,
+        en: `${appUrl}/en/legal/cgu`,
+      },
+    },
   };
 }
 

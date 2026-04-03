@@ -5,9 +5,17 @@ import { HelpFaqAccordion } from "@/components/help/help-faq-accordion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Help");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
   return {
     title: t("meta.title"),
     description: t("meta.description"),
+    alternates: {
+      canonical: `${appUrl}/help`,
+      languages: {
+        fr: `${appUrl}/help`,
+        en: `${appUrl}/en/help`,
+      },
+    },
     openGraph: {
       title: t("meta.title"),
       description: t("meta.description"),

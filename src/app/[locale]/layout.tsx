@@ -28,7 +28,7 @@ export async function generateMetadata({
       process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
     ),
     title: {
-      default: "The Playground — Lancez votre communauté, organisez vos événements",
+      default: `The Playground — ${t("metaTitle")}`,
       template: "%s — The Playground",
     },
     description: t("heroSubtitle"),

@@ -5,9 +5,17 @@ import { ContactForm } from "@/components/contact/contact-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Contact");
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),
+    alternates: {
+      canonical: `${appUrl}/contact`,
+      languages: {
+        fr: `${appUrl}/contact`,
+        en: `${appUrl}/en/contact`,
+      },
+    },
     openGraph: {
       title: t("pageTitle"),
       description: t("pageDescription"),

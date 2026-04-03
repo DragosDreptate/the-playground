@@ -7,6 +7,7 @@
     "heroRest2": "your events.",
     "heroHighlight3": "Engage",
     "heroRest3": "your network.",
+    "metaTitle": "Launch your community, organize your events",
     "heroSubtitle": "The free platform to build your community and host unforgettable events.",
     "cta": "Launch your community",
     "mockupCircleName": "Product & AI",
@@ -1593,7 +1594,7 @@
     "errorRateLimited": "Too many messages sent. Please try again in a few minutes."
   },
   "About": {
-    "pageTitle": "About · The Playground",
+    "pageTitle": "About",
     "pageDescription": "The story of The Playground — why, how, and what's next."
   }
 }
