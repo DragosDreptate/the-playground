@@ -174,7 +174,7 @@
       "greetingPrefix": "Welcome,",
       "greetingSuffix": "What do you want to do?",
       "greetingAnonymous": "Welcome — what do you want to do?",
-      "subtitle": "Choose your default mode. You can change it at any time.",
+      "subtitle": "Where would you like to start?",
       "participant": {
         "title": "I participate",
         "description": "Discover and join events that inspire me"
@@ -183,12 +183,12 @@
         "title": "I organize",
         "description": "Create my community and host events"
       },
-      "hint": "You can switch modes at any time from your dashboard."
+      "hint": ""
     }
   },
   "Dashboard": {
     "title": "Dashboard",
-    "myCircles": "My Communities",
+    "myCircles": "Communities",
     "myCirclesOrganizer": "My Communities",
     "createCircle": "Create a Community",
     "createMoment": "Create an Event",
@@ -202,18 +202,20 @@
       "title": "Create a Community first",
       "description": "You need a Community before creating an Event."
     },
-    "myMoments": "My registrations",
+    "myMoments": "Events",
     "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
     "pastMoments": "Past",
     "showMorePast": "Show more",
     "noUpcomingMoments": "No upcoming Events.",
     "noMoments": "No Events yet.",
+    "noMomentsHostOnly": "No organized Events.",
     "noMomentsHint": "Join an Event or create your community.",
     "noMomentsHintExplore": "Explore events →",
     "noMomentsOrganizer": "No Events organized yet.",
     "noMomentsOrganizerHint": "Create your first Event from a Community.",
     "emptyCircles": "You're not a member of any Community.",
+    "emptyCirclesHostOnly": "You don't organize any Community.",
     "emptyCirclesHint": "Create a Community or join an Event to become a member of one.",
     "emptyCirclesHintExplore": "Explore communities →",
     "noCirclesOrganizer": "You don't organize any Community yet.",
@@ -262,13 +264,9 @@
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
     "greetingSubtitle": "Your Communities and upcoming Events, all in one place.",
-    "greetingSubtitleOrganizer": "Manage your Communities and Events.",
     "memberCount": "{count} members",
-    "modeLabel": "View",
-    "modeParticipant": "Member",
-    "modeOrganizer": "Organizer",
-    "modeBadgeParticipant": "Member view",
-    "modeBadgeOrganizer": "Organizer view"
+    "filterAll": "All",
+    "filterHostOnly": "Organizer"
   },
   "Circle": {
     "create": {
@@ -677,8 +675,8 @@
     "OTHER": "Other"
   },
   "Explorer": {
-    "title": "Communities & events",
-    "description": "Discover communities and events near you. Join for free on The Playground, the 100% free community platform.",
+    "title": "Explore communities",
+    "description": "Join communities. Attend events.",
     "navLink": "Explore",
     "featured": {
       "eyebrow": "Featured",
@@ -1456,10 +1454,11 @@
       "mySpace": {
         "title": "My Dashboard",
         "intro": "<strong>Dashboard</strong> is your personal hub. You'll find there:",
-        "item1": "Your <strong>upcoming events</strong> (those you're registered for)",
+        "item1": "Your <strong>upcoming events</strong> — those you're registered for and those you organize (including drafts)",
         "item2": "Your <strong>past events</strong>",
-        "item3": "The <strong>Communities</strong> you belong to",
-        "item4": "Your <strong>profile</strong> (name, avatar, notification preferences) — including a link to your public profile, visible to other members"
+        "item3": "The <strong>Communities</strong> you belong to or organize",
+        "item4": "Your <strong>profile</strong> (name, avatar, notification preferences) — including a link to your public profile, visible to other members",
+        "item5": "An <strong>Organizer</strong> filter (visible if you organize at least one Community) to show only your organized events and Communities"
       },
       "notifications": {
         "title": "Manage notifications",

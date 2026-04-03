@@ -58,7 +58,7 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
   return (
     <div className="flex items-center gap-2">
       <Select value={selectedCategory ?? "ALL"} onValueChange={handleCategoryChange}>
-        <SelectTrigger className="w-fit min-w-[180px]">
+        <SelectTrigger className="w-fit min-w-[180px] shadow-none focus:ring-0 focus-visible:border-border focus-visible:ring-0">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -72,7 +72,7 @@ export function ExplorerFilterBar({ selectedCategory, sortBy, activeTab }: Props
       </Select>
 
       <Select value={sortBy} onValueChange={handleSortChange}>
-        <SelectTrigger className="w-fit min-w-[150px]">
+        <SelectTrigger className="w-fit min-w-[150px] shadow-none focus:ring-0 focus-visible:border-border focus-visible:ring-0">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

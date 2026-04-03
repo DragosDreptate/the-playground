@@ -6,18 +6,18 @@ import { measureTime } from "@/lib/perf-logger";
 import { Link } from "@/i18n/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DashboardContent } from "./_components/dashboard-content";
-import { DashboardModeSwitcher } from "@/components/dashboard/dashboard-mode-switcher";
+import { DashboardFilterBar } from "./_components/dashboard-filter-bar";
 import { CreateMomentButton } from "@/components/dashboard/create-moment-button";
 import { CreateCircleButton } from "@/components/dashboard/create-circle-button";
-import type { DashboardMode } from "@/domain/models/user";
 
 export default async function DashboardPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; mode?: string }>;
+  searchParams: Promise<{ tab?: string; host?: string }>;
 }) {
-  const { tab, mode: modeParam } = await searchParams;
+  const { tab, host } = await searchParams;
   const activeTab = tab === "circles" ? "circles" : "moments";
+  const hostOnly = host === "true";
 
   const [session, t] = await Promise.all([
     measureTime("dashboard:auth", () => getCachedSession()),
@@ -28,17 +28,8 @@ export default async function DashboardPage({
     return null;
   }
 
-  // Résolution du mode actif : searchParams > session.dashboardMode > null
-  const sessionMode = session.user.dashboardMode ?? null;
-  const resolvedMode: DashboardMode | null =
-    modeParam === "organizer"
-      ? "ORGANIZER"
-      : modeParam === "participant"
-        ? "PARTICIPANT"
-        : sessionMode;
-
-  // Redirect immédiat avant tout render — évite le flash du shell dashboard
-  if (resolvedMode === null) {
+  // Redirect vers welcome si le mode n'a jamais été choisi (= nouvel utilisateur)
+  if (session.user.dashboardMode === null) {
     redirect("/dashboard/welcome");
   }
 
@@ -46,59 +37,54 @@ export default async function DashboardPage({
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      {/* Header : greeting + mode switcher */}
-      <div className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {firstName
-              ? t("greeting", { name: firstName })
-              : t("greetingAnonymous")}
-          </h1>
-          <div className="shrink-0 self-start">
-            <DashboardModeSwitcher currentMode={resolvedMode} activeTab={activeTab} />
-          </div>
-        </div>
-        <p className="text-muted-foreground text-base leading-relaxed">
-          {resolvedMode === "ORGANIZER"
-            ? t("greetingSubtitleOrganizer")
-            : t("greetingSubtitle")}
+      {/* Header */}
+      <div className="border-l-[3px] border-primary pl-5">
+        <h1 className="text-3xl font-bold tracking-tight">
+          {firstName
+            ? t("greeting", { name: firstName })
+            : t("greetingAnonymous")}
+        </h1>
+        <p className="mt-2 text-muted-foreground text-base leading-relaxed">
+          {t("greetingSubtitle")}
         </p>
       </div>
 
-      {/* Tab selector + CTA conditionnel */}
+      {/* Tab selector + filter + CTA */}
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full items-center gap-1 rounded-full border p-1 sm:w-auto">
           <Link
-            href={`?tab=moments${resolvedMode ? `&mode=${resolvedMode.toLowerCase()}` : ""}`}
+            href={`?tab=moments${hostOnly ? "&host=true" : ""}`}
             className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors sm:flex-none ${
               activeTab === "moments"
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {resolvedMode === "ORGANIZER" ? t("myMomentsOrganizer") : t("myMoments")}
+            {t("myMoments")}
           </Link>
           <Link
-            href={`?tab=circles${resolvedMode ? `&mode=${resolvedMode.toLowerCase()}` : ""}`}
+            href={`?tab=circles${hostOnly ? "&host=true" : ""}`}
             className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors sm:flex-none ${
               activeTab === "circles"
                 ? "bg-foreground text-background"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            {resolvedMode === "ORGANIZER" ? t("myCirclesOrganizer") : t("myCircles")}
+            {t("myCircles")}
           </Link>
         </div>
 
-        {resolvedMode === "ORGANIZER" && (
-          <div className="sm:contents">
-            {activeTab === "moments" ? (
-              <CreateMomentButton />
-            ) : (
-              <CreateCircleButton />
-            )}
-          </div>
-        )}
+        <Suspense>
+          <DashboardFilterBar hostOnly={hostOnly} activeTab={activeTab} userId={session.user.id} />
+        </Suspense>
+
+        <Suspense>
+          {activeTab === "moments" ? (
+            <CreateMomentButton />
+          ) : (
+            <CreateCircleButton />
+          )}
+        </Suspense>
       </div>
 
       {/* Contenu — streamé en arrière-plan pendant que le shell s'affiche */}
@@ -106,7 +92,7 @@ export default async function DashboardPage({
         <DashboardContent
           userId={session.user.id}
           activeTab={activeTab}
-          mode={resolvedMode}
+          hostOnly={hostOnly}
         />
       </Suspense>
     </div>

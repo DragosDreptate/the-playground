@@ -2,110 +2,104 @@ import { test, expect } from "@playwright/test";
 import { SLUGS, AUTH } from "./fixtures";
 
 /**
- * Tests E2E — Mode Switcher Dashboard Participant / Organisateur
+ * Tests E2E — Dashboard unifié
  *
  * Couvre :
- *   - Présence du mode switcher (pills) sur le dashboard
- *   - Mode ORGANIZER : CTAs Créer, contenu Organisateur
- *   - Mode PARTICIPANT : contenu Participant (sans CTAs Organisateur)
- *   - Persistence du mode via URL params
+ *   - Vue unifiée : événements (inscrits + organisés) et communautés (membre + host)
+ *   - CTAs Créer toujours visibles (événement si host, communauté toujours)
+ *   - Filtre "Organisateur" (dropdown, visible uniquement pour les hosts)
+ *   - Tabs Événements / Communautés
+ *   - Welcome page redirect
  */
 
-test.describe("Dashboard mode switcher — Host connecté", () => {
+test.describe("Dashboard unifié — Host connecté", () => {
   test.use({ storageState: AUTH.HOST });
 
-  test("should display the mode switcher on the dashboard", async ({ page }) => {
+  test("should display the dashboard with greeting and tabs", async ({ page }) => {
     await page.goto("/fr/dashboard");
-    // Attendre la stabilisation de l'URL (le dashboardMode étant seedé à ORGANIZER,
-    // il n'y a pas de redirect vers /welcome — mais on attend quand même pour la robustesse)
     await page.waitForURL(/\/dashboard/, { timeout: 8_000 });
-    // Le mode switcher doit être visible (deux pills)
-    const switcher = page.locator(".rounded-full.border").filter({ hasText: /Participant|Organisateur/ }).first();
-    await expect(switcher).toBeVisible({ timeout: 8_000 });
+    await expect(page.locator("h1")).toBeVisible();
+    // Les tabs Événements / Communautés doivent être visibles
+    const tabs = page.locator(".rounded-full.border").filter({ hasText: /Événements|Communautés/ }).first();
+    await expect(tabs).toBeVisible({ timeout: 8_000 });
   });
 
-  test("should show Organizer CTA when in organizer mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer&tab=moments");
-    // Un CTA de création est visible (lien direct ou dropdown selon nb de communautés)
+  test("should show create Event CTA on events tab", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=moments");
     const createCTA = page.locator("a, button").filter({ hasText: /Créer/i }).first();
     await expect(createCTA).toBeVisible();
   });
 
-  test("should show create Circle CTA in organizer mode on circles tab", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
+  test("should show create Circle CTA on circles tab", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=circles");
     const createCircleBtn = page.locator("a[href*='/circles/new']").first();
     await expect(createCircleBtn).toBeVisible();
   });
 
-  test("should highlight the Organisateur pill in organizer mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer");
-    // Le pill Organisateur doit avoir le style actif (bg-foreground)
-    const organizerPill = page.locator("button").filter({ hasText: "Organisateur" }).first();
-    await expect(organizerPill).toBeVisible();
-    await expect(organizerPill).toHaveClass(/bg-foreground/);
-  });
-
-  test("should highlight the Participant pill in participant mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=participant");
-    const participantPill = page.locator("button").filter({ hasText: "Participant" }).first();
-    await expect(participantPill).toBeVisible();
-    await expect(participantPill).toHaveClass(/bg-foreground/);
-  });
-
-  test("should show the host Circle in organizer mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
-    // Le Circle seedé du Host doit apparaître
+  test("should show the host Circle on circles tab", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=circles");
     await expect(page.locator("main").first()).toContainText("Paris Creative Tech");
   });
 
-  test("should NOT show create Event CTA in participant mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=participant&tab=moments");
-    const createBtn = page.locator("a[href*='/moments/new']");
-    await expect(createBtn).not.toBeVisible();
+  test("should show the organizer filter dropdown for a host", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=moments");
+    // Le dropdown filtre doit être visible (contient "Tous" par défaut)
+    const filterTrigger = page.locator("[data-slot='select-trigger']").filter({ hasText: /Tous|Organisateur/i }).first();
+    await expect(filterTrigger).toBeVisible();
   });
 
-  test("should switch mode when clicking the Organisateur pill", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=participant");
-    // Cliquer sur le pill Organisateur
-    const organizerPill = page.locator("button").filter({ hasText: "Organisateur" }).first();
-    await expect(organizerPill).toBeVisible();
-    await organizerPill.click();
-    // L'URL doit contenir mode=organizer
-    await expect(page).toHaveURL(/mode=organizer/, { timeout: 5_000 });
+  test("should filter events when organizer filter is active", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=moments&host=true");
+    // Tous les événements affichés doivent avoir le badge Organisateur
+    const main = page.locator("main").first();
+    await expect(main).toBeVisible();
+    // Le dropdown doit afficher "Organisateur"
+    const filterTrigger = page.locator("[data-slot='select-trigger']").first();
+    await expect(filterTrigger).toContainText(/Organisateur/i);
   });
 
-  test("should switch back to participant mode when clicking Participant pill", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer");
-    const participantPill = page.locator("button").filter({ hasText: "Participant" }).first();
-    await expect(participantPill).toBeVisible();
-    await participantPill.click();
-    await expect(page).toHaveURL(/mode=participant/, { timeout: 5_000 });
+  test("should filter circles when organizer filter is active", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=circles&host=true");
+    // Seules les communautés organisées sont affichées
+    const main = page.locator("main").first();
+    await expect(main).toBeVisible();
+  });
+
+  test("should preserve filter when switching tabs", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=moments&host=true");
+    // Cliquer sur l'onglet Communautés
+    const circlesTab = page.locator("a").filter({ hasText: /Communautés/i }).first();
+    await circlesTab.click();
+    // L'URL doit conserver host=true
+    await expect(page).toHaveURL(/host=true/, { timeout: 5_000 });
   });
 });
 
-test.describe("Dashboard mode switcher — Player connecté", () => {
+test.describe("Dashboard unifié — Player connecté", () => {
   test.use({ storageState: AUTH.PLAYER });
 
-  test("should display the mode switcher for a participant user", async ({ page }) => {
+  test("should display the dashboard without organizer filter", async ({ page }) => {
     await page.goto("/fr/dashboard");
-    const switcher = page.locator(".rounded-full.border").filter({ hasText: /Participant|Organisateur/ }).first();
-    await expect(switcher).toBeVisible();
+    await page.waitForURL(/\/dashboard/, { timeout: 8_000 });
+    await expect(page.locator("h1")).toBeVisible();
+    // Le dropdown filtre ne doit PAS être visible pour un pur participant
+    const filterTrigger = page.locator("[data-slot='select-trigger']").filter({ hasText: /Tous|Organisateur/i });
+    await expect(filterTrigger).not.toBeVisible();
   });
 
-  test("should show participant events for a player user in participant mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=participant&tab=moments");
+  test("should show participant events on the dashboard", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=moments");
     // Player1 est inscrit à PUBLISHED_MOMENT — doit apparaître
     await expect(page.locator("main").first()).toBeVisible();
-    // Pas de bouton "Créer un événement"
+    // Pas de bouton "Créer un événement" (player n'est pas host)
     const createBtn = page.locator("a[href*='/moments/new']");
     await expect(createBtn).not.toBeVisible();
   });
 
-  test("should show no host circles when player switches to organizer mode", async ({ page }) => {
-    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
-    // Player n'a pas de Circles en tant qu'Organisateur
-    const main = page.locator("main").first();
-    await expect(main).toContainText(/aucun|no/i);
+  test("should show create Circle CTA on circles tab even for non-host", async ({ page }) => {
+    await page.goto("/fr/dashboard?tab=circles");
+    const createCircleBtn = page.locator("a[href*='/circles/new']").first();
+    await expect(createCircleBtn).toBeVisible();
   });
 });
 
@@ -113,8 +107,6 @@ test.describe("Dashboard — welcome page redirect", () => {
   test.use({ storageState: AUTH.HOST });
 
   test("should redirect from welcome to dashboard when mode is already set", async ({ page }) => {
-    // Naviguer vers welcome avec un mode déjà en session (après avoir visité le dashboard)
-    // Note : le HOST a de l'activité, donc welcome redirige vers /dashboard
     await page.goto("/fr/dashboard/welcome");
     await expect(page).toHaveURL(/\/dashboard$/, { timeout: 5_000 });
   });
