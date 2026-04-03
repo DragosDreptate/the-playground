@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
 import { ChevronDown } from "lucide-react";
 import {
   Collapsible,
@@ -9,40 +8,25 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const FAQ_COUNT = 7;
+interface FaqItem {
+  question: string;
+  answerRich: React.ReactNode;
+}
 
-export function FaqSection() {
-  const t = useTranslations("HomePage");
+export function FaqSection({
+  heading,
+  items,
+}: {
+  heading: string;
+  items: FaqItem[];
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-
-  const items = Array.from({ length: FAQ_COUNT }, (_, i) => ({
-    question: t(`faqQ${i + 1}`),
-    // Strip <b> tags for JSON-LD plain text
-    answer: t.raw(`faqA${i + 1}`) as string,
-  }));
-
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: items.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
 
   return (
     <section className="bg-muted/60 px-4 py-14 md:py-20">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
       <div className="mx-auto max-w-2xl">
         <h2 className="mb-12 text-center text-3xl font-bold tracking-tight md:text-4xl">
-          {t("faqHeading")}
+          {heading}
         </h2>
 
         <div className="divide-y">
@@ -62,13 +46,7 @@ export function FaqSection() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up">
                   <p className="pb-5 text-[15px] leading-relaxed text-muted-foreground">
-                    {t.rich(`faqA${i + 1}`, {
-                      b: (chunks) => (
-                        <strong className="font-semibold text-foreground">
-                          {chunks}
-                        </strong>
-                      ),
-                    })}
+                    {item.answerRich}
                   </p>
                 </CollapsibleContent>
               </Collapsible>

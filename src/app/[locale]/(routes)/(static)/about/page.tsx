@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
+import { getAppUrl } from "@/lib/app-url";
 import {
   CheckIcon,
   Github,
@@ -16,7 +17,7 @@ import {
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("About");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+  const appUrl = getAppUrl();
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),

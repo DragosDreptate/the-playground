@@ -1,6 +1,4 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Mic, Users, Briefcase, BookOpen } from "lucide-react";
 
 const AUDIENCES = [
@@ -10,8 +8,8 @@ const AUDIENCES = [
   { key: 4, icon: BookOpen },
 ] as const;
 
-export function AudienceSection() {
-  const t = useTranslations("HomePage");
+export async function AudienceSection() {
+  const t = await getTranslations("HomePage");
 
   return (
     <section className="bg-muted/60 px-4 py-14 md:py-20">

@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { getAppUrl } from "@/lib/app-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Legal");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+  const appUrl = getAppUrl();
   return {
     title: t("privacy.title"),
     description: t("privacy.metaDescription"),

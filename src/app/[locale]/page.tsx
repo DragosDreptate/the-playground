@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
+import { getAppUrl } from "@/lib/app-url";
 import { prisma } from "@/infrastructure/db/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -23,12 +24,14 @@ import { AudienceSection } from "@/components/landing/audience-section";
 import { ComparisonSection } from "@/components/landing/comparison-section";
 import { FaqSection } from "@/components/landing/faq-section";
 
+const FAQ_COUNT = 7;
+
 // Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+  const appUrl = getAppUrl();
   const title = `The Playground — ${t("metaTitle")}`;
   const description = t("metaDescription");
   return {
@@ -62,7 +65,7 @@ export default async function HomePage() {
   // Sauf si navigation interne (clic logo, footer, etc.) détectée via Referer
   if (session?.user?.id) {
     const referer = (await headers()).get("referer");
-    const appHost = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+    const appHost = getAppUrl();
     const isInternalNav = referer?.startsWith(appHost);
 
     if (!isInternalNav) {
@@ -229,7 +232,42 @@ export default async function HomePage() {
         <ComparisonSection isLoggedIn={!!session?.user} />
 
         {/* FAQ — SEO section with JSON-LD FAQPage */}
-        <FaqSection />
+        {(() => {
+          const faqItems = Array.from({ length: FAQ_COUNT }, (_, i) => ({
+            question: t(`faqQ${i + 1}`),
+            answer: (t.raw(`faqA${i + 1}`) as string).replace(/<[^>]+>/g, ""),
+          }));
+          const faqJsonLd = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: { "@type": "Answer", text: item.answer },
+            })),
+          };
+          return (
+            <>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+              />
+              <FaqSection
+                heading={t("faqHeading")}
+                items={faqItems.map((item, i) => ({
+                  question: item.question,
+                  answerRich: t.rich(`faqA${i + 1}`, {
+                    b: (chunks) => (
+                      <strong className="font-semibold text-foreground">
+                        {chunks}
+                      </strong>
+                    ),
+                  }),
+                }))}
+              />
+            </>
+          );
+        })()}
 
         {/* PWA — télécharger l'app (iOS + Android) */}
         <PwaInstallSection />

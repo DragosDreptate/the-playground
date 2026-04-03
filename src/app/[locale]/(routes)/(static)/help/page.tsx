@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { getAppUrl } from "@/lib/app-url";
 import { HelpSidebar } from "@/components/help/help-sidebar";
 import { HelpFaqAccordion } from "@/components/help/help-faq-accordion";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Help");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+  const appUrl = getAppUrl();
   return {
     title: t("meta.title"),
     description: t("meta.description"),

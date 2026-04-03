@@ -1,6 +1,4 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Check, X, Minus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -29,9 +27,19 @@ function StatusIcon({ status }: { status: CellStatus }) {
   );
 }
 
-function Cell({ status, label }: { status: CellStatus; label?: string }) {
+function Cell({
+  status,
+  label,
+  highlight,
+}: {
+  status: CellStatus;
+  label?: string;
+  highlight?: boolean;
+}) {
   return (
-    <td className={`px-4 py-3.5 text-center${status === "check" ? " first-col:bg-primary/[0.03]" : ""}`}>
+    <td
+      className={`px-4 py-3.5 text-center${highlight ? " bg-primary/[0.03]" : ""}`}
+    >
       <div className="flex flex-col items-center gap-1">
         <StatusIcon status={status} />
         {label && (
@@ -42,21 +50,12 @@ function Cell({ status, label }: { status: CellStatus; label?: string }) {
   );
 }
 
-function PlaygroundCell({ label }: { label?: string }) {
-  return (
-    <td className="bg-primary/[0.03] px-4 py-3.5 text-center">
-      <div className="flex flex-col items-center gap-1">
-        <StatusIcon status="check" />
-        {label && (
-          <span className="text-muted-foreground text-[11px]">{label}</span>
-        )}
-      </div>
-    </td>
-  );
-}
-
-export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const t = useTranslations("HomePage");
+export async function ComparisonSection({
+  isLoggedIn,
+}: {
+  isLoggedIn: boolean;
+}) {
+  const t = await getTranslations("HomePage");
 
   const rows: {
     label: string;
@@ -70,7 +69,10 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
       playground: t("comparisonPlaygroundCommunity"),
       meetup: { status: "check", label: t("comparisonMeetupCommunity") },
       luma: { status: "cross", label: t("comparisonLumaCommunity") },
-      eventbrite: { status: "cross", label: t("comparisonEventbriteCommunity") },
+      eventbrite: {
+        status: "cross",
+        label: t("comparisonEventbriteCommunity"),
+      },
     },
     {
       label: t("comparisonRowFree"),
@@ -84,21 +86,30 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
       playground: t("comparisonPlaygroundDesign"),
       meetup: { status: "cross", label: t("comparisonMeetupDesign") },
       luma: { status: "check", label: t("comparisonLumaDesign") },
-      eventbrite: { status: "partial", label: t("comparisonEventbriteDesign") },
+      eventbrite: {
+        status: "partial",
+        label: t("comparisonEventbriteDesign"),
+      },
     },
     {
       label: t("comparisonRowFriction"),
       playground: t("comparisonPlaygroundFriction"),
       meetup: { status: "cross", label: t("comparisonMeetupFriction") },
       luma: { status: "check" },
-      eventbrite: { status: "partial", label: t("comparisonEventbriteFriction") },
+      eventbrite: {
+        status: "partial",
+        label: t("comparisonEventbriteFriction"),
+      },
     },
     {
       label: t("comparisonRowOwnership"),
       playground: t("comparisonPlaygroundOwnership"),
       meetup: { status: "cross", label: t("comparisonMeetupOwnership") },
       luma: { status: "partial", label: t("comparisonLumaOwnership") },
-      eventbrite: { status: "partial", label: t("comparisonEventbriteOwnership") },
+      eventbrite: {
+        status: "partial",
+        label: t("comparisonEventbriteOwnership"),
+      },
     },
     {
       label: t("comparisonRowTicketing"),
@@ -126,7 +137,6 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
           {t("comparisonSubtitle")}
         </p>
 
-        {/* Table wrapper — scroll horizontal sur mobile */}
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full min-w-[600px] border-collapse bg-card text-sm">
             <thead>
@@ -152,17 +162,23 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
                   <td className="px-4 py-3.5 text-[13px] font-semibold">
                     {row.label}
                   </td>
-                  <PlaygroundCell label={row.playground} />
+                  <Cell
+                    status="check"
+                    label={row.playground}
+                    highlight
+                  />
                   <Cell status={row.meetup.status} label={row.meetup.label} />
                   <Cell status={row.luma.status} label={row.luma.label} />
-                  <Cell status={row.eventbrite.status} label={row.eventbrite.label} />
+                  <Cell
+                    status={row.eventbrite.status}
+                    label={row.eventbrite.label}
+                  />
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        {/* SEO text */}
         <p className="text-muted-foreground mx-auto mt-10 max-w-2xl text-center text-[15px] leading-relaxed">
           {t.rich("comparisonText", {
             b: (chunks) => (
@@ -177,7 +193,9 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
             size="lg"
             className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90"
           >
-            <Link href={isLoggedIn ? "/dashboard/circles/new" : "/auth/sign-in"}>
+            <Link
+              href={isLoggedIn ? "/dashboard/circles/new" : "/auth/sign-in"}
+            >
               {t("comparisonCta")}
             </Link>
           </Button>
