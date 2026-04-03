@@ -101,11 +101,12 @@ test.describe("F8 — Lien 'Voir mon profil public' depuis la page profil dashbo
     const viewProfileLink = page.locator("a[href*='/u/']").first();
     await viewProfileLink.click();
 
-    // Attendre la navigation vers /u/[publicId]
+    // Attendre la navigation vers /u/[publicId] et le rendu complet de la page
     await expect(page).toHaveURL(/\/u\//);
+    await page.waitForLoadState("networkidle");
 
     // Le fil d'ariane "C'est votre profil" doit être affiché (profil propre)
-    await expect(page.locator("main")).toContainText(/votre profil|your profile/i);
+    await expect(page.getByText(/votre profil|your profile/i)).toBeVisible();
 
     await context.close();
   });
