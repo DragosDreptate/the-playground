@@ -1046,7 +1046,8 @@
     "ctaDescription": "The Playground est la plateforme 100% gratuite pour créer votre communauté et organiser des événements.",
     "ctaButton": "Commencer",
     "noPosts": "Aucun article pour le moment.",
-    "readMore": "Lire l'article"
+    "readMore": "Lire l'article",
+    "readingTime": "{minutes} min de lecture"
   },
   "Legal": {
     "lastUpdated": "Dernière mise à jour : {date}",

@@ -87,6 +87,11 @@ export async function getPostBySlug(
   return { ...meta, content };
 }
 
+export function estimateReadingTime(content: string): number {
+  const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
 export function formatBlogDate(dateStr: string, locale: string): string {
   const [year, month, day] = dateStr.split("-").map(Number);
   return new Date(year, month - 1, day).toLocaleDateString(

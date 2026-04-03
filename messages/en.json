@@ -1046,7 +1046,8 @@
     "ctaDescription": "The Playground is the 100% free platform to build your community and host events.",
     "ctaButton": "Get started",
     "noPosts": "No articles yet.",
-    "readMore": "Read article"
+    "readMore": "Read article",
+    "readingTime": "{minutes} min read"
   },
   "Legal": {
     "lastUpdated": "Last updated: {date}",

@@ -4,7 +4,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ChevronLeft } from "lucide-react";
 import { getAppUrl } from "@/lib/app-url";
-import { getPostBySlug, getPostSlugs, formatBlogDate } from "@/lib/blog";
+import {
+  getPostBySlug,
+  getPostSlugs,
+  formatBlogDate,
+  estimateReadingTime,
+} from "@/lib/blog";
 import { Button } from "@/components/ui/button";
 
 export async function generateStaticParams() {
@@ -107,13 +112,29 @@ export default async function BlogPostPage({
       </Link>
 
       {/* Article header */}
-      <header className="mt-8 mb-10">
-        <time className="text-sm font-medium text-muted-foreground">
-          {t("publishedOn", { date: formatBlogDate(post.date, locale) })}
-        </time>
-        <h1 className="mt-2 text-4xl font-extrabold tracking-tight leading-tight">
+      <header className="mt-8 mb-10 border-b border-border pb-8">
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <time className="font-medium">
+            {t("publishedOn", { date: formatBlogDate(post.date, locale) })}
+          </time>
+          <span className="text-border">|</span>
+          <span>{t("readingTime", { minutes: estimateReadingTime(post.content) })}</span>
+        </div>
+        <h1 className="mt-3 text-4xl font-extrabold tracking-tight leading-tight">
           {post.title}
         </h1>
+        {post.keywords.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {post.keywords.slice(0, 4).map((keyword) => (
+              <span
+                key={keyword}
+                className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary"
+              >
+                {keyword}
+              </span>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* Article content */}
