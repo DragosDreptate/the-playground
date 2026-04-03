@@ -32,7 +32,7 @@ export default async function BlogPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">
-      <div className="border-b border-border pb-8">
+      <div className="border-l-[3px] border-primary pl-5">
         <h1 className="text-4xl font-extrabold tracking-tight">
           {t("pageTitle")}
         </h1>
