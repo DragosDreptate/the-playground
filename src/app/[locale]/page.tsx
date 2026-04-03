@@ -20,6 +20,7 @@ import {
   Mail,
 } from "lucide-react";
 import { ComparisonSection } from "@/components/landing/comparison-section";
+import { FaqSection } from "@/components/landing/faq-section";
 
 // Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
 export const dynamic = "force-dynamic";
@@ -222,6 +223,9 @@ export default async function HomePage() {
 
         {/* Comparaison — SEO section */}
         <ComparisonSection isLoggedIn={!!session?.user} />
+
+        {/* FAQ — SEO section with JSON-LD FAQPage */}
+        <FaqSection />
 
         {/* PWA — télécharger l'app (iOS + Android) */}
         <PwaInstallSection />

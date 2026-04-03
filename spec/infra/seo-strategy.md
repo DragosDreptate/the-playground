@@ -175,8 +175,8 @@ Il n'est pas possible de servir des images différentes selon la plateforme via 
 
 Chaque réponse = 2-3 phrases avec les mots-clés naturels + JSON-LD `FAQPage` pour les rich snippets.
 
-**Décision** : —
-**Statut** : À faire
+**Décision** : 7 questions (gratuit, vs Meetup, vs Luma, créer communauté, événements payants, export données, hébergement Europe). Composant `FaqSection` avec accordéon (Collapsible) + JSON-LD `FAQPage` pour les rich snippets Google. Q7 axée sur l'aspect européen (hébergement UE, sous-traitants US encadrés par SCC/DPA).
+**Statut** : **Fait**
 
 ### 2.4 Section "Pour qui" sur la homepage
 

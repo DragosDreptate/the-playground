@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Landing — Section Comparaison (mockup SEO 2.2)</title>
+  <title>Landing — Comparaison + FAQ (mockup SEO 2.2 + 2.3)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -100,82 +100,28 @@
       background: var(--muted);
       border-bottom: 1px solid var(--border);
     }
-    .comparison-table thead th:first-child {
-      width: 200px;
-    }
+    .comparison-table thead th:first-child { width: 200px; }
     .comparison-table thead th.highlight {
       background: linear-gradient(135deg, #ec4899, #a855f7);
       color: white;
       text-align: center;
     }
-    .comparison-table thead th:not(:first-child):not(.highlight) {
-      text-align: center;
-    }
+    .comparison-table thead th:not(:first-child):not(.highlight) { text-align: center; }
     .comparison-table tbody td {
       padding: 14px 20px;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
     }
-    .comparison-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .comparison-table tbody td:first-child {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--foreground);
-    }
-    .comparison-table tbody td:not(:first-child) {
-      text-align: center;
-    }
-    .comparison-table tbody td.highlight-col {
-      background: rgba(236, 72, 153, 0.04);
-    }
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+    .comparison-table tbody td:first-child { font-weight: 600; font-size: 13px; color: var(--foreground); }
+    .comparison-table tbody td:not(:first-child) { text-align: center; }
+    .comparison-table tbody td.highlight-col { background: rgba(236, 72, 153, 0.04); }
 
-    /* Check / Cross / Partial */
-    .check {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #10b98120;
-      color: #10b981;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .cross {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #ef444420;
-      color: #ef4444;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .partial {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: #f59e0b20;
-      color: #f59e0b;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .check-label, .cross-label, .partial-label {
-      display: block;
-      font-size: 11px;
-      color: var(--muted-foreground);
-      margin-top: 4px;
-    }
+    .check { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #10b98120; color: #10b981; font-size: 14px; font-weight: 700; }
+    .cross { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #ef444420; color: #ef4444; font-size: 14px; font-weight: 700; }
+    .partial { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #f59e0b20; color: #f59e0b; font-size: 14px; font-weight: 700; }
+    .check-label, .cross-label, .partial-label { display: block; font-size: 11px; color: var(--muted-foreground); margin-top: 4px; }
 
-    /* ── Bottom text (SEO content) ── */
     .comparison-text {
       margin-top: 40px;
       max-width: 700px;
@@ -186,16 +132,9 @@
       color: var(--muted-foreground);
       text-align: center;
     }
-    .comparison-text strong {
-      color: var(--foreground);
-      font-weight: 600;
-    }
+    .comparison-text strong { color: var(--foreground); font-weight: 600; }
 
-    /* ── CTA ── */
-    .cta-wrapper {
-      text-align: center;
-      margin-top: 40px;
-    }
+    .cta-wrapper { text-align: center; margin-top: 40px; }
     .cta-btn {
       display: inline-flex;
       align-items: center;
@@ -213,53 +152,95 @@
     }
     .cta-btn:hover { opacity: 0.9; }
 
+    /* ── FAQ section ── */
+    .faq-section {
+      padding: 96px 16px;
+      background: var(--background);
+    }
+    .faq-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .faq-section h2 {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.5px;
+      margin-bottom: 48px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+    .faq-item:first-child {
+      border-top: 1px solid var(--border);
+    }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+      text-align: left;
+      line-height: 1.4;
+      transition: color 0.15s;
+    }
+    .faq-question:hover { color: var(--primary); }
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-left: 16px;
+      color: var(--muted-foreground);
+      transition: transform 0.2s;
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      display: none;
+      padding: 0 0 20px 0;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted-foreground);
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-answer strong { color: var(--foreground); font-weight: 600; }
+
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .comparison-section { padding: 64px 16px; }
-      .comparison-section h2 { font-size: 26px; }
+      .comparison-section h2, .faq-section h2 { font-size: 26px; }
       .comparison-section .subtitle { font-size: 15px; margin-bottom: 32px; }
+      .faq-section { padding: 64px 16px; }
+      .faq-question { font-size: 15px; }
 
-      /* Scroll horizontal sur mobile */
       .table-wrapper {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         border-radius: var(--radius);
       }
-      .comparison-table {
-        min-width: 600px;
-      }
+      .comparison-table { min-width: 600px; }
     }
   </style>
 </head>
 <body>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Section repliée : Hero (contexte)                   -->
+  <!-- Sections repliées : Hero + Comment ça marche + Piliers -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div class="collapsed-section">
-    <h3>Section Hero</h3>
-    <p>Lancez votre communauté. Organisez vos événements. Animez votre réseau.</p>
+    <h3>Hero + Comment ça marche + 3 piliers</h3>
+    <p>(sections existantes inchangées)</p>
   </div>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Section repliée : Comment ça marche (contexte)      -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="collapsed-section">
-    <h3>Section "Comment ça marche"</h3>
-    <p>3 étapes — Créer, Lancer, Grandir</p>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Section repliée : 3 piliers (contexte)              -->
-  <!-- ═══════════════════════════════════════════════════ -->
-  <div class="collapsed-section" style="border-bottom: none;">
-    <h3>Section "Ce qui rend The Playground différent"</h3>
-    <p>Communauté d'abord · Ownership · 100% gratuit</p>
-  </div>
-
-  <!-- ═══════════════════════════════════════════════════ -->
-  <!-- NOUVELLE SECTION : Comparaison (SEO 2.2)            -->
-  <!-- Position : entre les 3 piliers et le CTA final      -->
+  <!-- SECTION : Comparaison (SEO 2.2) — déjà implémentée  -->
   <!-- ═══════════════════════════════════════════════════ -->
   <section class="comparison-section">
     <div class="comparison-inner">
@@ -284,129 +265,52 @@
           <tbody>
             <tr>
               <td>Communauté persistante</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Membres fidélisés</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-                <span class="check-label">Groupes</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">Événement isolé</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">Événement isolé</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Membres fidélisés</span></td>
+              <td><span class="check">&#10003;</span><span class="check-label">Groupes</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Événement isolé</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Événement isolé</span></td>
             </tr>
             <tr>
               <td>100% gratuit</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Aucun frais</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">Abo organisateur</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Commission</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Freemium limité</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Aucun frais</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Abo organisateur</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Commission</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Freemium limité</span></td>
             </tr>
             <tr>
               <td>Pages événement premium</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Design soigné</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">UX datée</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-                <span class="check-label">Référence UX</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Standard</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Design soigné</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">UX datée</span></td>
+              <td><span class="check">&#10003;</span><span class="check-label">Référence UX</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Standard</span></td>
             </tr>
             <tr>
               <td>Inscription sans friction</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Magic link</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">Compte obligatoire</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Formulaire long</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Magic link</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Compte obligatoire</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Formulaire long</span></td>
             </tr>
             <tr>
               <td>Ownership des données</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Export complet</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-                <span class="cross-label">Lock-in</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Export limité</span>
-              </td>
-              <td>
-                <span class="partial">~</span>
-                <span class="partial-label">Export limité</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Export complet</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Lock-in</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Export limité</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Export limité</span></td>
             </tr>
             <tr>
               <td>Billetterie intégrée</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Via Stripe</span>
-              </td>
-              <td>
-                <span class="cross">&#10005;</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Via Stripe</span></td>
+              <td><span class="cross">&#10005;</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
             </tr>
             <tr>
               <td>Liste d'attente automatique</td>
-              <td class="highlight-col">
-                <span class="check">&#10003;</span>
-                <span class="check-label">Promotion auto</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
-              <td>
-                <span class="check">&#10003;</span>
-              </td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Promotion auto</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
             </tr>
           </tbody>
         </table>
@@ -430,20 +334,106 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Section repliée : CTA final (contexte)              -->
+  <!-- NOUVELLE SECTION : FAQ (SEO 2.3)                     -->
+  <!-- Position : entre la comparaison et PWA/Contact       -->
   <!-- ═══════════════════════════════════════════════════ -->
-  <div class="collapsed-section">
-    <h3>Section CTA final</h3>
-    <p>Prêt à lancer votre communauté ?</p>
-  </div>
+  <section class="faq-section">
+    <div class="faq-inner">
+
+      <h2>Questions fréquentes</h2>
+
+      <!-- Q1 -->
+      <div class="faq-item open">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          The Playground est-il vraiment gratuit ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui, <strong>100% gratuit</strong>. Pas d'abonnement, pas de commission plateforme, pas de limite sur le nombre de communautés, d'événements ou de membres. Si vous organisez des événements payants, seuls les frais Stripe standard s'appliquent (~2,9% + 0,30€ par transaction) — The Playground ne prend aucune marge.
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Quelle est la différence avec Meetup ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          <strong>Meetup</strong> propose un bon modèle communautaire (groupes, membres), mais impose un <strong>abonnement payant aux organisateurs</strong> et offre une expérience datée. The Playground reprend le modèle communautaire de Meetup — avec une <strong>UX moderne</strong> inspirée de Luma, des pages événement premium, et surtout une <strong>gratuité totale</strong> pour les organisateurs.
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Quelle est la différence avec Luma ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          <strong>Luma</strong> excelle sur l'expérience événement (pages belles, inscription fluide), mais chaque événement est une île — <strong>aucune rétention</strong> entre les événements. The Playground ajoute la <strong>couche communautaire</strong> qui manque à Luma : vos participants deviennent automatiquement membres de votre communauté et reviennent pour les prochains événements.
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Comment créer une communauté ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Créez votre communauté en <strong>30 secondes</strong> : un nom, une description, un thème — c'est tout. Votre communauté est immédiatement prête. Vous pouvez ensuite créer des événements, inviter des membres par lien, et personnaliser votre page communauté. Aucune validation, aucune attente.
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Puis-je organiser des événements payants ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui. La billetterie est intégrée via <strong>Stripe Connect</strong>. Vous recevez les paiements directement sur votre compte Stripe — The Playground <strong>ne prend aucune commission</strong>. Seuls les frais de traitement Stripe standard s'appliquent.
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Mes données sont-elles exportables ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui. Vous pouvez <strong>exporter vos membres et vos inscriptions</strong> au format CSV à tout moment. Pas de lock-in, pas de piège. Ce que vous construisez sur The Playground reste à vous.
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          The Playground fonctionne-t-il en dehors de la France ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui. La plateforme est <strong>bilingue français/anglais</strong> et accessible partout. L'hébergement est en Europe (Vercel EU + Neon EU) pour garantir la conformité RGPD. Vous pouvez créer des communautés et organiser des événements dans n'importe quel pays.
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Section repliée : PWA + Contact (contexte)          -->
+  <!-- Section repliée : PWA + Contact + Footer             -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div class="collapsed-section">
     <h3>Sections PWA + Contact + Footer</h3>
     <p>(sections existantes inchangées)</p>
   </div>
+
+  <script>
+    // Par défaut, seule la première question est ouverte.
+    // Cliquer ouvre/ferme chaque question indépendamment.
+  </script>
 
 </body>
 </html>
