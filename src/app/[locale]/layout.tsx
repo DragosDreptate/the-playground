@@ -31,7 +31,7 @@ export async function generateMetadata({
       default: `The Playground — ${t("metaTitle")}`,
       template: "%s — The Playground",
     },
-    description: t("heroSubtitle"),
+    description: t("metaDescription"),
     manifest: "/manifest.json",
     appleWebApp: {
       capable: true,
@@ -49,12 +49,12 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: "The Playground",
-      description: t("heroSubtitle"),
+      description: t("metaDescription"),
       locale: locale === "en" ? "en_US" : "fr_FR",
     },
     twitter: {
       card: "summary_large_image",
-      description: t("heroSubtitle"),
+      description: t("metaDescription"),
     },
   };
 }

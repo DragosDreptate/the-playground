@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
   const title = `The Playground — ${t("metaTitle")}`;
-  const description = t("heroSubtitle");
+  const description = t("metaDescription");
   return {
     title,
     description,

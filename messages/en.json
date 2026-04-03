@@ -8,6 +8,7 @@
     "heroHighlight3": "Engage",
     "heroRest3": "your network.",
     "metaTitle": "Launch your community, organize your events",
+    "metaDescription": "The free platform to build your community and host events. A free alternative to Meetup and Luma, with no fees or subscriptions.",
     "heroSubtitle": "The free platform to build your community and host unforgettable events.",
     "cta": "Launch your community",
     "mockupCircleName": "Product & AI",
@@ -621,7 +622,7 @@
   },
   "Explorer": {
     "title": "Communities & events",
-    "description": "Communities that share your values, events you don't want to miss.",
+    "description": "Discover communities and events near you. Join for free on The Playground, the 100% free community platform.",
     "navLink": "Explore",
     "featured": {
       "eyebrow": "Featured",
@@ -1595,6 +1596,6 @@
   },
   "About": {
     "pageTitle": "About",
-    "pageDescription": "The story of The Playground — why, how, and what's next."
+    "pageDescription": "The Playground is the free community platform for organizing events — an alternative to Meetup and Luma, with no fees or subscriptions."
   }
 }

@@ -141,8 +141,8 @@ Il n'est pas possible de servir des images différentes selon la plateforme via 
 - **Homepage EN** : `"The Playground — the free platform to build your community and host events. A free alternative to Meetup and Luma, with no fees or subscriptions."`
 - **Explorer FR** : `"Découvrez des communautés et événements près de chez vous. Rejoignez gratuitement sur The Playground, la plateforme communautaire 100% gratuite."`
 
-**Décision** : —
-**Statut** : À faire
+**Décision** : séparer `heroSubtitle` (texte visible) et `metaDescription` (meta tag enrichi) pour ne pas polluer le UI avec du texte SEO
+**Statut** : **Fait**
 
 ### 2.2 Section comparaison sur la homepage
 

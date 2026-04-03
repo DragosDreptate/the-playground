@@ -8,6 +8,7 @@
     "heroHighlight3": "Animez",
     "heroRest3": "votre réseau.",
     "metaTitle": "Lancez votre communauté, organisez vos événements",
+    "metaDescription": "La plateforme gratuite pour créer votre communauté et organiser des événements. Alternative à Meetup et Luma, sans commission ni abonnement.",
     "heroSubtitle": "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
     "cta": "Lancez votre communauté",
     "mockupCircleName": "Product & AI",
@@ -621,7 +622,7 @@
   },
   "Explorer": {
     "title": "Communautés & événements",
-    "description": "Des communautés qui partagent vos passions, des événements à ne pas manquer.",
+    "description": "Découvrez des communautés et événements près de chez vous. Rejoignez gratuitement sur The Playground, la plateforme communautaire 100% gratuite.",
     "navLink": "Explorer",
     "featured": {
       "eyebrow": "À la une",
@@ -1595,6 +1596,6 @@
   },
   "About": {
     "pageTitle": "À propos",
-    "pageDescription": "L'histoire de The Playground — pourquoi, comment, et ce qui vient."
+    "pageDescription": "The Playground est la plateforme communautaire gratuite pour organiser des événements — alternative à Meetup et Luma, sans commission ni abonnement."
   }
 }
