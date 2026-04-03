@@ -42,11 +42,14 @@ export async function updateProfileAction(
   }
 
   try {
+    const trimmedFirst = firstName.trim();
+    const trimmedLast = lastName.trim();
     const user = await updateProfile(
       {
         userId: session.user.id,
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
+        firstName: trimmedFirst,
+        lastName: trimmedLast,
+        name: `${trimmedFirst} ${trimmedLast}`,
       },
       { userRepository: prismaUserRepository }
     );

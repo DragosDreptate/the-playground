@@ -15,10 +15,11 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  function handleSelect(mode: "PARTICIPANT" | "ORGANIZER") {
+  function handleSelect(intent: "explore" | "organize") {
     startTransition(async () => {
-      await setDashboardModeAction(mode);
-      if (mode === "ORGANIZER") {
+      // Persiste un mode par défaut pour marquer le welcome comme vu
+      await setDashboardModeAction(intent === "organize" ? "ORGANIZER" : "PARTICIPANT");
+      if (intent === "organize") {
         router.push("/dashboard/circles/new");
       } else {
         router.push("/explorer");
@@ -46,7 +47,7 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
           )}
         </h1>
         <p className="text-muted-foreground">
-          {t("modeChoice.subtitle")}<br />{t("modeChoice.hint")}
+          {t("modeChoice.subtitle")}
         </p>
       </div>
 
@@ -56,11 +57,11 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
         <button
           type="button"
           disabled={isPending}
-          onClick={() => handleSelect("PARTICIPANT")}
+          onClick={() => handleSelect("explore")}
           className="flex flex-col items-center gap-4 rounded-2xl border-2 border-border px-6 py-8 text-center transition-all hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-muted">
-            <Compass className="size-7 text-muted-foreground" />
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/10">
+            <Compass className="size-7 text-primary" />
           </span>
           <div className="space-y-1.5">
             <p className="text-base font-semibold">{t("modeChoice.participant.title")}</p>
@@ -73,11 +74,11 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
         <button
           type="button"
           disabled={isPending}
-          onClick={() => handleSelect("ORGANIZER")}
+          onClick={() => handleSelect("organize")}
           className="flex flex-col items-center gap-4 rounded-2xl border-2 border-border px-6 py-8 text-center transition-all hover:border-primary hover:bg-primary/5 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-muted">
-            <Crown className="size-7 text-muted-foreground" />
+          <span className="flex size-14 items-center justify-center rounded-2xl bg-primary/10">
+            <Crown className="size-7 text-primary" />
           </span>
           <div className="space-y-1.5">
             <p className="text-base font-semibold">{t("modeChoice.organizer.title")}</p>
@@ -88,7 +89,6 @@ export function WelcomeModeChoice({ firstName }: WelcomeModeChoiceProps) {
         </button>
 
       </div>
-
 
     </div>
   );

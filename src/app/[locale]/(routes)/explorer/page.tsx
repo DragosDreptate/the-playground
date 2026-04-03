@@ -121,9 +121,9 @@ export default async function ExplorerPage({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="space-y-3">
+      <div className="border-l-[3px] border-primary pl-5">
         <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground text-base leading-relaxed">{t("description")}</p>
+        <p className="mt-2 text-muted-foreground text-base leading-relaxed">{t("description")}</p>
       </div>
 
       {/* À la une */}

@@ -22,15 +22,13 @@ test.describe("Flux Host — dashboard", () => {
   });
 
   test("should show the create Circle button on the dashboard", async ({ page }) => {
-    // Le bouton "Créer une Communauté" n'apparaît qu'en mode Organisateur sur l'onglet Communautés
-    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
+    await page.goto("/fr/dashboard?tab=circles");
     const createCircleButton = page.locator("a[href*='/circles/new']").first();
     await expect(createCircleButton).toBeVisible();
   });
 
   test("should show the paris-creative-tech Circle on the dashboard", async ({ page }) => {
-    // Les Communautés organisées n'apparaissent qu'en mode Organisateur
-    await page.goto("/fr/dashboard?mode=organizer&tab=circles");
+    await page.goto("/fr/dashboard?tab=circles");
     await expect(page.locator("main").first()).toContainText("Paris Creative Tech");
   });
 });

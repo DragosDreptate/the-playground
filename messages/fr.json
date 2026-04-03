@@ -174,7 +174,7 @@
       "greetingPrefix": "Bienvenue,",
       "greetingSuffix": "Que veux-tu faire ?",
       "greetingAnonymous": "Bienvenue — que veux-tu faire ?",
-      "subtitle": "Choisis ton mode par défaut.",
+      "subtitle": "Par où veux-tu commencer ?",
       "participant": {
         "title": "Je participe",
         "description": "Explorer et rejoindre des événements qui m'inspirent"
@@ -183,12 +183,12 @@
         "title": "J'organise",
         "description": "Créer ma communauté et animer des événements"
       },
-      "hint": "Tu pourras changer de mode à tout moment depuis ton espace."
+      "hint": ""
     }
   },
   "Dashboard": {
     "title": "Mon espace",
-    "myCircles": "Mes Communautés",
+    "myCircles": "Communautés",
     "myCirclesOrganizer": "Mes Communautés",
     "createCircle": "Créer une Communauté",
     "createMoment": "Créer un événement",
@@ -202,18 +202,20 @@
       "title": "Créez d'abord une Communauté",
       "description": "Vous devez créer une Communauté avant de créer un événement."
     },
-    "myMoments": "Mes inscriptions",
+    "myMoments": "Événements",
     "myMomentsOrganizer": "Mes événements",
     "upcomingMoments": "Mes prochains événements",
     "pastMoments": "Passés",
     "showMorePast": "Voir plus",
     "noUpcomingMoments": "Aucun événement à venir.",
     "noMoments": "Aucun événement pour l'instant.",
+    "noMomentsHostOnly": "Aucun événement organisé.",
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
     "noMomentsHintExplore": "Explorer des événements →",
     "noMomentsOrganizer": "Aucun événement organisé pour l'instant.",
     "noMomentsOrganizerHint": "Créez votre premier événement depuis une Communauté.",
     "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
+    "emptyCirclesHostOnly": "Vous n'organisez aucune Communauté.",
     "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
     "emptyCirclesHintExplore": "Explorer des communautés →",
     "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
@@ -262,13 +264,9 @@
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
     "greetingSubtitle": "Vos Communautés et vos prochains événements, au même endroit.",
-    "greetingSubtitleOrganizer": "Gérez vos Communautés et vos événements.",
     "memberCount": "{count} membres",
-    "modeLabel": "Vue",
-    "modeParticipant": "Participant",
-    "modeOrganizer": "Organisateur",
-    "modeBadgeParticipant": "Vue Participant",
-    "modeBadgeOrganizer": "Vue Organisateur"
+    "filterAll": "Tous",
+    "filterHostOnly": "Organisateur"
   },
   "Circle": {
     "create": {
@@ -677,8 +675,8 @@
     "OTHER": "Autre"
   },
   "Explorer": {
-    "title": "Communautés & événements",
-    "description": "Découvrez des communautés et événements près de chez vous. Rejoignez gratuitement sur The Playground, la plateforme communautaire 100% gratuite.",
+    "title": "Explorez les communautés",
+    "description": "Rejoignez des communautés. Participez à des événements.",
     "navLink": "Explorer",
     "featured": {
       "eyebrow": "À la une",
@@ -1456,10 +1454,11 @@
       "mySpace": {
         "title": "Mon espace",
         "intro": "<strong>Mon espace</strong> est votre tableau de bord personnel. Vous y retrouvez :",
-        "item1": "Vos <strong>prochains événements</strong> (ceux auxquels vous êtes inscrit)",
+        "item1": "Vos <strong>prochains événements</strong> — ceux auxquels vous êtes inscrit et ceux que vous organisez (y compris les brouillons)",
         "item2": "Vos <strong>événements passés</strong>",
-        "item3": "Les <strong>Communautés</strong> dont vous êtes membre",
-        "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications) — avec un lien vers votre profil public, visible par les autres membres"
+        "item3": "Les <strong>Communautés</strong> dont vous êtes membre ou Organisateur",
+        "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications) — avec un lien vers votre profil public, visible par les autres membres",
+        "item5": "Un filtre <strong>Organisateur</strong> (visible si vous organisez au moins une Communauté) pour afficher uniquement vos événements et Communautés organisés"
       },
       "notifications": {
         "title": "Gérer ses notifications",

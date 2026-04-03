@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Filter Options — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0e1a;
+    --fg: #e8e6f0;
+    --card: #1e1b2e;
+    --card-border: #2e2b42;
+    --muted-fg: #8b87a0;
+    --primary: #e8457a;
+    --primary-10: rgba(232, 69, 122, 0.1);
+    --primary-40: rgba(232, 69, 122, 0.4);
+    --border: #2e2b42;
+    --radius: 0.5rem;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  /* ─── Section label ─── */
+  .option-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-10);
+    border: 1px solid var(--primary-40);
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin-bottom: 28px;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 56px 0;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    border-left: 3px solid var(--primary);
+    padding-left: 20px;
+    margin-bottom: 32px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .header p {
+    margin-top: 8px;
+    font-size: 15px;
+    color: var(--muted-fg);
+    line-height: 1.5;
+  }
+
+  /* ─── Controls bar ─── */
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 4px;
+  }
+  .tab {
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+    color: var(--muted-fg);
+  }
+  .tab.active {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .tab:not(.active):hover {
+    color: var(--fg);
+  }
+
+  .spacer { flex: 1; }
+
+  /* ─── CTA Button ─── */
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .cta svg { width: 14px; height: 14px; }
+
+  /* ─── Option 1: Chip toggle ─── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .chip.inactive {
+    border: 1px solid var(--border);
+    color: var(--muted-fg);
+  }
+  .chip.inactive:hover {
+    border-color: var(--primary-40);
+    color: var(--fg);
+  }
+  .chip.active {
+    border: 1px solid var(--primary-40);
+    background: var(--primary-10);
+    color: var(--primary);
+  }
+  .chip svg { width: 12px; height: 12px; }
+
+  /* ─── Option 2: Dropdown ─── */
+  .dropdown {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px 6px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    white-space: nowrap;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .dropdown svg { width: 14px; height: 14px; color: var(--muted-fg); }
+
+  /* ─── Timeline ─── */
+  .timeline { margin-top: 4px; }
+  .timeline-item {
+    display: flex;
+    gap: 0;
+  }
+
+  .tl-date {
+    width: 80px;
+    flex-shrink: 0;
+    padding-right: 8px;
+    padding-top: 4px;
+    text-align: right;
+  }
+  .tl-date .day {
+    font-size: 11px;
+    color: var(--muted-fg);
+  }
+  .tl-date .date {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .tl-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .tl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  .tl-connector {
+    width: 1px;
+    flex: 1;
+    border-left: 1px dashed var(--border);
+    margin-top: 8px;
+  }
+
+  .tl-card {
+    flex: 1;
+    min-width: 0;
+    padding-left: 12px;
+    padding-bottom: 24px;
+  }
+  .tl-card-inner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--card);
+    transition: border-color 0.15s;
+  }
+  .tl-card-inner:hover {
+    border-color: var(--primary-40);
+  }
+
+  .tl-content { flex: 1; min-width: 0; }
+  .tl-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .tl-time {
+    font-size: 12px;
+    color: var(--muted-fg);
+    flex-shrink: 0;
+  }
+  .tl-pill {
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: var(--muted-fg);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tl-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .tl-location {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted-fg);
+    margin-bottom: 6px;
+  }
+  .tl-location svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+  .tl-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .avatar-stack {
+    display: flex;
+    align-items: center;
+  }
+  .avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .avatar + .avatar { margin-left: -6px; }
+  .avatar.a1 { background: linear-gradient(135deg, #e8457a, #9333ea); }
+  .avatar.a2 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .avatar.a3 { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+  .tl-count {
+    font-size: 12px;
+    color: var(--muted-fg);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--primary-40);
+    color: var(--primary);
+  }
+  .badge svg { width: 12px; height: 12px; }
+
+  .badge-registered {
+    border-color: var(--primary-40);
+    color: var(--primary);
+  }
+
+  .cover {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+  .cover-gradient {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  }
+  .cover-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #e8457a, #9333ea);
+  }
+
+  .draft-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--primary-40);
+    color: var(--primary);
+    background: rgba(0,0,0,0.6);
+  }
+
+  /* Crown SVG inline */
+  .crown-icon { display: inline-flex; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 1 — Chip toggle inline                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+  <div class="option-label">Option 1 — Chip toggle inline (inactif)</div>
+
+  <div class="header">
+    <h1>Bonjour, Dragos</h1>
+    <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+  </div>
+
+  <div class="controls">
+    <div class="tabs">
+      <span class="tab active">Mes événements</span>
+      <span class="tab">Mes Communautés</span>
+    </div>
+
+    <!-- Chip: inactive state -->
+    <a class="chip inactive" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg>
+      Organisateur uniquement
+    </a>
+
+    <span class="spacer"></span>
+
+    <a class="cta" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Créer un événement
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-left:2px"><path d="m6 9 6 6 6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline">
+    <!-- Item 1 -->
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">sam.</div><div class="date">4 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">00:00</span>
+              <span class="draft-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+                Brouillon
+              </span>
+              <span class="tl-pill">Test Stripe</span>
+            </div>
+            <div class="tl-title">test brouillon</div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div></div>
+              <span class="tl-count">1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-gradient"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 2 -->
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">mar.</div><div class="date">14 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">19:00</span>
+              <span class="tl-pill">Benext Alumni</span>
+            </div>
+            <div class="tl-title">#benews de printemps</div>
+            <div class="tl-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              La Grosse Caisse
+            </div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div><div class="avatar a2">Q</div><div class="avatar a3">J</div></div>
+              <span class="tl-count">+1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-placeholder"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item 3 — participant only -->
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">jeu.</div><div class="date">7 mai 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">18:30</span>
+              <span class="tl-pill">Design & Produit Lyon</span>
+            </div>
+            <div class="tl-title">Product Roadmap — Comment prioriser sans se pe...</div>
+            <div class="tl-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              Le Village by CA Auvergne-Rhône-Alpes
+            </div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a3">J</div><div class="avatar a2">L</div><div class="avatar a1">O</div></div>
+              <span class="tl-count">+3 inscrit(s)</span>
+              <span class="badge badge-registered"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Inscrit</span>
+            </div>
+          </div>
+          <div class="cover-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <hr class="section-divider">
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 1 bis — Chip toggle inline (ACTIF)                          -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+  <div class="option-label">Option 1 — Chip toggle inline (actif)</div>
+
+  <div class="header">
+    <h1>Bonjour, Dragos</h1>
+    <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+  </div>
+
+  <div class="controls">
+    <div class="tabs">
+      <span class="tab active">Mes événements</span>
+      <span class="tab">Mes Communautés</span>
+    </div>
+
+    <!-- Chip: active state -->
+    <a class="chip active" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg>
+      Organisateur uniquement
+    </a>
+
+    <span class="spacer"></span>
+
+    <a class="cta" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Créer un événement
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-left:2px"><path d="m6 9 6 6 6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Timeline — filtered (only organizer events) -->
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">sam.</div><div class="date">4 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">00:00</span>
+              <span class="draft-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+                Brouillon
+              </span>
+              <span class="tl-pill">Test Stripe</span>
+            </div>
+            <div class="tl-title">test brouillon</div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div></div>
+              <span class="tl-count">1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-gradient"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">mar.</div><div class="date">14 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">19:00</span>
+              <span class="tl-pill">Benext Alumni</span>
+            </div>
+            <div class="tl-title">#benews de printemps</div>
+            <div class="tl-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              La Grosse Caisse
+            </div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div><div class="avatar a2">Q</div><div class="avatar a3">J</div></div>
+              <span class="tl-count">+1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-placeholder"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Note: "Product Roadmap" filtered out — not an organizer event -->
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <hr class="section-divider">
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- OPTION 2 — Dropdown filter                                         -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+
+  <div class="option-label">Option 2 — Dropdown filter</div>
+
+  <div class="header">
+    <h1>Bonjour, Dragos</h1>
+    <p>Vos Communautés et vos prochains événements, au même endroit.</p>
+  </div>
+
+  <div class="controls">
+    <div class="tabs">
+      <span class="tab active">Mes événements</span>
+      <span class="tab">Mes Communautés</span>
+    </div>
+
+    <!-- Dropdown -->
+    <button class="dropdown">
+      Tous
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+
+    <span class="spacer"></span>
+
+    <a class="cta" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Créer un événement
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;margin-left:2px"><path d="m6 9 6 6 6-6"/></svg>
+    </a>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">sam.</div><div class="date">4 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">00:00</span>
+              <span class="draft-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:11px;height:11px"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg>
+                Brouillon
+              </span>
+              <span class="tl-pill">Test Stripe</span>
+            </div>
+            <div class="tl-title">test brouillon</div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div></div>
+              <span class="tl-count">1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-gradient"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">mar.</div><div class="date">14 avr. 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">19:00</span>
+              <span class="tl-pill">Benext Alumni</span>
+            </div>
+            <div class="tl-title">#benews de printemps</div>
+            <div class="tl-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              La Grosse Caisse
+            </div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a1">D</div><div class="avatar a2">Q</div><div class="avatar a3">J</div></div>
+              <span class="tl-count">+1 inscrit(s)</span>
+              <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5.865 17 4 22h16l-1.865-5"/></svg> Organisateur</span>
+            </div>
+          </div>
+          <div class="cover-placeholder"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="tl-date"><div class="day">jeu.</div><div class="date">7 mai 2026</div></div>
+      <div class="tl-line"><div class="tl-dot"></div></div>
+      <div class="tl-card">
+        <div class="tl-card-inner">
+          <div class="tl-content">
+            <div class="tl-meta">
+              <span class="tl-time">18:30</span>
+              <span class="tl-pill">Design & Produit Lyon</span>
+            </div>
+            <div class="tl-title">Product Roadmap — Comment prioriser sans se pe...</div>
+            <div class="tl-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              Le Village by CA Auvergne-Rhône-Alpes
+            </div>
+            <div class="tl-footer">
+              <div class="avatar-stack"><div class="avatar a3">J</div><div class="avatar a2">L</div><div class="avatar a1">O</div></div>
+              <span class="tl-count">+3 inscrit(s)</span>
+              <span class="badge badge-registered"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Inscrit</span>
+            </div>
+          </div>
+          <div class="cover-placeholder" style="background: linear-gradient(135deg, #3b82f6, #06b6d4)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

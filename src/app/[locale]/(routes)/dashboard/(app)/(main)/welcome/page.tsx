@@ -42,7 +42,9 @@ export default async function WelcomePage() {
     redirect("/dashboard");
   }
 
-  const firstName = session.user.name?.split(" ")[0] ?? null;
+  // Lire firstName depuis la DB (session.user.name peut être null avec magic link)
+  const dbUser = await prismaUserRepository.findById(userId);
+  const firstName = dbUser?.firstName ?? session.user.name?.split(" ")[0] ?? null;
 
   return (
     <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center">

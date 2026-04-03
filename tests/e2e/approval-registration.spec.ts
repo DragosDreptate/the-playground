@@ -448,7 +448,7 @@ test.describe("Dashboard participant — pending states", () => {
     await playerPage.waitForLoadState("networkidle");
 
     // Click on communities tab and wait for content to load
-    const circlesTab = playerPage.getByText(/mes communautés|my communities/i);
+    const circlesTab = playerPage.locator("a").filter({ hasText: /communautés|communities/i }).first();
     await circlesTab.click();
     await playerPage.waitForTimeout(1000);
 
