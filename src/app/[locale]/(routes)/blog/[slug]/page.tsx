@@ -149,7 +149,7 @@ export default async function BlogPostPage({
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           {t("ctaDescription")}
         </p>
-        <Button asChild size="lg" className="mt-5">
+        <Button asChild size="lg" className="mt-5 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 text-white hover:opacity-90">
           <Link href="/">{t("ctaButton")}</Link>
         </Button>
       </aside>
