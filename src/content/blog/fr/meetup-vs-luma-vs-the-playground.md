@@ -1,7 +1,7 @@
 ---
 title: "Meetup vs Luma vs The Playground — comparatif 2026"
 description: "Comparatif détaillé des plateformes communautaires : fonctionnalités, prix, UX. Quelle alternative gratuite à Meetup et Luma ?"
-date: "2026-04-15"
+date: "2026-03-05"
 keywords:
   - alternative meetup
   - alternative luma
