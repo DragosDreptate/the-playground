@@ -113,16 +113,15 @@ export default async function BlogPostPage({
 
       {/* Article header */}
       <header className="mt-8 mb-10 border-b border-border pb-8">
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <time className="font-medium">
-            {t("publishedOn", { date: formatBlogDate(post.date, locale) })}
-          </time>
-          <span className="text-border">|</span>
-          <span>{t("readingTime", { minutes: estimateReadingTime(post.content) })}</span>
-        </div>
+        <time className="text-sm font-medium text-muted-foreground">
+          {t("publishedOn", { date: formatBlogDate(post.date, locale) })}
+        </time>
         <h1 className="mt-3 text-4xl font-extrabold tracking-tight leading-tight">
           {post.title}
         </h1>
+        <span className="mt-2 block text-sm text-muted-foreground">
+          {t("readingTime", { minutes: estimateReadingTime(post.content) })}
+        </span>
         {post.keywords.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {post.keywords.slice(0, 4).map((keyword) => (
