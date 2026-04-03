@@ -124,3 +124,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Blog blockquote styling */
+.prose blockquote {
+  border-left: 3px solid var(--primary);
+  background: var(--muted);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.25rem;
+  font-style: normal;
+}
