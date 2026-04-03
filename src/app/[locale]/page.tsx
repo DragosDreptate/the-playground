@@ -223,21 +223,6 @@ export default async function HomePage() {
         {/* Comparaison — SEO section */}
         <ComparisonSection isLoggedIn={!!session?.user} />
 
-        {/* CTA final */}
-        <section className="px-4 py-24 md:py-32">
-          <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-              {t("ctaFinalTitle")}
-            </h2>
-            <p className="text-muted-foreground mt-4 text-lg">
-              {t("ctaFinalSubtitle")}
-            </p>
-            <Button asChild size="lg" className="mt-8 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
-              <Link href={session?.user ? "/dashboard/circles/new" : "/auth/sign-in"}>{t("ctaFinal")}</Link>
-            </Button>
-          </div>
-        </section>
-
         {/* PWA — télécharger l'app (iOS + Android) */}
         <PwaInstallSection />
 
