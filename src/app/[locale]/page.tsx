@@ -126,7 +126,7 @@ export default async function HomePage() {
         </section>
 
         {/* Comment ça marche */}
-        <section id="how-it-works" className="bg-muted/60 px-4 pt-16 pb-24 md:pt-20 md:pb-32">
+        <section id="how-it-works" className="bg-muted/60 px-4 py-14 md:py-20">
           <div className="mx-auto max-w-3xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("howItWorks")}
@@ -182,7 +182,7 @@ export default async function HomePage() {
         </section>
 
         {/* 3 piliers */}
-        <section className="px-4 py-24 md:py-32">
+        <section className="px-4 py-14 md:py-20">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("pillarsHeading")}
@@ -235,7 +235,7 @@ export default async function HomePage() {
         <PwaInstallSection />
 
         {/* Contact */}
-        <section className="bg-muted/60 px-4 py-16">
+        <section className="bg-muted/60 px-4 py-14">
           <div className="mx-auto flex max-w-lg flex-col items-center text-center">
             <h2 className="text-xl font-bold tracking-tight">
               {t("contactTitle")}

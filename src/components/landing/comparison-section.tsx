@@ -117,7 +117,7 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
   ];
 
   return (
-    <section className="px-4 py-24 md:py-32">
+    <section className="px-4 py-14 md:py-20">
       <div className="mx-auto max-w-[900px]">
         <h2 className="mb-3 text-center text-3xl font-bold tracking-tight md:text-4xl">
           {t("comparisonHeading")}
