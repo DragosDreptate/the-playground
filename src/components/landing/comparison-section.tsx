@@ -164,7 +164,11 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
 
         {/* SEO text */}
         <p className="text-muted-foreground mx-auto mt-10 max-w-2xl text-center text-[15px] leading-relaxed">
-          {t("comparisonText")}
+          {t.rich("comparisonText", {
+            b: (chunks) => (
+              <strong className="text-foreground font-semibold">{chunks}</strong>
+            ),
+          })}
         </p>
 
         <div className="mt-10 flex justify-center">
