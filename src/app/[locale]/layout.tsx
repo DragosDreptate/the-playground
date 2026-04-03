@@ -76,7 +76,7 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://the-playground.fr";
 
   const websiteJsonLd = {
     "@context": "https://schema.org",
