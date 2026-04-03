@@ -171,18 +171,11 @@ export function ComparisonSection({ isLoggedIn }: { isLoggedIn: boolean }) {
           })}
         </p>
 
-        {/* Closing CTA */}
-        <div className="mt-16 flex flex-col items-center text-center">
-          <h3 className="text-2xl font-bold tracking-tight md:text-3xl">
-            {t("ctaFinalTitle")}
-          </h3>
-          <p className="text-muted-foreground mt-3 text-lg">
-            {t("ctaFinalSubtitle")}
-          </p>
+        <div className="mt-10 flex justify-center">
           <Button
             asChild
             size="lg"
-            className="mt-8 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90"
+            className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90"
           >
             <Link href={isLoggedIn ? "/dashboard/circles/new" : "/auth/sign-in"}>
               {t("comparisonCta")}
