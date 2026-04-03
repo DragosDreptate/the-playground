@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Landing — Comparaison + FAQ (mockup SEO 2.2 + 2.3)</title>
+  <title>Landing — Pour qui + Comparaison + FAQ (mockup SEO 2.2 + 2.3 + 2.4)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -53,6 +53,72 @@
       opacity: 0.6;
     }
 
+    /* ── Section heading (shared) ── */
+    .section-heading {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.5px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Pour qui section ── */
+    .audience-section {
+      padding: 96px 16px;
+      background: var(--background);
+    }
+    .audience-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .audience-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+    .audience-card:hover {
+      border-color: rgba(232, 69, 122, 0.3);
+    }
+    .audience-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+    }
+    .audience-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .audience-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .audience-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted-foreground);
+    }
+
     /* ── Comparison section ── */
     .comparison-section {
       padding: 96px 16px;
@@ -63,10 +129,6 @@
       margin: 0 auto;
     }
     .comparison-section h2 {
-      font-size: 32px;
-      font-weight: 800;
-      text-align: center;
-      letter-spacing: -0.5px;
       margin-bottom: 12px;
     }
     .comparison-section .subtitle {
@@ -154,27 +216,16 @@
 
     /* ── FAQ section ── */
     .faq-section {
-      padding: 96px 16px;
+      padding: 96px 16px 48px;
       background: var(--background);
     }
     .faq-inner {
       max-width: 700px;
       margin: 0 auto;
     }
-    .faq-section h2 {
-      font-size: 32px;
-      font-weight: 800;
-      text-align: center;
-      letter-spacing: -0.5px;
-      margin-bottom: 48px;
-    }
 
-    .faq-item {
-      border-bottom: 1px solid var(--border);
-    }
-    .faq-item:first-child {
-      border-top: 1px solid var(--border);
-    }
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
     .faq-question {
       display: flex;
       align-items: center;
@@ -214,10 +265,12 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
+      .section-heading { font-size: 26px; margin-bottom: 32px; }
+      .audience-section { padding: 64px 16px; }
+      .audience-grid { grid-template-columns: 1fr; }
       .comparison-section { padding: 64px 16px; }
-      .comparison-section h2, .faq-section h2 { font-size: 26px; }
       .comparison-section .subtitle { font-size: 15px; margin-bottom: 32px; }
-      .faq-section { padding: 64px 16px; }
+      .faq-section { padding: 64px 16px 32px; }
       .faq-question { font-size: 15px; }
 
       .table-wrapper {
@@ -232,12 +285,79 @@
 <body>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- Sections repliées : Hero + Comment ça marche + Piliers -->
+  <!-- Sections repliées : Hero + Comment ça marche         -->
   <!-- ═══════════════════════════════════════════════════ -->
   <div class="collapsed-section">
-    <h3>Hero + Comment ça marche + 3 piliers</h3>
+    <h3>Hero + Comment ça marche</h3>
     <p>(sections existantes inchangées)</p>
   </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : 3 piliers                          -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section" style="border-bottom: none;">
+    <h3>Section "Ce qui rend The Playground différent"</h3>
+    <p>Communauté d'abord · Ownership · 100% gratuit</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- NOUVELLE SECTION : Pour qui (SEO 2.4)                -->
+  <!-- Position : entre les 3 piliers et la comparaison     -->
+  <!-- Fond blanc (même que piliers, section distincte)      -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="audience-section">
+    <div class="audience-inner">
+      <h2 class="section-heading">Pour qui est The Playground ?</h2>
+
+      <div class="audience-grid">
+
+        <!-- Card 1 : Meetups tech & design -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M16 18l2-2-4-4 4-4-2-2-6 6z"/><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <h3>Meetups tech & design</h3>
+            <p>Vous organisez des meetups, des conférences ou des ateliers dans la tech, le design ou le produit.</p>
+          </div>
+        </div>
+
+        <!-- Card 2 : Associations & clubs -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h3>Associations & clubs</h3>
+            <p>Vous animez un club sportif, une association culturelle ou un réseau d'entraide locale.</p>
+          </div>
+        </div>
+
+        <!-- Card 3 : Communautés professionnelles -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div>
+            <h3>Communautés professionnelles</h3>
+            <p>Vous fédérez un réseau de freelances, d'entrepreneurs ou de professionnels autour d'un métier.</p>
+          </div>
+        </div>
+
+        <!-- Card 4 : Ateliers & formations -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div>
+            <h3>Ateliers & formations</h3>
+            <p>Vous créez des ateliers, des formations ou des événements récurrents et cherchez à fidéliser vos participants.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
   <!-- ═══════════════════════════════════════════════════ -->
   <!-- SECTION : Comparaison (SEO 2.2) — déjà implémentée  -->
@@ -245,7 +365,7 @@
   <section class="comparison-section">
     <div class="comparison-inner">
 
-      <h2>Pourquoi choisir The Playground ?</h2>
+      <h2 class="section-heading" style="margin-bottom: 12px;">Pourquoi choisir The Playground ?</h2>
       <p class="subtitle">
         Il existe plusieurs plateformes pour organiser des événements. Aucune ne combine
         communauté persistante, expérience premium et gratuité totale.
@@ -334,15 +454,13 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════ -->
-  <!-- NOUVELLE SECTION : FAQ (SEO 2.3)                     -->
-  <!-- Position : entre la comparaison et PWA/Contact       -->
+  <!-- SECTION : FAQ (SEO 2.3) — déjà implémentée          -->
   <!-- ═══════════════════════════════════════════════════ -->
   <section class="faq-section">
     <div class="faq-inner">
 
-      <h2>Questions fréquentes</h2>
+      <h2 class="section-heading">Questions fréquentes</h2>
 
-      <!-- Q1 -->
       <div class="faq-item open">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           The Playground est-il vraiment gratuit ?
@@ -353,7 +471,6 @@
         </div>
       </div>
 
-      <!-- Q2 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           Quelle est la différence avec Meetup ?
@@ -364,7 +481,6 @@
         </div>
       </div>
 
-      <!-- Q3 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           Quelle est la différence avec Luma ?
@@ -375,7 +491,6 @@
         </div>
       </div>
 
-      <!-- Q4 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           Comment créer une communauté ?
@@ -386,7 +501,6 @@
         </div>
       </div>
 
-      <!-- Q5 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           Puis-je organiser des événements payants ?
@@ -397,7 +511,6 @@
         </div>
       </div>
 
-      <!-- Q6 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
           Mes données sont-elles exportables ?
@@ -408,14 +521,13 @@
         </div>
       </div>
 
-      <!-- Q7 -->
       <div class="faq-item">
         <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
-          The Playground fonctionne-t-il en dehors de la France ?
+          Mes données restent-elles en Europe ?
           <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div class="faq-answer">
-          Oui. La plateforme est <strong>bilingue français/anglais</strong> et accessible partout. L'hébergement est en Europe (Vercel EU + Neon EU) pour garantir la conformité RGPD. Vous pouvez créer des communautés et organiser des événements dans n'importe quel pays.
+          Les données principales — base de données, hébergement applicatif, analytics, monitoring — sont <strong>hébergées en Union européenne</strong> (Allemagne). Certains sous-traitants (emails, paiements, IA) opèrent aux États-Unis avec des <strong>clauses contractuelles types UE</strong> et des DPA en place. Aucune donnée n'est vendue ni partagée à des fins publicitaires.
         </div>
       </div>
 
@@ -429,11 +541,6 @@
     <h3>Sections PWA + Contact + Footer</h3>
     <p>(sections existantes inchangées)</p>
   </div>
-
-  <script>
-    // Par défaut, seule la première question est ouverte.
-    // Cliquer ouvre/ferme chaque question indépendamment.
-  </script>
 
 </body>
 </html>

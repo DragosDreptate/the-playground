@@ -19,6 +19,7 @@ import {
   Gift,
   Mail,
 } from "lucide-react";
+import { AudienceSection } from "@/components/landing/audience-section";
 import { ComparisonSection } from "@/components/landing/comparison-section";
 import { FaqSection } from "@/components/landing/faq-section";
 
@@ -220,6 +221,9 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* Pour qui — SEO section */}
+        <AudienceSection />
 
         {/* Comparaison — SEO section */}
         <ComparisonSection isLoggedIn={!!session?.user} />

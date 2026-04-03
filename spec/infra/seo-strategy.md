@@ -191,8 +191,8 @@ Chaque réponse = 2-3 phrases avec les mots-clés naturels + JSON-LD `FAQPage` p
 
 ~150 mots de texte riche.
 
-**Décision** : —
-**Statut** : À faire
+**Décision** : 4 profils (Meetups & conférences, Associations & clubs, Communautés professionnelles, Ateliers & formations). Composant `AudienceSection` avec grille 2x2 sur desktop, 1 colonne sur mobile. Placé entre piliers et comparaison. Inversion des backgrounds comparaison/FAQ pour maintenir l'alternance.
+**Statut** : **Fait**
 
 ---
 
