@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Calendar, Clock } from "lucide-react";
 import { getAppUrl } from "@/lib/app-url";
 import {
   getPostBySlug,
@@ -113,13 +113,15 @@ export default async function BlogPostPage({
 
       {/* Article header */}
       <header className="mt-8 mb-10 border-b border-border pb-8">
-        <time className="text-sm font-medium text-muted-foreground">
+        <time className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+          <Calendar className="size-3.5" />
           {t("publishedOn", { date: formatBlogDate(post.date, locale) })}
         </time>
         <h1 className="mt-3 text-4xl font-extrabold tracking-tight leading-tight">
           {post.title}
         </h1>
-        <span className="mt-2 block text-sm text-muted-foreground">
+        <span className="mt-2 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Clock className="size-3.5" />
           {t("readingTime", { minutes: estimateReadingTime(post.content) })}
         </span>
         {post.keywords.length > 0 && (
