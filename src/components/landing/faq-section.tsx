@@ -17,7 +17,8 @@ export function FaqSection() {
 
   const items = Array.from({ length: FAQ_COUNT }, (_, i) => ({
     question: t(`faqQ${i + 1}`),
-    answer: t(`faqA${i + 1}`),
+    // Strip <b> tags for JSON-LD plain text
+    answer: t.raw(`faqA${i + 1}`) as string,
   }));
 
   const faqJsonLd = {
