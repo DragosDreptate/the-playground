@@ -128,7 +128,7 @@ export default async function BlogPostPage({
             {post.keywords.slice(0, 4).map((keyword) => (
               <span
                 key={keyword}
-                className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary"
+                className="rounded-full border border-border bg-muted/50 px-3 py-0.5 text-xs font-medium text-muted-foreground"
               >
                 {keyword}
               </span>
