@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/infrastructure/db/prisma";
+import { getAppUrl } from "@/lib/app-url";
 
 function withAlternates(
   baseUrl: string,
@@ -24,7 +25,7 @@ function withAlternates(
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const baseUrl = getAppUrl();
   const now = new Date();
 
   // Static pages
@@ -40,11 +41,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     withAlternates(baseUrl, "legal/cgu", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
   ];
 
-  // Public circles
-  const circles = await prisma.circle.findMany({
-    where: { visibility: "PUBLIC" },
-    select: { slug: true, updatedAt: true },
+  // Exclude circles owned by test/demo users
+  const testDemoMemberships = await prisma.circleMembership.findMany({
+    where: {
+      role: "HOST",
+      user: {
+        OR: [
+          { email: { endsWith: "@test.playground" } },
+          { email: { endsWith: "@demo.playground" } },
+        ],
+      },
+    },
+    select: { circleId: true },
   });
+  const excludeCircleIds = testDemoMemberships.map((m) => m.circleId);
+
+  // Public circles + published/past moments (excluding test/demo), in parallel
+  const [circles, moments] = await Promise.all([
+    prisma.circle.findMany({
+      where: {
+        visibility: "PUBLIC",
+        id: { notIn: excludeCircleIds },
+      },
+      select: { slug: true, updatedAt: true },
+    }),
+    prisma.moment.findMany({
+      where: {
+        status: { in: ["PUBLISHED", "PAST"] },
+        circleId: { notIn: excludeCircleIds },
+      },
+      select: { slug: true, updatedAt: true },
+    }),
+  ]);
 
   const circlePages: MetadataRoute.Sitemap = circles.map((circle) =>
     withAlternates(baseUrl, `circles/${circle.slug}`, {
@@ -53,12 +81,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }),
   );
-
-  // Published + past moments (CANCELLED excluded — they return 404)
-  const moments = await prisma.moment.findMany({
-    where: { status: { in: ["PUBLISHED", "PAST"] } },
-    select: { slug: true, updatedAt: true },
-  });
 
   const momentPages: MetadataRoute.Sitemap = moments.map((moment) =>
     withAlternates(baseUrl, `m/${moment.slug}`, {

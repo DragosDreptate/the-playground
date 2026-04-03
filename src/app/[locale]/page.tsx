@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
+import { getAppUrl } from "@/lib/app-url";
 import { prisma } from "@/infrastructure/db/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -19,33 +20,39 @@ import {
   Gift,
   Mail,
 } from "lucide-react";
+import { AudienceSection } from "@/components/landing/audience-section";
+import { ComparisonSection } from "@/components/landing/comparison-section";
+import { FaqSection } from "@/components/landing/faq-section";
+
+const FAQ_COUNT = 7;
 
 // Pas de revalidate statique — la page redirige dynamiquement les utilisateurs connectés
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("HomePage");
-  const description = t("heroSubtitle");
+  const appUrl = getAppUrl();
+  const title = `The Playground — ${t("metaTitle")}`;
+  const description = t("metaDescription");
   return {
-    title: "The Playground — Lancez votre communauté, organisez vos événements",
+    title,
     description,
+    alternates: {
+      canonical: appUrl,
+      languages: {
+        fr: appUrl,
+        en: `${appUrl}/en`,
+      },
+    },
     openGraph: {
-      title: "The Playground — Lancez votre communauté, organisez vos événements",
+      title,
       description,
       siteName: "The Playground",
-      images: [
-        {
-          url: "/hero-phone.png",
-          width: 1241,
-          height: 1453,
-          alt: "The Playground — application mobile",
-        },
-      ],
+      url: appUrl,
     },
     twitter: {
-      title: "The Playground — Lancez votre communauté, organisez vos événements",
+      title,
       description,
-      images: ["/hero-phone.png"],
     },
   };
 }
@@ -58,7 +65,7 @@ export default async function HomePage() {
   // Sauf si navigation interne (clic logo, footer, etc.) détectée via Referer
   if (session?.user?.id) {
     const referer = (await headers()).get("referer");
-    const appHost = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
+    const appHost = getAppUrl();
     const isInternalNav = referer?.startsWith(appHost);
 
     if (!isInternalNav) {
@@ -69,24 +76,8 @@ export default async function HomePage() {
     }
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.the-playground.fr";
-
   return (
     <div className="flex min-h-screen flex-col overflow-x-clip">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: "The Playground",
-            url: appUrl,
-            description:
-              "La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.",
-            image: `${appUrl}/hero-phone.png`,
-          }),
-        }}
-      />
       <PwaRedirect isLoggedIn={!!session?.user?.id} />
       <SiteHeader />
 
@@ -138,7 +129,7 @@ export default async function HomePage() {
         </section>
 
         {/* Comment ça marche */}
-        <section id="how-it-works" className="bg-muted/60 px-4 pt-16 pb-24 md:pt-20 md:pb-32">
+        <section id="how-it-works" className="bg-muted/60 px-4 py-14 md:py-20">
           <div className="mx-auto max-w-3xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("howItWorks")}
@@ -194,7 +185,7 @@ export default async function HomePage() {
         </section>
 
         {/* 3 piliers */}
-        <section className="px-4 py-24 md:py-32">
+        <section className="px-4 py-14 md:py-20">
           <div className="mx-auto max-w-5xl">
             <h2 className="mb-16 text-center text-3xl font-bold tracking-tight md:text-4xl">
               {t("pillarsHeading")}
@@ -234,26 +225,55 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* CTA final */}
-        <section className="bg-muted/60 px-4 py-24 md:py-32">
-          <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-              {t("ctaFinalTitle")}
-            </h2>
-            <p className="text-muted-foreground mt-4 text-lg">
-              {t("ctaFinalSubtitle")}
-            </p>
-            <Button asChild size="lg" className="mt-8 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
-              <Link href={session?.user ? "/dashboard/circles/new" : "/auth/sign-in"}>{t("ctaFinal")}</Link>
-            </Button>
-          </div>
-        </section>
+        {/* Pour qui — SEO section */}
+        <AudienceSection />
+
+        {/* Comparaison — SEO section */}
+        <ComparisonSection isLoggedIn={!!session?.user} />
+
+        {/* FAQ — SEO section with JSON-LD FAQPage */}
+        {(() => {
+          const faqItems = Array.from({ length: FAQ_COUNT }, (_, i) => ({
+            question: t(`faqQ${i + 1}`),
+            answer: (t.raw(`faqA${i + 1}`) as string).replace(/<[^>]+>/g, ""),
+          }));
+          const faqJsonLd = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: { "@type": "Answer", text: item.answer },
+            })),
+          };
+          return (
+            <>
+              <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+              />
+              <FaqSection
+                heading={t("faqHeading")}
+                items={faqItems.map((item, i) => ({
+                  question: item.question,
+                  answerRich: t.rich(`faqA${i + 1}`, {
+                    b: (chunks) => (
+                      <strong className="font-semibold text-foreground">
+                        {chunks}
+                      </strong>
+                    ),
+                  }),
+                }))}
+              />
+            </>
+          );
+        })()}
 
         {/* PWA — télécharger l'app (iOS + Android) */}
         <PwaInstallSection />
 
         {/* Contact */}
-        <section className="bg-muted/60 px-4 py-16">
+        <section className="bg-muted/60 px-4 py-14">
           <div className="mx-auto flex max-w-lg flex-col items-center text-center">
             <h2 className="text-xl font-bold tracking-tight">
               {t("contactTitle")}

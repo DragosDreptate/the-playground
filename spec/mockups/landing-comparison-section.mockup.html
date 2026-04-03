@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Landing — Pour qui + Comparaison + FAQ (mockup SEO 2.2 + 2.3 + 2.4)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #e8457a;
+      --primary-foreground: #ffffff;
+      --background: #ffffff;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f5f5fa;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.75rem;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Collapsed sections (context only) ── */
+    .collapsed-section {
+      background: var(--muted);
+      padding: 48px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .collapsed-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted-foreground);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .collapsed-section p {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      margin-top: 4px;
+      opacity: 0.6;
+    }
+
+    /* ── Section heading (shared) ── */
+    .section-heading {
+      font-size: 32px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.5px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Pour qui section ── */
+    .audience-section {
+      padding: 96px 16px;
+      background: var(--background);
+    }
+    .audience-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .audience-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .audience-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      transition: border-color 0.15s;
+    }
+    .audience-card:hover {
+      border-color: rgba(232, 69, 122, 0.3);
+    }
+    .audience-icon {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+    }
+    .audience-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .audience-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .audience-card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted-foreground);
+    }
+
+    /* ── Comparison section ── */
+    .comparison-section {
+      padding: 96px 16px;
+      background: var(--muted);
+    }
+    .comparison-inner {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .comparison-section h2 {
+      margin-bottom: 12px;
+    }
+    .comparison-section .subtitle {
+      text-align: center;
+      color: var(--muted-foreground);
+      font-size: 17px;
+      line-height: 1.6;
+      max-width: 600px;
+      margin: 0 auto 48px;
+    }
+
+    /* ── Table ── */
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 14px;
+    }
+    .comparison-table thead th {
+      padding: 16px 20px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted-foreground);
+      background: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .comparison-table thead th:first-child { width: 200px; }
+    .comparison-table thead th.highlight {
+      background: linear-gradient(135deg, #ec4899, #a855f7);
+      color: white;
+      text-align: center;
+    }
+    .comparison-table thead th:not(:first-child):not(.highlight) { text-align: center; }
+    .comparison-table tbody td {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+    .comparison-table tbody td:first-child { font-weight: 600; font-size: 13px; color: var(--foreground); }
+    .comparison-table tbody td:not(:first-child) { text-align: center; }
+    .comparison-table tbody td.highlight-col { background: rgba(236, 72, 153, 0.04); }
+
+    .check { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #10b98120; color: #10b981; font-size: 14px; font-weight: 700; }
+    .cross { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #ef444420; color: #ef4444; font-size: 14px; font-weight: 700; }
+    .partial { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #f59e0b20; color: #f59e0b; font-size: 14px; font-weight: 700; }
+    .check-label, .cross-label, .partial-label { display: block; font-size: 11px; color: var(--muted-foreground); margin-top: 4px; }
+
+    .comparison-text {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--muted-foreground);
+      text-align: center;
+    }
+    .comparison-text strong { color: var(--foreground); font-weight: 600; }
+
+    .cta-wrapper { text-align: center; margin-top: 40px; }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(135deg, #ec4899, #d946ef, #a855f7);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+    .cta-btn:hover { opacity: 0.9; }
+
+    /* ── FAQ section ── */
+    .faq-section {
+      padding: 96px 16px 48px;
+      background: var(--background);
+    }
+    .faq-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .faq-item { border-bottom: 1px solid var(--border); }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+      text-align: left;
+      line-height: 1.4;
+      transition: color 0.15s;
+    }
+    .faq-question:hover { color: var(--primary); }
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-left: 16px;
+      color: var(--muted-foreground);
+      transition: transform 0.2s;
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); }
+    .faq-answer {
+      display: none;
+      padding: 0 0 20px 0;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--muted-foreground);
+    }
+    .faq-item.open .faq-answer { display: block; }
+    .faq-answer strong { color: var(--foreground); font-weight: 600; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .section-heading { font-size: 26px; margin-bottom: 32px; }
+      .audience-section { padding: 64px 16px; }
+      .audience-grid { grid-template-columns: 1fr; }
+      .comparison-section { padding: 64px 16px; }
+      .comparison-section .subtitle { font-size: 15px; margin-bottom: 32px; }
+      .faq-section { padding: 64px 16px 32px; }
+      .faq-question { font-size: 15px; }
+
+      .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: var(--radius);
+      }
+      .comparison-table { min-width: 600px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Sections repliées : Hero + Comment ça marche         -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Hero + Comment ça marche</h3>
+    <p>(sections existantes inchangées)</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : 3 piliers                          -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section" style="border-bottom: none;">
+    <h3>Section "Ce qui rend The Playground différent"</h3>
+    <p>Communauté d'abord · Ownership · 100% gratuit</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- NOUVELLE SECTION : Pour qui (SEO 2.4)                -->
+  <!-- Position : entre les 3 piliers et la comparaison     -->
+  <!-- Fond blanc (même que piliers, section distincte)      -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="audience-section">
+    <div class="audience-inner">
+      <h2 class="section-heading">Pour qui est The Playground ?</h2>
+
+      <div class="audience-grid">
+
+        <!-- Card 1 : Meetups tech & design -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M16 18l2-2-4-4 4-4-2-2-6 6z"/><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <div>
+            <h3>Meetups tech & design</h3>
+            <p>Vous organisez des meetups, des conférences ou des ateliers dans la tech, le design ou le produit.</p>
+          </div>
+        </div>
+
+        <!-- Card 2 : Associations & clubs -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h3>Associations & clubs</h3>
+            <p>Vous animez un club sportif, une association culturelle ou un réseau d'entraide locale.</p>
+          </div>
+        </div>
+
+        <!-- Card 3 : Communautés professionnelles -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div>
+            <h3>Communautés professionnelles</h3>
+            <p>Vous fédérez un réseau de freelances, d'entrepreneurs ou de professionnels autour d'un métier.</p>
+          </div>
+        </div>
+
+        <!-- Card 4 : Ateliers & formations -->
+        <div class="audience-card">
+          <div class="audience-icon">
+            <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          </div>
+          <div>
+            <h3>Ateliers & formations</h3>
+            <p>Vous créez des ateliers, des formations ou des événements récurrents et cherchez à fidéliser vos participants.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SECTION : Comparaison (SEO 2.2) — déjà implémentée  -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="comparison-section">
+    <div class="comparison-inner">
+
+      <h2 class="section-heading" style="margin-bottom: 12px;">Pourquoi choisir The Playground ?</h2>
+      <p class="subtitle">
+        Il existe plusieurs plateformes pour organiser des événements. Aucune ne combine
+        communauté persistante, expérience premium et gratuité totale.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="highlight">The Playground</th>
+              <th>Meetup</th>
+              <th>Luma</th>
+              <th>Eventbrite</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Communauté persistante</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Membres fidélisés</span></td>
+              <td><span class="check">&#10003;</span><span class="check-label">Groupes</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Événement isolé</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Événement isolé</span></td>
+            </tr>
+            <tr>
+              <td>100% gratuit</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Aucun frais</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Abo organisateur</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Commission</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Freemium limité</span></td>
+            </tr>
+            <tr>
+              <td>Pages événement premium</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Design soigné</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">UX datée</span></td>
+              <td><span class="check">&#10003;</span><span class="check-label">Référence UX</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Standard</span></td>
+            </tr>
+            <tr>
+              <td>Inscription sans friction</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Magic link</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Compte obligatoire</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Formulaire long</span></td>
+            </tr>
+            <tr>
+              <td>Ownership des données</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Export complet</span></td>
+              <td><span class="cross">&#10005;</span><span class="cross-label">Lock-in</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Export limité</span></td>
+              <td><span class="partial">~</span><span class="partial-label">Export limité</span></td>
+            </tr>
+            <tr>
+              <td>Billetterie intégrée</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Via Stripe</span></td>
+              <td><span class="cross">&#10005;</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>Liste d'attente automatique</td>
+              <td class="highlight-col"><span class="check">&#10003;</span><span class="check-label">Promotion auto</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
+              <td><span class="check">&#10003;</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="comparison-text">
+        <strong>The Playground</strong> est la plateforme gratuite pour les organisateurs
+        de communautés qui veulent plus qu'un simple outil d'événements. Contrairement à
+        <strong>Meetup</strong> (abonnement organisateur obligatoire) ou <strong>Luma</strong>
+        (événements isolés, aucune rétention), The Playground combine une
+        <strong>communauté persistante</strong>, des <strong>pages événement premium</strong>
+        et une <strong>gratuité totale</strong> — sans commission plateforme, sans abonnement,
+        sans limite artificielle.
+      </p>
+
+      <div class="cta-wrapper">
+        <a href="#" class="cta-btn">Commencer gratuitement</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- SECTION : FAQ (SEO 2.3) — déjà implémentée          -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <section class="faq-section">
+    <div class="faq-inner">
+
+      <h2 class="section-heading">Questions fréquentes</h2>
+
+      <div class="faq-item open">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          The Playground est-il vraiment gratuit ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui, <strong>100% gratuit</strong>. Pas d'abonnement, pas de commission plateforme, pas de limite sur le nombre de communautés, d'événements ou de membres. Si vous organisez des événements payants, seuls les frais Stripe standard s'appliquent (~2,9% + 0,30€ par transaction) — The Playground ne prend aucune marge.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Quelle est la différence avec Meetup ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          <strong>Meetup</strong> propose un bon modèle communautaire (groupes, membres), mais impose un <strong>abonnement payant aux organisateurs</strong> et offre une expérience datée. The Playground reprend le modèle communautaire de Meetup — avec une <strong>UX moderne</strong> inspirée de Luma, des pages événement premium, et surtout une <strong>gratuité totale</strong> pour les organisateurs.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Quelle est la différence avec Luma ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          <strong>Luma</strong> excelle sur l'expérience événement (pages belles, inscription fluide), mais chaque événement est une île — <strong>aucune rétention</strong> entre les événements. The Playground ajoute la <strong>couche communautaire</strong> qui manque à Luma : vos participants deviennent automatiquement membres de votre communauté et reviennent pour les prochains événements.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Comment créer une communauté ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Créez votre communauté en <strong>30 secondes</strong> : un nom, une description, un thème — c'est tout. Votre communauté est immédiatement prête. Vous pouvez ensuite créer des événements, inviter des membres par lien, et personnaliser votre page communauté. Aucune validation, aucune attente.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Puis-je organiser des événements payants ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui. La billetterie est intégrée via <strong>Stripe Connect</strong>. Vous recevez les paiements directement sur votre compte Stripe — The Playground <strong>ne prend aucune commission</strong>. Seuls les frais de traitement Stripe standard s'appliquent.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Mes données sont-elles exportables ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Oui. Vous pouvez <strong>exporter vos membres et vos inscriptions</strong> au format CSV à tout moment. Pas de lock-in, pas de piège. Ce que vous construisez sur The Playground reste à vous.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          Mes données restent-elles en Europe ?
+          <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="faq-answer">
+          Les données principales — base de données, hébergement applicatif, analytics, monitoring — sont <strong>hébergées en Union européenne</strong> (Allemagne). Certains sous-traitants (emails, paiements, IA) opèrent aux États-Unis avec des <strong>clauses contractuelles types UE</strong> et des DPA en place. Aucune donnée n'est vendue ni partagée à des fins publicitaires.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- Section repliée : PWA + Contact + Footer             -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="collapsed-section">
+    <h3>Sections PWA + Contact + Footer</h3>
+    <p>(sections existantes inchangées)</p>
+  </div>
+
+</body>
+</html>

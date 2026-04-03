@@ -1,11 +1,20 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
+import { getAppUrl } from "@/lib/app-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Legal");
+  const appUrl = getAppUrl();
   return {
     title: t("privacy.title"),
     description: t("privacy.metaDescription"),
+    alternates: {
+      canonical: `${appUrl}/legal/confidentialite`,
+      languages: {
+        fr: `${appUrl}/legal/confidentialite`,
+        en: `${appUrl}/en/legal/confidentialite`,
+      },
+    },
   };
 }
 
