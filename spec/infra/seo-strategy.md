@@ -239,7 +239,7 @@ Chaque réponse = 2-3 phrases avec les mots-clés naturels + JSON-LD `FAQPage` p
 - Surveiller les erreurs de crawl
 
 **Décision** : —
-**Statut** : À vérifier
+**Statut** : **Fait**
 
 ---
 

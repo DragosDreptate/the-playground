@@ -31,6 +31,9 @@ export async function SiteFooter() {
           <Link href="/help" className="hover:text-foreground transition-colors">
             {t("product.help")}
           </Link>
+          <Link href="/blog" className="hover:text-foreground transition-colors">
+            {t("product.blog")}
+          </Link>
           <Link href="/contact" className="hover:text-foreground transition-colors">
             {t("product.contact")}
           </Link>

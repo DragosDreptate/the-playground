@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/infrastructure/db/prisma";
 import { getAppUrl } from "@/lib/app-url";
+import { getAllPosts } from "@/lib/blog";
 
 function withAlternates(
   baseUrl: string,
@@ -90,5 +91,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }),
   );
 
-  return [...staticPages, ...circlePages, ...momentPages];
+  // Blog posts
+  const blogPosts = getAllPosts("fr");
+  const blogPages: MetadataRoute.Sitemap = [
+    withAlternates(baseUrl, "blog", { lastModified: now, changeFrequency: "weekly", priority: 0.5 }),
+    ...blogPosts.map((post) =>
+      withAlternates(baseUrl, `blog/${post.slug}`, {
+        lastModified: new Date(post.date),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }),
+    ),
+  ];
+
+  return [...staticPages, ...blogPages, ...circlePages, ...momentPages];
 }

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog Article — The Playground (Mockup)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Design tokens (dark mode) ── */
+    :root {
+      --background: oklch(0.1649 0.0352 281.8285);
+      --foreground: oklch(0.9513 0.0074 260.7315);
+      --card: oklch(0.2542 0.0611 281.1423);
+      --primary: oklch(0.6726 0.2904 341.4084);
+      --primary-foreground: oklch(1 0 0);
+      --muted: oklch(0.2123 0.0522 280.9917);
+      --muted-foreground: oklch(0.6245 0.05 278.1046);
+      --border: oklch(0.3279 0.0832 280.789);
+      --radius: 0.5rem;
+    }
+
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border-color: var(--border); }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ── Layout ── */
+    .page { display: flex; flex-direction: column; min-height: 100vh; }
+    .container { max-width: 64rem; margin: 0 auto; padding: 0 1rem; width: 100%; }
+    .container-narrow { max-width: 42rem; margin: 0 auto; padding: 0 1rem; width: 100%; }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 50;
+      border-bottom: 1px solid oklch(0.3279 0.0832 280.789 / 0.4);
+      background: oklch(0.1649 0.0352 281.8285 / 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .header-inner {
+      max-width: 64rem; margin: 0 auto; padding: 0 1rem;
+      display: flex; align-items: center; height: 3.5rem;
+    }
+    .logo { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .logo-icon {
+      width: 24px; height: 24px; border-radius: 5px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-text { font-size: 15px; font-weight: 800; letter-spacing: -0.4px; }
+    .logo-text .accent { color: var(--primary); }
+    .header-nav {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+    }
+    .header-nav a {
+      font-size: 14px; font-weight: 500; color: var(--muted-foreground);
+      transition: color 0.15s;
+    }
+    .header-nav a:hover { color: var(--foreground); }
+    .header-nav .nav-icon { width: 16px; height: 16px; margin-right: 6px; vertical-align: -2px; opacity: 0.7; }
+    .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .btn-ghost {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 2rem; padding: 0 0.75rem; border-radius: 6px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      background: transparent; border: none; color: var(--foreground);
+      transition: background 0.15s;
+    }
+    .btn-ghost:hover { background: oklch(0.8903 0.1739 171.269 / 0.15); }
+    .icon-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 2rem; height: 2rem; border-radius: 6px;
+      background: transparent; border: none; color: var(--muted-foreground);
+      cursor: pointer; transition: background 0.15s, color 0.15s;
+    }
+    .icon-btn:hover { background: oklch(0.8903 0.1739 171.269 / 0.15); color: var(--foreground); }
+
+    /* ── Blog article ── */
+    .blog-main { flex: 1; padding: 3rem 0; }
+
+    .blog-back {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      font-size: 14px; font-weight: 500; color: var(--muted-foreground);
+      transition: color 0.15s; margin-bottom: 2rem;
+    }
+    .blog-back:hover { color: var(--foreground); }
+    .blog-back svg { width: 16px; height: 16px; }
+
+    .blog-header { margin-bottom: 2.5rem; }
+    .blog-date {
+      font-size: 14px; color: var(--muted-foreground); font-weight: 500;
+      margin-bottom: 0.75rem; display: block;
+    }
+    .blog-title {
+      font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em;
+      line-height: 1.2; color: var(--foreground);
+    }
+
+    /* ── Prose (article content) ── */
+    .prose { color: oklch(0.85 0.01 260); line-height: 1.75; font-size: 1.0625rem; }
+    .prose h2 {
+      font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em;
+      color: var(--foreground); margin-top: 2.5rem; margin-bottom: 1rem;
+    }
+    .prose h3 {
+      font-size: 1.25rem; font-weight: 600;
+      color: var(--foreground); margin-top: 2rem; margin-bottom: 0.75rem;
+    }
+    .prose p { margin-bottom: 1.25rem; }
+    .prose a { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+    .prose a:hover { opacity: 0.8; }
+    .prose strong { color: var(--foreground); font-weight: 600; }
+    .prose ul, .prose ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+    .prose li { margin-bottom: 0.5rem; }
+    .prose ul li { list-style-type: disc; }
+    .prose ol li { list-style-type: decimal; }
+    .prose li::marker { color: var(--muted-foreground); }
+    .prose blockquote {
+      border-left: 3px solid var(--primary);
+      padding: 0.75rem 1rem; margin: 1.5rem 0;
+      background: oklch(0.2123 0.0522 280.9917 / 0.5);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-style: italic; color: oklch(0.8 0.015 260);
+    }
+    .prose blockquote p { margin-bottom: 0; }
+    .prose hr {
+      border: none; border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    .prose table {
+      width: 100%; border-collapse: collapse; margin: 1.5rem 0;
+      font-size: 0.9375rem;
+    }
+    .prose th {
+      text-align: left; font-weight: 600; color: var(--foreground);
+      padding: 0.625rem 0.75rem; border-bottom: 2px solid var(--border);
+    }
+    .prose td {
+      padding: 0.625rem 0.75rem; border-bottom: 1px solid oklch(0.3279 0.0832 280.789 / 0.5);
+    }
+    .prose .check { color: oklch(0.72 0.19 155); }
+    .prose .cross { color: oklch(0.65 0.2 15); opacity: 0.6; }
+    .prose .partial { color: oklch(0.8 0.15 85); }
+
+    /* ── CTA block ── */
+    .cta-block {
+      margin-top: 3rem; padding: 2rem;
+      background: var(--muted);
+      border-radius: calc(var(--radius) + 4px);
+      text-align: center;
+    }
+    .cta-title {
+      font-size: 1.25rem; font-weight: 700; color: var(--foreground);
+      margin-bottom: 0.5rem;
+    }
+    .cta-description {
+      font-size: 0.9375rem; color: var(--muted-foreground);
+      margin-bottom: 1.25rem; max-width: 28rem; margin-left: auto; margin-right: auto;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 2.5rem; padding: 0 1.5rem; border-radius: 6px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      background: var(--primary); color: var(--primary-foreground);
+      border: none; transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+
+    /* ── Footer ── */
+    .footer { border-top: 1px solid oklch(0.3279 0.0832 280.789 / 0.4); }
+    .footer-inner {
+      max-width: 64rem; margin: 0 auto; padding: 0.75rem 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-left { display: flex; align-items: center; gap: 0.5rem; }
+    .footer-logo { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .footer-logo-icon {
+      width: 20px; height: 20px; border-radius: 4px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .footer-logo-text { font-size: 13px; font-weight: 800; letter-spacing: -0.4px; }
+    .footer-copyright { font-size: 12px; color: var(--muted-foreground); }
+    .footer-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+    .footer-nav a {
+      font-size: 12px; color: var(--muted-foreground); transition: color 0.15s;
+    }
+    .footer-nav a:hover { color: var(--foreground); }
+
+    /* ── Separator ── */
+    .sep { color: var(--muted-foreground); opacity: 0.4; margin: 0 0.125rem; }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ════════════ HEADER ════════════ -->
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="logo">
+          <div class="logo-icon">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><polygon points="0,0 0,12 10,6" fill="white" /></svg>
+          </div>
+          <span class="logo-text">the&#8201;<span class="accent">playground</span></span>
+        </a>
+
+        <nav class="header-nav">
+          <a href="/explorer">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Discover
+          </a>
+          <a href="/dashboard">
+            <svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>Dashboard
+          </a>
+        </nav>
+
+        <div class="header-actions">
+          <button class="icon-btn" title="Langue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          </button>
+          <button class="icon-btn" title="Theme">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          </button>
+          <button class="btn-ghost">Se connecter</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════ ARTICLE ════════════ -->
+    <div class="blog-main">
+      <div class="container-narrow">
+
+        <!-- Back link -->
+        <a href="/blog" class="blog-back">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          Retour au blog
+        </a>
+
+        <!-- Article header -->
+        <div class="blog-header">
+          <time class="blog-date">15 avril 2026</time>
+          <h1 class="blog-title">Meetup vs Luma vs The Playground&nbsp;&mdash; comparatif 2026</h1>
+        </div>
+
+        <!-- Article content (prose) -->
+        <article class="prose">
+
+          <p>Vous cherchez une plateforme pour organiser vos événements et fédérer votre communauté ? Le choix entre Meetup, Luma et les alternatives gratuites peut sembler compliqué. Ce comparatif détaille les forces et faiblesses de chaque plateforme pour vous aider à choisir.</p>
+
+          <h2>Le paysage en 2026</h2>
+
+          <p>Organiser des événements communautaires n'a jamais été aussi accessible. Mais toutes les plateformes ne se valent pas. <strong>Certaines sont centrées sur l'événement</strong> (vous créez un event, des gens viennent, puis repartent), d'autres sur <strong>la communauté</strong> (les gens rejoignent un groupe et reviennent naturellement).</p>
+
+          <p>Cette distinction est fondamentale : elle détermine si vos participants reviendront ou si vous repartirez de zéro à chaque événement.</p>
+
+          <h2>Comparatif détaillé</h2>
+
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>The Playground</th>
+                <th>Meetup</th>
+                <th>Luma</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Communauté persistante</strong></td>
+                <td><span class="check">&#10003;</span></td>
+                <td><span class="check">&#10003;</span></td>
+                <td><span class="cross">&#10007;</span></td>
+              </tr>
+              <tr>
+                <td><strong>100% gratuit</strong></td>
+                <td><span class="check">&#10003;</span></td>
+                <td><span class="cross">&#10007;</span> abo organisateur</td>
+                <td><span class="partial">~</span> commission</td>
+              </tr>
+              <tr>
+                <td><strong>Page événement premium</strong></td>
+                <td><span class="check">&#10003;</span></td>
+                <td><span class="cross">&#10007;</span> design daté</td>
+                <td><span class="check">&#10003;</span></td>
+              </tr>
+              <tr>
+                <td><strong>Inscription sans friction</strong></td>
+                <td><span class="check">&#10003;</span></td>
+                <td><span class="cross">&#10007;</span> compte obligatoire</td>
+                <td><span class="check">&#10003;</span></td>
+              </tr>
+              <tr>
+                <td><strong>Export des données</strong></td>
+                <td><span class="check">&#10003;</span> CSV complet</td>
+                <td><span class="partial">~</span> limité</td>
+                <td><span class="partial">~</span> limité</td>
+              </tr>
+              <tr>
+                <td><strong>Hébergement Europe</strong></td>
+                <td><span class="check">&#10003;</span> UE</td>
+                <td><span class="cross">&#10007;</span> US</td>
+                <td><span class="cross">&#10007;</span> US</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>Meetup : le pionnier communautaire</h2>
+
+          <p>Meetup a inventé le concept de groupe local en ligne. Son modèle communautaire est solide : vous créez un groupe, les gens le rejoignent, et ils sont notifiés des prochains événements. C'est exactement le bon modèle.</p>
+
+          <p>Le problème ? <strong>Meetup facture les organisateurs</strong> (à partir de 15$/mois) et son interface n'a pas évolué depuis des années. L'inscription nécessite un compte complet, ce qui freine la conversion.</p>
+
+          <h2>Luma : l'expérience premium</h2>
+
+          <p>Luma a révolutionné la page événement. Design soigné, inscription en un clic, intégration calendrier impeccable. C'est devenu le standard pour les événements tech et créatifs.</p>
+
+          <p>Mais Luma est <strong>event-centric, pas community-centric</strong>. Il n'y a pas de notion de groupe persistant. Chaque événement est isolé. Vos participants ne "rejoignent" rien — ils s'inscrivent à un event ponctuel, et c'est fini.</p>
+
+          <blockquote>
+            <p>Avec Luma, vous repartez de zéro à chaque événement. Pas de rétention, pas de communauté qui grandit dans le temps.</p>
+          </blockquote>
+
+          <h2>The Playground : le meilleur des deux mondes</h2>
+
+          <p>The Playground combine le <strong>modèle communautaire de Meetup</strong> avec <strong>l'expérience premium de Luma</strong>, le tout <strong>100% gratuit</strong> :</p>
+
+          <ul>
+            <li><strong>Communauté persistante</strong> — vos participants rejoignent votre communauté, pas juste un événement</li>
+            <li><strong>Pages événement premium</strong> — design soigné, inscription sans friction, social proof</li>
+            <li><strong>Zéro commission</strong> — seuls les frais Stripe sur les événements payants</li>
+            <li><strong>Export complet</strong> — vos données vous appartiennent (CSV, membres, historique)</li>
+            <li><strong>Hébergé en Europe</strong> — conformité RGPD native</li>
+          </ul>
+
+          <h3>Le parcours qui change tout</h3>
+
+          <p>Sur The Playground, quand quelqu'un s'inscrit à votre événement, il devient automatiquement membre de votre communauté. Après l'événement, il voit les prochains rendez-vous, les autres membres, l'identité de votre groupe. Il revient naturellement.</p>
+
+          <hr />
+
+          <h2>Verdict</h2>
+
+          <p>Si vous cherchez uniquement à créer une belle page pour un événement ponctuel, Luma fait le travail. Si vous voulez <strong>construire une communauté qui grandit dans le temps</strong>, sans payer d'abonnement et avec une expérience moderne, <a href="https://the-playground.fr">The Playground</a> est la meilleure option en 2026.</p>
+
+        </article>
+
+        <!-- CTA block -->
+        <aside class="cta-block">
+          <h3 class="cta-title">Lancez votre communaut&eacute; gratuitement</h3>
+          <p class="cta-description">The Playground est la plateforme 100% gratuite pour cr&eacute;er votre communaut&eacute; et organiser des &eacute;v&eacute;nements.</p>
+          <a href="/" class="btn-primary">Commencer</a>
+        </aside>
+
+      </div>
+    </div>
+
+    <!-- ════════════ FOOTER ════════════ -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <a href="/" class="footer-logo">
+            <div class="footer-logo-icon">
+              <svg width="8" height="10" viewBox="0 0 10 12" fill="none"><polygon points="0,0 0,12 10,6" fill="white" /></svg>
+            </div>
+            <span class="footer-logo-text">the&#8201;<span class="accent" style="color: var(--primary)">playground</span></span>
+          </a>
+          <span class="footer-copyright">&copy; 2026 &middot; v2.4.0</span>
+        </div>
+        <nav class="footer-nav">
+          <a href="/about">&Agrave; propos</a>
+          <a href="/help">Aide</a>
+          <a href="/blog" style="color: var(--foreground); font-weight: 500;">Blog</a>
+          <a href="/contact">Contact</a>
+          <a href="/changelog">Changelog</a>
+          <a href="/legal/mentions-legales">Mentions l&eacute;gales</a>
+          <a href="/legal/confidentialite">Confidentialit&eacute;</a>
+          <a href="/legal/cgu">CGU</a>
+        </nav>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

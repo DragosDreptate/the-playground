@@ -1027,6 +1027,7 @@
       "about": "À propos",
       "changelog": "Changelog",
       "help": "Aide",
+      "blog": "Blog",
       "contact": "Contact"
     },
     "legal": {
@@ -1035,6 +1036,16 @@
       "privacy": "Confidentialité",
       "terms": "CGU"
     }
+  },
+  "Blog": {
+    "pageTitle": "Blog",
+    "pageDescription": "Guides, comparatifs et ressources pour créer et animer votre communauté.",
+    "backToList": "Retour au blog",
+    "publishedOn": "Publié le {date}",
+    "ctaTitle": "Lancez votre communauté gratuitement",
+    "ctaDescription": "The Playground est la plateforme 100% gratuite pour créer votre communauté et organiser des événements.",
+    "ctaButton": "Commencer",
+    "noPosts": "Aucun article pour le moment."
   },
   "Legal": {
     "lastUpdated": "Dernière mise à jour : {date}",
