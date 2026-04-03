@@ -1027,6 +1027,7 @@
       "about": "About",
       "changelog": "Changelog",
       "help": "Help",
+      "blog": "Blog",
       "contact": "Contact"
     },
     "legal": {
@@ -1035,6 +1036,18 @@
       "privacy": "Privacy policy",
       "terms": "Terms of use"
     }
+  },
+  "Blog": {
+    "pageTitle": "Blog",
+    "pageDescription": "Guides, comparisons and resources to build and grow your community.",
+    "backToList": "Back to blog",
+    "publishedOn": "Published on {date}",
+    "ctaTitle": "Launch your community for free",
+    "ctaDescription": "The Playground is the 100% free platform to build your community and host events.",
+    "ctaButton": "Get started",
+    "noPosts": "No articles yet.",
+    "readMore": "Read article",
+    "readingTime": "{minutes} min read"
   },
   "Legal": {
     "lastUpdated": "Last updated: {date}",
