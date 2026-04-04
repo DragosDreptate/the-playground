@@ -43,8 +43,8 @@ export async function addCommentAction(
     const locale = await getLocale();
     const t = await getTranslations("Email");
 
-    // Fire-and-forget: notify all registrants without blocking the response (sauf si admin)
-    if (!isAdminUser(session)) sendCommentNotifications(
+    // Fire-and-forget: notify all registrants without blocking the response
+    sendCommentNotifications(
       momentId,
       session.user.id,
       content,
