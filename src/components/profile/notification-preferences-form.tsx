@@ -122,7 +122,7 @@ export function NotificationPreferencesForm({
         </div>
       </div>
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} className="w-full">
         {isPending ? tCommon("loading") : tCommon("save")}
       </Button>
     </form>

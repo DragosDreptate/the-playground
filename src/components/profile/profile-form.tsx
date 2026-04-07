@@ -198,28 +198,17 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
         </>
       )}
 
-      <div className="flex gap-3">
-        <Button
-          type="submit"
-          disabled={isPending}
-          className={mode === "setup" ? "w-full" : undefined}
-        >
-          {isPending
-            ? tCommon("loading")
-            : mode === "setup"
-              ? t("form.continue")
-              : tCommon("save")}
-        </Button>
-        {mode === "edit" && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
-            {tCommon("cancel")}
-          </Button>
-        )}
-      </div>
+      <Button
+        type="submit"
+        disabled={isPending}
+        className="w-full"
+      >
+        {isPending
+          ? tCommon("loading")
+          : mode === "setup"
+            ? t("form.continue")
+            : tCommon("save")}
+      </Button>
     </form>
   );
 }
