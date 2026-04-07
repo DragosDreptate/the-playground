@@ -70,6 +70,12 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
         </div>
       )}
 
+      {mode === "edit" && (
+        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          {t("edit.personalInfo")}
+        </p>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label htmlFor="firstName">{t("form.firstName")}</Label>

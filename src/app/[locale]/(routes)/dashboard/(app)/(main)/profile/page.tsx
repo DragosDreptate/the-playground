@@ -116,7 +116,7 @@ export default async function ProfilePage({
 
       {/* Tab content */}
       {activeTab === "profile" ? (
-        <>
+        <div className="rounded-xl border p-5 space-y-5">
           {/* Form */}
           <ProfileForm
             user={{
@@ -135,6 +135,11 @@ export default async function ProfilePage({
 
           {/* Separator */}
           <div className="border-border border-t" />
+
+          {/* Account info */}
+          <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+            {t("edit.account")}
+          </p>
 
           {/* Meta rows */}
           <div className="flex flex-col gap-3">
@@ -197,7 +202,7 @@ export default async function ProfilePage({
               </div>
             </>
           )}
-        </>
+        </div>
       ) : (
         <NotificationPreferencesForm
           preferences={{
