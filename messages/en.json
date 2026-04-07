@@ -21,12 +21,12 @@
     "mockupMomentLocation": "The Counter",
     "mockupMomentAttendees": "8 joined",
     "howItWorks": "How it works",
-    "step1Title": "Create your Community",
+    "step1Title": "Create your community",
     "step1Description": "Your community space in 30 seconds. Public or private, you decide.",
     "step2Title": "Launch your Events",
     "step2Description": "Every Event gets a premium, shareable page. One link, and you're live.",
-    "step3Title": "Watch your Community grow",
-    "step3Description": "Members stay in your Community and come back for the next Events.",
+    "step3Title": "Watch your community grow",
+    "step3Description": "Members stay in your community and come back for the next Events.",
     "pillarsHeading": "What makes The Playground different",
     "pillar1Title": "Community-first",
     "pillar1Description": "Every event registration automatically becomes a community membership. Your members stay. Your audience grows with every event.",
@@ -91,7 +91,7 @@
     "faqQ7": "Is my data stored in Europe?",
     "faqA7": "Core data — database, app hosting, analytics, monitoring — is <b>hosted in the European Union</b> (Germany). Some subprocessors (emails, payments, AI) operate in the US with <b>EU standard contractual clauses</b> and DPAs in place. No data is sold or shared for advertising purposes.",
     "ctaFinalTitle": "Ready to launch your community?",
-    "ctaFinalSubtitle": "Create your Community in 30 seconds. Free, forever.",
+    "ctaFinalSubtitle": "Create your community in 30 seconds. Free, forever.",
     "ctaFinal": "Get started for free",
     "ctaExplore": "Start exploring",
     "heroFamiliar1": "community",
@@ -161,12 +161,12 @@
     "greetingAnonymous": "Welcome to The Playground 👋",
     "subtitle": "What would you like to do first?",
     "createCircle": {
-      "title": "Create my Community",
+      "title": "Create my community",
       "description": "Launch your community, invite your members and organize your events.",
       "cta": "Get started"
     },
     "explore": {
-      "title": "Discover Communities",
+      "title": "Discover communities",
       "description": "Explore public communities and join the ones that match your interests.",
       "cta": "Explore"
     },
@@ -189,18 +189,18 @@
   "Dashboard": {
     "title": "Dashboard",
     "myCircles": "Communities",
-    "myCirclesOrganizer": "My Communities",
-    "createCircle": "Create a Community",
+    "myCirclesOrganizer": "My communities",
+    "createCircle": "Create a community",
     "createMoment": "Create an Event",
-    "createCircleFirst": "Create a Community first",
-    "selectCircleDropdown": "Which Community?",
+    "createCircleFirst": "Create a community first",
+    "selectCircleDropdown": "Which community?",
     "selectCircle": {
-      "title": "Choose a Community",
-      "description": "Which Community should this Event belong to?"
+      "title": "Choose a community",
+      "description": "Which community should this Event belong to?"
     },
     "noCircles": {
-      "title": "Create a Community first",
-      "description": "You need a Community before creating an Event."
+      "title": "Create a community first",
+      "description": "You need a community before creating an Event."
     },
     "myMoments": "Events",
     "myMomentsOrganizer": "My Events",
@@ -213,16 +213,16 @@
     "noMomentsHint": "Join an Event or create your community.",
     "noMomentsHintExplore": "Explore events →",
     "noMomentsOrganizer": "No Events organized yet.",
-    "noMomentsOrganizerHint": "Create your first Event from a Community.",
-    "emptyCircles": "You're not a member of any Community.",
-    "emptyCirclesHostOnly": "You don't organize any Community.",
-    "emptyCirclesHint": "Create a Community or join an Event to become a member of one.",
+    "noMomentsOrganizerHint": "Create your first Event from a community.",
+    "emptyCircles": "You're not a member of any community.",
+    "emptyCirclesHostOnly": "You don't organize any community.",
+    "emptyCirclesHint": "Create a community or join an Event to become a member of one.",
     "emptyCirclesHintExplore": "Explore communities →",
-    "noCirclesOrganizer": "You don't organize any Community yet.",
-    "noCirclesOrganizerHint": "Create your first Community to get started.",
+    "noCirclesOrganizer": "You don't organize any community yet.",
+    "noCirclesOrganizerHint": "Create your first community to get started.",
     "onboardingMoments": {
       "emptyTitle": "No events yet",
-      "emptyHintNoCircles": "Create your Community and launch your first event.",
+      "emptyHintNoCircles": "Create your community and launch your first event.",
       "emptyHintHasCircles": "Your community is ready — create your first event.",
       "subHasCircles": "You're almost there.",
       "ctaEvent": "Create an event"
@@ -231,17 +231,17 @@
       "emptyTitle": "No community yet",
       "emptyHint": "Create yours or join a community through an event.",
       "label": "To organize events",
-      "heading": "3 steps to launch your Community",
+      "heading": "3 steps to launch your community",
       "sub": "It takes less than 5 minutes.",
-      "step1Title": "Create your Community",
+      "step1Title": "Create your community",
       "step1Desc": "A name, a description, a photo — your space is ready.",
       "step2Title": "Create your first event",
       "step2Desc": "A title, a date, a location — that's all you need.",
       "step3Title": "Share the link",
       "step3Desc": "Share it on WhatsApp, Slack or Instagram.",
-      "cta": "Create my Community"
+      "cta": "Create my community"
     },
-    "noCirclesMember": "You are not a member of any Community yet.",
+    "noCirclesMember": "You are not a member of any community yet.",
     "role": {
       "host": "Organizer",
       "player": "Member"
@@ -263,30 +263,30 @@
     "hostTools": "Host tools",
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
-    "greetingSubtitle": "Your Communities and upcoming Events, all in one place.",
+    "greetingSubtitle": "Your communities and upcoming Events, all in one place.",
     "memberCount": "{count} members",
     "filterAll": "All",
     "filterHostOnly": "Organizer"
   },
   "Circle": {
     "create": {
-      "title": "Create a Community",
+      "title": "Create a community",
       "description": "Set up your community space"
     },
     "edit": {
-      "title": "Edit Community",
-      "description": "Update your Community settings"
+      "title": "Edit community",
+      "description": "Update your community settings"
     },
     "form": {
       "coverImage": "Cover image",
       "name": "Name",
       "namePlaceholder": "My awesome community",
       "description": "Description",
-      "descriptionPlaceholder": "Tell people what your Community is about...",
+      "descriptionPlaceholder": "Tell people what your community is about...",
       "requiresApproval": "Membership approval",
       "requiresApprovalDescription": "New members must be approved manually from your dashboard.",
       "visibility": "Visibility",
-      "visibilityPublic": "Public — anyone can discover this Community",
+      "visibilityPublic": "Public — anyone can discover this community",
       "visibilityPrivate": "Private — only accessible via invitation",
       "category": "Category",
       "categoryPlaceholder": "Choose a category",
@@ -296,9 +296,9 @@
       "customCategoryRequired": "Please specify your theme"
     },
     "delete": {
-      "title": "Delete Community",
-      "description": "Are you sure you want to delete this Community? This action cannot be undone. All Events and memberships will be permanently removed.",
-      "confirm": "Yes, delete this Community"
+      "title": "Delete community",
+      "description": "Are you sure you want to delete this community? This action cannot be undone. All Events and memberships will be permanently removed.",
+      "confirm": "Yes, delete this community"
     },
     "detail": {
       "members": "Members",
@@ -311,8 +311,8 @@
       "hostedBy": "Hosted by",
       "about": "About",
       "visibility": "Visibility",
-      "publicCircle": "Public Community",
-      "privateCircle": "Private Community",
+      "publicCircle": "Public community",
+      "privateCircle": "Private community",
       "memberCount": "{count} members",
       "upcomingMoments": "Upcoming Events",
       "pastMoments": "Past Events",
@@ -326,25 +326,25 @@
       "joined": "Member",
       "pendingApproval": "Request pending approval",
       "isMember": "You are a member",
-      "isHost": "You are an Organizer",
-      "manageCircle": "Manage this Community",
+      "isHost": "You are an organizer",
+      "manageCircle": "Manage this community",
       "shareableLink": "Shareable link",
       "signInToSeeMembers": "Sign in to see the members of this community",
       "signInToJoin": "Sign in to join"
     },
     "removeMember": {
-      "action": "Remove from Community",
+      "action": "Remove from community",
       "title": "Remove {name}?",
-      "description": "{name} will lose access to this Community. Their registrations for upcoming events will be automatically cancelled.",
+      "description": "{name} will lose access to this community. Their registrations for upcoming events will be automatically cancelled.",
       "confirm": "Remove",
       "cancel": "Cancel"
     },
     "errors": {
       "notFound": "Community not found",
       "unauthorized": "You don't have permission to perform this action",
-      "createFailed": "Failed to create Community",
-      "updateFailed": "Failed to update Community",
-      "deleteFailed": "Failed to delete Community"
+      "createFailed": "Failed to create community",
+      "updateFailed": "Failed to update community",
+      "deleteFailed": "Failed to delete community"
     },
     "invite": {
       "cardTitle": "Share & Invite",
@@ -357,30 +357,30 @@
       "emailSent": "Invitation(s) sent",
       "emailInvalid": "Invalid email address",
       "linkTitle": "Invite link",
-      "linkDescription": "Anyone with this link can join the Community — share it via WhatsApp, Slack or email.",
+      "linkDescription": "Anyone with this link can join the community — share it via WhatsApp, Slack or email.",
       "linkGenerate": "Generate a link",
       "linkRevoke": "Revoke",
       "linkRevoked": "Link revoked",
       "joinTitle": "Join {circleName}",
-      "joinButton": "Join this Community",
+      "joinButton": "Join this community",
       "joinSignIn": "Sign in to join",
       "alreadyMember": "You are already a member",
       "pendingApproval": "Your request is pending approval by the organizer.",
       "joinRequiresApproval": "Join (subject to approval)",
       "invalidToken": "This invite link is no longer valid",
-      "joined": "Welcome to the Community!",
-      "viewCircle": "View Community",
+      "joined": "Welcome to the community!",
+      "viewCircle": "View community",
       "copyLink": "Copy link",
       "copied": "Copied!",
       "emailAddMore": "Add an address",
       "emailMaxReached": "Maximum {max} addresses per send."
     },
     "leave": {
-      "triggerButton": "Leave Community",
+      "triggerButton": "Leave community",
       "title": "Leave {circleName}?",
-      "description": "You will leave this Community and will no longer be listed as a member. Your registrations for upcoming events will be cancelled and spots released to people on the waitlist.",
+      "description": "You will leave this community and will no longer be listed as a member. Your registrations for upcoming events will be cancelled and spots released to people on the waitlist.",
       "cancel": "Cancel",
-      "confirm": "Leave Community",
+      "confirm": "Leave community",
       "pending": "Leaving…"
     },
     "coverPicker": {
@@ -448,7 +448,7 @@
       "eventOptions": "Event options",
       "ticketPrice": "Ticket price",
       "priceSoon": "Coming soon",
-      "priceRequiresStripe": "Enable payments in your Community settings",
+      "priceRequiresStripe": "Enable payments in your community settings",
       "priceEstimation": "You will receive ~{net} {currency} after Stripe fees (2.9% + 0.30 {currency})",
       "refundable": "Refundable",
       "refundableDescription": "Members can unregister and get an automatic refund.",
@@ -561,9 +561,9 @@
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
       "attendedCount": "{count} members attended",
-      "viewCircleMoments": "See upcoming Events from this Community",
-      "proposedByCommunity": "Proposed by the Community",
-      "upcomingInCircle": "Also in this Community",
+      "viewCircleMoments": "See upcoming Events from this community",
+      "proposedByCommunity": "Proposed by the community",
+      "upcomingInCircle": "Also in this community",
       "seeAllCircleEvents": "See all events",
       "addToCalendar": {
         "label": "Add to calendar",
@@ -632,9 +632,9 @@
       "description": "No Events yet. Create your first event."
     },
     "broadcast": {
-      "triggerButton": "Invite my Community",
+      "triggerButton": "Invite my community",
       "alreadySent": "Invited on {date}",
-      "dialogTitle": "Invite my Community",
+      "dialogTitle": "Invite my community",
       "dialogDescription": "An invitation email will be sent to the members of {circleName}.",
       "customMessageLabel": "Custom message (optional)",
       "customMessagePlaceholder": "E.g. Don't miss this event! Limited spots available.",
@@ -643,7 +643,7 @@
       "sending": "Sending...",
       "successToast": "Invitation sent to {count} people",
       "alreadySentError": "The invitation has already been sent",
-      "notHostError": "Only the organizer can invite the Community",
+      "notHostError": "Only the organizer can invite the community",
       "hint": "Send an invitation email to all members",
       "alreadySentShort": "Sent",
       "cooldownHint": "Next send available in {time}"
@@ -656,7 +656,7 @@
       "deleteFailed": "Failed to delete Event",
       "MOMENT_PAST_DATE": "The start date cannot be in the past.",
       "INVALID_PRICE": "Price must be 0 (free) or at least €0.50.",
-      "PAID_MOMENT_REQUIRES_STRIPE": "Enable payments on your Community to set a price.",
+      "PAID_MOMENT_REQUIRES_STRIPE": "Enable payments on your community to set a price.",
       "PRICE_LOCKED": "Price can no longer be changed as members have already paid.",
       "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Cannot make this event paid: members are already registered.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Paid events cannot require registration approval.",
@@ -671,7 +671,7 @@
     "SPORT_WELLNESS": "Sport & Wellness",
     "ART_CULTURE": "Art & Culture",
     "SCIENCE_EDUCATION": "Science & Education",
-    "SOCIAL": "Social & Community",
+    "SOCIAL": "Social & community",
     "OTHER": "Other"
   },
   "Explorer": {
@@ -697,7 +697,7 @@
       }
     },
     "empty": {
-      "circles": "No public Communities for this category.",
+      "circles": "No public communities for this category.",
       "moments": "No upcoming Events for this category."
     },
     "circleCard": {
@@ -772,7 +772,7 @@
       "pending": "Pending",
       "memberSince": "Member since",
       "circles": "Communities",
-      "noCircles": "No Communities.",
+      "noCircles": "No communities.",
       "moments": "Events",
       "noMoments": "No Events."
     },
@@ -890,7 +890,7 @@
     "hostCircleMemberNotification": {
       "subject": "{playerName} joined {circleName}",
       "heading": "New member",
-      "message": "{playerName} joined your Community {circleName}.",
+      "message": "{playerName} joined your community {circleName}.",
       "memberCountInfo": "{count} member(s)",
       "manageMembersCta": "View members"
     },
@@ -923,8 +923,8 @@
     "momentCancelled": {
       "subject": "Cancelled: {momentTitle}",
       "heading": "This event has been cancelled",
-      "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the Community.",
-      "ctaLabel": "View Community"
+      "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the community.",
+      "ctaLabel": "View community"
     },
     "broadcastMoment": {
       "subject": "New event: {momentTitle}",
@@ -939,39 +939,39 @@
     },
     "circleInvitation": {
       "subject": "{inviterName} invited you to join {circleName}",
-      "ctaLabel": "Join the Community",
+      "ctaLabel": "Join the community",
       "footer": "Invitation sent by {inviterName} via The Playground — the-playground.fr"
     },
     "registrationRemovedByHost": {
       "subject": "Registration invalidated: {momentTitle}",
       "heading": "Your registration has been invalidated",
       "message": "The organizer of {circleName} has invalidated your registration for {momentTitle}.",
-      "ctaLabel": "View Community"
+      "ctaLabel": "View community"
     },
     "memberRemovedFromCircle": {
       "subject": "Your membership in {circleName} has been invalidated",
       "heading": "Your membership has been invalidated",
-      "message": "The organizer of {circleName} has invalidated your membership in this Community.",
-      "cancelledRegistrationsMessage": "Your {count} upcoming registration(s) in this Community have also been cancelled.",
-      "ctaLabel": "Discover other Communities"
+      "message": "The organizer of {circleName} has invalidated your membership in this community.",
+      "cancelledRegistrationsMessage": "Your {count} upcoming registration(s) in this community have also been cancelled.",
+      "ctaLabel": "Discover other communities"
     },
     "approvalNotification": {
       "membershipApprovedSubject": "You are now a member of {circleName}",
       "membershipApprovedHeading": "Membership approved",
-      "membershipApprovedMessage": "Your request to join the Community \"{circleName}\" has been accepted.",
+      "membershipApprovedMessage": "Your request to join the community \"{circleName}\" has been accepted.",
       "membershipRejectedSubject": "Your membership request was declined — {circleName}",
-      "membershipRejectedMessage": "Your request to join the Community \"{circleName}\" was not accepted.",
+      "membershipRejectedMessage": "Your request to join the community \"{circleName}\" was not accepted.",
       "registrationRejectedSubject": "Your registration request was declined — {momentTitle}",
       "registrationRejectedMessage": "Your registration request for the Event \"{momentTitle}\" was not accepted.",
       "rejectedHeading": "Request declined",
-      "viewCircleCta": "View Community",
+      "viewCircleCta": "View community",
       "viewMomentCta": "View Event",
       "hostPendingRegistrationSubject": "New registration request — {momentTitle}",
       "hostPendingRegistrationHeading": "New registration request",
       "hostPendingRegistrationMessage": "{playerName} wants to join the Event \"{momentTitle}\". This registration requires your approval.",
       "hostPendingMembershipSubject": "New membership request — {circleName}",
       "hostPendingMembershipHeading": "New membership request",
-      "hostPendingMembershipMessage": "{playerName} wants to join your Community \"{circleName}\". This request requires your approval.",
+      "hostPendingMembershipMessage": "{playerName} wants to join your community \"{circleName}\". This request requires your approval.",
       "manageCta": "Manage requests"
     },
     "paidCancellation": {
@@ -1139,7 +1139,7 @@
           "email": "Sending transactional emails (confirmations, reminders, cancellations)",
           "emailData": "Email, first name",
           "emailLegal": "Performance of contract (Art. 6.1.b)",
-          "notifications": "Sending Community notifications (new Events, Host messages)",
+          "notifications": "Sending community notifications (new Events, Host messages)",
           "notificationsData": "Email, first name, notification preferences",
           "notificationsLegal": "Legitimate interest (Art. 6.1.f) — you can unsubscribe at any time from your profile",
           "payment": "Processing payments for paid Events",
@@ -1189,7 +1189,7 @@
         "resend": { "purpose": "Transactional and notification emails", "hq": "United States", "hosting": "United States", "safeguards": "Resend DPA, EU standard contractual clauses" },
         "stripe": { "purpose": "Payment processing (paid Events)", "hq": "United States", "hosting": "United States / European Union (global infrastructure)", "safeguards": "PCI-DSS certified, Stripe DPA, EU standard contractual clauses" },
         "anthropic": { "purpose": "AI features (description generation)", "hq": "United States", "hosting": "United States", "safeguards": "Anthropic DPA, EU standard contractual clauses" },
-        "slack": { "purpose": "Internal administration notifications (new users, new Communities)", "hq": "United States", "hosting": "United States", "safeguards": "Slack/Salesforce DPA, EU standard contractual clauses" },
+        "slack": { "purpose": "Internal administration notifications (new users, new communities)", "hq": "United States", "hosting": "United States", "safeguards": "Slack/Salesforce DPA, EU standard contractual clauses" },
         "noSale": "Your data is never sold or shared with third parties for commercial or advertising purposes."
       },
       "transfers": {
@@ -1243,7 +1243,7 @@
       },
       "service": {
         "title": "Service description",
-        "content": "The Playground is a free platform for creating Communities and organizing Events. The service is accessible via the web and is provided \"as is\"."
+        "content": "The Playground is a free platform for creating communities and organizing Events. The service is accessible via the web and is provided \"as is\"."
       },
       "account": {
         "title": "User account",
@@ -1259,7 +1259,7 @@
       },
       "playerResponsibilities": {
         "title": "Member responsibilities",
-        "content": "As a Member, you agree to respect the rules of each Community and Event you participate in. Joining an Event constitutes a commitment to attend."
+        "content": "As a Member, you agree to respect the rules of each community and Event you participate in. Joining an Event constitutes a commitment to attend."
       },
       "pricing": {
         "title": "Pricing",
@@ -1328,7 +1328,7 @@
       "items": {
         "registrations": "Your event registrations",
         "comments": "Your comments",
-        "circles": "Communities where you are the sole Organizer (and their events)"
+        "circles": "Communities where you are the sole organizer (and their events)"
       },
       "confirm": "Delete permanently",
       "error": "Something went wrong. Please try again."
@@ -1336,14 +1336,14 @@
     "notifications": {
       "title": "Notifications",
       "emailBanner": "These preferences control the emails sent to {email}.",
-      "organizer": "As an Organizer",
+      "organizer": "As an organizer",
       "participant": "As a Member",
       "newRegistration": "New registration",
       "newRegistrationDesc": "When someone registers for one of your events",
       "newComment": "New comment",
       "newCommentDesc": "When someone comments on an event you're attending",
       "newMomentInCircle": "New event",
-      "newMomentInCircleDesc": "When an event is created in a Community you belong to",
+      "newMomentInCircleDesc": "When an event is created in a community you belong to",
       "saved": "Preferences saved"
     },
     "publicProfile": {
@@ -1371,7 +1371,7 @@
       "title": "How does it work?",
       "subtitle": "The Playground is a free platform to create and join communities. Organizers, manage your events and your network. Members, discover events near you and join communities that match your interests.",
       "ctaParticipant": "I'm a Member",
-      "ctaOrganizer": "I'm an Organizer"
+      "ctaOrganizer": "I'm an organizer"
     },
     "sidebar": {
       "participant": "Member",
@@ -1379,15 +1379,15 @@
       "faqLabel": "FAQ",
       "contactLabel": "Contact",
       "inscription": "Join an event",
-      "rejoindre": "Join a Community",
+      "rejoindre": "Join a community",
       "waitlist": "Waitlist",
       "cancel": "Cancel registration",
       "comments": "Comments",
       "mySpace": "My Dashboard",
       "notifications": "Manage notifications",
       "paidEvents": "Paid events",
-      "leave": "Leave a Community",
-      "createCommunity": "Create your Community",
+      "leave": "Leave a community",
+      "createCommunity": "Create your community",
       "createEvent": "Create an event",
       "manageRegistrations": "Manage registrations",
       "contact": "Contact your members",
@@ -1411,17 +1411,17 @@
         "step3": "If you don't have an account yet, you can sign in in seconds (magic link by email or via Google / GitHub) — no form to fill out",
         "step4": "Once registered, you receive a <strong>confirmation email</strong> with the details and a link to add the event to your calendar (Google Calendar, Apple Calendar, or .ics file)",
         "callout": "No prior account is needed to view an event page. Registration takes less than a minute.",
-        "approvalNote": "Some events require approval by the Organizer. In that case, the button reads \u201cJoin (subject to approval)\u201d. Your request is sent to the Organizer, and you receive a confirmation email once it is accepted. If your request is declined, you are notified by email. While your request is pending, it appears in Dashboard with the status \u201cPending approval\u201d."
+        "approvalNote": "Some events require approval by the organizer. In that case, the button reads \u201cJoin (subject to approval)\u201d. Your request is sent to the organizer, and you receive a confirmation email once it is accepted. If your request is declined, you are notified by email. While your request is pending, it appears in Dashboard with the status \u201cPending approval\u201d."
       },
       "join": {
-        "title": "Join a Community",
-        "intro": "When you register for an event, you automatically become a member of its Community. Nothing else to do.",
+        "title": "Join a community",
+        "intro": "When you register for an event, you automatically become a member of its community. Nothing else to do.",
         "memberLabel": "As a member, you can:",
-        "item1": "See <strong>upcoming events</strong> from the Community",
+        "item1": "See <strong>upcoming events</strong> from the community",
         "item2": "Browse <strong>past events</strong>",
         "item3": "See <strong>other members</strong> and visit their public profile",
         "item4": "Be notified of new events by email (based on your preferences)",
-        "outro": "You can also join a Community without registering for an event, from the <strong>Explore</strong> page or from a Community page. On Explore, you can filter Communities by topic and sort them (Recommended, Popularity, Date). The <strong>Featured</strong> section highlights a selection of active Communities. If the Community is private, the Organizer can send you a <strong>private invite link</strong> — click it to join directly, no event registration required."
+        "outro": "You can also join a community without registering for an event, from the <strong>Explore</strong> page or from a community page. On Explore, you can filter communities by topic and sort them (Recommended, Popularity, Date). The <strong>Featured</strong> section highlights a selection of active communities. If the community is private, the organizer can send you a <strong>private invite link</strong> — click it to join directly, no event registration required."
       },
       "waitlist": {
         "title": "Waitlist",
@@ -1443,52 +1443,52 @@
         "step3": "You're automatically registered and receive a <strong>confirmation email</strong> with your payment receipt",
         "refundLabel": "Refund policy:",
         "refund1": "Each event is either <strong>refundable</strong> (automatic refund on cancellation) or <strong>non-refundable</strong> (no refund if you cancel)",
-        "refund2": "If the <strong>event is cancelled by the Organizer</strong>, you are always refunded regardless of the policy",
+        "refund2": "If the <strong>event is cancelled by the organizer</strong>, you are always refunded regardless of the policy",
         "refund3": "Refunds are processed within <strong>5 to 10 business days</strong> to your card",
         "callout": "The Playground takes no commission. Your payment data is handled by Stripe and is never stored by the platform."
       },
       "comments": {
         "title": "Comments",
-        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the Organizer."
+        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the organizer."
       },
       "mySpace": {
         "title": "My Dashboard",
         "intro": "<strong>Dashboard</strong> is your personal hub. You'll find there:",
         "item1": "Your <strong>upcoming events</strong> — those you're registered for and those you organize (including drafts)",
         "item2": "Your <strong>past events</strong>",
-        "item3": "The <strong>Communities</strong> you belong to or organize",
+        "item3": "The <strong>communities</strong> you belong to or organize",
         "item4": "Your <strong>profile</strong> (name, avatar, notification preferences) — including a link to your public profile, visible to other members",
-        "item5": "An <strong>Organizer</strong> filter (visible if you organize at least one Community) to show only your organized events and Communities"
+        "item5": "An <strong>organizer</strong> filter (visible if you organize at least one community) to show only your organized events and communities"
       },
       "notifications": {
         "title": "Manage notifications",
         "intro": "In your profile (<strong>Dashboard → Profile</strong>), you can enable or disable certain emails. Three preferences are available:",
-        "item1": "New registration for one of your events (for Organizers)",
+        "item1": "New registration for one of your events (for organizers)",
         "item2": "New comment on an event",
-        "item3": "New event published in a Community you belong to",
+        "item3": "New event published in a community you belong to",
         "item4": "Some emails are sent automatically and cannot be disabled: registration confirmation, event reminders, event update or cancellation notifications."
       },
       "leave": {
-        "title": "Leave a Community",
-        "intro": "From a Community page in <strong>Dashboard</strong>, click <strong>Leave Community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed."
+        "title": "Leave a community",
+        "intro": "From a community page in <strong>Dashboard</strong>, click <strong>Leave community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed."
       }
     },
     "organizer": {
       "sectionTitle": "Organizer",
       "badge": "Organizer",
       "createCommunity": {
-        "title": "Create your Community",
-        "intro": "Your Community is your central space on The Playground. It's from here that you manage your events and your network.",
-        "stepsLabel": "To create your Community:",
+        "title": "Create your community",
+        "intro": "Your community is your central space on The Playground. It's from here that you manage your events and your network.",
+        "stepsLabel": "To create your community:",
         "step1": "Sign in and go to <strong>Dashboard</strong>",
-        "step2": "Click <strong>Create a Community</strong>",
+        "step2": "Click <strong>Create a community</strong>",
         "step3": "Fill in: name, description, topic, city, visibility (public or private)",
         "step4": "Add a cover image (optional but recommended)",
-        "callout": "A public Community appears in <strong>Explore</strong> (the platform's public directory), is accessible to everyone, and may be featured in the <strong>Featured</strong> section. A private Community is only accessible via a direct link and does not appear in the directory."
+        "callout": "A public community appears in <strong>Explore</strong> (the platform's public directory), is accessible to everyone, and may be featured in the <strong>Featured</strong> section. A private community is only accessible via a direct link and does not appear in the directory."
       },
       "createEvent": {
         "title": "Create an event",
-        "intro": "From your Community, click <strong>Create an event</strong>.",
+        "intro": "From your community, click <strong>Create an event</strong>.",
         "essentialLabel": "Essential fields:",
         "field1Title": "Title",
         "field1Desc": "short and clear",
@@ -1502,7 +1502,7 @@
         "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist)",
         "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
         "adv3": "<strong>Cover image</strong>",
-        "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify Community members."
+        "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members."
       },
       "manageRegistrations": {
         "title": "Manage registrations",
@@ -1514,21 +1514,21 @@
       },
       "approvalRegistrations": {
         "title": "Approve registrations",
-        "intro": "You can enable registration approval on each event and/or each Community independently, from the creation or edit settings.",
+        "intro": "You can enable registration approval on each event and/or each community independently, from the creation or edit settings.",
         "eventLabel": "For an event with approval enabled:",
-        "event1": "When a Member clicks Join, their request is sent to the Organizer (no automatic registration)",
+        "event1": "When a Member clicks Join, their request is sent to the organizer (no automatic registration)",
         "event2": "You receive an email for each new request",
         "event3": "From the event dashboard, a \"Pending requests\" section lists all requests with Approve or Decline options",
         "event4": "If you approve: the Member receives a confirmation email and is registered (or placed on the waitlist if the event is full)",
         "event5": "If you decline: the Member receives a notification email",
-        "communityLabel": "For a Community with approval enabled:",
-        "community1": "Membership requests (from the Community page or via invite link) are subject to your approval",
-        "community2": "From the Community dashboard, a \"Pending requests\" section lets you approve or decline each request",
-        "callout": "Approval is independent on each entity — enabling approval on a Community does not automatically enable it on its events, and vice versa."
+        "communityLabel": "For a community with approval enabled:",
+        "community1": "Membership requests (from the community page or via invite link) are subject to your approval",
+        "community2": "From the community dashboard, a \"Pending requests\" section lets you approve or decline each request",
+        "callout": "Approval is independent on each entity — enabling approval on a community does not automatically enable it on its events, and vice versa."
       },
       "contact": {
         "title": "Contact your members",
-        "intro": "From the event dashboard, the <strong>Invite my Community</strong> button lets you send an email to all Community members to invite them to the event. You can personalize the message. The same broadcast can only be resent after 24 hours."
+        "intro": "From the event dashboard, the <strong>Invite my community</strong> button lets you send an email to all community members to invite them to the event. You can personalize the message. The same broadcast can only be resent after 24 hours."
       },
       "editCancel": {
         "title": "Edit or cancel an event",
@@ -1548,24 +1548,24 @@
         "intro": "Every event has a <strong>unique URL</strong> (format <code>the-playground.fr/m/your-event</code>). Copy this link from the event dashboard and share it directly — via WhatsApp, Instagram, email, or newsletter. No installation or prior account is required for attendees."
       },
       "members": {
-        "title": "Manage Community members",
-        "intro": "From your Community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
-        "outro": "Members automatically join your Community when they register for one of your events."
+        "title": "Manage community members",
+        "intro": "From your community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
+        "outro": "Members automatically join your community when they register for one of your events."
       },
       "inviteMembers": {
         "title": "Invite members",
-        "intro": "You can invite someone directly into your Community without them needing to register for an event first. Two options are available from the <strong>Share & Invite</strong> card on your Community page:",
-        "step1": "<strong>By email</strong> — enter up to 10 email addresses and send an invitation directly from the platform. Each recipient receives an email with a link to join the Community.",
+        "intro": "You can invite someone directly into your community without them needing to register for an event first. Two options are available from the <strong>Share & Invite</strong> card on your community page:",
+        "step1": "<strong>By email</strong> — enter up to 10 email addresses and send an invitation directly from the platform. Each recipient receives an email with a link to join the community.",
         "step2": "<strong>By invite link</strong> — a private invite link is available in the Share & Invite card. Copy it and share it via WhatsApp, Slack, or any other channel. If the link has been revoked, click <strong>Generate a link</strong> to create a new one.",
-        "step3": "The person clicks the link, signs in, and instantly joins your Community.",
+        "step3": "The person clicks the link, signs in, and instantly joins your community.",
         "step4": "They appear immediately in the member list — you receive an email notification.",
         "callout": "The invite link is <strong>revocable at any time</strong> — click Revoke to deactivate it. Members who already joined are not affected. The same link can be used by multiple people."
       },
       "payments": {
         "title": "Enable payments",
-        "intro": "You can offer paid events by enabling payments on your Community via <strong>Stripe Connect</strong>.",
+        "intro": "You can offer paid events by enabling payments on your community via <strong>Stripe Connect</strong>.",
         "stepsLabel": "To enable payments:",
-        "step1": "Go to <strong>Edit</strong> your Community",
+        "step1": "Go to <strong>Edit</strong> your community",
         "step2": "In the <strong>Payments</strong> section, click <strong>Enable payments</strong>",
         "step3": "You'll be redirected to Stripe to complete your profile (name, address, bank details, ID)",
         "step4": "Back on The Playground, the status changes to <strong>Payments enabled</strong>",
@@ -1575,7 +1575,7 @@
         "price3": "Toggle <strong>Refundable</strong> on or off to set the refund policy",
         "billingLabel": "Payment tracking:",
         "billing1": "Each paid event's dashboard shows a <strong>Ticketing</strong> summary (paid registrations, amount collected, refunded)",
-        "billing2": "For full details, click <strong>View my payments</strong> in the Community settings — this opens the Stripe Express dashboard",
+        "billing2": "For full details, click <strong>View my payments</strong> in the community settings — this opens the Stripe Express dashboard",
         "callout": "The Playground takes <strong>no commission</strong>. Only Stripe fees (~2.9% + $0.30) are deducted from your earnings. The full remaining amount is transferred to you."
       }
     },
@@ -1583,15 +1583,15 @@
       "sectionTitle": "Frequently asked questions",
       "q1": {
         "question": "Is The Playground free?",
-        "answer": "Yes, completely free for Organizers and Members. The Playground takes no commission. The only applicable fees are Stripe fees (~2.9% + $0.30) on paid events, charged directly by Stripe."
+        "answer": "Yes, completely free for organizers and Members. The Playground takes no commission. The only applicable fees are Stripe fees (~2.9% + $0.30) on paid events, charged directly by Stripe."
       },
       "q2": {
-        "question": "What's the difference between a public and private Community?",
-        "answer": "A public Community is visible in Explore (the public directory, filterable by topic) and accessible to everyone. A private Community is only accessible via a private invite link generated by the Organizer — it doesn't appear in the directory."
+        "question": "What's the difference between a public and private community?",
+        "answer": "A public community is visible in Explore (the public directory, filterable by topic) and accessible to everyone. A private community is only accessible via a private invite link generated by the organizer — it doesn't appear in the directory."
       },
       "q3": {
-        "question": "Can I organize events without creating a Community?",
-        "answer": "No. The Community is the central space on The Playground. Every event belongs to a Community. Creating a Community only takes a few minutes."
+        "question": "Can I organize events without creating a community?",
+        "answer": "No. The community is the central space on The Playground. Every event belongs to a community. Creating a community only takes a few minutes."
       },
       "q4": {
         "question": "What happens if an event is full?",
@@ -1611,7 +1611,7 @@
       },
       "q8": {
         "question": "How do paid events work?",
-        "answer": "The Organizer enables payments via Stripe Connect in their Community settings, then sets a price on their events. The Member pays the displayed price through a secure Stripe page. The Playground takes no commission — only Stripe fees (~2.9% + $0.30) are charged and borne by the Organizer. The refund policy (refundable or non-refundable) is set by the Organizer. If the event is cancelled, refunds are always automatic."
+        "answer": "The organizer enables payments via Stripe Connect in their community settings, then sets a price on their events. The Member pays the displayed price through a secure Stripe page. The Playground takes no commission — only Stripe fees (~2.9% + $0.30) are charged and borne by the organizer. The refund policy (refundable or non-refundable) is set by the organizer. If the event is cancelled, refunds are always automatic."
       }
     },
     "contact": {

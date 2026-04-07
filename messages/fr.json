@@ -161,12 +161,12 @@
     "greetingAnonymous": "Bienvenue sur The Playground 👋",
     "subtitle": "Par où voulez-vous commencer ?",
     "createCircle": {
-      "title": "Créer ma Communauté",
+      "title": "Créer ma communauté",
       "description": "Lancez votre communauté et organisez votre premier événement.",
       "cta": "Commencer"
     },
     "explore": {
-      "title": "Explorer des Communautés",
+      "title": "Explorer des communautés",
       "description": "Explorez les communautés publiques et rejoignez celles qui vous correspondent.",
       "cta": "Explorer"
     },
@@ -189,18 +189,18 @@
   "Dashboard": {
     "title": "Mon espace",
     "myCircles": "Communautés",
-    "myCirclesOrganizer": "Mes Communautés",
-    "createCircle": "Créer une Communauté",
+    "myCirclesOrganizer": "Mes communautés",
+    "createCircle": "Créer une communauté",
     "createMoment": "Créer un événement",
-    "createCircleFirst": "Créer une Communauté d'abord",
-    "selectCircleDropdown": "Dans quelle Communauté ?",
+    "createCircleFirst": "Créer une communauté d'abord",
+    "selectCircleDropdown": "Dans quelle communauté ?",
     "selectCircle": {
-      "title": "Choisir une Communauté",
-      "description": "À quelle Communauté rattacher cet événement ?"
+      "title": "Choisir une communauté",
+      "description": "À quelle communauté rattacher cet événement ?"
     },
     "noCircles": {
-      "title": "Créez d'abord une Communauté",
-      "description": "Vous devez créer une Communauté avant de créer un événement."
+      "title": "Créez d'abord une communauté",
+      "description": "Vous devez créer une communauté avant de créer un événement."
     },
     "myMoments": "Événements",
     "myMomentsOrganizer": "Mes événements",
@@ -213,16 +213,16 @@
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
     "noMomentsHintExplore": "Explorer des événements →",
     "noMomentsOrganizer": "Aucun événement organisé pour l'instant.",
-    "noMomentsOrganizerHint": "Créez votre premier événement depuis une Communauté.",
-    "emptyCircles": "Vous n'êtes membre d'aucune Communauté.",
-    "emptyCirclesHostOnly": "Vous n'organisez aucune Communauté.",
-    "emptyCirclesHint": "Créez une Communauté ou rejoignez un événement pour en rejoindre une.",
+    "noMomentsOrganizerHint": "Créez votre premier événement depuis une communauté.",
+    "emptyCircles": "Vous n'êtes membre d'aucune communauté.",
+    "emptyCirclesHostOnly": "Vous n'organisez aucune communauté.",
+    "emptyCirclesHint": "Créez une communauté ou rejoignez un événement pour en rejoindre une.",
     "emptyCirclesHintExplore": "Explorer des communautés →",
-    "noCirclesOrganizer": "Vous n'organisez aucune Communauté.",
-    "noCirclesOrganizerHint": "Créez votre première Communauté pour commencer.",
+    "noCirclesOrganizer": "Vous n'organisez aucune communauté.",
+    "noCirclesOrganizerHint": "Créez votre première communauté pour commencer.",
     "onboardingMoments": {
       "emptyTitle": "Aucun événement pour l'instant",
-      "emptyHintNoCircles": "Crée ta Communauté et lance ton premier événement.",
+      "emptyHintNoCircles": "Crée ta communauté et lance ton premier événement.",
       "emptyHintHasCircles": "Ta communauté est prête — crée ton premier événement.",
       "subHasCircles": "Tu y es presque.",
       "ctaEvent": "Créer un événement"
@@ -231,17 +231,17 @@
       "emptyTitle": "Aucune communauté pour l'instant",
       "emptyHint": "Crée la tienne ou rejoins une communauté via un événement.",
       "label": "Pour organiser des événements",
-      "heading": "3 étapes pour lancer ta Communauté",
+      "heading": "3 étapes pour lancer ta communauté",
       "sub": "Ça prend moins de 5 minutes.",
-      "step1Title": "Créer ta Communauté",
+      "step1Title": "Créer ta communauté",
       "step1Desc": "Un nom, une description, une photo — ton espace est prêt.",
       "step2Title": "Créer ton premier événement",
       "step2Desc": "Un titre, une date, un lieu — c'est tout ce qu'il faut.",
       "step3Title": "Partager le lien",
       "step3Desc": "Envoie-le sur WhatsApp, Slack ou Instagram.",
-      "cta": "Créer ma Communauté"
+      "cta": "Créer ma communauté"
     },
-    "noCirclesMember": "Vous n'êtes membre d'aucune Communauté.",
+    "noCirclesMember": "Vous n'êtes membre d'aucune communauté.",
     "role": {
       "host": "Organisateur",
       "player": "Participant"
@@ -260,33 +260,33 @@
     },
     "online": "En ligne",
     "hybrid": "Hybride",
-    "hostTools": "Outils Organisateur",
+    "hostTools": "Outils organisateur",
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
-    "greetingSubtitle": "Vos Communautés et vos prochains événements, au même endroit.",
+    "greetingSubtitle": "Vos communautés et vos prochains événements, au même endroit.",
     "memberCount": "{count} membres",
     "filterAll": "Tous",
     "filterHostOnly": "Organisateur"
   },
   "Circle": {
     "create": {
-      "title": "Créer une Communauté",
+      "title": "Créer une communauté",
       "description": "Configurez votre espace communautaire"
     },
     "edit": {
-      "title": "Modifier la Communauté",
-      "description": "Mettez à jour les paramètres de votre Communauté"
+      "title": "Modifier la communauté",
+      "description": "Mettez à jour les paramètres de votre communauté"
     },
     "form": {
       "coverImage": "Image de couverture",
       "name": "Nom",
       "namePlaceholder": "Ma super communauté",
       "description": "Description",
-      "descriptionPlaceholder": "Décrivez votre Communauté en quelques mots...",
+      "descriptionPlaceholder": "Décrivez votre communauté en quelques mots...",
       "requiresApproval": "Validation des inscriptions",
       "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",
       "visibility": "Visibilité",
-      "visibilityPublic": "Publique — tout le monde peut découvrir cette Communauté",
+      "visibilityPublic": "Publique — tout le monde peut découvrir cette communauté",
       "visibilityPrivate": "Privée — accessible uniquement sur invitation",
       "category": "Thématique",
       "categoryPlaceholder": "Choisir une thématique",
@@ -296,9 +296,9 @@
       "customCategoryRequired": "Veuillez préciser votre thématique"
     },
     "delete": {
-      "title": "Supprimer la Communauté",
-      "description": "Êtes-vous sûr de vouloir supprimer cette Communauté ? Cette action est irréversible. Tous les événements et adhésions seront définitivement supprimés.",
-      "confirm": "Oui, supprimer cette Communauté"
+      "title": "Supprimer la communauté",
+      "description": "Êtes-vous sûr de vouloir supprimer cette communauté ? Cette action est irréversible. Tous les événements et adhésions seront définitivement supprimés.",
+      "confirm": "Oui, supprimer cette communauté"
     },
     "detail": {
       "members": "Membres",
@@ -326,25 +326,25 @@
       "joined": "Membre",
       "pendingApproval": "Demande en cours de validation",
       "isMember": "Vous êtes membre",
-      "isHost": "Vous êtes Organisateur",
-      "manageCircle": "Gérer cette Communauté",
+      "isHost": "Vous êtes organisateur",
+      "manageCircle": "Gérer cette communauté",
       "shareableLink": "Lien partageable",
       "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté",
       "signInToJoin": "Se connecter pour rejoindre"
     },
     "removeMember": {
-      "action": "Retirer de la Communauté",
+      "action": "Retirer de la communauté",
       "title": "Retirer {name} ?",
-      "description": "{name} perdra l'accès à cette Communauté. Ses inscriptions aux événements à venir seront annulées automatiquement.",
+      "description": "{name} perdra l'accès à cette communauté. Ses inscriptions aux événements à venir seront annulées automatiquement.",
       "confirm": "Retirer",
       "cancel": "Annuler"
     },
     "errors": {
       "notFound": "Communauté introuvable",
       "unauthorized": "Vous n'avez pas la permission d'effectuer cette action",
-      "createFailed": "Échec de la création de la Communauté",
-      "updateFailed": "Échec de la mise à jour de la Communauté",
-      "deleteFailed": "Échec de la suppression de la Communauté"
+      "createFailed": "Échec de la création de la communauté",
+      "updateFailed": "Échec de la mise à jour de la communauté",
+      "deleteFailed": "Échec de la suppression de la communauté"
     },
     "invite": {
       "cardTitle": "Partager & Inviter",
@@ -357,30 +357,30 @@
       "emailSent": "Invitation(s) envoyée(s)",
       "emailInvalid": "Adresse email invalide",
       "linkTitle": "Lien d'invitation",
-      "linkDescription": "Toute personne ayant ce lien peut rejoindre la Communauté — partagez-le via WhatsApp, Slack ou email.",
+      "linkDescription": "Toute personne ayant ce lien peut rejoindre la communauté — partagez-le via WhatsApp, Slack ou email.",
       "linkGenerate": "Générer un lien",
       "linkRevoke": "Révoquer",
       "linkRevoked": "Lien révoqué",
       "joinTitle": "Rejoindre {circleName}",
-      "joinButton": "Rejoindre cette Communauté",
+      "joinButton": "Rejoindre cette communauté",
       "joinSignIn": "Se connecter pour rejoindre",
       "alreadyMember": "Vous êtes déjà membre",
-      "pendingApproval": "Votre demande est en cours de validation par l'Organisateur.",
+      "pendingApproval": "Votre demande est en cours de validation par l'organisateur.",
       "joinRequiresApproval": "Rejoindre (soumis à validation)",
       "invalidToken": "Ce lien d'invitation n'est plus valide",
-      "joined": "Bienvenue dans la Communauté !",
-      "viewCircle": "Voir la Communauté",
+      "joined": "Bienvenue dans la communauté !",
+      "viewCircle": "Voir la communauté",
       "copyLink": "Copier le lien",
       "copied": "Copié !",
       "emailAddMore": "Ajouter une adresse",
       "emailMaxReached": "Maximum {max} adresses par envoi."
     },
     "leave": {
-      "triggerButton": "Quitter la Communauté",
+      "triggerButton": "Quitter la communauté",
       "title": "Quitter {circleName} ?",
-      "description": "Tu vas quitter cette Communauté et ne seras plus listé comme membre. Tes inscriptions aux prochains événements seront annulées et les places libérées pour les personnes en liste d'attente.",
+      "description": "Tu vas quitter cette communauté et ne seras plus listé comme membre. Tes inscriptions aux prochains événements seront annulées et les places libérées pour les personnes en liste d'attente.",
       "cancel": "Annuler",
-      "confirm": "Quitter la Communauté",
+      "confirm": "Quitter la communauté",
       "pending": "En cours…"
     },
     "coverPicker": {
@@ -448,10 +448,10 @@
       "eventOptions": "Options de l'événement",
       "ticketPrice": "Prix du billet",
       "priceSoon": "Bientôt disponible",
-      "priceRequiresStripe": "Activez les paiements dans les paramètres de votre Communauté",
+      "priceRequiresStripe": "Activez les paiements dans les paramètres de votre communauté",
       "priceEstimation": "Vous recevrez ~{net} {currency} après frais Stripe (2,9% + 0,30 {currency})",
       "refundable": "Remboursable",
-      "refundableDescription": "Les Participants peuvent se désinscrire et être remboursés automatiquement.",
+      "refundableDescription": "Les participants peuvent se désinscrire et être remboursés automatiquement.",
       "free": "Gratuit",
       "capacity": "Capacité",
       "capacityLabel": "Capacité",
@@ -540,7 +540,7 @@
       "registered": "Inscrit",
       "registeredBannerTitle": "Vous participez à cet événement",
       "pendingApprovalBannerTitle": "Demande envoyée",
-      "pendingApprovalBannerDescription": "L'Organisateur validera votre demande manuellement.",
+      "pendingApprovalBannerDescription": "L'organisateur validera votre demande manuellement.",
       "waitlisted": "Liste d'attente",
       "waitlistedBannerTitle": "Vous êtes sur liste d'attente",
       "joinWaitlist": "S'inscrire sur la liste d'attente",
@@ -561,9 +561,9 @@
       "eventEnded": "Événement terminé",
       "eventCancelled": "Événement annulé",
       "attendedCount": "{count} personnes ont participé",
-      "viewCircleMoments": "Voir les prochains événements de la Communauté",
-      "proposedByCommunity": "Proposé par la Communauté",
-      "upcomingInCircle": "Aussi dans cette Communauté",
+      "viewCircleMoments": "Voir les prochains événements de la communauté",
+      "proposedByCommunity": "Proposé par la communauté",
+      "upcomingInCircle": "Aussi dans cette communauté",
       "seeAllCircleEvents": "Voir tous les événements",
       "addToCalendar": {
         "label": "Ajouter à mon calendrier",
@@ -632,9 +632,9 @@
       "description": "Aucun événement pour le moment. Créez votre premier événement."
     },
     "broadcast": {
-      "triggerButton": "Inviter ma Communauté",
+      "triggerButton": "Inviter ma communauté",
       "alreadySent": "Invitation envoyée le {date}",
-      "dialogTitle": "Inviter ma Communauté",
+      "dialogTitle": "Inviter ma communauté",
       "dialogDescription": "Un email d'invitation sera envoyé aux membres de {circleName}.",
       "customMessageLabel": "Message personnalisé (optionnel)",
       "customMessagePlaceholder": "Ex : Ne manquez pas cet événement ! Places limitées.",
@@ -643,7 +643,7 @@
       "sending": "Envoi en cours...",
       "successToast": "Invitation envoyée à {count} personnes",
       "alreadySentError": "L'invitation a déjà été envoyée",
-      "notHostError": "Seul l'organisateur peut inviter la Communauté",
+      "notHostError": "Seul l'organisateur peut inviter la communauté",
       "hint": "Envoyez un email d'invitation à tous les membres",
       "alreadySentShort": "Envoyée",
       "cooldownHint": "Prochain envoi disponible dans {time}"
@@ -656,9 +656,9 @@
       "deleteFailed": "Échec de la suppression de l'événement",
       "MOMENT_PAST_DATE": "La date de début ne peut pas être dans le passé.",
       "INVALID_PRICE": "Le prix doit être de 0 (gratuit) ou d'au moins 0,50 €.",
-      "PAID_MOMENT_REQUIRES_STRIPE": "Activez les paiements sur votre Communauté pour définir un prix.",
-      "PRICE_LOCKED": "Le prix ne peut plus être modifié car des Participants ont déjà payé.",
-      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des Participants sont déjà inscrits.",
+      "PAID_MOMENT_REQUIRES_STRIPE": "Activez les paiements sur votre communauté pour définir un prix.",
+      "PRICE_LOCKED": "Le prix ne peut plus être modifié car des participants ont déjà payé.",
+      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des participants sont déjà inscrits.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Les événements payants ne peuvent pas avoir la validation des inscriptions.",
       "MOMENT_SLUG_EXISTS": "Un événement avec un titre similaire existe déjà.",
       "INTERNAL_ERROR": "Une erreur inattendue est survenue."
@@ -671,7 +671,7 @@
     "SPORT_WELLNESS": "Sport & Bien-être",
     "ART_CULTURE": "Art & Culture",
     "SCIENCE_EDUCATION": "Sciences & Éducation",
-    "SOCIAL": "Social & Communauté",
+    "SOCIAL": "Social & communauté",
     "OTHER": "Autre"
   },
   "Explorer": {
@@ -697,7 +697,7 @@
       }
     },
     "empty": {
-      "circles": "Aucune Communauté publique pour cette thématique.",
+      "circles": "Aucune communauté publique pour cette thématique.",
       "moments": "Aucun événement à venir pour cette thématique."
     },
     "circleCard": {
@@ -772,12 +772,12 @@
       "pending": "En attente",
       "memberSince": "Membre depuis",
       "circles": "Communautés",
-      "noCircles": "Aucune Communauté.",
+      "noCircles": "Aucune communauté.",
       "moments": "Événements",
       "noMoments": "Aucun événement."
     },
     "circleDetail": {
-      "title": "Détail Communauté",
+      "title": "Détail communauté",
       "host": "Organisateur",
       "members": "Membres",
       "moments": "Événements",
@@ -890,7 +890,7 @@
     "hostCircleMemberNotification": {
       "subject": "{playerName} a rejoint {circleName}",
       "heading": "Nouveau membre",
-      "message": "{playerName} a rejoint votre Communauté {circleName}.",
+      "message": "{playerName} a rejoint votre communauté {circleName}.",
       "memberCountInfo": "{count} membre(s)",
       "manageMembersCta": "Voir les membres"
     },
@@ -923,8 +923,8 @@
     "momentCancelled": {
       "subject": "Annulé : {momentTitle}",
       "heading": "Cet événement a été annulé",
-      "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la Communauté.",
-      "ctaLabel": "Voir la Communauté"
+      "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la communauté.",
+      "ctaLabel": "Voir la communauté"
     },
     "broadcastMoment": {
       "subject": "Nouveau : {momentTitle}",
@@ -939,39 +939,39 @@
     },
     "circleInvitation": {
       "subject": "{inviterName} vous invite à rejoindre {circleName}",
-      "ctaLabel": "Rejoindre la Communauté",
+      "ctaLabel": "Rejoindre la communauté",
       "footer": "Invitation envoyée par {inviterName} via The Playground — the-playground.fr"
     },
     "registrationRemovedByHost": {
       "subject": "Inscription invalidée : {momentTitle}",
       "heading": "Votre inscription a été invalidée",
       "message": "L'organisateur de {circleName} a invalidé votre inscription à {momentTitle}.",
-      "ctaLabel": "Voir la Communauté"
+      "ctaLabel": "Voir la communauté"
     },
     "memberRemovedFromCircle": {
       "subject": "Votre inscription à {circleName} a été invalidée",
       "heading": "Votre inscription a été invalidée",
-      "message": "L'organisateur de {circleName} a invalidé votre inscription à cette Communauté.",
-      "cancelledRegistrationsMessage": "Vos {count} inscription(s) à venir dans cette Communauté ont également été annulées.",
-      "ctaLabel": "Découvrir d'autres Communautés"
+      "message": "L'organisateur de {circleName} a invalidé votre inscription à cette communauté.",
+      "cancelledRegistrationsMessage": "Vos {count} inscription(s) à venir dans cette communauté ont également été annulées.",
+      "ctaLabel": "Découvrir d'autres communautés"
     },
     "approvalNotification": {
       "membershipApprovedSubject": "Vous êtes maintenant membre de {circleName}",
       "membershipApprovedHeading": "Membership approuvée",
-      "membershipApprovedMessage": "Votre demande pour rejoindre la Communauté « {circleName} » a été acceptée.",
+      "membershipApprovedMessage": "Votre demande pour rejoindre la communauté « {circleName} » a été acceptée.",
       "membershipRejectedSubject": "Votre demande de membership a été refusée — {circleName}",
-      "membershipRejectedMessage": "Votre demande pour rejoindre la Communauté « {circleName} » n'a pas été acceptée.",
+      "membershipRejectedMessage": "Votre demande pour rejoindre la communauté « {circleName} » n'a pas été acceptée.",
       "registrationRejectedSubject": "Votre demande d'inscription a été refusée — {momentTitle}",
       "registrationRejectedMessage": "Votre demande d'inscription à l'événement « {momentTitle} » n'a pas été acceptée.",
       "rejectedHeading": "Demande refusée",
-      "viewCircleCta": "Voir la Communauté",
+      "viewCircleCta": "Voir la communauté",
       "viewMomentCta": "Voir l'événement",
       "hostPendingRegistrationSubject": "Nouvelle demande d'inscription — {momentTitle}",
       "hostPendingRegistrationHeading": "Nouvelle demande d'inscription",
       "hostPendingRegistrationMessage": "{playerName} souhaite s'inscrire à l'événement « {momentTitle} ». Cette inscription nécessite votre validation.",
       "hostPendingMembershipSubject": "Nouvelle demande d'adhésion — {circleName}",
       "hostPendingMembershipHeading": "Nouvelle demande d'adhésion",
-      "hostPendingMembershipMessage": "{playerName} souhaite rejoindre votre Communauté « {circleName} ». Cette demande nécessite votre validation.",
+      "hostPendingMembershipMessage": "{playerName} souhaite rejoindre votre communauté « {circleName} ». Cette demande nécessite votre validation.",
       "manageCta": "Gérer les demandes"
     },
     "paidCancellation": {
@@ -1254,24 +1254,24 @@
         "content": "Vous êtes seul responsable du contenu que vous publiez sur The Playground (descriptions de communautés, d'événements, commentaires). Tout contenu illicite, diffamatoire, discriminatoire ou contraire aux bonnes mœurs est interdit et pourra être supprimé sans préavis."
       },
       "hostResponsibilities": {
-        "title": "Responsabilités de l'Organisateur",
-        "content": "En tant qu'Organisateur, vous êtes responsable de l'exactitude des informations relatives à vos événements (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
+        "title": "Responsabilités de l'organisateur",
+        "content": "En tant qu'organisateur, vous êtes responsable de l'exactitude des informations relatives à vos événements (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
       },
       "playerResponsibilities": {
-        "title": "Responsabilités du Participant",
-        "content": "En tant que Participant, vous vous engagez à respecter les règles de chaque Communauté et événement auxquels vous participez. L'inscription à un événement vaut engagement de présence."
+        "title": "Responsabilités du participant",
+        "content": "En tant que participant, vous vous engagez à respecter les règles de chaque communauté et événement auxquels vous participez. L'inscription à un événement vaut engagement de présence."
       },
       "pricing": {
         "title": "Gratuité et tarification",
-        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'Organisateur."
+        "content": "L'utilisation de The Playground est entièrement gratuite. Aucune commission n'est prélevée par la plateforme. Pour les événements payants, seuls les frais de transaction Stripe (environ 2,9 % + 0,30 €) s'appliquent et sont à la charge de l'organisateur."
       },
       "payments": {
         "title": "Paiements et transactions",
-        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'Organisateur et le Participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque Organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'Organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le Participant est invité à contacter l'Organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
+        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'organisateur et le participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le participant est invité à contacter l'organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
       },
       "liability": {
         "title": "Limitation de responsabilité",
-        "content": "The Spark SASU ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du service, notamment en cas d'interruption, de perte de données ou de litige entre Organisateurs et Participants."
+        "content": "The Spark SASU ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du service, notamment en cas d'interruption, de perte de données ou de litige entre organisateurs et participants."
       },
       "modification": {
         "title": "Modification des CGU",
@@ -1328,7 +1328,7 @@
       "items": {
         "registrations": "Vos inscriptions aux événements",
         "comments": "Vos commentaires",
-        "circles": "Les Communautés dont vous êtes le seul Organisateur (avec leurs événements)"
+        "circles": "Les communautés dont vous êtes le seul organisateur (avec leurs événements)"
       },
       "confirm": "Supprimer définitivement",
       "error": "Une erreur est survenue. Veuillez réessayer."
@@ -1336,14 +1336,14 @@
     "notifications": {
       "title": "Notifications",
       "emailBanner": "Ces préférences contrôlent les emails envoyés à {email}.",
-      "organizer": "En tant qu'Organisateur",
-      "participant": "En tant que Participant",
+      "organizer": "En tant qu'organisateur",
+      "participant": "En tant que participant",
       "newRegistration": "Nouvelle inscription",
       "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements",
       "newComment": "Nouveau commentaire",
       "newCommentDesc": "Quand quelqu'un commente un événement auquel vous participez",
       "newMomentInCircle": "Nouvel événement",
-      "newMomentInCircleDesc": "Quand un événement est créé dans une Communauté dont vous êtes membre",
+      "newMomentInCircleDesc": "Quand un événement est créé dans une communauté dont vous êtes membre",
       "saved": "Préférences enregistrées"
     },
     "publicProfile": {
@@ -1370,8 +1370,8 @@
     "hero": {
       "title": "Comment ça marche ?",
       "subtitle": "The Playground est une plateforme gratuite pour créer et rejoindre des communautés. Organisateurs, gérez vos événements et votre réseau. Participants, découvrez des événements près de chez vous et rejoignez des communautés qui vous ressemblent.",
-      "ctaParticipant": "Je suis Participant",
-      "ctaOrganizer": "Je suis Organisateur"
+      "ctaParticipant": "Je suis participant",
+      "ctaOrganizer": "Je suis organisateur"
     },
     "sidebar": {
       "participant": "Participant",
@@ -1379,15 +1379,15 @@
       "faqLabel": "FAQ",
       "contactLabel": "Contact",
       "inscription": "S'inscrire à un événement",
-      "rejoindre": "Rejoindre une Communauté",
+      "rejoindre": "Rejoindre une communauté",
       "waitlist": "Liste d'attente",
       "cancel": "Annuler son inscription",
       "comments": "Les commentaires",
       "mySpace": "Mon espace",
       "notifications": "Gérer ses notifications",
       "paidEvents": "Événements payants",
-      "leave": "Quitter une Communauté",
-      "createCommunity": "Créer sa Communauté",
+      "leave": "Quitter une communauté",
+      "createCommunity": "Créer sa communauté",
       "createEvent": "Créer un événement",
       "manageRegistrations": "Gérer les inscriptions",
       "contact": "Contacter vos participants",
@@ -1411,17 +1411,17 @@
         "step3": "Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google / GitHub) — aucun formulaire à remplir",
         "step4": "Une fois inscrit, vous recevez un <strong>email de confirmation</strong> avec les détails et un lien pour ajouter l'événement à votre calendrier (Google Calendar, Apple Calendar, ou fichier .ics)",
         "callout": "Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute.",
-        "approvalNote": "Certains événements requièrent une validation par l'Organisateur. Dans ce cas, le bouton affiche « S'inscrire (soumis à validation) ». Votre demande est transmise à l'Organisateur, et vous recevez un email de confirmation dès qu'elle est acceptée. Si votre demande est refusée, vous en êtes notifié par email. Tant que votre demande est en attente, elle apparaît dans Mon espace avec le statut « En attente de validation »."
+        "approvalNote": "Certains événements requièrent une validation par l'organisateur. Dans ce cas, le bouton affiche « S'inscrire (soumis à validation) ». Votre demande est transmise à l'organisateur, et vous recevez un email de confirmation dès qu'elle est acceptée. Si votre demande est refusée, vous en êtes notifié par email. Tant que votre demande est en attente, elle apparaît dans Mon espace avec le statut « En attente de validation »."
       },
       "join": {
-        "title": "Rejoindre une Communauté",
-        "intro": "Quand vous vous inscrivez à un événement, vous devenez automatiquement membre de sa Communauté. Rien de plus à faire.",
+        "title": "Rejoindre une communauté",
+        "intro": "Quand vous vous inscrivez à un événement, vous devenez automatiquement membre de sa communauté. Rien de plus à faire.",
         "memberLabel": "En tant que membre, vous pouvez :",
-        "item1": "Voir les <strong>prochains événements</strong> de la Communauté",
+        "item1": "Voir les <strong>prochains événements</strong> de la communauté",
         "item2": "Consulter les <strong>événements passés</strong>",
         "item3": "Voir les <strong>autres membres</strong> et consulter leur profil public",
         "item4": "Être notifié des nouveaux événements par email (selon vos préférences)",
-        "outro": "Vous pouvez aussi rejoindre une Communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une Communauté. Sur Explorer, vous pouvez filtrer les Communautés par thématique et les trier (Recommandé, Popularité, Date). La section <strong>À la une</strong> met en avant une sélection de Communautés actives. Si la Communauté est privée, l'Organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
+        "outro": "Vous pouvez aussi rejoindre une communauté sans vous inscrire à un événement, depuis la page <strong>Explorer</strong> ou depuis la page d'une communauté. Sur Explorer, vous pouvez filtrer les communautés par thématique et les trier (Recommandé, Popularité, Date). La section <strong>À la une</strong> met en avant une sélection de communautés actives. Si la communauté est privée, l'organisateur peut vous envoyer un <strong>lien d'invitation</strong> privé — cliquez dessus pour rejoindre directement, sans passer par un événement."
       },
       "waitlist": {
         "title": "La liste d'attente",
@@ -1443,52 +1443,52 @@
         "step3": "Vous êtes automatiquement inscrit et recevez un <strong>email de confirmation</strong> avec votre reçu de paiement",
         "refundLabel": "Politique de remboursement :",
         "refund1": "Chaque événement est soit <strong>remboursable</strong> (remboursement automatique en cas de désinscription), soit <strong>non remboursable</strong> (pas de remboursement si vous vous désinscrivez)",
-        "refund2": "En cas d'<strong>annulation de l'événement par l'Organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
+        "refund2": "En cas d'<strong>annulation de l'événement par l'organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
         "refund3": "Les remboursements sont effectués sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
         "callout": "The Playground ne prend aucune commission. Vos données bancaires sont traitées par Stripe et ne sont jamais stockées par la plateforme."
       },
       "comments": {
         "title": "Les commentaires",
-        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'Organisateur."
+        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'organisateur."
       },
       "mySpace": {
         "title": "Mon espace",
         "intro": "<strong>Mon espace</strong> est votre tableau de bord personnel. Vous y retrouvez :",
         "item1": "Vos <strong>prochains événements</strong> — ceux auxquels vous êtes inscrit et ceux que vous organisez (y compris les brouillons)",
         "item2": "Vos <strong>événements passés</strong>",
-        "item3": "Les <strong>Communautés</strong> dont vous êtes membre ou Organisateur",
+        "item3": "Les <strong>communautés</strong> dont vous êtes membre ou organisateur",
         "item4": "Votre <strong>profil</strong> (nom, avatar, préférences de notifications) — avec un lien vers votre profil public, visible par les autres membres",
-        "item5": "Un filtre <strong>Organisateur</strong> (visible si vous organisez au moins une Communauté) pour afficher uniquement vos événements et Communautés organisés"
+        "item5": "Un filtre <strong>organisateur</strong> (visible si vous organisez au moins une communauté) pour afficher uniquement vos événements et communautés organisés"
       },
       "notifications": {
         "title": "Gérer ses notifications",
         "intro": "Dans votre profil (<strong>Mon espace → Profil</strong>), vous pouvez activer ou désactiver certains emails. Trois préférences sont disponibles :",
-        "item1": "Nouvelle inscription à l'un de vos événements (pour les Organisateurs)",
+        "item1": "Nouvelle inscription à l'un de vos événements (pour les organisateurs)",
         "item2": "Nouveau commentaire sur un événement",
-        "item3": "Nouvel événement publié dans une Communauté dont vous êtes membre",
+        "item3": "Nouvel événement publié dans une communauté dont vous êtes membre",
         "item4": "D'autres emails sont envoyés automatiquement et ne peuvent pas être désactivés : confirmation d'inscription, rappels avant l'événement, notifications de modification ou d'annulation."
       },
       "leave": {
-        "title": "Quitter une Communauté",
-        "intro": "Depuis la page d'une Communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la Communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire."
+        "title": "Quitter une communauté",
+        "intro": "Depuis la page d'une communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire."
       }
     },
     "organizer": {
       "sectionTitle": "Organisateur",
       "badge": "Organisateur",
       "createCommunity": {
-        "title": "Créer sa Communauté",
-        "intro": "La Communauté est votre espace central sur The Playground. C'est depuis là que vous gérez vos événements et votre réseau.",
-        "stepsLabel": "Pour créer votre Communauté :",
+        "title": "Créer sa communauté",
+        "intro": "La communauté est votre espace central sur The Playground. C'est depuis là que vous gérez vos événements et votre réseau.",
+        "stepsLabel": "Pour créer votre communauté :",
         "step1": "Connectez-vous et accédez à <strong>Mon espace</strong>",
-        "step2": "Cliquez sur <strong>Créer une Communauté</strong>",
+        "step2": "Cliquez sur <strong>Créer une communauté</strong>",
         "step3": "Renseignez : nom, description, thématique, ville, visibilité (publique ou privée)",
         "step4": "Ajoutez une image de couverture (optionnel mais recommandé)",
-        "callout": "Une Communauté publique apparaît dans <strong>Explorer</strong> (l'annuaire public de la plateforme), est accessible par tous, et peut figurer dans la section <strong>À la une</strong>. Une Communauté privée est uniquement accessible via lien direct et n'apparaît pas dans l'annuaire."
+        "callout": "Une communauté publique apparaît dans <strong>Explorer</strong> (l'annuaire public de la plateforme), est accessible par tous, et peut figurer dans la section <strong>À la une</strong>. Une communauté privée est uniquement accessible via lien direct et n'apparaît pas dans l'annuaire."
       },
       "createEvent": {
         "title": "Créer un événement",
-        "intro": "Depuis votre Communauté, cliquez sur <strong>Créer un événement</strong>.",
+        "intro": "Depuis votre communauté, cliquez sur <strong>Créer un événement</strong>.",
         "essentialLabel": "Les champs essentiels :",
         "field1Title": "Titre",
         "field1Desc": "court et clair",
@@ -1502,7 +1502,7 @@
         "adv1": "<strong>Capacité</strong> — nombre maximum de participants (active la liste d'attente automatiquement)",
         "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
         "adv3": "<strong>Image de couverture</strong>",
-        "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Explorer ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la Communauté."
+        "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Explorer ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la communauté."
       },
       "manageRegistrations": {
         "title": "Gérer les inscriptions",
@@ -1514,21 +1514,21 @@
       },
       "approvalRegistrations": {
         "title": "Valider les inscriptions",
-        "intro": "Vous pouvez activer la validation des inscriptions sur chaque événement et/ou chaque Communauté indépendamment, depuis les paramètres de création ou de modification.",
+        "intro": "Vous pouvez activer la validation des inscriptions sur chaque événement et/ou chaque communauté indépendamment, depuis les paramètres de création ou de modification.",
         "eventLabel": "Pour un événement avec validation activée :",
-        "event1": "Quand un Participant clique sur S'inscrire, sa demande est transmise à l'Organisateur (pas d'inscription automatique)",
+        "event1": "Quand un participant clique sur S'inscrire, sa demande est transmise à l'organisateur (pas d'inscription automatique)",
         "event2": "Vous recevez un email pour chaque nouvelle demande",
         "event3": "Depuis le tableau de bord de l'événement, une section « Demandes en attente » liste toutes les demandes avec les options Approuver ou Refuser",
-        "event4": "Si vous approuvez : le Participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
-        "event5": "Si vous refusez : le Participant reçoit un email de notification",
-        "communityLabel": "Pour une Communauté avec validation activée :",
-        "community1": "Les demandes de membership (depuis la page Communauté ou via lien d'invitation) sont soumises à votre approbation",
-        "community2": "Depuis le tableau de bord de la Communauté, une section « Demandes en attente » vous permet d'approuver ou refuser chaque demande",
-        "callout": "La validation est indépendante sur chaque entité — activer la validation sur une Communauté n'active pas automatiquement la validation sur ses événements, et inversement."
+        "event4": "Si vous approuvez : le participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
+        "event5": "Si vous refusez : le participant reçoit un email de notification",
+        "communityLabel": "Pour une communauté avec validation activée :",
+        "community1": "Les demandes de membership (depuis la page communauté ou via lien d'invitation) sont soumises à votre approbation",
+        "community2": "Depuis le tableau de bord de la communauté, une section « Demandes en attente » vous permet d'approuver ou refuser chaque demande",
+        "callout": "La validation est indépendante sur chaque entité — activer la validation sur une communauté n'active pas automatiquement la validation sur ses événements, et inversement."
       },
       "contact": {
         "title": "Contacter vos participants",
-        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma Communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre Communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures."
+        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures."
       },
       "editCancel": {
         "title": "Modifier ou annuler un événement",
@@ -1548,24 +1548,24 @@
         "intro": "Chaque événement dispose d'une <strong>URL unique</strong> (format <code>the-playground.fr/m/votre-evenement</code>). Copiez ce lien depuis le tableau de bord de l'événement et partagez-le directement — via WhatsApp, Instagram, email, ou newsletter. Aucune installation ni compte préalable n'est requis pour les participants."
       },
       "members": {
-        "title": "Gérer les membres de votre Communauté",
-        "intro": "Depuis la page de votre Communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
-        "outro": "Les membres rejoignent automatiquement votre Communauté lorsqu'ils s'inscrivent à l'un de vos événements."
+        "title": "Gérer les membres de votre communauté",
+        "intro": "Depuis la page de votre communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
+        "outro": "Les membres rejoignent automatiquement votre communauté lorsqu'ils s'inscrivent à l'un de vos événements."
       },
       "inviteMembers": {
         "title": "Inviter des membres",
-        "intro": "Vous pouvez inviter quelqu'un directement dans votre Communauté sans qu'il ait besoin de s'inscrire à un événement. Deux options sont disponibles depuis la carte <strong>Partager & Inviter</strong> sur la page de votre Communauté :",
-        "step1": "<strong>Par email</strong> — saisissez jusqu'à 10 adresses email et envoyez une invitation directement depuis la plateforme. Chaque destinataire reçoit un email avec un lien pour rejoindre la Communauté.",
+        "intro": "Vous pouvez inviter quelqu'un directement dans votre communauté sans qu'il ait besoin de s'inscrire à un événement. Deux options sont disponibles depuis la carte <strong>Partager & Inviter</strong> sur la page de votre communauté :",
+        "step1": "<strong>Par email</strong> — saisissez jusqu'à 10 adresses email et envoyez une invitation directement depuis la plateforme. Chaque destinataire reçoit un email avec un lien pour rejoindre la communauté.",
         "step2": "<strong>Par lien d'invitation</strong> — un lien privé est disponible dans la carte Partager & Inviter. Copiez-le et partagez-le via WhatsApp, Slack, ou tout autre canal. Si le lien a été révoqué, cliquez sur <strong>Générer un lien</strong> pour en créer un nouveau.",
-        "step3": "La personne clique sur le lien, se connecte, et rejoint instantanément votre Communauté.",
+        "step3": "La personne clique sur le lien, se connecte, et rejoint instantanément votre communauté.",
         "step4": "Elle apparaît aussitôt dans la liste des membres — vous recevez une notification par email.",
         "callout": "Le lien d'invitation est <strong>révocable à tout moment</strong> — cliquez sur Révoquer pour le désactiver. Les membres déjà rejoints ne sont pas affectés. Un même lien peut être utilisé par plusieurs personnes."
       },
       "payments": {
         "title": "Activer les paiements",
-        "intro": "Vous pouvez proposer des événements payants en activant les paiements sur votre Communauté via <strong>Stripe Connect</strong>.",
+        "intro": "Vous pouvez proposer des événements payants en activant les paiements sur votre communauté via <strong>Stripe Connect</strong>.",
         "stepsLabel": "Pour activer les paiements :",
-        "step1": "Allez dans <strong>Modifier</strong> votre Communauté",
+        "step1": "Allez dans <strong>Modifier</strong> votre communauté",
         "step2": "Dans la section <strong>Paiements</strong>, cliquez sur <strong>Activer les paiements</strong>",
         "step3": "Vous êtes redirigé vers Stripe pour compléter votre profil (nom, adresse, IBAN, pièce d'identité)",
         "step4": "De retour sur The Playground, le statut passe à <strong>Paiements activés</strong>",
@@ -1575,7 +1575,7 @@
         "price3": "Activez ou désactivez le toggle <strong>Remboursable</strong> pour choisir la politique de remboursement",
         "billingLabel": "Suivi des paiements :",
         "billing1": "Le tableau de bord de chaque événement payant affiche un résumé <strong>Billetterie</strong> (inscrits payants, montant collecté, remboursés)",
-        "billing2": "Pour le détail complet, cliquez sur <strong>Voir mes paiements</strong> dans les paramètres de la Communauté — vous accédez au dashboard Stripe Express",
+        "billing2": "Pour le détail complet, cliquez sur <strong>Voir mes paiements</strong> dans les paramètres de la communauté — vous accédez au dashboard Stripe Express",
         "callout": "The Playground ne prend <strong>aucune commission</strong>. Seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et déduits de vos revenus. L'intégralité du montant restant vous est reversée."
       }
     },
@@ -1583,15 +1583,15 @@
       "sectionTitle": "Questions fréquentes",
       "q1": {
         "question": "The Playground est-il gratuit ?",
-        "answer": "Oui, entièrement gratuit pour les Organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
+        "answer": "Oui, entièrement gratuit pour les organisateurs et les participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
       },
       "q2": {
-        "question": "Quelle est la différence entre une Communauté publique et privée ?",
-        "answer": "Une Communauté publique est visible dans Explorer (l'annuaire public, filtrable par thématique) et accessible à tous. Une Communauté privée n'est accessible que via un lien d'invitation privé généré par l'Organisateur — elle n'apparaît pas dans l'annuaire."
+        "question": "Quelle est la différence entre une communauté publique et privée ?",
+        "answer": "Une communauté publique est visible dans Explorer (l'annuaire public, filtrable par thématique) et accessible à tous. Une communauté privée n'est accessible que via un lien d'invitation privé généré par l'organisateur — elle n'apparaît pas dans l'annuaire."
       },
       "q3": {
-        "question": "Puis-je organiser des événements sans créer de Communauté ?",
-        "answer": "Non. La Communauté est l'espace central de The Playground. Chaque événement appartient à une Communauté. Créer une Communauté ne prend que quelques minutes."
+        "question": "Puis-je organiser des événements sans créer de communauté ?",
+        "answer": "Non. La communauté est l'espace central de The Playground. Chaque événement appartient à une communauté. Créer une communauté ne prend que quelques minutes."
       },
       "q4": {
         "question": "Que se passe-t-il si un événement est complet ?",
@@ -1611,7 +1611,7 @@
       },
       "q8": {
         "question": "Comment fonctionnent les événements payants ?",
-        "answer": "L'Organisateur active les paiements via Stripe Connect dans les paramètres de sa Communauté, puis définit un prix sur ses événements. Le Participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'Organisateur. La politique de remboursement (remboursable ou non) est définie par l'Organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
+        "answer": "L'organisateur active les paiements via Stripe Connect dans les paramètres de sa communauté, puis définit un prix sur ses événements. Le participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'organisateur. La politique de remboursement (remboursable ou non) est définie par l'organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
       }
     },
     "contact": {
