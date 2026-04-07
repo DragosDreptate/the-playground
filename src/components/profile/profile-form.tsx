@@ -79,7 +79,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <Label htmlFor="firstName">{t("form.firstName")}</Label>
+          <Label htmlFor="firstName" className="pl-1">{t("form.firstName")}</Label>
           <Input
             id="firstName"
             name="firstName"
@@ -92,7 +92,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="lastName">{t("form.lastName")}</Label>
+          <Label htmlFor="lastName" className="pl-1">{t("form.lastName")}</Label>
           <Input
             id="lastName"
             name="lastName"
@@ -109,7 +109,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
       {mode === "edit" && (
         <>
           <div className="space-y-2">
-            <Label htmlFor="bio">{t("form.bio")}</Label>
+            <Label htmlFor="bio" className="pl-1">{t("form.bio")}</Label>
             <Textarea
               id="bio"
               name="bio"
@@ -126,7 +126,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="city">{t("form.city")}</Label>
+            <Label htmlFor="city" className="pl-1">{t("form.city")}</Label>
             <div className="relative">
               <MapPin className="text-muted-foreground absolute left-3 top-1/2 size-4 -translate-y-1/2" />
               <Input
