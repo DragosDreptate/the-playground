@@ -9,11 +9,11 @@ keywords:
   - meetup alternative 2026
 ---
 
-Meetup was the go-to platform for community events for nearly two decades. But since its acquisition by Bending Spoons in 2022, the platform has changed direction — and many organisers are looking for alternatives. If that's you, here's a comprehensive look at the best free options in 2026.
+Meetup was the go-to platform for community events for nearly two decades. But since its acquisition by Bending Spoons in 2024, the platform has changed direction — and many organisers are looking for alternatives. If that's you, here's a comprehensive look at the best free options in 2026.
 
 ## Why organisers are leaving Meetup
 
-In December 2022, Bending Spoons acquired Meetup and applied its usual playbook: massive staff cuts and aggressive monetisation. The result is an unprecedented **double paywall**.
+In January 2024, Bending Spoons acquired Meetup and applied its usual playbook: massive staff cuts and aggressive monetisation. The result is an unprecedented **double paywall**.
 
 **Organisers** pay a subscription to keep their group active. **Members** also pay — around $2 per RSVP, or a Meetup+ subscription at ~$5/month for unlimited RSVPs. Both sides of the table pay.
 

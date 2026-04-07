@@ -9,11 +9,11 @@ keywords:
   - plateforme communauté gratuite
 ---
 
-Meetup a longtemps été la référence pour organiser des événements communautaires. Mais depuis son rachat par Bending Spoons en 2022, la plateforme a changé de cap — et beaucoup d'organisateurs cherchent une alternative. Si c'est votre cas, voici un tour d'horizon des meilleures options gratuites en 2026.
+Meetup a longtemps été la référence pour organiser des événements communautaires. Mais depuis son rachat par Bending Spoons en 2024, la plateforme a changé de cap — et beaucoup d'organisateurs cherchent une alternative. Si c'est votre cas, voici un tour d'horizon des meilleures options gratuites en 2026.
 
 ## Pourquoi tant d'organisateurs quittent Meetup
 
-En décembre 2022, Bending Spoons rachète Meetup et applique son playbook habituel : réduction massive des équipes et monétisation agressive. Le résultat est un **double paywall** sans précédent dans l'histoire de la plateforme.
+En janvier 2024, Bending Spoons rachète Meetup et applique son playbook habituel : réduction massive des équipes et monétisation agressive. Le résultat est un **double paywall** sans précédent dans l'histoire de la plateforme.
 
 Les **organisateurs** paient un abonnement pour maintenir leur groupe actif. Les **membres** paient aussi — environ 2$ par inscription (RSVP), ou un abonnement Meetup+ à ~5$/mois pour des inscriptions illimitées. Les deux côtés de la table paient.
 

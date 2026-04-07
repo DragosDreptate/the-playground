@@ -39,7 +39,7 @@ Cette distinction change tout pour la rétention. Si vos participants ne revienn
 
 Meetup a inventé le concept de groupe local en ligne. Vous créez un groupe, les gens le rejoignent, et ils sont notifiés à chaque nouvel événement. C'est le bon modèle — et il a fait ses preuves pendant 20 ans.
 
-Depuis le rachat par Bending Spoons en 2022, Meetup a changé de cap. L'entreprise a réduit ses équipes et modifié sa tarification : les organisateurs paient toujours un abonnement sur certains plans, et les **membres** paient aussi (environ 2$ par RSVP, ou un abonnement Meetup+ à ~5$/mois pour des inscriptions illimitées). Les deux côtés paient.
+Depuis le rachat par Bending Spoons en 2024, Meetup a changé de cap. L'entreprise a réduit ses équipes et modifié sa tarification : les organisateurs paient toujours un abonnement sur certains plans, et les **membres** paient aussi (environ 2$ par RSVP, ou un abonnement Meetup+ à ~5$/mois pour des inscriptions illimitées). Les deux côtés paient.
 
 ### Ce qui fonctionne
 
