@@ -451,7 +451,7 @@
       "priceRequiresStripe": "Activez les paiements dans les paramètres de votre communauté",
       "priceEstimation": "Vous recevrez ~{net} {currency} après frais Stripe (2,9% + 0,30 {currency})",
       "refundable": "Remboursable",
-      "refundableDescription": "Les Participants peuvent se désinscrire et être remboursés automatiquement.",
+      "refundableDescription": "Les participants peuvent se désinscrire et être remboursés automatiquement.",
       "free": "Gratuit",
       "capacity": "Capacité",
       "capacityLabel": "Capacité",
@@ -657,8 +657,8 @@
       "MOMENT_PAST_DATE": "La date de début ne peut pas être dans le passé.",
       "INVALID_PRICE": "Le prix doit être de 0 (gratuit) ou d'au moins 0,50 €.",
       "PAID_MOMENT_REQUIRES_STRIPE": "Activez les paiements sur votre communauté pour définir un prix.",
-      "PRICE_LOCKED": "Le prix ne peut plus être modifié car des Participants ont déjà payé.",
-      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des Participants sont déjà inscrits.",
+      "PRICE_LOCKED": "Le prix ne peut plus être modifié car des participants ont déjà payé.",
+      "CANNOT_MAKE_PAID_WITH_REGISTRATIONS": "Impossible de rendre l'événement payant : des participants sont déjà inscrits.",
       "PAID_MOMENT_CANNOT_REQUIRE_APPROVAL": "Les événements payants ne peuvent pas avoir la validation des inscriptions.",
       "MOMENT_SLUG_EXISTS": "Un événement avec un titre similaire existe déjà.",
       "INTERNAL_ERROR": "Une erreur inattendue est survenue."
@@ -1258,8 +1258,8 @@
         "content": "En tant qu'organisateur, vous êtes responsable de l'exactitude des informations relatives à vos événements (lieu, date, description). Vous vous engagez à respecter les lois applicables à l'organisation d'événements."
       },
       "playerResponsibilities": {
-        "title": "Responsabilités du Participant",
-        "content": "En tant que Participant, vous vous engagez à respecter les règles de chaque communauté et événement auxquels vous participez. L'inscription à un événement vaut engagement de présence."
+        "title": "Responsabilités du participant",
+        "content": "En tant que participant, vous vous engagez à respecter les règles de chaque communauté et événement auxquels vous participez. L'inscription à un événement vaut engagement de présence."
       },
       "pricing": {
         "title": "Gratuité et tarification",
@@ -1267,11 +1267,11 @@
       },
       "payments": {
         "title": "Paiements et transactions",
-        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'organisateur et le Participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le Participant est invité à contacter l'organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
+        "content": "The Playground agit en qualité d'intermédiaire technique via Stripe Connect. La plateforme facilite la transaction entre l'organisateur et le participant mais n'est pas partie à la vente. Les données bancaires sont traitées exclusivement par Stripe et ne sont jamais stockées par The Playground. La politique de remboursement est définie par chaque organisateur lors de la création de l'événement : soit remboursable (remboursement intégral en cas de désinscription), soit non remboursable. En cas d'annulation d'un événement par l'organisateur, le remboursement intégral est systématique quel que soit le réglage. En cas de litige, le participant est invité à contacter l'organisateur. En dernier recours, une contestation peut être effectuée auprès de sa banque."
       },
       "liability": {
         "title": "Limitation de responsabilité",
-        "content": "The Spark SASU ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du service, notamment en cas d'interruption, de perte de données ou de litige entre organisateurs et Participants."
+        "content": "The Spark SASU ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du service, notamment en cas d'interruption, de perte de données ou de litige entre organisateurs et participants."
       },
       "modification": {
         "title": "Modification des CGU",
@@ -1337,7 +1337,7 @@
       "title": "Notifications",
       "emailBanner": "Ces préférences contrôlent les emails envoyés à {email}.",
       "organizer": "En tant qu'organisateur",
-      "participant": "En tant que Participant",
+      "participant": "En tant que participant",
       "newRegistration": "Nouvelle inscription",
       "newRegistrationDesc": "Quand quelqu'un s'inscrit à un de vos événements",
       "newComment": "Nouveau commentaire",
@@ -1370,7 +1370,7 @@
     "hero": {
       "title": "Comment ça marche ?",
       "subtitle": "The Playground est une plateforme gratuite pour créer et rejoindre des communautés. Organisateurs, gérez vos événements et votre réseau. Participants, découvrez des événements près de chez vous et rejoignez des communautés qui vous ressemblent.",
-      "ctaParticipant": "Je suis Participant",
+      "ctaParticipant": "Je suis participant",
       "ctaOrganizer": "Je suis organisateur"
     },
     "sidebar": {
@@ -1516,11 +1516,11 @@
         "title": "Valider les inscriptions",
         "intro": "Vous pouvez activer la validation des inscriptions sur chaque événement et/ou chaque communauté indépendamment, depuis les paramètres de création ou de modification.",
         "eventLabel": "Pour un événement avec validation activée :",
-        "event1": "Quand un Participant clique sur S'inscrire, sa demande est transmise à l'organisateur (pas d'inscription automatique)",
+        "event1": "Quand un participant clique sur S'inscrire, sa demande est transmise à l'organisateur (pas d'inscription automatique)",
         "event2": "Vous recevez un email pour chaque nouvelle demande",
         "event3": "Depuis le tableau de bord de l'événement, une section « Demandes en attente » liste toutes les demandes avec les options Approuver ou Refuser",
-        "event4": "Si vous approuvez : le Participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
-        "event5": "Si vous refusez : le Participant reçoit un email de notification",
+        "event4": "Si vous approuvez : le participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
+        "event5": "Si vous refusez : le participant reçoit un email de notification",
         "communityLabel": "Pour une communauté avec validation activée :",
         "community1": "Les demandes de membership (depuis la page communauté ou via lien d'invitation) sont soumises à votre approbation",
         "community2": "Depuis le tableau de bord de la communauté, une section « Demandes en attente » vous permet d'approuver ou refuser chaque demande",
@@ -1583,7 +1583,7 @@
       "sectionTitle": "Questions fréquentes",
       "q1": {
         "question": "The Playground est-il gratuit ?",
-        "answer": "Oui, entièrement gratuit pour les organisateurs et les Participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
+        "answer": "Oui, entièrement gratuit pour les organisateurs et les participants. The Playground ne prend aucune commission. Les seuls frais applicables sont les frais Stripe (~2,9 % + 0,30 €) sur les événements payants, prélevés directement par Stripe."
       },
       "q2": {
         "question": "Quelle est la différence entre une communauté publique et privée ?",
@@ -1611,7 +1611,7 @@
       },
       "q8": {
         "question": "Comment fonctionnent les événements payants ?",
-        "answer": "L'organisateur active les paiements via Stripe Connect dans les paramètres de sa communauté, puis définit un prix sur ses événements. Le Participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'organisateur. La politique de remboursement (remboursable ou non) est définie par l'organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
+        "answer": "L'organisateur active les paiements via Stripe Connect dans les paramètres de sa communauté, puis définit un prix sur ses événements. Le participant paie le prix affiché via une page Stripe sécurisée. The Playground ne prend aucune commission — seuls les frais Stripe (~2,9 % + 0,30 €) sont prélevés et supportés par l'organisateur. La politique de remboursement (remboursable ou non) est définie par l'organisateur. En cas d'annulation de l'événement, le remboursement est toujours automatique."
       }
     },
     "contact": {
