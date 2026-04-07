@@ -176,6 +176,19 @@ export default async function ProfilePage({
                 </div>
               </div>
             </div>
+
+            {/* Section admin */}
+            {user.role === "ADMIN" && (
+              <>
+                <div className="border-border border-t" />
+                <div className="space-y-3">
+                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                    Administration
+                  </p>
+                  <AdminHostModeToggle enabled={adminHostModeEnabled} />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Zone de danger — outside the card */}
@@ -188,16 +201,6 @@ export default async function ProfilePage({
             </p>
             <DeleteAccountDialog />
           </div>
-
-          {/* Section admin */}
-          {user.role === "ADMIN" && (
-            <div className="border-border bg-card rounded-2xl border p-6 space-y-3">
-              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-                Administration
-              </p>
-              <AdminHostModeToggle enabled={adminHostModeEnabled} />
-            </div>
-          )}
         </>
       ) : (
         <>
