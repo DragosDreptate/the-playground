@@ -204,15 +204,17 @@ export default async function ProfilePage({
           )}
         </div>
       ) : (
-        <NotificationPreferencesForm
-          preferences={{
-            notifyNewRegistration: user.notifyNewRegistration,
-            notifyNewComment: user.notifyNewComment,
-            notifyNewMomentInCircle: user.notifyNewMomentInCircle,
-          }}
-          email={user.email}
-          action={updateNotificationPreferencesAction}
-        />
+        <div className="border-border bg-card rounded-2xl border p-6">
+          <NotificationPreferencesForm
+            preferences={{
+              notifyNewRegistration: user.notifyNewRegistration,
+              notifyNewComment: user.notifyNewComment,
+              notifyNewMomentInCircle: user.notifyNewMomentInCircle,
+            }}
+            email={user.email}
+            action={updateNotificationPreferencesAction}
+          />
+        </div>
       )}
     </div>
   );
