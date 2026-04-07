@@ -40,7 +40,7 @@ This distinction changes everything for retention. If your attendees don't come 
 
 Meetup invented the concept of local online groups. You create a group, people join it, and they get notified with every new event. It's the right model — and it's been proven for 20 years.
 
-Since the acquisition by Bending Spoons in 2022, Meetup has changed course. The company cut its teams and revised its pricing: organisers still pay a subscription on certain plans, and **members** also pay (around $2 per RSVP, or a Meetup+ subscription at ~$5/month for unlimited RSVPs). Both sides pay.
+Since the acquisition by Bending Spoons in 2024, Meetup has changed course. The company cut its teams and revised its pricing: organisers still pay a subscription on certain plans, and **members** also pay (around $2 per RSVP, or a Meetup+ subscription at ~$5/month for unlimited RSVPs). Both sides pay.
 
 ### What works
 
