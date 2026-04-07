@@ -116,7 +116,7 @@ export default async function ProfilePage({
 
       {/* Tab content */}
       {activeTab === "profile" ? (
-        <div className="rounded-xl border p-5 space-y-5">
+        <div className="bg-card rounded-xl border p-5 space-y-5">
           {/* Form */}
           <ProfileForm
             user={{
