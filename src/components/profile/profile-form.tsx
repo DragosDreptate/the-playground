@@ -58,7 +58,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
   const [state, formAction, isPending] = useActionState(handleSubmit, {});
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-4">
       {state.error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {state.error}
