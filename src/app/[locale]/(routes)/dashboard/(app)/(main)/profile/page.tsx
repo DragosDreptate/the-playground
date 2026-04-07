@@ -184,7 +184,7 @@ export default async function ProfilePage({
             <p className="text-destructive text-xs font-medium uppercase tracking-wider">
               {t("deleteAccount.dangerZone")}
             </p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-foreground/70 text-sm">
               {t("deleteAccount.description")}
             </p>
             <DeleteAccountDialog />
