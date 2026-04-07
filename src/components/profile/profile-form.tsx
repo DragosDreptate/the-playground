@@ -70,28 +70,30 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
         </div>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor="firstName">{t("form.firstName")}</Label>
-        <Input
-          id="firstName"
-          name="firstName"
-          placeholder={t("form.firstNamePlaceholder")}
-          defaultValue={user.firstName ?? ""}
-          required
-          maxLength={50}
-        />
-      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">{t("form.firstName")}</Label>
+          <Input
+            id="firstName"
+            name="firstName"
+            placeholder={t("form.firstNamePlaceholder")}
+            defaultValue={user.firstName ?? ""}
+            required
+            maxLength={50}
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="lastName">{t("form.lastName")}</Label>
-        <Input
-          id="lastName"
-          name="lastName"
-          placeholder={t("form.lastNamePlaceholder")}
-          defaultValue={user.lastName ?? ""}
-          required
-          maxLength={50}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="lastName">{t("form.lastName")}</Label>
+          <Input
+            id="lastName"
+            name="lastName"
+            placeholder={t("form.lastNamePlaceholder")}
+            defaultValue={user.lastName ?? ""}
+            required
+            maxLength={50}
+          />
+        </div>
       </div>
 
       {/* Bio + City — only in edit mode */}
