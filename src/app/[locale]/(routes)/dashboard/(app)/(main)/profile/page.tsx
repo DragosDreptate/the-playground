@@ -180,8 +180,8 @@ export default async function ProfilePage({
           <div className="border-border border-t" />
 
           {/* Zone de danger */}
-          <div className="space-y-3">
-            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          <div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+            <p className="text-destructive text-xs font-medium uppercase tracking-wider">
               {t("deleteAccount.dangerZone")}
             </p>
             <p className="text-muted-foreground text-sm">
