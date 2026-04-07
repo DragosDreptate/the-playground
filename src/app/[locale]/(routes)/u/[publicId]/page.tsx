@@ -10,7 +10,7 @@ import { getUserPublicProfile } from "@/domain/usecases/get-user-public-profile"
 import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Crown, MapPin, Globe, Linkedin, Github } from "lucide-react";
+import { ChevronRight, Crown, MapPin, Globe, Linkedin, Github, CalendarDays, Users } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
 import { CollapsibleList } from "@/components/collapsible-list";
 import { formatLongDate, formatMonthYear } from "@/lib/format-date";
@@ -100,9 +100,15 @@ export default async function UserPublicProfilePage({
               {user.city}
             </span>
           )}
-          <span>{t("memberSince", { date: memberSince })}</span>
+          <span className="flex items-center gap-1.5">
+            <CalendarDays className="size-3.5" />
+            {t("memberSince", { date: memberSince })}
+          </span>
           {user.hostedMomentsCount > 0 && (
-            <span>{t("hostedEvents", { count: user.hostedMomentsCount })}</span>
+            <span className="flex items-center gap-1.5">
+              <Users className="size-3.5" />
+              {t("hostedEvents", { count: user.hostedMomentsCount })}
+            </span>
           )}
         </div>
 
