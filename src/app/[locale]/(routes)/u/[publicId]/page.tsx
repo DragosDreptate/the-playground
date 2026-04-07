@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Crown, MapPin, Globe, Linkedin, Github } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
+import { CollapsibleList } from "@/components/collapsible-list";
 import { formatLongDate, formatMonthYear } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
 
@@ -162,8 +163,8 @@ export default async function UserPublicProfilePage({
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("communities", { count: publicCircles.length })}
           </h2>
-          <div className="space-y-2">
-            {publicCircles.map((membership) => (
+          <CollapsibleList
+            items={publicCircles.map((membership) => (
               <Link
                 key={membership.circleSlug}
                 href={`/circles/${membership.circleSlug}`}
@@ -194,7 +195,7 @@ export default async function UserPublicProfilePage({
                 </Badge>
               </Link>
             ))}
-          </div>
+          />
         </section>
       )}
 
@@ -204,8 +205,8 @@ export default async function UserPublicProfilePage({
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("upcomingEvents", { count: upcomingPublicMoments.length })}
           </h2>
-          <div className="space-y-2">
-            {upcomingPublicMoments.map((reg) => (
+          <CollapsibleList
+            items={upcomingPublicMoments.map((reg) => (
               <Link
                 key={reg.momentSlug}
                 href={`/m/${reg.momentSlug}`}
@@ -220,7 +221,7 @@ export default async function UserPublicProfilePage({
                 </p>
               </Link>
             ))}
-          </div>
+          />
         </section>
       )}
 
