@@ -59,6 +59,14 @@ export async function MomentTimelineItem({
           ? "bg-amber-400"
           : "bg-primary";
 
+  const cardBorderClass = isCancelled
+    ? "border-destructive/20"
+    : isDraft
+      ? "border-dashed border-muted-foreground/30 opacity-70"
+      : isPast
+        ? "border-border"
+        : "border-border hover:border-primary/30";
+
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
   const isToday = isSameDayInParis(moment.startsAt, now);
@@ -77,7 +85,7 @@ export async function MomentTimelineItem({
   return (
     <div className="flex gap-0">
       {/* Date column */}
-      <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
+      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
         {isToday ? (
           <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
             {tCircle("detail.today")}
@@ -99,12 +107,12 @@ export async function MomentTimelineItem({
       </div>
 
       {/* Card */}
-      <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
+      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
         <Link
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="group block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${isCancelled ? "border-destructive/20" : isPast ? "border-border" : "border-border hover:border-primary/30"}`}>
+          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${cardBorderClass}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">

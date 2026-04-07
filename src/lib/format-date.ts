@@ -56,7 +56,7 @@ export function formatDayMonth(date: Date, locale: string): string {
   }).format(date);
 }
 
-/** { weekday, dateStr } pour les timelines — "sam." + "28 févr. 2026" */
+/** { weekday, dateStr } pour les timelines — "sam." + "28 févr." */
 export function formatWeekdayAndDate(
   date: Date,
   locale: string,
@@ -66,12 +66,7 @@ export function formatWeekdayAndDate(
     timeZone: TIMEZONE,
     weekday: "short",
   }).format(date);
-  const dateStr = new Intl.DateTimeFormat(intlLocale, {
-    timeZone: TIMEZONE,
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
+  const dateStr = formatDayMonth(date, locale);
   return { weekday, dateStr };
 }
 
