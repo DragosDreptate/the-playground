@@ -8,6 +8,7 @@ import { getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect
 import { CircleNotFoundError } from "@/domain/errors";
 import { CircleForm } from "@/components/circles/circle-form";
 import { updateCircleAction } from "@/app/actions/circle";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 
@@ -32,10 +33,11 @@ export default async function EditCirclePage({
 
   const boundAction = updateCircleAction.bind(null, circle.id);
 
-  // Load Stripe Connect status for the HOST
+  // Load Stripe Connect status for the HOST (supports admin host mode)
   const session = await auth();
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
   const membership = session?.user?.id
-    ? await prismaCircleRepository.findMembership(circle.id, session.user.id)
+    ? await circleRepo.findMembership(circle.id, session.user.id)
     : null;
   const isHost = membership?.role === "HOST";
 
