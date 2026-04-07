@@ -57,7 +57,7 @@ export function NotificationPreferencesForm({
       {/* Email banner */}
       <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/7 px-4 py-3">
         <Mail className="text-primary size-4 shrink-0" />
-        <p className="text-muted-foreground text-[13px] leading-snug">
+        <p className="text-foreground/70 text-[13px] leading-snug">
           {t.rich("emailBanner", {
             email,
             strong: (chunks) => (
