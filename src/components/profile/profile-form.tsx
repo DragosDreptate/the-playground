@@ -13,6 +13,7 @@ import type { ActionResult } from "@/app/actions/types";
 import { useRouter } from "@/i18n/navigation";
 
 const BIO_MAX_LENGTH = 160;
+const INPUT_BG = "dark:bg-background";
 
 type ProfileFormProps = {
   user: Pick<User, "firstName" | "lastName" | "bio" | "city" | "website" | "linkedinUrl" | "twitterUrl" | "githubUrl">;
@@ -86,6 +87,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
             defaultValue={user.firstName ?? ""}
             required
             maxLength={50}
+            className={INPUT_BG}
           />
         </div>
 
@@ -98,6 +100,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
             defaultValue={user.lastName ?? ""}
             required
             maxLength={50}
+            className={INPUT_BG}
           />
         </div>
       </div>
@@ -114,6 +117,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
               defaultValue={user.bio ?? ""}
               maxLength={BIO_MAX_LENGTH}
               rows={2}
+              className={INPUT_BG}
               onChange={(e) => setBioLength(e.target.value.length)}
             />
             <p className="text-muted-foreground text-xs text-right">
@@ -130,7 +134,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
                 name="city"
                 placeholder={t("form.cityPlaceholder")}
                 defaultValue={user.city ?? ""}
-                className="pl-9"
+                className={`pl-9 ${INPUT_BG}`}
                 maxLength={100}
               />
             </div>
@@ -152,7 +156,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
                   name="website"
                   placeholder="https://..."
                   defaultValue={user.website ?? ""}
-                  className="pl-9"
+                  className={`pl-9 ${INPUT_BG}`}
                   type="url"
                 />
               </div>
@@ -163,7 +167,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
                   name="linkedinUrl"
                   placeholder="https://linkedin.com/in/..."
                   defaultValue={user.linkedinUrl ?? ""}
-                  className="pl-9"
+                  className={`pl-9 ${INPUT_BG}`}
                   type="url"
                 />
               </div>
@@ -174,7 +178,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
                   name="twitterUrl"
                   placeholder="https://x.com/..."
                   defaultValue={user.twitterUrl ?? ""}
-                  className="pl-9"
+                  className={`pl-9 ${INPUT_BG}`}
                   type="url"
                 />
               </div>
@@ -185,7 +189,7 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
                   name="githubUrl"
                   placeholder="https://github.com/..."
                   defaultValue={user.githubUrl ?? ""}
-                  className="pl-9"
+                  className={`pl-9 ${INPUT_BG}`}
                   type="url"
                 />
               </div>
