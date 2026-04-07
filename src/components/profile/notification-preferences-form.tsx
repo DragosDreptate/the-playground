@@ -5,13 +5,11 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Mail } from "lucide-react";
 import type { NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "@/app/actions/types";
 
 type NotificationPreferencesFormProps = {
   preferences: NotificationPreferences;
-  email: string;
   action: (formData: FormData) => Promise<ActionResult<NotificationPreferences>>;
 };
 
@@ -22,7 +20,6 @@ type FormState = {
 
 export function NotificationPreferencesForm({
   preferences,
-  email,
   action,
 }: NotificationPreferencesFormProps) {
   const t = useTranslations("Profile.notifications");
@@ -54,19 +51,6 @@ export function NotificationPreferencesForm({
 
   return (
     <form action={formAction} className="space-y-6">
-      {/* Email banner */}
-      <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/7 px-4 py-3">
-        <Mail className="text-primary size-4 shrink-0" />
-        <p className="text-foreground/70 text-[13px] leading-snug">
-          {t.rich("emailBanner", {
-            email,
-            strong: (chunks) => (
-              <strong className="text-foreground font-medium">{chunks}</strong>
-            ),
-          })}
-        </p>
-      </div>
-
       {state.error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {state.error}

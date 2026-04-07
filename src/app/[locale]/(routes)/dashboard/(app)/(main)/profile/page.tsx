@@ -204,17 +204,26 @@ export default async function ProfilePage({
           )}
         </div>
       ) : (
-        <div className="border-border bg-card rounded-2xl border p-6">
-          <NotificationPreferencesForm
+        <>
+          {/* Email banner — outside the card */}
+          <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/7 px-4 py-3">
+            <Mail className="text-primary size-4 shrink-0" />
+            <p className="text-foreground/70 text-[13px] leading-snug">
+              {t("notifications.emailBanner", { email: user.email })}
+            </p>
+          </div>
+
+          <div className="border-border bg-card rounded-2xl border p-6">
+            <NotificationPreferencesForm
             preferences={{
               notifyNewRegistration: user.notifyNewRegistration,
               notifyNewComment: user.notifyNewComment,
               notifyNewMomentInCircle: user.notifyNewMomentInCircle,
             }}
-            email={user.email}
             action={updateNotificationPreferencesAction}
           />
-        </div>
+          </div>
+        </>
       )}
     </div>
   );
