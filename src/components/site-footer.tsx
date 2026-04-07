@@ -9,7 +9,7 @@ export async function SiteFooter() {
     <footer className="border-t border-border/40">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:py-3">
         {/* Logo + copyright */}
-        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
+        <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="flex size-5 items-center justify-center rounded-[4px] bg-gradient-to-br from-pink-500 to-violet-500">
               <svg width="8" height="10" viewBox="0 0 10 12" fill="none" className="ml-px">
