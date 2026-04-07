@@ -75,20 +75,20 @@ describe("formatDayMonth", () => {
 });
 
 describe("formatWeekdayAndDate", () => {
-  it("should return weekday and dateStr in French", () => {
+  it("should return weekday and dateStr (no year) in French", () => {
     const { weekday, dateStr } = formatWeekdayAndDate(EVENT_UTC, "fr");
     expect(weekday).toBeTruthy();
     expect(dateStr).toMatch(/25/);
-    expect(dateStr).toMatch(/2026/);
     expect(dateStr).toMatch(/janv/);
+    expect(dateStr).not.toMatch(/2026/);
   });
 
-  it("should return weekday and dateStr in English", () => {
+  it("should return weekday and dateStr (no year) in English", () => {
     const { weekday, dateStr } = formatWeekdayAndDate(EVENT_UTC, "en");
     expect(weekday).toBeTruthy();
     expect(dateStr).toMatch(/25/);
-    expect(dateStr).toMatch(/2026/);
     expect(dateStr).toMatch(/Jan/);
+    expect(dateStr).not.toMatch(/2026/);
   });
 });
 

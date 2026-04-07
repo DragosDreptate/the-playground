@@ -21,7 +21,7 @@ export function DraftBadge({ label, variant = "badge" }: Props) {
   return (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       <FileEdit className="size-3" />
-      {label}
+      <span className="hidden sm:inline">{label}</span>
     </Badge>
   );
 }
