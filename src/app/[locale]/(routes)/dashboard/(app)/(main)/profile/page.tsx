@@ -117,91 +117,112 @@ export default async function ProfilePage({
       {/* Tab content */}
       {activeTab === "profile" ? (
         <>
-          {/* Form */}
-          <ProfileForm
-            user={{
-              firstName: user.firstName ?? "",
-              lastName: user.lastName ?? "",
-            }}
-            mode="edit"
-            action={updateProfileAction}
-          />
+          <div className="border-border bg-card rounded-2xl border p-6 space-y-6">
+            {/* Form */}
+            <ProfileForm
+              user={{
+                firstName: user.firstName ?? "",
+                lastName: user.lastName ?? "",
+                bio: user.bio,
+                city: user.city,
+                website: user.website,
+                linkedinUrl: user.linkedinUrl,
+                twitterUrl: user.twitterUrl,
+                githubUrl: user.githubUrl,
+              }}
+              mode="edit"
+              action={updateProfileAction}
+            />
 
-          {/* Separator */}
-          <div className="border-border border-t" />
+            {/* Separator */}
+            <div className="border-border border-t" />
 
-          {/* Meta rows */}
-          <div className="flex flex-col gap-3">
-            {/* Email */}
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <Mail className="text-primary size-4" />
+            {/* Account info */}
+            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+              {t("edit.account")}
+            </p>
+
+            {/* Meta rows */}
+            <div className="flex flex-col gap-3">
+              {/* Email */}
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <Mail className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t("form.email")}
+                  </p>
+                  <p className="text-sm font-medium">{user.email}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("form.email")}
-                </p>
-                <p className="text-sm font-medium">{user.email}</p>
+
+              {/* Member since */}
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <CalendarIcon className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t("edit.memberSince")}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {user.createdAt.toLocaleDateString(undefined, {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Member since */}
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="text-primary size-4" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("edit.memberSince")}
-                </p>
-                <p className="text-sm font-medium">
-                  {user.createdAt.toLocaleDateString(undefined, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
+            {/* Section admin */}
+            {user.role === "ADMIN" && (
+              <>
+                <div className="border-border border-t" />
+                <div className="space-y-3">
+                  <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                    Administration
+                  </p>
+                  <AdminHostModeToggle enabled={adminHostModeEnabled} />
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Separator */}
-          <div className="border-border border-t" />
-
-          {/* Zone de danger */}
-          <div className="space-y-3">
-            <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+          {/* Zone de danger — outside the card */}
+          <div className="space-y-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+            <p className="text-destructive text-xs font-medium uppercase tracking-wider">
               {t("deleteAccount.dangerZone")}
             </p>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-foreground/70 text-sm">
               {t("deleteAccount.description")}
             </p>
             <DeleteAccountDialog />
           </div>
-
-          {/* Section admin — visible uniquement pour les admins plateforme */}
-          {user.role === "ADMIN" && (
-            <>
-              <div className="border-border border-t" />
-              <div className="space-y-3">
-                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-                  Administration
-                </p>
-                <AdminHostModeToggle enabled={adminHostModeEnabled} />
-              </div>
-            </>
-          )}
         </>
       ) : (
-        <NotificationPreferencesForm
-          preferences={{
-            notifyNewRegistration: user.notifyNewRegistration,
-            notifyNewComment: user.notifyNewComment,
-            notifyNewMomentInCircle: user.notifyNewMomentInCircle,
-          }}
-          email={user.email}
-          action={updateNotificationPreferencesAction}
-        />
+        <>
+          {/* Email banner — outside the card */}
+          <div className="flex items-center gap-2.5 rounded-lg border border-primary/20 bg-primary/7 px-4 py-3">
+            <Mail className="text-primary size-4 shrink-0" />
+            <p className="text-foreground/70 text-[13px] leading-snug">
+              {t("notifications.emailBanner", { email: user.email })}
+            </p>
+          </div>
+
+          <div className="border-border bg-card rounded-2xl border p-6">
+            <NotificationPreferencesForm
+            preferences={{
+              notifyNewRegistration: user.notifyNewRegistration,
+              notifyNewComment: user.notifyNewComment,
+              notifyNewMomentInCircle: user.notifyNewMomentInCircle,
+            }}
+            action={updateNotificationPreferencesAction}
+          />
+          </div>
+        </>
       )}
     </div>
   );

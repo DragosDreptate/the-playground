@@ -5,6 +5,12 @@ export type UpdateProfileInput = {
   lastName: string;
   name?: string | null;
   image?: string | null;
+  bio?: string | null;
+  city?: string | null;
+  website?: string | null;
+  linkedinUrl?: string | null;
+  twitterUrl?: string | null;
+  githubUrl?: string | null;
 };
 
 export type UpdateNotificationPreferencesInput = NotificationPreferences;

@@ -10,7 +10,9 @@ import { getUserPublicProfile } from "@/domain/usecases/get-user-public-profile"
 import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Crown } from "lucide-react";
+import { ChevronRight, Crown, MapPin, Globe, Linkedin, Github, CalendarDays, Users } from "lucide-react";
+import { XIcon } from "@/components/icons/x-icon";
+import { CollapsibleList } from "@/components/collapsible-list";
 import { formatLongDate, formatMonthYear } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
 
@@ -49,6 +51,12 @@ export default async function UserPublicProfilePage({
     .toUpperCase();
 
   const memberSince = formatMonthYear(user.memberSince, locale);
+  const hasSocialLinks = !!(
+    user.socialLinks.website ||
+    user.socialLinks.linkedinUrl ||
+    user.socialLinks.twitterUrl ||
+    user.socialLinks.githubUrl
+  );
 
   return (
     <div className="mx-auto max-w-lg space-y-8">
@@ -77,12 +85,82 @@ export default async function UserPublicProfilePage({
 
         <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
 
+        {/* Bio */}
+        {user.bio && (
+          <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
+            {user.bio}
+          </p>
+        )}
+
+        {/* Meta: city, member since, hosted events */}
         <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
-          <span>{t("memberSince", { date: memberSince })}</span>
+          {user.city && (
+            <span className="flex items-center gap-1.5">
+              <MapPin className="size-3.5" />
+              {user.city}
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <CalendarDays className="size-3.5" />
+            {t("memberSince", { date: memberSince })}
+          </span>
           {user.hostedMomentsCount > 0 && (
-            <span>{t("hostedEvents", { count: user.hostedMomentsCount })}</span>
+            <span className="flex items-center gap-1.5">
+              <Users className="size-3.5" />
+              {t("hostedEvents", { count: user.hostedMomentsCount })}
+            </span>
           )}
         </div>
+
+        {/* Social links */}
+        {hasSocialLinks && (
+          <div className="flex items-center gap-2">
+            {user.socialLinks.website && (
+              <a
+                href={user.socialLinks.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-8 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                title={t("socialLinks.website")}
+              >
+                <Globe className="size-4" />
+              </a>
+            )}
+            {user.socialLinks.linkedinUrl && (
+              <a
+                href={user.socialLinks.linkedinUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-8 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                title="LinkedIn"
+              >
+                <Linkedin className="size-4" />
+              </a>
+            )}
+            {user.socialLinks.twitterUrl && (
+              <a
+                href={user.socialLinks.twitterUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-8 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                title="Twitter / X"
+              >
+                <XIcon className="size-4" />
+              </a>
+            )}
+            {user.socialLinks.githubUrl && (
+              <a
+                href={user.socialLinks.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-8 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                title="GitHub"
+              >
+                <Github className="size-4" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Section Communautés */}
@@ -91,8 +169,8 @@ export default async function UserPublicProfilePage({
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("communities", { count: publicCircles.length })}
           </h2>
-          <div className="space-y-2">
-            {publicCircles.map((membership) => (
+          <CollapsibleList
+            items={publicCircles.map((membership) => (
               <Link
                 key={membership.circleSlug}
                 href={`/circles/${membership.circleSlug}`}
@@ -123,7 +201,7 @@ export default async function UserPublicProfilePage({
                 </Badge>
               </Link>
             ))}
-          </div>
+          />
         </section>
       )}
 
@@ -133,8 +211,8 @@ export default async function UserPublicProfilePage({
           <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t("upcomingEvents", { count: upcomingPublicMoments.length })}
           </h2>
-          <div className="space-y-2">
-            {upcomingPublicMoments.map((reg) => (
+          <CollapsibleList
+            items={upcomingPublicMoments.map((reg) => (
               <Link
                 key={reg.momentSlug}
                 href={`/m/${reg.momentSlug}`}
@@ -149,7 +227,7 @@ export default async function UserPublicProfilePage({
                 </p>
               </Link>
             ))}
-          </div>
+          />
         </section>
       )}
 

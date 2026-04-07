@@ -93,6 +93,61 @@ describe("UpdateProfile", () => {
       const [, profileInput] = (repo.updateProfile as ReturnType<typeof vi.fn>).mock.calls[0];
       expect(profileInput).not.toHaveProperty("image");
     });
+
+    it("should pass bio, city, and social links when provided", async () => {
+      const existing = makeUser({ id: "user-1" });
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        updateProfile: vi.fn().mockResolvedValue(
+          makeUser({
+            id: "user-1",
+            bio: "Dev React",
+            city: "Paris",
+            website: "https://example.com",
+          })
+        ),
+      });
+
+      await updateProfile(
+        {
+          ...defaultInput,
+          bio: "Dev React",
+          city: "Paris",
+          website: "https://example.com",
+          linkedinUrl: "https://linkedin.com/in/test",
+          twitterUrl: null,
+          githubUrl: null,
+        },
+        { userRepository: repo }
+      );
+
+      expect(repo.updateProfile).toHaveBeenCalledWith("user-1", {
+        firstName: "Alice",
+        lastName: "Dupont",
+        bio: "Dev React",
+        city: "Paris",
+        website: "https://example.com",
+        linkedinUrl: "https://linkedin.com/in/test",
+        twitterUrl: null,
+        githubUrl: null,
+      });
+    });
+
+    it("should not include bio/city/socialLinks when not provided", async () => {
+      const existing = makeUser({ id: "user-1" });
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        updateProfile: vi.fn().mockResolvedValue(makeUser({ id: "user-1" })),
+      });
+
+      await updateProfile(defaultInput, { userRepository: repo });
+
+      const [, profileInput] = (repo.updateProfile as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(profileInput).not.toHaveProperty("bio");
+      expect(profileInput).not.toHaveProperty("city");
+      expect(profileInput).not.toHaveProperty("website");
+      expect(profileInput).not.toHaveProperty("linkedinUrl");
+    });
   });
 
   describe("given a non-existing user", () => {

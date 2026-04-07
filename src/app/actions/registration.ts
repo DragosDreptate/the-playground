@@ -8,7 +8,7 @@ import { enUS } from "date-fns/locale/en-US";
 const PLATFORM_TIMEZONE = "Europe/Paris";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
-import { isAdminUser } from "@/lib/admin-host-mode";
+import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -441,12 +441,13 @@ export async function removeRegistrationByHostAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await removeRegistrationByHost(
       { registrationId, hostUserId: session.user.id },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
         paymentService,
       }
     );
@@ -543,12 +544,13 @@ export async function approveMomentRegistrationAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await approveMomentRegistration(
       { registrationId, hostUserId: session.user.id },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
       }
     );
 
@@ -580,12 +582,13 @@ export async function rejectMomentRegistrationAction(
   }
 
   try {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await rejectMomentRegistration(
       { registrationId, hostUserId: session.user.id },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
+        circleRepository: circleRepo,
       }
     );
 
