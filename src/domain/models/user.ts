@@ -8,11 +8,21 @@ export type UserAvatarInfo = {
   image: string | null;
 };
 
+export type SocialLinks = {
+  website: string | null;
+  linkedinUrl: string | null;
+  twitterUrl: string | null;
+  githubUrl: string | null;
+};
+
 export type PublicUser = {
   publicId: string;
   firstName: string;
   lastName: string;
   image: string | null;
+  bio: string | null;
+  city: string | null;
+  socialLinks: SocialLinks;
   memberSince: Date;
   hostedMomentsCount: number;
 };
@@ -52,6 +62,12 @@ export type User = {
   notifyNewRegistration: boolean;
   notifyNewComment: boolean;
   notifyNewMomentInCircle: boolean;
+  bio: string | null;
+  city: string | null;
+  website: string | null;
+  linkedinUrl: string | null;
+  twitterUrl: string | null;
+  githubUrl: string | null;
   dashboardMode: DashboardMode | null;
   publicId: string | null;
   createdAt: Date;

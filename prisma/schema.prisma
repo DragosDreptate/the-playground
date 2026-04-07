@@ -142,6 +142,12 @@ model User {
   notifyNewRegistration     Boolean   @default(true)
   notifyNewComment          Boolean   @default(true)
   notifyNewMomentInCircle   Boolean   @default(true)
+  bio                       String?   @db.VarChar(160)
+  city                      String?
+  website                   String?
+  linkedinUrl               String?   @map("linkedin_url")
+  twitterUrl                String?   @map("twitter_url")
+  githubUrl                 String?   @map("github_url")
   dashboardMode             DashboardMode?
   publicId                  String?   @unique @map("public_id")
   createdAt                 DateTime  @default(now())

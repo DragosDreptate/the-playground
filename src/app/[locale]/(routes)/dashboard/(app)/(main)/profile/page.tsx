@@ -122,6 +122,12 @@ export default async function ProfilePage({
             user={{
               firstName: user.firstName ?? "",
               lastName: user.lastName ?? "",
+              bio: user.bio,
+              city: user.city,
+              website: user.website,
+              linkedinUrl: user.linkedinUrl,
+              twitterUrl: user.twitterUrl,
+              githubUrl: user.githubUrl,
             }}
             mode="edit"
             action={updateProfileAction}

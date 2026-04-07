@@ -1,5 +1,5 @@
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
-import type { User, NotificationPreferences, PublicUser } from "@/domain/models/user";
+import type { User, NotificationPreferences, PublicUser, SocialLinks } from "@/domain/models/user";
 import { vi } from "vitest";
 
 export function createMockUserRepository(
@@ -46,6 +46,12 @@ export function makeUser(overrides: Partial<User> = {}): User {
     notifyNewRegistration: true,
     notifyNewComment: true,
     notifyNewMomentInCircle: true,
+    bio: null,
+    city: null,
+    website: null,
+    linkedinUrl: null,
+    twitterUrl: null,
+    githubUrl: null,
     dashboardMode: null,
     publicId: "test-user-1234",
     createdAt: new Date("2026-01-01"),
@@ -60,6 +66,9 @@ export function makePublicUser(overrides: Partial<PublicUser> = {}): PublicUser 
     firstName: "Jean",
     lastName: "Dupont",
     image: null,
+    bio: null,
+    city: null,
+    socialLinks: { website: null, linkedinUrl: null, twitterUrl: null, githubUrl: null },
     memberSince: new Date("2026-01-01"),
     hostedMomentsCount: 0,
     ...overrides,

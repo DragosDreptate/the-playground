@@ -1312,6 +1312,11 @@
       "firstNamePlaceholder": "Alice",
       "lastName": "Nom de famille",
       "lastNamePlaceholder": "Dupont",
+      "bio": "Bio",
+      "bioPlaceholder": "Décrivez-vous en quelques mots...",
+      "city": "Ville",
+      "cityPlaceholder": "Ex : Paris, Lyon, Bordeaux...",
+      "links": "Liens",
       "continue": "Continuer",
       "saved": "Profil mis à jour avec succès."
     },
@@ -1360,6 +1365,9 @@
       "signInToView": "Connecte-toi pour voir ce profil",
       "roleHost": "Organisateur",
       "rolePlayer": "Participant"
+    },
+    "socialLinks": {
+      "website": "Site web"
     }
   },
   "Help": {

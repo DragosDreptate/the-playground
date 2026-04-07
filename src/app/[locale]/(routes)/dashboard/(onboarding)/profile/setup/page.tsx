@@ -65,7 +65,7 @@ export default async function ProfileSetupPage() {
         </div>
       </div>
       <ProfileForm
-        user={{ firstName, lastName }}
+        user={{ firstName, lastName, bio: null, city: null, website: null, linkedinUrl: null, twitterUrl: null, githubUrl: null }}
         mode="setup"
         action={completeOnboardingAction}
         callbackUrl={callbackUrl}

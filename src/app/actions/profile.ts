@@ -41,6 +41,13 @@ export async function updateProfileAction(
     return { success: false, error: "Last name is required", code: "VALIDATION" };
   }
 
+  const bio = formData.get("bio") as string | null;
+  const city = formData.get("city") as string | null;
+  const website = formData.get("website") as string | null;
+  const linkedinUrl = formData.get("linkedinUrl") as string | null;
+  const twitterUrl = formData.get("twitterUrl") as string | null;
+  const githubUrl = formData.get("githubUrl") as string | null;
+
   try {
     const trimmedFirst = firstName.trim();
     const trimmedLast = lastName.trim();
@@ -50,6 +57,12 @@ export async function updateProfileAction(
         firstName: trimmedFirst,
         lastName: trimmedLast,
         name: `${trimmedFirst} ${trimmedLast}`,
+        bio: bio?.trim() || null,
+        city: city?.trim() || null,
+        website: website?.trim() || null,
+        linkedinUrl: linkedinUrl?.trim() || null,
+        twitterUrl: twitterUrl?.trim() || null,
+        githubUrl: githubUrl?.trim() || null,
       },
       { userRepository: prismaUserRepository }
     );
