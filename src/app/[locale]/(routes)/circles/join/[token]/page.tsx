@@ -24,7 +24,6 @@ import {
   Users,
   CalendarIcon,
   MapPin,
-  ExternalLink,
   Crown,
 } from "lucide-react";
 
@@ -268,7 +267,7 @@ export default async function JoinCircleByInvitePage({
             {circle.website && (
               <div className="flex items-center gap-3">
                 <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <ExternalLink className="text-primary size-4" />
+                  <Globe className="text-primary size-4" />
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs">{t("form.website")}</p>
