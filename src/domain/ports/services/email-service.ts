@@ -236,7 +236,7 @@ export type CircleInvitationEmailData = {
   coverImageUrl?: string | null;
   memberCount?: number;
   momentCount?: number;
-  inviteUrl: string;
+  circleUrl: string;
   strings: {
     subject: string;
     ctaLabel: string;

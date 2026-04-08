@@ -35,7 +35,6 @@ export type Circle = {
   city: string | null;
   website: string | null;
   stripeConnectAccountId: string | null;
-  inviteToken: string | null;
   requiresApproval: boolean;
   isDemo: boolean;
   createdAt: Date;

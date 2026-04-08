@@ -17,9 +17,6 @@ import { deleteCircle } from "@/domain/usecases/delete-circle";
 import { joinCircleDirectly } from "@/domain/usecases/join-circle-directly";
 import { leaveCircle } from "@/domain/usecases/leave-circle";
 import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
-import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
-import { revokeCircleInviteToken } from "@/domain/usecases/revoke-circle-invite-token";
-import { joinCircleByInvite } from "@/domain/usecases/join-circle-by-invite";
 import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
@@ -386,92 +383,6 @@ export async function removeCircleMemberAction(
   }
 }
 
-export async function generateCircleInviteTokenAction(
-  circleId: string
-): Promise<ActionResult<{ inviteUrl: string }>> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
-  }
-
-  try {
-    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    const { token } = await generateCircleInviteToken(
-      { circleId, userId: session.user.id },
-      { circleRepository: circleRepo }
-    );
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    return { success: true, data: { inviteUrl: `${baseUrl}/circles/join/${token}` } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
-}
-
-export async function revokeCircleInviteTokenAction(
-  circleId: string
-): Promise<ActionResult> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
-  }
-
-  try {
-    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    await revokeCircleInviteToken(
-      { circleId, userId: session.user.id },
-      { circleRepository: circleRepo }
-    );
-    const { revalidatePath } = await import("next/cache");
-    const circle = await prismaCircleRepository.findById(circleId);
-    if (circle) revalidatePath(`/dashboard/circles/${circle.slug}`);
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
-}
-
-export async function joinCircleByInviteAction(
-  token: string
-): Promise<ActionResult<{ circleSlug: string; alreadyMember: boolean; pendingApproval: boolean }>> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
-  }
-
-  try {
-    const { circle, alreadyMember, pendingApproval } = await joinCircleByInvite(
-      { token, userId: session.user.id },
-      { circleRepository: prismaCircleRepository }
-    );
-
-    if (!alreadyMember) {
-      const t = await getTranslations("Email");
-      const userId = session.user.id;
-      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
-      notifyHostCircleJoin(circle.id, userId, pendingApproval, t, circle.slug, circle.name).catch((err) => {
-        console.error("[joinCircleByInviteAction] Erreur notification host :", err);
-        Sentry.captureException(err);
-      });
-    }
-
-    return { success: true, data: { circleSlug: circle.slug, alreadyMember, pendingApproval } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
-}
-
 export async function inviteToCircleByEmailAction(
   circleId: string,
   emails: string[]
@@ -483,15 +394,21 @@ export async function inviteToCircleByEmailAction(
 
   try {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    const { token, circle } = await generateCircleInviteToken(
-      { circleId, userId: session.user.id },
-      { circleRepository: circleRepo }
-    );
+
+    // Check d'autorisation HOST (auparavant porté par generateCircleInviteToken)
+    const membership = await circleRepo.findMembership(circleId, session.user.id);
+    if (!membership || membership.role !== "HOST") {
+      return { success: false, error: "Only hosts can send invitations", code: "UNAUTHORIZED" };
+    }
+
+    const circle = await circleRepo.findById(circleId);
+    if (!circle) {
+      return { success: false, error: "Circle not found", code: "NOT_FOUND" };
+    }
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
-    const inviteUrl = `${baseUrl}/circles/join/${token}`;
+    const circleUrl = `${baseUrl}/circles/${circle.slug}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
-    // Résoudre la locale dans le contexte de la request (avant after())
     const t = await getTranslations("Email.circleInvitation");
 
     after(async () => {
@@ -509,7 +426,7 @@ export async function inviteToCircleByEmailAction(
           coverImageUrl: circle.coverImage,
           memberCount,
           momentCount,
-          inviteUrl,
+          circleUrl,
           strings: {
             subject: t("subject", { inviterName, circleName: circle.name }),
             ctaLabel: t("ctaLabel"),

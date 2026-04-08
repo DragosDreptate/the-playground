@@ -13,11 +13,6 @@ async function navigateToCircle(page: Page, slug: string) {
   await page.waitForLoadState("networkidle");
 }
 
-async function extractInviteToken(page: Page): Promise<string | null> {
-  const content = await page.locator("main").textContent().catch(() => "");
-  const match = content?.match(/circles\/join\/([a-f0-9-]{36})/i);
-  return match ? match[1] : null;
-}
 
 /** Submit a Circle join request as PLAYER3 if not already pending/member */
 async function ensurePlayer3PendingOnCircle(browser: import("@playwright/test").Browser) {
@@ -168,46 +163,23 @@ test.describe.serial("Circle membership approval — direct join", () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// Section 2: Circle membership approval — invite token (uses PLAYER1)
+// Section 2: Circle membership approval — public page (uses PLAYER1)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe.serial("Circle membership approval — invite token", () => {
-  let inviteToken: string;
-
-  test("should generate invite token and show approval CTA on invite page", async ({ browser }) => {
-    // Host generates invite token
-    const hostCtx = await browser.newContext({ storageState: AUTH.HOST });
-    const hostPage = await hostCtx.newPage();
-    await hostPage.goto(`/fr/dashboard/circles/${SLUGS.APPROVAL_CIRCLE}`);
-    await hostPage.waitForLoadState("networkidle");
-
-    const generateBtn = hostPage.getByRole("button", { name: /générer|generate/i }).first();
-    if (await generateBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await generateBtn.click();
-    }
-    await hostPage.reload();
-    await hostPage.waitForLoadState("networkidle");
-
-    const token = await extractInviteToken(hostPage);
-    expect(token).toBeTruthy();
-    inviteToken = token!;
-    await hostCtx.close();
-
-    // PLAYER1 (not member of APPROVAL_CIRCLE) visits invite page
+test.describe.serial("Circle membership approval — public page", () => {
+  test("should show approval CTA on public circle page", async ({ browser }) => {
     const playerCtx = await browser.newContext({ storageState: AUTH.PLAYER });
     const playerPage = await playerCtx.newPage();
-    await playerPage.goto(`/fr/circles/join/${inviteToken}`);
-    await playerPage.waitForLoadState("networkidle");
+    await navigateToCircle(playerPage, SLUGS.APPROVAL_CIRCLE);
 
     await expect(playerPage.getByRole("button", { name: /soumis à validation|subject to approval/i })).toBeVisible();
     await playerCtx.close();
   });
 
-  test("should show pending state after joining via invite token", async ({ browser }) => {
+  test("should show pending state after joining via public page", async ({ browser }) => {
     const playerCtx = await browser.newContext({ storageState: AUTH.PLAYER });
     const playerPage = await playerCtx.newPage();
-    await playerPage.goto(`/fr/circles/join/${inviteToken}`);
-    await playerPage.waitForLoadState("networkidle");
+    await navigateToCircle(playerPage, SLUGS.APPROVAL_CIRCLE);
 
     const joinButton = playerPage.getByRole("button", { name: /soumis à validation|subject to approval/i });
     if (await joinButton.isVisible({ timeout: 3000 }).catch(() => false)) {

@@ -5,33 +5,23 @@ import { Link as NextIntlLink } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
-import {
-  generateCircleInviteTokenAction,
-  revokeCircleInviteTokenAction,
-  inviteToCircleByEmailAction,
-} from "@/app/actions/circle";
-import type { Circle } from "@/domain/models/circle";
-import { Link as LinkIcon, UserPlus, Copy, Mail, Plus, X, Check } from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+import { inviteToCircleByEmailAction } from "@/app/actions/circle";
+import { Link as LinkIcon, UserPlus, Mail, Plus, X, Check } from "lucide-react";
+import { stripProtocol } from "@/lib/url";
 
 type Props = {
-  circle: Circle;
+  circleId: string;
+  circleSlug: string;
   publicUrl: string;
   t: {
     cardTitle: string;
     shareableLink: string;
     emailTitle: string;
     emailPlaceholder: string;
-    emailAdd: string;
     emailSend: string;
     emailSendMultiple: string;
     emailSent: string;
     emailInvalid: string;
-    linkTitle: string;
-    linkDescription: string;
-    linkGenerate: string;
-    linkRevoke: string;
-    linkRevoked: string;
     emailAddMore: string;
     emailMaxReached: string;
   };
@@ -43,27 +33,12 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
-  const router = useRouter();
-
-  // ── Email state ──
-  // List of email fields (each is a string, possibly empty)
+export function CircleShareInviteCard({ circleId, circleSlug, publicUrl, t }: Props) {
   const [emailFields, setEmailFields] = useState<string[]>([""]);
   const [emailError, setEmailError] = useState("");
   const [emailSent, setEmailSent] = useState(false);
-
-  // ── Invite link state ──
-  const [inviteUrl, setInviteUrl] = useState<string | null>(
-    circle.inviteToken
-      ? `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/circles/join/${circle.inviteToken}`
-      : null
-  );
-
-  const [isPendingGenerate, startGenerate] = useTransition();
-  const [isPendingRevoke, startRevoke] = useTransition();
   const [isPendingEmail, startEmail] = useTransition();
 
-  // ── Email handlers ──
   function handleEmailChange(idx: number, value: string) {
     setEmailFields((prev) => prev.map((f, i) => (i === idx ? value : f)));
     if (emailError) setEmailError("");
@@ -88,31 +63,12 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
     }
 
     startEmail(async () => {
-      const result = await inviteToCircleByEmailAction(circle.id, emails);
+      const result = await inviteToCircleByEmailAction(circleId, emails);
       if (result.success) {
         setEmailFields([""]);
         setEmailSent(true);
         setTimeout(() => setEmailSent(false), 3000);
       }
-    });
-  }
-
-  // ── Invite link handlers ──
-  function handleGenerate() {
-    startGenerate(async () => {
-      const result = await generateCircleInviteTokenAction(circle.id);
-      if (result.success) {
-        setInviteUrl(result.data.inviteUrl);
-        router.refresh();
-      }
-    });
-  }
-
-  function handleRevoke() {
-    startRevoke(async () => {
-      await revokeCircleInviteTokenAction(circle.id);
-      setInviteUrl(null);
-      router.refresh();
     });
   }
 
@@ -134,18 +90,18 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
           <p className="mb-1.5 text-[13px] font-medium">{t.shareableLink}</p>
           <div className="flex items-center gap-2">
             <NextIntlLink
-              href={`/circles/${circle.slug}`}
+              href={`/circles/${circleSlug}`}
               target="_blank"
               className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors"
             >
-              {publicUrl.replace(/^https?:\/\//, "")}
+              {stripProtocol(publicUrl)}
             </NextIntlLink>
             <CopyLinkButton value={publicUrl} />
           </div>
         </div>
       </div>
 
-      {/* Divider — ml-11 (44px = icon 32 + gap 12) */}
+      {/* Divider */}
       <div className="border-border ml-11 border-t" />
 
       {/* ── Row 2 : Inviter par email ── */}
@@ -218,52 +174,6 @@ export function CircleShareInviteCard({ circle, publicUrl, t }: Props) {
                 : filledEmails.length > 1
                   ? t.emailSendMultiple
                   : t.emailSend}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="border-border ml-11 border-t" />
-
-      {/* ── Row 3 : Lien d'invitation ── */}
-      <div className="flex items-start gap-3 pb-0 pt-3">
-        <div className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
-          <Copy className="size-[15px]" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="mb-1.5 text-[13px] font-medium">{t.linkTitle}</p>
-          <p className="text-muted-foreground mb-2 text-xs leading-[1.5]">
-            {t.linkDescription}
-          </p>
-
-          {inviteUrl ? (
-            <>
-              <div className="flex items-center gap-2">
-                <div className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-[7px] font-mono text-xs text-muted-foreground transition-colors">
-                  {inviteUrl.replace(/^https?:\/\//, "")}
-                </div>
-                <CopyLinkButton value={inviteUrl} />
-              </div>
-              <button
-                type="button"
-                onClick={handleRevoke}
-                disabled={isPendingRevoke}
-                className="text-muted-foreground hover:text-foreground mt-1.5 block text-[11px] underline underline-offset-2 disabled:cursor-wait"
-              >
-                {isPendingRevoke ? "..." : t.linkRevoke}
-              </button>
-            </>
-          ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGenerate}
-              disabled={isPendingGenerate}
-              className="w-full text-[13px]"
-            >
-              {isPendingGenerate ? "..." : t.linkGenerate}
             </Button>
           )}
         </div>

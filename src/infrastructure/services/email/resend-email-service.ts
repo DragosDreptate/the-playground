@@ -280,7 +280,7 @@ export function createResendEmailService(): EmailService {
         from,
         to: data.to,
         subject: data.strings.subject,
-        react: CircleInvitationEmail({ ...data, baseUrl }),
+        react: CircleInvitationEmail(data),
       });
     },
 
@@ -291,7 +291,7 @@ export function createResendEmailService(): EmailService {
           from,
           to,
           subject: emailData.strings.subject,
-          react: CircleInvitationEmail({ ...emailData, to, baseUrl }),
+          react: CircleInvitationEmail({ ...emailData, to }),
         }))
       );
     },
