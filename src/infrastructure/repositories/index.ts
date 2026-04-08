@@ -4,3 +4,4 @@ export { prismaRegistrationRepository } from "./prisma-registration-repository";
 export { prismaUserRepository } from "./prisma-user-repository";
 export { prismaCommentRepository } from "./prisma-comment-repository";
 export { prismaAdminRepository } from "./prisma-admin-repository";
+export { prismaCircleNetworkRepository } from "./prisma-circle-network-repository";

@@ -844,7 +844,49 @@
       "users": "Nouveaux utilisateurs",
       "registrations": "Inscriptions",
       "moments": "Événements créés"
-    }
+    },
+    "networks": "Réseaux",
+    "createNetwork": "Créer un Réseau",
+    "editNetwork": "Modifier le Réseau",
+    "deleteNetwork": "Supprimer le Réseau",
+    "networkName": "Nom",
+    "networkSlug": "Slug",
+    "networkDescription": "Description",
+    "networkCoverImage": "Image de couverture",
+    "networkWebsite": "Site web",
+    "addCircle": "Ajouter une Communauté",
+    "removeCircle": "Retirer",
+    "searchCircle": "Rechercher une Communauté…",
+    "networkMembers": "Communautés membres",
+    "confirmDeleteNetwork": "Supprimer ce Réseau ? Les Communautés ne seront pas supprimées.",
+    "circlePrivate": "Privée",
+    "circlePrivateWarning": "Privée — non visible sur la page publique",
+    "confirmRemoveCircle": "Retirer {name} de ce Réseau ?",
+    "slugChangeWarning": "⚠ Changer le slug cassera les liens existants.",
+    "networkCreated": "Réseau créé",
+    "networkUpdated": "Réseau mis à jour",
+    "networkDeleted": "Réseau supprimé",
+    "circleAdded": "Communauté ajoutée",
+    "circleRemoved": "Communauté retirée",
+    "noNetworks": "Aucun Réseau.",
+    "saveNetwork": "Enregistrer",
+    "saving": "Enregistrement…",
+    "creating": "Création…",
+    "networkDetail": "Détail Réseau"
+  },
+  "Network": {
+    "memberOf": "Membre de",
+    "communities": "Communautés",
+    "moments": "Événements",
+    "about": "À propos",
+    "noCommunities": "Aucune Communauté dans ce Réseau pour le moment",
+    "memberCommunities": "Communautés membres",
+    "totalMembers": "Membres au total",
+    "totalEvents": "Événements à venir",
+    "communitiesUnit": "communautés",
+    "membersUnit": "membres",
+    "eventsUnit": "événements",
+    "website": "Site web"
   },
   "UserMenu": {
     "dashboard": "Mon espace",
@@ -1380,6 +1422,7 @@
       "mySpace": "Mon espace",
       "notifications": "Gérer ses notifications",
       "paidEvents": "Événements payants",
+      "networks": "Les Réseaux",
       "leave": "Quitter une communauté",
       "createCommunity": "Créer sa communauté",
       "createEvent": "Créer un événement",
@@ -1437,7 +1480,7 @@
         "step3": "Vous êtes automatiquement inscrit et recevez un <strong>email de confirmation</strong> avec votre reçu de paiement",
         "refundLabel": "Politique de remboursement :",
         "refund1": "Chaque événement est soit <strong>remboursable</strong> (remboursement automatique en cas de désinscription), soit <strong>non remboursable</strong> (pas de remboursement si vous vous désinscrivez)",
-        "refund2": "En cas d'<strong>annulation de l'événement par l'organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
+        "refund2": "En cas d''<strong>annulation de l''événement par l''organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
         "refund3": "Les remboursements sont effectués sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
         "callout": "The Playground ne prend aucune commission. Vos données bancaires sont traitées par Stripe et ne sont jamais stockées par la plateforme."
       },
@@ -1465,6 +1508,13 @@
       "leave": {
         "title": "Quitter une communauté",
         "intro": "Depuis la page d'une communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire."
+      },
+      "networks": {
+        "title": "Les Réseaux",
+        "intro": "Un <strong>Réseau</strong> regroupe plusieurs communautés liées sous une même vitrine. Chaque Réseau dispose d'une page publique affichant ses communautés membres, avec leurs événements à venir et le nombre de membres.",
+        "item1": "Depuis la page d'une communauté, un badge <strong>Membre de [Réseau]</strong> apparaît dans les informations si la communauté appartient à un ou plusieurs réseaux",
+        "item2": "Cliquez sur le nom du réseau pour accéder à sa page et découvrir les autres communautés membres",
+        "item3": "Il n'y a pas d'inscription au réseau — vous êtes membre des communautés individuellement"
       }
     },
     "organizer": {

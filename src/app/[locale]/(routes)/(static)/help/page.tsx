@@ -91,6 +91,7 @@ export default async function HelpPage() {
         { id: "mySpace", label: t("sidebar.mySpace") },
         { id: "notifications", label: t("sidebar.notifications") },
         { id: "leave", label: t("sidebar.leave") },
+        { id: "networks", label: t("sidebar.networks") },
       ],
     },
     {
@@ -332,6 +333,19 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("participant.leave.intro", rich)}
               </p>
+            </div>
+
+            {/* Réseaux */}
+            <div className="space-y-3">
+              <SectionH3 id="networks">{t("participant.networks.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("participant.networks.intro", rich)}
+              </p>
+              <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
+                <li>{t.rich("participant.networks.item1", rich)}</li>
+                <li>{t.rich("participant.networks.item2", rich)}</li>
+                <li>{t.rich("participant.networks.item3", rich)}</li>
+              </ul>
             </div>
           </section>
 

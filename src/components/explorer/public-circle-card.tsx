@@ -17,9 +17,10 @@ import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 type Props = {
   circle: PublicCircle;
   membershipRole?: CircleMemberRole | null;
+  hideNextMoment?: boolean;
 };
 
-export function PublicCircleCard({ circle, membershipRole }: Props) {
+export function PublicCircleCard({ circle, membershipRole, hideNextMoment }: Props) {
   const t = useTranslations("Explorer");
   const tCategory = useTranslations("CircleCategory");
   const locale = useLocale();
@@ -115,21 +116,23 @@ export function PublicCircleCard({ circle, membershipRole }: Props) {
           </div>
 
           {/* Right column — desktop only */}
-          <div className="hidden sm:flex shrink-0 items-center ml-4">
-            {circle.nextMoment && nextMomentDate ? (
-              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[220px]">
-                <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
-                <div className="flex items-center gap-1.5">
-                  <CalendarIcon className="size-3 shrink-0 text-primary" />
-                  <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
+          {!hideNextMoment && (
+            <div className="hidden sm:flex shrink-0 items-center ml-4">
+              {circle.nextMoment && nextMomentDate ? (
+                <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[220px]">
+                  <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
+                  <div className="flex items-center gap-1.5">
+                    <CalendarIcon className="size-3 shrink-0 text-primary" />
+                    <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
-                {t("circleCard.noUpcomingMoments")}
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">
+                  {t("circleCard.noUpcomingMoments")}
+                </div>
+              )}
+            </div>
+          )}
 
         </div>
       </div>

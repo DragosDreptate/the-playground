@@ -4,6 +4,7 @@ import {
   CircleDot,
   CalendarDays,
   Compass,
+  Network,
   TicketCheck,
   MessageSquare,
   TrendingUp,
@@ -15,6 +16,7 @@ export const adminNavItems = [
   { key: "users", href: "/admin/users", icon: Users },
   { key: "circles", href: "/admin/circles", icon: CircleDot },
   { key: "moments", href: "/admin/moments", icon: CalendarDays },
+  { key: "networks", href: "/admin/networks", icon: Network },
   { key: "explorerNav", href: "/admin/explorer", icon: Compass },
 ] as const;
 

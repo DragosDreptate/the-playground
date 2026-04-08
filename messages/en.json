@@ -844,7 +844,49 @@
       "users": "New users",
       "registrations": "Registrations",
       "moments": "Events created"
-    }
+    },
+    "networks": "Networks",
+    "createNetwork": "Create Network",
+    "editNetwork": "Edit Network",
+    "deleteNetwork": "Delete Network",
+    "networkName": "Name",
+    "networkSlug": "Slug",
+    "networkDescription": "Description",
+    "networkCoverImage": "Cover image",
+    "networkWebsite": "Website",
+    "addCircle": "Add Community",
+    "removeCircle": "Remove",
+    "searchCircle": "Search Community…",
+    "networkMembers": "Member Communities",
+    "confirmDeleteNetwork": "Delete this Network? Communities will not be deleted.",
+    "circlePrivate": "Private",
+    "circlePrivateWarning": "Private — not visible on public page",
+    "confirmRemoveCircle": "Remove {name} from this Network?",
+    "slugChangeWarning": "⚠ Changing the slug will break existing links.",
+    "networkCreated": "Network created",
+    "networkUpdated": "Network updated",
+    "networkDeleted": "Network deleted",
+    "circleAdded": "Community added",
+    "circleRemoved": "Community removed",
+    "noNetworks": "No Networks.",
+    "saveNetwork": "Save",
+    "saving": "Saving…",
+    "creating": "Creating…",
+    "networkDetail": "Network Detail"
+  },
+  "Network": {
+    "memberOf": "Member of",
+    "communities": "Communities",
+    "moments": "Events",
+    "about": "About",
+    "noCommunities": "No Communities in this Network yet",
+    "memberCommunities": "Member Communities",
+    "totalMembers": "Total members",
+    "totalEvents": "Upcoming events",
+    "communitiesUnit": "communities",
+    "membersUnit": "members",
+    "eventsUnit": "events",
+    "website": "Website"
   },
   "UserMenu": {
     "dashboard": "Dashboard",
@@ -1380,6 +1422,7 @@
       "mySpace": "My Dashboard",
       "notifications": "Manage notifications",
       "paidEvents": "Paid events",
+      "networks": "Networks",
       "leave": "Leave a community",
       "createCommunity": "Create your community",
       "createEvent": "Create an event",
@@ -1465,6 +1508,13 @@
       "leave": {
         "title": "Leave a community",
         "intro": "From a community page in <strong>Dashboard</strong>, click <strong>Leave community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed."
+      },
+      "networks": {
+        "title": "Networks",
+        "intro": "A <strong>Network</strong> groups several related communities under a shared showcase page. Each Network has a public page displaying its member communities, with their upcoming events and member count.",
+        "item1": "On a community page, a <strong>Member of [Network]</strong> badge appears in the info section if the community belongs to one or more networks",
+        "item2": "Click the network name to visit its page and discover other member communities",
+        "item3": "There is no network membership — you are a member of individual communities"
       }
     },
     "organizer": {

@@ -8,6 +8,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaCircleNetworkRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -39,6 +40,7 @@ import {
   ExternalLink,
   Crown,
   Clock,
+  Network,
 } from "lucide-react";
 
 export const revalidate = 60;
@@ -107,12 +109,13 @@ export default async function PublicCirclePage({
   const { slug, locale } = await params;
   if (!isValidSlug(slug)) notFound();
 
-  const [{ tab }, t, tExplorer, tCategory, session] =
+  const [{ tab }, t, tExplorer, tCategory, tNetwork, session] =
     await Promise.all([
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
+      getTranslations("Network"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
@@ -172,9 +175,10 @@ export default async function PublicCirclePage({
 
   // Fetch registration counts + top attendees (avatars) pour les moments affichés
   const displayedMomentIds = displayedMoments.map((m) => m.id);
-  const [countByMomentId, topAttendeesByMomentId] = await Promise.all([
+  const [countByMomentId, topAttendeesByMomentId, circleNetworks] = await Promise.all([
     prismaRegistrationRepository.findRegisteredCountsByMomentIds(displayedMomentIds),
     prismaRegistrationRepository.findTopRegistrantsByMomentIds(displayedMomentIds, 3),
+    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const gradient = getMomentGradient(circle.name);
@@ -538,6 +542,26 @@ export default async function PublicCirclePage({
                 </p>
               </div>
             </div>
+
+            {/* Réseaux */}
+            {circleNetworks.map((network) => (
+              <div key={network.id} className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {tNetwork("memberOf")}
+                  </p>
+                  <Link
+                    href={`/networks/${network.slug}`}
+                    className="text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    {network.name}
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Séparateur */}
