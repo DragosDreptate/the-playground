@@ -1480,7 +1480,7 @@
         "step3": "Vous êtes automatiquement inscrit et recevez un <strong>email de confirmation</strong> avec votre reçu de paiement",
         "refundLabel": "Politique de remboursement :",
         "refund1": "Chaque événement est soit <strong>remboursable</strong> (remboursement automatique en cas de désinscription), soit <strong>non remboursable</strong> (pas de remboursement si vous vous désinscrivez)",
-        "refund2": "En cas d'<strong>annulation de l'événement par l'organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
+        "refund2": "En cas d''<strong>annulation de l''événement par l''organisateur</strong>, vous êtes toujours remboursé, quel que soit le réglage",
         "refund3": "Les remboursements sont effectués sous <strong>5 à 10 jours ouvrés</strong> sur votre carte bancaire",
         "callout": "The Playground ne prend aucune commission. Vos données bancaires sont traitées par Stripe et ne sont jamais stockées par la plateforme."
       },
