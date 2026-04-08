@@ -34,6 +34,8 @@ export const SLUGS = {
   MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE: "test-moment-no-approval-in-approval-circle",
   /** Moment avec approval dans test-approval-circle (double approval) */
   MOMENT_BOTH_APPROVAL: "test-moment-both-approval",
+  /** Circle Network (réseau de test contenant paris-creative-tech) */
+  NETWORK: "test-network",
 } as const;
 
 // ── Chemins auth (générés par globalSetup) ────────────────────────────────────

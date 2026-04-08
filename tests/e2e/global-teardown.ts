@@ -48,6 +48,14 @@ async function main() {
 
     const testUserIds = testUsers.map((u) => u.id);
 
+    // Étape 0 — CircleNetworks de test (slug commençant par "test-")
+    const deletedNetworks = await prisma.circleNetwork.deleteMany({
+      where: { slug: { startsWith: "test-" } },
+    });
+    if (deletedNetworks.count > 0) {
+      console.log(`  ✓ ${deletedNetworks.count} CircleNetwork(s) supprimé(s)`);
+    }
+
     // Étape 1 — Moments créés par les utilisateurs test (FK sans cascade)
     const deletedMoments = await prisma.moment.deleteMany({
       where: { createdById: { in: testUserIds } },

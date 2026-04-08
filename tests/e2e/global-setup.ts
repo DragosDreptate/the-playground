@@ -51,6 +51,45 @@ async function main() {
   });
   console.log(`  ✓ ${TEST_USERS.ONBOARDING} — onboardingCompleted = false`);
 
+  // 2b. Seed Circle Network de test
+  console.log("\n🌐 Seed Circle Network de test...");
+  const parisCircle = await prisma.circle.findUnique({
+    where: { slug: "paris-creative-tech" },
+  });
+
+  if (parisCircle) {
+    const network = await prisma.circleNetwork.upsert({
+      where: { slug: "test-network" },
+      create: {
+        slug: "test-network",
+        name: "Test Network",
+        description: "A test network for E2E tests",
+      },
+      update: {
+        name: "Test Network",
+        description: "A test network for E2E tests",
+      },
+    });
+
+    // Ajouter paris-creative-tech au réseau (idempotent)
+    await prisma.circleNetworkMembership.upsert({
+      where: {
+        networkId_circleId: {
+          networkId: network.id,
+          circleId: parisCircle.id,
+        },
+      },
+      create: {
+        networkId: network.id,
+        circleId: parisCircle.id,
+      },
+      update: {},
+    });
+    console.log(`  ✓ Network "test-network" avec paris-creative-tech`);
+  } else {
+    console.warn("  ⚠ Circle paris-creative-tech non trouvé — Network non créé");
+  }
+
   await prisma.$disconnect();
 
   // 3. Génère les storage states via l'endpoint de dev impersonation
