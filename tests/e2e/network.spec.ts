@@ -29,8 +29,8 @@ test.describe("Page Réseau — /networks/[slug]", () => {
   test("should show community count", async ({ page }) => {
     await page.goto(`/fr/networks/${SLUGS.NETWORK}`);
 
-    // Au moins "1 Communauté"
-    await expect(page.getByText(/\d+ Communauté/)).toBeVisible();
+    // Au moins "1 communautés" (sidebar stats)
+    await expect(page.getByText(/\d+ communauté/i)).toBeVisible();
   });
 
   test("should return 404 for unknown network slug", async ({ page }) => {
