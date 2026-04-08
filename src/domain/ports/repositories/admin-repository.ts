@@ -87,6 +87,7 @@ export type AdminCircleRow = {
   visibility: CircleVisibility;
   category: CircleCategory | null;
   city: string | null;
+  website: string | null;
   memberCount: number;
   momentCount: number;
   hostName: string;

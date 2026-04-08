@@ -48,6 +48,7 @@ export function makeCircle(overrides: Partial<Circle> = {}): Circle {
     category: null,
     customCategory: null,
     city: null,
+    website: null,
     stripeConnectAccountId: null,
     inviteToken: null,
     requiresApproval: false,

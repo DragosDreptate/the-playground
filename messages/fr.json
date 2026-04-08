@@ -292,6 +292,8 @@
       "categoryPlaceholder": "Choisir une thématique",
       "city": "Ville",
       "cityPlaceholder": "Paris, Lyon, Remote...",
+      "website": "Site web",
+      "websitePlaceholder": "https://mon-site.com",
       "customCategoryPlaceholder": "Précisez votre thématique",
       "customCategoryRequired": "Veuillez préciser votre thématique"
     },
@@ -784,6 +786,7 @@
       "visibility": "Visibilité",
       "category": "Thématique",
       "city": "Ville",
+      "website": "Site web",
       "description": "Description",
       "recentMoments": "Événements récents",
       "noMoments": "Aucun événement.",

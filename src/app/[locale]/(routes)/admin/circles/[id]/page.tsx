@@ -54,6 +54,23 @@ export default async function AdminCircleDetailPage({ params }: Props) {
               value={circle.category ? tCat(circle.category) : "—"}
             />
             <Row label={t("circleDetail.city")} value={circle.city ?? "—"} />
+            <Row
+              label={t("circleDetail.website")}
+              value={
+                circle.website ? (
+                  <a
+                    href={circle.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline underline-offset-2"
+                  >
+                    {circle.website.replace(/^https?:\/\//, "")}
+                  </a>
+                ) : (
+                  "—"
+                )
+              }
+            />
             <Row label={t("columns.createdAt")} value={circle.createdAt.toLocaleDateString()} />
           </CardContent>
         </Card>

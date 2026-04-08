@@ -55,6 +55,7 @@ export async function createCircleAction(
     formData.get("customCategory") as string | null
   );
   const city = (formData.get("city") as string)?.trim() || undefined;
+  const website = (formData.get("website") as string)?.trim() || undefined;
   const requiresApproval = formData.get("requiresApproval") === "on";
 
   if (!name?.trim()) {
@@ -86,6 +87,7 @@ export async function createCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        website,
         requiresApproval,
         userId: session.user.id,
         ...coverData,
@@ -160,6 +162,8 @@ export async function updateCircleAction(
   const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
+  const websiteRaw = formData.get("website") as string | null;
+  const website = websiteRaw ? websiteRaw.trim() : null;
   const customCategoryRaw = formData.get("customCategory") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
@@ -199,6 +203,7 @@ export async function updateCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        website,
         ...coverData,
         requiresApproval: requiresApprovalUpdate,
       },

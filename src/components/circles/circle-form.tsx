@@ -63,6 +63,7 @@ export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
   const [circleName, setCircleName] = useState(circle?.name ?? "");
   const [descriptionValue, setDescriptionValue] = useState(circle?.description ?? "");
   const [cityValue, setCityValue] = useState(circle?.city ?? "");
+  const [websiteValue, setWebsiteValue] = useState(circle?.website ?? "");
   const [customCategoryValue, setCustomCategoryValue] = useState(circle?.customCategory ?? "");
   const [localError, setLocalError] = useState<string | undefined>();
 
@@ -244,6 +245,24 @@ export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
                   value={cityValue}
                   onChange={(e) => setCityValue(e.target.value)}
                   maxLength={100}
+                  className="h-9"
+                />
+              </div>
+            </div>
+
+            {/* Site web */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <ExternalLink className="text-primary size-4" />
+              </div>
+              <span className="w-28 shrink-0 text-sm font-medium">{t("form.website")}</span>
+              <div className="min-w-0 flex-1">
+                <Input
+                  name="website"
+                  type="url"
+                  placeholder={t("form.websitePlaceholder")}
+                  value={websiteValue}
+                  onChange={(e) => setWebsiteValue(e.target.value)}
                   className="h-9"
                 />
               </div>
