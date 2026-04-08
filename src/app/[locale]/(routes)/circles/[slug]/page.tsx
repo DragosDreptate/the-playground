@@ -2,6 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
+import { stripProtocol } from "@/lib/url";
 import type { Metadata } from "next";
 import {
   prismaCircleRepository,
@@ -481,7 +482,7 @@ export default async function PublicCirclePage({
                     rel="noopener noreferrer"
                     className="text-sm font-medium hover:underline underline-offset-2"
                   >
-                    {circle.website.replace(/^https?:\/\//, "")}
+                    {stripProtocol(circle.website)}
                   </a>
                 </div>
               </div>

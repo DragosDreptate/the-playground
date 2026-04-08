@@ -530,7 +530,6 @@ export const prismaCircleRepository: CircleRepository = {
         category: true,
         customCategory: true,
         city: true,
-        website: true,
         coverImage: true,
         coverImageAttribution: true,
         _count: {

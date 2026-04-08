@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { stripProtocol } from "@/lib/url";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -361,7 +362,7 @@ export default async function CircleDetailPage({
                     rel="noopener noreferrer"
                     className="text-sm font-medium hover:underline underline-offset-2"
                   >
-                    {circle.website.replace(/^https?:\/\//, "")}
+                    {stripProtocol(circle.website)}
                   </a>
                 </div>
               </div>

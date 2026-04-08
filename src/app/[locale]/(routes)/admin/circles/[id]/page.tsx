@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { stripProtocol } from "@/lib/url";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,7 +65,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
                     rel="noopener noreferrer"
                     className="hover:underline underline-offset-2"
                   >
-                    {circle.website.replace(/^https?:\/\//, "")}
+                    {stripProtocol(circle.website)}
                   </a>
                 ) : (
                   "—"
