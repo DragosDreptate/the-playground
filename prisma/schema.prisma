@@ -178,7 +178,6 @@ model Circle {
   city                  String?
   website               String?
   stripeConnectAccountId String?
-  inviteToken           String?          @unique @map("invite_token")
   requiresApproval     Boolean   @default(false) @map("requires_approval")
   // Explorer scoring
   isDemo               Boolean   @default(false)

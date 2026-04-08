@@ -65,11 +65,3 @@ export class MembershipNotPendingError extends DomainError {
     super(`Membership for user ${userId} in circle ${circleId} is not pending approval`);
   }
 }
-
-export class InvalidInviteTokenError extends DomainError {
-  readonly code = "INVALID_INVITE_TOKEN";
-
-  constructor() {
-    super("This invite link is invalid or has been revoked");
-  }
-}

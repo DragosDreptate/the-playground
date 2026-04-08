@@ -31,7 +31,6 @@ function toDomainCircle(record: PrismaCircle): Circle {
     city: record.city ?? null,
     website: record.website ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
-    inviteToken: record.inviteToken ?? null,
     requiresApproval: record.requiresApproval,
     isDemo: record.isDemo,
     createdAt: record.createdAt,
@@ -109,11 +108,6 @@ export const prismaCircleRepository: CircleRepository = {
     return toDomainCircle(record);
   },
 
-  async findByInviteToken(token: string): Promise<Circle | null> {
-    const record = await prisma.circle.findUnique({ where: { inviteToken: token } });
-    return record ? toDomainCircle(record) : null;
-  },
-
   async findById(id: string): Promise<Circle | null> {
     const record = await prisma.circle.findUnique({ where: { id } });
     return record ? toDomainCircle(record) : null;
@@ -150,7 +144,6 @@ export const prismaCircleRepository: CircleRepository = {
               ? Prisma.DbNull
               : input.coverImageAttribution,
         }),
-        ...(input.inviteToken !== undefined && { inviteToken: input.inviteToken }),
         ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
         ...(input.stripeConnectAccountId !== undefined && { stripeConnectAccountId: input.stripeConnectAccountId }),
       },
@@ -244,7 +237,6 @@ export const prismaCircleRepository: CircleRepository = {
       city: string | null;
       website: string | null;
       stripeConnectAccountId: string | null;
-      inviteToken: string | null;
       requiresApproval: boolean;
       isDemo: boolean;
       createdAt: Date;
@@ -274,7 +266,6 @@ export const prismaCircleRepository: CircleRepository = {
         c.city                    AS "city",
         c.website                 AS "website",
         c."stripeConnectAccountId" AS "stripeConnectAccountId",
-        c.invite_token            AS "inviteToken",
         c.requires_approval       AS "requiresApproval",
         c."isDemo"                AS "isDemo",
         c."createdAt"             AS "createdAt",
@@ -319,7 +310,6 @@ export const prismaCircleRepository: CircleRepository = {
       city: row.city,
       website: row.website,
       stripeConnectAccountId: row.stripeConnectAccountId,
-      inviteToken: row.inviteToken,
       requiresApproval: row.requiresApproval ?? false,
       isDemo: row.isDemo ?? false,
       createdAt: row.createdAt,

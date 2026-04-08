@@ -20,7 +20,6 @@ import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
-import { generateCircleInviteToken } from "@/domain/usecases/generate-circle-invite-token";
 import { getMomentGradient } from "@/lib/gradient";
 import { getCircleUserInitials } from "@/lib/display-name";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -82,15 +81,6 @@ export default async function CircleDetailPage({
 
   const isHost = membership.role === "HOST";
 
-  // Auto-génère le token d'invitation pour l'Organisateur si absent
-  // Le lien est toujours affiché (pas de bouton "Générer" — conforme au mockup)
-  if (isHost && !circle.inviteToken) {
-    const result = await generateCircleInviteToken(
-      { circleId: circle.id, userId: session.user.id },
-      { circleRepository: circleRepo }
-    );
-    circle = result.circle;
-  }
 
   const [hosts, players, allMoments, pendingMemberships] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
@@ -430,23 +420,18 @@ export default async function CircleDetailPage({
           {/* Partager & Inviter — visible Organisateurs uniquement */}
           {isHost && (
             <CircleShareInviteCard
-              circle={circle}
+              circleId={circle.id}
+              circleSlug={circle.slug}
               publicUrl={publicUrl}
               t={{
                 cardTitle: t("invite.cardTitle"),
                 shareableLink: t("invite.shareableLink"),
                 emailTitle: t("invite.emailTitle"),
                 emailPlaceholder: t("invite.emailPlaceholder"),
-                emailAdd: t("invite.emailAdd"),
                 emailSend: t("invite.emailSend"),
                 emailSendMultiple: t("invite.emailSendMultiple"),
                 emailSent: t("invite.emailSent"),
                 emailInvalid: t("invite.emailInvalid"),
-                linkTitle: t("invite.linkTitle"),
-                linkDescription: t("invite.linkDescription"),
-                linkGenerate: t("invite.linkGenerate"),
-                linkRevoke: t("invite.linkRevoke"),
-                linkRevoked: t("invite.linkRevoked"),
                 emailAddMore: t("invite.emailAddMore"),
                 emailMaxReached: t("invite.emailMaxReached", { max: 10 }),
               }}

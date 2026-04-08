@@ -25,7 +25,6 @@ export type UpdateCircleInput = {
   website?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
-  inviteToken?: string | null;
   requiresApproval?: boolean;
   stripeConnectAccountId?: string | null;
 };
@@ -86,7 +85,6 @@ export type FeaturedCircle = {
 
 export interface CircleRepository {
   create(input: CreateCircleInput): Promise<Circle>;
-  findByInviteToken(token: string): Promise<Circle | null>;
   /**
    * Crée un Circle et sa CircleMembership HOST dans une seule transaction atomique.
    * Garantit qu'un Circle ne peut pas exister sans Organisateur.

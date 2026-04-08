@@ -309,13 +309,12 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
         coverImageUrl: null,
         memberCount: 47,
         momentCount: 3,
-        inviteUrl: `${BASE_URL}/circles/join/abc123`,
+        circleUrl: `${BASE_URL}/circles/paris-creative-tech`,
         strings: {
           subject: "Bob Dupont vous invite à rejoindre Paris Creative Tech",
           ctaLabel: "Rejoindre la Communauté",
           footer: "Invitation envoyée par Bob Dupont via The Playground — the-playground.fr",
         },
-        baseUrl: BASE_URL,
       }),
     },
     {

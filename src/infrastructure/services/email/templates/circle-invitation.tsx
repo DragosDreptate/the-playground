@@ -16,24 +16,21 @@ function paragraphs(text: string) {
   return text.split(/\n\n|\n/).map((p) => p.trim()).filter(Boolean);
 }
 
-type Props = CircleInvitationEmailData & { baseUrl: string };
+type Props = CircleInvitationEmailData;
 
 export function CircleInvitationEmail({
   inviterName,
   circleName,
   circleDescription,
-  circleSlug,
   coverImageUrl,
   memberCount,
   momentCount,
-  inviteUrl,
+  circleUrl,
   strings,
-  baseUrl,
 }: Props) {
   const grad = getMomentGradient(circleName);
   const { text, truncated } = truncate(circleDescription);
   const paras = paragraphs(text);
-  const circleUrl = circleSlug ? `${baseUrl}/circles/${circleSlug}` : inviteUrl;
   const initials = inviterName.split(" ").slice(0, 2).map((w) => w[0] ?? "").join("").toUpperCase();
   const showSocial = (memberCount ?? 0) > 0;
 
@@ -114,7 +111,7 @@ export function CircleInvitationEmail({
 
       {/* CTA */}
       <Section style={ctaSection}>
-        <Button style={ctaButton} href={inviteUrl}>
+        <Button style={ctaButton} href={circleUrl}>
           {strings.ctaLabel}
         </Button>
       </Section>
