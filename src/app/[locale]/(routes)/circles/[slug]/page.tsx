@@ -8,6 +8,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaCircleNetworkRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -24,6 +25,7 @@ import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
+import { NetworkBadge } from "@/components/circles/network-badge";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -107,12 +109,13 @@ export default async function PublicCirclePage({
   const { slug, locale } = await params;
   if (!isValidSlug(slug)) notFound();
 
-  const [{ tab }, t, tExplorer, tCategory, session] =
+  const [{ tab }, t, tExplorer, tCategory, tNetwork, session] =
     await Promise.all([
       searchParams,
       getTranslations("Circle"),
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
+      getTranslations("Network"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
@@ -172,9 +175,10 @@ export default async function PublicCirclePage({
 
   // Fetch registration counts + top attendees (avatars) pour les moments affichés
   const displayedMomentIds = displayedMoments.map((m) => m.id);
-  const [countByMomentId, topAttendeesByMomentId] = await Promise.all([
+  const [countByMomentId, topAttendeesByMomentId, circleNetworks] = await Promise.all([
     prismaRegistrationRepository.findRegisteredCountsByMomentIds(displayedMomentIds),
     prismaRegistrationRepository.findTopRegistrantsByMomentIds(displayedMomentIds, 3),
+    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const gradient = getMomentGradient(circle.name);
@@ -325,6 +329,9 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs">{t("detail.moments")}</p>
             </div>
           </div>
+
+          {/* Réseaux */}
+          <NetworkBadge networks={circleNetworks} label={tNetwork("memberOf")} />
 
           {/* Badge Organisateur — visible pour les Organisateurs */}
           {isHost && (
