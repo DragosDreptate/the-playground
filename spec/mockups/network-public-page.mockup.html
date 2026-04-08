@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Page Réseau publique — Desktop Dark</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --background: #1c1929;
+      --card: #252235;
+      --card-alt: #2a2640;
+      --border: #3d3850;
+      --foreground: #f0eff6;
+      --muted-foreground: #8885a0;
+      --primary: #e8437d;
+      --primary-10: rgba(232,67,125,0.1);
+      --primary-5: rgba(232,67,125,0.05);
+      --primary-40: rgba(232,67,125,0.4);
+      --radius: 0.5rem;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100vh;
+    }
+
+    /* ─── Bandeau mockup ─── */
+    .mockup-banner {
+      background: #0f0c1a;
+      border-bottom: 2px solid var(--primary-40);
+      padding: 10px 24px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.03em;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .mockup-banner span { color: var(--primary); }
+
+    /* ─── Fake Nav ─── */
+    .fake-nav {
+      background: rgba(37,34,53,0.8);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(61,56,80,0.4);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 42px;
+      z-index: 50;
+    }
+    .fake-nav .logo {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fake-nav .logo .icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 5px;
+      background: linear-gradient(135deg, #ec4899, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fake-nav .logo .icon svg { width: 10px; height: 12px; }
+    .fake-nav .logo .brand-primary { color: var(--primary); }
+    .fake-nav .nav-links {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+    }
+    .fake-nav .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted-foreground);
+      font-size: 13px;
+    }
+    .fake-nav .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06b6d4, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ─── Container ─── */
+    .container {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+
+    /* ─── Breadcrumb ─── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      margin-bottom: 32px;
+    }
+    .breadcrumb a {
+      color: var(--muted-foreground);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .breadcrumb a:hover { color: var(--foreground); }
+    .breadcrumb .current {
+      color: var(--foreground);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .breadcrumb svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ─── Two-column layout ─── */
+    .two-col {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    /* ─── LEFT sidebar ─── */
+    .sidebar {
+      width: 340px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 104px;
+    }
+
+    /* Cover */
+    .cover-wrapper { position: relative; }
+    .cover-glow {
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: -12px;
+      height: 40px;
+      opacity: 0.6;
+      filter: blur(20px);
+      border-radius: 50%;
+    }
+    .cover {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    .cover-gradient {
+      width: 100%;
+      height: 100%;
+    }
+    .cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.2);
+    }
+    .cover-icon-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-icon-center .icon-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-icon-center svg { width: 24px; height: 24px; color: #fff; }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      gap: 24px;
+      padding: 0 4px;
+    }
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .stat-divider {
+      border-left: 1px solid var(--border);
+      padding-left: 24px;
+    }
+
+    /* Website link */
+    .website-link {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      text-decoration: none;
+      padding: 0 4px;
+      transition: color 0.15s;
+    }
+    .website-link:hover { color: var(--foreground); }
+    .website-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ─── RIGHT column ─── */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Title */
+    .main-content h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    /* Description */
+    .description-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-foreground);
+    }
+    .description-text {
+      font-size: 14px;
+      color: var(--muted-foreground);
+      line-height: 1.7;
+    }
+
+    /* Separator */
+    .separator {
+      border-top: 1px solid var(--border);
+    }
+
+    /* Meta row (icon box + label + value) */
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .meta-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--primary-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .meta-icon svg { width: 16px; height: 16px; color: var(--primary); }
+    .meta-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .meta-value {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .meta-value a {
+      color: var(--foreground);
+      text-decoration: none;
+    }
+    .meta-value a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+    /* Communities section title */
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted-foreground);
+    }
+
+    /* Community card (same as PublicCircleCard) */
+    .circle-card {
+      background: var(--card-alt);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      transition: border-color 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .circle-card:hover { border-color: var(--primary-40); }
+    .circle-card-cover {
+      width: 150px;
+      height: 150px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .circle-card-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .circle-card-category {
+      display: inline-flex;
+      padding: 2px 10px;
+      border-radius: 9999px;
+      background: var(--card);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted-foreground);
+      width: fit-content;
+    }
+    .circle-card-name {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .circle-card-desc {
+      font-size: 13px;
+      color: var(--muted-foreground);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .circle-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .circle-card-meta svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .circle-card-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .circle-card-members {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .avatar-stack {
+      display: flex;
+    }
+    .avatar-stack .mini-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--card-alt);
+      font-size: 9px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: -6px;
+    }
+    .avatar-stack .mini-avatar:first-child { margin-left: 0; }
+    .members-label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+
+    /* Next moment panel (right side of card, desktop) */
+    .circle-card-next {
+      flex-shrink: 0;
+      margin-left: 16px;
+      display: flex;
+      align-items: center;
+    }
+    .next-moment-box {
+      border: 1px solid var(--border);
+      background: rgba(33,30,48,0.5);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--muted-foreground);
+      max-width: 220px;
+    }
+    .next-moment-box .nm-title {
+      font-weight: 500;
+      color: var(--foreground);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .next-moment-box .nm-date {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .next-moment-box .nm-date svg { width: 12px; height: 12px; color: var(--primary); }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 48px 0;
+      text-align: center;
+    }
+    .empty-state .empty-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .empty-state .empty-icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--muted-foreground);
+    }
+    .empty-state p {
+      font-size: 14px;
+      color: var(--muted-foreground);
+    }
+
+    /* ─── Footer ─── */
+    .fake-footer {
+      border-top: 1px solid rgba(61,56,80,0.4);
+      margin-top: 48px;
+    }
+    .fake-footer-inner {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+    .fake-footer-inner a {
+      color: var(--muted-foreground);
+      text-decoration: none;
+    }
+    .fake-footer-inner a:hover { color: var(--foreground); }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-logo .icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #ec4899, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .footer-logo .icon svg { width: 8px; height: 10px; }
+    .footer-logo .brand {
+      font-weight: 800;
+      font-size: 13px;
+      letter-spacing: -0.4px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 16px;
+    }
+
+    /* SVG icon helper */
+    svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+<body>
+
+<!-- Bandeau mockup -->
+<div class="mockup-banner">
+  MOCKUP — <span>Page Réseau publique</span> — Desktop Dark — Design aligné sur page Communauté
+</div>
+
+<!-- ─── Navigation ─── -->
+<div class="fake-nav">
+  <div class="logo">
+    <div class="icon">
+      <svg viewBox="0 0 10 12" fill="white" stroke="none"><polygon points="0,0 0,12 10,6" /></svg>
+    </div>
+    the&thinsp;<span class="brand-primary">playground</span>
+  </div>
+  <div class="nav-links">
+    <span>Découvrir</span>
+    <span>Mon espace</span>
+  </div>
+  <div class="nav-right">
+    <span>FR</span>
+    <span>🌙</span>
+    <div class="avatar">DD</div>
+  </div>
+</div>
+
+<!-- ─── Page content ─── -->
+<div class="container">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="#">Découvrir</a>
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
+    <span class="current">Tech Communities Paris</span>
+  </div>
+
+  <!-- Two-column layout -->
+  <div class="two-col">
+
+    <!-- ─── LEFT sidebar ─── -->
+    <div class="sidebar">
+
+      <!-- Cover -->
+      <div class="cover-wrapper">
+        <div class="cover-glow" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);"></div>
+        <div class="cover">
+          <div class="cover-gradient" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);"></div>
+          <div class="cover-overlay"></div>
+          <div class="cover-icon-center">
+            <div class="icon-circle">
+              <svg viewBox="0 0 24 24" stroke="white"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div>
+          <div class="stat-number">4</div>
+          <div class="stat-label">Communautés</div>
+        </div>
+        <div class="stat-divider">
+          <div class="stat-number">6</div>
+          <div class="stat-label">Événements</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── RIGHT column ─── -->
+    <div class="main-content">
+
+      <!-- Title -->
+      <h1>Tech Communities Paris</h1>
+
+      <!-- Description -->
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="description-label">À propos</div>
+        <div class="description-text">
+          Le réseau des communautés tech parisiennes. Nous regroupons les meilleures communautés de développeurs, designers et entrepreneurs de la région parisienne pour favoriser les échanges et la collaboration.
+        </div>
+      </div>
+
+      <!-- Separator -->
+      <div class="separator"></div>
+
+      <!-- Meta rows -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Website -->
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <div>
+            <div class="meta-label">Site web</div>
+            <div class="meta-value"><a href="#">tech-communities-paris.fr</a></div>
+          </div>
+        </div>
+
+        <!-- Communautés -->
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="meta-label">Communautés</div>
+            <div class="meta-value">4 Communautés</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Separator -->
+      <div class="separator"></div>
+
+      <!-- Communities list title -->
+      <div class="section-title">Communautés membres</div>
+
+      <!-- Community cards -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+
+        <!-- Card 1 — Paris Creative Tech -->
+        <a class="circle-card" href="#">
+          <div class="circle-card-cover" style="background: linear-gradient(135deg, #f43f5e, #a21caf);"></div>
+          <div class="circle-card-body">
+            <div class="circle-card-category">Tech</div>
+            <div class="circle-card-name">Paris Creative Tech</div>
+            <div class="circle-card-desc">La communauté des créatifs tech parisiens. Meetups, ateliers et networking autour du développement web, de l'IA et du design.</div>
+            <div class="circle-card-meta">
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Paris</span>
+              </div>
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>3 événements</span>
+              </div>
+            </div>
+            <div class="circle-card-members">
+              <div class="avatar-stack">
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);">JD</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #06b6d4, #2563eb);">ML</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #f43f5e, #a21caf);">SK</div>
+              </div>
+              <span class="members-label">+42 membres</span>
+            </div>
+          </div>
+          <div class="circle-card-next">
+            <div class="next-moment-box">
+              <div class="nm-title">Meetup IA & Créativité</div>
+              <div class="nm-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>15 avr. · 19:00</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 2 — React Paris -->
+        <a class="circle-card" href="#">
+          <div class="circle-card-cover" style="background: linear-gradient(135deg, #06b6d4, #2563eb);"></div>
+          <div class="circle-card-body">
+            <div class="circle-card-category">Tech</div>
+            <div class="circle-card-name">React Paris</div>
+            <div class="circle-card-desc">La communauté React.js de Paris. Talks, live coding et retours d'expérience sur React, Next.js et l'écosystème JavaScript moderne.</div>
+            <div class="circle-card-meta">
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Paris</span>
+              </div>
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>2 événements</span>
+              </div>
+            </div>
+            <div class="circle-card-members">
+              <div class="avatar-stack">
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #10b981, #0891b2);">AB</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #d946ef, #7c3aed);">PG</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #f59e0b, #e11d48);">NR</div>
+              </div>
+              <span class="members-label">+78 membres</span>
+            </div>
+          </div>
+          <div class="circle-card-next">
+            <div class="next-moment-box">
+              <div class="nm-title">Workshop React 19</div>
+              <div class="nm-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>22 avr. · 18:30</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Card 3 — Design System Paris -->
+        <a class="circle-card" href="#">
+          <div class="circle-card-cover" style="background: linear-gradient(135deg, #d946ef, #7c3aed);"></div>
+          <div class="circle-card-body">
+            <div class="circle-card-category">Design</div>
+            <div class="circle-card-name">Design System Paris</div>
+            <div class="circle-card-desc">Échanges et bonnes pratiques autour des design systems, de l'accessibilité et de la collaboration design-dev.</div>
+            <div class="circle-card-meta">
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Paris</span>
+              </div>
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>1 événement</span>
+              </div>
+            </div>
+            <div class="circle-card-members">
+              <div class="avatar-stack">
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #14b8a6, #4f46e5);">CL</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #6366f1, #0284c7);">FM</div>
+              </div>
+              <span class="members-label">+35 membres</span>
+            </div>
+          </div>
+          <div class="circle-card-next">
+            <div class="next-moment-box" style="white-space: nowrap;">Aucun événement à venir</div>
+          </div>
+        </a>
+
+        <!-- Card 4 — Startup Founders Paris -->
+        <a class="circle-card" href="#">
+          <div class="circle-card-cover" style="background: linear-gradient(135deg, #f59e0b, #e11d48);"></div>
+          <div class="circle-card-body">
+            <div class="circle-card-category">Business</div>
+            <div class="circle-card-name">Startup Founders Paris</div>
+            <div class="circle-card-desc">Rencontres entre fondateurs de startups tech à Paris. Partage d'expérience, retours de levées et discussions produit.</div>
+            <div class="circle-card-meta">
+              <div class="circle-card-meta-item">
+                <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Paris</span>
+              </div>
+            </div>
+            <div class="circle-card-members">
+              <div class="avatar-stack">
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #7c3aed, #4f46e5);">TH</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #06b6d4, #2563eb);">ER</div>
+                <div class="mini-avatar" style="background: linear-gradient(135deg, #10b981, #0891b2);">LV</div>
+              </div>
+              <span class="members-label">+56 membres</span>
+            </div>
+          </div>
+          <div class="circle-card-next">
+            <div class="next-moment-box">
+              <div class="nm-title">Petit-déj founders #12</div>
+              <div class="nm-date">
+                <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span>28 avr. · 08:30</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── Footer ─── -->
+<div class="fake-footer">
+  <div class="fake-footer-inner">
+    <div class="footer-logo">
+      <div class="icon">
+        <svg viewBox="0 0 10 12" fill="white" stroke="none"><polygon points="0,0 0,12 10,6" /></svg>
+      </div>
+      <span class="brand">the&thinsp;<span style="color: var(--primary);">playground</span></span>
+      <span style="margin-left: 4px;">© 2026 · v2.5.0</span>
+    </div>
+    <div class="footer-links">
+      <a href="#">À propos</a>
+      <a href="#">Aide</a>
+      <a href="#">Blog</a>
+      <a href="#">Contact</a>
+      <a href="#">Changelog</a>
+      <a href="#">Mentions légales</a>
+      <a href="#">Confidentialité</a>
+      <a href="#">CGU</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

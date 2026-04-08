@@ -875,7 +875,11 @@
     "title": "Network",
     "memberOf": "Member of",
     "communityCount": "{count, plural, one {# Community} other {# Communities}}",
+    "communities": "Communities",
+    "moments": "Events",
+    "about": "About",
     "noCommunities": "No Communities in this Network yet",
+    "memberCommunities": "Member Communities",
     "website": "Website"
   },
   "UserMenu": {
