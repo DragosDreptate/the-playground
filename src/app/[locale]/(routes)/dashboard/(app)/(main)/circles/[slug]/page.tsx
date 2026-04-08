@@ -34,6 +34,7 @@ import {
   CalendarIcon,
   ChevronRight,
   MapPin,
+  ExternalLink,
   ShieldCheck,
 } from "lucide-react";
 
@@ -340,6 +341,28 @@ export default async function CircleDetailPage({
                     {t("form.city")}
                   </p>
                   <p className="text-sm font-medium">{circle.city}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Site web */}
+            {circle.website && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <ExternalLink className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {t("form.website")}
+                  </p>
+                  <a
+                    href={circle.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    {circle.website.replace(/^https?:\/\//, "")}
+                  </a>
                 </div>
               </div>
             )}
