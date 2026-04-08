@@ -1422,6 +1422,7 @@
       "mySpace": "Mon espace",
       "notifications": "Gérer ses notifications",
       "paidEvents": "Événements payants",
+      "networks": "Les Réseaux",
       "leave": "Quitter une communauté",
       "createCommunity": "Créer sa communauté",
       "createEvent": "Créer un événement",
@@ -1507,6 +1508,13 @@
       "leave": {
         "title": "Quitter une communauté",
         "intro": "Depuis la page d'une communauté dans <strong>Mon espace</strong>, cliquez sur <strong>Quitter la communauté</strong>. Vos inscriptions aux événements à venir ne sont pas automatiquement annulées — pensez à les annuler séparément si nécessaire."
+      },
+      "networks": {
+        "title": "Les Réseaux",
+        "intro": "Un <strong>Réseau</strong> regroupe plusieurs communautés liées sous une même vitrine. Chaque Réseau dispose d'une page publique affichant ses communautés membres, avec leurs événements à venir et le nombre de membres.",
+        "item1": "Depuis la page d'une communauté, un badge <strong>Membre de [Réseau]</strong> apparaît dans les informations si la communauté appartient à un ou plusieurs réseaux",
+        "item2": "Cliquez sur le nom du réseau pour accéder à sa page et découvrir les autres communautés membres",
+        "item3": "Il n'y a pas d'inscription au réseau — vous êtes membre des communautés individuellement"
       }
     },
     "organizer": {
