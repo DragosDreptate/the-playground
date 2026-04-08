@@ -253,7 +253,7 @@ export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
             {/* Site web */}
             <div className="flex items-center gap-3">
               <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <ExternalLink className="text-primary size-4" />
+                <Globe className="text-primary size-4" />
               </div>
               <span className="w-28 shrink-0 text-sm font-medium">{t("form.website")}</span>
               <div className="min-w-0 flex-1">
