@@ -1,4 +1,5 @@
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
+import type { CoverImageAttribution } from "@/domain/models/circle";
 
 export type CircleNetwork = {
   id: string;
@@ -6,6 +7,7 @@ export type CircleNetwork = {
   name: string;
   description: string | null;
   coverImage: string | null;
+  coverImageAttribution: CoverImageAttribution | null;
   website: string | null;
   createdAt: Date;
   updatedAt: Date;

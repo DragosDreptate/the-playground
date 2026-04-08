@@ -27,6 +27,7 @@ export function makeNetwork(overrides: Partial<CircleNetwork> = {}): CircleNetwo
     name: "Test Network",
     description: null,
     coverImage: null,
+    coverImageAttribution: null,
     website: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),

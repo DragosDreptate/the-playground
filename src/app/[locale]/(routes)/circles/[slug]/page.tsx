@@ -25,7 +25,6 @@ import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
-import { NetworkBadge } from "@/components/circles/network-badge";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
@@ -41,6 +40,7 @@ import {
   ExternalLink,
   Crown,
   Clock,
+  Network,
 } from "lucide-react";
 
 export const revalidate = 60;
@@ -330,9 +330,6 @@ export default async function PublicCirclePage({
             </div>
           </div>
 
-          {/* Réseaux */}
-          <NetworkBadge networks={circleNetworks} label={tNetwork("memberOf")} />
-
           {/* Badge Organisateur — visible pour les Organisateurs */}
           {isHost && (
             <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
@@ -545,6 +542,26 @@ export default async function PublicCirclePage({
                 </p>
               </div>
             </div>
+
+            {/* Réseaux */}
+            {circleNetworks.map((network) => (
+              <div key={network.id} className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {tNetwork("memberOf")}
+                  </p>
+                  <Link
+                    href={`/networks/${network.slug}`}
+                    className="text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    {network.name}
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Séparateur */}

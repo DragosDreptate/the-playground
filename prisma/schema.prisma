@@ -340,14 +340,15 @@ model RateLimit {
 // ─────────────────────────────────────────────
 
 model CircleNetwork {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String?  @db.Text
-  coverImage  String?
-  website     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  slug                  String   @unique
+  name                  String
+  description           String?  @db.Text
+  coverImage            String?
+  coverImageAttribution Json?    @db.JsonB
+  website               String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   circles     CircleNetworkMembership[]
 

@@ -86,11 +86,21 @@ export function NetworkForm({ mode, networkId, defaultValues }: NetworkFormProps
         }
       }
 
+      let finalAttribution: { name: string; url: string } | null | undefined = undefined;
+      if (coverSelection) {
+        if (coverSelection.type === "unsplash") {
+          finalAttribution = coverSelection.attribution;
+        } else {
+          finalAttribution = null;
+        }
+      }
+
       const input = {
         name,
         slug,
         description: description || undefined,
         coverImage: finalCoverImage || undefined,
+        ...(finalAttribution !== undefined && { coverImageAttribution: finalAttribution }),
         website: website || undefined,
       };
 

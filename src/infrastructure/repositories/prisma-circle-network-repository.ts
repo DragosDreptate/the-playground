@@ -18,6 +18,9 @@ function toDomainNetwork(record: PrismaCircleNetwork): CircleNetwork {
     name: record.name,
     description: record.description,
     coverImage: record.coverImage,
+    coverImageAttribution: record.coverImageAttribution
+      ? (record.coverImageAttribution as CoverImageAttribution)
+      : null,
     website: record.website,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
@@ -170,6 +173,9 @@ export const prismaCircleNetworkRepository: CircleNetworkRepository = {
         name: input.name,
         ...(input.description && { description: input.description }),
         ...(input.coverImage && { coverImage: input.coverImage }),
+        ...(input.coverImageAttribution !== undefined && {
+          coverImageAttribution: input.coverImageAttribution as object ?? undefined,
+        }),
         ...(input.website && { website: input.website }),
       },
     });
@@ -189,6 +195,9 @@ export const prismaCircleNetworkRepository: CircleNetworkRepository = {
           description: input.description,
         }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
+        ...(input.coverImageAttribution !== undefined && {
+          coverImageAttribution: input.coverImageAttribution as object ?? null,
+        }),
         ...(input.website !== undefined && { website: input.website }),
       },
     });

@@ -880,6 +880,8 @@
     "about": "À propos",
     "noCommunities": "Aucune Communauté dans ce Réseau pour le moment",
     "memberCommunities": "Communautés membres",
+    "totalMembers": "Membres au total",
+    "totalEvents": "Événements à venir",
     "website": "Site web"
   },
   "UserMenu": {

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Users, Globe, ChevronRight } from "lucide-react";
+import { Users, Globe, ChevronRight, CalendarIcon } from "lucide-react";
 import { prismaCircleNetworkRepository } from "@/infrastructure/repositories";
 import { getNetworkBySlug } from "@/domain/usecases/get-network-by-slug";
 import { PublicCircleCard } from "@/components/explorer/public-circle-card";
@@ -73,6 +73,10 @@ export default async function NetworkPage({ params }: Props) {
     (sum, c) => sum + c.upcomingMomentCount,
     0
   );
+  const totalMembers = network.circles.reduce(
+    (sum, c) => sum + c.memberCount,
+    0
+  );
 
   return (
     <div className="space-y-8">
@@ -123,6 +127,22 @@ export default async function NetworkPage({ params }: Props) {
               )}
             </div>
           </div>
+
+          {/* Attribution photographe */}
+          {network.coverImageAttribution && (
+            <p className="text-muted-foreground px-1 text-xs">
+              Photo par{" "}
+              <a
+                href={network.coverImageAttribution.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-foreground underline"
+              >
+                {network.coverImageAttribution.name}
+              </a>{" "}
+              sur Unsplash
+            </p>
+          )}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -196,6 +216,32 @@ export default async function NetworkPage({ params }: Props) {
                 </p>
               </div>
             </div>
+
+            {/* Membres total */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <Users className="text-primary size-4" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  {t("totalMembers")}
+                </p>
+                <p className="text-sm font-medium">{totalMembers}</p>
+              </div>
+            </div>
+
+            {/* Événements total */}
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-4" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-xs">
+                  {t("totalEvents")}
+                </p>
+                <p className="text-sm font-medium">{totalMoments}</p>
+              </div>
+            </div>
           </div>
 
           {/* Séparateur */}
@@ -209,7 +255,7 @@ export default async function NetworkPage({ params }: Props) {
           {network.circles.length > 0 ? (
             <div className="flex flex-col gap-2 sm:gap-3">
               {network.circles.map((circle) => (
-                <PublicCircleCard key={circle.id} circle={circle} />
+                <PublicCircleCard key={circle.id} circle={circle} hideNextMoment />
               ))}
             </div>
           ) : (

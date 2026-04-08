@@ -2,13 +2,14 @@ import type {
   CircleNetwork,
   CircleNetworkWithCircles,
 } from "@/domain/models/circle-network";
-import type { CircleCategory } from "@/domain/models/circle";
+import type { CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
 
 export type CreateCircleNetworkInput = {
   slug: string;
   name: string;
   description?: string;
   coverImage?: string;
+  coverImageAttribution?: CoverImageAttribution | null;
   website?: string;
 };
 

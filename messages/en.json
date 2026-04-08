@@ -880,6 +880,8 @@
     "about": "About",
     "noCommunities": "No Communities in this Network yet",
     "memberCommunities": "Member Communities",
+    "totalMembers": "Total members",
+    "totalEvents": "Upcoming events",
     "website": "Website"
   },
   "UserMenu": {

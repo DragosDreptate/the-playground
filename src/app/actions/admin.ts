@@ -330,7 +330,7 @@ export async function toggleAdminHostModeAction(
 // ─────────────────────────────────────────────
 
 export async function adminCreateNetworkAction(
-  input: { name: string; slug: string; description?: string; coverImage?: string; website?: string }
+  input: { name: string; slug: string; description?: string; coverImage?: string; coverImageAttribution?: { name: string; url: string } | null; website?: string }
 ): Promise<ActionResult<CircleNetwork>> {
   const check = await requireAdmin();
   if (!check.success) return check;
@@ -350,7 +350,7 @@ export async function adminCreateNetworkAction(
 
 export async function adminUpdateNetworkAction(
   networkId: string,
-  input: { name?: string; slug?: string; description?: string; coverImage?: string; website?: string }
+  input: { name?: string; slug?: string; description?: string; coverImage?: string; coverImageAttribution?: { name: string; url: string } | null; website?: string }
 ): Promise<ActionResult<CircleNetwork>> {
   const check = await requireAdmin();
   if (!check.success) return check;
