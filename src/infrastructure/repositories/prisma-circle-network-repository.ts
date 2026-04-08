@@ -252,4 +252,18 @@ export const prismaCircleNetworkRepository: CircleNetworkRepository = {
 
     return circles;
   },
+
+  async getCircleVisibilities(
+    networkId: string
+  ): Promise<Map<string, "PUBLIC" | "PRIVATE">> {
+    const memberships = await prisma.circleNetworkMembership.findMany({
+      where: { networkId },
+      select: {
+        circle: { select: { id: true, visibility: true } },
+      },
+    });
+    return new Map(
+      memberships.map((m) => [m.circle.id, m.circle.visibility])
+    );
+  },
 };

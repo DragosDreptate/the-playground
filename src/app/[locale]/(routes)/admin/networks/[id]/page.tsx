@@ -16,9 +16,18 @@ type Props = {
 export default async function AdminNetworkDetailPage({ params }: Props) {
   const { id } = await params;
   const t = await getTranslations("Admin");
-  const network = await prismaCircleNetworkRepository.findById(id);
+  const [network, circleVisibilities] = await Promise.all([
+    prismaCircleNetworkRepository.findById(id),
+    prismaCircleNetworkRepository.getCircleVisibilities(id),
+  ]);
 
   if (!network) notFound();
+
+  const privateCircleIds = new Set(
+    [...circleVisibilities.entries()]
+      .filter(([, v]) => v === "PRIVATE")
+      .map(([id]) => id)
+  );
 
   return (
     <div className="space-y-6">
@@ -67,6 +76,7 @@ export default async function AdminNetworkDetailPage({ params }: Props) {
           <NetworkCircleManager
             networkId={network.id}
             circles={network.circles}
+            privateCircleIds={privateCircleIds}
           />
         </CardContent>
       </Card>

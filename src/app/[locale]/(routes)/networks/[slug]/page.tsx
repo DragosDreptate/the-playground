@@ -212,7 +212,7 @@ export default async function NetworkPage({ params }: Props) {
                   {t("communities")}
                 </p>
                 <p className="text-sm font-medium">
-                  {t("communityCount", { count: network.circles.length })}
+                  {network.circles.length} {t("communitiesUnit")}
                 </p>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default async function NetworkPage({ params }: Props) {
                 <p className="text-muted-foreground text-xs">
                   {t("totalMembers")}
                 </p>
-                <p className="text-sm font-medium">{totalMembers}</p>
+                <p className="text-sm font-medium">{totalMembers} {t("membersUnit")}</p>
               </div>
             </div>
 
@@ -239,7 +239,7 @@ export default async function NetworkPage({ params }: Props) {
                 <p className="text-muted-foreground text-xs">
                   {t("totalEvents")}
                 </p>
-                <p className="text-sm font-medium">{totalMoments}</p>
+                <p className="text-sm font-medium">{totalMoments} {t("eventsUnit")}</p>
               </div>
             </div>
           </div>

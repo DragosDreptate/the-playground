@@ -29,9 +29,10 @@ import type { NetworkCircleSearchResult } from "@/domain/ports/repositories/circ
 type Props = {
   networkId: string;
   circles: PublicCircle[];
+  privateCircleIds?: Set<string>;
 };
 
-export function NetworkCircleManager({ networkId, circles }: Props) {
+export function NetworkCircleManager({ networkId, circles, privateCircleIds }: Props) {
   const t = useTranslations("Admin");
   const tCat = useTranslations("CircleCategory");
   const router = useRouter();
@@ -157,6 +158,12 @@ export function NetworkCircleManager({ networkId, circles }: Props) {
                   )}
                   {circle.city && <span>· {circle.city}</span>}
                 </div>
+                {privateCircleIds?.has(circle.id) && (
+                  <p className="mt-1 flex items-center gap-1 text-xs text-amber-500">
+                    <Lock className="size-3" />
+                    {t("circlePrivateWarning")}
+                  </p>
+                )}
               </div>
 
               <AlertDialog>

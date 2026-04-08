@@ -359,6 +359,7 @@ export async function adminUpdateNetworkAction(
     const network = await adminUpdateNetwork(check.data.role, networkId, input, networkDeps);
     revalidatePath("/admin/networks");
     revalidatePath(`/admin/networks/${networkId}`);
+    revalidatePath("/networks", "layout");
     return { success: true, data: network };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -378,6 +379,7 @@ export async function adminDeleteNetworkAction(
   try {
     await adminDeleteNetwork(check.data.role, networkId, networkDeps);
     revalidatePath("/admin/networks");
+    revalidatePath("/networks", "layout");
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -398,6 +400,7 @@ export async function adminAddCircleToNetworkAction(
   try {
     await adminAddCircleToNetwork(check.data.role, networkId, circleId, networkDeps);
     revalidatePath(`/admin/networks/${networkId}`);
+    revalidatePath("/networks", "layout");
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {
@@ -418,6 +421,7 @@ export async function adminRemoveCircleFromNetworkAction(
   try {
     await adminRemoveCircleFromNetwork(check.data.role, networkId, circleId, networkDeps);
     revalidatePath(`/admin/networks/${networkId}`);
+    revalidatePath("/networks", "layout");
     return { success: true, data: undefined };
   } catch (error) {
     if (error instanceof DomainError) {

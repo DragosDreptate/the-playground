@@ -882,6 +882,9 @@
     "memberCommunities": "Communautés membres",
     "totalMembers": "Membres au total",
     "totalEvents": "Événements à venir",
+    "communitiesUnit": "communautés",
+    "membersUnit": "membres",
+    "eventsUnit": "événements",
     "website": "Site web"
   },
   "UserMenu": {

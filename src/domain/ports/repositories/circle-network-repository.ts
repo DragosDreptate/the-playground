@@ -49,4 +49,7 @@ export interface CircleNetworkRepository {
     networkId: string,
     query: string
   ): Promise<NetworkCircleSearchResult[]>;
+
+  // Admin : visibilité des Circles d'un Réseau (pour afficher le warning PRIVATE)
+  getCircleVisibilities(networkId: string): Promise<Map<string, "PUBLIC" | "PRIVATE">>;
 }

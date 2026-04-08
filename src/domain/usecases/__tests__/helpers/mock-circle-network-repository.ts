@@ -16,6 +16,7 @@ export function createMockCircleNetworkRepository(
     addCircle: vi.fn<CircleNetworkRepository["addCircle"]>().mockResolvedValue(undefined),
     removeCircle: vi.fn<CircleNetworkRepository["removeCircle"]>().mockResolvedValue(undefined),
     searchCirclesNotInNetwork: vi.fn<CircleNetworkRepository["searchCirclesNotInNetwork"]>().mockResolvedValue([]),
+    getCircleVisibilities: vi.fn<CircleNetworkRepository["getCircleVisibilities"]>().mockResolvedValue(new Map()),
     ...overrides,
   };
 }
