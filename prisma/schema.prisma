@@ -176,6 +176,7 @@ model Circle {
   category              CircleCategory?
   customCategory        String?          @map("custom_category")
   city                  String?
+  website               String?
   stripeConnectAccountId String?
   inviteToken           String?          @unique @map("invite_token")
   requiresApproval     Boolean   @default(false) @map("requires_approval")

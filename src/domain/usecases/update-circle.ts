@@ -11,6 +11,7 @@ type UpdateCircleInput = {
   category?: CircleCategory | null;
   customCategory?: string | null;
   city?: string | null;
+  website?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
   requiresApproval?: boolean;
@@ -50,6 +51,7 @@ export async function updateCircle(
     category: input.category,
     customCategory: input.customCategory,
     city: input.city,
+    website: input.website,
     ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
     ...(input.coverImageAttribution !== undefined && {
       coverImageAttribution: input.coverImageAttribution,

@@ -37,6 +37,7 @@ import {
 } from "@/lib/circle-category-helpers";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
+import { isValidUrl } from "@/lib/url";
 
 export async function createCircleAction(
   formData: FormData
@@ -55,6 +56,8 @@ export async function createCircleAction(
     formData.get("customCategory") as string | null
   );
   const city = (formData.get("city") as string)?.trim() || undefined;
+  const websiteRaw = (formData.get("website") as string)?.trim() || undefined;
+  const website = websiteRaw && isValidUrl(websiteRaw) ? websiteRaw : undefined;
   const requiresApproval = formData.get("requiresApproval") === "on";
 
   if (!name?.trim()) {
@@ -86,6 +89,7 @@ export async function createCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        website,
         requiresApproval,
         userId: session.user.id,
         ...coverData,
@@ -160,6 +164,8 @@ export async function updateCircleAction(
   const category = categoryRaw ? (categoryRaw as CircleCategory) : null;
   const cityRaw = formData.get("city") as string | null;
   const city = cityRaw ? cityRaw.trim() : null;
+  const websiteTrimmed = (formData.get("website") as string | null)?.trim() || null;
+  const website = websiteTrimmed && isValidUrl(websiteTrimmed) ? websiteTrimmed : null;
   const customCategoryRaw = formData.get("customCategory") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
@@ -199,6 +205,7 @@ export async function updateCircleAction(
         category,
         ...(customCategory !== undefined && { customCategory }),
         city,
+        website,
         ...coverData,
         requiresApproval: requiresApprovalUpdate,
       },

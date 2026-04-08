@@ -10,6 +10,7 @@ type CreateCircleInput = {
   category?: CircleCategory;
   customCategory?: string | null;
   city?: string;
+  website?: string;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
   requiresApproval?: boolean;
@@ -51,6 +52,7 @@ export async function createCircle(
       ...(input.category !== undefined && { category: input.category }),
       ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
       ...(input.city !== undefined && { city: input.city }),
+      ...(input.website !== undefined && { website: input.website }),
       ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
       ...(input.coverImageAttribution !== undefined && {
         coverImageAttribution: input.coverImageAttribution,

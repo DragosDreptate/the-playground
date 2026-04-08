@@ -133,6 +133,7 @@ export function makeAdminCircleRow(
     visibility: "PUBLIC",
     category: "TECH",
     city: "Paris",
+    website: null,
     memberCount: 42,
     momentCount: 8,
     hostName: "Alice Martin",

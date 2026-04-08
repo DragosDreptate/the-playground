@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { stripProtocol } from "@/lib/url";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -23,6 +24,7 @@ import {
   Users,
   CalendarIcon,
   MapPin,
+  ExternalLink,
   Crown,
 } from "lucide-react";
 
@@ -258,6 +260,26 @@ export default async function JoinCircleByInvitePage({
                 <div>
                   <p className="text-muted-foreground text-xs">{t("form.city")}</p>
                   <p className="text-sm font-medium">{circle.city}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Site web */}
+            {circle.website && (
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <ExternalLink className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">{t("form.website")}</p>
+                  <a
+                    href={circle.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium hover:underline underline-offset-2"
+                  >
+                    {stripProtocol(circle.website)}
+                  </a>
                 </div>
               </div>
             )}

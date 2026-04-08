@@ -292,6 +292,8 @@
       "categoryPlaceholder": "Choose a category",
       "city": "City",
       "cityPlaceholder": "Paris, London, Remote...",
+      "website": "Website",
+      "websitePlaceholder": "https://my-site.com",
       "customCategoryPlaceholder": "Specify your theme",
       "customCategoryRequired": "Please specify your theme"
     },
@@ -784,6 +786,7 @@
       "visibility": "Visibility",
       "category": "Category",
       "city": "City",
+      "website": "Website",
       "description": "Description",
       "recentMoments": "Recent Events",
       "noMoments": "No Events.",

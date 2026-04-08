@@ -9,6 +9,7 @@ export type CreateCircleInput = {
   category?: CircleCategory;
   customCategory?: string | null;
   city?: string;
+  website?: string;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
   requiresApproval?: boolean;
@@ -21,6 +22,7 @@ export type UpdateCircleInput = {
   category?: CircleCategory | null;
   customCategory?: string | null;
   city?: string | null;
+  website?: string | null;
   coverImage?: string | null;
   coverImageAttribution?: CoverImageAttribution | null;
   inviteToken?: string | null;

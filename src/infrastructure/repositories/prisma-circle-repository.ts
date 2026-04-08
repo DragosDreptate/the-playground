@@ -29,6 +29,7 @@ function toDomainCircle(record: PrismaCircle): Circle {
     category: record.category ?? null,
     customCategory: record.customCategory ?? null,
     city: record.city ?? null,
+    website: record.website ?? null,
     stripeConnectAccountId: record.stripeConnectAccountId,
     inviteToken: record.inviteToken ?? null,
     requiresApproval: record.requiresApproval,
@@ -60,6 +61,7 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.category !== undefined && { category: input.category }),
         ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.website !== undefined && { website: input.website }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
           coverImageAttribution:
@@ -88,6 +90,7 @@ export const prismaCircleRepository: CircleRepository = {
           ...(input.category !== undefined && { category: input.category }),
           ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
           ...(input.city !== undefined && { city: input.city }),
+          ...(input.website !== undefined && { website: input.website }),
           ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
           ...(input.coverImageAttribution !== undefined && {
             coverImageAttribution:
@@ -139,6 +142,7 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.category !== undefined && { category: input.category }),
         ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.website !== undefined && { website: input.website }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
           coverImageAttribution:
@@ -238,6 +242,7 @@ export const prismaCircleRepository: CircleRepository = {
       category: string | null;
       customCategory: string | null;
       city: string | null;
+      website: string | null;
       stripeConnectAccountId: string | null;
       inviteToken: string | null;
       requiresApproval: boolean;
@@ -267,6 +272,7 @@ export const prismaCircleRepository: CircleRepository = {
         c.category                AS "category",
         c.custom_category         AS "customCategory",
         c.city                    AS "city",
+        c.website                 AS "website",
         c."stripeConnectAccountId" AS "stripeConnectAccountId",
         c.invite_token            AS "inviteToken",
         c.requires_approval       AS "requiresApproval",
@@ -311,6 +317,7 @@ export const prismaCircleRepository: CircleRepository = {
       category: (row.category as CircleCategory | null) ?? null,
       customCategory: row.customCategory,
       city: row.city,
+      website: row.website,
       stripeConnectAccountId: row.stripeConnectAccountId,
       inviteToken: row.inviteToken,
       requiresApproval: row.requiresApproval ?? false,
