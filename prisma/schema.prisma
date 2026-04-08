@@ -191,6 +191,7 @@ model Circle {
 
   memberships   CircleMembership[]
   moments       Moment[]
+  networks      CircleNetworkMembership[]
 
   // Index composite (visibility, category) : utilisé dans getPublicCircles (explorer)
   // WHERE visibility = 'PUBLIC' — couvert par le préfixe visibility
@@ -332,5 +333,38 @@ model RateLimit {
   windowStart DateTime @default(now())
 
   @@map("rate_limits")
+}
+
+// ─────────────────────────────────────────────
+// Circle Networks
+// ─────────────────────────────────────────────
+
+model CircleNetwork {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?  @db.Text
+  coverImage  String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  circles     CircleNetworkMembership[]
+
+  @@map("circle_networks")
+}
+
+model CircleNetworkMembership {
+  id        String   @id @default(cuid())
+  networkId String
+  circleId  String
+  addedAt   DateTime @default(now())
+
+  network   CircleNetwork @relation(fields: [networkId], references: [id], onDelete: Cascade)
+  circle    Circle        @relation(fields: [circleId], references: [id], onDelete: Cascade)
+
+  @@unique([networkId, circleId])
+  @@index([circleId])
+  @@map("circle_network_memberships")
 }
 
