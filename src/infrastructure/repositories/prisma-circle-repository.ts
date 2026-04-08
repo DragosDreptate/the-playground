@@ -61,6 +61,7 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.category !== undefined && { category: input.category }),
         ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.website !== undefined && { website: input.website }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
           coverImageAttribution:
@@ -89,6 +90,7 @@ export const prismaCircleRepository: CircleRepository = {
           ...(input.category !== undefined && { category: input.category }),
           ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
           ...(input.city !== undefined && { city: input.city }),
+          ...(input.website !== undefined && { website: input.website }),
           ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
           ...(input.coverImageAttribution !== undefined && {
             coverImageAttribution:
@@ -140,6 +142,7 @@ export const prismaCircleRepository: CircleRepository = {
         ...(input.category !== undefined && { category: input.category }),
         ...(input.customCategory !== undefined && { customCategory: input.customCategory }),
         ...(input.city !== undefined && { city: input.city }),
+        ...(input.website !== undefined && { website: input.website }),
         ...(input.coverImage !== undefined && { coverImage: input.coverImage }),
         ...(input.coverImageAttribution !== undefined && {
           coverImageAttribution:
