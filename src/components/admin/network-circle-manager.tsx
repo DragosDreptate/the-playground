@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Search, X, Plus, Lock } from "lucide-react";
@@ -42,20 +42,24 @@ export function NetworkCircleManager({ networkId, circles, privateCircleIds }: P
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<NetworkCircleSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const handleSearch = useCallback(
-    async (value: string) => {
+    (value: string) => {
       setQuery(value);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       if (value.length < 2) {
         setSearchResults([]);
         return;
       }
       setIsSearching(true);
-      const result = await adminSearchCirclesForNetworkAction(networkId, value);
-      if (result.success) {
-        setSearchResults(result.data);
-      }
-      setIsSearching(false);
+      debounceRef.current = setTimeout(async () => {
+        const result = await adminSearchCirclesForNetworkAction(networkId, value);
+        if (result.success) {
+          setSearchResults(result.data);
+        }
+        setIsSearching(false);
+      }, 300);
     },
     [networkId]
   );
@@ -115,7 +119,7 @@ export function NetworkCircleManager({ networkId, circles, privateCircleIds }: P
                   {circle.visibility === "PRIVATE" && (
                     <Badge variant="outline" className="text-[10px] gap-0.5 py-0 px-1">
                       <Lock className="size-2.5" />
-                      Private
+                      {t("circlePrivate")}
                     </Badge>
                   )}
                 </div>
@@ -181,11 +185,11 @@ export function NetworkCircleManager({ networkId, circles, privateCircleIds }: P
                   <AlertDialogHeader>
                     <AlertDialogTitle>{t("removeCircle")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Retirer {circle.name} de ce Réseau ?
+                      {t("confirmRemoveCircle", { name: circle.name })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogCancel>{t("actions.cancel")}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => handleRemove(circle.id)}
                       className="bg-destructive text-white hover:bg-destructive/90"

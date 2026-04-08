@@ -142,7 +142,7 @@ export function NetworkForm({ mode, networkId, defaultValues }: NetworkFormProps
         />
         {mode === "edit" && slug !== defaultValues.slug && (
           <p className="text-xs text-amber-600">
-            ⚠ Changer le slug cassera les liens existants.
+            {t("slugChangeWarning")}
           </p>
         )}
       </div>

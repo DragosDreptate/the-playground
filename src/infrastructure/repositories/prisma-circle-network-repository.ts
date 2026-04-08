@@ -224,15 +224,9 @@ export const prismaCircleNetworkRepository: CircleNetworkRepository = {
     networkId: string,
     query: string
   ): Promise<NetworkCircleSearchResult[]> {
-    const existingCircleIds = await prisma.circleNetworkMembership.findMany({
-      where: { networkId },
-      select: { circleId: true },
-    });
-    const excludeIds = existingCircleIds.map((m) => m.circleId);
-
-    const circles = await prisma.circle.findMany({
+    return prisma.circle.findMany({
       where: {
-        id: { notIn: excludeIds },
+        networks: { none: { networkId } },
         OR: [
           { name: { contains: query, mode: "insensitive" } },
           { slug: { contains: query, mode: "insensitive" } },
@@ -249,8 +243,6 @@ export const prismaCircleNetworkRepository: CircleNetworkRepository = {
       take: 10,
       orderBy: { name: "asc" },
     });
-
-    return circles;
   },
 
   async getCircleVisibilities(

@@ -859,7 +859,10 @@
     "searchCircle": "Rechercher une Communauté…",
     "networkMembers": "Communautés membres",
     "confirmDeleteNetwork": "Supprimer ce Réseau ? Les Communautés ne seront pas supprimées.",
+    "circlePrivate": "Privée",
     "circlePrivateWarning": "Privée — non visible sur la page publique",
+    "confirmRemoveCircle": "Retirer {name} de ce Réseau ?",
+    "slugChangeWarning": "⚠ Changer le slug cassera les liens existants.",
     "networkCreated": "Réseau créé",
     "networkUpdated": "Réseau mis à jour",
     "networkDeleted": "Réseau supprimé",
@@ -872,9 +875,7 @@
     "networkDetail": "Détail Réseau"
   },
   "Network": {
-    "title": "Réseau",
     "memberOf": "Membre de",
-    "communityCount": "{count, plural, one {# Communauté} other {# Communautés}}",
     "communities": "Communautés",
     "moments": "Événements",
     "about": "À propos",
