@@ -5,6 +5,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaCircleNetworkRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -15,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
-import { MomentsTabSelector } from "@/components/circles/moments-tab-selector";
+import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
@@ -36,6 +37,7 @@ import {
   MapPin,
   ExternalLink,
   ShieldCheck,
+  Network,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -45,22 +47,19 @@ import {
 
 export default async function CircleDetailPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string }>;
 }) {
-  const [{ slug }, { tab }, t, tCommon, tDashboard, tCategory, session] = await Promise.all([
+  const [{ slug }, t, tCommon, tDashboard, tCategory, tMoment, tNetwork, session] = await Promise.all([
     params,
-    searchParams,
     getTranslations("Circle"),
     getTranslations("Common"),
     getTranslations("Dashboard"),
     getTranslations("CircleCategory"),
+    getTranslations("Moment"),
+    getTranslations("Network"),
     auth(),
   ]);
-
-  const activeTab = tab === "past" ? "past" : "upcoming";
 
   if (!session?.user?.id) notFound();
 
@@ -82,7 +81,7 @@ export default async function CircleDetailPage({
   const isHost = membership.role === "HOST";
 
 
-  const [hosts, players, allMoments, pendingMemberships] = await Promise.all([
+  const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
@@ -92,18 +91,18 @@ export default async function CircleDetailPage({
       { skipCircleCheck: true }
     ),
     isHost ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
+    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const totalMembers = hosts.length + players.length;
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isHost));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
-  const displayedMoments = activeTab === "past" ? pastMoments : upcomingMoments;
 
-  // Récupère compteurs + inscriptions utilisateur en deux requêtes GROUP BY (évite le N+1)
-  const momentIds = displayedMoments.map((m) => m.id);
+  // Récupère compteurs + inscriptions utilisateur pour TOUS les moments (upcoming + past)
+  const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, userRegistrationsByMomentId] = await Promise.all([
-    prismaRegistrationRepository.findRegisteredCountsByMomentIds(momentIds),
-    prismaRegistrationRepository.findByMomentIdsAndUser(momentIds, session.user.id!),
+    prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+    prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
   ]);
   const userStatusByMomentId = new Map(
     [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
@@ -412,6 +411,26 @@ export default async function CircleDetailPage({
                 </p>
               </div>
             </div>
+
+            {/* Réseaux */}
+            {circleNetworks.map((network) => (
+              <div key={network.id} className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {tNetwork("memberOf")}
+                  </p>
+                  <Link
+                    href={`/networks/${network.slug}`}
+                    className="text-sm font-medium underline-offset-2 hover:underline"
+                  >
+                    {network.name}
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Partager & Inviter — visible Organisateurs uniquement */}
@@ -442,37 +461,65 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Moments — toggle + timeline */}
-          <div className="space-y-6">
-            <MomentsTabSelector
-              activeTab={activeTab}
-              isHost={isHost}
-              circleSlug={circle.slug}
-            />
-
-            {displayedMoments.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-                <p className="text-muted-foreground text-sm">
-                  {activeTab === "upcoming"
-                    ? t("detail.noUpcomingMoments")
-                    : t("detail.noPastMoments")}
-                </p>
-              </div>
-            ) : (
-              <div>
-                {displayedMoments.map((moment, i) => (
-                  <MomentTimelineItem
-                    key={moment.id}
-                    moment={moment}
-                    circleSlug={circle.slug}
-                    registrationCount={countByMomentId.get(moment.id) ?? 0}
-                    userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                    isHost={isHost}
-                    isLast={i === displayedMoments.length - 1}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+          <CircleMomentTabs
+            upcomingLabel={t("detail.upcomingMoments")}
+            pastLabel={t("detail.pastMoments")}
+            upcomingAction={
+              isHost ? (
+                <Button asChild size="sm" className="w-full md:w-auto">
+                  <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
+                    {tMoment("create.title")}
+                  </Link>
+                </Button>
+              ) : undefined
+            }
+            upcomingContent={
+              upcomingMoments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+                  <p className="text-muted-foreground text-sm">
+                    {t("detail.noUpcomingMoments")}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {upcomingMoments.map((moment, i) => (
+                    <MomentTimelineItem
+                      key={moment.id}
+                      moment={moment}
+                      circleSlug={circle.slug}
+                      registrationCount={countByMomentId.get(moment.id) ?? 0}
+                      userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
+                      isHost={isHost}
+                      isLast={i === upcomingMoments.length - 1}
+                    />
+                  ))}
+                </div>
+              )
+            }
+            pastContent={
+              pastMoments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+                  <p className="text-muted-foreground text-sm">
+                    {t("detail.noPastMoments")}
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {pastMoments.map((moment, i) => (
+                    <MomentTimelineItem
+                      key={moment.id}
+                      moment={moment}
+                      circleSlug={circle.slug}
+                      registrationCount={countByMomentId.get(moment.id) ?? 0}
+                      userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
+                      isHost={isHost}
+                      isLast={i === pastMoments.length - 1}
+                    />
+                  ))}
+                </div>
+              )
+            }
+          />
 
           {/* Séparateur */}
           <div className="border-border border-t" />
