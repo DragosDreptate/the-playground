@@ -19,7 +19,7 @@ Certains Organisateurs souhaitent contrôler qui rejoint leur Communauté ou qui
 | D5 | Pas de message du Participant avec sa demande (pour l'instant). |
 | D6 | Pas de motif de refus par l'Organisateur (pour l'instant). |
 | D7 | Pas d'expiration des demandes. |
-| D8 | Les 3 modes de join Circle (direct, invite token, auto via Moment) sont tous soumis au `requiresApproval` du Circle. |
+| D8 | Les 2 modes de join Circle (direct depuis la page publique, auto via inscription Moment) sont tous soumis au `requiresApproval` du Circle. |
 | D9 | Une Registration `REJECTED` est finale : le Participant peut faire une nouvelle demande (la Registration REJECTED est ignorée à la prochaine tentative, ou réactivée). |
 | D10 | Un membership Circle `PENDING` n'accorde aucun accès aux pages et contenus réservés aux membres. |
 | D11 | Un Participant avec Registration `PENDING_APPROVAL` **ne peut pas** commenter l'événement, ni recevoir les broadcasts. |
@@ -351,10 +351,6 @@ Player → /circles/[slug] → "S'inscrire (soumis à validation)"
     → UI Participant : "Votre demande est en cours de validation"
 ```
 
-### Scénario 5 — Join Circle par invite token (/circles/join/[token])
-
-Même logique que Scénario 4. L'invite token donne accès à la page, mais `requiresApproval` s'applique quand même.
-
 ---
 
 ## Emails et notifications
@@ -414,10 +410,6 @@ Post-soumission (Registration = PENDING_APPROVAL) :
 Si `circle.requiresApproval = true` et Participant non-membre :
 - CTA : "S'inscrire (soumis à validation)" (au lieu de "Rejoindre")
 - Post-soumission : "Votre demande est en cours de validation par l'Organisateur."
-
-### Page d'invite token (`/circles/join/[token]`)
-
-Même comportement que la page Communauté publique.
 
 ### Dashboard Organisateur — Panneau de gestion des demandes
 

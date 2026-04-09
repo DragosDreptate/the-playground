@@ -10,8 +10,8 @@
 
 L'infrastructure est en place. La plateforme a déjà :
 
-- Un **lien d'invitation privé** (token UUID) générable et révocable par l'Organisateur
-- Une **invitation email batch** (`inviteToCircleByEmailAction`) qui accepte un tableau d'emails et envoie en parallèle via Resend
+- Un **lien partageable** (`/circles/[slug]`) que l'Organisateur peut partager
+- Une **invitation email batch** (`inviteToCircleByEmailAction`) qui accepte un tableau d'emails et envoie en parallèle via Resend (l'email contient l'URL publique de la Communauté)
 - Un **template email d'invitation** avec le nom de la Communauté et un CTA
 
 Le problème est uniquement **l'UX** : l'interface actuelle (`circle-share-invite-card.tsx`) ajoute les emails un par un (champ dynamique). Pour 500 personnes, c'est impraticable.
@@ -154,4 +154,3 @@ Résoudre le problème de volume email à la racine : passer Resend en plan paya
 | `src/components/circles/circle-share-invite-card.tsx` | UI invitation (à modifier pour paste bulk) |
 | `src/domain/ports/services/email-service.ts` | Port `sendCircleInvitation` |
 | `src/infrastructure/services/email/templates/circle-invitation.tsx` | Template email invitation |
-| `src/domain/usecases/generate-circle-invite-token.ts` | Génération token lien d'invitation |
