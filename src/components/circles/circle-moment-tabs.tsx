@@ -53,13 +53,7 @@ export function CircleMomentTabs({
         {activeTab === "upcoming" && upcomingAction}
       </div>
 
-      {/* Les deux contenus sont dans le DOM, on toggle la visibilité via CSS */}
-      <div className={activeTab === "upcoming" ? "" : "hidden"}>
-        {upcomingContent}
-      </div>
-      <div className={activeTab === "past" ? "" : "hidden"}>
-        {pastContent}
-      </div>
+      {activeTab === "upcoming" ? upcomingContent : pastContent}
     </div>
   );
 }
