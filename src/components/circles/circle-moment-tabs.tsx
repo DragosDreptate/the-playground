@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useRef, useLayoutEffect, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 type Props = {
   upcomingLabel: string;
   pastLabel: string;
   upcomingContent: ReactNode;
   pastContent: ReactNode;
+  /** Action affichée à droite des tabs sur le tab "upcoming" (ex: bouton "Créer un événement") */
+  upcomingAction?: ReactNode;
   defaultTab?: "upcoming" | "past";
 };
 
@@ -15,50 +17,49 @@ export function CircleMomentTabs({
   pastLabel,
   upcomingContent,
   pastContent,
+  upcomingAction,
   defaultTab = "upcoming",
 }: Props) {
   const [activeTab, setActiveTab] = useState<"upcoming" | "past">(defaultTab);
-  const scrollPosRef = useRef<number | null>(null);
-
-  const handleTabClick = (tab: "upcoming" | "past") => {
-    scrollPosRef.current = window.scrollY;
-    setActiveTab(tab);
-  };
-
-  useLayoutEffect(() => {
-    if (scrollPosRef.current !== null) {
-      window.scrollTo({ top: scrollPosRef.current, behavior: "instant" });
-      scrollPosRef.current = null;
-    }
-  }, [activeTab]);
 
   return (
     <div className="space-y-6">
-      {/* Tab selector */}
-      <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
-        <button
-          onClick={() => handleTabClick("upcoming")}
-          className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-            activeTab === "upcoming"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {upcomingLabel}
-        </button>
-        <button
-          onClick={() => handleTabClick("past")}
-          className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
-            activeTab === "past"
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          {pastLabel}
-        </button>
+      {/* Tab selector + optional action */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between md:gap-4">
+        <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+          <button
+            type="button"
+            onClick={() => setActiveTab("upcoming")}
+            className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+              activeTab === "upcoming"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {upcomingLabel}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("past")}
+            className={`whitespace-nowrap rounded-full px-4 py-1 text-sm font-medium transition-colors ${
+              activeTab === "past"
+                ? "bg-foreground text-background"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {pastLabel}
+          </button>
+        </div>
+        {activeTab === "upcoming" && upcomingAction}
       </div>
 
-      {activeTab === "upcoming" ? upcomingContent : pastContent}
+      {/* Les deux contenus sont dans le DOM, on toggle la visibilité via CSS */}
+      <div className={activeTab === "upcoming" ? "" : "hidden"}>
+        {upcomingContent}
+      </div>
+      <div className={activeTab === "past" ? "" : "hidden"}>
+        {pastContent}
+      </div>
     </div>
   );
 }
