@@ -414,11 +414,10 @@ export default async function CircleDetailPage({
             </div>
           </div>
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
           {/* Partager & Inviter — visible Organisateurs uniquement */}
           {isHost && (
+            <>
+            <div className="border-border border-t" />
             <CircleShareInviteCard
               circleId={circle.id}
               circleSlug={circle.slug}
@@ -436,6 +435,7 @@ export default async function CircleDetailPage({
                 emailMaxReached: t("invite.emailMaxReached", { max: 10 }),
               }}
             />
+            </>
           )}
 
           {/* Séparateur */}
