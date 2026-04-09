@@ -46,7 +46,7 @@ export default async function PrivacyPage() {
     <>
       <h1>{t("privacy.title")}</h1>
       <p className="text-muted-foreground not-prose text-sm">
-        {t("lastUpdated", { date: "01/04/2026" })}
+        {t("lastUpdated", { date: "09/04/2026" })}
       </p>
       <p>{t("privacy.intro")}</p>
 
