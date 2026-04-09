@@ -9,7 +9,6 @@ type Props = {
   pastContent: ReactNode;
   /** Action affichée à droite des tabs sur le tab "upcoming" (ex: bouton "Créer un événement") */
   upcomingAction?: ReactNode;
-  defaultTab?: "upcoming" | "past";
 };
 
 export function CircleMomentTabs({
@@ -18,9 +17,8 @@ export function CircleMomentTabs({
   upcomingContent,
   pastContent,
   upcomingAction,
-  defaultTab = "upcoming",
 }: Props) {
-  const [activeTab, setActiveTab] = useState<"upcoming" | "past">(defaultTab);
+  const [activeTab, setActiveTab] = useState<"upcoming" | "past">("upcoming");
 
   return (
     <div className="space-y-6">

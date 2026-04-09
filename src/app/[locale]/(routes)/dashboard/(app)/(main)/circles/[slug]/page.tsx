@@ -461,7 +461,6 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Moments — toggle + timeline */}
-          {/* Moments — toggle + timeline */}
           <CircleMomentTabs
             upcomingLabel={t("detail.upcomingMoments")}
             pastLabel={t("detail.pastMoments")}
