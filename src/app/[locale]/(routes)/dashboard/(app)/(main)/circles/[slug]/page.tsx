@@ -5,6 +5,7 @@ import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
+  prismaCircleNetworkRepository,
 } from "@/infrastructure/repositories";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -36,6 +37,7 @@ import {
   MapPin,
   ExternalLink,
   ShieldCheck,
+  Network,
 } from "lucide-react";
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -48,13 +50,14 @@ export default async function CircleDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const [{ slug }, t, tCommon, tDashboard, tCategory, tMoment, session] = await Promise.all([
+  const [{ slug }, t, tCommon, tDashboard, tCategory, tMoment, tNetwork, session] = await Promise.all([
     params,
     getTranslations("Circle"),
     getTranslations("Common"),
     getTranslations("Dashboard"),
     getTranslations("CircleCategory"),
     getTranslations("Moment"),
+    getTranslations("Network"),
     auth(),
   ]);
 
@@ -78,7 +81,7 @@ export default async function CircleDetailPage({
   const isHost = membership.role === "HOST";
 
 
-  const [hosts, players, allMoments, pendingMemberships] = await Promise.all([
+  const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
     prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
@@ -88,6 +91,7 @@ export default async function CircleDetailPage({
       { skipCircleCheck: true }
     ),
     isHost ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
+    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const totalMembers = hosts.length + players.length;
@@ -407,6 +411,26 @@ export default async function CircleDetailPage({
                 </p>
               </div>
             </div>
+
+            {/* Réseaux */}
+            {circleNetworks.map((network) => (
+              <div key={network.id} className="flex items-center gap-3">
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-4" />
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">
+                    {tNetwork("memberOf")}
+                  </p>
+                  <Link
+                    href={`/networks/${network.slug}`}
+                    className="text-sm font-medium underline-offset-2 hover:underline"
+                  >
+                    {network.name}
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Partager & Inviter — visible Organisateurs uniquement */}
