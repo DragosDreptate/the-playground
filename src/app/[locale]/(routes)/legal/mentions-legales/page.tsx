@@ -23,10 +23,10 @@ export default async function LegalNoticePage() {
 
   return (
     <>
+      <h1>{t("legalNotice.title")}</h1>
       <p className="text-muted-foreground not-prose text-sm">
         {t("lastUpdated", { date: "22/02/2026" })}
       </p>
-      <h1>{t("legalNotice.title")}</h1>
 
       <h2>{t("legalNotice.editor.title")}</h2>
       <p>{t("legalNotice.editor.content")}</p>

@@ -1202,22 +1202,23 @@
       },
       "subprocessors": {
         "title": "Sub-processors and data recipients",
-        "intro": "Your personal data may be shared with the following sub-processors, solely for the purposes described above:",
+        "intro": "The following sub-processors are involved in operating the platform. Depending on their role, they may receive personal data, technical data, or content you have entered:",
         "headers": {
           "name": "Sub-processor",
           "purpose": "Purpose",
+          "data": "Data transmitted",
           "hq": "Headquarters",
           "hosting": "Data hosting",
           "safeguards": "Safeguards"
         },
-        "vercel": { "purpose": "Application hosting", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Vercel DPA, data hosted in EU" },
-        "neon": { "purpose": "Database hosting", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Neon DPA, data hosted in EU" },
-        "posthog": { "purpose": "Service usage analytics", "hq": "United States", "hosting": "European Union (eu.posthog.com)", "safeguards": "PostHog DPA, data hosted in EU" },
-        "sentry": { "purpose": "Technical error monitoring", "hq": "United States", "hosting": "European Union (Germany, de.sentry.io)", "safeguards": "Sentry DPA, data hosted in EU" },
-        "resend": { "purpose": "Transactional and notification emails", "hq": "United States", "hosting": "United States", "safeguards": "Resend DPA, EU standard contractual clauses" },
-        "stripe": { "purpose": "Payment processing (paid Events)", "hq": "United States", "hosting": "United States / European Union (global infrastructure)", "safeguards": "PCI-DSS certified, Stripe DPA, EU standard contractual clauses" },
-        "anthropic": { "purpose": "AI features (description generation)", "hq": "United States", "hosting": "United States", "safeguards": "Anthropic DPA, EU standard contractual clauses" },
-        "slack": { "purpose": "Internal administration notifications (new users, new communities)", "hq": "United States", "hosting": "United States", "safeguards": "Slack/Salesforce DPA, EU standard contractual clauses" },
+        "vercel": { "purpose": "Application hosting", "data": "IP address, session cookies, HTTP requests (transit)", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Vercel DPA, data hosted in EU" },
+        "neon": { "purpose": "Database hosting", "data": "All account data: email, name, profile picture, registrations, comments", "hq": "United States", "hosting": "European Union (Frankfurt)", "safeguards": "Neon DPA, data hosted in EU" },
+        "posthog": { "purpose": "Service usage analytics", "data": "User identifier, email, name, pages visited", "hq": "United States", "hosting": "European Union (eu.posthog.com)", "safeguards": "PostHog DPA, data hosted in EU" },
+        "sentry": { "purpose": "Technical error monitoring", "data": "Technical error traces (no personal data explicitly transmitted)", "hq": "United States", "hosting": "European Union (Germany, de.sentry.io)", "safeguards": "Sentry DPA, data hosted in EU" },
+        "resend": { "purpose": "Transactional and notification emails", "data": "Recipient email address, name (in some emails)", "hq": "United States", "hosting": "United States", "safeguards": "Resend DPA, EU standard contractual clauses" },
+        "stripe": { "purpose": "Payment processing (paid Events)", "data": "Email address, user identifier", "hq": "United States", "hosting": "United States / European Union (global infrastructure)", "safeguards": "PCI-DSS certified, Stripe DPA, EU standard contractual clauses" },
+        "anthropic": { "purpose": "AI features (description generation)", "data": "User-entered content (event titles and descriptions) — no personal data", "hq": "United States", "hosting": "United States", "safeguards": "Anthropic DPA, EU standard contractual clauses" },
+        "slack": { "purpose": "Internal administration notifications (new users, new communities)", "data": "User name and email (admin notifications only)", "hq": "United States", "hosting": "United States", "safeguards": "Slack/Salesforce DPA, EU standard contractual clauses" },
         "noSale": "Your data is never sold or shared with third parties for commercial or advertising purposes."
       },
       "transfers": {

@@ -44,10 +44,10 @@ export default async function PrivacyPage() {
 
   return (
     <>
-      <p className="text-muted-foreground not-prose text-sm">
-        {t("lastUpdated", { date: "01/04/2026" })}
-      </p>
       <h1>{t("privacy.title")}</h1>
+      <p className="text-muted-foreground not-prose text-sm">
+        {t("lastUpdated", { date: "09/04/2026" })}
+      </p>
       <p>{t("privacy.intro")}</p>
 
       {/* 2. Responsable du traitement */}
@@ -183,6 +183,7 @@ export default async function PrivacyPage() {
           <tr>
             <th>{t("privacy.subprocessors.headers.name")}</th>
             <th>{t("privacy.subprocessors.headers.purpose")}</th>
+            <th>{t("privacy.subprocessors.headers.data")}</th>
             <th>{t("privacy.subprocessors.headers.hq")}</th>
             <th>{t("privacy.subprocessors.headers.hosting")}</th>
             <th>{t("privacy.subprocessors.headers.safeguards")}</th>
@@ -211,6 +212,7 @@ export default async function PrivacyPage() {
                 </strong>
               </td>
               <td>{t(`privacy.subprocessors.${sp}.purpose`)}</td>
+              <td>{t(`privacy.subprocessors.${sp}.data`)}</td>
               <td>{t(`privacy.subprocessors.${sp}.hq`)}</td>
               <td>{t(`privacy.subprocessors.${sp}.hosting`)}</td>
               <td>{t(`privacy.subprocessors.${sp}.safeguards`)}</td>

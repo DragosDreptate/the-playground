@@ -1202,22 +1202,23 @@
       },
       "subprocessors": {
         "title": "Sous-traitants et destinataires des données",
-        "intro": "Vos données personnelles peuvent être transmises aux sous-traitants suivants, uniquement pour les finalités décrites ci-dessus :",
+        "intro": "Les sous-traitants suivants interviennent dans le fonctionnement de la plateforme. Selon leur rôle, ils peuvent recevoir des données personnelles, des données techniques ou du contenu que vous avez saisi :",
         "headers": {
           "name": "Sous-traitant",
           "purpose": "Finalité",
+          "data": "Données transmises",
           "hq": "Siège",
           "hosting": "Hébergement des données",
           "safeguards": "Garanties"
         },
-        "vercel": { "purpose": "Hébergement de l'application", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Vercel, données hébergées en UE" },
-        "neon": { "purpose": "Hébergement de la base de données", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Neon, données hébergées en UE" },
-        "posthog": { "purpose": "Analyse d'utilisation du service", "hq": "États-Unis", "hosting": "Union européenne (eu.posthog.com)", "safeguards": "DPA PostHog, données hébergées en UE" },
-        "sentry": { "purpose": "Surveillance des erreurs techniques", "hq": "États-Unis", "hosting": "Union européenne (Allemagne, de.sentry.io)", "safeguards": "DPA Sentry, données hébergées en UE" },
-        "resend": { "purpose": "Envoi d'emails transactionnels et de notifications", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Resend, clauses contractuelles types UE" },
-        "stripe": { "purpose": "Traitement des paiements (événements payants)", "hq": "États-Unis", "hosting": "États-Unis / Union européenne (infrastructure globale)", "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE" },
-        "anthropic": { "purpose": "Fonctionnalités d'intelligence artificielle (génération de descriptions)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Anthropic, clauses contractuelles types UE" },
-        "slack": { "purpose": "Notifications internes d'administration (nouveaux utilisateurs, nouvelles communautés)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Slack/Salesforce, clauses contractuelles types UE" },
+        "vercel": { "purpose": "Hébergement de l'application", "data": "Adresse IP, cookies de session, requêtes HTTP (transit)", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Vercel, données hébergées en UE" },
+        "neon": { "purpose": "Hébergement de la base de données", "data": "Toutes les données du compte : email, nom, photo de profil, inscriptions, commentaires", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Neon, données hébergées en UE" },
+        "posthog": { "purpose": "Analyse d'utilisation du service", "data": "Identifiant utilisateur, email, nom, pages visitées", "hq": "États-Unis", "hosting": "Union européenne (eu.posthog.com)", "safeguards": "DPA PostHog, données hébergées en UE" },
+        "sentry": { "purpose": "Surveillance des erreurs techniques", "data": "Traces d'erreur techniques (aucune donnée personnelle explicitement transmise)", "hq": "États-Unis", "hosting": "Union européenne (Allemagne, de.sentry.io)", "safeguards": "DPA Sentry, données hébergées en UE" },
+        "resend": { "purpose": "Envoi d'emails transactionnels et de notifications", "data": "Adresse email du destinataire, nom (dans certains emails)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Resend, clauses contractuelles types UE" },
+        "stripe": { "purpose": "Traitement des paiements (événements payants)", "data": "Adresse email, identifiant utilisateur", "hq": "États-Unis", "hosting": "États-Unis / Union européenne (infrastructure globale)", "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE" },
+        "anthropic": { "purpose": "Fonctionnalités d'intelligence artificielle (génération de descriptions)", "data": "Contenu saisi par l'utilisateur (titres et descriptions d'événements) — aucune donnée personnelle", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Anthropic, clauses contractuelles types UE" },
+        "slack": { "purpose": "Notifications internes d'administration (nouveaux utilisateurs, nouvelles communautés)", "data": "Nom et email de l'utilisateur (notifications administrateur uniquement)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Slack/Salesforce, clauses contractuelles types UE" },
         "noSale": "Vos données ne sont jamais vendues ni partagées avec des tiers à des fins commerciales ou publicitaires."
       },
       "transfers": {
