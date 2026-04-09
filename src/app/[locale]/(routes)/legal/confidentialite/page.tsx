@@ -44,10 +44,10 @@ export default async function PrivacyPage() {
 
   return (
     <>
+      <h1>{t("privacy.title")}</h1>
       <p className="text-muted-foreground not-prose text-sm">
         {t("lastUpdated", { date: "01/04/2026" })}
       </p>
-      <h1>{t("privacy.title")}</h1>
       <p>{t("privacy.intro")}</p>
 
       {/* 2. Responsable du traitement */}

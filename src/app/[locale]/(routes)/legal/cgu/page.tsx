@@ -23,10 +23,10 @@ export default async function TermsPage() {
 
   return (
     <>
+      <h1>{t("terms.title")}</h1>
       <p className="text-muted-foreground not-prose text-sm">
         {t("lastUpdated", { date: "22/02/2026" })}
       </p>
-      <h1>{t("terms.title")}</h1>
       <p>{t("terms.intro")}</p>
 
       <h2>{t("terms.acceptance.title")}</h2>
