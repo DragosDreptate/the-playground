@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/posthog-daily-report",
       "schedule": "7 8 * * *"
+    },
+    {
+      "path": "/api/cron/posthog-weekly-report",
+      "schedule": "7 8 * * 1"
     }
   ]
 }

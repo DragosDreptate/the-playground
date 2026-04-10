@@ -74,7 +74,7 @@ export async function notifySlackNewUser(params: {
   });
 }
 
-export async function notifySlackDailyTrafficReport(params: {
+export async function notifySlackTrafficReport(params: {
   dashboardName: string;
   pageviews: number;
   uniqueVisitors: number;
