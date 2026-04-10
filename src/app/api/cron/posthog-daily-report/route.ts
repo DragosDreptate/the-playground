@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
+import { notifySlackDailyTrafficReport } from "@/infrastructure/services/slack/slack-notification-service";
 import { fetchPosthogDashboard } from "./fetch-dashboard";
 import { buildReportHtml } from "./build-report-html";
+import { extractReportKpis } from "./extract-report-kpis";
 
 /**
  * POST /api/cron/posthog-daily-report
@@ -16,6 +18,7 @@ import { buildReportHtml } from "./build-report-html";
  */
 
 const DASHBOARD_ID = 601861;
+const DASHBOARD_URL = `https://eu.posthog.com/project/134622/dashboard/${DASHBOARD_ID}`;
 
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -44,6 +47,17 @@ export async function POST(request: NextRequest) {
       to: [recipient],
       subject: `${dashboard.name} — The Playground`,
       html,
+    });
+
+    // Slack mirror — best-effort, silent failure (same pattern as other admin notifs).
+    // Email is the primary channel and has already been sent at this point.
+    const kpis = extractReportKpis(dashboard);
+    await notifySlackDailyTrafficReport({
+      dashboardName: dashboard.name,
+      pageviews: kpis.pageviews,
+      uniqueVisitors: kpis.uniqueVisitors,
+      sessions: kpis.sessions,
+      dashboardUrl: DASHBOARD_URL,
     });
 
     const durationMs = Date.now() - startedAt;
