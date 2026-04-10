@@ -5,16 +5,22 @@ import type {
 } from "./fetch-dashboard";
 
 /**
- * Pure HTML builder for the daily traffic report. Deterministic, no side effects,
- * trivially testable against a fixture dashboard JSON.
+ * Pure HTML builder for the traffic report (daily or weekly).
+ * Deterministic, no side effects, trivially testable against fixture JSONs.
+ *
+ * The builder matches PostHog insights by name *prefix* so it works with
+ * both the daily dashboard (insights suffixed "– 24h") and the weekly one
+ * (insights suffixed "– 7j"), and with any future variation.
  */
 
-const INSIGHT_NAMES = {
-  pageviews: "Pageviews & visiteurs uniques – 24h",
-  sessions: "Sessions – 24h",
-  interactions: "Interactions clés – 24h",
-  engagement: "Engagement social – 24h",
-  pages: "Pages les plus visitées – 24h",
+export type ReportPeriod = "day" | "week";
+
+const INSIGHT_PREFIXES = {
+  pageviews: "Pageviews & visiteurs uniques",
+  sessions: "Sessions",
+  interactions: "Interactions clés",
+  engagement: "Engagement social",
+  pages: "Pages les plus visitées",
 } as const;
 
 const INTERACTION_LABELS: Record<string, string> = {
@@ -36,7 +42,7 @@ const ENGAGEMENT_LABELS: Record<string, string> = {
   circle_joined_directly: "Inscriptions directes à une Communauté",
   circle_followed: "Abonnements à une Communauté",
   comment_posted: "Commentaires postés",
-  radar_searched: "Recherches (Découvrir)",
+  radar_searched: "Radar",
 };
 
 const ENGAGEMENT_ORDER = [
@@ -58,12 +64,12 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function findInsightByName(
+function findInsightByPrefix(
   dashboard: PosthogDashboard,
-  name: string
+  prefix: string
 ): PosthogInsight | null {
   for (const tile of dashboard.tiles) {
-    if (tile.insight && tile.insight.name === name) return tile.insight;
+    if (tile.insight && tile.insight.name.startsWith(prefix)) return tile.insight;
   }
   return null;
 }
@@ -77,10 +83,23 @@ function seriesByLabel(insight: PosthogInsight | null): Record<string, number> {
   return out;
 }
 
-function peakHour(series: PosthogSeries | undefined): {
-  label: string;
-  value: number;
-} {
+const WEEKDAY_FR = ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"];
+
+function formatDayLabel(iso: string): string {
+  // "2026-04-06T00:00:00+02:00" → "lun 06/04"
+  if (!iso || iso.length < 10) return "?";
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return iso.slice(0, 10);
+  const dayName = WEEKDAY_FR[dt.getDay()] ?? "";
+  const dd = String(dt.getDate()).padStart(2, "0");
+  const mm = String(dt.getMonth() + 1).padStart(2, "0");
+  return `${dayName} ${dd}/${mm}`;
+}
+
+function peakPoint(
+  series: PosthogSeries | undefined,
+  period: ReportPeriod
+): { label: string; value: number } {
   if (!series || !series.data || !series.days || series.data.length === 0) {
     return { label: "—", value: 0 };
   }
@@ -89,8 +108,13 @@ function peakHour(series: PosthogSeries | undefined): {
     if (series.data[i] > series.data[maxIdx]) maxIdx = i;
   }
   const day = series.days[maxIdx] ?? "";
-  const hour = day.length >= 16 ? day.slice(11, 16) : `${maxIdx}h`;
-  return { label: hour, value: Math.round(series.data[maxIdx] ?? 0) };
+  const label =
+    period === "week"
+      ? formatDayLabel(day)
+      : day.length >= 16
+        ? day.slice(11, 16)
+        : `${maxIdx}h`;
+  return { label, value: Math.round(series.data[maxIdx] ?? 0) };
 }
 
 function formatDate(iso: string | undefined): string {
@@ -109,10 +133,11 @@ function formatTimestamp(date: Date): string {
 
 export function buildReportHtml(
   dashboard: PosthogDashboard,
-  generatedAt: Date = new Date()
+  generatedAt: Date = new Date(),
+  period: ReportPeriod = "day"
 ): string {
   // ─── Pageviews + unique visitors ───────────────────────────
-  const pvInsight = findInsightByName(dashboard, INSIGHT_NAMES.pageviews);
+  const pvInsight = findInsightByPrefix(dashboard, INSIGHT_PREFIXES.pageviews);
   const pvSeries = pvInsight?.result ?? [];
   const pageviews = Math.round(pvSeries[0]?.count ?? 0);
   const uniqueVisitors = Math.round(pvSeries[1]?.count ?? 0);
@@ -122,31 +147,34 @@ export function buildReportHtml(
       : "0";
 
   // ─── Sessions ──────────────────────────────────────────────
-  const sessionsInsight = findInsightByName(dashboard, INSIGHT_NAMES.sessions);
+  const sessionsInsight = findInsightByPrefix(
+    dashboard,
+    INSIGHT_PREFIXES.sessions
+  );
   const sessionsSeries = sessionsInsight?.result?.[0];
   const sessions = Math.round(sessionsSeries?.count ?? 0);
 
   // ─── Peaks ─────────────────────────────────────────────────
-  const pvPeak = peakHour(pvSeries[0]);
-  const sessionsPeak = peakHour(sessionsSeries);
+  const pvPeak = peakPoint(pvSeries[0], period);
+  const sessionsPeak = peakPoint(sessionsSeries, period);
 
   // ─── Interactions ──────────────────────────────────────────
-  const interactionsInsight = findInsightByName(
+  const interactionsInsight = findInsightByPrefix(
     dashboard,
-    INSIGHT_NAMES.interactions
+    INSIGHT_PREFIXES.interactions
   );
   const interactions = seriesByLabel(interactionsInsight);
 
   // ─── Engagement ────────────────────────────────────────────
-  const engagementInsight = findInsightByName(
+  const engagementInsight = findInsightByPrefix(
     dashboard,
-    INSIGHT_NAMES.engagement
+    INSIGHT_PREFIXES.engagement
   );
   const engagement = seriesByLabel(engagementInsight);
   const engagementTotal = Object.values(engagement).reduce((a, b) => a + b, 0);
 
   // ─── Top pages ─────────────────────────────────────────────
-  const pagesInsight = findInsightByName(dashboard, INSIGHT_NAMES.pages);
+  const pagesInsight = findInsightByPrefix(dashboard, INSIGHT_PREFIXES.pages);
   const pages: Array<{ label: string; value: number }> = [];
   let otherPagesValue = 0;
   for (const s of pagesInsight?.result ?? []) {
@@ -209,6 +237,17 @@ export function buildReportHtml(
     }
   }
 
+  // ─── Period-dependent labels ───────────────────────────────
+  const periodLabel = period === "week" ? "7 derniers jours" : "24h";
+  const distributionTitle =
+    period === "week" ? "Distribution quotidienne" : "Distribution horaire";
+  const distributionSubtitle =
+    period === "week"
+      ? "Pageviews par jour sur la période."
+      : "Pageviews par heure sur la période.";
+  const barLabelWidth = period === "week" ? "80px" : "50px";
+  const peakPreposition = period === "week" ? "le" : "à";
+
   // ─── HTML assembly ─────────────────────────────────────────
   const parts: string[] = [];
 
@@ -216,7 +255,7 @@ export function buildReportHtml(
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Synthèse trafic quotidienne — The Playground</title>
+<title>${escapeHtml(dashboard.name)} — The Playground</title>
 </head>
 <body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1a1a1a;">
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f5f5f7;padding:32px 16px;">
@@ -237,7 +276,7 @@ export function buildReportHtml(
 <td width="33%" style="padding:16px;background:#faf5ff;border-radius:12px;vertical-align:top;">
 <p style="margin:0;font-size:11px;font-weight:600;color:#a855f7;text-transform:uppercase;letter-spacing:1px;">Pageviews</p>
 <p style="margin:4px 0 0 0;font-size:32px;font-weight:700;color:#1a1a1a;line-height:1;">${pageviews}</p>
-<p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Pic à ${pvPeak.label} (${pvPeak.value} pv)</p>
+<p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Pic ${peakPreposition} ${pvPeak.label} (${pvPeak.value} pv)</p>
 </td>
 <td width="8"></td>
 <td width="33%" style="padding:16px;background:#fdf2f8;border-radius:12px;vertical-align:top;">
@@ -249,7 +288,7 @@ export function buildReportHtml(
 <td width="33%" style="padding:16px;background:#f5f3ff;border-radius:12px;vertical-align:top;">
 <p style="margin:0;font-size:11px;font-weight:600;color:#7c3aed;text-transform:uppercase;letter-spacing:1px;">Sessions</p>
 <p style="margin:4px 0 0 0;font-size:32px;font-weight:700;color:#1a1a1a;line-height:1;">${sessions}</p>
-<p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Pic à ${sessionsPeak.label} (${sessionsPeak.value} sess.)</p>
+<p style="margin:8px 0 0 0;font-size:12px;color:#6b7280;">Pic ${peakPreposition} ${sessionsPeak.label} (${sessionsPeak.value} sess.)</p>
 </td>
 </tr>
 </table>
@@ -257,7 +296,7 @@ export function buildReportHtml(
 
 <tr><td style="padding:32px 32px 0 32px;">
 <h2 style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;">Interactions clés</h2>
-<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Volume des principales interactions sur 24h (hors comptes test).</p>
+<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Volume des principales interactions sur ${periodLabel} (hors comptes test).</p>
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;border-spacing:0;">
 `);
 
@@ -287,7 +326,7 @@ export function buildReportHtml(
 
 <tr><td style="padding:32px 32px 0 32px;">
 <h2 style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;">Engagement social</h2>
-<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Actions d'engagement (rejoindre, suivre, commenter, rechercher) sur 24h.</p>
+<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Actions d'engagement (rejoindre, suivre, commenter, rechercher) sur ${periodLabel}.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;border-spacing:0;">
 `);
 
@@ -312,7 +351,7 @@ export function buildReportHtml(
 
 <tr><td style="padding:32px 32px 0 32px;">
 <h2 style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;">Pages les plus visitées</h2>
-<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Top 10 des pages par nombre de vues sur 24h.</p>
+<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Top 10 des pages par nombre de vues sur ${periodLabel}.</p>
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;border-spacing:0;">
 <tr><th style="padding:8px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;text-align:left;border-bottom:1px solid #e5e7eb;">#</th><th style="padding:8px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;text-align:left;border-bottom:1px solid #e5e7eb;">Page</th><th style="padding:8px 0;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6b7280;text-align:right;border-bottom:1px solid #e5e7eb;">Vues</th></tr>
 `);
@@ -339,8 +378,8 @@ export function buildReportHtml(
 </td></tr>
 
 <tr><td style="padding:32px 32px 0 32px;">
-<h2 style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;">Distribution horaire</h2>
-<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">Pageviews par heure sur la période.</p>
+<h2 style="margin:0 0 8px 0;font-size:16px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:1px;">${distributionTitle}</h2>
+<p style="margin:0 0 16px 0;font-size:13px;color:#6b7280;">${distributionSubtitle}</p>
 `);
 
   const pvData = pvSeries[0]?.data ?? [];
@@ -350,11 +389,16 @@ export function buildReportHtml(
     parts.push(`<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;border-spacing:0;">`);
     pvData.forEach((val, i) => {
       const day = pvDays[i] ?? "";
-      const hour = day.length >= 16 ? day.slice(11, 16) : `${i}h`;
+      const barLabel =
+        period === "week"
+          ? formatDayLabel(day)
+          : day.length >= 16
+            ? day.slice(11, 16)
+            : `${i}h`;
       const bar = Math.round((val / maxVal) * 100);
       const opacity = val > 0 ? "1" : "0.3";
       parts.push(`<tr style="opacity:${opacity};">
-<td style="padding:4px 8px 4px 0;font-size:11px;color:#6b7280;font-family:ui-monospace,monospace;width:50px;">${hour}</td>
+<td style="padding:4px 8px 4px 0;font-size:11px;color:#6b7280;font-family:ui-monospace,monospace;width:${barLabelWidth};">${barLabel}</td>
 <td style="padding:4px 0;">
   <div style="background:#f3f4f6;border-radius:2px;height:6px;width:100%;">
     <div style="background:linear-gradient(90deg,#ec4899,#a855f7);border-radius:2px;height:6px;width:${bar}%;"></div>
