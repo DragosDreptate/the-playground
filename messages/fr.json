@@ -172,12 +172,12 @@
     },
     "modeChoice": {
       "greetingPrefix": "Bienvenue,",
-      "greetingSuffix": "Que veux-tu faire ?",
-      "greetingAnonymous": "Bienvenue — que veux-tu faire ?",
-      "subtitle": "Par où veux-tu commencer ?",
+      "greetingSuffix": "Que voulez-vous faire ?",
+      "greetingAnonymous": "Bienvenue — que voulez-vous faire ?",
+      "subtitle": "Par où voulez-vous commencer ?",
       "participant": {
         "title": "Je participe",
-        "description": "Explorer et rejoindre des événements qui m'inspirent"
+        "description": "Explorer et rejoindre des événements qui vous inspirent"
       },
       "organizer": {
         "title": "J'organise",
@@ -263,7 +263,7 @@
     "hostTools": "Outils organisateur",
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
-    "greetingSubtitle": "Vos communautés et vos prochains événements, au même endroit.",
+    "greetingSubtitle": "Voici ce qui se passe dans vos communautés.",
     "memberCount": "{count} membres",
     "filterAll": "Tous",
     "filterHostOnly": "Organisateur"

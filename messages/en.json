@@ -263,7 +263,7 @@
     "hostTools": "Host tools",
     "greeting": "Hello, {name}",
     "greetingAnonymous": "Hello",
-    "greetingSubtitle": "Your communities and upcoming Events, all in one place.",
+    "greetingSubtitle": "Here's what's happening in your communities.",
     "memberCount": "{count} members",
     "filterAll": "All",
     "filterHostOnly": "Organizer"
