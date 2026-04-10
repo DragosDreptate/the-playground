@@ -13,6 +13,10 @@ const slugRouteRe = new RegExp(
   `^(?:\\/(?:${localeAlt}))?\\/(?:m|circles)\\/([^/]+)(?:\\/|$)`
 );
 
+// Next.js metadata file routes (opengraph-image, twitter-image) — optional hash suffix
+// e.g. /fr/circles/[slug]/opengraph-image-gwtces
+const metadataFileRe = /\/(opengraph-image|twitter-image)(-[^/]+)?$/;
+
 function isBlockedBot(ua: string): boolean {
   const lower = ua.toLowerCase();
   return BLOCKED_BOTS.some((bot) => lower.includes(bot));
@@ -25,7 +29,16 @@ export default function middleware(request: NextRequest) {
     return new NextResponse("Forbidden", { status: 403 });
   }
 
-  // 2. Validate slugs on public routes before any processing
+  // 2. Bypass next-intl for Next.js metadata file routes. The i18n middleware
+  // strips the default locale prefix (e.g. /fr/...) via a 307 redirect, which
+  // drops the hash query string and breaks social crawlers (LinkedIn, X...)
+  // that don't follow redirects on og:image URLs. Next.js file-based routing
+  // still resolves these routes correctly without the middleware rewrite.
+  if (metadataFileRe.test(request.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
+  // 3. Validate slugs on public routes before any processing
   const slugMatch = request.nextUrl.pathname.match(slugRouteRe);
   if (slugMatch) {
     const slug = decodeURIComponent(slugMatch[1]);
@@ -34,7 +47,7 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // 3. Delegate to next-intl middleware
+  // 4. Delegate to next-intl middleware
   return intlMiddleware(request);
 }
 
