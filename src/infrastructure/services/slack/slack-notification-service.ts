@@ -74,6 +74,24 @@ export async function notifySlackNewUser(params: {
   });
 }
 
+export async function notifySlackTrafficReport(params: {
+  dashboardName: string;
+  pageviews: number;
+  uniqueVisitors: number;
+  sessions: number;
+  dashboardUrl: string;
+}): Promise<void> {
+  const summary = `*${params.pageviews}* pageviews · *${params.uniqueVisitors}* visiteurs uniques · *${params.sessions}* sessions`;
+  await sendSlack({
+    text: `📊 ${params.dashboardName} — ${params.pageviews} pv · ${params.uniqueVisitors} vis · ${params.sessions} sess`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: `📊 ${params.dashboardName}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: summary } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Ouvrir le dashboard" }, url: params.dashboardUrl }] },
+    ],
+  });
+}
+
 export async function notifySlackSentryIssue(params: {
   issueShortId: string;
   issueTitle: string;
