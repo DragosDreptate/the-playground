@@ -5,7 +5,12 @@ import { useTranslations } from "next-intl";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import { cn } from "@/lib/utils";
-import { formatAttachmentSize, formatAttachmentType } from "./attachment-format";
+import {
+  formatAttachmentSize,
+  formatAttachmentType,
+  isImageAttachment,
+  isPdfAttachment,
+} from "./attachment-format";
 
 type AttachmentViewerDialogProps = {
   attachment: MomentAttachment | null;
@@ -26,8 +31,8 @@ export function AttachmentViewerDialog({
   const t = useTranslations("Moment.public.attachments");
 
   const isOpen = attachment !== null;
-  const isImage = attachment?.contentType.startsWith("image/") ?? false;
-  const isPdf = attachment?.contentType === "application/pdf";
+  const isImage = attachment ? isImageAttachment(attachment.contentType) : false;
+  const isPdf = attachment ? isPdfAttachment(attachment.contentType) : false;
 
   const downloadHref = attachment
     ? `/api/moments/${momentSlug}/attachments/${attachment.id}/download`

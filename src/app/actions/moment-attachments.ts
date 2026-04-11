@@ -10,6 +10,7 @@ import {
   prismaCircleRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
+import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 import { addMomentAttachment } from "@/domain/usecases/add-moment-attachment";
 import { removeMomentAttachment } from "@/domain/usecases/remove-moment-attachment";
 import {
@@ -20,16 +21,8 @@ import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { ActionResult } from "./types";
 import { DomainError } from "@/domain/errors/domain-error";
 
-/**
- * Uploads a new attachment to a Moment.
- * Called from the moment form options section (drag-and-drop or file picker).
- *
- * Security:
- * - Auth required
- * - Magic number check via file-type (prevents mime spoofing)
- * - Ownership check in the usecase (HOST only)
- * - Size check both in the action (early) and the usecase (defense in depth)
- */
+const UPLOAD_RATE_LIMIT = { max: 10, windowMs: 60 * 1000 };
+
 export async function uploadMomentAttachmentAction(
   momentId: string,
   formData: FormData
@@ -39,12 +32,24 @@ export async function uploadMomentAttachmentAction(
     return { success: false, error: "Non authentifié", code: "UNAUTHORIZED" };
   }
 
+  const rate = await prismaRateLimiter.checkLimit(
+    `attachment-upload:${session.user.id}`,
+    UPLOAD_RATE_LIMIT.max,
+    UPLOAD_RATE_LIMIT.windowMs
+  );
+  if (!rate.allowed) {
+    return {
+      success: false,
+      error: "Trop de tentatives, réessayez dans quelques instants",
+      code: "RATE_LIMITED",
+    };
+  }
+
   const file = formData.get("file") as File | null;
   if (!file || file.size === 0) {
     return { success: false, error: "Fichier manquant", code: "MISSING_FILE" };
   }
 
-  // Early size check (avoid loading a huge file into memory if we know it's too big)
   if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
     return {
       success: false,
@@ -65,7 +70,7 @@ export async function uploadMomentAttachmentAction(
     };
   }
 
-  // Magic number check: trust the actual bytes, not the declared contentType
+  // Trust the actual bytes, not the client-declared contentType.
   const detected = await fileTypeFromBuffer(buffer);
   const detectedMime = detected?.mime;
   if (!detectedMime || !ALLOWED_ATTACHMENT_CONTENT_TYPES.has(detectedMime)) {
@@ -96,7 +101,6 @@ export async function uploadMomentAttachmentAction(
       }
     );
 
-    // Revalidate the public moment page so the new attachment appears
     revalidatePath(`/m/[slug]`, "page");
 
     return { success: true, data: attachment };
@@ -113,9 +117,6 @@ export async function uploadMomentAttachmentAction(
   }
 }
 
-/**
- * Deletes an attachment. HOST-only (enforced in the usecase).
- */
 export async function deleteMomentAttachmentAction(
   attachmentId: string
 ): Promise<ActionResult<null>> {
@@ -150,4 +151,3 @@ export async function deleteMomentAttachmentAction(
     };
   }
 }
-
