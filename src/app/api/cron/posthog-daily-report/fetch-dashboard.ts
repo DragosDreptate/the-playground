@@ -57,7 +57,14 @@ export async function fetchPosthogDashboard(
     );
   }
 
-  const url = `${POSTHOG_BASE_URL}/api/projects/${POSTHOG_PROJECT_ID}/dashboards/${dashboardId}/`;
+  // `refresh=force_blocking` : force PostHog à recalculer synchroniquement toutes
+  // les insights du dashboard avant de retourner la réponse, en ignorant le cache.
+  // Sans ce paramètre, PostHog renvoie le dernier cache — qui peut dater de la
+  // dernière consultation manuelle du dashboard, donc donner un rapport périmé
+  // (vu en prod : rapport généré à J affichant la période J-2 → J-1).
+  // Mesuré en local : ~7s pour le daily dashboard (5 tiles), ~8s pour le weekly.
+  // Couvert côté route par `export const maxDuration = 60`.
+  const url = `${POSTHOG_BASE_URL}/api/projects/${POSTHOG_PROJECT_ID}/dashboards/${dashboardId}/?refresh=force_blocking`;
   const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${apiKey}`,

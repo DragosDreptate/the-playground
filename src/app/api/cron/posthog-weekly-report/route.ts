@@ -27,6 +27,13 @@ import { extractReportKpis } from "../posthog-daily-report/extract-report-kpis";
 const DASHBOARD_ID = 615141;
 const DASHBOARD_URL = `https://eu.posthog.com/project/134622/dashboard/${DASHBOARD_ID}`;
 
+// Le fetch PostHog avec `?refresh=force_blocking` peut prendre ~7-12s depuis
+// la région Vercel `iad1` vers PostHog EU (round-trip US↔EU). Ajouté au reste
+// du pipeline (Resend + Slack), on approche les 15s. Défaut serverless à 15s,
+// on élargit à 60s pour être large. Le weekly a plus de data (7j vs 24h) donc
+// un refresh légèrement plus long que le daily.
+export const maxDuration = 60;
+
 async function handler(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
