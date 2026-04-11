@@ -535,6 +535,7 @@
       "hostedBy": "Organisé par",
       "attachments": {
         "sectionTitle": "Documents",
+        "viewerOpen": "Ouvrir dans un nouvel onglet",
         "viewerDownload": "Télécharger",
         "viewerClose": "Fermer"
       },

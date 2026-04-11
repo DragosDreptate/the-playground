@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, X } from "lucide-react";
+import { Download, ExternalLink, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
@@ -66,6 +66,23 @@ export function AttachmentViewerDialog({
               {attachment?.filename}
             </DialogPrimitive.Description>
             <div className="flex shrink-0 gap-1.5">
+              {/* Open in new tab — critical on mobile where the inline
+                  preview (iframe for PDF, <img> for image) does not
+                  support pinch-to-zoom because touch events are
+                  intercepted by the modal. Opening in a new tab uses
+                  the browser's native full-screen reader which has
+                  proper zoom controls on both desktop and mobile. */}
+              {attachment && (
+                <a
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-border hover:bg-muted hover:border-primary flex size-9 items-center justify-center rounded-lg border transition-colors"
+                  aria-label={t("viewerOpen")}
+                >
+                  <ExternalLink className="size-4" />
+                </a>
+              )}
               <a
                 href={downloadHref}
                 className="border-border hover:bg-muted hover:border-primary flex size-9 items-center justify-center rounded-lg border transition-colors"
