@@ -19,7 +19,7 @@ import {
 } from "@/domain/models/moment-attachment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { ActionResult } from "./types";
-import { DomainError } from "@/domain/errors/domain-error";
+import { toActionResult } from "./helpers/to-action-result";
 
 const UPLOAD_RATE_LIMIT = { max: 10, windowMs: 60 * 1000 };
 
@@ -81,7 +81,7 @@ export async function uploadMomentAttachmentAction(
     };
   }
 
-  try {
+  return toActionResult(async () => {
     const attachment = await addMomentAttachment(
       {
         momentId,
@@ -100,21 +100,9 @@ export async function uploadMomentAttachmentAction(
         storage: vercelBlobStorageService,
       }
     );
-
     revalidatePath(`/m/[slug]`, "page");
-
-    return { success: true, data: attachment };
-  } catch (err) {
-    if (err instanceof DomainError) {
-      return { success: false, error: err.message, code: err.code };
-    }
-    Sentry.captureException(err);
-    return {
-      success: false,
-      error: "Erreur lors de l'envoi",
-      code: "INTERNAL_ERROR",
-    };
-  }
+    return attachment;
+  }, "Erreur lors de l'envoi");
 }
 
 export async function deleteMomentAttachmentAction(
@@ -125,7 +113,7 @@ export async function deleteMomentAttachmentAction(
     return { success: false, error: "Non authentifié", code: "UNAUTHORIZED" };
   }
 
-  try {
+  return toActionResult(async () => {
     await removeMomentAttachment(
       { attachmentId, userId: session.user.id },
       {
@@ -135,19 +123,7 @@ export async function deleteMomentAttachmentAction(
         storage: vercelBlobStorageService,
       }
     );
-
     revalidatePath(`/m/[slug]`, "page");
-
-    return { success: true, data: null };
-  } catch (err) {
-    if (err instanceof DomainError) {
-      return { success: false, error: err.message, code: err.code };
-    }
-    Sentry.captureException(err);
-    return {
-      success: false,
-      error: "Erreur lors de la suppression",
-      code: "INTERNAL_ERROR",
-    };
-  }
+    return null;
+  }, "Erreur lors de la suppression");
 }

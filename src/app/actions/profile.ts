@@ -6,7 +6,6 @@ import { prismaUserRepository } from "@/infrastructure/repositories";
 import { updateProfile } from "@/domain/usecases/update-profile";
 import { deleteAccount } from "@/domain/usecases/delete-account";
 import { updateNotificationPreferences } from "@/domain/usecases/update-notification-preferences";
-import { DomainError } from "@/domain/errors";
 import { signOut } from "@/infrastructure/auth/auth.config";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { isUploadedUrl } from "@/lib/blob";
@@ -17,6 +16,7 @@ import { getDisplayName } from "@/lib/display-name";
 import { notifySlackNewUser, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
+import { toActionResult } from "./helpers/to-action-result";
 
 const emailService = createResendEmailService();
 
@@ -48,12 +48,13 @@ export async function updateProfileAction(
   const twitterUrl = formData.get("twitterUrl") as string | null;
   const githubUrl = formData.get("githubUrl") as string | null;
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const trimmedFirst = firstName.trim();
     const trimmedLast = lastName.trim();
-    const user = await updateProfile(
+    return updateProfile(
       {
-        userId: session.user.id,
+        userId,
         firstName: trimmedFirst,
         lastName: trimmedLast,
         name: `${trimmedFirst} ${trimmedLast}`,
@@ -66,14 +67,7 @@ export async function updateProfileAction(
       },
       { userRepository: prismaUserRepository }
     );
-    return { success: true, data: user };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function completeOnboardingAction(
@@ -156,19 +150,15 @@ export async function deleteAccountAction(): Promise<ActionResult> {
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
+  const userId = session.user.id;
 
-  try {
+  const result = await toActionResult(async () => {
     await deleteAccount(
-      { userId: session.user.id },
+      { userId },
       { userRepository: prismaUserRepository }
     );
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
+  if (!result.success) return result;
 
   // Compte supprimé — déconnexion (signOut lance un redirect en interne, ne retourne jamais)
   await signOut({ redirectTo: "/" });
@@ -189,19 +179,13 @@ export async function updateNotificationPreferencesAction(
     notifyNewMomentInCircle: formData.get("notifyNewMomentInCircle") === "true",
   };
 
-  try {
-    const result = await updateNotificationPreferences(
-      { userId: session.user.id, ...prefs },
+  const userId = session.user.id;
+  return toActionResult(async () =>
+    updateNotificationPreferences(
+      { userId, ...prefs },
       { userRepository: prismaUserRepository }
-    );
-    return { success: true, data: result };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    )
+  );
 }
 
 export async function uploadAvatarAction(
@@ -234,34 +218,25 @@ export async function uploadAvatarAction(
     };
   }
 
-  try {
-    const userId = session.user.id;
-
+  const userId = session.user.id;
+  return toActionResult(async () => {
     // Supprimer l'ancien avatar uploadé si existant (pas les avatars OAuth)
     const existingUser = await prismaUserRepository.findById(userId);
     if (existingUser?.image && isUploadedUrl(existingUser.image)) {
       await vercelBlobStorageService.delete(existingUser.image);
     }
 
-    // Générer un path unique pour éviter les collisions de cache
     const ext = file.type === "image/webp" ? "webp" : file.type === "image/png" ? "png" : "jpg";
     const path = `avatars/${userId}-${Date.now()}.${ext}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const url = await vercelBlobStorageService.upload(path, buffer, file.type);
 
-    // Sauvegarder l'URL via le usecase
     await updateProfile(
       { userId, firstName: existingUser?.firstName ?? "", lastName: existingUser?.lastName ?? "", image: url },
       { userRepository: prismaUserRepository }
     );
 
-    return { success: true, data: { url } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return { url };
+  });
 }

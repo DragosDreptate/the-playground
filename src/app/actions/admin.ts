@@ -1,6 +1,5 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
@@ -29,9 +28,9 @@ import { adminUpdateNetwork } from "@/domain/usecases/admin/admin-update-network
 import { adminDeleteNetwork } from "@/domain/usecases/admin/admin-delete-network";
 import { adminAddCircleToNetwork } from "@/domain/usecases/admin/admin-add-circle-to-network";
 import { adminRemoveCircleFromNetwork } from "@/domain/usecases/admin/admin-remove-circle-from-network";
-import { DomainError } from "@/domain/errors";
 import { setAdminHostMode } from "@/lib/admin-host-mode";
 import type { ActionResult } from "./types";
+import { toActionResult } from "./helpers/to-action-result";
 import type { AdminStats, AdminTimeSeries, AdminActivationStats, AdminUserFilters, AdminUserRow, AdminUserDetail, AdminCircleFilters, AdminCircleRow, AdminCircleDetail, AdminExplorerFilters, AdminExplorerCircleRow, AdminExplorerMomentFilters, AdminExplorerMomentRow, AdminMomentFilters, AdminMomentRow, AdminMomentDetail } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
 import type { CircleNetwork } from "@/domain/models/circle-network";
@@ -108,17 +107,10 @@ export async function adminDeleteUserAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminDeleteUser(check.data.role, userId, deps);
     revalidatePath("/admin/users");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -151,17 +143,10 @@ export async function adminDeleteCircleAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminDeleteCircle(check.data.role, circleId, deps);
     revalidatePath("/admin/circles");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -194,17 +179,10 @@ export async function adminDeleteMomentAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminDeleteMoment(check.data.role, momentId, deps);
     revalidatePath("/admin/moments");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminCancelMomentAction(
@@ -213,17 +191,10 @@ export async function adminCancelMomentAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminUpdateMomentStatus(check.data.role, momentId, "CANCELLED" as MomentStatus, deps);
     revalidatePath("/admin/moments");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -247,19 +218,12 @@ export async function adminUpdateCircleExcludedAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminUpdateCircleExcluded(check.data.role, circleId, excluded, deps);
     await recalculateCircleScore(circleId);
     revalidatePath("/admin/explorer");
     revalidatePath(`/admin/circles/${circleId}`);
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminUpdateCircleOverrideScoreAction(
@@ -269,19 +233,12 @@ export async function adminUpdateCircleOverrideScoreAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminUpdateCircleOverrideScore(check.data.role, circleId, score, deps);
     await recalculateCircleScore(circleId);
     revalidatePath("/admin/explorer");
     revalidatePath(`/admin/circles/${circleId}`);
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminRecalculateAllScoresAction(): Promise<
@@ -290,15 +247,12 @@ export async function adminRecalculateAllScoresAction(): Promise<
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     const result = await recalculateAllScores();
     revalidatePath("/admin/explorer");
     revalidatePath("/admin/explorer/moments");
-    return { success: true, data: result };
-  } catch (error) {
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result;
+  });
 }
 
 export async function getAdminExplorerMomentsAction(
@@ -335,17 +289,11 @@ export async function adminCreateNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     const network = await adminCreateNetwork(check.data.role, input, networkDeps);
     revalidatePath("/admin/networks");
-    return { success: true, data: network };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return network;
+  });
 }
 
 export async function adminUpdateNetworkAction(
@@ -355,19 +303,13 @@ export async function adminUpdateNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     const network = await adminUpdateNetwork(check.data.role, networkId, input, networkDeps);
     revalidatePath("/admin/networks");
     revalidatePath(`/admin/networks/${networkId}`);
     revalidatePath("/networks", "layout");
-    return { success: true, data: network };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return network;
+  });
 }
 
 export async function adminDeleteNetworkAction(
@@ -376,18 +318,11 @@ export async function adminDeleteNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminDeleteNetwork(check.data.role, networkId, networkDeps);
     revalidatePath("/admin/networks");
     revalidatePath("/networks", "layout");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminAddCircleToNetworkAction(
@@ -397,18 +332,11 @@ export async function adminAddCircleToNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminAddCircleToNetwork(check.data.role, networkId, circleId, networkDeps);
     revalidatePath(`/admin/networks/${networkId}`);
     revalidatePath("/networks", "layout");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminRemoveCircleFromNetworkAction(
@@ -418,18 +346,11 @@ export async function adminRemoveCircleFromNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
+  return toActionResult(async () => {
     await adminRemoveCircleFromNetwork(check.data.role, networkId, circleId, networkDeps);
     revalidatePath(`/admin/networks/${networkId}`);
     revalidatePath("/networks", "layout");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function adminSearchCirclesForNetworkAction(
@@ -439,11 +360,7 @@ export async function adminSearchCirclesForNetworkAction(
   const check = await requireAdmin();
   if (!check.success) return check;
 
-  try {
-    const results = await prismaCircleNetworkRepository.searchCirclesNotInNetwork(networkId, query);
-    return { success: true, data: results };
-  } catch (error) {
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  return toActionResult(async () =>
+    prismaCircleNetworkRepository.searchCirclesNotInNetwork(networkId, query)
+  );
 }

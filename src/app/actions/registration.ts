@@ -22,7 +22,7 @@ import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import { removeRegistrationByHost } from "@/domain/usecases/remove-registration-by-host";
 import { approveMomentRegistration } from "@/domain/usecases/approve-moment-registration";
 import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-registration";
-import { DomainError } from "@/domain/errors";
+import { toActionResult } from "./helpers/to-action-result";
 import { getDisplayName } from "@/lib/display-name";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration } from "@/domain/models/registration";
@@ -59,9 +59,10 @@ export async function joinMomentAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const result = await joinMoment(
-      { momentId, userId: session.user.id },
+      { momentId, userId },
       {
         momentRepository: prismaMomentRepository,
         registrationRepository: prismaRegistrationRepository,
@@ -70,13 +71,12 @@ export async function joinMomentAction(
     );
 
     if (!result.pendingApproval) {
-      // Normal flow: send confirmation to participant + notification to host
       const locale = await getLocale();
       const t = await getTranslations("Email");
 
       if (!isAdminUser(session)) sendRegistrationEmails(
         momentId,
-        session.user.id,
+        userId,
         result.registration,
         t,
         locale
@@ -85,10 +85,8 @@ export async function joinMomentAction(
         Sentry.captureException(err);
       });
     } else {
-      // Pending approval: notify hosts that a new request needs review
-      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
+      // Pending approval flow — fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
       const t = await getTranslations("Email");
-      const userId = session.user.id;
       if (!isAdminUser(session)) notifyHostsPendingApproval(
         momentId, userId, t
       ).catch((err) => {
@@ -97,14 +95,8 @@ export async function joinMomentAction(
       });
     }
 
-    return { success: true, data: result.registration };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.registration;
+  });
 }
 
 export async function cancelRegistrationAction(
@@ -115,9 +107,10 @@ export async function cancelRegistrationAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const result = await cancelRegistration(
-      { registrationId, userId: session.user.id },
+      { registrationId, userId },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
@@ -126,35 +119,22 @@ export async function cancelRegistrationAction(
       }
     );
 
-    // Send promotion email if someone was promoted from waitlist
     if (result.promotedRegistration) {
       const locale = await getLocale();
       const t = await getTranslations("Email");
-
-      sendPromotionEmail(result.promotedRegistration, t, locale).catch(
-        (err) => {
-          console.error(err);
-          Sentry.captureException(err);
-        }
-      );
+      sendPromotionEmail(result.promotedRegistration, t, locale).catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
     }
 
-    // Notify Host when a paid event registration is cancelled
     const cancelledReg = result.registration;
     if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
-      sendHostPaidCancellationEmail(registrationId, session.user.id).catch(
-        (err) => Sentry.captureException(err)
+      sendHostPaidCancellationEmail(registrationId, userId).catch((err) =>
+        Sentry.captureException(err)
       );
     }
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // --- Fire-and-forget email helpers ---
@@ -440,10 +420,11 @@ export async function removeRegistrationByHostAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await removeRegistrationByHost(
-      { registrationId, hostUserId: session.user.id },
+      { registrationId, hostUserId },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
@@ -456,30 +437,18 @@ export async function removeRegistrationByHostAction(
     const t = await getTranslations("Email");
     const { momentId, userId } = result.cancelledRegistration;
 
-    sendRemovedByHostEmail(momentId, userId, t, locale).catch(
-      (err) => {
-        console.error(err);
-        Sentry.captureException(err);
-      }
-    );
+    sendRemovedByHostEmail(momentId, userId, t, locale).catch((err) => {
+      console.error(err);
+      Sentry.captureException(err);
+    });
 
     if (result.promotedRegistration) {
-      sendPromotionEmail(result.promotedRegistration, t, locale).catch(
-        (err) => {
-          console.error(err);
-          Sentry.captureException(err);
-        }
-      );
+      sendPromotionEmail(result.promotedRegistration, t, locale).catch((err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      });
     }
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 async function sendRemovedByHostEmail(
@@ -543,10 +512,11 @@ export async function approveMomentRegistrationAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await approveMomentRegistration(
-      { registrationId, hostUserId: session.user.id },
+      { registrationId, hostUserId },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
@@ -554,7 +524,6 @@ export async function approveMomentRegistrationAction(
       }
     );
 
-    // Fire-and-forget: send confirmation email to approved participant
     const reg = result.registration;
     const locale = await getLocale();
     const t = await getTranslations("Email");
@@ -563,14 +532,8 @@ export async function approveMomentRegistrationAction(
       Sentry.captureException(err);
     });
 
-    return { success: true, data: result.registration };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.registration;
+  });
 }
 
 export async function rejectMomentRegistrationAction(
@@ -581,10 +544,11 @@ export async function rejectMomentRegistrationAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await rejectMomentRegistration(
-      { registrationId, hostUserId: session.user.id },
+      { registrationId, hostUserId },
       {
         registrationRepository: prismaRegistrationRepository,
         momentRepository: prismaMomentRepository,
@@ -593,22 +557,13 @@ export async function rejectMomentRegistrationAction(
     );
 
     const t = await getTranslations("Email");
-    // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
-    notifyPlayerRejection(
-      result.userId, result.momentId, t
-    ).catch((err) => {
+    notifyPlayerRejection(result.userId, result.momentId, t).catch((err) => {
       console.error("[rejection-notification] Error:", err);
       Sentry.captureException(err);
     });
 
-    return { success: true, data: result };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result;
+  });
 }
 
 // ── Notification helpers (fire-and-forget, pas de after()) ────
