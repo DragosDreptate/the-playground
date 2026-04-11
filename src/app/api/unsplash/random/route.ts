@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
 import type { UnsplashPhoto } from "@/app/api/unsplash/search/route";
 
-// 1 requête par thématique Circle — fetched en parallèle
-const THEME_QUERIES = [
-  "technology",
-  "design studio",
-  "business meeting",
-  "fitness sport",
-  "art painting",
-  "science laboratory",
-  "community people",
-  "nature landscape",
-];
+// Nombre de photos aléatoires à récupérer en une seule requête.
+// Unsplash /photos/random retourne un array quand `count` est fourni (max 30).
+const RANDOM_COUNT = 8;
+
+type UnsplashRandomPhoto = {
+  id: string;
+  urls: { regular: string; thumb: string };
+  user: { name: string; links: { html: string } };
+};
 
 export async function GET() {
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
@@ -19,34 +17,35 @@ export async function GET() {
     return NextResponse.json({ error: "Unsplash not configured" }, { status: 503 });
   }
 
-  const results = await Promise.all(
-    THEME_QUERIES.map(async (query) => {
-      const url = new URL("https://api.unsplash.com/photos/random");
-      url.searchParams.set("query", query);
-      url.searchParams.set("orientation", "squarish");
+  const url = new URL("https://api.unsplash.com/photos/random");
+  url.searchParams.set("count", String(RANDOM_COUNT));
+  url.searchParams.set("orientation", "squarish");
 
-      const res = await fetch(url.toString(), {
-        headers: { Authorization: `Client-ID ${accessKey}` },
-        next: { revalidate: 300 }, // cache 5 min côté serveur
-      });
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Client-ID ${accessKey}` },
+    // Cache 1h — ces photos servent uniquement de fallback "pas de mot-clé",
+    // leur fraîcheur n'est pas critique. Un cache long protège le quota Unsplash.
+    next: { revalidate: 3600 },
+  });
 
-      if (!res.ok) return null;
+  if (!response.ok) {
+    return NextResponse.json({ error: "Unsplash API error" }, { status: response.status });
+  }
 
-      const photo = await res.json();
-      return {
-        id: photo.id,
-        url: photo.urls.regular,
-        thumbUrl: photo.urls.thumb,
-        author: {
-          name: photo.user.name,
-          profileUrl: photo.user.links.html,
-        },
-      } as UnsplashPhoto;
-    })
-  );
+  const data = (await response.json()) as UnsplashRandomPhoto[];
+
+  const results: UnsplashPhoto[] = data.map((photo) => ({
+    id: photo.id,
+    url: photo.urls.regular,
+    thumbUrl: photo.urls.thumb,
+    author: {
+      name: photo.user.name,
+      profileUrl: photo.user.links.html,
+    },
+  }));
 
   return NextResponse.json(
-    { results: results.filter(Boolean) },
-    { headers: { "Cache-Control": "public, s-maxage=300" } }
+    { results },
+    { headers: { "Cache-Control": "public, s-maxage=3600" } }
   );
 }
