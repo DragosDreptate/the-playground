@@ -2,7 +2,7 @@
 
 **Lancez votre communauté. Organisez vos événements. Animez votre réseau.**
 
-→ [the-playground.fr](https://the-playground.fr)
+→ [the-playground.fr](https://the-playground.fr) · [Changelog](https://the-playground.fr/changelog) · [À propos](https://the-playground.fr/about)
 
 ---
 
@@ -32,27 +32,36 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 ## Fonctionnalités
 
 **Pour l'organisateur**
-- Créer et gérer sa communauté (Circle)
+- Créer et gérer sa communauté — privée ou publique, avec invitations par lien
 - Créer des événements avec une page autonome et partageable
+- **Billetterie intégrée** via Stripe Connect — 0% commission plateforme
+- **Inscriptions sur validation** pour filtrer les participants si besoin
 - Gérer ses participants de façon persistante (pas événement par événement)
-- Broadcast email à toute sa communauté
+- **Broadcast email** à toute sa communauté
 - Check-in, export CSV, liste d'attente automatique
-- Assistant IA (descriptions, emails, suggestions)
+- **Radar IA** — détection des événements similaires à venir (via Claude)
+- Assistant IA pour les descriptions, emails, suggestions
 
 **Pour le participant**
 - Découverte via lien partagé (mobile-first)
 - Inscription en quelques secondes — magic link, pas de compte requis
 - Devient automatiquement membre de la communauté
-- Notifications email (confirmation, rappels, changements)
+- **Profil public** avec bio, ville, liens sociaux
+- Notifications email (confirmation, rappels 24h et 1h, changements, annulations)
 - Page communauté : prochains événements, membres, historique
+- Fil de commentaires sur chaque événement
 
 **Plateforme**
-- Répertoire public de communautés ([Explorer](https://the-playground.fr/explorer))
-- Bilingue FR / EN
+- [Explorer](https://the-playground.fr/explorer) — répertoire public de communautés avec tri, filtres et section À la une
+- **Réseaux** — regrouper plusieurs communautés sous une vitrine commune (fédérations, collectifs, marques)
+- **Blog** — articles de fond sur la philosophie et les choix du produit
+- Bilingue FR / EN avec URLs propres
 - 100% gratuit — seuls les frais Stripe (~2,9% + 0,30€) sur les événements payants
 
 ## Stack
 
+| | |
+| --- | --- |
 | **Framework** | Next.js 16 (App Router, SSR) |
 | **Langage** | TypeScript strict, full-stack |
 | **Base de données** | PostgreSQL · Neon serverless (EU) |
@@ -62,9 +71,20 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 | **Email** | Resend + react-email |
 | **IA** | Anthropic SDK (Claude) |
 | **Paiements** | Stripe Connect |
+| **Analytics** | PostHog |
+| **Monitoring** | Sentry |
 | **Déploiement** | Vercel (EU) |
 
-Construit en moins d'une semaine avec [Claude Code](https://claude.ai/claude-code) (Anthropic). Architecture hexagonale, TypeScript strict, tout déployé en Europe.
+Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en Europe. Développé avec [Claude Code](https://claude.ai/claude-code) (Anthropic) — quelques jours pour le MVP, quelques semaines pour une plateforme complète en production.
+
+## En chiffres
+
+| | |
+| --- | --- |
+| **1 400+** | commits |
+| **300+** | pull requests |
+| **65** | cas d'usage (domain usecases) |
+| **880+** | tests (unit + integration + E2E) |
 
 ## Architecture
 
@@ -78,17 +98,28 @@ src/
   components/      → Composants React réutilisables
 ```
 
+Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépendance.
+
 ## Développement
 
 ```bash
 pnpm install
-pnpm dev          # Démarre le serveur de développement
-pnpm test         # Lance les tests (unit + integration)
-pnpm test:e2e     # Tests E2E Playwright
-pnpm typecheck    # Vérifie les types TypeScript
+pnpm dev              # Démarre le serveur de développement
+pnpm test             # Lance les tests (unit + integration)
+pnpm test:e2e         # Tests E2E Playwright
+pnpm typecheck        # Vérifie les types TypeScript
+pnpm db:push          # Applique le schema sur la DB dev
 ```
 
 Variables d'environnement requises : voir `.env.example`.
+
+## Versions récentes
+
+Les 3 dernières versions majeures (voir le [changelog complet](https://the-playground.fr/changelog)) :
+
+- **v2.6.0** — Réseaux de communautés, profils enrichis, site web des communautés
+- **v2.5.0** — Blog et landing page enrichis
+- **v2.0.0** — Événements payants et billetterie intégrée (Stripe Connect)
 
 ## Auteur
 
@@ -96,4 +127,4 @@ Projet de [Dragos Dreptate](https://www.linkedin.com/in/dragosdreptate/) — dir
 
 ---
 
-*Une expérience *[*Claude Code*](https://claude.ai/claude-code)* · Anthropic*
+*Une expérience [Claude Code](https://claude.ai/claude-code) · Anthropic*
