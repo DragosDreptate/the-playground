@@ -473,6 +473,7 @@
       "endDateRequired": "La date de fin est obligatoire.",
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Enregistrer le brouillon",
+      "uploadingAttachments": "Envoi des documents...",
       "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
       "requiresApproval": "Validation des inscriptions",
       "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",

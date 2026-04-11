@@ -66,6 +66,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const isPast = moment?.status === "PAST";
   const router = useRouter();
   const attachmentsEditorRef = useRef<MomentAttachmentsEditorHandle>(null);
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
 
   // --- Date/time state ---
   const defaultStart = moment?.startsAt ?? getDefaultStartDate();
@@ -156,8 +157,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
       // Flush staged attachments (create mode: files were staged client-side
       // because the moment didn't exist yet). We await this so the user lands
       // on the moment page with all attachments already persisted.
+      // `isUploadingAttachments` flips the submit button label so the user
+      // sees "Envoi des documents..." instead of a generic loading state
+      // during the upload phase.
       if (!moment && attachmentsEditorRef.current?.hasStagedFiles()) {
-        await attachmentsEditorRef.current.flushStaged(result.data.id);
+        setIsUploadingAttachments(true);
+        try {
+          await attachmentsEditorRef.current.flushStaged(result.data.id);
+        } finally {
+          setIsUploadingAttachments(false);
+        }
       }
 
       router.push(
@@ -430,11 +439,13 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={isPending || isEndBeforeStart || !startDate || !endDate} className="flex-1">
-              {isPending
-                ? tCommon("loading")
-                : moment
-                  ? tCommon("save")
-                  : t("form.createMoment")}
+              {isUploadingAttachments
+                ? t("form.uploadingAttachments")
+                : isPending
+                  ? tCommon("loading")
+                  : moment
+                    ? tCommon("save")
+                    : t("form.createMoment")}
             </Button>
             <Button
               type="button"

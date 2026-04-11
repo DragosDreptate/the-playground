@@ -197,20 +197,52 @@ export const MomentAttachmentsEditor = forwardRef<
     () => ({
       async flushStaged(newMomentId: string): Promise<{ failedCount: number }> {
         const filesToUpload = staged.filter((s) => !s.error);
+        if (filesToUpload.length === 0) return { failedCount: 0 };
+
+        // Move every staged file to the "uploading" state at once so the user
+        // immediately sees one card per file with the pulse progress bar.
+        // This provides real-time feedback during the flush, instead of a
+        // silent wait while uploads happen in the background.
+        const uploadingEntries: UploadingFile[] = filesToUpload.map((s) => ({
+          tempId: s.tempId,
+          filename: s.file.name,
+          sizeBytes: s.file.size,
+          contentType: s.file.type,
+        }));
+        setStaged([]);
+        setUploading(uploadingEntries);
+
         let failedCount = 0;
 
-        for (const stagedFile of filesToUpload) {
-          const formData = new FormData();
-          formData.append("file", stagedFile.file);
-          const result = await uploadMomentAttachmentAction(newMomentId, formData);
-          if (!result.success) {
-            failedCount += 1;
-          }
-        }
+        // Upload all files in parallel — faster than a sequential for-await loop.
+        // Each upload updates its own card as soon as it resolves (success =>
+        // card moves to attachments, failure => card shows error state).
+        await Promise.all(
+          filesToUpload.map(async (stagedFile) => {
+            const formData = new FormData();
+            formData.append("file", stagedFile.file);
+            const result = await uploadMomentAttachmentAction(
+              newMomentId,
+              formData
+            );
+            if (result.success) {
+              setAttachments((prev) => [...prev, result.data]);
+              setUploading((prev) =>
+                prev.filter((u) => u.tempId !== stagedFile.tempId)
+              );
+            } else {
+              failedCount += 1;
+              setUploading((prev) =>
+                prev.map((u) =>
+                  u.tempId === stagedFile.tempId
+                    ? { ...u, error: result.error }
+                    : u
+                )
+              );
+            }
+          })
+        );
 
-        // Clear staged files after flush (success or not — the parent decides
-        // what to do next based on failedCount)
-        setStaged([]);
         return { failedCount };
       },
       hasStagedFiles() {
