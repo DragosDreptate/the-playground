@@ -236,14 +236,31 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     const title = `E2E Edit ${Date.now()}`;
     await fillMomentForm(page, title);
     await page.locator("button[name='intent'][value='draft']").click();
-    await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
 
-    // 2. Naviguer vers la page d'édition du moment qu'on vient de créer
-    const momentUrl = page.url();
-    await page.goto(`${momentUrl}/edit`);
+    // Attendre explicitement que la redirect aille sur la page du moment (pas /moments/new).
+    // Le regex précédent `/moments\//` matchait aussi `/moments/new` → faux positif possible.
+    // On attend une URL qui se termine par un slug différent de "new".
+    await page.waitForURL(
+      (url) => {
+        const path = new URL(url).pathname;
+        return /\/dashboard\/circles\/[^/]+\/moments\/[^/]+$/.test(path) && !path.endsWith("/moments/new");
+      },
+      { timeout: 15_000 }
+    );
 
-    // Le form d'édition doit être visible
-    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 8_000 });
+    // 2. Extraire explicitement le slug du moment depuis l'URL actuelle
+    const pathname = new URL(page.url()).pathname;
+    const momentSlug = pathname.split("/").pop();
+    if (!momentSlug || momentSlug === "new") {
+      throw new Error(`Unexpected moment URL after creation: ${page.url()}`);
+    }
+
+    // 3. Naviguer vers la page d'édition en construisant l'URL proprement
+    await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}/edit`);
+    await page.waitForLoadState("domcontentloaded");
+
+    // Le form d'édition doit être visible (timeout large car cold render possible en CI)
+    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
 
     // Le bouton "Publier" du form NE doit PAS être présent en mode édition
     // (wrappé dans `{!moment && ...}` côté React → pas du tout rendu)
