@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
@@ -7,7 +8,7 @@ import { buildReportHtml } from "../posthog-daily-report/build-report-html";
 import { extractReportKpis } from "../posthog-daily-report/extract-report-kpis";
 
 /**
- * POST /api/cron/posthog-weekly-report
+ * GET /api/cron/posthog-weekly-report
  *
  * Envoie chaque lundi matin un récap HTML du dashboard PostHog "Synthèse
  * trafic hebdomadaire" (trafic sur 7 jours, interactions, engagement,
@@ -18,15 +19,21 @@ import { extractReportKpis } from "../posthog-daily-report/extract-report-kpis";
  * quotidienne, peak "le lun 06/04", fenêtre "7 derniers jours", etc.).
  *
  * Déclenché chaque lundi à 08:07 UTC via Vercel Cron (vercel.json).
+ * Vercel Cron invoque les endpoints en GET — on expose aussi POST pour
+ * permettre un déclenchement manuel (scripts, curl, tests).
  * Protection : header Authorization: Bearer CRON_SECRET
  */
 
 const DASHBOARD_ID = 615141;
 const DASHBOARD_URL = `https://eu.posthog.com/project/134622/dashboard/${DASHBOARD_ID}`;
 
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    Sentry.captureMessage(
+      "[cron] posthog-weekly-report: unauthorized request",
+      "warning"
+    );
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -34,6 +41,10 @@ export async function POST(request: NextRequest) {
   if (!recipient) {
     console.error(
       "[posthog-weekly-report] DAILY_REPORT_RECIPIENT is not configured"
+    );
+    Sentry.captureMessage(
+      "[cron] posthog-weekly-report: DAILY_REPORT_RECIPIENT is not configured",
+      "error"
     );
     return NextResponse.json(
       { error: "Recipient not configured" },
@@ -82,9 +93,15 @@ export async function POST(request: NextRequest) {
       `[posthog-weekly-report] Erreur après ${durationMs}ms :`,
       error
     );
+    Sentry.captureException(error, {
+      tags: { cron: "posthog-weekly-report" },
+      extra: { durationMs, dashboardId: DASHBOARD_ID },
+    });
     return NextResponse.json(
       { error: "Report generation failed" },
       { status: 500 }
     );
   }
 }
+
+export { handler as GET, handler as POST };

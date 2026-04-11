@@ -1,9 +1,10 @@
+import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { recalculateAllScores } from "@/infrastructure/services/recalculate-all-scores";
 import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 
 /**
- * POST /api/cron/recalculate-scores
+ * GET /api/cron/recalculate-scores
  *
  * Batch quotidien de recalcul des scores Explorer pour toutes les Communautés
  * (publiques ET privées) et leurs événements publics à venir.
@@ -13,11 +14,17 @@ import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma
  * Elles n'apparaissent jamais sur Explorer (filtre visibility: PUBLIC dans les requêtes Explorer).
  *
  * Déclenché chaque nuit à 3h via Vercel Cron (vercel.json).
+ * Vercel Cron invoque les endpoints en GET — on expose aussi POST pour
+ * permettre un déclenchement manuel (scripts, curl, tests).
  * Protection : header Authorization: Bearer CRON_SECRET
  */
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    Sentry.captureMessage(
+      "[cron] recalculate-scores: unauthorized request",
+      "warning"
+    );
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -36,6 +43,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, ...result, rateLimitsPurged: purged });
   } catch (error) {
     console.error("[recalculate-scores] Erreur :", error);
+    Sentry.captureException(error, {
+      tags: { cron: "recalculate-scores" },
+    });
     return NextResponse.json({ error: "Score recalculation failed" }, { status: 500 });
   }
 }
+
+export { handler as GET, handler as POST };
