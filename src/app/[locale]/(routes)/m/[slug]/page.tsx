@@ -15,6 +15,7 @@ import {
   prismaCircleRepository,
   prismaRegistrationRepository,
   prismaCommentRepository,
+  prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
 import { getCachedSession } from "@/lib/auth-cache";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
@@ -123,7 +124,7 @@ export default async function PublicMomentPage({
 
   // Parallélise : inscription existante + données publiques en une seule vague
   // registeredCount est dérivé de allAttendees en JS (évite un round-trip Neon supplémentaire)
-  const [existingRegistration, allAttendees, comments, upcomingCircleMoments] =
+  const [existingRegistration, allAttendees, comments, upcomingCircleMoments, attachments] =
     await measureTime("moment-page:data", () =>
       Promise.all([
         isAuthenticated
@@ -138,6 +139,7 @@ export default async function PublicMomentPage({
           { commentRepository: prismaCommentRepository }
         ),
         prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
+        prismaMomentAttachmentRepository.findByMoment(moment.id),
       ])
     );
 
@@ -271,6 +273,7 @@ export default async function PublicMomentPage({
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
         comments={comments}
+        attachments={attachments}
         currentUserId={session?.user?.id ?? null}
         isAuthenticated={isAuthenticated}
         isHost={isHost}

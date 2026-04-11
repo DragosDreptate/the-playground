@@ -435,6 +435,24 @@
       "priceSoon": "Coming soon",
       "priceRequiresStripe": "Enable payments in your community settings",
       "priceEstimation": "You will receive ~{net} {currency} after Stripe fees (2.9% + 0.30 {currency})",
+      "attachments": {
+        "label": "Documents (optional)",
+        "count": "{count}/{max} files",
+        "dropzoneTitle": "Drop your files here",
+        "dropzoneSeparator": "or",
+        "dropzoneBrowse": "Browse",
+        "dropzoneHint": "PDF, JPG, PNG, WEBP · Max {max} MB",
+        "addMore": "Add a document",
+        "uploading": "Uploading",
+        "uploadError": "Upload failed. Try again.",
+        "errorTypeNotAllowed": "Format not supported. PDF, JPG, PNG or WEBP only.",
+        "errorTooLarge": "File too large. Maximum {max} MB.",
+        "errorLimitReached": "You've reached the limit of {max} documents.",
+        "deleteConfirmTitle": "Delete this document?",
+        "deleteConfirmDescription": "This action is irreversible.",
+        "deleteConfirmAction": "Delete",
+        "deleteConfirmCancel": "Cancel"
+      },
       "refundable": "Refundable",
       "refundableDescription": "Members can unregister and get an automatic refund.",
       "free": "Free",
@@ -513,6 +531,11 @@
     },
     "public": {
       "hostedBy": "Hosted by",
+      "attachments": {
+        "sectionTitle": "Documents",
+        "viewerDownload": "Download",
+        "viewerClose": "Close"
+      },
       "free": "Free",
       "spotsAvailable": "{count} spots",
       "registerFree": "Join",

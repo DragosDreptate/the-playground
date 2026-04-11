@@ -26,6 +26,8 @@ import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
 import { MomentFormOptionsSection } from "./moment-form-options-section";
 import { MomentFormRadar } from "./moment-form-radar";
+import { MomentAttachmentsEditor } from "./moment-attachments-editor";
+import type { MomentAttachment } from "@/domain/models/moment-attachment";
 
 type MomentFormProps = {
   moment?: Moment;
@@ -35,6 +37,7 @@ type MomentFormProps = {
   circleCoverImage?: string | null;
   stripeConnectActive?: boolean;
   priceLocked?: boolean;
+  initialAttachments?: MomentAttachment[];
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -54,7 +57,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, initialAttachments = [], action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
@@ -374,6 +377,14 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             approvalEnabled={approvalEnabled}
             onPriceCentsChange={handlePriceCentsChange}
           />
+
+          {/* Attachments editor — edit mode only (needs a momentId) */}
+          {moment?.id && (
+            <MomentAttachmentsEditor
+              momentId={moment.id}
+              initialAttachments={initialAttachments}
+            />
+          )}
 
           {/* Validation des inscriptions */}
           <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>

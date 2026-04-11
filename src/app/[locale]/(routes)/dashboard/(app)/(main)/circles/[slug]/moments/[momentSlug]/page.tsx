@@ -4,6 +4,7 @@ import {
   prismaMomentRepository,
   prismaRegistrationRepository,
   prismaCommentRepository,
+  prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
 import { getCachedSession } from "@/lib/auth-cache";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -54,13 +55,14 @@ export default async function MomentDetailPage({
 
   const isHost = hasActiveMembership && membership!.role === "HOST";
 
-  const [allAttendees, comments, pendingRegistrations] = await Promise.all([
+  const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
     getMomentComments(
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
     isHost ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
+    prismaMomentAttachmentRepository.findByMoment(moment.id),
   ]);
   const registeredCount = allAttendees.filter(
     (r) => r.status === "REGISTERED"
@@ -95,6 +97,7 @@ export default async function MomentDetailPage({
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
         comments={comments}
+        attachments={attachments}
         currentUserId={session.user.id}
         isAuthenticated={true}
         isHost={false}
@@ -140,6 +143,7 @@ export default async function MomentDetailPage({
       registeredCount={registeredCount}
       waitlistedCount={waitlistedCount}
       comments={comments}
+      attachments={attachments}
       currentUserId={session.user.id}
       circleSlug={slug}
       momentSlug={momentSlug}
