@@ -15,7 +15,6 @@ import { removeMomentAttachment } from "@/domain/usecases/remove-moment-attachme
 import {
   ALLOWED_ATTACHMENT_CONTENT_TYPES,
   MAX_ATTACHMENT_SIZE_BYTES,
-  MAX_ATTACHMENTS_PER_MOMENT,
 } from "@/domain/models/moment-attachment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { ActionResult } from "./types";
@@ -152,8 +151,3 @@ export async function deleteMomentAttachmentAction(
   }
 }
 
-// Re-export constants for the client component (dropzone hint, count display)
-export {
-  MAX_ATTACHMENTS_PER_MOMENT,
-  MAX_ATTACHMENT_SIZE_BYTES,
-};
