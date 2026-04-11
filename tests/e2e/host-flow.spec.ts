@@ -136,7 +136,10 @@ test.describe("Flux Host — création d'un Moment", () => {
       await dateInput.fill(formatted);
     }
 
-    await page.locator("button[type='submit']").click();
+    // Selector spécifique : le form contient maintenant 2 boutons submit
+    // (draft + publish). On clique explicitement sur celui qui crée un brouillon
+    // pour préserver la sémantique de ce test (comportement par défaut).
+    await page.locator("button[name='intent'][value='draft']").click();
 
     await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
   });
@@ -146,5 +149,148 @@ test.describe("Flux Host — création d'un Moment", () => {
     // La timeline doit contenir au moins un événement
     const momentLinks = page.locator("a[href*='/moments/']");
     await expect(momentLinks.first()).toBeVisible();
+  });
+});
+
+/**
+ * Tests E2E — Flux Host : publication directe depuis le formulaire de création
+ *
+ * Vérifie la feature "Publier directement" (PR #362) :
+ *   - Desktop : le form a 2 boutons submit (draft + publish)
+ *   - Cliquer "Enregistrer le brouillon" crée un DRAFT (comportement inchangé)
+ *   - Cliquer "Publier" crée ET publie l'événement en une seule action
+ *   - Sur mobile, le bouton Publier est masqué (hidden sm:inline-flex)
+ *   - En mode édition d'un brouillon existant, le bouton Publier n'est pas dans le form
+ *   - Presser Enter dans un input soumet en mode draft par défaut (1er submit button
+ *     dans le DOM) — aucun risque de publication accidentelle au clavier
+ */
+
+test.describe("Flux Host — publication directe d'un Moment", () => {
+  test.use({ storageState: AUTH.HOST });
+
+  async function fillMomentForm(page: import("@playwright/test").Page, title: string) {
+    await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
+    await page.fill("input[name='title']", title);
+
+    const dateInput = page.locator("input[name='startsAt'], input[type='datetime-local']").first();
+    if (await dateInput.isVisible()) {
+      const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const formatted = futureDate.toISOString().slice(0, 16);
+      await dateInput.fill(formatted);
+    }
+
+    // La description est requise côté usecase (createMoment). On en met une courte
+    // pour ne pas tomber sur l'erreur VALIDATION côté server action.
+    const description = page.locator("textarea[name='description']");
+    if (await description.isVisible()) {
+      await description.fill("Description E2E publication directe");
+    }
+  }
+
+  test("should create a DRAFT when clicking 'Enregistrer le brouillon'", async ({ page }) => {
+    const title = `E2E Draft ${Date.now()}`;
+    await fillMomentForm(page, title);
+
+    // Bouton primary, toujours le 1er submit du DOM → couvre aussi implicitement
+    // le cas Enter-in-input grâce à la sémantique HTML (1er submit par défaut)
+    await page.locator("button[name='intent'][value='draft']").click();
+    await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
+
+    // Le moment créé est en DRAFT — le banner "en cours de préparation" doit être visible
+    await expect(
+      page.getByText(/en cours de préparation/i).first()
+    ).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("should create AND publish in one action when clicking 'Publier'", async ({ page }) => {
+    const title = `E2E Publish ${Date.now()}`;
+    await fillMomentForm(page, title);
+
+    // Bouton outline, présent uniquement en création desktop (hidden sm:inline-flex)
+    const publishButton = page.locator("button[name='intent'][value='publish']");
+    await expect(publishButton).toBeVisible();
+    await publishButton.click();
+
+    await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
+
+    // Le moment créé est en PUBLISHED — le banner draft ne doit PAS être visible
+    await expect(page.getByText(/en cours de préparation/i)).toHaveCount(0);
+  });
+
+  test("should submit as DRAFT when pressing Enter in the title input", async ({ page }) => {
+    const title = `E2E Enter ${Date.now()}`;
+    await fillMomentForm(page, title);
+
+    // Enter dans l'input titre → HTML soumet via le 1er submit button du DOM = draft
+    await page.locator("input[name='title']").press("Enter");
+    await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
+
+    // Confirmer que c'est bien un DRAFT (pas un publish accidentel)
+    await expect(
+      page.getByText(/en cours de préparation/i).first()
+    ).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("should NOT show the 'Publier' button when editing an existing DRAFT moment", async ({ page }) => {
+    // 1. Créer un moment DRAFT pour avoir une cible d'édition
+    const title = `E2E Edit ${Date.now()}`;
+    await fillMomentForm(page, title);
+    await page.locator("button[name='intent'][value='draft']").click();
+
+    // Attendre explicitement que la redirect aille sur la page du moment (pas /moments/new).
+    // Le regex précédent `/moments\//` matchait aussi `/moments/new` → faux positif possible.
+    // On attend une URL qui se termine par un slug différent de "new".
+    await page.waitForURL(
+      (url) => {
+        const path = new URL(url).pathname;
+        return /\/dashboard\/circles\/[^/]+\/moments\/[^/]+$/.test(path) && !path.endsWith("/moments/new");
+      },
+      { timeout: 15_000 }
+    );
+
+    // 2. Extraire explicitement le slug du moment depuis l'URL actuelle
+    const pathname = new URL(page.url()).pathname;
+    const momentSlug = pathname.split("/").pop();
+    if (!momentSlug || momentSlug === "new") {
+      throw new Error(`Unexpected moment URL after creation: ${page.url()}`);
+    }
+
+    // 3. Naviguer vers la page d'édition en construisant l'URL proprement
+    await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}/edit`);
+    await page.waitForLoadState("domcontentloaded");
+
+    // Le form d'édition doit être visible (timeout large car cold render possible en CI)
+    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
+
+    // Le bouton "Publier" du form NE doit PAS être présent en mode édition
+    // (wrappé dans `{!moment && ...}` côté React → pas du tout rendu)
+    await expect(page.locator("button[name='intent'][value='publish']")).toHaveCount(0);
+
+    // En revanche le bouton draft (qui devient "Enregistrer" en mode édition) reste présent
+    await expect(page.locator("button[name='intent'][value='draft']")).toBeVisible();
+  });
+});
+
+test.describe("Flux Host — publication directe d'un Moment (mobile)", () => {
+  test.use({
+    storageState: AUTH.HOST,
+    // Viewport mobile < 640px : le breakpoint Tailwind `sm:` n'est pas actif
+    // → le bouton "Publier" doit être masqué via `hidden sm:inline-flex`
+    viewport: { width: 375, height: 812 },
+  });
+
+  test("should NOT show the 'Publier' button on mobile viewport", async ({ page }) => {
+    await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
+
+    // Le bouton draft (primary) doit rester visible
+    await expect(
+      page.locator("button[name='intent'][value='draft']")
+    ).toBeVisible();
+
+    // Le bouton publish est rendu dans le DOM (React monte le composant) mais
+    // Tailwind lui applique `hidden` par défaut → Playwright le voit comme non-visible
+    await expect(
+      page.locator("button[name='intent'][value='publish']")
+    ).toBeHidden();
   });
 });
