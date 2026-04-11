@@ -42,6 +42,8 @@
     "db:backfill-public-id:prod": "bash scripts/backfill-public-id-prod.sh",
     "db:backfill-is-demo": "tsx scripts/backfill-explorer-is-demo.ts",
     "db:backfill-is-demo:prod": "bash scripts/backfill-explorer-is-demo-prod.sh",
+    "db:send-onboarding-welcome-backfill": "tsx scripts/send-onboarding-welcome-backfill.ts",
+    "db:send-onboarding-welcome-backfill:prod": "bash scripts/send-onboarding-welcome-backfill-prod.sh",
     "db:subscribe-demo-to-the-spark:prod": "bash scripts/db-subscribe-demo-to-the-spark-prod.sh",
     "db:seed-covers": "tsx scripts/seed-covers.ts",
     "db:seed-covers:execute": "tsx scripts/seed-covers.ts --execute",

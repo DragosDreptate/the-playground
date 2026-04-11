@@ -27,6 +27,7 @@ export function createMockEmailService(
     sendRegistrationRemovedByHost: vi.fn().mockResolvedValue(undefined),
     sendApprovalNotification: vi.fn().mockResolvedValue(undefined),
     sendHostPaidCancellation: vi.fn().mockResolvedValue(undefined),
+    sendOnboardingWelcome: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

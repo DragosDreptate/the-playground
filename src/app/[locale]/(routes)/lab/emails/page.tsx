@@ -17,6 +17,7 @@ import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-
 import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
 import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
 import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
+import { OnboardingWelcomeEmail } from "@/infrastructure/services/email/templates/onboarding-welcome";
 import { EmailPreviewClient } from "./email-preview-client";
 
 const BASE_URL = "https://the-playground.fr";
@@ -404,6 +405,15 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
           footer: FOOTER,
         },
         baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "onboarding-welcome",
+      label: "Onboarding — Lettre du fondateur",
+      element: OnboardingWelcomeEmail({
+        firstName: "Alice",
+        // Utilise l'URL de l'app pour que la preview charge le logo local en dev
+        baseUrl: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
       }),
     },
     {

@@ -39,4 +39,6 @@ export interface UserRepository {
   resolvePublicProfile(publicId: string): Promise<{ user: PublicUser; internalUserId: string } | null>;
   /** Génère et persiste un publicId pour l'utilisateur (si absent). */
   ensurePublicId(userId: string, firstName: string | null, lastName: string | null): Promise<string>;
+  /** Marque l'utilisateur comme ayant reçu l'email de bienvenue onboarding. */
+  setWelcomeEmailSent(userId: string): Promise<void>;
 }

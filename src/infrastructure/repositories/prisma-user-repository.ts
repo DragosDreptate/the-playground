@@ -30,6 +30,7 @@ function toDomainUser(record: PrismaUser): User {
     githubUrl: record.githubUrl,
     dashboardMode: record.dashboardMode as DashboardMode | null,
     publicId: record.publicId ?? null,
+    welcomeEmailSentAt: record.welcomeEmailSentAt ?? null,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -261,5 +262,12 @@ export const prismaUserRepository: UserRepository = {
     }
 
     throw new Error(`[ensurePublicId] Impossible de générer un publicId unique pour l'utilisateur ${userId}`);
+  },
+
+  async setWelcomeEmailSent(userId: string): Promise<void> {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { welcomeEmailSentAt: new Date() },
+    });
   },
 };

@@ -386,6 +386,13 @@ export type ApprovalNotificationEmailData = {
   };
 };
 
+// --- Onboarding welcome ---
+
+export type OnboardingWelcomeEmailData = {
+  to: string;
+  firstName: string | null;
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -413,4 +420,5 @@ export interface EmailService {
   sendRegistrationRemovedByHost(data: RegistrationRemovedByHostEmailData): Promise<void>;
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
   sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void>;
+  sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
 }

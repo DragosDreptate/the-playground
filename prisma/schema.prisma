@@ -150,6 +150,7 @@ model User {
   githubUrl                 String?   @map("github_url")
   dashboardMode             DashboardMode?
   publicId                  String?   @unique @map("public_id")
+  welcomeEmailSentAt        DateTime? @map("welcome_email_sent_at")
   createdAt                 DateTime  @default(now())
   updatedAt                 DateTime  @updatedAt
 
