@@ -1,3 +1,11 @@
+export function isImageAttachment(contentType: string): boolean {
+  return contentType.startsWith("image/");
+}
+
+export function isPdfAttachment(contentType: string): boolean {
+  return contentType === "application/pdf";
+}
+
 /**
  * Format bytes as "X KB" or "X,Y MB" (French decimal separator).
  */

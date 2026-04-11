@@ -9,6 +9,7 @@ import {
   formatAttachmentName,
   formatAttachmentSize,
   formatAttachmentType,
+  isImageAttachment,
 } from "./attachment-format";
 
 type MomentAttachmentsListProps = {
@@ -74,8 +75,7 @@ export function MomentAttachmentsList({
 
         <ul role="list" className="flex flex-col gap-2">
           {attachments.map((attachment) => {
-            const isImage = attachment.contentType.startsWith("image/");
-            const Icon = isImage ? ImageIcon : FileText;
+            const Icon = isImageAttachment(attachment.contentType) ? ImageIcon : FileText;
             return (
               <li key={attachment.id} role="listitem">
                 <button

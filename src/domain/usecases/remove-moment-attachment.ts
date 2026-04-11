@@ -20,12 +20,6 @@ type RemoveMomentAttachmentDeps = {
   storage: StorageService;
 };
 
-/**
- * Removes an attachment: deletes the blob first, then the DB row.
- *
- * If the blob deletion fails, the DB row is NOT deleted (consistency).
- * Only HOST members of the Moment's Circle can remove attachments.
- */
 export async function removeMomentAttachment(
   input: RemoveMomentAttachmentInput,
   deps: RemoveMomentAttachmentDeps
@@ -33,20 +27,16 @@ export async function removeMomentAttachment(
   const { attachmentRepository, momentRepository, circleRepository, storage } =
     deps;
 
-  // 1. Attachment exists
   const attachment = await attachmentRepository.findById(input.attachmentId);
   if (!attachment) {
     throw new AttachmentNotFoundError(input.attachmentId);
   }
 
-  // 2. Load parent Moment to resolve the Circle
   const moment = await momentRepository.findById(attachment.momentId);
   if (!moment) {
-    // Orphan attachment — should not happen but handle defensively
     throw new MomentNotFoundError(attachment.momentId);
   }
 
-  // 3. Ownership check
   const membership = await circleRepository.findMembership(
     moment.circleId,
     input.userId
@@ -55,9 +45,8 @@ export async function removeMomentAttachment(
     throw new UnauthorizedMomentActionError();
   }
 
-  // 4. Delete blob first (if this fails, DB row remains — consistency)
+  // Delete the blob before the DB row: if the blob delete fails, the row
+  // stays so the attachment is still recoverable — avoids orphan blobs.
   await storage.delete(attachment.url);
-
-  // 5. Delete DB row
   await attachmentRepository.delete(attachment.id);
 }

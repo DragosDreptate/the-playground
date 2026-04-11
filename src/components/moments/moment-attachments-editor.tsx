@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   forwardRef,
   useCallback,
@@ -7,17 +8,24 @@ import {
   useRef,
   useState,
 } from "react";
-import { FileText, ImageIcon, Upload, X, AlertCircle } from "lucide-react";
+import {
+  AlertCircle,
+  FileText,
+  ImageIcon,
+  Upload,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import {
-  MAX_ATTACHMENTS_PER_MOMENT,
-  MAX_ATTACHMENT_SIZE_BYTES,
   ALLOWED_ATTACHMENT_CONTENT_TYPES,
+  MAX_ATTACHMENT_SIZE_BYTES,
+  MAX_ATTACHMENTS_PER_MOMENT,
 } from "@/domain/models/moment-attachment";
 import {
-  uploadMomentAttachmentAction,
   deleteMomentAttachmentAction,
+  uploadMomentAttachmentAction,
 } from "@/app/actions/moment-attachments";
 import {
   AlertDialog,
@@ -29,16 +37,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { formatAttachmentSize } from "./attachment-format";
+import {
+  formatAttachmentSize,
+  isImageAttachment,
+} from "./attachment-format";
 
-/** Local file held in the staging list (create mode — moment doesn't exist yet). */
-type StagedFile = {
-  tempId: string;
-  file: File;
-  error?: string;
-};
-
-/** Upload in progress (live mode — moment exists, upload fired). */
+type StagedFile = { tempId: string; file: File; error?: string };
 type UploadingFile = {
   tempId: string;
   filename: string;
@@ -48,17 +52,13 @@ type UploadingFile = {
 };
 
 type MomentAttachmentsEditorProps = {
-  /** Moment ID if editing an existing moment (live mode). Null during creation (staged mode). */
+  /** Null during creation (staged mode), set when editing an existing moment (live mode). */
   momentId: string | null;
   initialAttachments?: MomentAttachment[];
 };
 
 export type MomentAttachmentsEditorHandle = {
-  /**
-   * In staged mode: uploads all staged files to the newly-created moment.
-   * Resolves once all uploads complete (success or error).
-   * Returns the number of files that failed to upload.
-   */
+  /** Upload every staged file to the newly-created moment. Resolves with the error count. */
   flushStaged(momentId: string): Promise<{ failedCount: number }>;
   hasStagedFiles(): boolean;
 };
@@ -66,15 +66,18 @@ export type MomentAttachmentsEditorHandle = {
 const MAX_MB = MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024;
 const ACCEPT = Array.from(ALLOWED_ATTACHMENT_CONTENT_TYPES).join(",");
 
+function newTempId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random()}`;
+}
+
 /**
- * Attachments editor displayed in the Moment form.
- *
- * Two modes:
- * - **Staged mode** (create): moment doesn't exist yet. Files are held in
- *   browser memory as File objects, no upload happens. After the moment is
- *   created, the parent calls `flushStaged(momentId)` via ref to upload them.
- * - **Live mode** (edit): moment exists. Each dropped/picked file is uploaded
- *   immediately via server action.
+ * Two modes, picked by `momentId`:
+ * - **Staged** (create): files stay in browser memory until the parent
+ *   calls `flushStaged(newMomentId)` via ref after the moment is created.
+ * - **Live** (edit): each dropped file is uploaded immediately.
  */
 export const MomentAttachmentsEditor = forwardRef<
   MomentAttachmentsEditorHandle,
@@ -113,7 +116,6 @@ export const MomentAttachmentsEditor = forwardRef<
     [t]
   );
 
-  // ── File intake (both modes) ─────────────────────────────
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
       setGlobalError(null);
@@ -131,23 +133,17 @@ export const MomentAttachmentsEditor = forwardRef<
       }
 
       for (const file of toProcess) {
-        const tempId = `${file.name}-${Date.now()}-${Math.random()}`;
+        const tempId = newTempId();
         const clientError = clientValidate(file);
 
-        // Staged mode: just add to the local list (no upload yet)
         if (!isLiveMode) {
           setStaged((prev) => [
             ...prev,
-            {
-              tempId,
-              file,
-              error: clientError ?? undefined,
-            },
+            { tempId, file, error: clientError ?? undefined },
           ]);
           continue;
         }
 
-        // Live mode: upload immediately
         if (clientError) {
           setUploading((prev) => [
             ...prev,
@@ -191,7 +187,6 @@ export const MomentAttachmentsEditor = forwardRef<
     [clientValidate, isLiveMode, momentId, t, totalCount]
   );
 
-  // ── Imperative handle: flushStaged (called by parent after create) ───
   useImperativeHandle(
     ref,
     () => ({
@@ -199,10 +194,8 @@ export const MomentAttachmentsEditor = forwardRef<
         const filesToUpload = staged.filter((s) => !s.error);
         if (filesToUpload.length === 0) return { failedCount: 0 };
 
-        // Move every staged file to the "uploading" state at once so the user
-        // immediately sees one card per file with the pulse progress bar.
-        // This provides real-time feedback during the flush, instead of a
-        // silent wait while uploads happen in the background.
+        // Move staged files to the uploading state immediately so the user
+        // sees progress cards instead of a silent wait during the flush.
         const uploadingEntries: UploadingFile[] = filesToUpload.map((s) => ({
           tempId: s.tempId,
           filename: s.file.name,
@@ -214,9 +207,6 @@ export const MomentAttachmentsEditor = forwardRef<
 
         let failedCount = 0;
 
-        // Upload all files in parallel — faster than a sequential for-await loop.
-        // Each upload updates its own card as soon as it resolves (success =>
-        // card moves to attachments, failure => card shows error state).
         await Promise.all(
           filesToUpload.map(async (stagedFile) => {
             const formData = new FormData();
@@ -252,7 +242,6 @@ export const MomentAttachmentsEditor = forwardRef<
     [staged]
   );
 
-  // ── Drag & drop handlers ─────────────────────────────────
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -288,7 +277,6 @@ export const MomentAttachmentsEditor = forwardRef<
     [handleFiles]
   );
 
-  // ── Delete / remove handlers ─────────────────────────────
   const onConfirmDelete = useCallback(async () => {
     if (!pendingDelete) return;
     const id = pendingDelete.id;
@@ -311,6 +299,7 @@ export const MomentAttachmentsEditor = forwardRef<
 
   const isEmpty =
     attachments.length === 0 && staged.length === 0 && uploading.length === 0;
+  const removeAriaLabel = t("deleteConfirmAction");
 
   return (
     <div className="space-y-3">
@@ -323,7 +312,6 @@ export const MomentAttachmentsEditor = forwardRef<
         </span>
       </div>
 
-      {/* Dropzone — only when empty */}
       {isEmpty && (
         <button
           type="button"
@@ -349,7 +337,6 @@ export const MomentAttachmentsEditor = forwardRef<
         </button>
       )}
 
-      {/* Cards list */}
       {!isEmpty && (
         <div
           onDrop={onDrop}
@@ -357,130 +344,71 @@ export const MomentAttachmentsEditor = forwardRef<
           onDragLeave={onDragLeave}
           className={`space-y-2 ${isDragging ? "ring-primary rounded-lg ring-2" : ""}`}
         >
-          {/* Persistent attachments (live mode) */}
-          {attachments.map((a) => {
-            const isImage = a.contentType.startsWith("image/");
-            const Icon = isImage ? ImageIcon : FileText;
-            return (
-              <div
-                key={a.id}
-                className="border-border bg-muted flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3"
-              >
-                <div className="text-muted-foreground flex size-8 shrink-0 items-center justify-center">
-                  <Icon className="size-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-foreground truncate text-sm font-medium">
-                    {a.filename}
-                  </p>
-                  <p className="text-muted-foreground mt-0.5 text-xs">
-                    {formatAttachmentSize(a.sizeBytes)}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPendingDelete(a)}
-                  className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded transition-colors"
-                  aria-label={t("deleteConfirmAction")}
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            );
-          })}
+          {attachments.map((a) => (
+            <AttachmentCard
+              key={a.id}
+              icon={isImageAttachment(a.contentType) ? ImageIcon : FileText}
+              filename={a.filename}
+              subtitle={formatAttachmentSize(a.sizeBytes)}
+              onRemove={() => setPendingDelete(a)}
+              removeAriaLabel={removeAriaLabel}
+            />
+          ))}
 
-          {/* Staged files (create mode — not yet uploaded) */}
-          {staged.map((s) => {
-            const isImage = s.file.type.startsWith("image/");
-            const Icon = s.error ? AlertCircle : isImage ? ImageIcon : FileText;
-            return (
-              <div
-                key={s.tempId}
-                className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 ${
-                  s.error
-                    ? "border-destructive/30 bg-destructive/5"
-                    : "border-border bg-muted"
-                }`}
-              >
-                <div
-                  className={`flex size-8 shrink-0 items-center justify-center ${
-                    s.error ? "text-destructive" : "text-muted-foreground"
-                  }`}
-                >
-                  <Icon className="size-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-foreground truncate text-sm font-medium">
-                    {s.file.name}
-                  </p>
-                  {s.error ? (
-                    <p className="text-destructive mt-0.5 text-xs">{s.error}</p>
-                  ) : (
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {formatAttachmentSize(s.file.size)}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onRemoveStaged(s.tempId)}
-                  className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded transition-colors"
-                  aria-label={t("deleteConfirmAction")}
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            );
-          })}
+          {staged.map((s) => (
+            <AttachmentCard
+              key={s.tempId}
+              icon={
+                s.error
+                  ? AlertCircle
+                  : isImageAttachment(s.file.type)
+                    ? ImageIcon
+                    : FileText
+              }
+              filename={s.file.name}
+              subtitle={
+                s.error ? (
+                  <span className="text-destructive">{s.error}</span>
+                ) : (
+                  formatAttachmentSize(s.file.size)
+                )
+              }
+              hasError={!!s.error}
+              onRemove={() => onRemoveStaged(s.tempId)}
+              removeAriaLabel={removeAriaLabel}
+            />
+          ))}
 
-          {/* In-progress uploads (live mode) */}
-          {uploading.map((u) => {
-            const isImage = u.contentType.startsWith("image/");
-            const Icon = u.error ? AlertCircle : isImage ? ImageIcon : FileText;
-            return (
-              <div
-                key={u.tempId}
-                className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 ${
-                  u.error
-                    ? "border-destructive/30 bg-destructive/5"
-                    : "border-border bg-muted"
-                }`}
-              >
-                <div
-                  className={`flex size-8 shrink-0 items-center justify-center ${
-                    u.error ? "text-destructive" : "text-muted-foreground"
-                  }`}
-                >
-                  <Icon className="size-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-foreground truncate text-sm font-medium">
-                    {u.filename}
-                  </p>
-                  {u.error ? (
-                    <p className="text-destructive mt-0.5 text-xs">{u.error}</p>
-                  ) : (
-                    <>
-                      <div className="bg-border mt-1.5 h-1 overflow-hidden rounded-full">
-                        <div className="bg-primary h-full w-1/2 animate-pulse" />
-                      </div>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {t("uploading")} · {formatAttachmentSize(u.sizeBytes)}
-                      </p>
-                    </>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onCancelUpload(u.tempId)}
-                  className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded transition-colors"
-                  aria-label={t("deleteConfirmAction")}
-                >
-                  <X className="size-4" />
-                </button>
-              </div>
-            );
-          })}
+          {uploading.map((u) => (
+            <AttachmentCard
+              key={u.tempId}
+              icon={
+                u.error
+                  ? AlertCircle
+                  : isImageAttachment(u.contentType)
+                    ? ImageIcon
+                    : FileText
+              }
+              filename={u.filename}
+              subtitle={
+                u.error ? (
+                  <span className="text-destructive">{u.error}</span>
+                ) : (
+                  <>
+                    <span className="bg-border mt-1.5 block h-1 overflow-hidden rounded-full">
+                      <span className="bg-primary block h-full w-1/2 animate-pulse" />
+                    </span>
+                    <span className="mt-1 block">
+                      {t("uploading")} · {formatAttachmentSize(u.sizeBytes)}
+                    </span>
+                  </>
+                )
+              }
+              hasError={!!u.error}
+              onRemove={() => onCancelUpload(u.tempId)}
+              removeAriaLabel={removeAriaLabel}
+            />
+          ))}
 
           {canAddMore && (
             <button
@@ -533,3 +461,51 @@ export const MomentAttachmentsEditor = forwardRef<
     </div>
   );
 });
+
+type AttachmentCardProps = {
+  icon: LucideIcon;
+  filename: string;
+  subtitle: ReactNode;
+  hasError?: boolean;
+  onRemove: () => void;
+  removeAriaLabel: string;
+};
+
+function AttachmentCard({
+  icon: Icon,
+  filename,
+  subtitle,
+  hasError = false,
+  onRemove,
+  removeAriaLabel,
+}: AttachmentCardProps) {
+  return (
+    <div
+      className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 ${
+        hasError
+          ? "border-destructive/30 bg-destructive/5"
+          : "border-border bg-muted"
+      }`}
+    >
+      <div
+        className={`flex size-8 shrink-0 items-center justify-center ${
+          hasError ? "text-destructive" : "text-muted-foreground"
+        }`}
+      >
+        <Icon className="size-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-foreground truncate text-sm font-medium">{filename}</p>
+        <p className="text-muted-foreground mt-0.5 text-xs">{subtitle}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded transition-colors"
+        aria-label={removeAriaLabel}
+      >
+        <X className="size-4" />
+      </button>
+    </div>
+  );
+}

@@ -8,18 +8,9 @@ import {
 } from "@/infrastructure/repositories";
 
 /**
- * GET /api/moments/[slug]/attachments/[attachmentId]/download
- *
- * Proxies an attachment blob and forces a download via Content-Disposition.
- *
- * Visibility rules (same as the public moment page):
- * - Moment must exist and not be CANCELLED
- * - If the Circle is PUBLIC: anyone can download
- * - If the Circle is PRIVATE: only ACTIVE members of the Circle can download
- *
- * Why this is a route API (and not a server action):
- * We need to return a binary stream with a Content-Disposition header.
- * Server actions can't set response headers or stream binary content.
+ * Why a route and not a server action: we stream the blob with a
+ * Content-Disposition header to force a real download, which isn't
+ * possible from a server action.
  */
 export async function GET(
   _request: Request,
@@ -28,19 +19,18 @@ export async function GET(
   const { slug, attachmentId } = await params;
 
   try {
-    // 1. Resolve the moment by slug
-    const moment = await prismaMomentRepository.findBySlug(slug);
+    const [moment, attachment] = await Promise.all([
+      prismaMomentRepository.findBySlug(slug),
+      prismaMomentAttachmentRepository.findById(attachmentId),
+    ]);
+
     if (!moment || moment.status === "CANCELLED") {
       return new NextResponse("Not found", { status: 404 });
     }
-
-    // 2. Resolve the attachment and check it belongs to this moment
-    const attachment = await prismaMomentAttachmentRepository.findById(attachmentId);
     if (!attachment || attachment.momentId !== moment.id) {
       return new NextResponse("Not found", { status: 404 });
     }
 
-    // 3. Visibility check — same rules as the public moment page
     const circle = await prismaCircleRepository.findById(moment.circleId);
     if (!circle) {
       return new NextResponse("Not found", { status: 404 });
@@ -60,7 +50,6 @@ export async function GET(
       }
     }
 
-    // 4. Fetch the blob from Vercel Blob
     const blobResponse = await fetch(attachment.url);
     if (!blobResponse.ok || !blobResponse.body) {
       Sentry.captureMessage(
@@ -69,8 +58,7 @@ export async function GET(
       return new NextResponse("Not found", { status: 404 });
     }
 
-    // 5. Stream the response with a Content-Disposition header that forces download.
-    //    RFC 5987 filename* parameter supports non-ASCII characters.
+    // RFC 5987: filename* supports non-ASCII, filename is the ASCII fallback
     const asciiFilename = attachment.filename.replace(/[^\x20-\x7e]/g, "_");
     const encodedFilename = encodeURIComponent(attachment.filename);
     const contentDisposition = `attachment; filename="${asciiFilename}"; filename*=UTF-8''${encodedFilename}`;
@@ -80,7 +68,6 @@ export async function GET(
         "Content-Type": attachment.contentType,
         "Content-Disposition": contentDisposition,
         "Content-Length": String(attachment.sizeBytes),
-        // Prevent intermediary caches from serving stale content to wrong users.
         "Cache-Control": "private, no-store",
       },
     });
