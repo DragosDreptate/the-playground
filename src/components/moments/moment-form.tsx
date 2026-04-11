@@ -26,7 +26,10 @@ import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
 import { MomentFormOptionsSection } from "./moment-form-options-section";
 import { MomentFormRadar } from "./moment-form-radar";
-import { MomentAttachmentsEditor } from "./moment-attachments-editor";
+import {
+  MomentAttachmentsEditor,
+  type MomentAttachmentsEditorHandle,
+} from "./moment-attachments-editor";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 
 type MomentFormProps = {
@@ -62,6 +65,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
   const router = useRouter();
+  const attachmentsEditorRef = useRef<MomentAttachmentsEditorHandle>(null);
 
   // --- Date/time state ---
   const defaultStart = moment?.startsAt ?? getDefaultStartDate();
@@ -148,6 +152,14 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
         has_capacity: result.data.capacity !== null,
         is_paid: result.data.price > 0,
       });
+
+      // Flush staged attachments (create mode: files were staged client-side
+      // because the moment didn't exist yet). We await this so the user lands
+      // on the moment page with all attachments already persisted.
+      if (!moment && attachmentsEditorRef.current?.hasStagedFiles()) {
+        await attachmentsEditorRef.current.flushStaged(result.data.id);
+      }
+
       router.push(
         `/dashboard/circles/${circleSlug}/moments/${result.data.slug}`
       );
@@ -378,13 +390,15 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onPriceCentsChange={handlePriceCentsChange}
           />
 
-          {/* Attachments editor — edit mode only (needs a momentId) */}
-          {moment?.id && (
-            <MomentAttachmentsEditor
-              momentId={moment.id}
-              initialAttachments={initialAttachments}
-            />
-          )}
+          {/* Attachments editor — works in both create and edit modes.
+              Create mode: files are staged client-side and uploaded after the
+              moment is created (see handleSubmit above). Edit mode: upload
+              happens immediately via server action. */}
+          <MomentAttachmentsEditor
+            ref={attachmentsEditorRef}
+            momentId={moment?.id ?? null}
+            initialAttachments={initialAttachments}
+          />
 
           {/* Validation des inscriptions */}
           <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>

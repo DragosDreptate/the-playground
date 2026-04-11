@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { FileText, ImageIcon, Upload, X, AlertCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
@@ -25,6 +31,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { formatAttachmentSize } from "./attachment-format";
 
+/** Local file held in the staging list (create mode — moment doesn't exist yet). */
+type StagedFile = {
+  tempId: string;
+  file: File;
+  error?: string;
+};
+
+/** Upload in progress (live mode — moment exists, upload fired). */
 type UploadingFile = {
   tempId: string;
   filename: string;
@@ -34,29 +48,44 @@ type UploadingFile = {
 };
 
 type MomentAttachmentsEditorProps = {
-  momentId: string;
-  initialAttachments: MomentAttachment[];
+  /** Moment ID if editing an existing moment (live mode). Null during creation (staged mode). */
+  momentId: string | null;
+  initialAttachments?: MomentAttachment[];
+};
+
+export type MomentAttachmentsEditorHandle = {
+  /**
+   * In staged mode: uploads all staged files to the newly-created moment.
+   * Resolves once all uploads complete (success or error).
+   * Returns the number of files that failed to upload.
+   */
+  flushStaged(momentId: string): Promise<{ failedCount: number }>;
+  hasStagedFiles(): boolean;
 };
 
 const MAX_MB = MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024;
 const ACCEPT = Array.from(ALLOWED_ATTACHMENT_CONTENT_TYPES).join(",");
 
 /**
- * Attachments editor displayed in the Moment edit form.
+ * Attachments editor displayed in the Moment form.
  *
- * Uploads are fire-and-forget: each file is uploaded independently via
- * server action as soon as it is added (drag-and-drop or picker), without
- * waiting for the main form submit.
- *
- * Shown only in edit mode — create mode doesn't have a momentId yet.
+ * Two modes:
+ * - **Staged mode** (create): moment doesn't exist yet. Files are held in
+ *   browser memory as File objects, no upload happens. After the moment is
+ *   created, the parent calls `flushStaged(momentId)` via ref to upload them.
+ * - **Live mode** (edit): moment exists. Each dropped/picked file is uploaded
+ *   immediately via server action.
  */
-export function MomentAttachmentsEditor({
-  momentId,
-  initialAttachments,
-}: MomentAttachmentsEditorProps) {
+export const MomentAttachmentsEditor = forwardRef<
+  MomentAttachmentsEditorHandle,
+  MomentAttachmentsEditorProps
+>(function MomentAttachmentsEditor({ momentId, initialAttachments = [] }, ref) {
   const t = useTranslations("Moment.form.attachments");
+  const isLiveMode = momentId !== null;
+
   const [attachments, setAttachments] =
     useState<MomentAttachment[]>(initialAttachments);
+  const [staged, setStaged] = useState<StagedFile[]>([]);
   const [uploading, setUploading] = useState<UploadingFile[]>([]);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<MomentAttachment | null>(
@@ -65,7 +94,10 @@ export function MomentAttachmentsEditor({
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const totalCount = attachments.length + uploading.filter((u) => !u.error).length;
+  const totalCount =
+    attachments.length +
+    staged.filter((s) => !s.error).length +
+    uploading.filter((u) => !u.error).length;
   const canAddMore = totalCount < MAX_ATTACHMENTS_PER_MOMENT;
 
   const clientValidate = useCallback(
@@ -81,6 +113,7 @@ export function MomentAttachmentsEditor({
     [t]
   );
 
+  // ── File intake (both modes) ─────────────────────────────
   const handleFiles = useCallback(
     async (files: FileList | File[]) => {
       setGlobalError(null);
@@ -101,6 +134,20 @@ export function MomentAttachmentsEditor({
         const tempId = `${file.name}-${Date.now()}-${Math.random()}`;
         const clientError = clientValidate(file);
 
+        // Staged mode: just add to the local list (no upload yet)
+        if (!isLiveMode) {
+          setStaged((prev) => [
+            ...prev,
+            {
+              tempId,
+              file,
+              error: clientError ?? undefined,
+            },
+          ]);
+          continue;
+        }
+
+        // Live mode: upload immediately
         if (clientError) {
           setUploading((prev) => [
             ...prev,
@@ -127,7 +174,7 @@ export function MomentAttachmentsEditor({
 
         const formData = new FormData();
         formData.append("file", file);
-        const result = await uploadMomentAttachmentAction(momentId, formData);
+        const result = await uploadMomentAttachmentAction(momentId!, formData);
 
         if (result.success) {
           setAttachments((prev) => [...prev, result.data]);
@@ -141,9 +188,39 @@ export function MomentAttachmentsEditor({
         }
       }
     },
-    [clientValidate, momentId, t, totalCount]
+    [clientValidate, isLiveMode, momentId, t, totalCount]
   );
 
+  // ── Imperative handle: flushStaged (called by parent after create) ───
+  useImperativeHandle(
+    ref,
+    () => ({
+      async flushStaged(newMomentId: string): Promise<{ failedCount: number }> {
+        const filesToUpload = staged.filter((s) => !s.error);
+        let failedCount = 0;
+
+        for (const stagedFile of filesToUpload) {
+          const formData = new FormData();
+          formData.append("file", stagedFile.file);
+          const result = await uploadMomentAttachmentAction(newMomentId, formData);
+          if (!result.success) {
+            failedCount += 1;
+          }
+        }
+
+        // Clear staged files after flush (success or not — the parent decides
+        // what to do next based on failedCount)
+        setStaged([]);
+        return { failedCount };
+      },
+      hasStagedFiles() {
+        return staged.some((s) => !s.error);
+      },
+    }),
+    [staged]
+  );
+
+  // ── Drag & drop handlers ─────────────────────────────────
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -173,12 +250,13 @@ export function MomentAttachmentsEditor({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files.length > 0) {
         handleFiles(e.target.files);
-        e.target.value = ""; // reset so re-selecting the same file works
+        e.target.value = "";
       }
     },
     [handleFiles]
   );
 
+  // ── Delete / remove handlers ─────────────────────────────
   const onConfirmDelete = useCallback(async () => {
     if (!pendingDelete) return;
     const id = pendingDelete.id;
@@ -191,9 +269,16 @@ export function MomentAttachmentsEditor({
     }
   }, [pendingDelete]);
 
+  const onRemoveStaged = useCallback((tempId: string) => {
+    setStaged((prev) => prev.filter((s) => s.tempId !== tempId));
+  }, []);
+
   const onCancelUpload = useCallback((tempId: string) => {
     setUploading((prev) => prev.filter((u) => u.tempId !== tempId));
   }, []);
+
+  const isEmpty =
+    attachments.length === 0 && staged.length === 0 && uploading.length === 0;
 
   return (
     <div className="space-y-3">
@@ -206,8 +291,8 @@ export function MomentAttachmentsEditor({
         </span>
       </div>
 
-      {/* Dropzone — visible when no attachments yet */}
-      {attachments.length === 0 && uploading.length === 0 && (
+      {/* Dropzone — only when empty */}
+      {isEmpty && (
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -232,14 +317,15 @@ export function MomentAttachmentsEditor({
         </button>
       )}
 
-      {/* Cards list (attachments + uploads in progress) */}
-      {(attachments.length > 0 || uploading.length > 0) && (
+      {/* Cards list */}
+      {!isEmpty && (
         <div
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           className={`space-y-2 ${isDragging ? "ring-primary rounded-lg ring-2" : ""}`}
         >
+          {/* Persistent attachments (live mode) */}
           {attachments.map((a) => {
             const isImage = a.contentType.startsWith("image/");
             const Icon = isImage ? ImageIcon : FileText;
@@ -271,6 +357,51 @@ export function MomentAttachmentsEditor({
             );
           })}
 
+          {/* Staged files (create mode — not yet uploaded) */}
+          {staged.map((s) => {
+            const isImage = s.file.type.startsWith("image/");
+            const Icon = s.error ? AlertCircle : isImage ? ImageIcon : FileText;
+            return (
+              <div
+                key={s.tempId}
+                className={`flex min-h-14 items-center gap-3 rounded-lg border px-4 py-3 ${
+                  s.error
+                    ? "border-destructive/30 bg-destructive/5"
+                    : "border-border bg-muted"
+                }`}
+              >
+                <div
+                  className={`flex size-8 shrink-0 items-center justify-center ${
+                    s.error ? "text-destructive" : "text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-foreground truncate text-sm font-medium">
+                    {s.file.name}
+                  </p>
+                  {s.error ? (
+                    <p className="text-destructive mt-0.5 text-xs">{s.error}</p>
+                  ) : (
+                    <p className="text-muted-foreground mt-0.5 text-xs">
+                      {formatAttachmentSize(s.file.size)}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onRemoveStaged(s.tempId)}
+                  className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground flex size-7 shrink-0 items-center justify-center rounded transition-colors"
+                  aria-label={t("deleteConfirmAction")}
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            );
+          })}
+
+          {/* In-progress uploads (live mode) */}
           {uploading.map((u) => {
             const isImage = u.contentType.startsWith("image/");
             const Icon = u.error ? AlertCircle : isImage ? ImageIcon : FileText;
@@ -368,4 +499,4 @@ export function MomentAttachmentsEditor({
       </AlertDialog>
     </div>
   );
-}
+});
