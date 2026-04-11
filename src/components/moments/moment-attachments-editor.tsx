@@ -505,6 +505,7 @@ export const MomentAttachmentsEditor = forwardRef<
         multiple
         onChange={onPickerChange}
         className="hidden"
+        data-testid="moment-attachments-file-input"
       />
 
       <AlertDialog
