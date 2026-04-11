@@ -1,23 +1,28 @@
-import { Button, Hr, Section, Text } from "@react-email/components";
+import { Button, Hr, Img, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
 type Props = {
   url: string;
+  baseUrl: string;
 };
 
-export function MagicLinkEmail({ url }: Props) {
+export function MagicLinkEmail({ url, baseUrl }: Props) {
   return (
     <EmailLayout
       preview="Votre lien de connexion à The Playground"
       footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     >
       <Section style={iconSection}>
-        {/* Icône CSS pure — gradient + triangle border-trick.
-            line-height + inline-block pour centrage email-compatible (pas de flex). */}
-        <div style={iconBox}>
-          <span style={triangle} />
-        </div>
+        {/* Logo The Playground — PNG hébergé sur public/brand/icon.png.
+            URL absolue obligatoire pour les clients email. */}
+        <Img
+          src={`${baseUrl}/brand/icon.png`}
+          width="48"
+          height="48"
+          alt="The Playground"
+          style={iconImage}
+        />
         <Text style={brandName}>The Playground</Text>
       </Section>
 
@@ -50,32 +55,11 @@ const iconSection: React.CSSProperties = {
   marginBottom: "24px",
 };
 
-// Carré gradient 48×48 — même dégradé que le bouton CTA.
-// line-height + text-align pour centrage email-compatible (flex non supporté).
-// font-size:0 évite l'espace fantôme autour du span inline.
-const iconBox: React.CSSProperties = {
-  backgroundColor: "#ec4899", backgroundImage: "linear-gradient(135deg, #ec4899, #a855f7)",
-  borderRadius: "11px",
-  width: "48px",
-  height: "48px",
-  lineHeight: "48px",
-  textAlign: "center" as const,
-  fontSize: "0",
+// Logo 48×48 — PNG pour compatibilité maximale (Gmail, Outlook, Apple Mail
+// n'ont qu'un support SVG partiel). Centré via margin auto.
+const iconImage: React.CSSProperties = {
   margin: "0 auto 8px auto",
-};
-
-// Triangle border-trick proportionnel à icon.tsx (polygon 13×15 dans un carré 32×32).
-// À 48×48 : largeur ≈ 20px, hauteur ≈ 22px (= 2×11px).
-// marginLeft: 3px = décalage optique vers la droite (comme marginLeft:"2px" dans icon.tsx).
-const triangle: React.CSSProperties = {
-  display: "inline-block",
-  verticalAlign: "middle",
-  width: 0,
-  height: 0,
-  borderTop: "11px solid transparent",
-  borderBottom: "11px solid transparent",
-  borderLeft: "20px solid #ffffff",
-  marginLeft: "3px",
+  display: "block",
 };
 
 const brandName: React.CSSProperties = {

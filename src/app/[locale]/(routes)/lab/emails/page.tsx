@@ -362,6 +362,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
       label: "Magic Link (connexion)",
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
+        baseUrl: BASE_URL,
       }),
     },
     {
