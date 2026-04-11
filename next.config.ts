@@ -59,7 +59,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "4mb",
+      // 12 MB : couvre les pièces jointes Moment (10 MB max par fichier,
+      // uploadées une par une) avec une marge pour l'overhead multipart/form-data.
+      bodySizeLimit: "12mb",
     },
   },
   async rewrites() {
