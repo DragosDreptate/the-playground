@@ -70,6 +70,7 @@ export type User = {
   githubUrl: string | null;
   dashboardMode: DashboardMode | null;
   publicId: string | null;
+  welcomeEmailSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };

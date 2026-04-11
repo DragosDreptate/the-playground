@@ -23,6 +23,7 @@ import type {
   RegistrationRemovedByHostEmailData,
   ApprovalNotificationEmailData,
   HostPaidCancellationEmailData,
+  OnboardingWelcomeEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -42,6 +43,7 @@ import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-ci
 import { RegistrationRemovedByHostEmail } from "./templates/registration-removed-by-host";
 import { ApprovalNotificationEmail } from "./templates/approval-notification";
 import { HostPaidCancellationEmail } from "./templates/host-paid-cancellation";
+import { OnboardingWelcomeEmail } from "./templates/onboarding-welcome";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -54,6 +56,22 @@ export function getSender(): string {
     "onboarding@resend.dev"
   );
 }
+
+/**
+ * Expéditeur dédié aux emails relationnels du fondateur (onboarding welcome).
+ * Domaine `the-playground.fr` déjà vérifié dans Resend — le fallback pointe
+ * vers l'expéditeur transactionnel classique en dev si la variable est absente.
+ */
+export function getOnboardingSender(): string {
+  return (
+    process.env.ONBOARDING_EMAIL_FROM ||
+    "Dragos · The Playground <dragos@the-playground.fr>"
+  );
+}
+
+// Partagé entre l'envoi applicatif et le script de backfill one-shot.
+export const ONBOARDING_WELCOME_SUBJECT = "The Playground a besoin de toi";
+export const ONBOARDING_WELCOME_REPLY_TO = "dragos@the-playground.fr";
 
 function isDemoEmail(email: string): boolean {
   const lower = email.toLowerCase();
@@ -385,6 +403,16 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: HostPaidCancellationEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void> {
+      await send({
+        from: getOnboardingSender(),
+        to: data.to,
+        replyTo: ONBOARDING_WELCOME_REPLY_TO,
+        subject: ONBOARDING_WELCOME_SUBJECT,
+        react: OnboardingWelcomeEmail({ firstName: data.firstName, baseUrl }),
       });
     },
   };

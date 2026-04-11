@@ -28,6 +28,9 @@ export function createMockUserRepository(
     ensurePublicId: vi
       .fn<UserRepository["ensurePublicId"]>()
       .mockResolvedValue("test-user-1234"),
+    setWelcomeEmailSent: vi
+      .fn<UserRepository["setWelcomeEmailSent"]>()
+      .mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -54,6 +57,7 @@ export function makeUser(overrides: Partial<User> = {}): User {
     githubUrl: null,
     dashboardMode: null,
     publicId: "test-user-1234",
+    welcomeEmailSentAt: null,
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,
