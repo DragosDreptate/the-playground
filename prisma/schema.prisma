@@ -260,6 +260,7 @@ model Moment {
 
   registrations Registration[]
   comments      Comment[]
+  attachments   MomentAttachment[]
 
   // Index sur circleId : utilisé dans findByCircleId, getCircleMoments
   @@index([circleId])
@@ -270,6 +271,22 @@ model Moment {
   // Index sur explorerScore : utilisé dans ORDER BY explorer_score DESC (Explorer)
   @@index([explorerScore])
   @@map("moments")
+}
+
+model MomentAttachment {
+  id          String   @id @default(cuid())
+  momentId    String
+  url         String
+  filename    String
+  contentType String
+  sizeBytes   Int
+  createdAt   DateTime @default(now())
+
+  moment Moment @relation(fields: [momentId], references: [id], onDelete: Cascade)
+
+  // Index sur momentId : utilisé dans findByMoment, countByMoment
+  @@index([momentId])
+  @@map("moment_attachments")
 }
 
 model Registration {
