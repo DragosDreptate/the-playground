@@ -14,32 +14,20 @@ import * as React from "react";
 
 type Props = {
   firstName: string | null;
-  /**
-   * Base URL absolue utilisée pour le logo. En dev, le lab preview passe
-   * `http://localhost:3000` ; en prod, la resend-email-service passe
-   * `https://the-playground.fr` via `getBaseUrl()`. Un défaut prod est fourni
-   * pour les callers qui n'ont pas besoin de le surcharger.
-   */
+  /** Défaut prod pour le backfill one-shot ; la resend-email-service injecte `getBaseUrl()`. */
   baseUrl?: string;
 };
 
 /**
  * Lettre du fondateur — envoyée une fois par utilisateur à la complétion du profil.
- * Contenu hardcodé en français et tutoiement (lettre d'humain à humain).
- * Voir `spec/mkt/emails/onboarding-1-lettre-fondateur.md` pour le contenu validé.
- *
- * Compat email clients : Gmail (web/app), Apple Mail (macOS/iOS), Outlook
- * (2016/2019/365/web), Yahoo, Proton, Thunderbird. Pas de flex/grid,
- * pas de SVG, pas de web font, pas de JS. Centrage images via `align="center"`
- * sur table wrapper (fallback Outlook Word renderer).
+ * Contenu validé (FR, tutoiement) dans `spec/mkt/emails/onboarding-1-lettre-fondateur.md`.
  */
 export function OnboardingWelcomeEmail({
   firstName,
   baseUrl = "https://the-playground.fr",
 }: Props) {
-  const greeting = `Bonjour ${firstName ?? "à toi"},`;
-  // logo-light = logo pensé pour un fond clair (texte "the" en #1a1b2e).
-  // L'email a un fond #f4f4f5 et la card en blanc — donc version light.
+  // logo-light = version destinée à un fond clair (texte "the" en #1a1b2e).
+  // logo-dark a le "the" en blanc et serait invisible sur la card.
   const logoUrl = `${baseUrl}/brand/logo-light.png`;
 
   return (
@@ -59,7 +47,7 @@ export function OnboardingWelcomeEmail({
 
           <Section style={card}>
             <Section style={cardBody}>
-              <Text style={paragraph}>{greeting}</Text>
+              <Text style={paragraph}>Bonjour {firstName ?? "à toi"},</Text>
 
               <Text style={paragraph}>
                 Il y a quelque chose que j&apos;aimerais partager avec toi.
@@ -78,7 +66,7 @@ export function OnboardingWelcomeEmail({
                 français, au code ouvert, où les communautés qu&apos;ils
                 animent restent les leurs.
               </Text>
-              <Text style={paragraphLast}>
+              <Text style={{ ...paragraph, marginBottom: "36px" }}>
                 C&apos;est ça, The Playground. Rien de plus, rien de moins.
               </Text>
 
@@ -95,7 +83,7 @@ export function OnboardingWelcomeEmail({
                 Ce qu&apos;il manque, ce sont les premières vraies communautés
                 qui vivent, qui grandissent, dont les membres reviennent.
               </Text>
-              <Text style={paragraphLast}>
+              <Text style={{ ...paragraph, marginBottom: "36px" }}>
                 Tu as créé un compte. Ça veut dire que quelque chose a résonné.
                 Et ça compte.
               </Text>
@@ -121,7 +109,7 @@ export function OnboardingWelcomeEmail({
                 </Text>
               </Section>
 
-              <Text style={paragraphHighlightAfter}>
+              <Text style={{ ...paragraph, marginTop: "16px", marginBottom: 0 }}>
                 C&apos;est comme ça que les outils qui durent se construisent.
               </Text>
             </Section>
@@ -131,7 +119,9 @@ export function OnboardingWelcomeEmail({
                 Si tu as envie de répondre, fais-le. Je lis tout et je réponds
                 personnellement.
               </Text>
-              <Text style={paragraphThankYou}>Merci d&apos;être là.</Text>
+              <Text style={{ ...paragraph, marginBottom: "24px" }}>
+                Merci d&apos;être là.
+              </Text>
               <Text style={signature}>— Dragos</Text>
               <Text style={signatureSubline}>
                 Fondateur de The Playground &nbsp;·&nbsp;
@@ -234,26 +224,8 @@ const paragraph: React.CSSProperties = {
   margin: "0 0 16px 0",
 };
 
-const paragraphLast: React.CSSProperties = {
-  ...paragraph,
-  margin: "0 0 36px 0",
-};
-
-const paragraphHighlightAfter: React.CSSProperties = {
-  ...paragraph,
-  margin: "16px 0 0 0",
-};
-
-const paragraphThankYou: React.CSSProperties = {
-  ...paragraph,
-  margin: "0 0 24px 0",
-};
-
 const divider: React.CSSProperties = {
   borderTop: "1px solid #e4e4e7",
-  borderBottom: "none",
-  borderLeft: "none",
-  borderRight: "none",
   margin: "0 0 36px 0",
 };
 
