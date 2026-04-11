@@ -95,6 +95,12 @@ export async function createMomentAction(
   // Refundable only meaningful for paid events; default to true for free events
   const refundable = price > 0 ? formData.get("refundable") === "on" : true;
 
+  // Intent = "draft" (default) or "publish" — coming from the form's submit
+  // button `name="intent" value="..."`. When "publish", we chain a publishMoment
+  // call after createMoment to publish the event in a single user action.
+  const intent = formData.get("intent") as string | null;
+  const shouldPublishImmediately = intent === "publish";
+
   const userId = session.user.id;
   return toActionResult(async () => {
     const coverData = await processCoverImage(formData);
@@ -146,7 +152,36 @@ export async function createMomentAction(
       Sentry.captureException(err);
     });
 
-    return result.moment;
+    if (!shouldPublishImmediately) {
+      return result.moment;
+    }
+
+    // Publish-on-create path : chain publishMoment after a successful createMoment.
+    // If the publish step fails, we fall back to returning the freshly-created
+    // DRAFT (logged to Sentry) so the user doesn't lose their work — they'll be
+    // redirected to the draft page where they can retry publication manually
+    // via the existing PublishMomentButton.
+    try {
+      const publishResult = await publishMoment(
+        { momentId: result.moment.id, userId },
+        { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
+      );
+
+      sendMomentPublishedNotifications(publishResult.moment, userId);
+
+      revalidatePath(`/dashboard/circles/${publishResult.moment.circleId}`);
+      revalidatePath(`/m/${publishResult.moment.slug}`);
+      revalidatePath(`/en/m/${publishResult.moment.slug}`);
+
+      return publishResult.moment;
+    } catch (publishError) {
+      Sentry.captureException(publishError, {
+        tags: { context: "publish_after_create" },
+        extra: { momentId: result.moment.id, circleId: result.moment.circleId },
+      });
+      // Fall back to the draft — the user still got their moment created.
+      return result.moment;
+    }
   });
 }
 
@@ -500,16 +535,35 @@ export async function publishMomentAction(
       { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
     );
 
-    // Fire-and-forget : notifier les membres + envoyer email de confirmation à l'organisateur
-    prismaCircleRepository.findById(result.moment.circleId).then(async (circle) => {
+    sendMomentPublishedNotifications(result.moment, userId);
+
+    revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
+    revalidatePath(`/m/${result.moment.slug}`);
+    revalidatePath(`/en/m/${result.moment.slug}`);
+    return result.moment;
+  });
+}
+
+/**
+ * Fire-and-forget post-publication notifications : notify community members
+ * of the new published event and send a confirmation email to the host with
+ * an ICS attachment. Never throws — all errors are logged to Sentry so that
+ * a failed notification doesn't fail the upstream action.
+ *
+ * Shared between `publishMomentAction` (manual DRAFT → PUBLISHED transition)
+ * and `createMomentAction` with `intent=publish` (create + publish in one
+ * operation).
+ */
+function sendMomentPublishedNotifications(moment: Moment, userId: string): void {
+  prismaCircleRepository
+    .findById(moment.circleId)
+    .then(async (circle) => {
       if (!circle) return;
 
-      notifyNewMoment(result.moment, userId, circle.name, circle.slug).catch(
-        (err) => {
-          console.error("[notifyNewMoment] Erreur:", err);
-          Sentry.captureException(err);
-        }
-      );
+      notifyNewMoment(moment, userId, circle.name, circle.slug).catch((err) => {
+        console.error("[notifyNewMoment] Erreur:", err);
+        Sentry.captureException(err);
+      });
 
       const [host, locale] = await Promise.all([
         prismaUserRepository.findById(userId),
@@ -518,28 +572,28 @@ export async function publishMomentAction(
       if (!host?.email) return;
 
       const dateFnsLocale = getDateFnsLocale(locale);
-      const momentDate = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-      const momentDateMonth = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-      const momentDateDay = formatInTimeZone(result.moment.startsAt, PLATFORM_TIMEZONE, "d");
+      const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
+      const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
+      const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
       const locationText = formatLocationText(
-        result.moment.locationType,
-        result.moment.locationName,
-        result.moment.locationAddress,
-        result.moment.videoLink,
+        moment.locationType,
+        moment.locationName,
+        moment.locationAddress,
+        moment.videoLink,
         locale
       );
       const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
       const icsContent = generateIcs({
-        uid: result.moment.id,
-        title: result.moment.title,
-        description: result.moment.description,
-        startsAt: result.moment.startsAt,
-        endsAt: result.moment.endsAt,
+        uid: moment.id,
+        title: moment.title,
+        description: moment.description,
+        startsAt: moment.startsAt,
+        endsAt: moment.endsAt,
         location: locationText,
-        videoLink: result.moment.videoLink,
-        url: `${appUrl}/m/${result.moment.slug}`,
+        videoLink: moment.videoLink,
+        url: `${appUrl}/m/${moment.slug}`,
         organizerName: circle.name,
         method: "REQUEST",
         attendeeEmail: host.email,
@@ -549,8 +603,8 @@ export async function publishMomentAction(
       await emailService.sendHostMomentCreated({
         to: host.email,
         hostName,
-        momentTitle: result.moment.title,
-        momentSlug: result.moment.slug,
+        momentTitle: moment.title,
+        momentSlug: moment.slug,
         circleSlug: circle.slug,
         momentDate,
         momentDateMonth,
@@ -559,23 +613,18 @@ export async function publishMomentAction(
         circleName: circle.name,
         icsContent,
         strings: {
-          subject: t("hostMomentCreated.subject", { momentTitle: result.moment.title }),
+          subject: t("hostMomentCreated.subject", { momentTitle: moment.title }),
           heading: t("hostMomentCreated.heading"),
-          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: result.moment.title }),
+          statusMessage: t("hostMomentCreated.statusMessage", { momentTitle: moment.title }),
           dateLabel: t("common.dateLabel"),
           locationLabel: t("common.locationLabel"),
           manageMomentCta: t("hostMomentCreated.manageMomentCta"),
           footer: t("common.footer"),
         },
       });
-    }).catch((err) => {
+    })
+    .catch((err) => {
       console.error(err);
       Sentry.captureException(err);
     });
-
-    revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
-    revalidatePath(`/m/${result.moment.slug}`);
-    revalidatePath(`/en/m/${result.moment.slug}`);
-    return result.moment;
-  });
 }

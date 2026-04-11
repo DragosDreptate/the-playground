@@ -152,6 +152,8 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
         location_type: result.data.locationType,
         has_capacity: result.data.capacity !== null,
         is_paid: result.data.price > 0,
+        status: result.data.status,
+        published_immediately: result.data.status === "PUBLISHED",
       });
 
       // Flush staged attachments (create mode: files were staged client-side
@@ -439,7 +441,13 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" disabled={isPending || isEndBeforeStart || !startDate || !endDate} className="flex-1">
+            <Button
+              type="submit"
+              name="intent"
+              value="draft"
+              disabled={isPending || isUploadingAttachments || isEndBeforeStart || !startDate || !endDate}
+              className="flex-1"
+            >
               {isUploadingAttachments
                 ? t("form.uploadingAttachments")
                 : isPending
@@ -448,6 +456,24 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                     ? tCommon("save")
                     : t("form.createMoment")}
             </Button>
+
+            {/* Publier directement — création uniquement, desktop uniquement.
+                En édition un bouton "Publier" existe déjà sur la page du Moment
+                (PublishMomentButton). Sur mobile on garde le flux par défaut
+                (brouillon → puis publier depuis la page). */}
+            {!moment && (
+              <Button
+                type="submit"
+                name="intent"
+                value="publish"
+                variant="outline"
+                disabled={isPending || isUploadingAttachments || isEndBeforeStart || !startDate || !endDate}
+                className="hidden sm:inline-flex"
+              >
+                {t("actions.publish")}
+              </Button>
+            )}
+
             <Button
               type="button"
               variant="outline"
