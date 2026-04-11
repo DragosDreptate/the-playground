@@ -193,6 +193,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           <div className="flex flex-col gap-3">
             <CoverImagePicker
               circleName={circleName}
+              contextQuery={titleValue || undefined}
               currentImage={previewImage}
               currentAttribution={previewAttribution}
               onSelect={setCoverSelection}

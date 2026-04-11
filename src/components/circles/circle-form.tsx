@@ -143,6 +143,7 @@ export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
           <div className="flex flex-col gap-3">
             <CoverImagePicker
               circleName={circleName || undefined}
+              contextQuery={circleName || undefined}
               currentImage={previewImage}
               currentAttribution={previewAttribution}
               onSelect={setCoverSelection}

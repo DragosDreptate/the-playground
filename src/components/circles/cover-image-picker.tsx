@@ -29,8 +29,18 @@ type Props = {
   circleName?: string;
   currentImage?: string | null;
   currentAttribution?: CoverImageAttribution | null;
+  /**
+   * Mot-clé de contexte pré-rempli dans la barre de recherche à l'ouverture
+   * du dialog (ex: titre du Moment, nom de la Communauté). L'utilisateur
+   * peut le modifier ou l'effacer pour chercher autre chose.
+   * Tronqué à 80 caractères, ignoré si < 2 caractères.
+   */
+  contextQuery?: string;
   onSelect: (data: CoverSelection) => void;
 };
+
+const CONTEXT_QUERY_MAX_LENGTH = 80;
+const MIN_QUERY_LENGTH = 2;
 
 
 // ── Photo Grid ─────────────────────────────────────────────────
@@ -85,6 +95,7 @@ export function CoverImagePicker({
   circleName,
   currentImage,
   currentAttribution,
+  contextQuery,
   onSelect,
 }: Props) {
   const t = useTranslations("Circle.coverPicker");
@@ -103,6 +114,7 @@ export function CoverImagePicker({
   const [searchPage, setSearchPage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [selectedUnsplashId, setSelectedUnsplashId] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -116,33 +128,59 @@ export function CoverImagePicker({
 
   const displayedPhotos = searchResults ?? defaultPhotos ?? [];
 
-  // Debounced Unsplash search
-  const handleQueryChange = useCallback((value: string) => {
-    setQuery(value);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    if (value.trim().length < 2) {
-      setSearchResults(null);
-      setSearchTotal(0);
-      return;
-    }
-
-    debounceRef.current = setTimeout(async () => {
+  // Fetch sans debounce — appelé directement par handleOpenChange (recherche
+  // contextuelle initiale) et indirectement par handleQueryChange (debounced).
+  const performSearch = useCallback(
+    async (value: string, page: number): Promise<void> => {
       setIsSearching(true);
-      setSearchPage(1);
+      setSearchError(null);
+      setSearchPage(page);
       try {
-        const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(value.trim())}&page=1`);
+        const res = await fetch(
+          `/api/unsplash/search?q=${encodeURIComponent(value.trim())}&page=${page}`
+        );
         if (res.ok) {
           const data = await res.json();
           setSearchResults(data.results);
           setSearchTotal(data.total);
           setSearchTotalPages(data.totalPages);
+        } else {
+          setSearchResults([]);
+          setSearchTotal(0);
+          setSearchTotalPages(0);
+          setSearchError(t("apiError"));
         }
+      } catch {
+        setSearchResults([]);
+        setSearchTotal(0);
+        setSearchTotalPages(0);
+        setSearchError(t("apiError"));
       } finally {
         setIsSearching(false);
       }
-    }, 400);
-  }, []);
+    },
+    [t]
+  );
+
+  // Debounced Unsplash search — utilisé quand l'utilisateur tape dans l'input
+  const handleQueryChange = useCallback(
+    (value: string) => {
+      setQuery(value);
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+
+      if (value.trim().length < MIN_QUERY_LENGTH) {
+        setSearchResults(null);
+        setSearchTotal(0);
+        setSearchError(null);
+        return;
+      }
+
+      debounceRef.current = setTimeout(() => {
+        void performSearch(value, 1);
+      }, 400);
+    },
+    [performSearch]
+  );
 
   useEffect(() => {
     return () => {
@@ -222,8 +260,16 @@ export function CoverImagePicker({
   function handleOpenChange(value: boolean) {
     setOpen(value);
     if (value) {
-      // Fetch random photos on first open
-      if (defaultPhotos === null && !isLoadingDefaults) {
+      // Ouverture : décider entre recherche contextuelle et fallback random
+      const trimmed = contextQuery?.trim() ?? "";
+      const truncated = trimmed.slice(0, CONTEXT_QUERY_MAX_LENGTH);
+
+      if (truncated.length >= MIN_QUERY_LENGTH) {
+        // Recherche contextuelle — pré-remplir l'input et fetch immédiat
+        setQuery(truncated);
+        void performSearch(truncated, 1);
+      } else if (defaultPhotos === null && !isLoadingDefaults) {
+        // Fallback : photos random (première ouverture uniquement)
         setIsLoadingDefaults(true);
         fetch("/api/unsplash/random")
           .then((res) => (res.ok ? res.json() : null))
@@ -243,6 +289,7 @@ export function CoverImagePicker({
       setSearchTotal(0);
       setSearchTotalPages(0);
       setSearchPage(1);
+      setSearchError(null);
       setSelectedUnsplashId(null);
       setUploadFile(null);
       setUploadPreview(null);
@@ -328,12 +375,19 @@ export function CoverImagePicker({
                 )}
               </div>
 
+              {/* Message d'erreur API (quota saturé, réseau, etc.) */}
+              {searchError && (
+                <p className="text-destructive bg-destructive/10 rounded-md px-3 py-2 text-xs">
+                  {searchError}
+                </p>
+              )}
+
               {/* Résultats, skeleton ou photos par défaut */}
-              {searchResults !== null && searchResults.length === 0 ? (
+              {searchResults !== null && searchResults.length === 0 && !searchError ? (
                 <p className="text-muted-foreground py-8 text-center text-sm">
                   {t("noResults", { query })}
                 </p>
-              ) : isLoadingDefaults && searchResults === null ? (
+              ) : (isLoadingDefaults || isSearching) && displayedPhotos.length === 0 ? (
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {Array.from({ length: 8 }).map((_, i) => (
                     <div
