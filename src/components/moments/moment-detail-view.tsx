@@ -13,9 +13,11 @@ import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName } from "@/lib/display-name";
 import type { Moment } from "@/domain/models/moment";
+import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
 import type { CommentWithUser } from "@/domain/models/comment";
+import { MomentAttachmentsList } from "@/components/moments/moment-attachments-list";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
 import { formatDateRange } from "@/lib/format-date";
@@ -47,6 +49,7 @@ type CommonProps = {
   registeredCount: number;
   waitlistedCount: number;
   comments: CommentWithUser[];
+  attachments: MomentAttachment[];
   currentUserId: string | null;
 };
 
@@ -186,7 +189,7 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
 // ── Component ────────────────────────────────────────────────
 
 export async function MomentDetailView(props: MomentDetailViewProps) {
-  const { moment, circle, hosts, registrations, registeredCount, waitlistedCount } =
+  const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments } =
     props;
   const isHostView = props.variant === "host";
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
@@ -646,6 +649,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 )}
               </div>
             </div>
+          )}
+
+          {/* Documents */}
+          {attachments.length > 0 && (
+            <MomentAttachmentsList
+              attachments={attachments}
+              momentSlug={moment.slug}
+            />
           )}
 
           {/* Liste des participants */}

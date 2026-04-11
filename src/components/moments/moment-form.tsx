@@ -26,6 +26,11 @@ import { MomentFormDateCard } from "./moment-form-date-card";
 import { MomentFormLocationRow } from "./moment-form-location-row";
 import { MomentFormOptionsSection } from "./moment-form-options-section";
 import { MomentFormRadar } from "./moment-form-radar";
+import {
+  MomentAttachmentsEditor,
+  type MomentAttachmentsEditorHandle,
+} from "./moment-attachments-editor";
+import type { MomentAttachment } from "@/domain/models/moment-attachment";
 
 type MomentFormProps = {
   moment?: Moment;
@@ -35,6 +40,7 @@ type MomentFormProps = {
   circleCoverImage?: string | null;
   stripeConnectActive?: boolean;
   priceLocked?: boolean;
+  initialAttachments?: MomentAttachment[];
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -54,11 +60,13 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, initialAttachments = [], action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
   const router = useRouter();
+  const attachmentsEditorRef = useRef<MomentAttachmentsEditorHandle>(null);
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
 
   // --- Date/time state ---
   const defaultStart = moment?.startsAt ?? getDefaultStartDate();
@@ -145,6 +153,22 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
         has_capacity: result.data.capacity !== null,
         is_paid: result.data.price > 0,
       });
+
+      // Flush staged attachments (create mode: files were staged client-side
+      // because the moment didn't exist yet). We await this so the user lands
+      // on the moment page with all attachments already persisted.
+      // `isUploadingAttachments` flips the submit button label so the user
+      // sees "Envoi des documents..." instead of a generic loading state
+      // during the upload phase.
+      if (!moment && attachmentsEditorRef.current?.hasStagedFiles()) {
+        setIsUploadingAttachments(true);
+        try {
+          await attachmentsEditorRef.current.flushStaged(result.data.id);
+        } finally {
+          setIsUploadingAttachments(false);
+        }
+      }
+
       router.push(
         `/dashboard/circles/${circleSlug}/moments/${result.data.slug}`
       );
@@ -376,6 +400,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onPriceCentsChange={handlePriceCentsChange}
           />
 
+          {/* Attachments editor — works in both create and edit modes.
+              Create mode: files are staged client-side and uploaded after the
+              moment is created (see handleSubmit above). Edit mode: upload
+              happens immediately via server action. */}
+          <MomentAttachmentsEditor
+            ref={attachmentsEditorRef}
+            momentId={moment?.id ?? null}
+            initialAttachments={initialAttachments}
+          />
+
           {/* Validation des inscriptions */}
           <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>
             <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
@@ -406,11 +440,13 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={isPending || isEndBeforeStart || !startDate || !endDate} className="flex-1">
-              {isPending
-                ? tCommon("loading")
-                : moment
-                  ? tCommon("save")
-                  : t("form.createMoment")}
+              {isUploadingAttachments
+                ? t("form.uploadingAttachments")
+                : isPending
+                  ? tCommon("loading")
+                  : moment
+                    ? tCommon("save")
+                    : t("form.createMoment")}
             </Button>
             <Button
               type="button"

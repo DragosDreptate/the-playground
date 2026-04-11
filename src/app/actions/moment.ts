@@ -13,6 +13,7 @@ import {
   prismaMomentRepository,
   prismaRegistrationRepository,
   prismaUserRepository,
+  prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
@@ -391,11 +392,12 @@ export async function deleteMomentAction(
   }
 
   try {
-    // Fetch data before deletion — needed for email notifications
-    const [momentToDelete, registrationsToNotify, circleRepo] = await Promise.all([
+    // Fetch data before deletion — needed for email notifications + blob cleanup
+    const [momentToDelete, registrationsToNotify, circleRepo, attachmentsToCleanup] = await Promise.all([
       prismaMomentRepository.findById(momentId),
       prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
       resolveCircleRepository(session, prismaCircleRepository),
+      prismaMomentAttachmentRepository.findByMoment(momentId),
     ]);
 
     await deleteMoment(
@@ -407,6 +409,21 @@ export async function deleteMomentAction(
         paymentService,
       }
     );
+
+    // Clean up Vercel Blob storage AFTER successful delete (both the cover image
+    // and all attachments). The usecase handles the DB cascade for attachments
+    // via Prisma onDelete: Cascade, but blob storage is external and must be
+    // cleaned up explicitly here.
+    // Fire-and-forget : errors logged to Sentry but don't block the response.
+    if (momentToDelete) {
+      const blobsToDelete = [
+        ...(momentToDelete.coverImage ? [momentToDelete.coverImage] : []),
+        ...attachmentsToCleanup.map((a) => a.url),
+      ];
+      Promise.all(
+        blobsToDelete.map((url) => vercelBlobStorageService.delete(url))
+      ).catch((err) => Sentry.captureException(err));
+    }
 
     // Fire-and-forget : notifier les participants de l'annulation
     // Skip only when admin deletes someone else's event (admin moderation, not own event)

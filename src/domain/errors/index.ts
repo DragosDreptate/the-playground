@@ -21,6 +21,12 @@ export {
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
 } from "./moment-errors";
+export {
+  AttachmentLimitReachedError,
+  AttachmentTooLargeError,
+  AttachmentTypeNotAllowedError,
+  AttachmentNotFoundError,
+} from "./moment-attachment-errors";
 export { UserNotFoundError } from "./user-errors";
 export {
   CommentNotFoundError,

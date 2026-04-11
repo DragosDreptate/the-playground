@@ -47,7 +47,8 @@ const securityHeaders = [
       "worker-src 'self'",
       "font-src 'self'",
       // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
-      "frame-src js.stripe.com www.google.com",
+      // + Vercel Blob (PDF preview dans la modale des pièces jointes Moment)
+      "frame-src js.stripe.com www.google.com *.public.blob.vercel-storage.com",
       // Interdire l'intégration de NOTRE page dans des iframes tierces (anti-clickjacking)
       "frame-ancestors 'none'",
       // Formulaires : uniquement vers le domaine propre
@@ -59,7 +60,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: "4mb",
+      // 12 MB : couvre les pièces jointes Moment (10 MB max par fichier,
+      // uploadées une par une) avec une marge pour l'overhead multipart/form-data.
+      bodySizeLimit: "12mb",
     },
   },
   async rewrites() {
