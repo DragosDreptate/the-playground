@@ -161,6 +161,7 @@ export function NetworkForm({ mode, networkId, defaultValues }: NetworkFormProps
         <Label>{t("networkCoverImage")}</Label>
         <CoverImagePicker
           circleName={name}
+          contextQuery={name || undefined}
           currentImage={coverImage || null}
           onSelect={handleCoverSelect}
         />

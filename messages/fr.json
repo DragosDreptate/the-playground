@@ -378,6 +378,7 @@
       "noResults": "Aucun résultat pour « {query} »",
       "resultCount": "{count, plural, one {# résultat} other {# résultats}}",
       "unsplashHint": "Photos Unsplash · tapez pour chercher",
+      "apiError": "Impossible de charger les images. Réessayez plus tard.",
       "prev": "← Précédent",
       "next": "Suivant →",
       "previewAlt": "Aperçu",
