@@ -3,7 +3,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
-import { isAdminUser } from "@/lib/admin-host-mode";
 import {
   prismaCommentRepository,
   prismaMomentRepository,
@@ -14,9 +13,9 @@ import {
 import { createResendEmailService } from "@/infrastructure/services";
 import { addComment } from "@/domain/usecases/add-comment";
 import { deleteComment } from "@/domain/usecases/delete-comment";
-import { DomainError } from "@/domain/errors";
 import type { Comment } from "@/domain/models/comment";
 import type { ActionResult } from "./types";
+import { toActionResult } from "./helpers/to-action-result";
 
 const emailService = createResendEmailService();
 
@@ -28,10 +27,11 @@ export async function addCommentAction(
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
+  const userId = session.user.id;
 
-  try {
+  return toActionResult(async () => {
     const result = await addComment(
-      { momentId, userId: session.user.id, content },
+      { momentId, userId, content },
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
@@ -43,26 +43,15 @@ export async function addCommentAction(
     const locale = await getLocale();
     const t = await getTranslations("Email");
 
-    // Fire-and-forget: notify all registrants without blocking the response
-    sendCommentNotifications(
-      momentId,
-      session.user.id,
-      content,
-      t,
-      locale
-    ).catch((err) => {
-      console.error(err);
-      Sentry.captureException(err);
-    });
+    sendCommentNotifications(momentId, userId, content, t, locale).catch(
+      (err) => {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    );
 
-    return { success: true, data: result.comment };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.comment;
+  });
 }
 
 export async function deleteCommentAction(
@@ -72,24 +61,18 @@ export async function deleteCommentAction(
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
+  const userId = session.user.id;
 
-  try {
+  return toActionResult(async () => {
     await deleteComment(
-      { commentId, userId: session.user.id },
+      { commentId, userId },
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
       }
     );
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // --- Fire-and-forget email helpers ---

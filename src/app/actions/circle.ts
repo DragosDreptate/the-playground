@@ -20,10 +20,10 @@ import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
-import { DomainError } from "@/domain/errors";
 import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
+import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 import { notifyHostNewCircleMember } from "./notify-host-new-circle-member";
@@ -75,7 +75,8 @@ export async function createCircleAction(
     };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const coverData = await processCoverImage(formData);
 
     const result = await createCircle(
@@ -88,18 +89,16 @@ export async function createCircleAction(
         city,
         website,
         requiresApproval,
-        userId: session.user.id,
+        userId,
         ...coverData,
       },
       { circleRepository: prismaCircleRepository }
     );
 
-    // Fire-and-forget : calculer le score initial + notifier les admins
     after(async () => {
       try {
-        // Calcul et persistance du score Explorer initial.
-        // Sans ça, la communauté resterait à score=0 jusqu'au cron de 3h00
-        // et n'apparaîtrait pas dans Explorer avant le lendemain.
+        // Explorer score initial — sans ça la communauté resterait à score=0
+        // jusqu'au cron de 3h00 et n'apparaîtrait pas dans Explorer avant le lendemain.
         const initialScore = calculateCircleScore({
           description: result.circle.description,
           coverImage: result.circle.coverImage ?? null,
@@ -121,12 +120,12 @@ export async function createCircleAction(
       }
 
       try {
-        const creator = await prismaUserRepository.findById(session.user.id);
+        const creator = await prismaUserRepository.findById(userId);
         await notifyAdminEntityCreated({
           entityType: "circle",
           entityName: result.circle.name,
           entitySlug: result.circle.slug,
-          creatorId: session.user.id,
+          creatorId: userId,
           creatorName: creator?.name ?? creator?.email ?? session.user.email ?? "",
           creatorEmail: creator?.email ?? session.user.email ?? "",
         });
@@ -135,14 +134,8 @@ export async function createCircleAction(
       }
     });
 
-    return { success: true, data: result.circle };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.circle;
+  });
 }
 
 export async function updateCircleAction(
@@ -177,7 +170,8 @@ export async function updateCircleAction(
     };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     // Récupère l'ancienne cover pour cleanup si besoin
@@ -195,7 +189,7 @@ export async function updateCircleAction(
     const result = await updateCircle(
       {
         circleId,
-        userId: session.user.id,
+        userId,
         ...(name && { name: name.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...(visibility && { visibility }),
@@ -209,7 +203,6 @@ export async function updateCircleAction(
       { circleRepository: circleRepo }
     );
 
-    // Cleanup ancien blob si une nouvelle image a été uploadée
     if (
       coverData.coverImage !== undefined &&
       coverData.coverImage !== oldCoverImage &&
@@ -218,18 +211,11 @@ export async function updateCircleAction(
       await vercelBlobStorageService.delete(oldCoverImage);
     }
 
-    // Invalide le cache Next.js pour que la page détail reflète les changements
     const { revalidatePath } = await import("next/cache");
     revalidatePath(`/dashboard/circles/${result.circle.slug}`);
 
-    return { success: true, data: result.circle };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.circle;
+  });
 }
 
 export async function deleteCircleAction(
@@ -240,20 +226,11 @@ export async function deleteCircleAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-    await deleteCircle(
-      { circleId, userId: session.user.id },
-      { circleRepository: circleRepo }
-    );
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    await deleteCircle({ circleId, userId }, { circleRepository: circleRepo });
+  });
 }
 
 export async function joinCircleDirectlyAction(
@@ -264,30 +241,23 @@ export async function joinCircleDirectlyAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const { alreadyMember, pendingApproval } = await joinCircleDirectly(
-      { circleId, userId: session.user.id },
+      { circleId, userId },
       { circleRepository: prismaCircleRepository }
     );
 
     if (!alreadyMember) {
       const t = await getTranslations("Email");
-      const userId = session.user.id;
-      // Fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
       notifyHostCircleJoin(circleId, userId, pendingApproval, t).catch((err) => {
         console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
         Sentry.captureException(err);
       });
     }
 
-    return { success: true, data: { alreadyMember, pendingApproval } };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return { alreadyMember, pendingApproval };
+  });
 }
 
 export async function leaveCircleAction(
@@ -298,22 +268,16 @@ export async function leaveCircleAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     await leaveCircle(
-      { circleId, userId: session.user.id },
+      { circleId, userId },
       {
         circleRepository: prismaCircleRepository,
         registrationRepository: prismaRegistrationRepository,
       }
     );
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function removeCircleMemberAction(
@@ -325,10 +289,11 @@ export async function removeCircleMemberAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     const result = await removeCircleMember(
-      { circleId, hostUserId: session.user.id, targetUserId },
+      { circleId, hostUserId, targetUserId },
       {
         circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
@@ -373,14 +338,7 @@ export async function removeCircleMemberAction(
 
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/dashboard/circles");
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function inviteToCircleByEmailAction(
@@ -392,20 +350,20 @@ export async function inviteToCircleByEmailAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
-    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+  const userId = session.user.id;
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
-    // Check d'autorisation HOST (auparavant porté par generateCircleInviteToken)
-    const membership = await circleRepo.findMembership(circleId, session.user.id);
-    if (!membership || membership.role !== "HOST") {
-      return { success: false, error: "Only hosts can send invitations", code: "UNAUTHORIZED" };
-    }
+  const membership = await circleRepo.findMembership(circleId, userId);
+  if (!membership || membership.role !== "HOST") {
+    return { success: false, error: "Only hosts can send invitations", code: "UNAUTHORIZED" };
+  }
 
-    const circle = await circleRepo.findById(circleId);
-    if (!circle) {
-      return { success: false, error: "Circle not found", code: "NOT_FOUND" };
-    }
+  const circle = await circleRepo.findById(circleId);
+  if (!circle) {
+    return { success: false, error: "Circle not found", code: "NOT_FOUND" };
+  }
 
+  return toActionResult(async () => {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const circleUrl = `${baseUrl}/circles/${circle.slug}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
@@ -437,15 +395,7 @@ export async function inviteToCircleByEmailAction(
         Sentry.captureException(e);
       }
     });
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 export async function approveCircleMembershipAction(
@@ -457,9 +407,10 @@ export async function approveCircleMembershipAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     const result = await approveCircleMembership(
-      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleId, memberUserId, hostUserId },
       { circleRepository: prismaCircleRepository }
     );
 
@@ -490,14 +441,8 @@ export async function approveCircleMembershipAction(
       }
     });
 
-    return { success: true, data: result };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result;
+  });
 }
 
 export async function rejectCircleMembershipAction(
@@ -509,9 +454,10 @@ export async function rejectCircleMembershipAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const hostUserId = session.user.id;
+  return toActionResult(async () => {
     await rejectCircleMembership(
-      { circleId, memberUserId, hostUserId: session.user.id },
+      { circleId, memberUserId, hostUserId },
       { circleRepository: prismaCircleRepository }
     );
 
@@ -541,15 +487,7 @@ export async function rejectCircleMembershipAction(
         Sentry.captureException(err);
       }
     });
-
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 // ── Notification helper : nouveau membre ou demande d'adhésion ──

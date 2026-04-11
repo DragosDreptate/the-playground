@@ -22,10 +22,10 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
-import { DomainError } from "@/domain/errors";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
+import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
 import { notifyNewMoment } from "./notify-new-moment";
@@ -95,14 +95,15 @@ export async function createMomentAction(
   // Refundable only meaningful for paid events; default to true for free events
   const refundable = price > 0 ? formData.get("refundable") === "on" : true;
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const coverData = await processCoverImage(formData);
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await createMoment(
       {
         circleId,
-        userId: session.user.id,
+        userId,
         title: title.trim(),
         description: description.trim(),
         ...coverData,
@@ -129,12 +130,12 @@ export async function createMomentAction(
     prismaCircleRepository.findById(circleId).then(async (circle) => {
       if (!circle) return;
 
-      const creator = await prismaUserRepository.findById(session.user.id);
+      const creator = await prismaUserRepository.findById(userId);
       notifyAdminEntityCreated({
         entityType: "moment",
         entityName: result.moment.title,
         entitySlug: result.moment.slug,
-        creatorId: session.user.id,
+        creatorId: userId,
         creatorName: creator?.name ?? creator?.email ?? session.user.email ?? "",
         creatorEmail: creator?.email ?? session.user.email ?? "",
         circleName: circle.name,
@@ -145,15 +146,8 @@ export async function createMomentAction(
       Sentry.captureException(err);
     });
 
-    // Pas de revalidatePath : la page est nouvelle (aucun cache stale), le dashboard est dynamique.
-    return { success: true, data: result.moment };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.moment;
+  });
 }
 
 export async function updateMomentAction(
@@ -190,7 +184,8 @@ export async function updateMomentAction(
     ? (price > 0 ? formData.get("refundable") === "on" : true)
     : undefined;
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     // Récupère l'ancienne cover pour cleanup si besoin
     const existingMoment = await prismaMomentRepository.findById(momentId);
     const oldCoverImage = existingMoment?.coverImage ?? null;
@@ -204,7 +199,7 @@ export async function updateMomentAction(
     const result = await updateMoment(
       {
         momentId,
-        userId: session.user.id,
+        userId,
         ...(title && { title: title.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...coverData,
@@ -267,14 +262,8 @@ export async function updateMomentAction(
     // Invalide uniquement la page de cet événement (les deux locales)
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
-    return { success: true, data: result.moment };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.moment;
+  });
 }
 
 type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
@@ -390,8 +379,9 @@ export async function deleteMomentAction(
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
+  const userId = session.user.id;
 
-  try {
+  return toActionResult(async () => {
     // Fetch data before deletion — needed for email notifications + blob cleanup
     const [momentToDelete, registrationsToNotify, circleRepo, attachmentsToCleanup] = await Promise.all([
       prismaMomentRepository.findById(momentId),
@@ -401,7 +391,7 @@ export async function deleteMomentAction(
     ]);
 
     await deleteMoment(
-      { momentId, userId: session.user.id },
+      { momentId, userId },
       {
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
@@ -410,11 +400,8 @@ export async function deleteMomentAction(
       }
     );
 
-    // Clean up Vercel Blob storage AFTER successful delete (both the cover image
-    // and all attachments). The usecase handles the DB cascade for attachments
-    // via Prisma onDelete: Cascade, but blob storage is external and must be
-    // cleaned up explicitly here.
-    // Fire-and-forget : errors logged to Sentry but don't block the response.
+    // Blob cleanup is external to the DB cascade and must run explicitly.
+    // Fire-and-forget: errors captured in Sentry but don't block the response.
     if (momentToDelete) {
       const blobsToDelete = [
         ...(momentToDelete.coverImage ? [momentToDelete.coverImage] : []),
@@ -425,10 +412,9 @@ export async function deleteMomentAction(
       ).catch((err) => Sentry.captureException(err));
     }
 
-    // Fire-and-forget : notifier les participants de l'annulation
-    // Skip only when admin deletes someone else's event (admin moderation, not own event)
+    // Skip notifications only when admin moderates someone else's event.
     const isHostOfEvent = momentToDelete
-      ? (await prismaCircleRepository.findMembership(momentToDelete.circleId, session.user.id))?.role === "HOST"
+      ? (await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))?.role === "HOST"
       : false;
     const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isHostOfEvent);
     if (shouldNotify) {
@@ -437,20 +423,11 @@ export async function deleteMomentAction(
       );
     }
 
-    // Invalide uniquement la page de l'événement annulé (les deux locales) — critique
-    // pour que les visiteurs voient immédiatement le statut CANCELLED / 404.
     if (momentToDelete) {
       revalidatePath(`/m/${momentToDelete.slug}`);
       revalidatePath(`/en/m/${momentToDelete.slug}`);
     }
-    return { success: true, data: undefined };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+  });
 }
 
 async function sendMomentCancelledEmails(
@@ -514,11 +491,12 @@ export async function publishMomentAction(
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
 
-  try {
+  const userId = session.user.id;
+  return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await publishMoment(
-      { momentId, userId: session.user.id },
+      { momentId, userId },
       { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
     );
 
@@ -526,7 +504,7 @@ export async function publishMomentAction(
     prismaCircleRepository.findById(result.moment.circleId).then(async (circle) => {
       if (!circle) return;
 
-      notifyNewMoment(result.moment, session.user.id, circle.name, circle.slug).catch(
+      notifyNewMoment(result.moment, userId, circle.name, circle.slug).catch(
         (err) => {
           console.error("[notifyNewMoment] Erreur:", err);
           Sentry.captureException(err);
@@ -534,7 +512,7 @@ export async function publishMomentAction(
       );
 
       const [host, locale] = await Promise.all([
-        prismaUserRepository.findById(session.user.id),
+        prismaUserRepository.findById(userId),
         getLocale(),
       ]);
       if (!host?.email) return;
@@ -598,12 +576,6 @@ export async function publishMomentAction(
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
-    return { success: true, data: result.moment };
-  } catch (error) {
-    if (error instanceof DomainError) {
-      return { success: false, error: error.message, code: error.code };
-    }
-    Sentry.captureException(error);
-    return { success: false, error: "An unexpected error occurred", code: "INTERNAL_ERROR" };
-  }
+    return result.moment;
+  });
 }
