@@ -1453,6 +1453,7 @@
       "leave": "Quitter une communauté",
       "createCommunity": "Créer sa communauté",
       "createEvent": "Créer un événement",
+      "attachments": "Ajouter des documents",
       "manageRegistrations": "Gérer les inscriptions",
       "contact": "Contacter vos participants",
       "editCancel": "Modifier ou annuler",
@@ -1574,6 +1575,14 @@
         "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
         "adv3": "<strong>Image de couverture</strong>",
         "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Découvrir ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la communauté. Sur ordinateur, vous pouvez aussi cliquer directement sur <strong>Publier</strong> depuis le formulaire de création pour créer et publier en une seule étape."
+      },
+      "attachments": {
+        "title": "Ajouter des documents",
+        "intro": "Vous pouvez joindre jusqu'à <strong>3 fichiers</strong> (PDF, JPEG, PNG ou WebP, 10 Mo max chacun) à chaque événement — pratique pour partager un support de présentation, un compte-rendu, un plan d'accès ou tout document utile aux participants.",
+        "item1": "Depuis la page de votre événement, cliquez sur <strong>Ajouter un document</strong> ou glissez vos fichiers dans la zone prévue",
+        "item2": "Les documents peuvent être ajoutés dès la création de l'événement (avant publication) ou à tout moment depuis la page de l'événement",
+        "item3": "Les participants voient les documents directement sur la page de l'événement et peuvent les télécharger en un clic",
+        "callout": "Sur mobile, un tap sur un document ouvre directement le fichier dans un nouvel onglet. Vous pouvez supprimer un document à tout moment depuis la page de l'événement."
       },
       "manageRegistrations": {
         "title": "Gérer les inscriptions",

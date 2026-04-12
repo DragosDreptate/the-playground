@@ -100,6 +100,7 @@ export default async function HelpPage() {
       children: [
         { id: "createCommunity", label: t("sidebar.createCommunity") },
         { id: "createEvent", label: t("sidebar.createEvent") },
+        { id: "attachments", label: t("sidebar.attachments") },
         { id: "manageRegistrations", label: t("sidebar.manageRegistrations") },
         { id: "contactParticipants", label: t("sidebar.contact") },
         { id: "editCancel", label: t("sidebar.editCancel") },
@@ -425,6 +426,25 @@ export default async function HelpPage() {
                 ))}
               </ul>
               <Callout>{t.rich("organizer.createEvent.callout", rich)}</Callout>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Ajouter des documents */}
+            <div className="space-y-4">
+              <SectionH3 id="attachments">{t("organizer.attachments.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.attachments.intro", rich)}
+              </p>
+              <ul className="space-y-2">
+                {(["item1", "item2", "item3"] as const).map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    {t.rich(`organizer.attachments.${item}`, rich)}
+                  </li>
+                ))}
+              </ul>
+              <Callout>{t.rich("organizer.attachments.callout", rich)}</Callout>
             </div>
 
             <hr className="border-border" />
