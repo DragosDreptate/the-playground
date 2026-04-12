@@ -1573,7 +1573,7 @@
         "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist)",
         "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
         "adv3": "<strong>Cover image</strong>",
-        "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members."
+        "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members. On desktop, you can also click <strong>Publish</strong> directly in the creation form to create and publish in a single step."
       },
       "manageRegistrations": {
         "title": "Manage registrations",
