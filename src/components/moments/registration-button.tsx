@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Check, Clock, Download } from "lucide-react";
 import {
@@ -204,11 +205,11 @@ export function RegistrationButton({
       <div className="space-y-3">
 
         {/* Banner de confirmation */}
-        <div className={`flex items-center gap-3 rounded-xl p-4 ${isRegistered ? "bg-primary/[0.06]" : "bg-amber-500/[0.06]"}`}>
-          <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${isRegistered ? "bg-primary/15 text-primary" : "bg-amber-500/15 text-amber-500"}`}>
+        <div className={`border-border bg-card flex items-center gap-3 rounded-2xl border p-4 ${!isRegistered ? "border-amber-500/30 bg-amber-500/[0.06]" : ""}`}>
+          <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${isRegistered ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-500"}`}>
             {isRegistered ? <Check className="size-4" /> : <Clock className="size-4" />}
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold">
               {isRegistered ? t("public.registeredBannerTitle") : t("public.waitlistedBannerTitle")}
             </p>
@@ -223,6 +224,13 @@ export function RegistrationButton({
                     : ""}
             </p>
           </div>
+          {isRegistered && (
+            <Button variant="outline" className="h-[34px] shrink-0 rounded-xl text-xs" asChild>
+              <Link href="/dashboard?tab=moments">
+                {t("public.viewInDashboard")}
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Boutons calendrier — inscrits confirmés uniquement */}

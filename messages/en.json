@@ -584,6 +584,7 @@
         "calendarJoin": "Join",
         "calendarOrganizedBy": "Organized by"
       },
+      "viewInDashboard": "My registrations",
       "waitlistPosition": "You're #{position} on the waitlist",
       "draftNotice": "This event is being prepared and has not been published yet.",
       "draftTitle": "Event in preparation",
