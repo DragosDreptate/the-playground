@@ -76,6 +76,27 @@ Orienté bénéfices utilisateur, vocabulaire naturel, pas de jargon technique.
 - Français uniquement
 - Omettre les entrées purement techniques (refactor, ci, chore, tests, infra) invisibles pour l'utilisateur
 
+## Terminologie obligatoire (FR)
+
+Le code source utilise des termes anglais techniques. Dans le changelog (texte user-facing en français), tu DOIS TOUJOURS utiliser les traductions suivantes :
+- Moment → **événement** (jamais "moment", "Moment", ni "escale")
+- Circle → **Communauté** (jamais "cercle", "circle", ni "Circle")
+- Host → **Organisateur** (jamais "host", "fondateur", ni "créateur")
+- Player → **Participant** (jamais "player")
+- Dashboard → **Mon espace** (jamais "dashboard")
+- Explorer → **Découvrir** (jamais "explorer", "Explorer")
+
+## Règle anti-doublon
+
+Si plusieurs entrées Release Please décrivent la même fonctionnalité sous des angles différents (par exemple "feat(moment): add attachments" et "feat(moment-attachments): allow organizers to attach files to events"), les FUSIONNER en une seule entrée cohérente. Ne jamais lister la même feature deux fois avec des formulations différentes, même si les commits source sont distincts.
+
+## Précision factuelle
+
+Ne pas extrapoler ni inventer des détails absents du texte source. Rester fidèle au périmètre exact de chaque commit :
+- Si le commit dit "send welcome email after onboarding" sans restriction, ne PAS traduire en "email pour les organisateurs" — écrire "email pour chaque nouvel utilisateur".
+- En cas de doute sur le périmètre (qui est concerné, dans quelles conditions), utiliser une formulation inclusive plutôt que restrictive.
+- Ne pas ajouter de qualificatifs non présents dans le texte source (ex: "fondateur", "premium", "avancé").
+
 ## Exemples de notre style (3 dernières versions) :
 
 ${examples}
