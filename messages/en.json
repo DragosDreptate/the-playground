@@ -1453,6 +1453,7 @@
       "leave": "Leave a community",
       "createCommunity": "Create your community",
       "createEvent": "Create an event",
+      "attachments": "Attach documents",
       "manageRegistrations": "Manage registrations",
       "contact": "Contact your members",
       "editCancel": "Edit or cancel",
@@ -1574,6 +1575,14 @@
         "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
         "adv3": "<strong>Cover image</strong>",
         "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members. On desktop, you can also click <strong>Publish</strong> directly in the creation form to create and publish in a single step."
+      },
+      "attachments": {
+        "title": "Attach documents",
+        "intro": "You can attach up to <strong>3 files</strong> (PDF, JPEG, PNG or WebP, 10 MB max each) to any event — great for sharing a presentation deck, meeting notes, venue directions or any relevant document.",
+        "item1": "From the event page, click <strong>Add document</strong> or drag your files into the drop zone",
+        "item2": "Documents can be added when creating the event (before publishing) or at any time from the event page",
+        "item3": "Attendees can see the documents directly on the event page and download them in one click",
+        "callout": "On mobile, tapping a document opens it directly in a new tab. You can delete a document at any time from the event page."
       },
       "manageRegistrations": {
         "title": "Manage registrations",
