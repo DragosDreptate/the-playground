@@ -1573,7 +1573,7 @@
         "adv1": "<strong>Capacité</strong> — nombre maximum de participants (active la liste d'attente automatiquement)",
         "adv2": "<strong>Prix</strong> — si l'événement est payant, le paiement se fait via Stripe (les participants paient directement, The Playground ne prend aucune commission)",
         "adv3": "<strong>Image de couverture</strong>",
-        "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Explorer ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la communauté."
+        "callout": "L'événement est créé en <strong>brouillon</strong> : il n'est pas encore visible dans Découvrir ni ouvert aux inscriptions. Quand il est prêt, cliquez sur <strong>Publier</strong> pour le rendre public et notifier les membres de la communauté. Sur ordinateur, vous pouvez aussi cliquer directement sur <strong>Publier</strong> depuis le formulaire de création pour créer et publier en une seule étape."
       },
       "manageRegistrations": {
         "title": "Gérer les inscriptions",
