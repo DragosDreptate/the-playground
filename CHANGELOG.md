@@ -10,16 +10,15 @@ Les évolutions du Playground, jour après jour.
 
 ### Ajouté
 
-- **Pièces jointes sur les moments** : il est désormais possible de joindre des fichiers (PDF ou images, jusqu'à 3 par moment) directement depuis la page d'un moment — pratique pour partager un support de présentation, un compte-rendu ou tout document utile à la communauté
-- **Pièces jointes sur les événements** : les organisateurs peuvent également attacher des fichiers à leurs événements (PDF + images, jusqu'à 3 par événement) — les participants ont accès aux documents clés directement sur la page de l'événement
+- **Pièces jointes sur les événements** : les organisateurs peuvent désormais joindre des fichiers à leurs événements (PDF ou images, jusqu'à 3 par événement) directement depuis la page de l'événement — pratique pour partager un support de présentation, un compte-rendu ou tout document utile aux participants
 - **Couverture intelligente** : le sélecteur de photo de couverture propose désormais des suggestions automatiquement liées au titre saisi, avec un retour visuel en cas d'erreur — trouver la bonne image est bien plus rapide et intuitif
-- **Publication directe depuis le formulaire de création** : un moment peut désormais être publié immédiatement à sa création, sans passer par une étape supplémentaire — un gain de temps appréciable pour les organisateurs qui savent déjà ce qu'ils veulent partager
+- **Publication directe depuis le formulaire de création** : un événement peut désormais être publié immédiatement à sa création, sans passer par une étape supplémentaire — un gain de temps appréciable pour les organisateurs qui savent déjà ce qu'ils veulent partager
 - **Badge Réseau sur le dashboard** : les communautés appartenant à un réseau affichent désormais un badge visible directement depuis la page de leur cercle sur le dashboard — plus facile de savoir d'un coup d'œil à quel réseau on appartient
-- **Email de bienvenue pour les fondateurs** : un email de bienvenue personnalisé est désormais envoyé aux nouveaux organisateurs une fois leur profil complété — une attention qui marque le début de l'aventure sur The Playground
+- **Email de bienvenue** : un email de bienvenue personnalisé est désormais envoyé à chaque nouvel utilisateur une fois son profil complété — une attention qui marque le début de l'aventure sur The Playground
 
 ### Amélioré
 
-- **Page d'aide** : la section dédiée à la création de moments mentionne désormais la possibilité de publier directement depuis le formulaire de création
+- **Page d'aide** : la section dédiée à la création d'événements mentionne désormais la possibilité de publier directement depuis le formulaire de création
 
 ### Corrigé
 
