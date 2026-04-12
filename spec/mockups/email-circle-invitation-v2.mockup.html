@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Email Invitation Communauté v2</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .comparison {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .version-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .email-container {
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .email-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+    }
+
+    /* Badge (BEFORE only) */
+    .badge-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: #ec4899;
+      background: #fde8f0;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* Cover */
+    .cover-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .cover-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 14px;
+      border: 3px solid #f0f0f4;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      object-fit: cover;
+    }
+
+    /* Inviter */
+    .inviter-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .inviter-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .inviter-text {
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .inviter-name {
+      font-weight: 700;
+      color: #7c3aed;
+    }
+
+    /* Circle name */
+    .circle-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #18181b;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+      margin: 0 0 16px 0;
+      text-align: center;
+    }
+
+    /* Description */
+    .desc-box {
+      background: #f4f4f5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+    .desc-text {
+      font-size: 13px;
+      color: #52525b;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* Stats (email table-based alignment) */
+    .stats-box {
+      background: #f4f4f5;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .stats-table {
+      display: inline-table;
+      border-collapse: collapse;
+    }
+    .stats-table td {
+      vertical-align: middle;
+    }
+    .stat-emoji {
+      font-size: 14px;
+      line-height: 1;
+      vertical-align: middle;
+      padding-right: 4px;
+    }
+    .stat-text {
+      font-size: 13px;
+      color: #374151;
+      font-weight: 500;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+    .stat-divider-cell {
+      padding: 0 10px;
+      color: #d1d5db;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    /* Avatar dots (BEFORE only) */
+    .avatar-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .avatar-dot {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      vertical-align: middle;
+    }
+    .avatar-dot + .avatar-dot {
+      margin-left: -7px;
+    }
+    .avatar-label {
+      font-size: 12px;
+      color: #6b7280;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+    }
+    .cta-button {
+      display: block;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 12px 32px;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+      color: #a1a1aa;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 24px;
+      line-height: 20px;
+    }
+
+    /* Diff markers */
+    .removed {
+      position: relative;
+    }
+    .removed::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border: 2px dashed #ef4444;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    .removed-label {
+      position: absolute;
+      top: -10px;
+      right: -4px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .fixed {
+      position: relative;
+    }
+    .fixed::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border: 2px dashed #22c55e;
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    .fixed-label {
+      position: absolute;
+      top: -10px;
+      right: -4px;
+      background: #22c55e;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="comparison">
+
+    <!-- ── AVANT ── -->
+    <div>
+      <div class="version-label">Avant</div>
+      <div class="email-container">
+        <div class="email-card">
+
+          <!-- Badge -->
+          <div class="badge-section removed" style="position:relative;">
+            <span class="removed-label">Supprimé</span>
+            <span class="badge">Invitation</span>
+          </div>
+
+          <!-- Cover -->
+          <div class="cover-section">
+            <img src="https://images.unsplash.com/photo-1472457897821-70d12a8ab4c6?w=160&h=160&fit=crop" class="cover-img" alt="Cover" />
+          </div>
+
+          <!-- Inviter -->
+          <div class="inviter-row">
+            <div class="inviter-avatar">DD</div>
+            <div class="inviter-text">
+              <span class="inviter-name">Dragos Dreptate</span> vous invite à rejoindre
+            </div>
+          </div>
+
+          <!-- Circle name -->
+          <p class="circle-name">Benext Alumni</p>
+
+          <!-- Description -->
+          <div class="desc-box">
+            <p class="desc-text">Be your potential. Show must go on !</p>
+          </div>
+
+          <!-- Stats avec emojis mal alignés -->
+          <div class="stats-box removed" style="position:relative;">
+            <span class="removed-label">Emojis mal alignés</span>
+            <span style="font-size:13px;color:#374151;font-weight:500;">👥&nbsp;<strong>5</strong>&nbsp;membres</span>
+            <span style="padding:0 10px;color:#d1d5db;font-size:13px;">|</span>
+            <span style="font-size:13px;color:#374151;font-weight:500;">📅&nbsp;<strong>2</strong>&nbsp;événements</span>
+          </div>
+
+          <!-- Avatar dots -->
+          <div class="avatar-section removed" style="position:relative;">
+            <span class="removed-label">Supprimé</span>
+            <span class="avatar-dot" style="background:linear-gradient(135deg,#ec4899,#f97316);"></span>
+            <span class="avatar-dot" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4);"></span>
+            <span class="avatar-dot" style="background:linear-gradient(135deg,#10b981,#3b82f6);"></span>
+            <span class="avatar-dot" style="background:linear-gradient(135deg,#f59e0b,#ef4444);"></span>
+            <span class="avatar-dot" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);"></span>
+            <span class="avatar-label">Rejoignez <strong style="color:#374151;">5</strong> membres</span>
+          </div>
+
+          <!-- CTA -->
+          <div class="cta-section">
+            <a href="#" class="cta-button">Rejoindre la Communauté</a>
+          </div>
+
+        </div>
+        <p class="footer">Cet email a été envoyé par The Playground.<br/>Vous recevez cet email car un membre vous a invité.</p>
+      </div>
+    </div>
+
+    <!-- ── APRÈS ── -->
+    <div>
+      <div class="version-label">Après</div>
+      <div class="email-container">
+        <div class="email-card">
+
+          <!-- Cover -->
+          <div class="cover-section">
+            <img src="https://images.unsplash.com/photo-1472457897821-70d12a8ab4c6?w=160&h=160&fit=crop" class="cover-img" alt="Cover" />
+          </div>
+
+          <!-- Inviter -->
+          <div class="inviter-row">
+            <div class="inviter-avatar">DD</div>
+            <div class="inviter-text">
+              <span class="inviter-name">Dragos Dreptate</span> vous invite à rejoindre
+            </div>
+          </div>
+
+          <!-- Circle name -->
+          <p class="circle-name">Benext Alumni</p>
+
+          <!-- Description -->
+          <div class="desc-box">
+            <p class="desc-text">Be your potential. Show must go on !</p>
+          </div>
+
+          <!-- Stats avec emojis alignés via table -->
+          <div class="stats-box fixed" style="position:relative;">
+            <span class="fixed-label">Alignement corrigé</span>
+            <table class="stats-table" cellpadding="0" cellspacing="0" role="presentation">
+              <tr>
+                <td class="stat-emoji">👥</td>
+                <td class="stat-text"><strong>5</strong>&nbsp;membres</td>
+                <td class="stat-divider-cell">|</td>
+                <td class="stat-emoji">📅</td>
+                <td class="stat-text"><strong>2</strong>&nbsp;événements</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- CTA -->
+          <div class="cta-section">
+            <a href="#" class="cta-button">Rejoindre la Communauté</a>
+          </div>
+
+        </div>
+        <p class="footer">Cet email a été envoyé par The Playground.<br/>Vous recevez cet email car un membre vous a invité.</p>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
