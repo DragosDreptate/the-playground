@@ -13,7 +13,7 @@ set -euo pipefail
 
 # Load env vars
 if [ -f .env.local ]; then
-  export $(grep -E '^(NEON_API_KEY|NEON_PROJECT_ID|NEON_PROD_BRANCH_ID|AUTH_RESEND_KEY|ONBOARDING_EMAIL_FROM)=' .env.local | xargs)
+  export $(grep -E '^(NEON_API_KEY|NEON_PROJECT_ID|NEON_PROD_BRANCH_ID|AUTH_RESEND_KEY)=' .env.local | xargs)
 fi
 
 if [ -z "${NEON_API_KEY:-}" ] || [ -z "${NEON_PROJECT_ID:-}" ] || [ -z "${NEON_PROD_BRANCH_ID:-}" ]; then
@@ -77,5 +77,4 @@ echo ""
 echo "🌱 Backfill onboarding welcome en production..."
 DATABASE_URL="${PROD_URL}" \
   AUTH_RESEND_KEY="${AUTH_RESEND_KEY}" \
-  ONBOARDING_EMAIL_FROM="${ONBOARDING_EMAIL_FROM:-Dragos · The Playground <dragos@the-playground.fr>}" \
   npx tsx scripts/send-onboarding-welcome-backfill.ts "${ARGS[@]}"
