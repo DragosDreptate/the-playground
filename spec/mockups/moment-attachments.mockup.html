@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Mockup — Pièces jointes d'événement (dark · desktop)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Dark mode tokens — alignés sur globals.css (oklch → hex approximatifs) */
+  --background: #17152a;
+  --foreground: #ecebf3;
+  --card: #282238;
+  --card-foreground: #ecebf3;
+  --muted: #201c33;
+  --muted-foreground: #918ea5;
+  --border: #382f52;
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --primary-10: rgba(232, 69, 122, 0.10);
+  --primary-20: rgba(232, 69, 122, 0.20);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  padding: 2.5rem 0 5rem;
+}
+
+/* ── Layout ── */
+.screen {
+  max-width: 1180px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
+}
+.screen-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+/* ═════════════════════════════════════════════════════════════════ */
+/* Event page — two columns layout (reproduction fidèle)            */
+/* ═════════════════════════════════════════════════════════════════ */
+.event-page {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+/* ─── LEFT column : cover + circle info, 340px, sticky ─── */
+.left-col {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.cover-block {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8457a 0%, #a855f7 50%, #6366f1 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  box-shadow: 0 20px 60px rgba(232, 69, 122, 0.15);
+}
+.cover-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom left, rgba(0,0,0,0.2) 0%, transparent 60%);
+}
+.cover-block .cover-label {
+  position: relative;
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.1;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.circle-info-block {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.circle-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.circle-info-meta {
+  flex: 1;
+  min-width: 0;
+}
+.circle-info-label {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+}
+.circle-info-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── RIGHT column : main content ─── */
+.right-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.hosted-by {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+.hosted-by strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.event-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--foreground);
+}
+
+/* ─── Row icon + meta (date / location / documents label) ─── */
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.meta-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-10);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.meta-icon svg { width: 16px; height: 16px; }
+.meta-label-block {
+  min-width: 0;
+}
+.meta-label {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.meta-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+/* ─── Description (collapsible style) ─── */
+.description-block {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--foreground);
+}
+.description-block p + p {
+  margin-top: 0.75rem;
+}
+
+/* ─── CTA inscription ─── */
+.register-card {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.register-info {
+  min-width: 0;
+}
+.register-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.register-spots {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.125rem;
+}
+.register-btn {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ═════════════════════════════════════════════════════════════════ */
+/* Documents section — compact, discret                            */
+/* ═════════════════════════════════════════════════════════════════ */
+.documents-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.documents-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.documents-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+
+.attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.attachment-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  min-height: 56px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+  color: inherit;
+}
+.attachment-card:hover {
+  background: var(--muted);
+  border-color: var(--primary-20);
+}
+.attachment-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-10);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.attachment-icon svg {
+  width: 16px;
+  height: 16px;
+}
+.attachment-body {
+  flex: 1;
+  min-width: 0;
+}
+.attachment-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-meta {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+  margin-top: 0.125rem;
+}
+.attachment-chevron {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+}
+
+/* ═════════════════════════════════════════════════════════════════ */
+/* Participants section (context)                                  */
+/* ═════════════════════════════════════════════════════════════════ */
+.participants-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.participants-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+.participants-card {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+}
+.participants-count {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 0.75rem;
+}
+.participants-avatars {
+  display: flex;
+  align-items: center;
+  gap: -0.5rem;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--card);
+  background: linear-gradient(135deg, var(--primary), #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-left: -0.5rem;
+  flex-shrink: 0;
+}
+.avatar:first-child { margin-left: 0; }
+.avatar.a2 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.avatar.a3 { background: linear-gradient(135deg, #06b6d4, #6366f1); }
+.avatar.a4 { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+.avatar.a5 { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+.avatar.more {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  border-color: var(--card);
+}
+
+/* ═════════════════════════════════════════════════════════════════ */
+/* Modal viewer                                                     */
+/* ═════════════════════════════════════════════════════════════════ */
+.viewer-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 0.875rem;
+  padding: 2rem;
+  min-height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.viewer-dialog {
+  background: var(--card);
+  border-radius: 0.875rem;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+}
+.viewer-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+.viewer-info {
+  flex: 1;
+  min-width: 0;
+}
+.viewer-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.viewer-meta {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.125rem;
+}
+.viewer-actions {
+  display: flex;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+.viewer-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-decoration: none;
+}
+.viewer-btn:hover {
+  background: var(--muted);
+  border-color: var(--primary);
+}
+.viewer-btn svg {
+  width: 18px;
+  height: 18px;
+}
+.viewer-body {
+  flex: 1;
+  background: #0b0a15;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
+}
+
+/* Fake PDF (shown in PDF viewer) */
+.viewer-fake-pdf {
+  background: white;
+  width: 320px;
+  height: 380px;
+  border-radius: 0.125rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 2rem 1.75rem;
+  color: #1a1b2e;
+  position: relative;
+  font-family: Georgia, serif;
+}
+.viewer-fake-pdf h3 {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.875rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #1a1b2e;
+}
+.viewer-fake-pdf ul { list-style: none; font-size: 0.75rem; }
+.viewer-fake-pdf ul li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-bottom: 1px dotted #e5e5e5;
+}
+.viewer-fake-pdf ul li:last-child { border-bottom: none; }
+.viewer-fake-pdf .price { color: #e8457a; font-weight: 700; }
+.viewer-fake-pdf .footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 1.75rem;
+  right: 1.75rem;
+  font-size: 0.625rem;
+  color: #999;
+  text-align: center;
+  font-style: italic;
+  border-top: 1px solid #eee;
+  padding-top: 0.5rem;
+}
+
+/* Fake image (shown in image viewer) */
+.viewer-fake-image {
+  background: linear-gradient(135deg, #e8457a 0%, #a855f7 50%, #6366f1 100%);
+  width: 520px;
+  height: 360px;
+  border-radius: 0.375rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: Georgia, serif;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.viewer-fake-image::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.15) 0%, transparent 50%);
+}
+.viewer-fake-image .hero {
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0.9;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.viewer-fake-image .main {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.05;
+  position: relative;
+}
+.viewer-fake-image .divider {
+  width: 40px;
+  height: 2px;
+  background: white;
+  margin: 1rem 0;
+  opacity: 0.8;
+  position: relative;
+}
+.viewer-fake-image .date {
+  font-size: 0.9375rem;
+  opacity: 0.95;
+  line-height: 1.5;
+  position: relative;
+}
+
+/* ═════════════════════════════════════════════════════════════════ */
+/* Editor — dropzone + cards                                        */
+/* ═════════════════════════════════════════════════════════════════ */
+.editor-frame {
+  max-width: 640px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+}
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.editor-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.editor-counter {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 0.75rem;
+  padding: 2.25rem 1.5rem;
+  text-align: center;
+  background: var(--muted);
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+}
+.dropzone:hover {
+  border-color: var(--primary);
+  background: rgba(232, 69, 122, 0.06);
+}
+.dropzone-icon {
+  width: 40px;
+  height: 40px;
+  color: var(--muted-foreground);
+  margin: 0 auto 0.875rem;
+}
+.dropzone-title {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+.dropzone-sep {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  margin: 0.25rem 0 0.5rem;
+}
+.dropzone-browse {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  margin-bottom: 0.875rem;
+  cursor: pointer;
+}
+.dropzone-hint {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.editor-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.editor-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  min-height: 56px;
+}
+.editor-card .attachment-icon {
+  background: transparent;
+}
+.attachment-delete {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.attachment-delete:hover {
+  background: rgba(232, 69, 122, 0.15);
+  color: var(--primary);
+}
+
+/* Page heading */
+.page-heading {
+  max-width: 1180px;
+  margin: 0 auto 2.5rem;
+  padding: 0 2rem;
+}
+.page-heading h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.375rem;
+  color: var(--foreground);
+}
+.page-heading p {
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+}
+</style>
+</head>
+<body>
+
+<div class="page-heading">
+  <h1>Pièces jointes d'événement · Mockup</h1>
+  <p>Desktop · dark mode · reproduction fidèle de la page Moment actuelle (layout 2 colonnes, design system The Playground).</p>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN 1 — Page événement complète avec section Documents        -->
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">1 · Page événement publique — Section "Documents" intégrée</div>
+
+  <div class="event-page">
+
+    <!-- LEFT: cover + circle info (340px sticky) -->
+    <div class="left-col">
+      <div class="cover-block">
+        <div class="cover-label">Regards<br>croisés</div>
+      </div>
+      <div class="circle-info-block">
+        <div class="circle-avatar">G</div>
+        <div class="circle-info-meta">
+          <div class="circle-info-label">Proposé par</div>
+          <div class="circle-info-name">Galerie Vivienne</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--muted-foreground);">
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT: main content -->
+    <div class="right-col">
+
+      <div class="hosted-by">Organisé par <strong>Claire Dubois</strong> et <strong>Marc Leroy</strong></div>
+
+      <h1 class="event-title">Vernissage "Regards croisés"</h1>
+
+      <!-- Register card -->
+      <div class="register-card">
+        <div class="register-info">
+          <div class="register-price">Gratuit</div>
+          <div class="register-spots">12 places restantes</div>
+        </div>
+        <button class="register-btn">S'inscrire</button>
+      </div>
+
+      <!-- Description -->
+      <div class="description-block">
+        <p>Vernissage de l'exposition collective réunissant 8 artistes émergents autour du thème de la ville contemporaine. Performances live, cocktail et rencontre avec les artistes.</p>
+        <p>L'exposition reste visible jusqu'au 15 mai, entrée libre en journée.</p>
+      </div>
+
+      <!-- Quand & Où -->
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <div class="meta-label-block">
+            <div class="meta-label">Quand</div>
+            <div class="meta-value">Vendredi 18 avril · 19h00 — 22h00</div>
+          </div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="meta-label-block">
+            <div class="meta-label">Où</div>
+            <div class="meta-value">Galerie Vivienne, Paris</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── DOCUMENTS SECTION ───────────────────────────────── -->
+      <div class="documents-section" style="margin-top: 0.5rem;">
+        <div class="documents-header">
+          <div class="documents-title">Documents</div>
+        </div>
+
+        <div class="attachments-list">
+          <a href="#" class="attachment-card">
+            <div class="attachment-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+              </svg>
+            </div>
+            <div class="attachment-body">
+              <div class="attachment-name">Invitation du vernissage</div>
+              <div class="attachment-meta">JPG · 780 KB</div>
+            </div>
+            <svg class="attachment-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+
+          <a href="#" class="attachment-card">
+            <div class="attachment-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="15" y2="17"/>
+              </svg>
+            </div>
+            <div class="attachment-body">
+              <div class="attachment-name">Catalogue des œuvres</div>
+              <div class="attachment-meta">PDF · 2,3 MB</div>
+            </div>
+            <svg class="attachment-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+
+          <a href="#" class="attachment-card">
+            <div class="attachment-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="15" y2="17"/>
+              </svg>
+            </div>
+            <div class="attachment-body">
+              <div class="attachment-name">Plan de la galerie</div>
+              <div class="attachment-meta">PDF · 850 KB</div>
+            </div>
+            <svg class="attachment-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Participants section (context) -->
+      <div class="participants-section" style="margin-top: 0.5rem;">
+        <div class="participants-title">Participants · 38</div>
+        <div class="participants-card">
+          <div class="participants-avatars">
+            <div class="avatar">CL</div>
+            <div class="avatar a2">MA</div>
+            <div class="avatar a3">SB</div>
+            <div class="avatar a4">JT</div>
+            <div class="avatar a5">RL</div>
+            <div class="avatar more">+33</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN 2 — Modale PDF                                            -->
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">2 · Modale de consultation — PDF (iframe native du navigateur)</div>
+  <div class="viewer-backdrop">
+    <div class="viewer-dialog">
+      <div class="viewer-header">
+        <div class="viewer-info">
+          <div class="viewer-title">Catalogue des œuvres.pdf</div>
+          <div class="viewer-meta">PDF · 2,3 MB</div>
+        </div>
+        <div class="viewer-actions">
+          <a href="#" class="viewer-btn" aria-label="Télécharger">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </a>
+          <button class="viewer-btn" aria-label="Fermer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="viewer-body">
+        <div class="viewer-fake-pdf">
+          <h3>Catalogue des œuvres</h3>
+          <ul>
+            <li><span>Horizon I — Léa R.</span><span class="price">800 €</span></li>
+            <li><span>Rythme urbain — K. Moreau</span><span class="price">1 200 €</span></li>
+            <li><span>Sans titre #4 — A. Serra</span><span class="price">650 €</span></li>
+            <li><span>Fragments — J. Weiss</span><span class="price">2 100 €</span></li>
+            <li><span>Métamorphose — M. Cruz</span><span class="price">950 €</span></li>
+            <li><span>Terrain vague — S. Louis</span><span class="price">1 450 €</span></li>
+            <li><span>Mémoire du lieu — R. Blanc</span><span class="price">780 €</span></li>
+            <li><span>Écho — T. Winter</span><span class="price">1 100 €</span></li>
+          </ul>
+          <div class="footer">Regards croisés — Galerie Vivienne · Avril 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN 3 — Modale image                                          -->
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">3 · Modale de consultation — Image</div>
+  <div class="viewer-backdrop">
+    <div class="viewer-dialog">
+      <div class="viewer-header">
+        <div class="viewer-info">
+          <div class="viewer-title">Invitation du vernissage.jpg</div>
+          <div class="viewer-meta">JPG · 780 KB</div>
+        </div>
+        <div class="viewer-actions">
+          <a href="#" class="viewer-btn" aria-label="Télécharger">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </a>
+          <button class="viewer-btn" aria-label="Fermer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="viewer-body">
+        <div class="viewer-fake-image">
+          <div class="hero">Vous êtes invité·e</div>
+          <div class="main">Regards<br>croisés</div>
+          <div class="divider"></div>
+          <div class="date">Vendredi 18 avril · 19h00<br>Galerie Vivienne, Paris</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN 4 — Éditeur : dropzone vide                               -->
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">4 · Formulaire événement — Options avancées · "Documents" vide</div>
+  <div class="editor-frame">
+    <div class="editor-header">
+      <div class="editor-label">Documents (optionnel)</div>
+      <div class="editor-counter">0/3 fichiers</div>
+    </div>
+    <div class="dropzone">
+      <svg class="dropzone-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <div class="dropzone-title">Glissez vos fichiers ici</div>
+      <div class="dropzone-sep">ou</div>
+      <div class="dropzone-browse">Parcourir</div>
+      <div class="dropzone-hint">PDF, JPG, PNG, WEBP · Max 10 MB</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<!-- SCREEN 5 — Éditeur : 2 uploads + 1 en cours                      -->
+<!-- ═════════════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">5 · Formulaire — 2 fichiers uploadés + 1 upload en cours</div>
+  <div class="editor-frame">
+    <div class="editor-header">
+      <div class="editor-label">Documents (optionnel)</div>
+      <div class="editor-counter">2/3 fichiers</div>
+    </div>
+    <div class="editor-cards">
+      <div class="editor-card">
+        <div class="attachment-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+            <line x1="9" y1="17" x2="15" y2="17"/>
+          </svg>
+        </div>
+        <div class="attachment-body">
+          <div class="attachment-name">menu-foodtruck.pdf</div>
+          <div class="attachment-meta">1,2 MB</div>
+        </div>
+        <button class="attachment-delete" aria-label="Supprimer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="editor-card">
+        <div class="attachment-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+            <circle cx="9" cy="9" r="2"/>
+            <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+          </svg>
+        </div>
+        <div class="attachment-body">
+          <div class="attachment-name">affiche.jpg</div>
+          <div class="attachment-meta">780 KB</div>
+        </div>
+        <button class="attachment-delete" aria-label="Supprimer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Upload en cours -->
+      <div class="editor-card">
+        <div class="attachment-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="attachment-body">
+          <div class="attachment-name">catalogue.pdf</div>
+          <div style="height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 0.375rem;">
+            <div style="height: 100%; background: var(--primary); width: 62%; border-radius: 2px;"></div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.25rem;">62% · 2,3 MB</div>
+        </div>
+        <button class="attachment-delete" aria-label="Annuler">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

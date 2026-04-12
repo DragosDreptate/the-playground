@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Carte complétion profil | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+    }
+    .dark {
+      --background: #1a1b2e;
+      --foreground: #f0eff7;
+      --card: #252640;
+      --muted: #2a2b45;
+      --muted-foreground: #8b8faa;
+      --border: #353658;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background); color: var(--foreground);
+      font-size: 14px; line-height: 1.5;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ─── Toolbar (mockup only) ─── */
+    .toolbar {
+      position: fixed; bottom: 16px; right: 16px; z-index: 100;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      display: flex; align-items: center; gap: 8px; font-size: 12px;
+    }
+    .toolbar label { color: var(--muted-foreground); font-weight: 500; }
+    .toolbar select, .toolbar button {
+      font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 5px 10px; cursor: pointer;
+      background: var(--muted); color: var(--foreground);
+    }
+
+    /* ─── SiteHeader ─── */
+    .site-header {
+      border-bottom: 1px solid var(--border); background: var(--card);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-weight: 800; font-size: 16px; letter-spacing: -0.3px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-nav { display: flex; gap: 2px; }
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--muted-foreground);
+      padding: 6px 12px; border-radius: 8px; text-decoration: none;
+    }
+    .nav-link.active { color: var(--foreground); background: var(--muted); }
+    .header-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #e8457a, #9333ea);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white;
+    }
+
+    /* ─── Page ─── */
+    .page { max-width: 672px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ─── Greeting (identique à la page actuelle) ─── */
+    .greeting {
+      margin-bottom: 32px;
+      border-left: 3px solid var(--primary);
+      padding-left: 20px;
+    }
+    .greeting h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .greeting p { color: var(--muted-foreground); font-size: 15px; line-height: 1.55; }
+
+    /* ══════════════════════════════════════════════════════════
+       ✨ CARTE COMPLÉTION PROFIL — le mockup
+       ══════════════════════════════════════════════════════════ */
+    .profile-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    /* Halo décoratif subtil en haut à droite — accent visuel premium */
+    .profile-card::before {
+      content: ""; position: absolute; top: -40px; right: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,69,122,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .pc-body { padding: 24px 24px 20px; position: relative; }
+
+    .pc-header {
+      display: flex; align-items: flex-start; gap: 14px;
+      margin-bottom: 18px;
+    }
+    .pc-avatar {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: linear-gradient(135deg, rgba(232,69,122,0.18), rgba(147,51,234,0.18));
+      border: 1px solid rgba(232,69,122,0.25);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+    .pc-header-text { flex: 1; min-width: 0; padding-top: 2px; }
+    .pc-label {
+      font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em;
+      color: var(--primary); text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .pc-title {
+      font-size: 16px; font-weight: 700; color: var(--foreground);
+      letter-spacing: -0.2px; line-height: 1.3; margin-bottom: 2px;
+    }
+    .pc-sub {
+      font-size: 12.5px; color: var(--muted-foreground);
+      line-height: 1.45;
+    }
+
+    /* Progression */
+    .pc-progress-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
+    }
+    .pc-progress-track {
+      flex: 1; height: 6px; border-radius: 99px;
+      background: var(--muted); overflow: hidden;
+    }
+    .pc-progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #e8457a, #9333ea);
+      transition: width 0.4s ease;
+    }
+    .pc-progress-label {
+      font-size: 12px; font-weight: 700; color: var(--foreground);
+      font-variant-numeric: tabular-nums;
+      min-width: 32px; text-align: right;
+    }
+
+    /* Liste des items manquants */
+    .pc-items {
+      border: 1px solid var(--border); border-radius: 12px;
+      overflow: hidden; margin-bottom: 18px;
+      background: rgba(0,0,0,0.04);
+    }
+    .dark .pc-items { background: rgba(255,255,255,0.015); }
+
+    .pc-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; cursor: pointer;
+      transition: background 0.12s;
+      text-decoration: none; color: inherit;
+    }
+    .pc-item:hover { background: var(--muted); }
+    .pc-item + .pc-item { border-top: 1px solid var(--border); }
+
+    .pc-item-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--muted); color: var(--muted-foreground);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pc-item-text { flex: 1; min-width: 0; }
+    .pc-item-title {
+      font-size: 13px; font-weight: 600; color: var(--foreground);
+      line-height: 1.3;
+    }
+    .pc-item-desc {
+      font-size: 11.5px; color: var(--muted-foreground);
+      margin-top: 1px; line-height: 1.35;
+    }
+    .pc-item-chevron {
+      color: var(--muted-foreground); flex-shrink: 0;
+      transition: transform 0.15s;
+    }
+    .pc-item:hover .pc-item-chevron { transform: translateX(2px); color: var(--foreground); }
+
+    /* État "déjà fait" */
+    .pc-item.done { cursor: default; opacity: 0.55; }
+    .pc-item.done:hover { background: transparent; }
+    .pc-item.done .pc-item-icon {
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+    }
+    .pc-item.done .pc-item-title { text-decoration: line-through; text-decoration-color: var(--muted-foreground); }
+    .pc-item.done .pc-item-chevron { display: none; }
+
+    /* Footer actions */
+    .pc-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+    }
+    .btn-ghost {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+      padding: 8px 14px; border-radius: 8px; cursor: pointer;
+      background: none; border: none; color: var(--muted-foreground);
+      transition: color 0.15s;
+    }
+    .btn-ghost:hover { color: var(--foreground); }
+    .btn-outline {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 9px 16px; border-radius: 10px; cursor: pointer;
+      background: transparent; border: 1px solid var(--border); color: var(--foreground);
+      display: inline-flex; align-items: center; gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-outline:hover { background: var(--muted); border-color: var(--muted-foreground); }
+
+    /* ─── Tabs row (identique à la page actuelle) ─── */
+    .tabs-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 12px;
+    }
+    .tab-pills {
+      display: flex; gap: 1px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 99px; padding: 4px;
+    }
+    .tab-pill {
+      font-size: 13px; font-weight: 500; border-radius: 99px;
+      padding: 6px 16px; cursor: pointer;
+      color: var(--muted-foreground); background: none; border: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .tab-pill.active { background: var(--foreground); color: var(--background); }
+
+    .btn-new-moment {
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 8px; cursor: pointer; border: none;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ✨ NUDGE DISCRET — version compacte
+       ══════════════════════════════════════════════════════════ */
+    .profile-nudge {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 28px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .profile-nudge:hover { border-color: rgba(232,69,122,0.35); }
+
+    .pn-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px 12px 14px;
+      text-decoration: none; color: inherit;
+      cursor: pointer;
+    }
+    .pn-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: linear-gradient(135deg, rgba(232,69,122,0.18), rgba(147,51,234,0.18));
+      border: 1px solid rgba(232,69,122,0.22);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+    .pn-text { flex: 1; min-width: 0; }
+    .pn-title {
+      font-size: 13px; font-weight: 600; color: var(--foreground);
+      line-height: 1.35;
+    }
+    .pn-title strong {
+      font-weight: 700;
+      color: var(--foreground);
+      font-variant-numeric: tabular-nums;
+    }
+    .pn-title .pn-sep {
+      display: inline-block; margin: 0 6px;
+      color: var(--border);
+    }
+    .pn-title .pn-hint {
+      color: var(--muted-foreground);
+      font-weight: 500;
+    }
+    .pn-arrow {
+      color: var(--muted-foreground);
+      flex-shrink: 0;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .profile-nudge:hover .pn-arrow { transform: translateX(2px); color: var(--foreground); }
+    .pn-close {
+      width: 26px; height: 26px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted-foreground); flex-shrink: 0;
+      background: none; border: none; cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .pn-close:hover { background: var(--muted); color: var(--foreground); }
+
+    /* Barre de progression en base du nudge (full width, 2px) */
+    .pn-progress {
+      height: 2px; background: var(--muted); position: relative;
+    }
+    .pn-progress-fill {
+      position: absolute; top: 0; left: 0; bottom: 0;
+      background: linear-gradient(90deg, #e8457a, #9333ea);
+      transition: width 0.4s ease;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ✨ MINIMALISTE — avec libellés "Plus tard" / "Compléter mon profil"
+       ══════════════════════════════════════════════════════════ */
+    .profile-minimal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .pm-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px;
+    }
+    .pm-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, rgba(232,69,122,0.18), rgba(147,51,234,0.18));
+      border: 1px solid rgba(232,69,122,0.22);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; color: var(--primary);
+    }
+    .pm-text {
+      flex: 1; min-width: 0;
+      font-size: 13px; color: var(--muted-foreground);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .pm-text strong {
+      color: var(--foreground);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .pm-actions {
+      display: flex; align-items: center; gap: 20px;
+      flex-shrink: 0;
+    }
+    .pm-later {
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px; font-weight: 500;
+      background: none; border: none; cursor: pointer;
+      color: var(--muted-foreground);
+      padding: 0;
+      transition: color 0.15s;
+    }
+    .pm-later:hover { color: var(--foreground); }
+    .pm-cta {
+      font-size: 13px; font-weight: 600;
+      color: var(--foreground);
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 5px;
+      transition: color 0.15s;
+    }
+    .pm-cta:hover { color: var(--primary); }
+    .pm-cta svg { transition: transform 0.15s; }
+    .pm-cta:hover svg { transform: translateX(2px); }
+
+    @media (max-width: 520px) {
+      .pm-row { flex-wrap: wrap; row-gap: 10px; }
+      .pm-text { flex: 1 1 100%; order: 2; }
+      .pm-actions { flex: 1 1 100%; order: 3; justify-content: space-between; }
+      .pm-icon { order: 1; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ✨ VARIANTE D — shadcn buttons + mobile-first
+       · Vrais Button shadcn outline sm (CTA) + ghost icon (X)
+       · Icône bg-muted rounded-lg (cohérent avec onboarding-guide)
+       · Desktop : 1 ligne · Mobile < 640px : CTA fullwidth en ligne 2
+       ══════════════════════════════════════════════════════════ */
+    .profile-v4 {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    .pv4-main {
+      display: flex; align-items: center;
+      gap: 12px;
+      padding: 12px 12px 12px 16px;
+      flex-wrap: wrap;
+    }
+    .pv4-icon {
+      order: 1;
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      background: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--muted-foreground);
+    }
+    .pv4-text {
+      order: 2;
+      flex: 1; min-width: 0;
+      font-size: 14px;
+      color: var(--muted-foreground);
+      font-weight: 500;
+      line-height: 1.45;
+    }
+    .pv4-text strong {
+      color: var(--foreground);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .pv4-cta { order: 3; }
+    .pv4-dismiss { order: 4; }
+
+    /* ── Boutons shadcn reproduits fidèlement ──
+       Base : inline-flex, gap 6px, text-sm 14px font-medium,
+              rounded-md 6px, whitespace-nowrap, transition-all.
+       Outline sm : h-8 px-3 (px-2.5 avec svg), border, shadow-xs,
+              bg = var(--input)/30, hover bg = var(--input)/50. */
+    .btn-shadcn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      outline: none;
+    }
+    .btn-shadcn:focus-visible {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 50%, transparent);
+    }
+    .btn-shadcn-outline-sm {
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--border);
+      background: color-mix(in srgb, var(--border) 30%, transparent);
+      color: var(--foreground);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    .btn-shadcn-outline-sm:hover {
+      background: color-mix(in srgb, var(--border) 50%, transparent);
+    }
+    .btn-shadcn-outline-sm svg {
+      transition: transform 0.15s ease;
+    }
+    .btn-shadcn-outline-sm:hover svg {
+      transform: translateX(1px);
+    }
+    .btn-shadcn-ghost-icon-sm {
+      width: 32px; height: 32px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      color: var(--muted-foreground);
+    }
+    .btn-shadcn-ghost-icon-sm:hover {
+      background: color-mix(in srgb, var(--muted-foreground) 15%, transparent);
+      color: var(--foreground);
+    }
+
+    /* Mobile < 640px — CTA fullwidth en ligne 2 */
+    @media (max-width: 640px) {
+      .pv4-main {
+        padding: 12px 12px 14px 16px;
+        column-gap: 10px;
+        row-gap: 12px;
+      }
+      .pv4-text {
+        /* Texte prend l'espace restant sur ligne 1 */
+        flex: 1 1 auto;
+      }
+      .pv4-dismiss {
+        /* X reste sur ligne 1, à droite */
+        order: 3;
+      }
+      .pv4-cta {
+        /* CTA bascule en ligne 2, pleine largeur */
+        order: 4;
+        flex: 1 1 100%;
+        width: 100%;
+      }
+      /* Le bouton lui-même prend 100 % de sa zone */
+      .pv4-cta.btn-shadcn-outline-sm {
+        width: 100%;
+      }
+    }
+
+    /* ─── Timeline extract (contexte, volontairement léger) ─── */
+    .timeline { position: relative; opacity: 0.75; }
+    .timeline-row { display: flex; gap: 0; padding: 12px 0; }
+    .tl-date { width: 100px; flex-shrink: 0; padding-right: 16px; text-align: right; }
+    .tl-date-day { font-size: 13px; font-weight: 700; color: var(--foreground); }
+    .tl-date-month { font-size: 11px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.04em; }
+    .tl-dot-col { display: flex; flex-direction: column; align-items: center; position: relative; }
+    .tl-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--primary); margin-top: 5px;
+      box-shadow: 0 0 0 3px rgba(232,69,122,0.15);
+    }
+    .tl-line {
+      width: 1px; flex: 1; background: var(--border);
+      margin-top: 6px;
+    }
+    .tl-card {
+      flex: 1; margin-left: 16px; margin-bottom: 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .tl-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .tl-meta { font-size: 12px; color: var(--muted-foreground); }
+
+    /* ─── Annotation badges (mockup only) ─── */
+    .annotation {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      color: #c4b5fd; background: #2e1065;
+      border: 1px solid #4c1d95; border-radius: 99px;
+      padding: 3px 10px; margin-bottom: 12px;
+    }
+    .annotation-dot { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; }
+
+    @media (max-width: 480px) {
+      .page { padding: 24px 16px 60px; }
+      .header-inner { padding: 0 16px; }
+      .header-nav { display: none; }
+    }
+  </style>
+</head>
+<body class="dark">
+
+<div class="toolbar">
+  <label>Variante :</label>
+  <select onchange="applyVariant(this.value)">
+    <option value="v4" selected>D — shadcn + mobile-first</option>
+    <option value="minimal">C — Minimaliste (libellés)</option>
+    <option value="nudge">A — Nudge discret</option>
+    <option value="card">B — Carte détaillée</option>
+    <option value="all">Toutes (comparer)</option>
+  </select>
+  <label>Progression :</label>
+  <select onchange="applyProgress(this.value)">
+    <option value="20">20 %</option>
+    <option value="40" selected>40 %</option>
+    <option value="60">60 %</option>
+    <option value="80">80 %</option>
+  </select>
+  <button onclick="toggleDark()">☀️ Light</button>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <span class="logo">The Playground</span>
+    <nav class="header-nav">
+      <a href="#" class="nav-link active">Mon espace</a>
+      <a href="#" class="nav-link">Découvrir</a>
+    </nav>
+    <div class="header-avatar">D</div>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- Greeting — pattern actuel inchangé -->
+  <div class="greeting">
+    <h1>Bonjour, Dragos</h1>
+    <p>Voici ce qui se passe dans tes communautés.</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION D — shadcn buttons + mobile-first (recommandée)
+       · CTA = vrai Button outline sm (bg-input/30, border, shadow-xs)
+       · Dismiss = vrai Button ghost icon sm (X)
+       · Icône bg-muted (pattern organizer-onboarding-guide)
+       · Desktop : 1 ligne  ·  Mobile < 640px : CTA fullwidth ligne 2
+       ═══════════════════════════════════════════════ -->
+
+  <div id="wrap-v4">
+    <div class="annotation"><span class="annotation-dot"></span>Option D — shadcn + mobile-first</div>
+
+    <div class="profile-v4">
+      <div class="pv4-main">
+        <div class="pv4-icon">
+          <!-- Lucide: user-circle-2 -->
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20a6 6 0 0 0-12 0"/>
+            <circle cx="12" cy="10" r="4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+        </div>
+        <p class="pv4-text">
+          Ton profil est à <strong id="pv4-percent">40 %</strong>
+        </p>
+        <a href="#" class="btn-shadcn btn-shadcn-outline-sm pv4-cta">
+          Compléter mon profil
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+        <button class="btn-shadcn btn-shadcn-ghost-icon-sm pv4-dismiss" title="Plus tard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="pn-progress">
+        <div id="pv4-fill" class="pn-progress-fill" style="width: 40%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION C — MINIMALISTE avec libellés
+       · 1 ligne, ~56px de haut
+       · Libellés "Plus tard" + "Compléter mon profil" visibles
+       · Pas de × ni de chevron — actions explicites
+       · Mini progress bar 2px en base
+       ═══════════════════════════════════════════════ -->
+
+  <div id="wrap-minimal">
+    <div class="annotation"><span class="annotation-dot"></span>Option C — Minimaliste (libellés)</div>
+
+    <div class="profile-minimal">
+      <div class="pm-row">
+        <div class="pm-icon">
+          <!-- Lucide: user-circle-2 -->
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20a6 6 0 0 0-12 0"/>
+            <circle cx="12" cy="10" r="4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+        </div>
+        <div class="pm-text">
+          Ton profil est à <strong id="pm-percent">40 %</strong>
+        </div>
+        <div class="pm-actions">
+          <button class="pm-later">Plus tard</button>
+          <a href="#" class="pm-cta">
+            Compléter mon profil
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div class="pn-progress">
+        <div id="pm-fill" class="pn-progress-fill" style="width: 40%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION A — NUDGE DISCRET (recommandé)
+       · 1 ligne, ~56px de haut
+       · Tout le bandeau est cliquable → page profil
+       · Mini progress bar full-width en base (2px)
+       · Close icon pour dismiss sans navigation
+       ═══════════════════════════════════════════════ -->
+
+  <div id="wrap-nudge">
+    <div class="annotation"><span class="annotation-dot"></span>Option A — Nudge discret</div>
+
+    <a href="#" class="profile-nudge" style="display: block;">
+      <div class="pn-row">
+        <div class="pn-icon">
+          <!-- Lucide: user-circle-2 -->
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20a6 6 0 0 0-12 0"/>
+            <circle cx="12" cy="10" r="4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+        </div>
+        <div class="pn-text">
+          <div class="pn-title">
+            Ton profil est à <strong id="pn-percent">40 %</strong>
+            <span class="pn-sep">·</span>
+            <span class="pn-hint">Ajoute ta ville, une bio et un lien social</span>
+          </div>
+        </div>
+        <div class="pn-arrow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m9 18 6-6-6-6"/>
+          </svg>
+        </div>
+        <button class="pn-close" title="Plus tard" onclick="event.preventDefault(); event.stopPropagation();">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="pn-progress">
+        <div id="pn-fill" class="pn-progress-fill" style="width: 40%"></div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION B — CARTE DÉTAILLÉE (initiale)
+       · Liste des items, déjà-faits cochés, CTAs
+       · Plus visible mais plus imposant
+       ═══════════════════════════════════════════════ -->
+
+  <div id="wrap-card">
+    <div class="annotation"><span class="annotation-dot"></span>Option B — Carte détaillée</div>
+
+    <section class="profile-card">
+    <div class="pc-body">
+
+      <!-- Header : avatar icon + label + titre + sub -->
+      <div class="pc-header">
+        <div class="pc-avatar">
+          <!-- Lucide: user-circle-2 -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 20a6 6 0 0 0-12 0"/>
+            <circle cx="12" cy="10" r="4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+        </div>
+        <div class="pc-header-text">
+          <div class="pc-label">Ton profil</div>
+          <h2 class="pc-title">Un profil complet inspire confiance</h2>
+          <p class="pc-sub">Les autres Participants et Organisateurs voient ton profil sur chaque événement. Quelques détails et on te reconnaît.</p>
+        </div>
+      </div>
+
+      <!-- Barre de progression -->
+      <div class="pc-progress-row">
+        <div class="pc-progress-track">
+          <div id="pc-fill" class="pc-progress-fill" style="width: 40%"></div>
+        </div>
+        <div id="pc-label" class="pc-progress-label">40 %</div>
+      </div>
+
+      <!-- Liste d'items -->
+      <div class="pc-items">
+
+        <!-- Fait : photo -->
+        <div class="pc-item done">
+          <div class="pc-item-icon">
+            <!-- Lucide: check -->
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="pc-item-text">
+            <div class="pc-item-title">Photo de profil</div>
+            <div class="pc-item-desc">Ajouté</div>
+          </div>
+          <div class="pc-item-chevron"></div>
+        </div>
+
+        <!-- Fait : nom -->
+        <div class="pc-item done">
+          <div class="pc-item-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="pc-item-text">
+            <div class="pc-item-title">Nom et prénom</div>
+            <div class="pc-item-desc">Ajouté</div>
+          </div>
+        </div>
+
+        <!-- À faire : ville -->
+        <a href="#" class="pc-item">
+          <div class="pc-item-icon">
+            <!-- Lucide: map-pin -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="pc-item-text">
+            <div class="pc-item-title">Ajoute ta ville</div>
+            <div class="pc-item-desc">Pour que les organisateurs te repèrent près de chez toi</div>
+          </div>
+          <div class="pc-item-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- À faire : bio -->
+        <a href="#" class="pc-item">
+          <div class="pc-item-icon">
+            <!-- Lucide: sparkles -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+              <path d="M20 3v4"/><path d="M22 5h-4"/>
+              <path d="M4 17v2"/><path d="M5 18H3"/>
+            </svg>
+          </div>
+          <div class="pc-item-text">
+            <div class="pc-item-title">Présente-toi en une phrase</div>
+            <div class="pc-item-desc">Une courte bio pour que les autres sachent qui tu es</div>
+          </div>
+          <div class="pc-item-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </div>
+        </a>
+
+        <!-- À faire : liens sociaux -->
+        <a href="#" class="pc-item">
+          <div class="pc-item-icon">
+            <!-- Lucide: link-2 -->
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+              <path d="M15 7h2a5 5 0 1 1 0 10h-2"/>
+              <line x1="8" x2="16" y1="12" y2="12"/>
+            </svg>
+          </div>
+          <div class="pc-item-text">
+            <div class="pc-item-title">Ajoute un lien social</div>
+            <div class="pc-item-desc">LinkedIn, GitHub, X ou ton site perso</div>
+          </div>
+          <div class="pc-item-chevron">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+
+      <!-- Footer : dismiss + CTA -->
+      <div class="pc-footer">
+        <button class="btn-ghost">Plus tard</button>
+        <a href="#" class="btn-outline">
+          Compléter mon profil
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- Tabs + filter + CTA — pattern actuel inchangé -->
+  <div class="tabs-row">
+    <div class="tab-pills">
+      <button class="tab-pill active">Mes événements</button>
+      <button class="tab-pill">Mes Communautés</button>
+    </div>
+    <button class="btn-new-moment">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M6.5 1.5v10M1.5 6.5h10" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      Nouvel événement
+    </button>
+  </div>
+
+  <!-- Timeline extract (contexte, volontairement estompé) -->
+  <div class="timeline">
+    <div class="timeline-row">
+      <div class="tl-date">
+        <div class="tl-date-day">24</div>
+        <div class="tl-date-month">avril</div>
+      </div>
+      <div class="tl-dot-col">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-title">Soirée JS & Pizza</div>
+        <div class="tl-meta">Paris Creative Tech · 19:00 · Paris 11e</div>
+      </div>
+    </div>
+
+    <div class="timeline-row">
+      <div class="tl-date">
+        <div class="tl-date-day">02</div>
+        <div class="tl-date-month">mai</div>
+      </div>
+      <div class="tl-dot-col">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-card">
+        <div class="tl-title">Workshop React 19</div>
+        <div class="tl-meta">Paris Creative Tech · 14:00 · En ligne</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const labels = {
+    20: '20 %',
+    40: '40 %',
+    60: '60 %',
+    80: '80 %',
+  };
+  function applyProgress(v) {
+    // Synchro des 4 variantes (v4, carte, nudge, minimaliste)
+    ['pc-fill', 'pn-fill', 'pm-fill', 'pv4-fill'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.width = v + '%';
+    });
+    ['pc-label', 'pn-percent', 'pm-percent', 'pv4-percent'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = labels[v];
+    });
+  }
+  function applyVariant(v) {
+    const v4 = document.getElementById('wrap-v4');
+    const minimal = document.getElementById('wrap-minimal');
+    const nudge = document.getElementById('wrap-nudge');
+    const card = document.getElementById('wrap-card');
+    v4.style.display = (v === 'v4' || v === 'all') ? 'block' : 'none';
+    minimal.style.display = (v === 'minimal' || v === 'all') ? 'block' : 'none';
+    nudge.style.display = (v === 'nudge' || v === 'all') ? 'block' : 'none';
+    card.style.display = (v === 'card' || v === 'all') ? 'block' : 'none';
+  }
+  function toggleDark() {
+    document.body.classList.toggle('dark');
+    document.querySelector('.toolbar button').textContent =
+      document.body.classList.contains('dark') ? '☀️ Light' : '🌙 Dark';
+  }
+  // État initial : variante D par défaut
+  applyVariant('v4');
+</script>
+</body>
+</html>

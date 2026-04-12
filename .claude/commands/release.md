@@ -33,18 +33,43 @@ gh run list --branch main --workflow CI --limit 1 --json conclusion --jq '.[0].c
 
 Si `conclusion != "success"` → **STOP**. Le CI sur main doit être vert avant de lancer une release. Un test flaky sur main sera flaky sur la branche release aussi. Informer l'utilisateur et s'arrêter.
 
-### Étape 2 — Vérifier la page Aide (OBLIGATOIRE)
+### Étape 2 — Vérifier les pages statiques (OBLIGATOIRE)
 
-Avant chaque release, s'assurer que la page Aide reflète les features incluses. Lancer l'agent `docs-coherence-guardian` :
+Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Deux vérifications :
+
+#### 2a — Page Aide
+
+Lancer l'agent `docs-coherence-guardian` :
 
 > Vérifie que la page Aide (clé "Help" dans messages/fr.json et messages/en.json + page help/page.tsx) est à jour avec toutes les fonctionnalités implémentées depuis la dernière release. Si des features manquent, ajoute-les.
 
-Si l'agent détecte des écarts et effectue des modifications :
-1. Committer les changements sur main (branche dédiée → PR → merge)
-2. Attendre que Release Please mette à jour sa PR avec les nouveaux commits
-3. Puis continuer avec l'étape 3
+#### 2b — Stats page À propos
 
-Si la page Aide est déjà à jour → continuer directement.
+Mettre à jour les 4 chiffres hardcodés dans `src/app/[locale]/(routes)/(static)/about/page.tsx` (section "En chiffres") :
+
+```bash
+COMMITS=$(git rev-list --count HEAD)
+PRS=$(gh pr list --state merged --limit 1000 --json number --jq length)
+USECASES=$(find src/domain/usecases -name '*.ts' ! -name 'index.ts' ! -path '*__tests__*' | wc -l | tr -d ' ')
+TESTS=$(pnpm test 2>&1 | grep 'Tests' | grep -o '[0-9]\+ passed' | grep -o '[0-9]\+')
+```
+
+Arrondir pour l'affichage :
+- Commits : centaine inférieure + "+" (ex: 1694 → `"1 600+"`)
+- PRs : dizaine inférieure + "+" (ex: 353 → `"350+"`)
+- Usecases : valeur exacte
+- Tests : dizaine inférieure + "+" (ex: 888 → `"880+"`)
+
+#### Résultat
+
+Si au moins une modification (page Aide ou stats) :
+1. Créer la branche `chore/pre-release-updates`
+2. Committer toutes les modifications ensemble
+3. PR + merge sur main
+4. Attendre que Release Please mette à jour sa PR
+5. Puis continuer avec l'étape 3
+
+Si tout est déjà à jour → continuer directement.
 
 ### Étape 3 — Trouver la PR Release Please
 

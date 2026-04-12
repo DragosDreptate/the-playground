@@ -304,6 +304,7 @@
 - [ ] **Track** — Série d'événements récurrents dans une Communauté (retiré du MVP v1)
 - [ ] **Check-in** — Marquer présent sur place (retiré du MVP v1)
 - [ ] **Galerie photos post-événement** — Upload par Participants et Organisateur après un événement PAST. Galerie sur `/m/[slug]` et page Communauté. Modération par l'Organisateur. CTA "Voir les photos" dans l'email post-événement. Infrastructure `StorageService` (Vercel Blob) déjà en place.
+- [ ] **Dupliquer un événement** — Bouton "Dupliquer" sur un événement existant pour pré-remplir le formulaire de création avec les mêmes infos (titre, lieu, description, capacité, prix). Gain de temps pour les événements récurrents similaires.
 - [ ] **Plan Pro** — Analytics avancés, branding personnalisé, IA avancée, API, notifications multi-canal
 - [ ] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
 - [ ] **White-label / mono-community** — `spec/product/white-label-mono-community.md`
