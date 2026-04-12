@@ -26,12 +26,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async sendVerificationRequest({ identifier, url }) {
         const resend = new Resend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
         const { error } = await resend.emails.send({
           from,
           to: identifier,
           subject: "Votre lien de connexion — The Playground",
-          react: MagicLinkEmail({ url }),
+          react: MagicLinkEmail({ url, baseUrl }),
         });
 
         if (error) {
