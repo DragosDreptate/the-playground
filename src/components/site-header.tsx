@@ -46,23 +46,21 @@ export function SiteHeader() {
 
         {/* Nav — center (desktop only) */}
         <nav className="hidden flex-1 items-center justify-center gap-6 md:flex">
+          <Link
+            href="/explorer"
+            className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/explorer") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Compass className="size-3.5" />
+            {tExplorer("navLink")}
+          </Link>
           {user && (
-            <>
-              <Link
-                href="/explorer"
-                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/explorer") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <Compass className="size-3.5" />
-                {tExplorer("navLink")}
-              </Link>
-              <Link
-                href={dashboardHref}
-                className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                <LayoutDashboard className="size-3.5" />
-                {tDashboard("title")}
-              </Link>
-            </>
+            <Link
+              href={dashboardHref}
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${pathname.startsWith("/dashboard") ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              <LayoutDashboard className="size-3.5" />
+              {tDashboard("title")}
+            </Link>
           )}
         </nav>
 
