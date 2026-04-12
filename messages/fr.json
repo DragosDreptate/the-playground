@@ -584,6 +584,7 @@
         "calendarJoin": "Rejoindre",
         "calendarOrganizedBy": "Organisé par"
       },
+      "viewInDashboard": "Mes inscriptions",
       "waitlistPosition": "Vous êtes {position}° sur la liste d'attente",
       "draftNotice": "Cet événement est en cours de préparation et n'est pas encore publié.",
       "draftTitle": "Événement en cours de préparation",

@@ -28,7 +28,7 @@
 ### Authentification & Profil
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Auth magic link + OAuth Google/GitHub (Auth.js v5) | v0.1.0 | — |
 | Onboarding profil obligatoire au premier login | v0.2.0 | `spec/product/options-onboarding.md` |
 | Isolation onboarding (route group Next.js, layout minimal) | v0.2.0 | — |
@@ -42,7 +42,7 @@
 ### Communautés (Circles)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | CRUD Communauté (domain, tests, UI, i18n) | v0.1.0 | — |
 | Page publique `/circles/[slug]` (SEO, cold traffic, sans compte) | v0.5.0 | `spec/features/explorer-la-carte.md` |
 | Catégorie (enum 8 valeurs) + ville sur Communauté | v0.5.0 | — |
@@ -59,7 +59,7 @@
 ### Événements (Moments)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | CRUD événement + page publique `/m/[slug]` (URL partageable) | v0.1.0 | — |
 | Formulaire création minimaliste (titre, date, lieu, description) | v0.1.0 | — |
 | Autocomplétion adresse (Google Places) | v1.10.0 | — |
@@ -79,7 +79,7 @@
 ### Inscriptions & Liste d'attente
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Inscription + auto-join Communauté (zéro friction) | v0.2.0 | — |
 | Annulation inscription + promotion automatique liste d'attente | v0.2.0 | — |
 | Position dans la liste d'attente visible (Xème) | v0.8.0 | — |
@@ -92,7 +92,7 @@
 ### Paiements (Stripe Connect)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Événements payants avec prix configurable (en centimes) | v2.0.0 | `spec/features/stripe-connect.md` |
 | Stripe Connect onboarding Organisateur | v2.0.0 | — |
 | Politique de remboursement configurable par événement | v2.0.0 | — |
@@ -105,7 +105,7 @@
 ### Emails & Notifications
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | **Architecture** : port `EmailService` (14+ méthodes) + adapter `ResendEmailService` | v0.7.0 | `spec/features/email-transactional.md` |
 | Templates React (react-email) avec calendar badge gradient | v0.7.0 | — |
 | Magic link email avec logo PNG embarqué base64 | v0.7.0 | — |
@@ -129,7 +129,7 @@
 ### Dashboard (Mon espace)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Vue Participant / Organisateur (mode switcher persisté en DB + session) | v1.6.0 | — |
 | Timeline événements (à venir + passés) avec badges statut | v0.2.0 | — |
 | Onglet Communautés (cards avec stats membres/événements, prochain événement) | v1.0.0 | — |
@@ -139,11 +139,12 @@
 | Badge réseau sur les Communautés du dashboard | v2.7.0 | — |
 | Compteurs inscrits/liste d'attente sur page Organisateur | v0.2.0 | — |
 | Perf : `React.cache()` pour `getUserDashboardCircles` (754ms → 192ms, -75%) | v1.5.0 | — |
+| CTA "Mes inscriptions" post-inscription (bouton dans le banner confirmation → `/dashboard?tab=moments`) | v2.8.0 | — |
 
 ### Explorer (Découvrir)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Page `/explorer` (tabs Communautés/Événements, SSR, revalidate 300s) | v0.5.0 | `spec/features/explorer-la-carte.md` |
 | Section "À la une" (3 Communautés featured, cinématique, renouvellement quotidien) | v1.13.0 | — |
 | Filtres catégorie + tri (Recommandé / Popularité / Date) | v1.13.0 | — |
@@ -155,7 +156,7 @@
 ### Radar (planification événements)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Radar d'événements concurrents (Luma, Eventbrite, Meetup) | v1.8.0 | `spec/features/local-events-watcher.md` |
 | Interface : sélecteur ville, dates, mots-clés, streaming résultats | v1.8.0 | — |
 | Mots-clés personnalisés (ajout/modification/suppression) | v2.1.0 | — |
@@ -165,7 +166,7 @@
 ### Admin plateforme
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Dashboard stats + listes paginées (Utilisateurs/Communautés/Événements) | v0.6.0 | `spec/features/admin-plateforme.md` |
 | Suppression + forcer annulation événement | v0.6.0 | — |
 | Courbes d'activité 30 jours enrichies | v1.12.0 | — |
@@ -179,7 +180,7 @@
 ### SEO & Contenu
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | OG images dynamiques (homepage, événement, Communauté) | v0.8.0 | `spec/infra/seo-strategy.md` |
 | `generateMetadata`, `metadataBase`, `robots.ts`, `sitemap.ts` | v0.8.0 | — |
 | Structured data enrichies (événements : description, image, prix, disponibilité) | v2.4.0 | — |
@@ -191,7 +192,7 @@
 ### Pages institutionnelles
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Homepage (hero, "Comment ça marche", 3 piliers, CTA, footer) | v0.5.0 | — |
 | About `/about` | v0.10.0 | — |
 | Changelog `/changelog` + réécriture automatique en langage utilisateur | v0.10.0 | — |
@@ -202,7 +203,7 @@
 ### Infrastructure & DevOps
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Neon branching dev/prod + `db:dev:reset` | v0.1.0 | — |
 | Sentry error tracking (client/server/edge) | v0.2.0 | — |
 | PostHog product analytics | v0.2.0 | — |
@@ -218,7 +219,7 @@
 ### i18n (internationalisation)
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Français + Anglais natifs (next-intl) | v0.1.0 | — |
 | Espagnol | v1.7.0 | — |
 | Roumain | v1.7.0 | — |
@@ -227,7 +228,7 @@
 ### Design & UX
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | Design system dark/light (Tailwind + shadcn/ui) | v0.1.0 | `spec/design/design-system.md` |
 | Responsive mobile complet (hamburger menu, cards compactes, hero centré) | v0.8.0 | — |
 | Covers carrées 1:1 partout (règle absolue) | v1.0.0 | — |
@@ -237,7 +238,7 @@
 ### Tests & Qualité
 
 | Feature | Version | Spec / PR |
-|---------|---------|-----------|
+| --- | --- | --- |
 | 690+ tests unitaires Vitest (37 usecases domaine + 11 admin) | — | — |
 | 99+ tests de sécurité (RBAC, IDOR cross-tenant, admin, avatar isolation, invite token) | — | — |
 | 11 specs E2E Playwright (auth, join, host-flow, cancel, comments, onboarding, waitlist, explore, dashboard-mode, broadcast, circle-invite) | — | — |
@@ -253,16 +254,15 @@
 ### Haute priorité — Rétention & croissance
 
 | # | Feature | Contexte | Gap |
-|---|---------|----------|-----|
+| --- | --- | --- | --- |
 | P-01 | **Rappel 1h avant événement** | Infra 24h en place (cron, template, batch). Ajout incrémental : champ `reminder1hSentAt`, fenêtre 50min-70min. | — |
-| P-02 | **CTA "Voir dans mon espace" post-inscription** | Sur `/m/[slug]` après inscription confirmée : lien vers `/dashboard`. Faire découvrir l'espace personnel. | M-2 |
-| P-03 | **CTA "Créer le prochain événement" depuis un événement PAST** | Vue Organisateur événement passé : bouton "Programmer le prochain événement" (pré-remplir même Communauté). Capitaliser sur l'élan post-événement. | H-2 |
-| P-04 | **Guide onboarding Organisateur** | Stepper 3 étapes (Créer Communauté → Créer événement → Partager le lien). Objectif : time-to-first-event < 5 min. La welcome page oriente déjà, mais sans guide pas-à-pas. | H-7 |
+| P-02 | **CTA "Créer le prochain événement" depuis un événement PAST** | Vue Organisateur événement passé : bouton "Programmer le prochain événement" (pré-remplir même Communauté). Capitaliser sur l'élan post-événement. | H-2 |
+| P-03 | **Guide onboarding Organisateur** | Stepper 3 étapes (Créer Communauté → Créer événement → Partager le lien). Objectif : time-to-first-event < 5 min. La welcome page oriente déjà, mais sans guide pas-à-pas. | H-7 |
 
 ### Moyenne priorité
 
 | # | Feature | Contexte | Spec |
-|---|---------|----------|------|
+| --- | --- | --- | --- |
 | P-05 | **Co-Organisateurs** | Plusieurs Organisateurs par Communauté. Nécessite un modèle de permissions. | `spec/features/co-organisateurs.md` |
 | P-06 | **Export données Organisateur étendu** | CSV membres Communauté, historique événements, inscrits cumulés. L'export CSV inscrits par événement existe déjà. | — |
 | P-07 | **Assistant IA basique** | Description événement, email invitation, suggestions Communauté. SDK Anthropic (Claude). | — |
@@ -273,19 +273,19 @@
 ## À faire — Infrastructure & Qualité
 
 | # | Feature | Contexte | Spec |
-|---|---------|----------|------|
+| --- | --- | --- | --- |
 | I-01 | **Stratégie migrations DB + rollback prod** | Passer de `db:push` à `prisma migrate`. `db:push` peut silencieusement supprimer des données en prod (drop+recreate sur renommage). Snapshot Neon + PITR comme filet. | `spec/infra/db-migration-rollback-strategy.md` |
 | I-02 | **Corriger vulnérabilités dépendances** | `pnpm audit` remontait 6 high + 5 moderate (état 2026-02-27). À réévaluer. | — |
 | I-03 | **Pre-commit hooks (Husky + lint-staged)** | Aucun hook git local — erreurs TS/lint détectées uniquement en CI. Hook `pre-commit` + `commit-msg`. | — |
-| I-04 | **Retirer `unsafe-eval` du CSP** | `script-src` inclut `'unsafe-eval'`. Solution : nonces CSP via middleware Next.js. | — |
-| I-05 | **CI : `pnpm audit --audit-level=high` gate bloquant** | Gate manquant en CI. | — |
+| I-04 | **Retirer \****`unsafe-eval`**\*\* du CSP** | `script-src` inclut `'unsafe-eval'`. Solution : nonces CSP via middleware Next.js. | — |
+| I-05 | **CI : \****`pnpm audit --audit-level=high`**\*\* gate bloquant** | Gate manquant en CI. | — |
 | I-06 | **CI : Tests d'intégration** | Job dédié avec service PostgreSQL GitHub Actions. | — |
 | I-07 | **CI : Lighthouse CI** | Pages clés (`/m/[slug]`, `/`). Seuils : Performance ≥ 90, A11y ≥ 90. | — |
 | I-08 | **Rate limiting actions sensibles** | Aucune protection anti-abus. Solution : Upstash Rate Limit. Limites : 10 inscriptions/min/IP, 5 créations/heure/user. | — |
 | I-09 | **Accessibilité axe-core dans Playwright** | Intégrer axe-core dans les tests E2E existants. | — |
 | I-10 | **Bundle analyzer** | `@next/bundle-analyzer`. Aucune visibilité sur la taille du bundle JS. | — |
 | I-11 | **Diagramme d'architecture** | L'architecture hexagonale est documentée textuellement (CLAUDE.md) mais sans schéma visuel. C4 niveau 2 dans `spec/architecture.md`. | — |
-| I-12 | **Test unitaire `joinCircleDirectly`** | Fichier de test dédié manquant. | — |
+| I-12 | **Test unitaire \****`joinCircleDirectly`** | Fichier de test dédié manquant. | — |
 | I-13 | **E2E : rejoindre Communauté directement** | Parcours `JoinCircleButton` (sans événement) non couvert en E2E. | — |
 
 ---
@@ -320,7 +320,7 @@
 ## Bugs connus
 
 | # | Description | Statut | Détail |
-|---|-------------|--------|--------|
+| --- | --- | --- | --- |
 | B-01 | OAuth Google bloquée depuis les navigateurs in-app (Instagram, WhatsApp, Facebook) | **Workaround utilisateur** | Google refuse les WebViews (`Error 403: disallowed_useragent`). Fix possible : détecter le user-agent et afficher un message explicatif sur `/auth/error`. |
 | B-04 | Page `/changelog` uniquement en français | **Ouvert** | Contenu de `CHANGELOG.md` rédigé en FR uniquement. Fix possible : deux fichiers FR/EN, ou afficher le même contenu FR (acceptable pour un changelog technique). |
 
@@ -333,10 +333,10 @@
 > Issues identifiées pendant l'implémentation Stripe Connect (mars 2026). Non bloquantes pour le MVP.
 
 | # | Sujet | Détail |
-|---|-------|--------|
+| --- | --- | --- |
 | S-01 | Redesign bloc CTA + Participants | Dédupliquer les stats (inscrits + places) entre le bloc CTA et le bloc Participants. Intégrer la mention de politique de remboursement. |
 | S-02 | Section Paiements à la création de Communauté | Afficher la section "Paiements" en mode désactivé sur la page de création (message : "Disponible après la création"). |
-| S-03 | Banner vert confirmation inscription | Changer la couleur du banner "Vous participez" de rose à vert pour mieux communiquer "confirmé". |
+| ~~S-03~~ | ~~Banner vert confirmation inscription~~ | Résolu : banner redesigné en style card (`bg-card`) avec icône check emerald. |
 | S-04 | Sécuriser checkout-return URL | Remplacer `userId`/`momentId` dans les query params par le Stripe Checkout Session ID. Récupérer les metadata côté serveur. |
 | S-05 | Renommer `isDemoEmail` | Le nom est trompeur (filtre aussi `@test.playground`). Renommer en `isFilteredEmail` ou `isNonDeliverableEmail`. |
 | S-06 | Frais Stripe non rembours��s | Stripe ne rembourse pas ses frais (~0,59€/transaction). Si abus, ajouter limite temporelle (ex: remboursable jusqu'à 24h avant). |
@@ -349,7 +349,7 @@
 > Décisions architecturales et produit prises au fil du développement. Les décisions intermédiaires supersédées ont été retirées.
 
 | Date | Décision |
-|------|----------|
+| --- | --- |
 | 2026-02-19 | Usecases = fonctions (pas de classes). ActionResult pattern pour server actions. Slug généré dans le usecase (règle métier). |
 | 2026-02-19 | Stack : TypeScript full-stack (Next.js 16, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon). |
 | 2026-02-19 | Architecture hexagonale stricte : `domain/` (models, ports, usecases) + `infrastructure/` (repositories, services) + `app/` (routes Next.js). |
@@ -381,7 +381,7 @@
 ### Specs par domaine
 
 | Domaine | Fichier |
-|---------|---------|
+| --- | --- |
 | Produit — Vision | `spec/product/vision-produit.md` |
 | Produit — Cadrage | `spec/product/cadrage.md` |
 | Produit — UX / JTBD | `spec/product/ux-parcours-jtbd.md` |
