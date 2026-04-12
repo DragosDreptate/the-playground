@@ -39,10 +39,9 @@ if [ -z "$PROD_URL" ]; then
   exit 1
 fi
 
-# Forwarder les args (--execute) au script TS
-ARGS=("$@")
+# Détecter --execute dans les args
 IS_EXECUTE=false
-for arg in "${ARGS[@]}"; do
+for arg in "$@"; do
   if [ "$arg" = "--execute" ]; then
     IS_EXECUTE=true
   fi
@@ -64,17 +63,10 @@ if [ "$IS_EXECUTE" = true ]; then
     echo "   Annulé."
     exit 0
   fi
-else
-  read -p "   Continuer ? (y/N) " -n 1 -r
-  echo ""
-  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "   Annulé."
-    exit 0
-  fi
 fi
 
 echo ""
 echo "🌱 Backfill onboarding welcome en production..."
 DATABASE_URL="${PROD_URL}" \
   AUTH_RESEND_KEY="${AUTH_RESEND_KEY}" \
-  npx tsx scripts/send-onboarding-welcome-backfill.ts "${ARGS[@]}"
+  npx tsx scripts/send-onboarding-welcome-backfill.ts "$@"
