@@ -110,9 +110,14 @@ export default async function HomePage() {
               <p className="text-muted-foreground mt-6 max-w-md text-lg font-light lg:max-w-none">
                 {t("heroSubtitle")}
               </p>
-              <Button asChild size="lg" className="mt-10 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
-                <Link href={session?.user ? "/dashboard/circles/new" : "/auth/sign-in"}>{t("cta")}</Link>
-              </Button>
+              <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 lg:justify-start">
+                <Button asChild size="lg" className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 px-8 py-6 text-base text-white hover:opacity-90">
+                  <Link href="/explorer">{t("ctaDiscover")}</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="hidden px-8 py-6 text-base sm:inline-flex">
+                  <Link href={session?.user ? "/dashboard/circles/new" : "/auth/sign-in"}>{t("cta")}</Link>
+                </Button>
+              </div>
             </div>
 
             {/* RIGHT — iPhone mockup illustration (desktop only) */}
