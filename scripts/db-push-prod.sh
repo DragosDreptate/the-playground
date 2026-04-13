@@ -44,6 +44,24 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   exit 0
 fi
 
+# Create a Neon snapshot before pushing (safety net)
+echo ""
+echo "📸 Creating Neon snapshot before push..."
+SNAPSHOT_NAME="pre-push-$(date +%Y%m%d-%H%M%S)"
+SNAP_RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+  -H "$AUTH" \
+  -H "Content-Type: application/json" \
+  "${API}/branches/${NEON_PROD_BRANCH_ID}/snapshot?name=${SNAPSHOT_NAME}")
+SNAP_HTTP_CODE=$(echo "$SNAP_RESPONSE" | tail -1)
+SNAP_BODY=$(echo "$SNAP_RESPONSE" | sed '$d')
+
+if [[ "$SNAP_HTTP_CODE" =~ ^2 ]]; then
+  echo "   Snapshot '${SNAPSHOT_NAME}' created."
+else
+  echo "   ⚠️  Snapshot creation failed (HTTP ${SNAP_HTTP_CODE}). Continuing without snapshot."
+  echo "   Response: ${SNAP_BODY}"
+fi
+
 echo ""
 echo "🚀 Pushing schema to production..."
 DATABASE_URL="${PROD_URL}" npx prisma db push --accept-data-loss
