@@ -1,6 +1,8 @@
 import type { CommentRepository } from "@/domain/ports/repositories/comment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { CommentAttachmentRepository } from "@/domain/ports/repositories/comment-attachment-repository";
+import type { StorageService } from "@/domain/ports/services/storage-service";
 import {
   CommentNotFoundError,
   UnauthorizedCommentDeletionError,
@@ -15,6 +17,8 @@ type DeleteCommentDeps = {
   commentRepository: CommentRepository;
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  commentAttachmentRepository?: CommentAttachmentRepository;
+  storage?: StorageService;
 };
 
 export async function deleteComment(
@@ -28,24 +32,39 @@ export async function deleteComment(
     throw new CommentNotFoundError(input.commentId);
   }
 
-  // Author can always delete their own comment
-  if (comment.userId === input.userId) {
-    await commentRepository.delete(input.commentId);
-    return;
-  }
-
-  // A Host of the Circle that owns the Moment can delete any comment
-  const moment = await momentRepository.findById(comment.momentId);
-  if (moment) {
+  // Check authorization: author or host can delete
+  const isAuthor = comment.userId === input.userId;
+  if (!isAuthor) {
+    const moment = await momentRepository.findById(comment.momentId);
+    if (!moment) {
+      throw new UnauthorizedCommentDeletionError();
+    }
     const membership = await circleRepository.findMembership(
       moment.circleId,
       input.userId
     );
-    if (membership?.role === "HOST") {
-      await commentRepository.delete(input.commentId);
-      return;
+    if (membership?.role !== "HOST") {
+      throw new UnauthorizedCommentDeletionError();
     }
   }
 
-  throw new UnauthorizedCommentDeletionError();
+  // Best-effort blob cleanup before DB deletion
+  if (deps.commentAttachmentRepository && deps.storage) {
+    const attachments = await deps.commentAttachmentRepository.findByComment(
+      input.commentId
+    );
+    for (const att of attachments) {
+      try {
+        await deps.storage.delete(att.url);
+      } catch {
+        // Log but don't block deletion — orphaned blobs are recoverable
+        console.error(
+          `Failed to delete blob for comment attachment ${att.id}`
+        );
+      }
+    }
+  }
+
+  // Cascade on Comment deletes CommentAttachment rows automatically
+  await commentRepository.delete(input.commentId);
 }

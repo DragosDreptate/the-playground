@@ -43,6 +43,7 @@ export function makeCommentWithUser(
       email: "alice@example.com",
       image: null,
     },
+    attachments: [],
     ...overrides,
   };
 }
