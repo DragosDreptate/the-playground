@@ -92,6 +92,44 @@ export async function notifySlackTrafficReport(params: {
   });
 }
 
+export async function notifySlackNewRegistration(params: {
+  playerName: string;
+  momentTitle: string;
+  circleName: string;
+  registrationInfo: string;
+  momentUrl: string;
+}): Promise<void> {
+  await sendSlack({
+    text: `🎟️ Nouvelle inscription — ${params.playerName} → ${params.momentTitle}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "🎟️ Nouvelle inscription", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* s'est inscrit a *${params.momentTitle}*` } },
+      { type: "section", fields: [
+        { type: "mrkdwn", text: `*Communaute*\n${params.circleName}` },
+        { type: "mrkdwn", text: `*Inscriptions*\n${params.registrationInfo}` },
+      ]},
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'evenement" }, url: params.momentUrl }] },
+    ],
+  });
+}
+
+export async function notifySlackNewComment(params: {
+  playerName: string;
+  momentTitle: string;
+  commentPreview: string;
+  momentUrl: string;
+}): Promise<void> {
+  await sendSlack({
+    text: `💬 Nouveau commentaire — ${params.playerName} sur ${params.momentTitle}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "💬 Nouveau commentaire", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* a commente sur *${params.momentTitle}*` } },
+      { type: "section", text: { type: "mrkdwn", text: `> ${params.commentPreview}` } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'evenement" }, url: params.momentUrl }] },
+    ],
+  });
+}
+
 export async function notifySlackSentryIssue(params: {
   issueShortId: string;
   issueTitle: string;

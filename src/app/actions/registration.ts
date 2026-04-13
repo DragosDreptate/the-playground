@@ -25,6 +25,7 @@ import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-regist
 import { toActionResult } from "./helpers/to-action-result";
 import { getDisplayName } from "@/lib/display-name";
 import { formatPrice } from "@/lib/format-price";
+import { notifySlackNewRegistration } from "@/infrastructure/services/slack/slack-notification-service";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
@@ -335,6 +336,14 @@ export async function sendRegistrationEmails(
       });
     })
   );
+
+  await notifySlackNewRegistration({
+    playerName,
+    momentTitle: moment.title,
+    circleName: circle.name,
+    registrationInfo,
+    momentUrl: `${baseUrl}/m/${moment.slug}`,
+  });
 }
 
 async function sendPromotionEmail(
