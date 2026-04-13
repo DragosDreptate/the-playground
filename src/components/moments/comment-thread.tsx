@@ -347,16 +347,24 @@ export function CommentThread({
         {/* Form or sign-in prompt */}
         {isAuthenticated ? (
           <div className="space-y-2 pt-2">
-            <textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={isPastMoment ? t("comments.placeholderPast") : t("comments.placeholder")}
-              rows={3}
-              maxLength={MAX_CONTENT_LENGTH}
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full resize-none rounded-xl border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
-              disabled={isPending}
-            />
+            {/* Textarea + char count in a single bordered container */}
+            <div className="border-input bg-background focus-within:ring-ring focus-within:border-ring rounded-xl border focus-within:ring-2 focus-within:ring-offset-2">
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={isPastMoment ? t("comments.placeholderPast") : t("comments.placeholder")}
+                rows={3}
+                maxLength={MAX_CONTENT_LENGTH}
+                className="placeholder:text-muted-foreground w-full resize-none border-none bg-transparent px-3 pt-2 pb-0 text-sm outline-none disabled:opacity-50"
+                disabled={isPending}
+              />
+              <div className="flex justify-end px-3 pb-1.5">
+                <span className="text-muted-foreground text-[11px]">
+                  {content.length} / {MAX_CONTENT_LENGTH}
+                </span>
+              </div>
+            </div>
 
             {/* Photo previews */}
             {stagedPhotos.length > 0 && (
@@ -384,38 +392,31 @@ export function CommentThread({
               </div>
             )}
 
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                {/* Photo button */}
-                <button
-                  type="button"
-                  onClick={() => !photosAtLimit && fileInputRef.current?.click()}
-                  className={
-                    photosAtLimit
-                      ? "text-muted-foreground flex size-7 cursor-not-allowed items-center justify-center rounded-md opacity-40"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted flex size-7 cursor-pointer items-center justify-center rounded-md transition-colors"
-                  }
-                  aria-label={
-                    photosAtLimit
-                      ? t("comments.addPhotosDisabled")
-                      : t("comments.addPhotos")
-                  }
-                  aria-disabled={photosAtLimit}
-                >
-                  <ImagePlus className="size-[18px]" />
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  multiple
-                  className="hidden"
-                  onChange={handlePhotoSelect}
-                />
-                <span className="text-muted-foreground text-xs">
-                  {content.length} / {MAX_CONTENT_LENGTH}
-                </span>
-              </div>
+            <div className="flex items-center justify-end gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                className="hidden"
+                onChange={handlePhotoSelect}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => !photosAtLimit && fileInputRef.current?.click()}
+                disabled={photosAtLimit}
+                aria-label={
+                  photosAtLimit
+                    ? t("comments.addPhotosDisabled")
+                    : t("comments.addPhotos")
+                }
+                className="text-muted-foreground gap-1.5"
+              >
+                <ImagePlus className="size-4" />
+                {t("comments.addPhotos")}
+              </Button>
               <Button
                 size="sm"
                 onClick={handleSubmit}
