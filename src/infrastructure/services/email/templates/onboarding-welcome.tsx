@@ -64,40 +64,44 @@ export function OnboardingWelcomeEmail({
                 </Text>
               ))}
 
-              <Hr style={divider} />
-
-              <Text style={sectionLabel}>{content.statusLabel}</Text>
-              {content.statusParagraphs.map((text, i) => (
-                <Text
-                  key={i}
-                  style={
-                    i === content.statusParagraphs.length - 1
-                      ? { ...paragraph, marginBottom: "36px" }
-                      : paragraph
-                  }
-                >
-                  {text}
-                </Text>
+              {content.sections.map((section, si) => (
+                <React.Fragment key={si}>
+                  <Hr style={divider} />
+                  <Text style={sectionLabel}>{section.label}</Text>
+                  {section.paragraphs.map((text, pi) => (
+                    <Text
+                      key={pi}
+                      style={
+                        !content.highlight &&
+                        pi === section.paragraphs.length - 1
+                          ? { ...paragraph, marginBottom: "36px" }
+                          : paragraph
+                      }
+                    >
+                      {text}
+                    </Text>
+                  ))}
+                  {/* Highlight et conclusion : rendus après la dernière section qui les contient */}
+                  {si === content.sections.length - 1 && content.highlight && (
+                    <>
+                      <Section style={highlightBox}>
+                        <Text style={highlightText}>{content.highlight}</Text>
+                      </Section>
+                      {content.conclusion && (
+                        <Text
+                          style={{
+                            ...paragraph,
+                            marginTop: "16px",
+                            marginBottom: 0,
+                          }}
+                        >
+                          {content.conclusion}
+                        </Text>
+                      )}
+                    </>
+                  )}
+                </React.Fragment>
               ))}
-
-              <Hr style={divider} />
-
-              <Text style={sectionLabel}>{content.askLabel}</Text>
-              {content.askParagraphs.map((text, i) => (
-                <Text key={i} style={paragraph}>
-                  {text}
-                </Text>
-              ))}
-
-              <Section style={highlightBox}>
-                <Text style={highlightText}>{content.highlight}</Text>
-              </Section>
-
-              <Text
-                style={{ ...paragraph, marginTop: "16px", marginBottom: 0 }}
-              >
-                {content.conclusion}
-              </Text>
             </Section>
 
             <Section style={closing}>

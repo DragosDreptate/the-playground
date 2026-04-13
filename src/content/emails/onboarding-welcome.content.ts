@@ -1,66 +1,126 @@
 /**
- * Contenu textuel de l'email d'onboarding — Lettre du fondateur.
+ * Contenu de l'email d'onboarding — Lettre du fondateur.
  *
- * Modifier ce fichier pour changer le texte de l'email sans toucher
- * au template React Email (layout/styling).
- *
- * Spec de référence : `spec/mkt/emails/onboarding-1-lettre-fondateur.md`
+ * Pour modifier le texte, éditer `onboarding-welcome.md` (ce dossier).
+ * Ce fichier le parse et exporte un objet typé consommé par le template React Email.
  */
 
-export const onboardingWelcomeContent = {
-  /** Texte de preview (visible dans la liste des emails, pas dans le body). */
-  preview: "Une histoire de conviction — et ce que je te demande.",
+import fs from "node:fs";
+import path from "node:path";
 
-  /** Sujet de l'email. */
-  subject: "The Playground a besoin de toi",
+export type OnboardingWelcomeContent = {
+  subject: string;
+  preview: string;
+  replyTo: string;
+  senderName: string;
+  greeting: string;
+  greetingFallback: string;
+  signature: string;
+  signatureSubline: string;
+  footer: string;
+  intro: string[];
+  sections: { label: string; paragraphs: string[] }[];
+  highlight: string | null;
+  conclusion: string | null;
+  closingParagraphs: string[];
+};
 
-  /** Expéditeur affiché. */
-  senderName: "Dragos \u00B7 The Playground",
+function parse(): OnboardingWelcomeContent {
+  const raw = fs.readFileSync(
+    path.join(__dirname, "onboarding-welcome.md"),
+    "utf-8",
+  );
 
-  /** Adresse de réponse. */
-  replyTo: "dragos@the-playground.fr",
+  // --- Frontmatter ---
+  const fmMatch = raw.match(/^---\n([\s\S]*?)\n---/);
+  if (!fmMatch) throw new Error("Frontmatter manquant dans onboarding-welcome.md");
 
-  /** Salutation — `{firstName}` sera remplacé par le prénom ou le fallback. */
-  greeting: "Bonjour {firstName},",
-  greetingFallback: "Bonjour \u00E0 toi,",
+  const meta: Record<string, string> = {};
+  for (const line of fmMatch[1].split("\n")) {
+    const sep = line.indexOf(":");
+    if (sep === -1) continue;
+    const key = line.slice(0, sep).trim();
+    // Supprime les guillemets optionnels autour de la valeur
+    const val = line.slice(sep + 1).trim().replace(/^["']|["']$/g, "");
+    meta[key] = val;
+  }
 
-  /** Corps principal — chaque entrée = un paragraphe. */
-  intro: [
-    "Il y a quelque chose que j'aimerais partager avec toi.",
-    "J'ai construit The Playground parce que j'en avais marre de voir des organisateurs se faire plumer. Meetup qui facture des abonnements pour acc\u00E9der \u00E0 sa propre communaut\u00E9. Luma, \u00E9l\u00E9gant mais sans m\u00E9moire — chaque \u00E9v\u00E9nement repart de z\u00E9ro, aucun lien qui dure.",
-    "Les gens qui animent des communaut\u00E9s font quelque chose d'utile. Ils m\u00E9ritent un outil \u00E0 la hauteur — gratuit, fran\u00E7ais, au code ouvert, o\u00F9 les communaut\u00E9s qu'ils animent restent les leurs.",
-    "C'est \u00E7a, The Playground. Rien de plus, rien de moins.",
-  ],
+  // --- Body (après le frontmatter) ---
+  const body = raw.slice(fmMatch[0].length).trim();
 
-  /** Section "O\u00F9 on en est". */
-  statusLabel: "O\u00F9 on en est",
-  statusParagraphs: [
-    "L'app tourne. La structure est solide, les fonctionnalit\u00E9s sont l\u00E0. Mais une plateforme pour les communaut\u00E9s sans communaut\u00E9s, \u00E7a ne prouve rien \u00E0 personne — ni aux organisateurs qui h\u00E9sitent, ni \u00E0 moi.",
-    "Ce qu'il manque, ce sont les premi\u00E8res vraies communaut\u00E9s qui vivent, qui grandissent, dont les membres reviennent.",
-    "Tu as cr\u00E9\u00E9 un compte. \u00C7a veut dire que quelque chose a r\u00E9sonn\u00E9. Et \u00E7a compte.",
-  ],
+  // Découpe par sections ## (le texte avant le premier ## = intro)
+  const sectionSplits = body.split(/^## /m);
+  const introRaw = sectionSplits[0].trim();
+  const intro = splitParagraphs(introRaw);
 
-  /** Section "Ce que j'aimerais te demander". */
-  askLabel: "Ce que j'aimerais te demander",
-  askParagraphs: [
-    "Pas un like. Pas un partage (m\u00EAme si je ne le refuserais pas).",
-    "Juste \u00E7a : si tu penses \u00E0 quelqu'un qui organise des \u00E9v\u00E9nements r\u00E9guli\u00E8rement — un meetup, un atelier, un r\u00E9seau pro, des moments informels, peu importe — parle-lui de The Playground.",
-  ],
+  const sections: { label: string; paragraphs: string[] }[] = [];
+  let highlight: string | null = null;
+  let conclusion: string | null = null;
+  let closingParagraphs: string[] = [];
 
-  /** Texte mis en avant (highlight box). */
-  highlight: "Une personne. Une conversation.",
+  for (let i = 1; i < sectionSplits.length; i++) {
+    const block = sectionSplits[i];
+    const newlineIdx = block.indexOf("\n");
+    const label = block.slice(0, newlineIdx).trim();
+    const content = block.slice(newlineIdx).trim();
 
-  /** Phrase de conclusion apr\u00E8s le highlight. */
-  conclusion: "C'est comme \u00E7a que les outils qui durent se construisent.",
+    if (label.toLowerCase() === "clôture") {
+      closingParagraphs = splitParagraphs(content);
+      continue;
+    }
 
-  /** Section de cl\u00F4ture (fond gris). */
-  closingParagraphs: [
-    "Si tu as envie de r\u00E9pondre, fais-le. Je lis tout et je r\u00E9ponds personnellement.",
-    "Merci d'\u00EAtre l\u00E0.",
-  ],
-  signature: "— Dragos",
-  signatureSubline: "Fondateur de The Playground",
+    // Extraire le highlight (blockquote >) et la conclusion (texte après le blockquote)
+    const lines = content.split("\n");
+    const paragraphLines: string[] = [];
+    const afterHighlight: string[] = [];
+    let inAfterHighlight = false;
 
-  /** Footer. */
-  footer: "Tu re\u00E7ois cet email car tu as cr\u00E9\u00E9 un compte sur The Playground.",
-} as const;
+    for (const line of lines) {
+      if (line.startsWith("> ")) {
+        highlight = line.slice(2).trim();
+        inAfterHighlight = true;
+      } else if (inAfterHighlight) {
+        afterHighlight.push(line);
+      } else {
+        paragraphLines.push(line);
+      }
+    }
+
+    if (afterHighlight.length > 0) {
+      const afterText = afterHighlight.join("\n").trim();
+      if (afterText) conclusion = afterText;
+    }
+
+    sections.push({
+      label,
+      paragraphs: splitParagraphs(paragraphLines.join("\n")),
+    });
+  }
+
+  return {
+    subject: meta.subject ?? "",
+    preview: meta.preview ?? "",
+    replyTo: meta.replyTo ?? "",
+    senderName: meta.senderName ?? "",
+    greeting: meta.greeting ?? "",
+    greetingFallback: meta.greetingFallback ?? "",
+    signature: meta.signature ?? "",
+    signatureSubline: meta.signatureSubline ?? "",
+    footer: meta.footer ?? "",
+    intro,
+    sections,
+    highlight,
+    conclusion,
+    closingParagraphs,
+  };
+}
+
+/** Découpe un bloc de texte en paragraphes (séparés par des lignes vides). */
+function splitParagraphs(text: string): string[] {
+  return text
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
+export const onboardingWelcomeContent = parse();
