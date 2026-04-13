@@ -101,24 +101,9 @@ export async function completeOnboardingAction(
       }
     });
 
-    // Fire-and-forget : lettre du fondateur. Le flag `welcomeEmailSentAt` est
-    // posé AVANT l'envoi — en cas d'échec Resend, on ne re-tente pas : mieux
-    // un email perdu qu'un doublon. Admins exclus (ils voient déjà tout).
-    const shouldSendWelcome =
-      result.data.welcomeEmailSentAt === null && result.data.role !== "ADMIN";
-    if (shouldSendWelcome) {
-      after(async () => {
-        try {
-          await prismaUserRepository.setWelcomeEmailSent(result.data.id);
-          await emailService.sendOnboardingWelcome({
-            to: result.data.email,
-            firstName: result.data.firstName,
-          });
-        } catch (e) {
-          Sentry.captureException(e, { tags: { context: "onboarding_welcome_email" } });
-        }
-      });
-    }
+    // Lettre du fondateur : envoyée en différé (J+1) par le cron
+    // /api/cron/send-onboarding-welcome. Le cron cherche les utilisateurs
+    // avec onboardingCompleted=true et welcomeEmailSentAt=null.
   }
 
   return result;
