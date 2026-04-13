@@ -396,7 +396,7 @@ export function CommentThread({
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/*"
                 multiple
                 className="hidden"
                 onChange={handlePhotoSelect}
@@ -415,7 +415,7 @@ export function CommentThread({
                 className="text-muted-foreground gap-1.5"
               >
                 <ImagePlus className="size-4" />
-                {t("comments.addPhotos")}
+                <span className="hidden sm:inline">{t("comments.addPhotos")}</span>
               </Button>
               <Button
                 size="sm"
