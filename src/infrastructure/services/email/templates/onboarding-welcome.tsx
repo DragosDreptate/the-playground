@@ -12,6 +12,8 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
+import { onboardingWelcomeContent as content } from "./onboarding-welcome.content";
+
 type Props = {
   firstName: string | null;
   /** Défaut prod pour le backfill one-shot ; la resend-email-service injecte `getBaseUrl()`. */
@@ -20,25 +22,25 @@ type Props = {
 
 /**
  * Lettre du fondateur — envoyée une fois par utilisateur à la complétion du profil.
- * Contenu validé (FR, tutoiement) dans `spec/mkt/emails/onboarding-1-lettre-fondateur.md`.
+ * Contenu textuel dans `onboarding-welcome.content.ts`.
+ * Spec de référence : `spec/mkt/emails/onboarding-1-lettre-fondateur.md`.
  */
 export function OnboardingWelcomeEmail({
   firstName,
   baseUrl = "https://the-playground.fr",
 }: Props) {
-  // logo-light = version destinée à un fond clair (texte "the" en #1a1b2e).
-  // logo-dark a le "the" en blanc et serait invisible sur la card.
   const logoUrl = `${baseUrl}/brand/logo-light.png`;
+  const greeting = firstName
+    ? content.greeting.replace("{firstName}", firstName)
+    : content.greetingFallback;
 
   return (
     <Html lang="fr">
       <Head>
-        {/* Force light mode — empêche Apple Mail iOS / Outlook mobile
-            d'auto-inverser les couleurs (texte gris illisible sur card inversée) */}
         <meta name="color-scheme" content="light" />
         <meta name="supported-color-schemes" content="light" />
       </Head>
-      <Preview>Une histoire de conviction — et ce que je te demande.</Preview>
+      <Preview>{content.preview}</Preview>
       <Body style={body}>
         <Container style={container}>
           <Section style={headerSection}>
@@ -47,84 +49,73 @@ export function OnboardingWelcomeEmail({
 
           <Section style={card}>
             <Section style={cardBody}>
-              <Text style={paragraph}>Bonjour {firstName ?? "à toi"},</Text>
+              <Text style={paragraph}>{greeting}</Text>
 
-              <Text style={paragraph}>
-                Il y a quelque chose que j&apos;aimerais partager avec toi.
-              </Text>
-
-              <Text style={paragraph}>
-                J&apos;ai construit The Playground parce que j&apos;en avais
-                marre de voir des organisateurs se faire plumer. Meetup qui
-                facture des abonnements pour accéder à sa propre communauté.
-                Luma, élégant mais sans mémoire — chaque événement repart de
-                zéro, aucun lien qui dure.
-              </Text>
-              <Text style={paragraph}>
-                Les gens qui animent des communautés font quelque chose
-                d&apos;utile. Ils méritent un outil à la hauteur — gratuit,
-                français, au code ouvert, où les communautés qu&apos;ils
-                animent restent les leurs.
-              </Text>
-              <Text style={{ ...paragraph, marginBottom: "36px" }}>
-                C&apos;est ça, The Playground. Rien de plus, rien de moins.
-              </Text>
+              {content.intro.map((text, i) => (
+                <Text
+                  key={i}
+                  style={
+                    i === content.intro.length - 1
+                      ? { ...paragraph, marginBottom: "36px" }
+                      : paragraph
+                  }
+                >
+                  {text}
+                </Text>
+              ))}
 
               <Hr style={divider} />
 
-              <Text style={sectionLabel}>Où on en est</Text>
-              <Text style={paragraph}>
-                L&apos;app tourne. La structure est solide, les fonctionnalités
-                sont là. Mais une plateforme pour les communautés sans
-                communautés, ça ne prouve rien à personne — ni aux
-                organisateurs qui hésitent, ni à moi.
-              </Text>
-              <Text style={paragraph}>
-                Ce qu&apos;il manque, ce sont les premières vraies communautés
-                qui vivent, qui grandissent, dont les membres reviennent.
-              </Text>
-              <Text style={{ ...paragraph, marginBottom: "36px" }}>
-                Tu as créé un compte. Ça veut dire que quelque chose a résonné.
-                Et ça compte.
-              </Text>
+              <Text style={sectionLabel}>{content.statusLabel}</Text>
+              {content.statusParagraphs.map((text, i) => (
+                <Text
+                  key={i}
+                  style={
+                    i === content.statusParagraphs.length - 1
+                      ? { ...paragraph, marginBottom: "36px" }
+                      : paragraph
+                  }
+                >
+                  {text}
+                </Text>
+              ))}
 
               <Hr style={divider} />
 
-              <Text style={sectionLabel}>
-                Ce que j&apos;aimerais te demander
-              </Text>
-              <Text style={paragraph}>
-                Pas un like. Pas un partage (même si je ne le refuserais pas).
-              </Text>
-              <Text style={paragraph}>
-                Juste ça : si tu penses à quelqu&apos;un qui organise des
-                événements régulièrement — un meetup, un atelier, un réseau
-                pro, des moments informels, peu importe — parle-lui de The
-                Playground.
-              </Text>
+              <Text style={sectionLabel}>{content.askLabel}</Text>
+              {content.askParagraphs.map((text, i) => (
+                <Text key={i} style={paragraph}>
+                  {text}
+                </Text>
+              ))}
 
               <Section style={highlightBox}>
-                <Text style={highlightText}>
-                  Une personne. Une conversation.
-                </Text>
+                <Text style={highlightText}>{content.highlight}</Text>
               </Section>
 
-              <Text style={{ ...paragraph, marginTop: "16px", marginBottom: 0 }}>
-                C&apos;est comme ça que les outils qui durent se construisent.
+              <Text
+                style={{ ...paragraph, marginTop: "16px", marginBottom: 0 }}
+              >
+                {content.conclusion}
               </Text>
             </Section>
 
             <Section style={closing}>
-              <Text style={paragraph}>
-                Si tu as envie de répondre, fais-le. Je lis tout et je réponds
-                personnellement.
-              </Text>
-              <Text style={{ ...paragraph, marginBottom: "24px" }}>
-                Merci d&apos;être là.
-              </Text>
-              <Text style={signature}>— Dragos</Text>
+              {content.closingParagraphs.map((text, i) => (
+                <Text
+                  key={i}
+                  style={
+                    i === content.closingParagraphs.length - 1
+                      ? { ...paragraph, marginBottom: "24px" }
+                      : paragraph
+                  }
+                >
+                  {text}
+                </Text>
+              ))}
+              <Text style={signature}>{content.signature}</Text>
               <Text style={signatureSubline}>
-                Fondateur de The Playground &nbsp;·&nbsp;
+                {content.signatureSubline} &nbsp;&middot;&nbsp;
                 <Link href="https://the-playground.fr" style={signatureLink}>
                   the-playground.fr
                 </Link>
@@ -133,9 +124,7 @@ export function OnboardingWelcomeEmail({
           </Section>
 
           <Section style={footerSection}>
-            <Text style={footerText}>
-              Tu reçois cet email car tu as créé un compte sur The Playground.
-            </Text>
+            <Text style={footerText}>{content.footer}</Text>
             <CenteredLogo src={logoUrl} />
           </Section>
         </Container>
