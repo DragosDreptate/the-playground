@@ -10,6 +10,7 @@ declare module "next-auth" {
       onboardingCompleted: boolean;
       role: "USER" | "ADMIN";
       dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+      isNewUser?: boolean;
     };
   }
 }

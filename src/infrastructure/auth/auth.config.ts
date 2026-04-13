@@ -8,7 +8,6 @@ import { prisma } from "@/infrastructure/db/prisma";
 import { Resend } from "resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
-import { captureServerEvent } from "@/lib/posthog-server";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -83,26 +82,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         console.error("[AUTH] OAuth image sync failed (non-blocking):", err);
       }
 
-      // Tracking nouvel utilisateur — createdAt dans les 30 dernières secondes
-      try {
-        if (user.id) {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: { createdAt: true },
-          });
-          if (dbUser) {
-            const ageMs = Date.now() - dbUser.createdAt.getTime();
-            if (ageMs < 30_000) {
-              await captureServerEvent(user.id, "user_signed_up", {
-                provider: profile ? "oauth" : "email",
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error("[AUTH] PostHog user_signed_up tracking failed (non-blocking):", err);
-      }
-
       // Génération du publicId si absent — non bloquant
       try {
         if (user.id) {
@@ -131,10 +110,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         onboardingCompleted: boolean;
         role: "USER" | "ADMIN";
         dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
+        createdAt: Date;
       };
       session.user.onboardingCompleted = dbUser.onboardingCompleted;
       session.user.role = dbUser.role;
       session.user.dashboardMode = dbUser.dashboardMode ?? null;
+      // Nouveau user = compte créé il y a moins de 2 minutes
+      const ageMs = Date.now() - new Date(dbUser.createdAt).getTime();
+      session.user.isNewUser = ageMs < 120_000;
       return session;
     },
   },
