@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef, useCallback } from "react";
+import { useState, useTransition, useRef, useCallback, useEffect } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
 import { ImagePlus, X } from "lucide-react";
@@ -21,6 +21,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import { compressCommentPhoto } from "@/lib/image-compress";
+import { isCoarsePointer } from "@/lib/coarse-pointer";
 import { getDisplayName } from "@/lib/display-name";
 import { linkifyText } from "@/lib/linkify";
 import {
@@ -120,16 +121,6 @@ function DeleteCommentButton({
 
 // --- Comment photos display ---
 
-/**
- * Touch-first device detection (phones, tablets).
- * On coarse pointers, photos open directly in a new tab where
- * pinch-to-zoom works natively — no modal needed.
- */
-function isCoarsePointer(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(pointer: coarse)").matches;
-}
-
 function CommentPhotos({
   attachments,
   onPhotoClick,
@@ -169,7 +160,7 @@ function CommentPhotos({
               alt={alt}
               className={
                 isSingle
-                  ? "max-h-60 w-auto rounded-lg object-cover"
+                  ? "max-h-60 max-w-xs rounded-lg object-cover"
                   : "size-full object-cover"
               }
             />
@@ -207,6 +198,15 @@ export function CommentThread({
   // Lightbox state
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [lightboxAlt, setLightboxAlt] = useState("");
+
+  // Cleanup preview URLs on unmount to avoid memory leaks
+  const stagedPhotosRef = useRef(stagedPhotos);
+  stagedPhotosRef.current = stagedPhotos;
+  useEffect(() => {
+    return () => {
+      stagedPhotosRef.current.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+    };
+  }, []);
 
   const isAuthenticated = currentUserId !== null;
   const photosAtLimit = stagedPhotos.length >= MAX_COMMENT_PHOTOS;

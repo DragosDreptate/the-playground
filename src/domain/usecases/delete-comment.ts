@@ -53,16 +53,15 @@ export async function deleteComment(
     const attachments = await deps.commentAttachmentRepository.findByComment(
       input.commentId
     );
-    for (const att of attachments) {
-      try {
-        await deps.storage.delete(att.url);
-      } catch {
-        // Log but don't block deletion — orphaned blobs are recoverable
-        console.error(
-          `Failed to delete blob for comment attachment ${att.id}`
-        );
-      }
-    }
+    await Promise.all(
+      attachments.map((att) =>
+        deps.storage!.delete(att.url).catch(() => {
+          console.error(
+            `Failed to delete blob for comment attachment ${att.id}`
+          );
+        })
+      )
+    );
   }
 
   // Cascade on Comment deletes CommentAttachment rows automatically

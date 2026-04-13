@@ -38,16 +38,17 @@ export async function addCommentAction(
   }
   const userId = session.user.id;
 
-  const content = formData.get("content") as string | null;
-  if (!content) {
+  const rawContent = formData.get("content");
+  if (typeof rawContent !== "string" || !rawContent) {
     return { success: false, error: "Content missing", code: "MISSING_CONTENT" };
   }
+  const content = rawContent;
 
   // Extract photo files from FormData (photo-0, photo-1, photo-2)
   const photoFiles: File[] = [];
   for (let i = 0; i < 3; i++) {
-    const f = formData.get(`photo-${i}`) as File | null;
-    if (f && f.size > 0) photoFiles.push(f);
+    const f = formData.get(`photo-${i}`);
+    if (f instanceof File && f.size > 0) photoFiles.push(f);
   }
 
   // Validate and detect MIME for each photo

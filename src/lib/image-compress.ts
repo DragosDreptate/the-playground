@@ -51,14 +51,26 @@ export async function compressCommentPhoto(file: File): Promise<Blob> {
 
       ctx.drawImage(img, 0, 0, targetW, targetH);
 
+      function releaseCanvas() {
+        canvas.width = 0;
+        canvas.height = 0;
+      }
+
       canvas.toBlob(
         (blob) => {
+          releaseCanvas();
           if (blob) {
             resolve(blob);
           } else {
-            // Fallback to JPEG if WebP is not supported
-            canvas.toBlob(
+            const fallback = document.createElement("canvas");
+            fallback.width = targetW;
+            fallback.height = targetH;
+            const fbCtx = fallback.getContext("2d");
+            fbCtx?.drawImage(img, 0, 0, targetW, targetH);
+            fallback.toBlob(
               (fallbackBlob) => {
+                fallback.width = 0;
+                fallback.height = 0;
                 if (fallbackBlob) {
                   resolve(fallbackBlob);
                 } else {

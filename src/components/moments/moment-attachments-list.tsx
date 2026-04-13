@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { ChevronRight, FileText, ImageIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
+import { isCoarsePointer } from "@/lib/coarse-pointer";
 import { AttachmentViewerDialog } from "./attachment-viewer-dialog";
 import {
   formatAttachmentName,
@@ -16,21 +17,6 @@ type MomentAttachmentsListProps = {
   attachments: MomentAttachment[];
   momentSlug: string;
 };
-
-/**
- * Detects touch-first devices (phones, tablets) at click time.
- * `(pointer: coarse)` is the standard media query for coarse pointers
- * like fingers (vs. `fine` for mouse/trackpad).
- *
- * Runs only in the browser — always returns false during SSR/first
- * render, avoiding hydration mismatch. This is fine because the only
- * place we call it is inside a click handler, which by definition runs
- * on the client.
- */
-function isCoarsePointer(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(pointer: coarse)").matches;
-}
 
 /**
  * Public-facing list of attachments on the Moment page.

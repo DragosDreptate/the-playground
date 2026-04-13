@@ -109,24 +109,26 @@ export async function addComment(
     deps.commentAttachmentRepository &&
     deps.storage
   ) {
-    for (const photo of photos) {
-      const safeName = sanitizeFilename(photo.filename);
-      const path = `comment-photos/${comment.id}-${Date.now()}-${safeName}`;
-      const url = await deps.storage.upload(
-        path,
-        photo.buffer,
-        photo.contentType
-      );
-
-      await deps.commentAttachmentRepository.create({
-        commentId: comment.id,
-        url,
-        filename: photo.filename,
-        contentType: photo.contentType,
-        sizeBytes: photo.sizeBytes,
-      });
-      uploadedCount++;
-    }
+    const { commentAttachmentRepository, storage } = deps;
+    await Promise.all(
+      photos.map(async (photo, i) => {
+        const safeName = sanitizeFilename(photo.filename);
+        const path = `comment-photos/${comment.id}-${Date.now()}-${i}-${safeName}`;
+        const url = await storage.upload(
+          path,
+          photo.buffer,
+          photo.contentType
+        );
+        await commentAttachmentRepository.create({
+          commentId: comment.id,
+          url,
+          filename: photo.filename,
+          contentType: photo.contentType,
+          sizeBytes: photo.sizeBytes,
+        });
+      })
+    );
+    uploadedCount = photos.length;
   }
 
   return { comment, photoCount: uploadedCount };
