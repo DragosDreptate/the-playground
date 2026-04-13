@@ -1526,7 +1526,11 @@
       },
       "comments": {
         "title": "Les commentaires",
-        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'organisateur."
+        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'organisateur.",
+        "photosLabel": "Photos dans les commentaires :",
+        "photos1": "Vous pouvez <strong>ajouter jusqu'à 3 photos</strong> à chaque commentaire (JPG, PNG, WebP)",
+        "photos2": "Les photos volumineuses sont <strong>automatiquement compressées</strong> pour un envoi rapide, même depuis un téléphone",
+        "photos3": "Cliquez sur une photo pour l'agrandir"
       },
       "mySpace": {
         "title": "Mon espace",

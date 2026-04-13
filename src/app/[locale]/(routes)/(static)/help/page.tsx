@@ -288,6 +288,14 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("participant.comments.intro", rich)}
               </p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("participant.comments.photosLabel")}
+              </p>
+              <ul className="list-inside list-disc space-y-1.5 text-sm leading-relaxed text-muted-foreground">
+                <li>{t.rich("participant.comments.photos1", rich)}</li>
+                <li>{t.rich("participant.comments.photos2", rich)}</li>
+                <li>{t("participant.comments.photos3")}</li>
+              </ul>
             </div>
 
             <hr className="border-border" />

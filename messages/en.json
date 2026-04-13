@@ -1526,7 +1526,11 @@
       },
       "comments": {
         "title": "Comments",
-        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the organizer."
+        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the organizer.",
+        "photosLabel": "Photos in comments:",
+        "photos1": "You can <strong>add up to 3 photos</strong> to each comment (JPG, PNG, WebP)",
+        "photos2": "Large photos are <strong>automatically compressed</strong> for fast upload, even from a phone",
+        "photos3": "Click a photo to enlarge it"
       },
       "mySpace": {
         "title": "My Dashboard",
