@@ -120,6 +120,16 @@ function DeleteCommentButton({
 
 // --- Comment photos display ---
 
+/**
+ * Touch-first device detection (phones, tablets).
+ * On coarse pointers, photos open directly in a new tab where
+ * pinch-to-zoom works natively — no modal needed.
+ */
+function isCoarsePointer(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
 function CommentPhotos({
   attachments,
   onPhotoClick,
@@ -131,6 +141,14 @@ function CommentPhotos({
 
   const isSingle = attachments.length === 1;
 
+  function handleClick(url: string, altText: string) {
+    if (isCoarsePointer()) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    onPhotoClick(url, altText);
+  }
+
   return (
     <div className={isSingle ? "mt-2" : "mt-2 flex flex-wrap gap-2"}>
       {attachments.map((att) => {
@@ -139,7 +157,7 @@ function CommentPhotos({
           <button
             key={att.id}
             type="button"
-            onClick={() => onPhotoClick(att.url, alt)}
+            onClick={() => handleClick(att.url, alt)}
             className={
               isSingle
                 ? "block max-w-xs cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30"
