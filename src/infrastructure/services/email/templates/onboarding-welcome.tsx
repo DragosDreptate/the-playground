@@ -12,7 +12,7 @@ import {
 } from "@react-email/components";
 import * as React from "react";
 
-import { onboardingWelcomeContent as content } from "./onboarding-welcome.content";
+import { onboardingWelcomeContent as content } from "@/content/emails/onboarding-welcome.content";
 
 type Props = {
   firstName: string | null;
@@ -22,7 +22,7 @@ type Props = {
 
 /**
  * Lettre du fondateur — envoyée une fois par utilisateur à la complétion du profil.
- * Contenu textuel dans `onboarding-welcome.content.ts`.
+ * Contenu textuel dans `src/content/emails/onboarding-welcome.content.ts`.
  * Spec de référence : `spec/mkt/emails/onboarding-1-lettre-fondateur.md`.
  */
 export function OnboardingWelcomeEmail({

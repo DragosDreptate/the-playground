@@ -32,7 +32,7 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { Resend } from "resend";
 import { render } from "@react-email/components";
 import { OnboardingWelcomeEmail } from "../src/infrastructure/services/email/templates/onboarding-welcome";
-import { onboardingWelcomeContent } from "../src/infrastructure/services/email/templates/onboarding-welcome.content";
+import { onboardingWelcomeContent } from "../src/content/emails/onboarding-welcome.content";
 import { getOnboardingSender } from "../src/infrastructure/services/email/resend-email-service";
 
 if (!process.env.DATABASE_URL) {

@@ -70,8 +70,8 @@ export function getOnboardingSender(): string {
 }
 
 // Contenu centralisé — re-exporté pour le script de backfill one-shot.
-export { onboardingWelcomeContent } from "./templates/onboarding-welcome.content";
-import { onboardingWelcomeContent } from "./templates/onboarding-welcome.content";
+export { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
+import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 
 function isDemoEmail(email: string): boolean {
   const lower = email.toLowerCase();
