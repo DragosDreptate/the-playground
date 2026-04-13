@@ -27,7 +27,7 @@ export type OnboardingWelcomeContent = {
 
 function parse(): OnboardingWelcomeContent {
   const raw = fs.readFileSync(
-    path.join(__dirname, "onboarding-welcome.md"),
+    path.join(process.cwd(), "src/content/emails/onboarding-welcome.md"),
     "utf-8",
   );
 
