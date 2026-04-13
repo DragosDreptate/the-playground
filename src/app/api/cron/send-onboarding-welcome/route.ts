@@ -14,14 +14,14 @@ import { prismaUserRepository } from "@/infrastructure/repositories";
  * - onboardingCompleted = true
  * - welcomeEmailSentAt = null (pas encore envoyé)
  * - role != ADMIN
- * - createdAt <= now - 24h (J+1)
+ * - createdAt <= now - 3h (délai minimum avant envoi)
  * - Exclut les emails @test.playground et @demo.playground
  *
  * Déclenché chaque jour à 6h UTC (≈ 8h Paris été / 7h Paris hiver)
  * via Vercel Cron (vercel.json).
  */
 
-const DELAY_HOURS = 24;
+const DELAY_HOURS = 3;
 
 const emailService = createResendEmailService();
 
