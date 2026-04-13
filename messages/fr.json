@@ -123,7 +123,9 @@
     "you": "Vous",
     "demo": "Démo",
     "copyLink": "Copier le lien",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "close": "Fermer",
+    "openInNewTab": "Ouvrir dans un nouvel onglet"
   },
   "Auth": {
     "signIn": {

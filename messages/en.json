@@ -123,7 +123,9 @@
     "you": "You",
     "demo": "Demo",
     "copyLink": "Copy link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "close": "Close",
+    "openInNewTab": "Open in new tab"
   },
   "Auth": {
     "signIn": {
