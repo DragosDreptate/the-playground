@@ -1,5 +1,5 @@
 ---
-title: "How to organise a free meetup in 2026 — complete guide"
+title: "How to organise a free meetup in 2026, the complete guide"
 description: "Everything you need to know to organise a free meetup: venue, promotion, registration, tools. A practical step-by-step guide."
 date: "2026-03-05"
 keywords:
@@ -19,11 +19,11 @@ Because the best communities are built in real life. A meetup, even a small one,
 
 Before hunting for a venue or setting up a registration page, ask yourself one simple question: **what format fits your topic and your audience?**
 
-**In person** — The most natural format for a meetup. People meet, chat, stick around after the official end. The downside: you need a venue, and attendees need to travel.
+**In person.** The most natural format for a meetup. People meet, chat, stick around after the official end. The downside: you need a venue, and attendees need to travel.
 
-**Online** — Easier to organise (no venue to find, no geographical limits), but engagement is lower. People turn off their cameras, leave after 30 minutes. It works well for short, structured formats: lightning talks, hands-on workshops, Q&A sessions.
+**Online.** Easier to organise (no venue to find, no geographical limits), but engagement is lower. People turn off their cameras, leave after 30 minutes. It works well for short, structured formats: lightning talks, hands-on workshops, Q&A sessions.
 
-**Hybrid** — Sounds like the best of both worlds on paper. In practice, it's the worst: a degraded experience for both groups. Avoid it unless you have experience and the right equipment.
+**Hybrid.** Sounds like the best of both worlds on paper. In practice, it's the worst: a degraded experience for both groups. Avoid it unless you have experience and the right equipment.
 
 > Our advice: start in person. Even with 8 people. The energy of a room changes everything.
 
@@ -31,11 +31,11 @@ Before hunting for a venue or setting up a registration page, ask yourself one s
 
 This is often the first roadblock. Here are concrete options that work:
 
-- **Coworking spaces** — Many offer a free room in the evening in exchange for visibility. Send a short email with your topic, expected number of attendees, and what you can offer in return (a mention on your social channels, for instance).
-- **Bars and restaurants** — Reserve a space in exchange for one drink per person. Ideally, negotiate a semi-private area. Make sure to clarify "no minimum spend" in your agreement.
-- **Company offices** — Tech companies happily lend their spaces in the evening. It's passive recruiting for them, a free venue for you. Everyone wins.
-- **Public libraries** — Free rooms, often underused. Book early.
-- **Parks and public spaces** — Free by definition. Perfect for spring and summer. Have a rain plan.
+- **Coworking spaces.** Many offer a free room in the evening in exchange for visibility. Send a short email with your topic, expected number of attendees, and what you can offer in return (a mention on your social channels, for instance).
+- **Bars and restaurants.** Reserve a space in exchange for one drink per person. Ideally, negotiate a semi-private area. Make sure to clarify "no minimum spend" in your agreement.
+- **Company offices.** Tech companies happily lend their spaces in the evening. It's passive recruiting for them, a free venue for you. Everyone wins.
+- **Public libraries.** Free rooms, often underused. Book early.
+- **Parks and public spaces.** Free by definition. Perfect for spring and summer. Have a rain plan.
 
 Don't look for the perfect venue for your first meetup. A reachable place with enough chairs is more than enough.
 
@@ -47,10 +47,10 @@ You need three things: a **registration page**, a way to **communicate** with yo
 
 Several platforms exist, each with its own trade-offs:
 
-- **Meetup.com** — The historical reference, large user base, good for discoverability. But it costs money for organisers (monthly subscription). If your goal is "free", it's out.
-- **Luma** — Clean design, magic link registration with no account creation. Free for free events. However, there's no community layer: each event starts from scratch, with no attendee retention.
-- **Eventbrite** — Powerful but heavy. The interface is designed for conferences, not informal meetups. Free for free events.
-- **The Playground** — Free, with polished event pages and a community layer (attendees who register for an event automatically join your community). CSV export, calendar integration (Google Calendar, Apple Calendar, ICS), magic link authentication. It's a newer platform, so the user base is smaller than Meetup or Eventbrite.
+- **Meetup.com.** The historical reference, large user base, good for discoverability. But it costs money for organisers (monthly subscription). If your goal is "free", it's out.
+- **Luma.** Clean design, magic link registration with no account creation. Free for free events. However, there's no community layer: each event starts from scratch, with no attendee retention.
+- **Eventbrite.** Powerful but heavy. The interface is designed for conferences, not informal meetups. Free for free events.
+- **The Playground.** Free, with polished event pages and a community layer (attendees who register for an event automatically join your community). CSV export, calendar integration (Google Calendar, Apple Calendar, ICS), magic link authentication. It's a newer platform, so the user base is smaller than Meetup or Eventbrite.
 
 Whatever tool you pick, the essential thing is a clear page with the title, date, venue, and a visible registration button.
 
@@ -68,10 +68,10 @@ Promotion is the hard part. Here's what actually works, and what's a waste of ti
 
 **What works:**
 
-- **Word of mouth** — By far the most effective channel. Tell 5 people who'll tell 5 more.
-- **Themed WhatsApp/Telegram groups** — If you're organising a Python meetup, the WhatsApp group for Python developers in your city is your best ally.
-- **LinkedIn** — A personal post (not a company page) with authentic copy. Posts like "I'm starting a meetup, here's why" perform well.
-- **Existing Slack/Discord communities** — Share your event there, but contribute first. Nobody likes spam.
+- **Word of mouth.** By far the most effective channel. Tell 5 people who'll tell 5 more.
+- **Themed WhatsApp/Telegram groups.** If you're organising a Python meetup, the WhatsApp group for Python developers in your city is your best ally.
+- **LinkedIn.** A personal post (not a company page) with authentic copy. Posts like "I'm starting a meetup, here's why" perform well.
+- **Existing Slack/Discord communities.** Share your event there, but contribute first. Nobody likes spam.
 
 **What doesn't work (or barely):**
 
@@ -92,7 +92,7 @@ A few practical tips that make the difference:
 - **Respect the schedule.** Start on time, end on time. People have lives.
 - **Keep 15-20 minutes of free networking** at the end. That's often where the best conversations happen.
 
-## After the event — the step most people skip
+## After the event, the step most people skip
 
 This is where the difference between "a one-off event" and "a community" is made. Most organisers stop at the day itself. Don't make that mistake.
 

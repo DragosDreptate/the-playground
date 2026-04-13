@@ -9,13 +9,13 @@ keywords:
   - grow community
 ---
 
-You've probably done it before: created a WhatsApp group, a Discord server or a Slack channel to "keep in touch" after an event. Three months later, the group is silent. People didn't leave — they just stopped looking.
+You've probably done it before: created a WhatsApp group, a Discord server or a Slack channel to "keep in touch" after an event. Three months later, the group is silent. People didn't leave. They just stopped looking.
 
 That's not a platform problem. It's a method problem. Creating a space doesn't create a community. Here are five practical steps to build something that actually lasts.
 
 ## 1. Start with a clear identity
 
-The most common mistake is launching a group without knowing who it's for. "A group for people who like tech" isn't an identity — it's a category. "Freelance developers in Manchester who want to break out of isolation" is one.
+The most common mistake is launching a group without knowing who it's for. "A group for people who like tech" isn't an identity, it's a category. "Freelance developers in Manchester who want to break out of isolation" is one.
 
 A community needs three things from day one:
 
@@ -23,15 +23,15 @@ A community needs three things from day one:
 - **A promise**: what do members get out of it? Networking, learning, support, inspiration?
 - **A name and description** that say both in one sentence.
 
-This sounds basic. But most communities that die within two months never clearly articulated their identity. Features don't compensate for vague positioning. A Slack workspace with 200 people who don't know why they're there is noise — not a community.
+This sounds basic. But most communities that die within two months never clearly articulated their identity. Features don't compensate for vague positioning. A Slack workspace with 200 people who don't know why they're there is noise, not a community.
 
 ## 2. Make the first event happen fast
 
 Don't look for the perfect venue, the ideal number of attendees or the definitive theme. Organise a first gathering. Quickly.
 
-Ten people in a pub, an informal drinks, a one-hour video call — the format doesn't matter. The first event has one single objective: **prove the concept works**. Do people show up? Do they leave happy? Do they tell others about it?
+Ten people in a pub, an informal drinks, a one-hour video call. The format doesn't matter. The first event has one single objective: **prove the concept works**. Do people show up? Do they leave happy? Do they tell others about it?
 
-The temptation is to plan for weeks. To polish the registration page, find a speaker, design a visual. All of that can come later. The number one risk for a nascent community isn't being imperfect — it's never starting.
+The temptation is to plan for weeks. To polish the registration page, find a speaker, design a visual. All of that can come later. The number one risk for a nascent community isn't being imperfect. It's never starting.
 
 > A failed first event teaches you more than a month of planning.
 
@@ -49,24 +49,24 @@ In practice, you need a space where attendees stay connected between events. Sev
 - **A Discord server**: more structured, but the barrier to entry is real. Not everyone has Discord, and not everyone wants to install it for a meetup.
 - **A dedicated community platform**: this is the approach taken by The Playground, for instance. When someone registers for your event, they automatically join your community. The community page shows upcoming events, past events and members. The link doesn't break between events, without you having to manage a chat group.
 
-The tool matters less than the principle: **there must be a continuous thread between events**. If your attendees have to re-register each time as though they've never met you, you're not building a community — you're starting from scratch every time.
+The tool matters less than the principle: **there must be a continuous thread between events**. If your attendees have to re-register each time as though they've never met you, you're not building a community. You're starting from scratch every time.
 
 ## 4. Create a rhythm
 
 A community without regularity is a group of friends who say "we should meet up again" and never do.
 
-Rhythm is the strongest signal you send to your members. Monthly, fortnightly, weekly — the frequency matters less than the consistency. What counts is that members can anticipate. "First Thursday of the month" becomes a mental anchor. "Now and then, when I have time" creates no habit at all.
+Rhythm is the strongest signal you send to your members. Monthly, fortnightly, weekly. The frequency matters less than the consistency. What counts is that members can anticipate. "First Thursday of the month" becomes a mental anchor. "Now and then, when I have time" creates no habit at all.
 
 Two practices that change everything:
 
 - **Announce the next event before the current one ends.** When people are still in the energy of the moment, give them the next date. "The next meetup is on 14 March" is more powerful than any follow-up email sent two weeks later.
-- **Maintain the rhythm even when it's hard.** One month without an event is fine. Two months, people start to forget. Three months, you're essentially relaunching the community from scratch. If you don't have time for a full event, do a lighter format — an informal coffee, a discussion thread, a quick call. The important thing is not to disappear.
+- **Maintain the rhythm even when it's hard.** One month without an event is fine. Two months, people start to forget. Three months, you're essentially relaunching the community from scratch. If you don't have time for a full event, do a lighter format. An informal coffee, a discussion thread, a quick call. The important thing is not to disappear.
 
 > Regularity builds trust. Trust builds engagement. Engagement builds community.
 
 ## 5. Let members shape the community
 
-If you're the only person proposing topics, organising events and driving discussions, you don't have a community — you have a one-person show. And the day you're tired, everything stops.
+If you're the only person proposing topics, organising events and driving discussions, you don't have a community. You have a one-person show. And the day you're tired, everything stops.
 
 The strongest communities are those where members take initiative:
 
@@ -74,7 +74,7 @@ The strongest communities are those where members take initiative:
 - **Co-organise**: identify the most engaged members and offer them the chance to co-host an event. It involves them and takes weight off your shoulders.
 - **Bring people**: word of mouth is your best growth channel. If your members invite their contacts, it means the community is creating value.
 
-Your role naturally evolves: you shift from organiser to facilitator. You're no longer carrying everything — you're creating the framework within which things happen.
+Your role naturally evolves: you shift from organiser to facilitator. You're no longer carrying everything. You're creating the framework within which things happen.
 
 This is also a sign of maturity. A community that depends on one person is fragile. A community where several people contribute is resilient.
 
@@ -90,4 +90,4 @@ Building an online community that lasts isn't a question of tools or budget. It'
 4. **Rhythm**: be consistent, not perfect.
 5. **Participation**: let members contribute.
 
-None of these steps require a particular tool. But the right tools make the right habits easier. Choose the one that fits your approach — and focus on what truly matters: the people who come back.
+None of these steps require a particular tool. But the right tools make the right habits easier. Choose the one that fits your approach, and focus on what truly matters: the people who come back.
