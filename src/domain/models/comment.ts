@@ -1,3 +1,5 @@
+import type { CommentAttachment } from "./comment-attachment";
+
 export type Comment = {
   id: string;
   momentId: string;
@@ -15,4 +17,5 @@ export type CommentWithUser = Comment & {
     email: string;
     image: string | null;
   };
+  attachments: CommentAttachment[];
 };

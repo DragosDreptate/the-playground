@@ -15,6 +15,7 @@ import {
   AttachmentTooLargeError,
   AttachmentTypeNotAllowedError,
 } from "@/domain/errors";
+import { sanitizeFilename } from "@/lib/sanitize-filename";
 
 type AddMomentAttachmentInput = {
   momentId: string;
@@ -79,13 +80,4 @@ export async function addMomentAttachment(
     contentType: input.file.contentType,
     sizeBytes: input.file.sizeBytes,
   });
-}
-
-function sanitizeFilename(filename: string): string {
-  const ascii = filename.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const safe = ascii
-    .replace(/[^a-zA-Z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .toLowerCase();
-  return safe.length > 0 ? safe : "file";
 }
