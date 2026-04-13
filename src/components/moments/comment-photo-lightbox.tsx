@@ -1,6 +1,6 @@
 "use client";
 
-import { X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { cn } from "@/lib/utils";
@@ -40,13 +40,29 @@ export function CommentPhotoLightbox({
             {alt}
           </DialogPrimitive.Description>
 
-          {/* Close button */}
-          <DialogPrimitive.Close
-            className="absolute top-0 right-0 z-10 flex size-9 items-center justify-center rounded-lg border border-white/12 bg-white/6 text-gray-300 transition-colors hover:border-white/20 hover:bg-white/12 hover:text-white"
-            aria-label={t("close")}
-          >
-            <X className="size-4" />
-          </DialogPrimitive.Close>
+          {/* Action buttons — top right */}
+          <div className="absolute top-0 right-0 z-10 flex gap-1.5">
+            {/* Open in new tab — pinch-to-zoom works natively in
+                the browser's full-screen image viewer, unlike inside
+                a modal where touch events are intercepted. */}
+            {url && (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex size-9 items-center justify-center rounded-lg border border-white/12 bg-white/6 text-gray-300 transition-colors hover:border-white/20 hover:bg-white/12 hover:text-white"
+                aria-label={t("openInNewTab")}
+              >
+                <ExternalLink className="size-4" />
+              </a>
+            )}
+            <DialogPrimitive.Close
+              className="flex size-9 items-center justify-center rounded-lg border border-white/12 bg-white/6 text-gray-300 transition-colors hover:border-white/20 hover:bg-white/12 hover:text-white"
+              aria-label={t("close")}
+            >
+              <X className="size-4" />
+            </DialogPrimitive.Close>
+          </div>
 
           {/* Image */}
           {url && (

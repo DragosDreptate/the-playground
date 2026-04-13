@@ -499,6 +499,7 @@
       "rateLimitReached": "Limite atteinte — {limit} analyses par jour maximum. Revenez demain.",
       "sources": "Sources : Luma · Eventbrite · Meetup",
       "close": "Fermer",
+      "openInNewTab": "Ouvrir dans un nouvel onglet",
       "cityLabel": "dans {city}",
       "badgeNew": "NOUVEAU",
       "analyzeShort": "Analyser",
