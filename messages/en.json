@@ -639,7 +639,14 @@
       "justNow": "Just now",
       "minutesAgo": "{count}m ago",
       "hoursAgo": "{count}h ago",
-      "daysAgo": "{count}d ago"
+      "daysAgo": "{count}d ago",
+      "addPhotos": "Add photos",
+      "addPhotosDisabled": "3 photos limit reached",
+      "removePhoto": "Remove this photo",
+      "photoTypeError": "Unsupported format. JPG, PNG or WebP only.",
+      "photoTooLargeError": "Photo too large, even after compression.",
+      "photoUploadError": "Failed to send. Try again.",
+      "photoCount": "{count}/3 photos"
     },
     "empty": {
       "description": "No Events yet. Create your first event."
