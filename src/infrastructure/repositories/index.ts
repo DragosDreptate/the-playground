@@ -3,6 +3,7 @@ export { prismaMomentRepository } from "./prisma-moment-repository";
 export { prismaRegistrationRepository } from "./prisma-registration-repository";
 export { prismaUserRepository } from "./prisma-user-repository";
 export { prismaCommentRepository } from "./prisma-comment-repository";
+export { prismaCommentAttachmentRepository } from "./prisma-comment-attachment-repository";
 export { prismaMomentAttachmentRepository } from "./prisma-moment-attachment-repository";
 export { prismaAdminRepository } from "./prisma-admin-repository";
 export { prismaCircleNetworkRepository } from "./prisma-circle-network-repository";
