@@ -13,6 +13,7 @@ import {
 import { createResendEmailService } from "@/infrastructure/services";
 import { addComment } from "@/domain/usecases/add-comment";
 import { deleteComment } from "@/domain/usecases/delete-comment";
+import { notifySlackNewComment } from "@/infrastructure/services/slack/slack-notification-service";
 import type { Comment } from "@/domain/models/comment";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
@@ -172,4 +173,12 @@ async function sendCommentNotifications(
       });
     })
   );
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  await notifySlackNewComment({
+    playerName,
+    momentTitle: moment.title,
+    commentPreview,
+    momentUrl: `${baseUrl}/m/${moment.slug}`,
+  });
 }
