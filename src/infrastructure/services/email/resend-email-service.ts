@@ -69,9 +69,9 @@ export function getOnboardingSender(): string {
   );
 }
 
-// Partagé entre l'envoi applicatif et le script de backfill one-shot.
-export const ONBOARDING_WELCOME_SUBJECT = "The Playground a besoin de toi";
-export const ONBOARDING_WELCOME_REPLY_TO = "dragos@the-playground.fr";
+// Contenu centralisé — re-exporté pour le script de backfill one-shot.
+export { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
+import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 
 function isDemoEmail(email: string): boolean {
   const lower = email.toLowerCase();
@@ -410,8 +410,8 @@ export function createResendEmailService(): EmailService {
       await send({
         from: getOnboardingSender(),
         to: data.to,
-        replyTo: ONBOARDING_WELCOME_REPLY_TO,
-        subject: ONBOARDING_WELCOME_SUBJECT,
+        replyTo: onboardingWelcomeContent.replyTo,
+        subject: onboardingWelcomeContent.subject,
         react: OnboardingWelcomeEmail({ firstName: data.firstName, baseUrl }),
       });
     },

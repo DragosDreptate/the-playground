@@ -32,11 +32,8 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { Resend } from "resend";
 import { render } from "@react-email/components";
 import { OnboardingWelcomeEmail } from "../src/infrastructure/services/email/templates/onboarding-welcome";
-import {
-  ONBOARDING_WELCOME_SUBJECT,
-  ONBOARDING_WELCOME_REPLY_TO,
-  getOnboardingSender,
-} from "../src/infrastructure/services/email/resend-email-service";
+import { onboardingWelcomeContent } from "../src/content/emails/onboarding-welcome.content";
+import { getOnboardingSender } from "../src/infrastructure/services/email/resend-email-service";
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL non défini.");
@@ -74,7 +71,7 @@ async function main() {
   );
   console.log(`   Cutoff : utilisateurs inscrits après ${BREVO_FOUNDER_LETTER_DATE.toISOString()}`);
   console.log(`   Expéditeur : ${getOnboardingSender()}`);
-  console.log(`   Reply-to   : ${ONBOARDING_WELCOME_REPLY_TO}`);
+  console.log(`   Reply-to   : ${onboardingWelcomeContent.replyTo}`);
   console.log("─────────────────────────────────────────────────────────\n");
 
   const users = await prisma.user.findMany({
@@ -151,8 +148,8 @@ async function main() {
       const { error } = await resend.emails.send({
         from: getOnboardingSender(),
         to: user.email,
-        replyTo: ONBOARDING_WELCOME_REPLY_TO,
-        subject: ONBOARDING_WELCOME_SUBJECT,
+        replyTo: onboardingWelcomeContent.replyTo,
+        subject: onboardingWelcomeContent.subject,
         html,
       });
 
