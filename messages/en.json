@@ -123,7 +123,9 @@
     "you": "You",
     "demo": "Demo",
     "copyLink": "Copy link",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "close": "Close",
+    "openInNewTab": "Open in new tab"
   },
   "Auth": {
     "signIn": {
@@ -499,6 +501,7 @@
       "rateLimitReached": "Daily limit reached — {limit} analyses maximum per day. Come back tomorrow.",
       "sources": "Sources: Luma · Eventbrite · Meetup",
       "close": "Close",
+      "openInNewTab": "Open in new tab",
       "cityLabel": "in {city}",
       "badgeNew": "NEW",
       "analyzeShort": "Analyze",
@@ -639,7 +642,14 @@
       "justNow": "Just now",
       "minutesAgo": "{count}m ago",
       "hoursAgo": "{count}h ago",
-      "daysAgo": "{count}d ago"
+      "daysAgo": "{count}d ago",
+      "addPhotos": "Add photos",
+      "addPhotosDisabled": "3 photos limit reached",
+      "removePhoto": "Remove this photo",
+      "photoTypeError": "Unsupported format. JPG, PNG or WebP only.",
+      "photoTooLargeError": "Photo too large, even after compression.",
+      "photoUploadError": "Failed to send. Try again.",
+      "photoCount": "{count}/3 photos"
     },
     "empty": {
       "description": "No Events yet. Create your first event."
@@ -1516,7 +1526,11 @@
       },
       "comments": {
         "title": "Comments",
-        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the organizer."
+        "intro": "Each event has a <strong>comment thread</strong>. You can ask questions, share your excitement, or chat with other attendees. Comments are visible to all registered members and the organizer.",
+        "photosLabel": "Photos in comments:",
+        "photos1": "You can <strong>add up to 3 photos</strong> to each comment (JPG, PNG, WebP)",
+        "photos2": "Large photos are <strong>automatically compressed</strong> for fast upload, even from a phone",
+        "photos3": "Click a photo to enlarge it"
       },
       "mySpace": {
         "title": "My Dashboard",

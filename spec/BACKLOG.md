@@ -267,6 +267,7 @@
 | P-06 | **Export données Organisateur étendu** | CSV membres Communauté, historique événements, inscrits cumulés. L'export CSV inscrits par événement existe déjà. | — |
 | P-07 | **Assistant IA basique** | Description événement, email invitation, suggestions Communauté. SDK Anthropic (Claude). | — |
 | P-08 | **Stats Communauté basiques** | Métriques sur la page Communauté Organisateur (tendance membres, taux de remplissage, etc.). | — |
+| P-09 | **Notification désinscription (opt-in Organisateur)** | Option dans le profil Organisateur pour recevoir (ou non) une notification quand un Participant se désinscrit d'un événement gratuit. Actuellement seuls les événements payants notifient l'Organisateur. Alignement Meetup (qui notifie systématiquement). | — |
 
 ---
 
@@ -305,6 +306,7 @@
 - [ ] **Check-in** — Marquer présent sur place (retiré du MVP v1)
 - [ ] **Galerie photos post-événement** — Upload par Participants et Organisateur après un événement PAST. Galerie sur `/m/[slug]` et page Communauté. Modération par l'Organisateur. CTA "Voir les photos" dans l'email post-événement. Infrastructure `StorageService` (Vercel Blob) déjà en place.
 - [ ] **Dupliquer un événement** — Bouton "Dupliquer" sur un événement existant pour pré-remplir le formulaire de création avec les mêmes infos (titre, lieu, description, capacité, prix). Gain de temps pour les événements récurrents similaires.
+- [ ] **API publique v1** — Permettre aux organisateurs de créer/gérer des événements et récupérer les données via API REST + webhooks sortants. Débloque les intégrations avec des systèmes internes (automatisation, CRM, bots). Spec : `spec/features/public-api-v1.md`
 - [ ] **Plan Pro** — Analytics avancés, branding personnalisé, IA avancée, API, notifications multi-canal
 - [ ] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
 - [ ] **White-label / mono-community** — `spec/product/white-label-mono-community.md`

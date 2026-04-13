@@ -123,7 +123,9 @@
     "you": "Vous",
     "demo": "Démo",
     "copyLink": "Copier le lien",
-    "copied": "Copié !"
+    "copied": "Copié !",
+    "close": "Fermer",
+    "openInNewTab": "Ouvrir dans un nouvel onglet"
   },
   "Auth": {
     "signIn": {
@@ -499,6 +501,7 @@
       "rateLimitReached": "Limite atteinte — {limit} analyses par jour maximum. Revenez demain.",
       "sources": "Sources : Luma · Eventbrite · Meetup",
       "close": "Fermer",
+      "openInNewTab": "Ouvrir dans un nouvel onglet",
       "cityLabel": "dans {city}",
       "badgeNew": "NOUVEAU",
       "analyzeShort": "Analyser",
@@ -639,7 +642,14 @@
       "justNow": "À l'instant",
       "minutesAgo": "Il y a {count}min",
       "hoursAgo": "Il y a {count}h",
-      "daysAgo": "Il y a {count}j"
+      "daysAgo": "Il y a {count}j",
+      "addPhotos": "Ajouter des photos",
+      "addPhotosDisabled": "Limite de 3 photos atteinte",
+      "removePhoto": "Retirer cette photo",
+      "photoTypeError": "Format non supporté. JPG, PNG ou WebP uniquement.",
+      "photoTooLargeError": "Photo trop volumineuse, même après compression.",
+      "photoUploadError": "Erreur lors de l'envoi. Réessayez.",
+      "photoCount": "{count}/3 photos"
     },
     "empty": {
       "description": "Aucun événement pour le moment. Créez votre premier événement."
@@ -1516,7 +1526,11 @@
       },
       "comments": {
         "title": "Les commentaires",
-        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'organisateur."
+        "intro": "Chaque événement dispose d'un <strong>fil de commentaires</strong>. Vous pouvez poser des questions, partager votre enthousiasme, ou échanger avec d'autres participants. Les commentaires sont visibles par tous les inscrits et par l'organisateur.",
+        "photosLabel": "Photos dans les commentaires :",
+        "photos1": "Vous pouvez <strong>ajouter jusqu'à 3 photos</strong> à chaque commentaire (JPG, PNG, WebP)",
+        "photos2": "Les photos volumineuses sont <strong>automatiquement compressées</strong> pour un envoi rapide, même depuis un téléphone",
+        "photos3": "Cliquez sur une photo pour l'agrandir"
       },
       "mySpace": {
         "title": "Mon espace",

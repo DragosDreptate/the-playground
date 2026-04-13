@@ -50,3 +50,8 @@ export {
   StripeConnectNotActiveError,
   StripeConnectAlreadyActiveError,
 } from "./stripe-errors";
+export {
+  CommentPhotoLimitReachedError,
+  CommentPhotoTooLargeError,
+  CommentPhotoTypeNotAllowedError,
+} from "./comment-attachment-errors";

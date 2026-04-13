@@ -4,7 +4,11 @@ import type {
   CreateCommentInput,
 } from "@/domain/ports/repositories/comment-repository";
 import type { Comment, CommentWithUser } from "@/domain/models/comment";
-import type { Comment as PrismaComment } from "@prisma/client";
+import type { CommentAttachment } from "@/domain/models/comment-attachment";
+import type {
+  Comment as PrismaComment,
+  CommentAttachment as PrismaCommentAttachment,
+} from "@prisma/client";
 
 function toDomainComment(record: PrismaComment): Comment {
   return {
@@ -17,6 +21,20 @@ function toDomainComment(record: PrismaComment): Comment {
   };
 }
 
+function toDomainCommentAttachment(
+  record: PrismaCommentAttachment
+): CommentAttachment {
+  return {
+    id: record.id,
+    commentId: record.commentId,
+    url: record.url,
+    filename: record.filename,
+    contentType: record.contentType,
+    sizeBytes: record.sizeBytes,
+    createdAt: record.createdAt,
+  };
+}
+
 type PrismaCommentWithUser = PrismaComment & {
   user: {
     id: string;
@@ -25,6 +43,7 @@ type PrismaCommentWithUser = PrismaComment & {
     email: string;
     image: string | null;
   };
+  attachments: PrismaCommentAttachment[];
 };
 
 function toDomainCommentWithUser(record: PrismaCommentWithUser): CommentWithUser {
@@ -37,6 +56,7 @@ function toDomainCommentWithUser(record: PrismaCommentWithUser): CommentWithUser
       email: record.user.email,
       image: record.user.image,
     },
+    attachments: record.attachments.map(toDomainCommentAttachment),
   };
 }
 
@@ -69,6 +89,9 @@ export const prismaCommentRepository: CommentRepository = {
             email: true,
             image: true,
           },
+        },
+        attachments: {
+          orderBy: { createdAt: "asc" },
         },
       },
       orderBy: { createdAt: "asc" },

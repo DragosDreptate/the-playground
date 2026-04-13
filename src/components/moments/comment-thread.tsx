@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useCallback, useEffect } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
+import { ImagePlus, X } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import {
   AlertDialog,
@@ -17,12 +18,25 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
+import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
+import { compressCommentPhoto } from "@/lib/image-compress";
+import { isCoarsePointer } from "@/lib/coarse-pointer";
 import { getDisplayName } from "@/lib/display-name";
 import { linkifyText } from "@/lib/linkify";
+import {
+  MAX_COMMENT_PHOTOS,
+  ALLOWED_COMMENT_PHOTO_TYPES,
+} from "@/domain/models/comment-attachment";
 import type { CommentWithUser } from "@/domain/models/comment";
 
 const MAX_CONTENT_LENGTH = 2000;
+
+type StagedPhoto = {
+  file: File;
+  previewUrl: string;
+  compressed: Blob | null; // null = not yet compressed
+};
 
 type CommentThreadProps = {
   momentId: string;
@@ -105,6 +119,60 @@ function DeleteCommentButton({
   );
 }
 
+// --- Comment photos display ---
+
+function CommentPhotos({
+  attachments,
+  onPhotoClick,
+}: {
+  attachments: CommentWithUser["attachments"];
+  onPhotoClick: (url: string, alt: string) => void;
+}) {
+  if (attachments.length === 0) return null;
+
+  const isSingle = attachments.length === 1;
+
+  function handleClick(url: string, altText: string) {
+    if (isCoarsePointer()) {
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+    onPhotoClick(url, altText);
+  }
+
+  return (
+    <div className={isSingle ? "mt-2" : "mt-2 flex flex-wrap gap-2"}>
+      {attachments.map((att) => {
+        const alt = att.filename.replace(/\.[^.]+$/, "");
+        return (
+          <button
+            key={att.id}
+            type="button"
+            onClick={() => handleClick(att.url, alt)}
+            className={
+              isSingle
+                ? "block max-w-xs cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30"
+                : "size-24 cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30 sm:size-32"
+            }
+          >
+            <img
+              src={att.url}
+              alt={alt}
+              className={
+                isSingle
+                  ? "max-h-60 max-w-xs rounded-lg object-cover"
+                  : "size-full object-cover"
+              }
+            />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// --- Main component ---
+
 export function CommentThread({
   momentId,
   comments,
@@ -120,19 +188,98 @@ export function CommentThread({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const formatRelativeTime = useRelativeTime(t);
 
+  // Photo state
+  const [stagedPhotos, setStagedPhotos] = useState<StagedPhoto[]>([]);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  // Lightbox state
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [lightboxAlt, setLightboxAlt] = useState("");
+
+  // Cleanup preview URLs on unmount to avoid memory leaks
+  const stagedPhotosRef = useRef(stagedPhotos);
+  stagedPhotosRef.current = stagedPhotos;
+  useEffect(() => {
+    return () => {
+      stagedPhotosRef.current.forEach((p) => URL.revokeObjectURL(p.previewUrl));
+    };
+  }, []);
+
   const isAuthenticated = currentUserId !== null;
-  const canComment = isAuthenticated;
+  const photosAtLimit = stagedPhotos.length >= MAX_COMMENT_PHOTOS;
+
+  const handlePhotoSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      setPhotoError(null);
+      const files = e.target.files;
+      if (!files) return;
+
+      const remaining = MAX_COMMENT_PHOTOS - stagedPhotos.length;
+      const filesToAdd = Array.from(files).slice(0, remaining);
+
+      for (const file of filesToAdd) {
+        // Client-side type check
+        if (!ALLOWED_COMMENT_PHOTO_TYPES.has(file.type)) {
+          setPhotoError(t("comments.photoTypeError"));
+          continue;
+        }
+
+        // Compress if needed, create preview
+        const previewUrl = URL.createObjectURL(file);
+        try {
+          const compressed = await compressCommentPhoto(file);
+          setStagedPhotos((prev) => [
+            ...prev,
+            { file, previewUrl, compressed },
+          ]);
+        } catch {
+          URL.revokeObjectURL(previewUrl);
+          setPhotoError(t("comments.photoUploadError"));
+        }
+      }
+
+      // Reset input so the same file can be re-selected
+      e.target.value = "";
+    },
+    [stagedPhotos.length, t]
+  );
+
+  const removePhoto = useCallback((index: number) => {
+    setStagedPhotos((prev) => {
+      const removed = prev[index];
+      if (removed) URL.revokeObjectURL(removed.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
+  }, []);
 
   function handleSubmit() {
     if (!content.trim()) return;
     setError(null);
+    setPhotoError(null);
     startTransition(async () => {
-      const result = await addCommentAction(momentId, content);
+      const formData = new FormData();
+      formData.set("content", content);
+
+      // Attach compressed photos
+      for (let i = 0; i < stagedPhotos.length; i++) {
+        const staged = stagedPhotos[i];
+        const blob = staged.compressed ?? staged.file;
+        formData.set(`photo-${i}`, blob, staged.file.name);
+      }
+
+      const result = await addCommentAction(momentId, formData);
       if (result.success) {
-        posthog.capture("comment_posted", { moment_id: momentId });
+        posthog.capture("comment_posted", {
+          moment_id: momentId,
+          photo_count: stagedPhotos.length,
+        });
         setContent("");
+        // Cleanup preview URLs
+        for (const p of stagedPhotos) URL.revokeObjectURL(p.previewUrl);
+        setStagedPhotos([]);
         router.refresh();
       } else {
         setError(result.error);
@@ -199,6 +346,15 @@ export function CommentThread({
                     <p className="mt-0.5 text-sm whitespace-pre-wrap break-words">
                       {linkifyText(comment.content)}
                     </p>
+
+                    {/* Photos */}
+                    <CommentPhotos
+                      attachments={comment.attachments}
+                      onPhotoClick={(url, alt) => {
+                        setLightboxUrl(url);
+                        setLightboxAlt(alt);
+                      }}
+                    />
                   </div>
                 </div>
               );
@@ -209,20 +365,76 @@ export function CommentThread({
         {/* Form or sign-in prompt */}
         {isAuthenticated ? (
           <div className="space-y-2 pt-2">
-            <textarea
-              ref={textareaRef}
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={isPastMoment ? t("comments.placeholderPast") : t("comments.placeholder")}
-              rows={3}
-              maxLength={MAX_CONTENT_LENGTH}
-              className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring w-full resize-none rounded-xl border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
-              disabled={isPending}
-            />
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-muted-foreground text-xs">
-                {content.length} / {MAX_CONTENT_LENGTH}
-              </span>
+            {/* Textarea + char count in a single bordered container */}
+            <div className="border-input bg-background focus-within:ring-ring focus-within:border-ring rounded-xl border focus-within:ring-2 focus-within:ring-offset-2">
+              <textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={isPastMoment ? t("comments.placeholderPast") : t("comments.placeholder")}
+                rows={3}
+                maxLength={MAX_CONTENT_LENGTH}
+                className="placeholder:text-muted-foreground w-full resize-none border-none bg-transparent px-3 pt-2 pb-0 text-sm outline-none disabled:opacity-50"
+                disabled={isPending}
+              />
+              <div className="flex justify-end px-3 pb-1.5">
+                <span className="text-muted-foreground text-[11px]">
+                  {content.length} / {MAX_CONTENT_LENGTH}
+                </span>
+              </div>
+            </div>
+
+            {/* Photo previews */}
+            {stagedPhotos.length > 0 && (
+              <div className="flex gap-2 px-0.5">
+                {stagedPhotos.map((staged, i) => (
+                  <div
+                    key={staged.previewUrl}
+                    className="relative size-16 shrink-0 overflow-hidden rounded-lg sm:size-20"
+                  >
+                    <img
+                      src={staged.previewUrl}
+                      alt=""
+                      className="size-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="absolute top-0.5 right-0.5 flex size-[18px] cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/85"
+                      aria-label={t("comments.removePhoto")}
+                    >
+                      <X className="size-2.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handlePhotoSelect}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => !photosAtLimit && fileInputRef.current?.click()}
+                disabled={photosAtLimit}
+                aria-label={
+                  photosAtLimit
+                    ? t("comments.addPhotosDisabled")
+                    : t("comments.addPhotos")
+                }
+                className="text-muted-foreground gap-1.5"
+              >
+                <ImagePlus className="size-4" />
+                <span className="hidden sm:inline">{t("comments.addPhotos")}</span>
+              </Button>
               <Button
                 size="sm"
                 onClick={handleSubmit}
@@ -231,8 +443,8 @@ export function CommentThread({
                 {t("comments.submit")}
               </Button>
             </div>
-            {error && (
-              <p className="text-destructive text-xs">{error}</p>
+            {(error || photoError) && (
+              <p className="text-destructive text-xs">{error || photoError}</p>
             )}
           </div>
         ) : (
@@ -244,6 +456,13 @@ export function CommentThread({
           </a>
         )}
       </div>
+
+      {/* Lightbox */}
+      <CommentPhotoLightbox
+        url={lightboxUrl}
+        alt={lightboxAlt}
+        onClose={() => setLightboxUrl(null)}
+      />
     </div>
   );
 }

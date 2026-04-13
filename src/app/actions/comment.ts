@@ -2,6 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
+import { fileTypeFromBuffer } from "file-type";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCommentRepository,
@@ -9,11 +10,18 @@ import {
   prismaCircleRepository,
   prismaUserRepository,
   prismaRegistrationRepository,
+  prismaCommentAttachmentRepository,
 } from "@/infrastructure/repositories";
+import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService } from "@/infrastructure/services";
 import { addComment } from "@/domain/usecases/add-comment";
+import type { CommentPhotoInput } from "@/domain/usecases/add-comment";
 import { deleteComment } from "@/domain/usecases/delete-comment";
 import { notifySlackNewComment } from "@/infrastructure/services/slack/slack-notification-service";
+import {
+  ALLOWED_COMMENT_PHOTO_TYPES,
+  MAX_COMMENT_PHOTO_SIZE_BYTES,
+} from "@/domain/models/comment-attachment";
 import type { Comment } from "@/domain/models/comment";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
@@ -22,7 +30,7 @@ const emailService = createResendEmailService();
 
 export async function addCommentAction(
   momentId: string,
-  content: string
+  formData: FormData
 ): Promise<ActionResult<Comment>> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -30,13 +38,87 @@ export async function addCommentAction(
   }
   const userId = session.user.id;
 
+  const rawContent = formData.get("content");
+  if (typeof rawContent !== "string" || !rawContent) {
+    return { success: false, error: "Content missing", code: "MISSING_CONTENT" };
+  }
+  const content = rawContent;
+
+  // Extract photo files from FormData (photo-0, photo-1, photo-2)
+  const photoFiles: File[] = [];
+  for (let i = 0; i < 3; i++) {
+    const f = formData.get(`photo-${i}`);
+    if (f instanceof File && f.size > 0) photoFiles.push(f);
+  }
+
+  // Validate and detect MIME for each photo
+  let photos: CommentPhotoInput[] = [];
+  if (photoFiles.length > 0) {
+    try {
+      photos = await Promise.all(
+        photoFiles.map(async (file) => {
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const detected = await fileTypeFromBuffer(buffer);
+          if (
+            !detected ||
+            !ALLOWED_COMMENT_PHOTO_TYPES.has(detected.mime)
+          ) {
+            return {
+              buffer,
+              filename: file.name,
+              contentType: "invalid",
+              sizeBytes: buffer.length,
+            };
+          }
+          return {
+            buffer,
+            filename: file.name,
+            contentType: detected.mime,
+            sizeBytes: buffer.length,
+          };
+        })
+      );
+
+      // Check for invalid types (detected in parallel above)
+      const invalid = photos.find((p) => p.contentType === "invalid");
+      if (invalid) {
+        return {
+          success: false,
+          error: "Format non supporté",
+          code: "COMMENT_PHOTO_TYPE_NOT_ALLOWED",
+        };
+      }
+
+      // Check sizes
+      const tooLarge = photos.find(
+        (p) => p.sizeBytes > MAX_COMMENT_PHOTO_SIZE_BYTES
+      );
+      if (tooLarge) {
+        return {
+          success: false,
+          error: "Photo trop volumineuse",
+          code: "COMMENT_PHOTO_TOO_LARGE",
+        };
+      }
+    } catch (err) {
+      Sentry.captureException(err);
+      return {
+        success: false,
+        error: "Erreur de lecture des photos",
+        code: "READ_ERROR",
+      };
+    }
+  }
+
   return toActionResult(async () => {
     const result = await addComment(
-      { momentId, userId, content },
+      { momentId, userId, content, photos },
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
         registrationRepository: prismaRegistrationRepository,
+        commentAttachmentRepository: prismaCommentAttachmentRepository,
+        storage: vercelBlobStorageService,
       }
     );
 
@@ -71,6 +153,8 @@ export async function deleteCommentAction(
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
         circleRepository: prismaCircleRepository,
+        commentAttachmentRepository: prismaCommentAttachmentRepository,
+        storage: vercelBlobStorageService,
       }
     );
   });
