@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>Mockup — Photos dans les commentaires (dark, desktop)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Dark mode tokens — globals.css oklch → hex */
+  --background: #17152a;
+  --foreground: #ecebf3;
+  --card: #282238;
+  --card-foreground: #ecebf3;
+  --muted: #201c33;
+  --muted-foreground: #918ea5;
+  --border: #382f52;
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --primary-10: rgba(232, 69, 122, 0.10);
+  --primary-20: rgba(232, 69, 122, 0.20);
+  --primary-30: rgba(232, 69, 122, 0.30);
+  --destructive: #e8457a;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.55);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  padding: 2.5rem 0 5rem;
+}
+
+/* ── Layout ── */
+.screen {
+  max-width: 1180px;
+  margin: 0 auto 4rem;
+  padding: 0 2rem;
+}
+.screen-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+.screen-note {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-bottom: 1.5rem;
+  padding-left: 0.25rem;
+  line-height: 1.5;
+  max-width: 680px;
+}
+.divider {
+  border: none;
+  border-top: 1px dashed var(--border);
+  margin: 3rem 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* Event page — two columns                                       */
+/* ═══════════════════════════════════════════════════════════════ */
+.event-page {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+/* ─── LEFT column ─── */
+.left-col {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.cover-block {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8457a 0%, #a855f7 50%, #6366f1 100%);
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  box-shadow: 0 20px 60px rgba(232, 69, 122, 0.15);
+}
+.cover-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at bottom left, rgba(0,0,0,0.2) 0%, transparent 60%);
+}
+.cover-block .cover-label {
+  position: relative;
+  font-family: Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.1;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+.circle-info-block {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.circle-avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.circle-info-meta { flex: 1; min-width: 0; }
+.circle-info-label { font-size: 0.7rem; color: var(--muted-foreground); }
+.circle-info-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── RIGHT column ─── */
+.right-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.hosted-by { font-size: 0.875rem; color: var(--muted-foreground); }
+.hosted-by strong { color: var(--foreground); font-weight: 500; }
+.event-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--foreground);
+}
+.meta-row { display: flex; align-items: center; gap: 0.75rem; }
+.meta-icon {
+  width: 32px; height: 32px; flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  background: var(--primary-10); color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+}
+.meta-icon svg { width: 16px; height: 16px; }
+.meta-label { font-size: 0.75rem; color: var(--muted-foreground); line-height: 1.4; }
+.meta-value { font-size: 0.875rem; font-weight: 500; color: var(--foreground); line-height: 1.4; }
+.description-block { font-size: 0.9375rem; line-height: 1.7; color: var(--foreground); }
+.description-block p + p { margin-top: 0.75rem; }
+
+/* ─── Collapsed content indicator ─── */
+.collapsed-placeholder {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  font-style: italic;
+  padding: 0.75rem 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* Comment thread — card                                          */
+/* ═══════════════════════════════════════════════════════════════ */
+.comment-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+.comment-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1rem;
+}
+.comment-card-title .count {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted-foreground);
+}
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ─── Single comment ─── */
+.comment {
+  display: flex;
+  gap: 0.75rem;
+}
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  color: var(--primary);
+  background: var(--primary-10);
+}
+.comment-avatar.green  { background: rgba(34,197,94,0.12); color: #22c55e; }
+.comment-avatar.purple { background: rgba(168,85,247,0.12); color: #a855f7; }
+.comment-avatar.blue   { background: rgba(59,130,246,0.12); color: #3b82f6; }
+.comment-avatar.orange { background: rgba(249,115,22,0.12); color: #f97316; }
+.comment-avatar.teal   { background: rgba(20,184,166,0.12); color: #14b8a6; }
+.comment-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.comment-body { flex: 1; min-width: 0; }
+.comment-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.comment-name { font-size: 0.875rem; font-weight: 500; color: var(--foreground); }
+.comment-time { font-size: 0.75rem; color: var(--muted-foreground); }
+.comment-delete {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.comment-delete:hover { color: var(--destructive); }
+.comment-text {
+  margin-top: 0.125rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--foreground);
+}
+
+/* ─── Photos in a posted comment ─── */
+.comment-photos {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.comment-photo {
+  width: 128px;
+  height: 128px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  border: 1px solid var(--border);
+}
+.comment-photo:hover {
+  opacity: 0.9;
+  box-shadow: 0 0 0 2px var(--primary-30);
+}
+
+/* Single photo — larger display */
+.comment-photos.single .comment-photo {
+  width: auto;
+  max-width: 320px;
+  height: auto;
+  max-height: 240px;
+  object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* Comment form — input area                                      */
+/* ═══════════════════════════════════════════════════════════════ */
+.comment-form {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.comment-textarea {
+  width: 100%;
+  resize: none;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.comment-textarea::placeholder { color: var(--muted-foreground); }
+.comment-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-20);
+}
+
+/* ─── Photo previews (before posting) ─── */
+.photo-previews {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0.125rem;
+}
+.photo-preview-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.photo-preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-preview-remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+  transition: background 0.15s;
+}
+.photo-preview-remove:hover { background: rgba(0,0,0,0.85); }
+
+/* ─── Form footer (photo btn + counter + submit) ─── */
+.comment-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.comment-form-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.photo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 0.375rem;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.photo-btn:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+.photo-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.photo-btn.disabled:hover {
+  color: var(--muted-foreground);
+  background: none;
+}
+.photo-btn svg { width: 18px; height: 18px; }
+.char-count { font-size: 0.75rem; color: var(--muted-foreground); }
+.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-sm:hover { background: #d63a6c; }
+.btn-sm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* Lightbox overlay                                               */
+/* ═══════════════════════════════════════════════════════════════ */
+.lightbox-overlay {
+  position: relative;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+.lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.lightbox-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.lightbox-close:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.2);
+  color: white;
+}
+.lightbox-close svg { width: 16px; height: 16px; }
+.lightbox-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  min-height: 400px;
+}
+.lightbox-body img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 0.375rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* Annotations                                                    */
+/* ═══════════════════════════════════════════════════════════════ */
+.annotation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background: var(--primary-10);
+  color: var(--primary);
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+.annotation.new {
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+}
+.annotation.changed {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+}
+
+/* ── Placeholder images ── */
+.placeholder-photo {
+  background: linear-gradient(135deg, #352c47 0%, #282238 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 1 : Page complete avec commentaires + photos       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 1 — Page publique avec commentaires et photos</div>
+  <div class="screen-note">
+    Vue d'ensemble : la section commentaires sur la page publique d'un événement.
+    Les photos sont intégrées dans les commentaires existants, sous le texte.
+  </div>
+
+  <div class="event-page">
+    <!-- LEFT COL -->
+    <div class="left-col">
+      <div class="cover-block">
+        <div class="cover-label">Soirée Networking<br>Tech Bordeaux</div>
+      </div>
+      <div class="circle-info-block">
+        <div class="circle-avatar">TB</div>
+        <div class="circle-info-meta">
+          <div class="circle-info-label">Communauté</div>
+          <div class="circle-info-name">Tech Bordeaux</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div class="right-col">
+      <div class="hosted-by">Organisé par <strong>Marie Dupont</strong></div>
+      <h1 class="event-title">Soirée Networking Tech Bordeaux</h1>
+
+      <!-- Meta rows -->
+      <div class="meta-row">
+        <div class="meta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        </div>
+        <div>
+          <div class="meta-label">Date</div>
+          <div class="meta-value">Vendredi 11 avril 2026, 19h00</div>
+        </div>
+      </div>
+      <div class="meta-row">
+        <div class="meta-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        </div>
+        <div>
+          <div class="meta-label">Lieu</div>
+          <div class="meta-value">Le Node, 12 rue Sainte-Catherine, Bordeaux</div>
+        </div>
+      </div>
+
+      <!-- Description (collapsed) -->
+      <div class="collapsed-placeholder">... description, inscription, participants ...</div>
+
+      <!-- ═══════════════════════════════════════════════════ -->
+      <!--  COMMENT THREAD                                    -->
+      <!-- ═══════════════════════════════════════════════════ -->
+      <div class="comment-card">
+        <div class="comment-card-title">
+          Commentaires <span class="count">(4)</span>
+        </div>
+
+        <div class="comments-list">
+
+          <!-- Comment 1 : texte seul (inchangé) -->
+          <div class="comment">
+            <div class="comment-avatar green">ML</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-name">Marc Lefèvre</span>
+                <span class="comment-time">il y a 2 heures</span>
+              </div>
+              <p class="comment-text">Super soirée en perspective ! Quelqu'un sait si le parking du Node est ouvert le soir ?</p>
+            </div>
+          </div>
+
+          <!-- Comment 2 : texte + 1 photo (single = larger display) -->
+          <div class="comment">
+            <div class="comment-avatar purple">SD</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-name">Sophie Durand</span>
+                <span class="comment-time">il y a 45 min</span>
+              </div>
+              <p class="comment-text">L'entrée c'est bien ici ? Je suis passée devant tout à l'heure.</p>
+              <div class="comment-photos single">
+                <div class="comment-photo placeholder-photo" style="width:320px;height:200px;border-radius:0.5rem;border:1px solid var(--border);">
+                  Photo de l'entrée du Node
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comment 3 : texte + 3 photos -->
+          <div class="comment">
+            <div class="comment-avatar">MD</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-name">Marie Dupont</span>
+                <span class="comment-time">il y a 20 min</span>
+                <button class="comment-delete">Supprimer</button>
+              </div>
+              <p class="comment-text">Merci à tous pour cette soirée incroyable ! Voici quelques photos de l'ambiance.</p>
+              <div class="comment-photos">
+                <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                  Photo 1
+                </div>
+                <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                  Photo 2
+                </div>
+                <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                  Photo 3
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comment 4 : texte + 2 photos -->
+          <div class="comment">
+            <div class="comment-avatar blue">TM</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-name">Thomas Martin</span>
+                <span class="comment-time">il y a 5 min</span>
+              </div>
+              <p class="comment-text">Top ambiance ! Hâte de revenir au prochain.</p>
+              <div class="comment-photos">
+                <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                  Photo 1
+                </div>
+                <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                  Photo 2
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ─── Comment form : empty state ─── -->
+        <div class="comment-form">
+          <textarea class="comment-textarea" rows="3" placeholder="Partagez votre expérience, posez une question..."></textarea>
+          <div class="comment-form-footer">
+            <div class="comment-form-left">
+              <button class="photo-btn" title="Ajouter des photos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+              </button>
+              <span class="char-count">0 / 2000</span>
+            </div>
+            <button class="btn-sm" disabled>Commenter</button>
+          </div>
+        </div>
+
+      </div><!-- /comment-card -->
+    </div><!-- /right-col -->
+  </div><!-- /event-page -->
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 2 : Formulaire avec photos sélectionnées          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 2 — Saisie d'un commentaire avec 2 photos sélectionnées <span class="annotation new">nouveau</span></div>
+  <div class="screen-note">
+    L'utilisateur a saisi du texte et sélectionné 2 photos. Les miniatures apparaissent entre le textarea et la barre d'action.
+    Chaque miniature a un bouton [x] pour retirer la photo avant l'envoi. Le bouton photo reste actif (2/3 photos).
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card">
+      <div class="comment-card-title">
+        Commentaires <span class="count">(3)</span>
+      </div>
+
+      <div class="comments-list">
+        <div class="comment">
+          <div class="comment-avatar green">ML</div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-name">Marc Lefèvre</span>
+              <span class="comment-time">il y a 2 heures</span>
+            </div>
+            <p class="comment-text">Super soirée en perspective !</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form with photos selected -->
+      <div class="comment-form">
+        <textarea class="comment-textarea" rows="3" style="border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-20);">Merci à tous pour cette soirée incroyable ! Voici quelques photos de l'ambiance.</textarea>
+
+        <!-- Photo previews -->
+        <div class="photo-previews">
+          <div class="photo-preview-item">
+            <div class="placeholder-photo" style="width:100%;height:100%;font-size:9px;">IMG_2847</div>
+            <button class="photo-preview-remove" title="Retirer cette photo">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div class="photo-preview-item">
+            <div class="placeholder-photo" style="width:100%;height:100%;font-size:9px;">IMG_2850</div>
+            <button class="photo-preview-remove" title="Retirer cette photo">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="comment-form-footer">
+          <div class="comment-form-left">
+            <button class="photo-btn" title="Ajouter des photos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <span class="char-count">72 / 2000</span>
+          </div>
+          <button class="btn-sm">Commenter</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 3 : Limite de 3 photos atteinte                   -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 3 — Limite de 3 photos atteinte <span class="annotation changed">limite</span></div>
+  <div class="screen-note">
+    3 photos sélectionnées. Le bouton photo passe en grisé (opacity 40%, cursor not-allowed). Pas de message d'erreur, le bouton suffit.
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card" style="padding-top:0.75rem;">
+
+      <!-- Form with 3 photos -->
+      <div class="comment-form" style="margin-top:0;">
+        <textarea class="comment-textarea" rows="3" style="border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-20);">Quelques souvenirs de la soirée !</textarea>
+
+        <!-- 3 photo previews -->
+        <div class="photo-previews">
+          <div class="photo-preview-item">
+            <div class="placeholder-photo" style="width:100%;height:100%;font-size:9px;">IMG_2847</div>
+            <button class="photo-preview-remove" title="Retirer cette photo">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div class="photo-preview-item">
+            <div class="placeholder-photo" style="width:100%;height:100%;font-size:9px;">IMG_2850</div>
+            <button class="photo-preview-remove" title="Retirer cette photo">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div class="photo-preview-item">
+            <div class="placeholder-photo" style="width:100%;height:100%;font-size:9px;">IMG_2853</div>
+            <button class="photo-preview-remove" title="Retirer cette photo">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="comment-form-footer">
+          <div class="comment-form-left">
+            <!-- Disabled photo button -->
+            <button class="photo-btn disabled" title="Limite de 3 photos atteinte" aria-disabled="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <span class="char-count">33 / 2000</span>
+          </div>
+          <button class="btn-sm">Commenter</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 4 : Formulaire vide (état initial)                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 4 — Formulaire vide, état initial <span class="annotation changed">modifié</span></div>
+  <div class="screen-note">
+    L'unique changement par rapport à l'existant : le bouton photo (ImagePlus) apparaît à gauche du compteur de caractères.
+    Le bouton "Commenter" est disabled tant que le textarea est vide.
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card" style="padding-top:0.75rem;">
+
+      <div class="comment-form" style="margin-top:0;">
+        <textarea class="comment-textarea" rows="3" placeholder="Partagez votre expérience, posez une question..."></textarea>
+        <div class="comment-form-footer">
+          <div class="comment-form-left">
+            <button class="photo-btn" title="Ajouter des photos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <span class="char-count">0 / 2000</span>
+          </div>
+          <button class="btn-sm" disabled>Commenter</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 5 : Commentaire posté — 1 photo (affichage large) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 5 — Commentaire avec une seule photo (affichage large) <span class="annotation new">nouveau</span></div>
+  <div class="screen-note">
+    Quand un commentaire n'a qu'une seule photo, elle est affichée plus grande (max-width 320px, ratio préservé).
+    Le clic ouvre la lightbox.
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card" style="padding-top:0.75rem;">
+      <div class="comments-list">
+        <div class="comment">
+          <div class="comment-avatar purple">SD</div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-name">Sophie Durand</span>
+              <span class="comment-time">il y a 45 min</span>
+            </div>
+            <p class="comment-text">L'entrée c'est bien ici ? Je suis passée devant tout à l'heure.</p>
+            <div class="comment-photos single">
+              <div class="comment-photo placeholder-photo" style="width:320px;height:200px;border-radius:0.5rem;border:1px solid var(--border);cursor:pointer;">
+                Photo de l'entrée du lieu
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 6 : Commentaire posté — 3 photos (grille)         -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 6 — Commentaire avec 3 photos (grille compacte) <span class="annotation new">nouveau</span></div>
+  <div class="screen-note">
+    Les photos multiples sont affichées en 128x128px, croppées visuellement en carré (object-fit: cover).
+    Au hover, un léger anneau rose apparaît. Le clic ouvre la lightbox.
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card" style="padding-top:0.75rem;">
+      <div class="comments-list">
+        <div class="comment">
+          <div class="comment-avatar">MD</div>
+          <div class="comment-body">
+            <div class="comment-header">
+              <span class="comment-name">Marie Dupont</span>
+              <span class="comment-time">il y a 20 min</span>
+              <button class="comment-delete">Supprimer</button>
+            </div>
+            <p class="comment-text">Merci à tous pour cette soirée incroyable ! Voici quelques photos.</p>
+            <div class="comment-photos">
+              <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                Photo 1
+              </div>
+              <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);box-shadow:0 0 0 2px var(--primary-30);">
+                Photo 2 (hover)
+              </div>
+              <div class="comment-photo placeholder-photo" style="border:1px solid var(--border);">
+                Photo 3
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 7 : Lightbox (photo agrandie)                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 7 — Lightbox (photo agrandie au clic) <span class="annotation new">nouveau</span></div>
+  <div class="screen-note">
+    Overlay sombre (bg-black/85), photo centrée en taille originale (max 90vh). Bouton fermer en haut à droite.
+    Fermeture via Escape, clic sur l'overlay, ou bouton X. Réutilise le composant AttachmentViewerDialog.
+  </div>
+
+  <div class="lightbox-overlay">
+    <div class="lightbox-header">
+      <button class="lightbox-close" title="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="lightbox-body">
+      <div class="placeholder-photo" style="width:600px;height:400px;border-radius:0.375rem;font-size:1rem;">
+        Photo agrandie (600 x 400)
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<hr class="divider">
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SCREEN 8 : Erreur format non supporté                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="screen">
+  <div class="screen-label">Screen 8 — Erreur : format non supporté</div>
+  <div class="screen-note">
+    L'utilisateur a tenté d'ajouter un fichier non supporté (ex: .pdf ou .gif). Le message d'erreur apparaît sous le formulaire.
+  </div>
+
+  <div style="max-width:680px;">
+    <div class="comment-card" style="padding-top:0.75rem;">
+
+      <div class="comment-form" style="margin-top:0;">
+        <textarea class="comment-textarea" rows="3">Je partage le programme de la soirée</textarea>
+        <div class="comment-form-footer">
+          <div class="comment-form-left">
+            <button class="photo-btn" title="Ajouter des photos">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"/><line x1="16" x2="22" y1="5" y2="5"/><line x1="19" x2="19" y1="2" y2="8"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <span class="char-count">38 / 2000</span>
+          </div>
+          <button class="btn-sm">Commenter</button>
+        </div>
+        <p style="font-size:0.75rem;color:var(--destructive);margin-top:0.125rem;">Format non supporté. JPG, PNG ou WebP uniquement.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
