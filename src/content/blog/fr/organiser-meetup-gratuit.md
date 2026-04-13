@@ -1,5 +1,5 @@
 ---
-title: "Comment organiser un meetup gratuit en 2026 — guide complet"
+title: "Comment organiser un meetup gratuit en 2026, le guide complet"
 description: "Tout ce qu'il faut savoir pour organiser un meetup gratuit : lieu, promotion, inscription, outils. Guide pratique étape par étape."
 date: "2026-03-05"
 keywords:
@@ -19,11 +19,11 @@ Parce que les meilleures communautés se construisent dans la vraie vie. Un meet
 
 Avant de chercher un lieu ou de créer une page d'inscription, posez-vous une question simple : **quel format correspond à votre sujet et à votre audience ?**
 
-**En présentiel** — C'est le format le plus naturel pour un meetup. Les gens se rencontrent, échangent, restent après la fin officielle. L'inconvénient : il faut un lieu, et les participants doivent se déplacer.
+**En présentiel.** C'est le format le plus naturel pour un meetup. Les gens se rencontrent, échangent, restent après la fin officielle. L'inconvénient : il faut un lieu, et les participants doivent se déplacer.
 
-**En ligne** — Plus facile à organiser (pas de lieu à trouver, pas de limite géographique), mais l'engagement est plus faible. Les gens coupent leur caméra, partent après 30 minutes. Ça fonctionne bien pour des formats courts et structurés : lightning talks, ateliers pratiques, Q&A.
+**En ligne.** Plus facile à organiser (pas de lieu à trouver, pas de limite géographique), mais l'engagement est plus faible. Les gens coupent leur caméra, partent après 30 minutes. Ça fonctionne bien pour des formats courts et structurés : lightning talks, ateliers pratiques, Q&A.
 
-**Hybride** — Sur le papier, c'est le meilleur des deux mondes. En pratique, c'est le pire : une expérience dégradée pour les deux groupes. Évitez-le sauf si vous avez de l'expérience et le matériel adapté.
+**Hybride.** Sur le papier, c'est le meilleur des deux mondes. En pratique, c'est le pire : une expérience dégradée pour les deux groupes. Évitez-le sauf si vous avez de l'expérience et le matériel adapté.
 
 > Notre conseil : commencez en présentiel. Même avec 8 personnes. L'énergie d'une salle change tout.
 
@@ -31,11 +31,11 @@ Avant de chercher un lieu ou de créer une page d'inscription, posez-vous une qu
 
 C'est souvent le premier blocage. Voici des pistes concrètes qui fonctionnent :
 
-- **Espaces de coworking** — Beaucoup proposent une salle gratuite le soir en échange de visibilité. Envoyez un email court avec votre sujet, le nombre de participants prévu et ce que vous pouvez offrir (mention sur vos réseaux, par exemple).
-- **Bars et restaurants** — Réservez un espace en échange d'une consommation par personne. Idéalement, négociez un coin semi-privé. Précisez "pas de minimum de dépense" dans votre accord.
-- **Bureaux d'entreprise** — Des entreprises tech prêtent volontiers leurs locaux le soir. C'est du recrutement passif pour elles, une salle gratuite pour vous. Tout le monde y gagne.
-- **Bibliothèques municipales** — Salles gratuites, souvent méconnues. Il faut réserver tôt.
-- **Parcs et espaces publics** — Gratuit par définition. Parfait pour le printemps et l'été. Prévoyez un plan B en cas de pluie.
+- **Espaces de coworking.** Beaucoup proposent une salle gratuite le soir en échange de visibilité. Envoyez un email court avec votre sujet, le nombre de participants prévu et ce que vous pouvez offrir (mention sur vos réseaux, par exemple).
+- **Bars et restaurants.** Réservez un espace en échange d'une consommation par personne. Idéalement, négociez un coin semi-privé. Précisez "pas de minimum de dépense" dans votre accord.
+- **Bureaux d'entreprise.** Des entreprises tech prêtent volontiers leurs locaux le soir. C'est du recrutement passif pour elles, une salle gratuite pour vous. Tout le monde y gagne.
+- **Bibliothèques municipales.** Salles gratuites, souvent méconnues. Il faut réserver tôt.
+- **Parcs et espaces publics.** Gratuit par définition. Parfait pour le printemps et l'été. Prévoyez un plan B en cas de pluie.
 
 Ne cherchez pas la salle parfaite pour votre premier meetup. Un endroit accessible, avec assez de chaises, suffit largement.
 
@@ -47,10 +47,10 @@ Vous avez besoin de trois choses : une **page d'inscription**, un moyen de **com
 
 Plusieurs plateformes existent, chacune avec ses compromis :
 
-- **Meetup.com** — La référence historique, grosse base d'utilisateurs, bon pour la découverte. Mais payant pour les organisateurs (abonnement mensuel). Si votre objectif est "gratuit", c'est éliminé.
-- **Luma** — Design soigné, inscription par magic link sans création de compte. Gratuit pour les événements gratuits. En revanche, pas de notion de communauté : chaque événement repart de zéro, sans rétention des participants.
-- **Eventbrite** — Puissant mais lourd. L'interface est pensée pour des conférences, pas pour des meetups informels. Gratuit pour les événements gratuits.
-- **The Playground** — Gratuit, avec des pages événement soignées et une couche communautaire (les inscrits à un événement rejoignent automatiquement votre communauté). Export CSV, ajout au calendrier (Google Calendar, Apple Calendar, ICS), authentification par magic link. C'est une plateforme récente, donc la base d'utilisateurs est plus petite que Meetup ou Eventbrite.
+- **Meetup.com.** La référence historique, grosse base d'utilisateurs, bon pour la découverte. Mais payant pour les organisateurs (abonnement mensuel). Si votre objectif est "gratuit", c'est éliminé.
+- **Luma.** Design soigné, inscription par magic link sans création de compte. Gratuit pour les événements gratuits. En revanche, pas de notion de communauté : chaque événement repart de zéro, sans rétention des participants.
+- **Eventbrite.** Puissant mais lourd. L'interface est pensée pour des conférences, pas pour des meetups informels. Gratuit pour les événements gratuits.
+- **The Playground.** Gratuit, avec des pages événement soignées et une couche communautaire (les inscrits à un événement rejoignent automatiquement votre communauté). Export CSV, ajout au calendrier (Google Calendar, Apple Calendar, ICS), authentification par magic link. C'est une plateforme récente, donc la base d'utilisateurs est plus petite que Meetup ou Eventbrite.
 
 Quel que soit l'outil, l'essentiel est d'avoir une page claire avec le titre, la date, le lieu et un bouton d'inscription visible.
 
@@ -68,10 +68,10 @@ La promotion est le nerf de la guerre. Voici ce qui fonctionne réellement, et c
 
 **Ce qui fonctionne :**
 
-- **Le bouche-à-oreille** — De loin le canal le plus efficace. Parlez-en à 5 personnes qui en parleront à 5 autres.
-- **Les groupes WhatsApp/Telegram thématiques** — Si vous organisez un meetup Python, le groupe WhatsApp des développeurs Python de votre ville est votre meilleur allié.
-- **LinkedIn** — Un post personnel (pas une page entreprise) avec un texte authentique. Les posts "je lance un meetup, voici pourquoi" fonctionnent bien.
-- **Les communautés Slack/Discord existantes** — Partagez-y votre événement, mais contribuez d'abord. Personne n'aime le spam.
+- **Le bouche-à-oreille.** De loin le canal le plus efficace. Parlez-en à 5 personnes qui en parleront à 5 autres.
+- **Les groupes WhatsApp/Telegram thématiques.** Si vous organisez un meetup Python, le groupe WhatsApp des développeurs Python de votre ville est votre meilleur allié.
+- **LinkedIn.** Un post personnel (pas une page entreprise) avec un texte authentique. Les posts "je lance un meetup, voici pourquoi" fonctionnent bien.
+- **Les communautés Slack/Discord existantes.** Partagez-y votre événement, mais contribuez d'abord. Personne n'aime le spam.
 
 **Ce qui ne fonctionne pas (ou très peu) :**
 
@@ -92,7 +92,7 @@ Quelques conseils pratiques qui font la différence :
 - **Respectez l'horaire.** Commencez à l'heure annoncée, terminez à l'heure annoncée. Les gens ont des vies.
 - **Gardez 15-20 minutes de networking libre** à la fin. C'est souvent là que les meilleures conversations ont lieu.
 
-## Après l'événement — l'étape que tout le monde oublie
+## Après l'événement, l'étape que tout le monde oublie
 
 C'est ici que se joue la différence entre "un événement ponctuel" et "une communauté". La plupart des organisateurs s'arrêtent au jour J. Ne faites pas cette erreur.
 

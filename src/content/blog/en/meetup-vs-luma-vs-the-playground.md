@@ -1,5 +1,5 @@
 ---
-title: "Meetup vs Luma vs The Playground — 2026 comparison"
+title: "Meetup vs Luma vs The Playground, 2026 comparison"
 description: "Detailed comparison of community platforms: features, pricing, model. Which platform should you choose to host events and build your community?"
 date: "2026-03-24"
 keywords:
@@ -10,7 +10,7 @@ keywords:
   - free event platform
 ---
 
-You're organising meetups, workshops or community events and looking for the right platform? This comparison analyses three popular options — Meetup, Luma and The Playground — breaking down their models, pricing and limitations.
+You're organising meetups, workshops or community events and looking for the right platform? This comparison analyses three popular options (Meetup, Luma and The Playground), breaking down their models, pricing and limitations.
 
 ## The real question: events or community?
 
@@ -20,7 +20,7 @@ Before comparing features, you need to understand a structural difference betwee
 
 **Others are community-centric**: attendees join a group. They receive upcoming events, see other members, and come back naturally.
 
-This distinction changes everything for retention. If your attendees don't come back from one event to the next, the problem might not be your content — it might be your tool.
+This distinction changes everything for retention. If your attendees don't come back from one event to the next, the problem might not be your content. It might be your tool.
 
 ## The comparison at a glance
 
@@ -38,7 +38,7 @@ This distinction changes everything for retention. If your attendees don't come 
 
 ## Meetup: the original community model
 
-Meetup invented the concept of local online groups. You create a group, people join it, and they get notified with every new event. It's the right model — and it's been proven for 20 years.
+Meetup invented the concept of local online groups. You create a group, people join it, and they get notified with every new event. It's the right model, and it's been proven for 20 years.
 
 Since the acquisition by Bending Spoons in 2024, Meetup has changed course. The company cut its teams and revised its pricing: organisers still pay a subscription on certain plans, and **members** also pay (around $2 per RSVP, or a Meetup+ subscription at ~$5/month for unlimited RSVPs). Both sides pay.
 
@@ -56,13 +56,13 @@ Since the acquisition by Bending Spoons in 2024, Meetup has changed course. The 
 
 ### When to choose Meetup
 
-Meetup remains relevant if you're relying on **organic discovery**: you want strangers to find your group via the directory. That's its unique strength. If your community already exists and you distribute your events through other channels (WhatsApp, Slack, LinkedIn), the Meetup directory loses its value — and the cost becomes hard to justify.
+Meetup remains relevant if you're relying on **organic discovery**: you want strangers to find your group via the directory. That's its unique strength. If your community already exists and you distribute your events through other channels (WhatsApp, Slack, LinkedIn), the Meetup directory loses its value, and the cost becomes hard to justify.
 
 ## Luma: the event page benchmark
 
 Luma set a new standard for the event page. Polished design, registration in seconds (email only, no account), automatic calendar integration. It has become the go-to tool for tech events, creative gatherings and conferences.
 
-On pricing, Luma is free for organisers. The platform takes a **5% commission** on paid events (on top of Stripe fees). To remove that commission, you need Luma Plus at **$59/month** — which also unlocks API access, custom URLs and higher email sending limits.
+On pricing, Luma is free for organisers. The platform takes a **5% commission** on paid events (on top of Stripe fees). To remove that commission, you need Luma Plus at **$59/month**, which also unlocks API access, custom URLs and higher email sending limits.
 
 Luma has evolved beyond the purely event-centric model with **Calendars**: a public page listing your events, which visitors can subscribe to. And more recently, **Calendar Memberships** allow you to create membership tiers (free or paid).
 
@@ -70,14 +70,14 @@ Luma has evolved beyond the purely event-centric model with **Calendars**: a pub
 
 - **The event page**: the market benchmark. Beautiful, fast, optimised for sharing.
 - **Frictionless registration**: email only, no account, no password. Conversion rate is excellent.
-- **Communications**: email, SMS, push, WhatsApp — all included in the free plan.
+- **Communications**: email, SMS, push, WhatsApp. All included in the free plan.
 - **The Calendar**: a first layer of persistence to stay in touch with your audience.
 
 ### The limitations
 
 - **No real community page**: the Calendar shows your events, but not your members. There's no sense of belonging to a group. Attendees subscribe to an event list, they don't join a community.
 - **The 5% commission**: on recurring paid events, it adds up fast. The alternative ($59/month) is only worth it above a certain volume.
-- **No native recurrence**: no recurring events as such — you have to duplicate manually (up to 30 times). Attendee lists are not copied.
+- **No native recurrence**: no recurring events as such. You have to duplicate manually (up to 30 times). Attendee lists are not copied.
 
 ### When to choose Luma
 
@@ -89,7 +89,7 @@ The Playground starts from a simple observation: Meetup has the right model (per
 
 The core principle: **when someone registers for your event, they automatically join your community**. After the event, they see the next meetups, the other members, your group's identity. The link doesn't break between events.
 
-On pricing: **0% commission**, no subscription, no limits. Only standard Stripe fees (~2.9% + €0.30) apply on paid events — and the full amount goes to the organiser.
+On pricing: **0% commission**, no subscription, no limits. Only standard Stripe fees (~2.9% + €0.30) apply on paid events. The full amount goes to the organiser.
 
 ### What works
 
@@ -100,7 +100,7 @@ On pricing: **0% commission**, no subscription, no limits. Only standard Stripe 
 - **CSV export** of attendees per event.
 - **Calendar add** (Google Calendar + ICS file) after registration.
 
-### The limitations — let's be honest
+### The limitations. Let's be honest
 
 - **No Discover as large as Meetup's**: the directory exists, but the user base is smaller. Distribution relies on the organiser (shared links via WhatsApp, LinkedIn, etc.), not on a discovery algorithm.
 - **Registration via magic link or OAuth**: more secure than a password, but one more step than Luma (which only requires an email). It's a security vs. friction trade-off.
@@ -109,7 +109,7 @@ On pricing: **0% commission**, no subscription, no limits. Only standard Stripe 
 
 ### When to choose The Playground
 
-The Playground is built for organisers who want to **build a community over time** — not just manage events on a case-by-case basis. If your attendees come once and don't return, that's the problem The Playground solves. And if budget matters, the total free model removes the question entirely.
+The Playground is built for organisers who want to **build a community over time**, not just manage events on a case-by-case basis. If your attendees come once and don't return, that's the problem The Playground solves. And if budget matters, the total free model removes the question entirely.
 
 ---
 
@@ -121,4 +121,4 @@ There's no universal "best tool". The choice depends on what you're building:
 - **You organise one-off premium events** and community isn't your priority → **Luma**
 - **You're building a lasting community**, without budget, with a modern experience → **The Playground**
 
-The real question isn't "which tool has the most features" — it's "do your attendees come back?". If the answer is no, maybe it's the tool that needs to change.
+The real question isn't "which tool has the most features". It's "do your attendees come back?". If the answer is no, maybe it's the tool that needs to change.

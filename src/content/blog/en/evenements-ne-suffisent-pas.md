@@ -1,5 +1,5 @@
 ---
-title: "Why events alone aren't enough — the community model"
+title: "Why events alone aren't enough, the community model"
 description: "You host events but your attendees don't come back? The problem isn't the event, it's the lack of community."
 date: "2026-03-18"
 keywords:
@@ -19,7 +19,7 @@ Most event tools operate on a simple model: create an event, share it, people re
 
 This model is not inherently flawed. For an annual conference, a one-off workshop, or a product launch, it works perfectly well. The event is the destination. Nobody expects recurrence.
 
-But if you run events regularly — meetups, monthly workshops, networking evenings, practice sessions — this model condemns you to starting from scratch every time. Your audience has no structural reason to return. They need to stumble upon your next announcement at the right moment, on the right channel, with the right availability. That is chance, not retention.
+But if you run events regularly (meetups, monthly workshops, networking evenings, practice sessions), this model condemns you to starting from scratch every time. Your audience has no structural reason to return. They need to stumble upon your next announcement at the right moment, on the right channel, with the right availability. That is chance, not retention.
 
 Think about it: when an attendee leaves your event, what link remains between you and them? A confirmation email buried in their inbox. Perhaps a LinkedIn post they liked. The relationship ends there. You cannot rely on goodwill to replace a retention mechanism.
 
@@ -27,7 +27,7 @@ Think about it: when an attendee leaves your event, what link remains between yo
 
 Consider the most popular platforms. Luma offers an elegant registration experience and polished event pages. Eventbrite handles ticketing at scale. Google Forms is free and frictionless. But they all share the same limitation: the event is terminal.
 
-On Luma, once your event has passed, the page becomes an archive. The attendee has no reason to return to it. There is no page that gathers your upcoming events, your past attendees, your group's identity. Luma has introduced a personal calendar feature — a step in the right direction — but following a calendar is not the same as belonging to a group.
+On Luma, once your event has passed, the page becomes an archive. The attendee has no reason to return to it. There is no page that gathers your upcoming events, your past attendees, your group's identity. Luma has introduced a personal calendar feature, a step in the right direction, but following a calendar is not the same as belonging to a group.
 
 Eventbrite lets people follow an organiser, but the relationship stays transactional. You receive an email when they publish a new event. That is a notification, not a sense of belonging.
 
@@ -35,7 +35,7 @@ The issue is not the quality of these tools. It is their mental architecture. Wh
 
 ## What a community actually changes
 
-Meetup understood something that event-centric platforms have not internalised: the persistence of the group. When you join a Meetup group, you are not registering for an event — you are joining a community. You see the other members. You see the upcoming events. You receive notifications because you belong to the group, not because you clicked a link at the right moment.
+Meetup understood something that event-centric platforms have not internalised: the persistence of the group. When you join a Meetup group, you are not registering for an event. You are joining a community. You see the other members. You see the upcoming events. You receive notifications because you belong to the group, not because you clicked a link at the right moment.
 
 This mechanism transforms the retention dynamic:
 
@@ -61,12 +61,12 @@ Let us compare the two flows from the attendee's perspective.
 
 **Community-centric model:**
 1. A friend shares a link to an event
-2. Quick registration — and automatic membership in the community
+2. Quick registration, and automatic membership in the community
 3. Attend the event
 4. The event ends
 5. The attendee sees the community page: upcoming events, members, history
 6. They receive a notification for the next event because they are a member
-7. They return — and bring a friend
+7. They return, and bring a friend
 
 The difference does not play out during the event. It plays out in the space between events. The event-centric model leaves a void. The community model fills it.
 

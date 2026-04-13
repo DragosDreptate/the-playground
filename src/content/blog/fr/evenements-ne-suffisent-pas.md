@@ -1,5 +1,5 @@
 ---
-title: "Pourquoi les événements seuls ne suffisent pas — le modèle communautaire"
+title: "Pourquoi les événements seuls ne suffisent pas, le modèle communautaire"
 description: "Vous organisez des événements mais vos participants ne reviennent pas ? Le problème n'est pas l'événement, c'est l'absence de communauté."
 date: "2026-03-18"
 keywords:
@@ -19,7 +19,7 @@ La plupart des outils événementiels fonctionnent sur un modèle simple : vous 
 
 Ce modèle n'est pas mauvais en soi. Pour une conférence annuelle, un atelier ponctuel ou un lancement de produit, il fonctionne très bien. L'événement est la destination. On n'attend pas de récurrence.
 
-Mais si vous organisez des événements réguliers — meetups, ateliers mensuels, soirées réseau, sessions de pratique — ce modèle vous condamne à recommencer de zéro à chaque fois. Votre audience n'a aucune raison structurelle de revenir. Elle doit tomber sur votre prochaine annonce au bon moment, sur le bon canal, avec la bonne disponibilité. C'est du hasard, pas de la rétention.
+Mais si vous organisez des événements réguliers (meetups, ateliers mensuels, soirées réseau, sessions de pratique), ce modèle vous condamne à recommencer de zéro à chaque fois. Votre audience n'a aucune raison structurelle de revenir. Elle doit tomber sur votre prochaine annonce au bon moment, sur le bon canal, avec la bonne disponibilité. C'est du hasard, pas de la rétention.
 
 Pensez-y : quand un participant quitte votre événement, quel lien reste entre vous et lui ? Un email de confirmation dans ses archives. Peut-être un post LinkedIn qu'il a liké. La relation s'arrête là. Vous ne pouvez pas compter sur la bonne volonté pour remplacer un mécanisme de rétention.
 
@@ -27,7 +27,7 @@ Pensez-y : quand un participant quitte votre événement, quel lien reste entre 
 
 Regardons les plateformes les plus utilisées. Luma propose une expérience d'inscription élégante et des pages événement soignées. Eventbrite gère la billetterie à grande échelle. Google Forms est gratuit et sans friction. Mais elles partagent toutes la même limite : l'événement est terminal.
 
-Sur Luma, quand votre événement est passé, la page devient une archive. Le participant n'a aucune raison d'y retourner. Il n'y a pas de page qui regroupe vos événements à venir, vos anciens participants, l'identité de votre groupe. Luma a ajouté un système de calendrier personnel — un pas dans la bonne direction — mais suivre un calendrier n'est pas la même chose qu'appartenir à un groupe.
+Sur Luma, quand votre événement est passé, la page devient une archive. Le participant n'a aucune raison d'y retourner. Il n'y a pas de page qui regroupe vos événements à venir, vos anciens participants, l'identité de votre groupe. Luma a ajouté un système de calendrier personnel, un pas dans la bonne direction, mais suivre un calendrier n'est pas la même chose qu'appartenir à un groupe.
 
 Eventbrite permet de suivre un organisateur, mais la relation reste transactionnelle. Vous recevez un email quand il publie un nouvel événement. C'est une notification, pas une appartenance.
 
@@ -35,7 +35,7 @@ Le problème n'est pas la qualité de ces outils. C'est leur architecture mental
 
 ## Ce qu'une communauté change concrètement
 
-Meetup a compris quelque chose que les plateformes event-centric n'ont pas intégré : la persistance du groupe. Quand vous rejoignez un groupe Meetup, vous ne vous inscrivez pas à un événement — vous rejoignez une communauté. Vous voyez les autres membres. Vous voyez les prochains événements. Vous recevez des notifications parce que vous appartenez au groupe, pas parce que vous avez cliqué sur un lien au bon moment.
+Meetup a compris quelque chose que les plateformes event-centric n'ont pas intégré : la persistance du groupe. Quand vous rejoignez un groupe Meetup, vous ne vous inscrivez pas à un événement. Vous rejoignez une communauté. Vous voyez les autres membres. Vous voyez les prochains événements. Vous recevez des notifications parce que vous appartenez au groupe, pas parce que vous avez cliqué sur un lien au bon moment.
 
 Ce mécanisme transforme la dynamique de rétention :
 
@@ -61,12 +61,12 @@ Comparons les deux flux du point de vue du participant.
 
 **Modèle community-centric :**
 1. Un ami partage un lien vers un événement
-2. Inscription rapide — et adhésion automatique à la communauté
+2. Inscription rapide, et adhésion automatique à la communauté
 3. Participation à l'événement
 4. L'événement se termine
 5. Le participant voit la page de la communauté : prochains événements, membres, historique
 6. Il reçoit une notification pour le prochain événement parce qu'il est membre
-7. Il revient — et il amène un ami
+7. Il revient, et il amène un ami
 
 La différence ne se joue pas au moment de l'événement. Elle se joue dans l'entre-deux. Le modèle event-centric laisse un vide. Le modèle communautaire le comble.
 
