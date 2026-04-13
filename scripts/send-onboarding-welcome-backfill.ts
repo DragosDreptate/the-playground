@@ -1,10 +1,10 @@
 /**
  * Backfill one-shot : envoyer la lettre du fondateur aux utilisateurs existants.
  *
- * Contexte : l'email applicatif `onboarding-welcome` ne part que pour les
- * nouveaux utilisateurs via `after()` dans `completeOnboardingAction`. Pour
- * les utilisateurs déjà inscrits après la campagne Brevo du 12/03/2026 (lettre
- * ambassadeur), on envoie la lettre via ce script one-shot.
+ * Contexte : l'email applicatif `onboarding-welcome` est envoyé en différé
+ * (J+1) par le cron /api/cron/send-onboarding-welcome. Pour les utilisateurs
+ * déjà inscrits après la campagne Brevo du 12/03/2026 (lettre ambassadeur),
+ * on envoie la lettre via ce script one-shot.
  *
  * Cutoff : utilisateurs inscrits après le 12/03/2026 (avant cette date, ils
  * ont déjà reçu la lettre ambassadeur via Brevo — pas de doublon).
