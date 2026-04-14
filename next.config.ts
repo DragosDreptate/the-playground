@@ -7,8 +7,11 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const withPWA = withPWAInit({
   dest: "public",
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
+  // Désactivé : cachait le HTML personnalisé du dashboard côté service worker,
+  // provoquant des données obsolètes après mutations (inscriptions, création,
+  // suppression). Le precaching des assets statiques + offline fallback restent actifs.
+  cacheOnFrontEndNav: false,
+  aggressiveFrontEndNavCaching: false,
   reloadOnOnline: true,
   disable: process.env.NODE_ENV === "development",
 });

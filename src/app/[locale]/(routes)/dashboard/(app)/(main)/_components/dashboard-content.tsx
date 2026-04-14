@@ -1,10 +1,6 @@
-import { after } from "next/server";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
-import {
-  prismaMomentRepository,
-  prismaRegistrationRepository,
-} from "@/infrastructure/repositories";
+import { prismaRegistrationRepository } from "@/infrastructure/repositories";
 import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
 import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
@@ -31,8 +27,8 @@ export async function DashboardContent({
   activeTab: "moments" | "circles";
   hostOnly?: boolean;
 }) {
-  // Transition PUBLISHED → PAST pour les Moments terminés — fire-and-forget après la réponse
-  after(() => prismaMomentRepository.transitionPastMoments());
+  // La transition PUBLISHED → PAST est gérée par le cron /api/cron/transition-past-moments
+  // (toutes les 5 min) — plus fiable que `after()` sur Vercel serverless ("best effort").
 
   // Requêtes fusionnées : inscriptions + communautés + host moments en parallèle
   const [
