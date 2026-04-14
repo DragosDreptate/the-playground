@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { PostHogProvider } from "@/components/providers/posthog-provider";
 import { PostHogIdentity } from "@/components/providers/posthog-identity";
 import { PostHogPageView } from "@/components/providers/posthog-pageview";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "sonner";
 import "../globals.css";
 
@@ -105,6 +106,7 @@ export default async function LocaleLayout({
             </PostHogProvider>
           </SessionProvider>
         </ThemeProvider>
+        <SpeedInsights />
         <Toaster richColors position="bottom-right" />
       </body>
     </html>
