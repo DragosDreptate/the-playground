@@ -26,6 +26,7 @@ import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
+import { partitionMomentUpdateRecipients } from "./helpers/moment-update-recipients";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
 import { invalidateDashboardCache } from "@/lib/dashboard-cache";
@@ -316,14 +317,18 @@ async function sendMomentUpdateEmails(
   t: TranslationFunction,
   locale: string
 ): Promise<void> {
-  const [circle, registrations] = await Promise.all([
+  const [circle, registrations, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
   ]);
   if (!circle) return;
 
   const confirmed = registrations.filter((r) => r.status === "REGISTERED");
   if (confirmed.length === 0) return;
+
+  const { participants: participantRecipients, hosts: hostRecipients } =
+    partitionMomentUpdateRecipients(confirmed, hosts);
 
   const dateFnsLocale = getDateFnsLocale(locale);
   const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
@@ -379,14 +384,7 @@ async function sendMomentUpdateEmails(
     icsContent,
   };
 
-  // Notifier les participants en batch
-  const participantRecipients = confirmed
-    .filter((r) => r.user?.email)
-    .map((r) => ({
-      to: r.user!.email!,
-      playerName: getDisplayName(r.user!.firstName, r.user!.lastName, r.user!.email!),
-    }));
-
+  // Notifier les participants (les HOSTs inscrits sont exclus, ils reçoivent la version Organisateur)
   if (participantRecipients.length > 0) {
     await emailService.sendMomentUpdateBatch({
       ...commonFields,
@@ -395,15 +393,7 @@ async function sendMomentUpdateEmails(
     });
   }
 
-  // Notifier les Organisateurs en batch
-  const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
-  const hostRecipients = hosts
-    .filter((h) => h.user?.email)
-    .map((h) => ({
-      to: h.user!.email!,
-      playerName: getDisplayName(h.user!.firstName, h.user!.lastName, h.user!.email!),
-    }));
-
+  // Notifier les Organisateurs
   if (hostRecipients.length > 0) {
     await emailService.sendMomentUpdateBatch({
       ...commonFields,
