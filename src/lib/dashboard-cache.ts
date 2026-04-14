@@ -37,7 +37,8 @@ export function invalidateDashboardCache(userId: string): void {
 // DashboardCircle — cache cross-requête avec sérialisation Date
 // ---------------------------------------------------------------------------
 
-type SerializedDashboardCircle = Omit<
+/** @internal Exporté pour les tests unitaires — ne pas utiliser hors de ce module. */
+export type SerializedDashboardCircle = Omit<
   DashboardCircle,
   "createdAt" | "updatedAt" | "nextMoment"
 > & {
@@ -46,7 +47,8 @@ type SerializedDashboardCircle = Omit<
   nextMoment: { title: string; startsAt: string } | null;
 };
 
-function serializeDashboardCircle(c: DashboardCircle): SerializedDashboardCircle {
+/** @internal Exporté pour les tests unitaires. */
+export function serializeDashboardCircle(c: DashboardCircle): SerializedDashboardCircle {
   return {
     ...c,
     createdAt: c.createdAt.toISOString(),
@@ -57,7 +59,8 @@ function serializeDashboardCircle(c: DashboardCircle): SerializedDashboardCircle
   };
 }
 
-function deserializeDashboardCircle(c: SerializedDashboardCircle): DashboardCircle {
+/** @internal Exporté pour les tests unitaires. */
+export function deserializeDashboardCircle(c: SerializedDashboardCircle): DashboardCircle {
   return {
     ...c,
     createdAt: new Date(c.createdAt),
@@ -100,7 +103,8 @@ export const getCachedDashboardCircles = cache(
 // HostMomentSummary — cache cross-requête avec sérialisation Date
 // ---------------------------------------------------------------------------
 
-type SerializedHostMomentSummary = Omit<
+/** @internal Exporté pour les tests unitaires. */
+export type SerializedHostMomentSummary = Omit<
   HostMomentSummary,
   "startsAt" | "endsAt"
 > & {
@@ -108,7 +112,8 @@ type SerializedHostMomentSummary = Omit<
   endsAt: string | null;
 };
 
-function serializeHostMoment(m: HostMomentSummary): SerializedHostMomentSummary {
+/** @internal Exporté pour les tests unitaires. */
+export function serializeHostMoment(m: HostMomentSummary): SerializedHostMomentSummary {
   return {
     ...m,
     startsAt: m.startsAt.toISOString(),
@@ -116,7 +121,8 @@ function serializeHostMoment(m: HostMomentSummary): SerializedHostMomentSummary 
   };
 }
 
-function deserializeHostMoment(m: SerializedHostMomentSummary): HostMomentSummary {
+/** @internal Exporté pour les tests unitaires. */
+export function deserializeHostMoment(m: SerializedHostMomentSummary): HostMomentSummary {
   return {
     ...m,
     startsAt: new Date(m.startsAt),
