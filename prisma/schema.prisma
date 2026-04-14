@@ -269,6 +269,10 @@ model Moment {
   @@index([status, startsAt])
   // Index sur (circleId, status) : utilisé dans findPublic (circles avec moments à venir)
   @@index([circleId, status])
+  // Index composite (circleId, status, startsAt) : optimise les correlated subqueries
+  // de findAllByUserIdWithStats (dashboard) et findUpcomingByCircleId (page événement).
+  // Permet un index seek par circleId + status, puis range scan sur startsAt.
+  @@index([circleId, status, startsAt])
   // Index sur explorerScore : utilisé dans ORDER BY explorer_score DESC (Explorer)
   @@index([explorerScore])
   @@map("moments")
