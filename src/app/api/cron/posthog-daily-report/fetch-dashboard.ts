@@ -82,3 +82,30 @@ export async function fetchPosthogDashboard(
 
   return (await response.json()) as PosthogDashboard;
 }
+
+const PAGEVIEWS_INSIGHT_PREFIX = "Pageviews & visiteurs uniques";
+const UV_TOTAL_INSIGHT_PREFIX = "Visiteurs uniques (total)";
+
+/**
+ * Extrait le vrai nombre de visiteurs uniques depuis la tile "Visiteurs uniques
+ * (total)" du dashboard (insight BoldNumber, `aggregated_value` dédupliqué),
+ * puis corrige le `.count` gonflé dans la tile "Pageviews & visiteurs uniques".
+ *
+ * Retourne le vrai nombre de visiteurs uniques, ou null si la tile est absente.
+ */
+export function patchUniqueVisitors(dashboard: PosthogDashboard): number | null {
+  const uvInsight = dashboard.tiles.find((t) =>
+    t.insight?.name.startsWith(UV_TOTAL_INSIGHT_PREFIX)
+  )?.insight;
+  const trueCount = uvInsight?.result?.[0]?.aggregated_value;
+  if (trueCount == null) return null;
+
+  const rounded = Math.round(trueCount);
+  const pvInsight = dashboard.tiles.find((t) =>
+    t.insight?.name.startsWith(PAGEVIEWS_INSIGHT_PREFIX)
+  )?.insight;
+  if (pvInsight?.result?.[1]) {
+    pvInsight.result[1] = { ...pvInsight.result[1], count: rounded };
+  }
+  return rounded;
+}

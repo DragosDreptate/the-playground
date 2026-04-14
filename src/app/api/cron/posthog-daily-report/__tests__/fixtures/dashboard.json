@@ -842,6 +842,24 @@
           }
         ]
       }
+    },
+    {
+      "id": 3841046,
+      "insight": {
+        "id": 3841046,
+        "short_id": "uvTotal24",
+        "name": "Visiteurs uniques (total) – 24h",
+        "description": "Nombre réel de visiteurs uniques sur 24h (agrégé sur toute la période).",
+        "result": [
+          {
+            "label": "$pageview",
+            "count": 0,
+            "aggregated_value": 18,
+            "data": [],
+            "days": []
+          }
+        ]
+      }
     }
   ]
 }
