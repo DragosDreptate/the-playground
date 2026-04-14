@@ -20,6 +20,10 @@
     {
       "path": "/api/cron/send-onboarding-welcome",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/transition-past-moments",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

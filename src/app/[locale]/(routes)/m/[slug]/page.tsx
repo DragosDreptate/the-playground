@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { after } from "next/server";
 import { notFound } from "next/navigation";
 import { measureTime } from "@/lib/perf-logger";
 import { isValidSlug } from "@/lib/slug";
@@ -101,8 +100,8 @@ export default async function PublicMomentPage({
   const { slug, locale } = await params;
   if (!isValidSlug(slug)) notFound();
 
-  // Transition PUBLISHED → PAST for ended Moments — fire-and-forget après la réponse
-  after(() => prismaMomentRepository.transitionPastMoments());
+  // La transition PUBLISHED → PAST est gérée par le cron /api/cron/transition-past-moments
+  // (toutes les 5 min) — plus fiable que `after()` sur Vercel serverless ("best effort").
 
   const moment = await measureTime("moment-page:moment", () => getMoment(slug));
   if (!moment) notFound();
