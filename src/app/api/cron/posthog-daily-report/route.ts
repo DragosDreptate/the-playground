@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackTrafficReport } from "@/infrastructure/services/slack/slack-notification-service";
-import { fetchPosthogDashboard } from "./fetch-dashboard";
+import { fetchPosthogDashboard, patchUniqueVisitors } from "./fetch-dashboard";
 import { buildReportHtml } from "./build-report-html";
 import { extractReportKpis } from "./extract-report-kpis";
 
@@ -56,6 +56,7 @@ async function handler(request: NextRequest) {
 
   try {
     const dashboard = await fetchPosthogDashboard(DASHBOARD_ID);
+    patchUniqueVisitors(dashboard);
     const html = buildReportHtml(dashboard);
 
     const resend = new Resend(process.env.AUTH_RESEND_KEY);

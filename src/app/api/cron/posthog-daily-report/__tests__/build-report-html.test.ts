@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildReportHtml } from "../build-report-html";
+import { patchUniqueVisitors } from "../fetch-dashboard";
 import type { PosthogDashboard } from "../fetch-dashboard";
 import realDashboard from "./fixtures/dashboard.json";
 
@@ -22,7 +23,8 @@ describe("buildReportHtml", () => {
     });
 
     it("should render pageviews, unique visitors and sessions KPIs", () => {
-      // From fixture: pageviews=70, unique_visitors=25, sessions=25
+      // From fixture (without patching): pageviews=70, unique_visitors=25
+      // (inflated sum of hourly uniques), sessions=25
       expect(html).toMatch(/Pageviews<\/p>\s*<p[^>]*>70</);
       expect(html).toMatch(/Visiteurs uniques<\/p>\s*<p[^>]*>25</);
       expect(html).toMatch(/Sessions<\/p>\s*<p[^>]*>25</);
@@ -130,5 +132,60 @@ describe("buildReportHtml", () => {
       expect(html).not.toContain("<script>alert(1)</script>");
       expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
     });
+  });
+
+  describe("given a patched dashboard with corrected unique visitors", () => {
+    it("should render the corrected unique visitors count and ratio", () => {
+      const patched = structuredClone(
+        realDashboard
+      ) as unknown as PosthogDashboard;
+      patchUniqueVisitors(patched);
+      const html = buildReportHtml(patched, fixedDate);
+
+      // Fixture "Visiteurs uniques (total)" has aggregated_value=18
+      expect(html).toMatch(/Visiteurs uniques<\/p>\s*<p[^>]*>18</);
+      // Ratio: 70 / 18 = 3.89
+      expect(html).toContain("3.89 pv / visiteur");
+      // Pageviews unchanged
+      expect(html).toMatch(/Pageviews<\/p>\s*<p[^>]*>70</);
+    });
+  });
+});
+
+describe("patchUniqueVisitors", () => {
+  it("should read aggregated_value from the 'Visiteurs uniques (total)' tile and patch the PV insight", () => {
+    const dashboard = structuredClone(
+      realDashboard
+    ) as unknown as PosthogDashboard;
+    const pvInsight = dashboard.tiles.find((t) =>
+      t.insight?.name.startsWith("Pageviews & visiteurs uniques")
+    )?.insight;
+
+    expect(pvInsight?.result?.[1]?.count).toBe(25);
+    const result = patchUniqueVisitors(dashboard);
+    expect(result).toBe(18);
+    expect(pvInsight?.result?.[1]?.count).toBe(18);
+  });
+
+  it("should not modify the pageviews series", () => {
+    const dashboard = structuredClone(
+      realDashboard
+    ) as unknown as PosthogDashboard;
+    patchUniqueVisitors(dashboard);
+    const pvInsight = dashboard.tiles.find((t) =>
+      t.insight?.name.startsWith("Pageviews & visiteurs uniques")
+    )?.insight;
+
+    expect(pvInsight?.result?.[0]?.count).toBe(70);
+  });
+
+  it("should return null on a dashboard without the total tile", () => {
+    const empty: PosthogDashboard = {
+      id: 1,
+      name: "Empty",
+      description: null,
+      tiles: [],
+    };
+    expect(patchUniqueVisitors(empty)).toBeNull();
   });
 });
