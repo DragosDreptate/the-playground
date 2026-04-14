@@ -35,6 +35,7 @@ import {
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import { isValidUrl } from "@/lib/url";
+import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 
 export async function createCircleAction(
   formData: FormData
@@ -134,6 +135,7 @@ export async function createCircleAction(
       }
     });
 
+    invalidateDashboardCache(userId);
     return result.circle;
   });
 }
@@ -214,6 +216,7 @@ export async function updateCircleAction(
     const { revalidatePath } = await import("next/cache");
     revalidatePath(`/dashboard/circles/${result.circle.slug}`);
 
+    invalidateDashboardCache(userId);
     return result.circle;
   });
 }
@@ -230,6 +233,7 @@ export async function deleteCircleAction(
   return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
     await deleteCircle({ circleId, userId }, { circleRepository: circleRepo });
+    invalidateDashboardCache(userId);
   });
 }
 
@@ -254,6 +258,7 @@ export async function joinCircleDirectlyAction(
         console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
         Sentry.captureException(err);
       });
+      invalidateDashboardCache(userId);
     }
 
     return { alreadyMember, pendingApproval };
@@ -277,6 +282,7 @@ export async function leaveCircleAction(
         registrationRepository: prismaRegistrationRepository,
       }
     );
+    invalidateDashboardCache(userId);
   });
 }
 
@@ -338,6 +344,8 @@ export async function removeCircleMemberAction(
 
     const { revalidatePath } = await import("next/cache");
     revalidatePath("/dashboard/circles");
+
+    invalidateDashboardCache(targetUserId);
   });
 }
 
@@ -441,6 +449,7 @@ export async function approveCircleMembershipAction(
       }
     });
 
+    invalidateDashboardCache(memberUserId);
     return result;
   });
 }
@@ -487,6 +496,8 @@ export async function rejectCircleMembershipAction(
         Sentry.captureException(err);
       }
     });
+
+    invalidateDashboardCache(memberUserId);
   });
 }
 

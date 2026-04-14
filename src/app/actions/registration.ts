@@ -23,6 +23,7 @@ import { removeRegistrationByHost } from "@/domain/usecases/remove-registration-
 import { approveMomentRegistration } from "@/domain/usecases/approve-moment-registration";
 import { rejectMomentRegistration } from "@/domain/usecases/reject-moment-registration";
 import { toActionResult } from "./helpers/to-action-result";
+import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { getDisplayName } from "@/lib/display-name";
 import { formatPrice } from "@/lib/format-price";
 import { notifySlackNewRegistration } from "@/infrastructure/services/slack/slack-notification-service";
@@ -96,6 +97,7 @@ export async function joinMomentAction(
       });
     }
 
+    invalidateDashboardCache(userId);
     return result.registration;
   });
 }
@@ -134,6 +136,11 @@ export async function cancelRegistrationAction(
       sendHostPaidCancellationEmail(registrationId, userId).catch((err) =>
         Sentry.captureException(err)
       );
+    }
+
+    invalidateDashboardCache(userId);
+    if (result.promotedRegistration) {
+      invalidateDashboardCache(result.promotedRegistration.userId);
     }
   });
 }
@@ -457,6 +464,11 @@ export async function removeRegistrationByHostAction(
         Sentry.captureException(err);
       });
     }
+
+    invalidateDashboardCache(userId);
+    if (result.promotedRegistration) {
+      invalidateDashboardCache(result.promotedRegistration.userId);
+    }
   });
 }
 
@@ -541,6 +553,7 @@ export async function approveMomentRegistrationAction(
       Sentry.captureException(err);
     });
 
+    invalidateDashboardCache(reg.userId);
     return result.registration;
   });
 }
@@ -571,6 +584,7 @@ export async function rejectMomentRegistrationAction(
       Sentry.captureException(err);
     });
 
+    invalidateDashboardCache(result.userId);
     return result;
   });
 }

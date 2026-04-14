@@ -28,6 +28,7 @@ import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
+import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
@@ -153,6 +154,7 @@ export async function createMomentAction(
     });
 
     if (!shouldPublishImmediately) {
+      invalidateDashboardCache(userId);
       return result.moment;
     }
 
@@ -173,6 +175,7 @@ export async function createMomentAction(
       revalidatePath(`/m/${publishResult.moment.slug}`);
       revalidatePath(`/en/m/${publishResult.moment.slug}`);
 
+      invalidateDashboardCache(userId);
       return publishResult.moment;
     } catch (publishError) {
       Sentry.captureException(publishError, {
@@ -180,6 +183,7 @@ export async function createMomentAction(
         extra: { momentId: result.moment.id, circleId: result.moment.circleId },
       });
       // Fall back to the draft — the user still got their moment created.
+      invalidateDashboardCache(userId);
       return result.moment;
     }
   });
@@ -297,6 +301,8 @@ export async function updateMomentAction(
     // Invalide uniquement la page de cet événement (les deux locales)
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
+
+    invalidateDashboardCache(session.user.id);
     return result.moment;
   });
 }
@@ -462,6 +468,8 @@ export async function deleteMomentAction(
       revalidatePath(`/m/${momentToDelete.slug}`);
       revalidatePath(`/en/m/${momentToDelete.slug}`);
     }
+
+    invalidateDashboardCache(userId);
   });
 }
 
@@ -540,6 +548,8 @@ export async function publishMomentAction(
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
+
+    invalidateDashboardCache(userId);
     return result.moment;
   });
 }

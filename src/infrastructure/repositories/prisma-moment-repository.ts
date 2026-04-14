@@ -9,7 +9,13 @@ import type {
   PublicMoment,
   UpcomingCircleMoment,
 } from "@/domain/ports/repositories/moment-repository";
-import type { Moment, CoverImageAttribution, HostMomentSummary } from "@/domain/models/moment";
+import type {
+  Moment,
+  CoverImageAttribution,
+  HostMomentSummary,
+  LocationType,
+  MomentStatus,
+} from "@/domain/models/moment";
 import type { PublicMomentRegistration } from "@/domain/models/user";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
@@ -289,57 +295,89 @@ export const prismaMomentRepository: MomentRepository = {
   async findAllByHostUserId(
     hostUserId: string
   ): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }> {
-    const records = await prisma.moment.findMany({
-      where: {
-        status: { in: ["DRAFT", "PUBLISHED", "PAST"] },
-        circle: {
-          memberships: { some: { userId: hostUserId, role: "HOST" } },
-        },
-      },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        coverImage: true,
-        startsAt: true,
-        endsAt: true,
-        locationType: true,
-        locationName: true,
-        status: true,
-        circle: { select: { slug: true, name: true, coverImage: true } },
-        _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
-        registrations: {
-          where: { status: "REGISTERED" },
-          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
-          orderBy: { registeredAt: "asc" },
-          take: 3,
-        },
-      },
-      orderBy: { startsAt: "asc" },
-    });
+    // $queryRaw : 1 seul round-trip Neon (vs 3-4 avec Prisma findMany + includes).
+    // Même pattern que findAllByUserIdWithStats et findAllForUserDashboard.
+    type Row = {
+      id: string;
+      slug: string;
+      title: string;
+      coverImage: string | null;
+      startsAt: Date;
+      endsAt: Date | null;
+      locationType: string;
+      locationName: string | null;
+      status: string;
+      cSlug: string;
+      cName: string;
+      cCoverImage: string | null;
+      registrationCount: number;
+      topAttendees: {
+        firstName: string | null;
+        lastName: string | null;
+        email: string;
+        image: string | null;
+      }[];
+    };
 
-    const toItem = (m: (typeof records)[number]): HostMomentSummary => ({
-      id: m.id,
-      slug: m.slug,
-      title: m.title,
-      coverImage: m.coverImage ?? null,
-      startsAt: m.startsAt,
-      endsAt: m.endsAt,
-      locationType: m.locationType,
-      locationName: m.locationName,
-      status: m.status,
-      registrationCount: m._count.registrations,
-      topAttendees: m.registrations.map((r) => ({ user: r.user })),
-      circle: { slug: m.circle.slug, name: m.circle.name, coverImage: m.circle.coverImage ?? null },
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        m.id,
+        m.slug,
+        m.title,
+        m."coverImage",
+        m."startsAt",
+        m."endsAt",
+        m."locationType",
+        m."locationName",
+        m.status,
+        c.slug           AS "cSlug",
+        c.name           AS "cName",
+        c."coverImage"   AS "cCoverImage",
+        (SELECT COUNT(*)::int FROM registrations r2
+         WHERE r2."momentId" = m.id AND r2.status = 'REGISTERED')
+          AS "registrationCount",
+        (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
+          SELECT u."firstName", u."lastName", u.email, u.image
+          FROM registrations r3
+          JOIN users u ON u.id = r3."userId"
+          WHERE r3."momentId" = m.id AND r3.status = 'REGISTERED'
+          ORDER BY r3."registeredAt" ASC
+          LIMIT 3
+        ) sub) AS "topAttendees"
+      FROM moments m
+      JOIN circles c ON c.id = m."circleId"
+      WHERE m.status IN ('DRAFT', 'PUBLISHED', 'PAST')
+        AND EXISTS (
+          SELECT 1 FROM circle_memberships cm
+          WHERE cm."circleId" = c.id
+            AND cm."userId" = ${hostUserId}
+            AND cm.role = 'HOST'
+        )
+      ORDER BY m."startsAt" ASC
+    `;
+
+    const toItem = (row: Row): HostMomentSummary => ({
+      id: row.id,
+      slug: row.slug,
+      title: row.title,
+      coverImage: row.coverImage,
+      startsAt: row.startsAt,
+      endsAt: row.endsAt,
+      locationType: row.locationType as LocationType,
+      locationName: row.locationName,
+      status: row.status as MomentStatus,
+      registrationCount: row.registrationCount,
+      topAttendees: (row.topAttendees ?? []).map((u) => ({ user: u })),
+      circle: { slug: row.cSlug, name: row.cName, coverImage: row.cCoverImage },
     });
 
     const upcoming: HostMomentSummary[] = [];
     const past: HostMomentSummary[] = [];
-    for (const m of records) {
-      if (m.status === "PAST") past.push(toItem(m));
-      else upcoming.push(toItem(m));
+    for (const row of rows) {
+      if (row.status === "PAST") past.push(toItem(row));
+      else upcoming.push(toItem(row));
     }
-    // Les moments passés doivent être triés par date décroissante
+    // Les moments passés triés par date décroissante
     past.sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
 
     return { upcoming, past };

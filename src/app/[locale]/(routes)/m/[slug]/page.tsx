@@ -108,24 +108,19 @@ export default async function PublicMomentPage({
 
   if (moment.status === "CANCELLED") notFound();
 
-  const [circle, hosts] = await measureTime("moment-page:initial", () =>
-    Promise.all([
-      getCircle(moment.circleId),
-      prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
-    ])
-  );
-
-  if (!circle) notFound();
-
+  // Auth chargée AVANT le Promise.all pour pouvoir conditionner getUserRegistration.
+  // getCachedSession est cache() donc déjà résolu (appelé par le layout) — coût proche de 0.
   const session = await measureTime("moment-page:auth", () => getCachedSession());
   const isAuthenticated = !!session?.user?.id;
-  const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
-  // Parallélise : inscription existante + données publiques en une seule vague
-  // registeredCount est dérivé de allAttendees en JS (évite un round-trip Neon supplémentaire)
-  const [existingRegistration, allAttendees, comments, upcomingCircleMoments, attachments] =
+  // Une seule vague de queries en parallèle : aucune query ne dépend des résultats
+  // des autres (toutes consomment moment.id / moment.circleId / session.user.id).
+  // registeredCount est dérivé de allAttendees en JS (évite un round-trip supplémentaire).
+  const [circle, hosts, existingRegistration, allAttendees, comments, upcomingCircleMoments, attachments] =
     await measureTime("moment-page:data", () =>
       Promise.all([
+        getCircle(moment.circleId),
+        prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
         isAuthenticated
           ? getUserRegistration(
               { momentId: moment.id, userId: session!.user!.id! },
@@ -141,6 +136,10 @@ export default async function PublicMomentPage({
         prismaMomentAttachmentRepository.findByMoment(moment.id),
       ])
     );
+
+  if (!circle) notFound();
+
+  const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   const registeredCount = allAttendees.filter((r) => r.status === "REGISTERED").length;
 
