@@ -22,25 +22,29 @@
 
 set -euo pipefail
 
+# `git worktree list --porcelain` liste toujours le repo principal en premier,
+# ce qui évite le piège de `git rev-parse --show-toplevel` qui retourne le
+# worktree courant quand on est dans un worktree.
+main_root="$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)"
+parent_dir="$(dirname "$main_root")"
+
 if [ $# -lt 1 ]; then
   echo "Usage: $0 <worktree-dir-name>" >&2
   echo "Example: $0 the-playground-feat-my-feature" >&2
   echo "" >&2
   echo "Active worktrees:" >&2
-  git worktree list 2>/dev/null | grep -v "$(git rev-parse --show-toplevel)$" | awk '{ print "  " $1 }' >&2
+  git worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' | grep -vxF "$main_root" | sed 's/^/  /' >&2
   exit 1
 fi
 
 worktree_name="$1"
-main_root="$(git rev-parse --show-toplevel)"
-parent_dir="$(dirname "$main_root")"
 worktree_dir="$parent_dir/$worktree_name"
 
 if [ ! -d "$worktree_dir" ]; then
   echo "Error: $worktree_dir does not exist" >&2
   echo "" >&2
   echo "Active worktrees:" >&2
-  git worktree list 2>/dev/null | grep -v "$(git rev-parse --show-toplevel)$" | awk '{ print "  " $1 }' >&2
+  git worktree list --porcelain 2>/dev/null | sed -n 's/^worktree //p' | grep -vxF "$main_root" | sed 's/^/  /' >&2
   exit 1
 fi
 
