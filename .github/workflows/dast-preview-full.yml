@@ -14,8 +14,8 @@ jobs:
     name: ZAP Full Scan — Preview
     runs-on: ubuntu-latest
     permissions:
-      issues: write
-      pull-requests: write  # Pour commenter la PR avec le résumé du scan
+      contents: read
+      actions: write # pour supprimer les artifacts publiés par l'action ZAP
 
     steps:
       - name: Checkout
@@ -30,23 +30,21 @@ jobs:
           rules_file_name: ".zap/rules.tsv"
           # Ne pas faire échouer le CI — alertes en avertissement uniquement
           fail_action: false
-          # Ouvrir une issue GitHub si de nouvelles alertes critiques sont détectées
-          allow_issue_writing: true
+          # Pas d'issue GitHub automatique (repo public : ne pas exposer les vulnérabilités)
+          allow_issue_writing: false
           # Durée max du spider (en minutes)
           cmd_options: "-m 5"
 
-      - name: Upload rapport HTML
-        uses: actions/upload-artifact@v4
+      # Le rapport reste consultable via les logs du run.
+      # L'action ZAP upload un artifact `zap_scan` par défaut — on le supprime immédiatement
+      # pour éviter toute exposition publique du rapport détaillé.
+      - name: Purger les artifacts du run (exposition publique interdite)
         if: always()
-        with:
-          name: zap-full-report-${{ github.run_number }}
-          path: report_html.html
-          retention-days: 14
-
-      - name: Upload rapport JSON
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: zap-full-report-json-${{ github.run_number }}
-          path: report_json.json
-          retention-days: 14
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ids=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts --jq '.artifacts[].id')
+          for id in $ids; do
+            echo "Suppression artifact $id"
+            gh api -X DELETE repos/${{ github.repository }}/actions/artifacts/$id
+          done
