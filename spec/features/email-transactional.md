@@ -45,7 +45,7 @@ Server Action (joinMomentAction)
 
 ---
 
-## 13 emails implémentés
+## 21 emails implémentés
 
 | Email | Template | Déclencheur | Destinataire | Pièce jointe .ics |
 |-------|----------|-------------|--------------|---------------------|
@@ -62,8 +62,16 @@ Server Action (joinMomentAction)
 | Invitation Communauté (Broadcast) | `broadcast-moment` | `broadcastMomentAction` | Membres de la Communauté (cooldown 24h entre envois, renvoi possible après expiration) | Non |
 | Invitation par lien privé | `circle-invitation` | `joinCircleByInviteAction` (via `circle.ts`) | Utilisateur invité | Non |
 | Alerte admin : entité créée | `admin-entity-created` | `notifyAdminEntityCreatedAction` (`notify-admin-entity-created.ts`) | Équipe admin (`ADMIN_NOTIFICATION_EMAIL`) | Non |
+| Alerte admin : nouvel utilisateur | `admin-new-user` | Post-onboarding | Équipe admin | Non |
+| Notification nouveau membre (Organisateur) | `host-new-circle-member` | `notify-host-new-circle-member.ts` | Organisateurs de la Communauté (filtre `notifyNewRegistration`) | Non |
+| Notification retrait de membre | `member-removed-from-circle` | `removeCircleMemberAction` | Membre retiré | Non |
+| Notification retrait d'inscription par Organisateur | `registration-removed-by-host` | `removeRegistrationByHostAction` | Participant retiré | Non |
+| Rappel 24h avant événement | `registration-reminder` | Cron horaire (`reminder24hSentAt`) | Inscrits REGISTERED (batch) | Non |
+| Notification approbation / refus inscription | `approval-notification` | `approveRegistrationAction` / `rejectRegistrationAction` | Participant | Non |
+| Notification annulation payante (Organisateur) | `host-paid-cancellation` | `cancelRegistrationAction` (remboursement) | Organisateur | Non |
+| Email de bienvenue personnalisé | `onboarding-welcome` | Post-onboarding (différé +24h, min 3h) | Nouvel utilisateur | Non |
 
-**Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n. `sendNewMomentToFollower` est encore présent dans le port `EmailService` (vestige non supprimé) mais n'est plus appelé depuis les actions — à retirer lors d'un prochain nettoyage.
+**Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n.
 
 ---
 

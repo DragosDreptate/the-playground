@@ -155,7 +155,7 @@ Contient :
 - Créer un événement (page autonome et partageable) ✅
 - Paramétrer :
   - Capacité ✅
-  - Gratuit / Payant *(Stripe Connect — pas encore implémenté)*
+  - Gratuit / Payant ✅ (Stripe Connect — livré v2.0.0)
 - Voir les Participants inscrits ✅
 - Gestion de la liste d'attente ✅
 - Export CSV des inscrits ✅ (colonnes : prénom, nom, email, statut, date)
@@ -169,13 +169,13 @@ Contient :
 
 - Découvrir un événement via un lien partagé (page autonome, design premium) ✅
 - S'inscrire à un événement (= rejoindre la Communauté automatiquement, zéro friction) ✅
-- Payer si nécessaire (Stripe) *(Stripe Connect — pas encore implémenté)*
+- Payer si nécessaire (Stripe) ✅ (Stripe Connect — livré v2.0.0)
 - Recevoir les notifications email :
   - Confirmation d'inscription ✅
   - Confirmation liste d'attente ✅
   - Promotion liste d'attente ✅
-  - ~~Rappel 24h avant~~ *(déprioritisé → Phase 2)*
-  - ~~Rappel 1h avant~~ *(déprioritisé → Phase 2)*
+  - Rappel 24h avant ✅ (livré v1.15.0)
+  - ~~Rappel 1h avant~~ *(pas encore implémenté — backlog P-01)*
   - Notification de changement (lieu, horaire) ✅
   - Notification d'annulation ✅
 - Commenter sur le fil de l'événement ✅
@@ -298,7 +298,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Inscriptions (avec inscription automatique à la Communauté) ✅
 - Liste d'attente avec promotion automatique ✅
 - Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, mise à jour événement, annulation événement, confirmation publication événement, notification nouvel événement dans communauté aux membres à la publication, broadcast "Inviter ma Communauté") ✅
-- Stripe Connect (événements payants) — pas encore implémenté
+- Stripe Connect (événements payants) ✅ — livré v2.0.0
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Explorer (répertoire public de Communautés + événements) ✅
 - Export données (CSV inscrits) ✅ — export membres Communauté et export historique pas encore implémentés
@@ -314,7 +314,7 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Dashboard analytics simple
 - Fil de commentaires enrichi
 - Notifications multi-canal (SMS, push)
-- Emails enrichis (rappels 24h/1h avant l'événement, communication Organisateur→Participants)
+- Emails enrichis (rappels 24h avant l'événement ✅ — livré v1.15.0 ; rappel 1h avant — pas encore implémenté)
 - Export avancé (JSON, données complètes)
 - Améliorations IA (agenda, FAQ, post LinkedIn)
 

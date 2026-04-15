@@ -27,8 +27,11 @@ fi
 
 branch="$1"
 
-# Détecter la racine du repo principal (le script peut être appelé depuis n'importe où)
-main_root="$(git rev-parse --show-toplevel)"
+# Détecter la racine du repo principal (le script peut être appelé depuis n'importe où,
+# y compris depuis un autre worktree). `git worktree list --porcelain` liste toujours
+# le repo principal en premier, ce qui évite le piège de `git rev-parse --show-toplevel`
+# qui retourne le worktree courant quand on est dans un worktree.
+main_root="$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)"
 main_name="$(basename "$main_root")"
 parent_dir="$(dirname "$main_root")"
 

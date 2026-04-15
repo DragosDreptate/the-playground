@@ -5,7 +5,7 @@
 >
 > **Sources de vérité** : page Aide (`Help` dans `messages/fr.json`), page Changelog (`CHANGELOG.md`), historique Git/PRs.
 >
-> **Dernière mise à jour** : 2026-04-12 (v2.7.0)
+> **Dernière mise à jour** : 2026-04-15 (v2.9.1)
 
 ---
 
@@ -23,7 +23,7 @@
 
 ## Fait (livré)
 
-> 31 versions livrées (v0.1.0 → v2.7.0), 100+ features. Organisées par domaine fonctionnel.
+> 33 versions livrées (v0.1.0 → v2.9.1), 100+ features. Organisées par domaine fonctionnel.
 
 ### Authentification & Profil
 
@@ -65,6 +65,7 @@
 | Autocomplétion adresse (Google Places) | v1.10.0 | — |
 | Fil de commentaires (plat, chronologique, max 2000 chars) | v0.3.0 | — |
 | Commentaires activés sur événements passés | v1.5.0 | — |
+| Photos dans les commentaires (max 3, compression auto Canvas → WebP, lightbox) | v2.9.0 | `spec/features/comment-photos.md` |
 | URLs cliquables dans descriptions et commentaires | v1.13.0 | — |
 | Événements passés accessibles (UI "Événement terminé" + CTA rétention) | v0.4.0 | — |
 | Statut Brouillon (DRAFT → PUBLISHED, sens unique) | v1.13.0 | — |
@@ -176,6 +177,7 @@
 | Gestion visibilité Explorer + recalcul scores | v1.16.0 | — |
 | Historique événements dans la fiche utilisateur | v2.3.0 | — |
 | Notifications Slack admin | v2.2.0 | — |
+| Notifications Slack inscriptions et commentaires (temps réel) | v2.9.0 | — |
 
 ### SEO & Contenu
 
@@ -208,6 +210,8 @@
 | Sentry error tracking (client/server/edge) | v0.2.0 | — |
 | PostHog product analytics | v0.2.0 | — |
 | Rapports PostHog quotidiens/hebdomadaires (cron email + Slack) | v2.7.0 | — |
+| Correction visiteurs uniques gonflés dans rapports PostHog | v2.9.1 | — |
+| Runbook incidents production + auto-snapshot avant db:push:prod | v2.9.1 | `spec/infra/incident-runbook.md` |
 | CI : typecheck + tests unitaires sur chaque PR | v0.5.0 | — |
 | CI : DAST ZAP baseline hebdomadaire + full scan manuel | v1.13.0 | — |
 | CI : Release Please v17 (changelog automatique) | v1.5.0 | — |
@@ -221,9 +225,9 @@
 | Feature | Version | Spec / PR |
 | --- | --- | --- |
 | Français + Anglais natifs (next-intl) | v0.1.0 | — |
-| Espagnol | v1.7.0 | — |
-| Roumain | v1.7.0 | — |
-| Néerlandais | v1.7.0 | — |
+| ~~Espagnol~~ | ~~v1.7.0~~ | Retiré 2026-03-09 — `chore(i18n): retirer es/ro/nl` |
+| ~~Roumain~~ | ~~v1.7.0~~ | Retiré 2026-03-09 — `chore(i18n): retirer es/ro/nl` |
+| ~~Néerlandais~~ | ~~v1.7.0~~ | Retiré 2026-03-09 — `chore(i18n): retirer es/ro/nl` |
 
 ### Design & UX
 
@@ -239,9 +243,9 @@
 
 | Feature | Version | Spec / PR |
 | --- | --- | --- |
-| 690+ tests unitaires Vitest (37 usecases domaine + 11 admin) | — | — |
+| 912 tests unitaires Vitest (49 usecases domaine + 24 admin + 5 fichiers sécurité, 82 fichiers de test) | — | — |
 | 99+ tests de sécurité (RBAC, IDOR cross-tenant, admin, avatar isolation, invite token) | — | — |
-| 11 specs E2E Playwright (auth, join, host-flow, cancel, comments, onboarding, waitlist, explore, dashboard-mode, broadcast, circle-invite) | — | — |
+| 16 specs E2E Playwright (auth, join, host-flow, cancel, comments, onboarding, waitlist, explore, dashboard-mode, broadcast, circle-invite, approval, network, attachments, public-profiles, stripe-payment) | — | — |
 | Infrastructure E2E : globalSetup + globalTeardown (nettoyage `@test.playground`) | — | — |
 | Audit sécurité complet | — | `spec/docs/security/AUDIT-2026-04-01.md` |
 
@@ -397,6 +401,7 @@
 | Feature — Approbation inscriptions | `spec/features/approval-registration.md` |
 | Feature — Réseaux Communautés | `spec/features/circle-network.md` |
 | Feature — Pièces jointes | `spec/features/moment-attachments.md` |
+| Feature — Photos commentaires | `spec/features/comment-photos.md` |
 | Feature — Profils publics | `spec/features/virality-public-profiles.md` |
 | Feature — Admin plateforme | `spec/features/admin-plateforme.md` |
 | Feature — Emails transactionnels | `spec/features/email-transactional.md` |
@@ -407,6 +412,7 @@
 | Feature — Radar | `spec/features/local-events-watcher.md` |
 | Feature — Suppression token invitation | `spec/features/remove-invite-token.md` |
 | Infra — Migration DB | `spec/infra/db-migration-rollback-strategy.md` |
+| Infra — Runbook incidents | `spec/infra/incident-runbook.md` |
 | Infra — Stratégie SEO | `spec/infra/seo-strategy.md` |
 | Infra — Workflow Git | `spec/infra/git-workflow.md` |
 | Recherche — Concurrence | `spec/research/analyse-concurrence.md` |

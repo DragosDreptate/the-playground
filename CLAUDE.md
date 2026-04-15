@@ -296,6 +296,13 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:seed-covers:execute` | Injecte les images de couverture en base |
 | `pnpm db:seed-covers:prod` | Injecte les images de couverture en production (avec confirmation) |
 | `pnpm db:subscribe-demo-to-the-spark:prod` | Inscrit les utilisateurs démo à la Communauté The Spark en production (avec confirmation) |
+| `pnpm db:backfill-public-id` | Backfill des identifiants publics (dev) — génère `publicId` pour les utilisateurs qui n'en ont pas |
+| `pnpm db:backfill-public-id:prod` | Backfill des identifiants publics en production (avec confirmation) |
+| `pnpm db:backfill-is-demo` | Backfill du flag `isDemo` sur les Communautés démo (dev) |
+| `pnpm db:backfill-is-demo:prod` | Backfill du flag `isDemo` en production (avec confirmation) |
+| `pnpm db:send-onboarding-welcome-backfill` | Envoie l'email de bienvenue aux utilisateurs qui ne l'ont pas encore reçu (dev) |
+| `pnpm db:send-onboarding-welcome-backfill:prod` | Envoie l'email de bienvenue en production (avec confirmation) |
+| `pnpm transfer-circle-host:prod` | Transfère le rôle HOST d'une Communauté vers un autre utilisateur en production |
 | `pnpm test:e2e` | Lance les tests E2E Playwright |
 | `pnpm test:mobile` | Lance les tests mobile Playwright (config dédiée) |
 | `pnpm test:mobile:setup` | Génère le storage state d'auth pour les tests mobile |
