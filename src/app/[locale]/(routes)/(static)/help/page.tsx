@@ -513,6 +513,9 @@ export default async function HelpPage() {
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {t.rich("organizer.radar.intro", rich)}
                 </p>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {t.rich("organizer.radar.keywords", rich)}
+                </p>
                 <p className="text-sm font-semibold text-foreground">
                   {t.rich("organizer.radar.limit", rich)}
                 </p>

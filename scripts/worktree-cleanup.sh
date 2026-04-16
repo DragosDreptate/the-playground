@@ -18,17 +18,16 @@
 
 set -euo pipefail
 
-main_root="$(git rev-parse --show-toplevel)"
-
-# Si on est appelé depuis un worktree secondaire, remonter au repo principal
-if git -C "$main_root" worktree list --porcelain | awk '/^worktree / { print $2 }' | head -1 | grep -q -v "^$main_root$"; then
-  main_root="$(git -C "$main_root" worktree list --porcelain | awk '/^worktree / { print $2; exit }')"
-fi
+# `git worktree list --porcelain` liste toujours le repo principal en premier,
+# ce qui évite le piège de `git rev-parse --show-toplevel` qui retourne le
+# worktree courant quand on est dans un worktree.
+# On utilise `sed` plutôt que `awk '{print $2}'` pour gérer les chemins avec espaces.
+main_root="$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)"
 
 removed=0
 skipped=0
 
-git -C "$main_root" worktree list --porcelain | awk '/^worktree / { print $2 }' | while read -r wt_path; do
+git -C "$main_root" worktree list --porcelain | sed -n 's/^worktree //p' | while read -r wt_path; do
   # Skip le worktree principal
   if [ "$wt_path" = "$main_root" ]; then
     continue
