@@ -272,6 +272,7 @@
 | P-07 | **Assistant IA basique** | Description événement, email invitation, suggestions Communauté. SDK Anthropic (Claude). | — |
 | P-08 | **Stats Communauté basiques** | Métriques sur la page Communauté Organisateur (tendance membres, taux de remplissage, etc.). | — |
 | P-09 | **Notification désinscription (opt-in Organisateur)** | Option dans le profil Organisateur pour recevoir (ou non) une notification quand un Participant se désinscrit d'un événement gratuit. Actuellement seuls les événements payants notifient l'Organisateur. Alignement Meetup (qui notifie systématiquement). | — |
+| P-10 | **Refonte UX édition d'événement : transitions de statut via actions contextuelles** | Aujourd'hui le formulaire d'édition expose un combobox de statut. Avec l'ajout de `PROPOSED`, chaque transition a des side-effects distincts (archivage commentaires, reset votes, envoi d'emails, refunds Stripe). Remplacer le combobox par des boutons d'action contextuels propres à chaque statut courant du Moment (ex. `DRAFT` → boutons "Publier" / "Proposer au vote" / "Annuler" ; `PUBLISHED` → "Annuler l'événement"). Voir recommandation dans `spec/features/moment-proposed-vote.md`. | — |
 
 ---
 
@@ -299,7 +300,7 @@
 
 ### Performance DB
 
-- [ ] **Migrer vers le driver WebSocket Neon** (`@neondatabase/serverless` Pool mode)
+- [x] **Migrer vers le driver WebSocket Neon** (`@neondatabase/serverless` Pool mode)
   - Connexions TCP concurrentes sur cold start Vercel causent 650-750ms d'attente
   - WebSocket = HTTP upgrade, plus rapide, conçu pour Vercel Serverless + Neon
   - Pré-requis : baseline propre post React.cache() (déjà en place)
@@ -310,9 +311,10 @@
 - [ ] **Check-in** — Marquer présent sur place (retiré du MVP v1)
 - [ ] **Galerie photos post-événement** — Upload par Participants et Organisateur après un événement PAST. Galerie sur `/m/[slug]` et page Communauté. Modération par l'Organisateur. CTA "Voir les photos" dans l'email post-événement. Infrastructure `StorageService` (Vercel Blob) déjà en place.
 - [ ] **Dupliquer un événement** — Bouton "Dupliquer" sur un événement existant pour pré-remplir le formulaire de création avec les mêmes infos (titre, lieu, description, capacité, prix). Gain de temps pour les événements récurrents similaires.
+- [ ] **Statut "Proposé" + vote Communauté** — Nouveau statut d'événement `PROPOSED` (en plus de `DRAFT`, `PUBLISHED`, `PAST`), visible uniquement des Membres `ACTIVE` de la Communauté. Permet aux Membres de voter (pour / contre / peut-être) sur la proposition (lieu, date, description) afin de guider l'Organisateur dans sa décision de publier ou de modifier. Objectif : recueillir un feedback en amont, impliquer les Membres, réduire le risque qu'un événement publié ne corresponde pas aux attentes. Sens du workflow : `DRAFT → PROPOSED → PUBLISHED` (avec retour possible à `DRAFT` pour modification). Spec : `spec/features/moment-proposed-vote.md`
 - [ ] **API publique v1** — Permettre aux organisateurs de créer/gérer des événements et récupérer les données via API REST + webhooks sortants. Débloque les intégrations avec des systèmes internes (automatisation, CRM, bots). Spec : `spec/features/public-api-v1.md`
 - [ ] **Plan Pro** — Analytics avancés, branding personnalisé, IA avancée, API, notifications multi-canal
-- [ ] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
+- [x] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
 - [ ] **White-label / mono-community** — `spec/product/white-label-mono-community.md`
 
 ### Qualité & Sécurité
@@ -401,6 +403,7 @@
 | Feature — Approbation inscriptions | `spec/features/approval-registration.md` |
 | Feature — Réseaux Communautés | `spec/features/circle-network.md` |
 | Feature — Pièces jointes | `spec/features/moment-attachments.md` |
+| Feature — Statut "Proposé" + vote | `spec/features/moment-proposed-vote.md` |
 | Feature — Photos commentaires | `spec/features/comment-photos.md` |
 | Feature — Profils publics | `spec/features/virality-public-profiles.md` |
 | Feature — Admin plateforme | `spec/features/admin-plateforme.md` |
