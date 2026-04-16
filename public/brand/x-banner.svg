@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500">
+  <defs>
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1500" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#0d0e1a"/>
+      <stop offset="55%"  stop-color="#1a1b2e"/>
+      <stop offset="100%" stop-color="#1e1030"/>
+    </linearGradient>
+
+    <!-- Icon gradient -->
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#ec4899"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1500" height="500" fill="url(#bgGrad)"/>
+
+  <!-- Glow blobs -->
+  <ellipse cx="720" cy="120"  rx="260" ry="170" fill="#e8457a" opacity="0.11" filter="url(#glow)"/>
+  <ellipse cx="1120" cy="400" rx="220" ry="150" fill="#8b5cf6" opacity="0.14" filter="url(#glow)"/>
+  <ellipse cx="1420" cy="420" rx="160" ry="110" fill="#ec4899" opacity="0.10" filter="url(#glow)"/>
+
+  <!-- ── Composition — identique à LinkedIn, scalée pour 1500×500 ──
+       Safe zone : éviter le coin bas-gauche (photo profil X ronde,
+       diamètre ~200px, centre ~(128, 500), zone couverte x:28-228 / y:400-500).
+       Bloc centré horizontalement et verticalement dans la zone libre. -->
+
+  <!-- Bloc total :
+       icon(80) + gap(22) + wordmark(~370) + gap(50) + sep(1) + gap(50) + taglines(~510) ≈ 1083px
+       x_start = (1500 - 1083) / 2 ≈ 208 -->
+
+  <!-- Icon: 80×80, centré verticalement : y = (500-80)/2 = 210 -->
+  <rect x="208" y="210" width="80" height="80" rx="17" fill="url(#iconGrad)"/>
+  <!-- Triangle play centré dans l'icône (centre = 248, 250) -->
+  <polygon points="235,224 235,276 277,250" fill="white"/>
+
+  <!-- Wordmark "the playground" -->
+  <text x="310" y="264"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="46" font-weight="800" letter-spacing="-1.2"
+    fill="#f0f0f5">the&#x2009;<tspan fill="#e8457a">playground</tspan></text>
+
+  <!-- Séparateur vertical : x=730, centré verticalement (hauteur 180) -->
+  <line x1="730" y1="160" x2="730" y2="340" stroke="#ffffff" stroke-opacity="0.14" stroke-width="1"/>
+
+  <!-- ── Taglines — x=780, 3 lignes × 58px centrées : y_center = 250 ──
+       Baselines : 203, 261, 319 (pour que les lignes soient centrées sur y=250) -->
+
+  <text x="780" y="203"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="42" font-weight="700" letter-spacing="-0.6"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Lancez</tspan><tspan> votre communauté.</tspan>
+  </text>
+
+  <text x="780" y="261"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="42" font-weight="700" letter-spacing="-0.6"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Organisez</tspan><tspan> vos événements.</tspan>
+  </text>
+
+  <text x="780" y="319"
+    font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+    font-size="42" font-weight="700" letter-spacing="-0.6"
+    fill="#7a7c9a">
+    <tspan font-weight="800" fill="#ffffff">Animez</tspan><tspan> votre réseau.</tspan>
+  </text>
+
+</svg>
