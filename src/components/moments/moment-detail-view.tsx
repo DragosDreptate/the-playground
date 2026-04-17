@@ -191,6 +191,9 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
 export async function MomentDetailView(props: MomentDetailViewProps) {
   const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments } =
     props;
+  // "Organisé par" n'affiche que le HOST principal (les CO_HOST figurent dans la liste des membres).
+  // On garde `hosts` complet pour les autres usages (exclusions notifications, hostUserIds...).
+  const primaryHosts = hosts.filter((h) => h.role === "HOST");
   const isHostView = props.variant === "host";
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
   const isAuthenticated = isHostView || (props as PublicViewProps).isAuthenticated;
@@ -280,10 +283,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* "Organisé par" + actions Host */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
+            {primaryHosts.length > 0 && (
               <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
                 {t("public.hostedBy")}{" "}
-                {hosts.map((h, i) => (
+                {primaryHosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
                     {isAuthenticated && h.user.publicId ? (
                       <Link
@@ -302,7 +305,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                         {tCommon("you")}
                       </Badge>
                     )}
-                    {i < hosts.length - 1 && <span>,</span>}
+                    {i < primaryHosts.length - 1 && <span>,</span>}
                   </span>
                 ))}
               </p>

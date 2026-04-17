@@ -272,39 +272,37 @@ export default async function PublicCirclePage({
             </p>
           )}
 
-          {/* Hosts */}
-          {hosts.length > 0 && (
-            <div className="space-y-2 px-1">
-              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                {t("detail.hosts")}
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {hosts.slice(0, 5).map((host) => (
-                  <div
-                    key={host.id}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
-                    style={{ background: getMomentGradient(host.user.email) }}
-                    title={host.user.firstName ?? host.user.email}
-                  >
-                    {getCircleUserInitials(host.user)}
-                  </div>
-                ))}
-                {hosts.length > 5 && (
-                  <span className="text-muted-foreground text-xs">
-                    +{hosts.length - 5}
-                  </span>
-                )}
+          {/* Hosts — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres avec leur badge) */}
+          {(() => {
+            const primaryHosts = hosts.filter((h) => h.role === "HOST");
+            return primaryHosts.length > 0 ? (
+              <div className="space-y-2 px-1">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                  {t("detail.hosts")}
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {primaryHosts.map((host) => (
+                    <div
+                      key={host.id}
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={{ background: getMomentGradient(host.user.email) }}
+                      title={host.user.firstName ?? host.user.email}
+                    >
+                      {getCircleUserInitials(host.user)}
+                    </div>
+                  ))}
+                </div>
+                <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id}>
+                      <HostLink user={h.user} linkDisabled={!isConnected} />
+                      {i < primaryHosts.length - 1 && ", "}
+                    </span>
+                  ))}
+                </p>
               </div>
-              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
-                {hosts.map((h, i) => (
-                  <span key={h.user.id}>
-                    <HostLink user={h.user} linkDisabled={!isConnected} />
-                    {i < hosts.length - 1 && ", "}
-                  </span>
-                ))}
-              </p>
-            </div>
-          )}
+            ) : null;
+          })()}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -384,19 +382,22 @@ export default async function PublicCirclePage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" + raccourci Organisateur */}
+          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres avec leur badge */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {hosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
-                    {i < hosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
+            {(() => {
+              const primaryHosts = hosts.filter((h) => h.role === "HOST");
+              return primaryHosts.length > 0 ? (
+                <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                  {t("detail.hostedBy")}
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id} className="flex items-center gap-1">
+                      <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
+                      {i < primaryHosts.length - 1 && <span>,</span>}
+                    </span>
+                  ))}
+                </p>
+              ) : null;
+            })()}
             {isOrganizer && (
               <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}`}>

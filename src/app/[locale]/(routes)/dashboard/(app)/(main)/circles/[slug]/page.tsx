@@ -191,14 +191,16 @@ export default async function CircleDetailPage({
             </p>
           )}
 
-          {/* Hosts bloc */}
-          {hosts.length > 0 && (
+          {/* Hosts bloc — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres) */}
+          {(() => {
+            const primaryHosts = hosts.filter((h) => h.role === "HOST");
+            return primaryHosts.length > 0 ? (
             <div className="space-y-2 px-1">
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.hosts")}
               </p>
               <div className="flex flex-wrap items-center gap-1.5">
-                {hosts.slice(0, 5).map((host) => (
+                {primaryHosts.map((host) => (
                   <div
                     key={host.id}
                     className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
@@ -208,22 +210,18 @@ export default async function CircleDetailPage({
                     {getCircleUserInitials(host.user)}
                   </div>
                 ))}
-                {hosts.length > 5 && (
-                  <span className="text-muted-foreground text-xs">
-                    +{hosts.length - 5}
-                  </span>
-                )}
               </div>
               <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
-                {hosts.map((h, i) => (
+                {primaryHosts.map((h, i) => (
                   <span key={h.user.id}>
                     <HostLink user={h.user} />
-                    {i < hosts.length - 1 && ", "}
+                    {i < primaryHosts.length - 1 && ", "}
                   </span>
                 ))}
               </p>
             </div>
-          )}
+            ) : null;
+          })()}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -254,19 +252,22 @@ export default async function CircleDetailPage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" + actions Host */}
+          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {hosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" />
-                    {i < hosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
+            {(() => {
+              const primaryHosts = hosts.filter((h) => h.role === "HOST");
+              return primaryHosts.length > 0 ? (
+                <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                  {t("detail.hostedBy")}
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id} className="flex items-center gap-1">
+                      <HostLink user={h.user} className="text-foreground font-medium" />
+                      {i < primaryHosts.length - 1 && <span>,</span>}
+                    </span>
+                  ))}
+                </p>
+              ) : null;
+            })()}
             {isOrganizer && (
               <div className="flex shrink-0 gap-2">
                 <Button asChild size="sm">
