@@ -8,6 +8,7 @@ import {
   infoLabel,
   infoValue,
 } from "../email/templates/components/email-styles";
+import type { UserImpact, UserImpactLevel } from "./analyze-issue";
 
 type Props = {
   issueShortId: string;
@@ -15,7 +16,7 @@ type Props = {
   culprit: string;
   urgency: string;
   urgencyLabel: string;
-  impact: string;
+  userImpact: UserImpact;
   diagnosis: string;
   remediation: string;
   sentryUrl: string;
@@ -29,18 +30,26 @@ const URGENCY_COLORS: Record<string, string> = {
   noise: "#71717a",
 };
 
+const USER_IMPACT_META: Record<UserImpactLevel, { label: string; color: string }> = {
+  none: { label: "AUCUN IMPACT UTILISATEUR", color: "#16a34a" },
+  silent: { label: "IMPACT SILENCIEUX", color: "#71717a" },
+  degraded: { label: "EXPÉRIENCE DÉGRADÉE", color: "#ea580c" },
+  blocking: { label: "UTILISATEUR BLOQUÉ", color: "#dc2626" },
+};
+
 export function SentryIssueAnalysisEmail({
   issueShortId,
   issueTitle,
   culprit,
   urgency,
   urgencyLabel,
-  impact,
+  userImpact,
   diagnosis,
   remediation,
   sentryUrl,
 }: Props) {
   const color = URGENCY_COLORS[urgency] ?? "#71717a";
+  const impactMeta = USER_IMPACT_META[userImpact.level];
 
   return (
     <EmailLayout
@@ -55,12 +64,16 @@ export function SentryIssueAnalysisEmail({
       <Text style={heading}>{issueShortId}</Text>
       <Text style={titleStyle}>{issueTitle}</Text>
 
+      <Section style={{ ...infoCard, borderLeft: `4px solid ${impactMeta.color}` }}>
+        <Text style={{ ...infoLabel, color: impactMeta.color, fontWeight: 700 }}>
+          {impactMeta.label}
+        </Text>
+        <Text style={bodyText}>{userImpact.description}</Text>
+      </Section>
+
       <Section style={infoCard}>
         <Text style={infoLabel}>Culprit</Text>
         <Text style={infoValue}>{culprit}</Text>
-
-        <Text style={infoLabel}>Impact</Text>
-        <Text style={infoValue}>{impact}</Text>
       </Section>
 
       <Section style={infoCard}>
