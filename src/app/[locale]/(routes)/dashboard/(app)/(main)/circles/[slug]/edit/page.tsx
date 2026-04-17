@@ -9,6 +9,7 @@ import { CircleNotFoundError } from "@/domain/errors";
 import { CircleForm } from "@/components/circles/circle-form";
 import { updateCircleAction } from "@/app/actions/circle";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 
@@ -39,10 +40,10 @@ export default async function EditCirclePage({
   const membership = session?.user?.id
     ? await circleRepo.findMembership(circle.id, session.user.id)
     : null;
-  const isOrganizer = membership?.role === "HOST";
+  const canManageStripe = isActivePrimaryHost(membership);
 
   let stripeConnect;
-  if (isOrganizer) {
+  if (canManageStripe) {
     // Default: no account (shows "Activer les paiements" button)
     let hasAccount = false;
     let status = null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null;

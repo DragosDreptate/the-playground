@@ -1,3 +1,4 @@
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
 
@@ -25,7 +26,7 @@ export async function deleteCircle(
     input.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActivePrimaryHost(membership)) {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
   }
 

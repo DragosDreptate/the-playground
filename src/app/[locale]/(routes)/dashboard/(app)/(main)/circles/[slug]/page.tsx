@@ -27,6 +27,7 @@ import { CollapsibleDescription } from "@/components/moments/collapsible-descrip
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import Image from "next/image";
 import {
   Globe,
@@ -78,9 +79,8 @@ export default async function CircleDetailPage({
   const membership = await circleRepo.findMembership(circle.id, session.user.id);
   if (!membership) notFound();
 
-  const isOrganizer = membership.role === "HOST" || membership.role === "CO_HOST";
+  const isOrganizer = isActiveOrganizer(membership);
   const callerRole = membership.role;
-
 
   const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
     prismaCircleRepository.findOrganizers(circle.id),
@@ -96,6 +96,7 @@ export default async function CircleDetailPage({
   ]);
 
   const totalMembers = hosts.length + players.length;
+  const primaryHosts = hosts.filter((h) => h.role === "HOST");
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
@@ -192,9 +193,7 @@ export default async function CircleDetailPage({
           )}
 
           {/* Hosts bloc — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres) */}
-          {(() => {
-            const primaryHosts = hosts.filter((h) => h.role === "HOST");
-            return primaryHosts.length > 0 ? (
+          {primaryHosts.length > 0 && (
             <div className="space-y-2 px-1">
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.hosts")}
@@ -220,8 +219,7 @@ export default async function CircleDetailPage({
                 ))}
               </p>
             </div>
-            ) : null;
-          })()}
+          )}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -254,20 +252,17 @@ export default async function CircleDetailPage({
 
           {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres */}
           <div className="flex items-center justify-between gap-4">
-            {(() => {
-              const primaryHosts = hosts.filter((h) => h.role === "HOST");
-              return primaryHosts.length > 0 ? (
-                <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                  {t("detail.hostedBy")}
-                  {primaryHosts.map((h, i) => (
-                    <span key={h.user.id} className="flex items-center gap-1">
-                      <HostLink user={h.user} className="text-foreground font-medium" />
-                      {i < primaryHosts.length - 1 && <span>,</span>}
-                    </span>
-                  ))}
-                </p>
-              ) : null;
-            })()}
+            {primaryHosts.length > 0 && (
+              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                {t("detail.hostedBy")}
+                {primaryHosts.map((h, i) => (
+                  <span key={h.user.id} className="flex items-center gap-1">
+                    <HostLink user={h.user} className="text-foreground font-medium" />
+                    {i < primaryHosts.length - 1 && <span>,</span>}
+                  </span>
+                ))}
+              </p>
+            )}
             {isOrganizer && (
               <div className="flex shrink-0 gap-2">
                 <Button asChild size="sm">

@@ -1,4 +1,5 @@
 import type { CircleMembership } from "@/domain/models/circle";
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
 import type { EmailService } from "@/domain/ports/services/email-service";
@@ -6,7 +7,6 @@ import {
   UnauthorizedCircleActionError,
   NotMemberOfCircleError,
   InvalidDemotionTargetError,
-  CircleNotFoundError,
 } from "@/domain/errors";
 
 type DemoteFromCoHostInput = {
@@ -39,51 +39,35 @@ export async function demoteFromCoHost(
 ): Promise<CircleMembership> {
   const { circleRepository, userRepository, emailService, emailStrings } = deps;
 
-  // 1. Seul le HOST principal peut rétrograder (D3)
-  const callerMembership = await circleRepository.findMembership(
-    input.circleId,
-    input.hostUserId
-  );
-  if (
-    !callerMembership ||
-    callerMembership.role !== "HOST" ||
-    callerMembership.status !== "ACTIVE"
-  ) {
+  // D3 : seul le HOST principal peut rétrograder.
+  const [callerMembership, targetMembership] = await Promise.all([
+    circleRepository.findMembership(input.circleId, input.hostUserId),
+    circleRepository.findMembership(input.circleId, input.targetUserId),
+  ]);
+  if (!isActivePrimaryHost(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, input.circleId);
   }
-
-  // 2. Charger la membership de la cible
-  const targetMembership = await circleRepository.findMembership(
-    input.circleId,
-    input.targetUserId
-  );
   if (!targetMembership) {
     throw new NotMemberOfCircleError(input.circleId);
   }
-
-  // 3. Seul un CO_HOST peut être rétrogradé
   if (targetMembership.role !== "CO_HOST") {
     throw new InvalidDemotionTargetError(targetMembership.role);
   }
 
-  // 4. Rétrogradation
   const updated = await circleRepository.updateMembershipRole(
     input.circleId,
     input.targetUserId,
     "PLAYER"
   );
 
-  // 5. Email de rétrogradation (D19) — best-effort
+  // D19 : email de rétrogradation best-effort.
   if (emailService && emailStrings) {
     try {
       const [targetUser, circle] = await Promise.all([
         userRepository.findById(input.targetUserId),
         circleRepository.findById(input.circleId),
       ]);
-
-      if (!targetUser || !circle) {
-        if (!circle) throw new CircleNotFoundError(input.circleId);
-      } else {
+      if (targetUser && circle) {
         const strings = await emailStrings.demoted({ circleName: circle.name });
         await emailService.sendCoHostDemoted({
           to: targetUser.email,
@@ -95,7 +79,7 @@ export async function demoteFromCoHost(
         });
       }
     } catch {
-      // L'échec d'envoi d'email ne bloque pas la rétrogradation en base.
+      // Swallowed on purpose — see D19.
     }
   }
 

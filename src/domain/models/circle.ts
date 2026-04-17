@@ -22,6 +22,17 @@ export function isActiveOrganizer(
   return membership.status === "ACTIVE" && isOrganizerRole(membership.role);
 }
 
+/**
+ * Garde les actions réservées au propriétaire de la Communauté (delete, promote,
+ * demote, Stripe Connect, leaveCircle guard). Un CO_HOST ne passe pas ce check.
+ */
+export function isActivePrimaryHost(
+  membership: Pick<CircleMembership, "role" | "status"> | null | undefined
+): boolean {
+  if (!membership) return false;
+  return membership.status === "ACTIVE" && membership.role === "HOST";
+}
+
 export type CircleCategory =
   | "TECH"
   | "DESIGN"
