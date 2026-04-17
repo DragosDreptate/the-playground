@@ -18,6 +18,7 @@ import { DeleteCircleDialog } from "@/components/circles/delete-circle-dialog";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
+import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
 import { CircleMembersList } from "@/components/circles/circle-members-list";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
@@ -485,7 +486,7 @@ export default async function CircleDetailPage({
                   </p>
                 </div>
               ) : (
-                <div>
+                <PaginatedMomentList>
                   {upcomingMoments.map((moment, i) => (
                     <MomentTimelineItem
                       key={moment.id}
@@ -497,7 +498,7 @@ export default async function CircleDetailPage({
                       isLast={i === upcomingMoments.length - 1}
                     />
                   ))}
-                </div>
+                </PaginatedMomentList>
               )
             }
             pastContent={
@@ -508,7 +509,7 @@ export default async function CircleDetailPage({
                   </p>
                 </div>
               ) : (
-                <div>
+                <PaginatedMomentList>
                   {pastMoments.map((moment, i) => (
                     <MomentTimelineItem
                       key={moment.id}
@@ -520,7 +521,7 @@ export default async function CircleDetailPage({
                       isLast={i === pastMoments.length - 1}
                     />
                   ))}
-                </div>
+                </PaginatedMomentList>
               )
             }
           />

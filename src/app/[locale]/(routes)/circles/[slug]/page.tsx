@@ -27,6 +27,7 @@ import { HostLink } from "@/components/circles/host-link";
 import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
+import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import Image from "next/image";
@@ -574,7 +575,7 @@ export default async function PublicCirclePage({
                   </p>
                 </div>
               ) : (
-                <div>
+                <PaginatedMomentList>
                   {upcomingMoments.map((moment, i) => (
                     <MomentTimelineItem
                       key={moment.id}
@@ -588,7 +589,7 @@ export default async function PublicCirclePage({
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
                   ))}
-                </div>
+                </PaginatedMomentList>
               )
             }
             pastContent={
@@ -599,7 +600,7 @@ export default async function PublicCirclePage({
                   </p>
                 </div>
               ) : (
-                <div>
+                <PaginatedMomentList>
                   {pastMoments.map((moment, i) => (
                     <MomentTimelineItem
                       key={moment.id}
@@ -613,7 +614,7 @@ export default async function PublicCirclePage({
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
                   ))}
-                </div>
+                </PaginatedMomentList>
               )
             }
           />
