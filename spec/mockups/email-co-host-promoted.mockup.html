@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email — Promotion en co-organisateur — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --accent: #4fe0c2;
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--foreground); background: var(--background); min-height: 100vh; padding: 48px 24px 80px; }
+
+.stage-header { max-width: 640px; margin: 0 auto 32px; text-align: center; }
+.stage-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-foreground); margin-bottom: 4px; }
+.stage-desc { font-size: 12px; color: var(--muted-foreground); }
+
+/* Email container */
+.email { max-width: 560px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px -10px rgba(0,0,0,0.4); }
+
+.email-header { padding: 32px 40px 20px; border-bottom: 1px solid var(--border); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-logo { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--primary), #9333ea); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 14px; }
+.brand-name { font-size: 15px; font-weight: 700; color: var(--foreground); }
+
+.email-body { padding: 32px 40px 28px; }
+
+.subject { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--foreground); margin-bottom: 20px; letter-spacing: -0.01em; }
+
+.paragraph { font-size: 15px; line-height: 1.6; color: var(--foreground); margin-bottom: 16px; }
+.paragraph.muted { color: var(--muted-foreground); font-size: 14px; }
+
+.circle-card { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--muted); border: 1px solid var(--border); border-radius: 12px; margin: 20px 0; }
+.circle-avatar { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #6366f1); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.circle-name { font-size: 15px; font-weight: 600; color: var(--foreground); }
+.circle-meta { font-size: 12px; color: var(--muted-foreground); margin-top: 2px; }
+
+.rights-list { list-style: none; padding: 18px; background: rgba(79,224,194,0.08); border: 1px solid rgba(79,224,194,0.25); border-radius: 12px; margin: 20px 0 8px; }
+.rights-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); margin-bottom: 10px; }
+.rights-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; font-size: 14px; color: var(--foreground); }
+.rights-item svg { color: var(--accent); flex-shrink: 0; margin-top: 4px; }
+
+.cta-block { text-align: center; padding: 28px 0 12px; }
+.cta-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 28px; border-radius: 10px; background: var(--primary); color: white; font-size: 15px; font-weight: 600; text-decoration: none; transition: opacity 0.15s; }
+.cta-btn:hover { opacity: 0.9; }
+
+.fine-print { padding: 20px 40px 28px; border-top: 1px solid var(--border); background: var(--muted); }
+.fine-print p { font-size: 12px; color: var(--muted-foreground); line-height: 1.55; }
+.fine-print p + p { margin-top: 8px; }
+.fine-print a { color: var(--muted-foreground); text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="stage-header">
+  <div class="stage-title">Email — Promotion en co-organisateur (D19)</div>
+  <div class="stage-desc">Envoyé automatiquement par <code>promoteToCoHost</code></div>
+</div>
+
+<div class="email">
+  <div class="email-header">
+    <div class="brand">
+      <div class="brand-logo">P</div>
+      <div class="brand-name">The Playground</div>
+    </div>
+  </div>
+
+  <div class="email-body">
+    <h1 class="subject">Vous êtes co-organisateur de Paris AI Builders</h1>
+
+    <p class="paragraph">Bonjour Alice,</p>
+    <p class="paragraph">Dragos Dreptate vient de vous promouvoir co-organisateur de sa Communauté. Vous pouvez désormais l'aider à gérer les événements et les membres.</p>
+
+    <div class="circle-card">
+      <div class="circle-avatar">P</div>
+      <div>
+        <div class="circle-name">Paris AI Builders</div>
+        <div class="circle-meta">42 membres · 3 événements à venir</div>
+      </div>
+    </div>
+
+    <div class="rights-list">
+      <div class="rights-title">Vos nouveaux droits</div>
+      <div class="rights-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Créer et éditer des événements</span>
+      </div>
+      <div class="rights-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Gérer les inscriptions et la liste d'attente</span>
+      </div>
+      <div class="rights-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Modifier les paramètres de la Communauté</span>
+      </div>
+      <div class="rights-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Diffuser des messages à la Communauté</span>
+      </div>
+      <div class="rights-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Recevoir les notifications d'Organisateur</span>
+      </div>
+    </div>
+
+    <p class="paragraph muted">Seul le propriétaire peut supprimer la Communauté, gérer le compte Stripe ou promouvoir d'autres co-organisateurs.</p>
+
+    <div class="cta-block">
+      <a href="#" class="cta-btn">
+        Ouvrir le dashboard
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="fine-print">
+    <p>Vous recevez cet email parce que vous avez été promu co-organisateur d'une Communauté dont vous êtes membre.</p>
+    <p>Ne souhaitez plus ce rôle ? Vous pouvez <a href="#">quitter la Communauté</a> à tout moment.</p>
+  </div>
+</div>
+
+</body>
+</html>

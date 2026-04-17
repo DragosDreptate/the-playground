@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liste des membres — co-organisateurs — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --accent: #4fe0c2;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --destructive: #e8457a;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+  --shadow-md: 0 4px 12px -2px rgba(26,27,46,0.1), 0 2px 6px -2px rgba(26,27,46,0.06);
+  --shadow-xl: 0 20px 60px -10px rgba(26,27,46,0.22);
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --input: #383a55;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-xl: 0 20px 60px -10px rgba(0,0,0,0.6);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--foreground); background: var(--background); min-height: 100vh; }
+
+/* Site header */
+.site-header { height: 56px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+.site-logo { font-size: 16px; font-weight: 800; color: var(--primary); margin-right: auto; }
+.nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; }
+
+/* Layout */
+.dashboard { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+
+.breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px; }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .sep { font-size: 11px; }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+.page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--muted-foreground); margin-bottom: 28px; }
+
+/* State toggle */
+.state-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; flex-wrap: wrap; }
+.state-bar-label { font-size: 11px; font-weight: 600; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
+.state-btn { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted-foreground); transition: all 0.15s; font-family: inherit; }
+.state-btn:hover { background: var(--muted); color: var(--foreground); }
+.state-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.badge-owner { border: 1px solid rgba(232,69,122,0.4); color: var(--primary); }
+.badge-org { border: 1px solid rgba(79,224,194,0.4); color: var(--accent); }
+.badge-outline { border: 1px solid var(--border); color: var(--muted-foreground); background: var(--muted); }
+.badge-you { border: 1px solid var(--border); color: var(--muted-foreground); font-size: 10px; padding: 1px 6px; }
+
+/* Members card */
+.members-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
+.members-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.members-title { font-size: 17px; font-weight: 600; }
+
+/* Section label */
+.section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); padding: 14px 0 6px; border-bottom: 1px solid var(--border); margin-top: 4px; }
+
+/* Member row */
+.member-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); position: relative; }
+.member-row:last-child { border-bottom: none; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; flex-shrink: 0; }
+.member-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.member-name { font-size: 14px; font-weight: 500; line-height: 1.3; display: flex; align-items: center; gap: 6px; }
+.member-email { font-size: 12px; color: var(--muted-foreground); }
+
+/* Menu button */
+.menu-btn { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; color: var(--muted-foreground); transition: all 0.15s; }
+.menu-btn:hover { background: var(--muted); color: var(--foreground); }
+.menu-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Dropdown */
+.dropdown { position: absolute; right: 0; top: 50px; z-index: 20; background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow-xl); padding: 4px; min-width: 240px; }
+.dropdown::before { content: ''; position: absolute; right: 12px; top: -6px; width: 10px; height: 10px; background: var(--card); border-left: 1px solid var(--border); border-top: 1px solid var(--border); transform: rotate(45deg); }
+.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--foreground); transition: background 0.1s; user-select: none; position: relative; z-index: 1; }
+.dropdown-item:hover { background: var(--muted); }
+.dropdown-item.destructive { color: var(--destructive); }
+.dropdown-item.destructive:hover { background: rgba(232,69,122,0.08); }
+.dropdown-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+.dropdown-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* Notes / matrix */
+.matrix-section { margin-top: 48px; }
+.matrix-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); }
+.matrix-desc { font-size: 13px; color: var(--muted-foreground); margin-bottom: 16px; }
+
+.matrix-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.matrix-table th, .matrix-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+.matrix-table th { font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); background: var(--muted); }
+.matrix-table tr:last-child td { border-bottom: none; }
+.matrix-table td:first-child { font-weight: 600; }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; margin-right: 4px; margin-bottom: 2px; }
+.pill.yes { background: rgba(79,224,194,0.15); color: var(--accent); }
+.pill.no { background: rgba(232,69,122,0.12); color: var(--primary); }
+.pill.muted { background: var(--muted); color: var(--muted-foreground); }
+.pill.self { background: rgba(234,179,8,0.15); color: #eab308; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">The Playground</div>
+  <div class="nav-avatar">D</div>
+</header>
+
+<main class="dashboard">
+  <div class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="sep">›</span>
+    <a href="#">Paris AI Builders</a>
+  </div>
+  <h1 class="page-title">Paris AI Builders</h1>
+  <p class="page-desc">Liste des membres, vue Organisateur (dashboard)</p>
+
+  <div class="state-bar">
+    <span class="state-bar-label">Vue de :</span>
+    <button class="state-btn active" onclick="setView(event,'host')">HOST (propriétaire)</button>
+    <button class="state-btn" onclick="setView(event,'cohost')">CO_HOST</button>
+  </div>
+
+  <!-- VUE HOST -->
+  <div id="view-host" class="members-card">
+    <div class="members-header">
+      <h2 class="members-title">Membres</h2>
+      <span class="badge badge-outline">5 membres</span>
+    </div>
+
+    <div class="section-label">Organisateurs</div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #e8457a, #9333ea);">DD</div>
+      <div class="member-info">
+        <div class="member-name">Dragos Dreptate<span class="badge badge-you">Vous</span></div>
+        <div class="member-email">dragos@example.com</div>
+      </div>
+      <span class="badge badge-owner">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Propriétaire
+      </span>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">AM</div>
+      <div class="member-info">
+        <div class="member-name">Alice Martin</div>
+        <div class="member-email">alice.martin@example.com</div>
+      </div>
+      <span class="badge badge-org">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <div class="dropdown">
+        <div class="dropdown-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          Rétrograder en participant
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item destructive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Retirer de la Communauté
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Participants</div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">BD</div>
+      <div class="member-info">
+        <div class="member-name">Bob Durand</div>
+        <div class="member-email">bob.durand@example.com</div>
+      </div>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <div class="dropdown">
+        <div class="dropdown-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+          Promouvoir en co-organisateur
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item destructive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Retirer de la Communauté
+        </div>
+      </div>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">CL</div>
+      <div class="member-info">
+        <div class="member-name">Claire Leblanc</div>
+        <div class="member-email">claire.l@example.com</div>
+      </div>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">EP</div>
+      <div class="member-info">
+        <div class="member-name">Éric Payet</div>
+        <div class="member-email">eric.payet@example.com</div>
+      </div>
+      <span class="badge badge-outline">En attente</span>
+      <button class="menu-btn" aria-label="Actions" disabled title="Pas d'actions pour un membre en attente (D22)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- VUE CO_HOST -->
+  <div id="view-cohost" class="members-card" style="display:none;">
+    <div class="members-header">
+      <h2 class="members-title">Membres</h2>
+      <span class="badge badge-outline">5 membres</span>
+    </div>
+
+    <div class="section-label">Organisateurs</div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #e8457a, #9333ea);">DD</div>
+      <div class="member-info">
+        <div class="member-name">Dragos Dreptate</div>
+        <div class="member-email">dragos@example.com</div>
+      </div>
+      <span class="badge badge-owner">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Propriétaire
+      </span>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">AM</div>
+      <div class="member-info">
+        <div class="member-name">Alice Martin<span class="badge badge-you">Vous</span></div>
+        <div class="member-email">alice.martin@example.com</div>
+      </div>
+      <span class="badge badge-org">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+    </div>
+
+    <div class="section-label">Participants</div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">BD</div>
+      <div class="member-info">
+        <div class="member-name">Bob Durand</div>
+        <div class="member-email">bob.durand@example.com</div>
+      </div>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <div class="dropdown">
+        <div class="dropdown-item destructive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Retirer de la Communauté
+        </div>
+      </div>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">CL</div>
+      <div class="member-info">
+        <div class="member-name">Claire Leblanc</div>
+        <div class="member-email">claire.l@example.com</div>
+      </div>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <div class="member-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);">EP</div>
+      <div class="member-info">
+        <div class="member-name">Éric Payet</div>
+        <div class="member-email">eric.payet@example.com</div>
+      </div>
+      <span class="badge badge-outline">En attente</span>
+    </div>
+  </div>
+
+  <!-- Matrice des actions -->
+  <section class="matrix-section">
+    <div class="matrix-title">Matrice des actions du menu contextuel</div>
+    <p class="matrix-desc">Visibilité des actions dans le <code>DropdownMenu</code> selon le rôle de l'appelant et du membre cible.</p>
+    <div class="matrix-card">
+      <table class="matrix-table">
+        <thead>
+          <tr>
+            <th>Appelant</th>
+            <th>Cible PLAYER (ACTIVE)</th>
+            <th>Cible PLAYER (PENDING)</th>
+            <th>Cible CO_HOST</th>
+            <th>Cible HOST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>HOST</td>
+            <td><span class="pill yes">Promouvoir</span><span class="pill no">Retirer</span></td>
+            <td><span class="pill muted">Menu désactivé</span></td>
+            <td><span class="pill yes">Rétrograder</span><span class="pill no">Retirer</span></td>
+            <td><span class="pill self">Soi-même</span></td>
+          </tr>
+          <tr>
+            <td>CO_HOST</td>
+            <td><span class="pill no">Retirer</span></td>
+            <td><span class="pill muted">Menu désactivé</span></td>
+            <td><span class="pill muted">Aucune action</span></td>
+            <td><span class="pill muted">Aucune action</span></td>
+          </tr>
+          <tr>
+            <td>PLAYER</td>
+            <td colspan="4"><span class="pill muted">Menu jamais affiché (vue Participant)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+function setView(e, view) {
+  document.querySelectorAll('.state-btn').forEach(b => b.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  document.getElementById('view-host').style.display = view === 'host' ? 'block' : 'none';
+  document.getElementById('view-cohost').style.display = view === 'cohost' ? 'block' : 'none';
+}
+</script>
+
+</body>
+</html>
