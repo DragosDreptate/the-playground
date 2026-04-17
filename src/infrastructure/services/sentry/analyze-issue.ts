@@ -92,12 +92,36 @@ function extractStacktraceSummary(event: SentryEvent): string {
   return lines.join("\n");
 }
 
+export type UserImpactLevel = "none" | "silent" | "degraded" | "blocking";
+
+export type UserImpact = {
+  level: UserImpactLevel;
+  description: string;
+};
+
 type AnalysisResult = {
   urgency: "critical" | "high" | "medium" | "low" | "noise";
-  impact: string;
+  userImpact: UserImpact;
   diagnosis: string;
   remediation: string;
 };
+
+const FALLBACK_USER_IMPACT: UserImpact = {
+  level: "silent",
+  description: "Impact utilisateur non évalué, à vérifier manuellement dans Sentry",
+};
+
+function isValidUserImpact(value: unknown): value is UserImpact {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  const validLevels: UserImpactLevel[] = ["none", "silent", "degraded", "blocking"];
+  return (
+    typeof v.level === "string" &&
+    validLevels.includes(v.level as UserImpactLevel) &&
+    typeof v.description === "string" &&
+    v.description.length > 0
+  );
+}
 
 async function analyzeWithClaude(
   issue: IssueInput,
@@ -107,7 +131,7 @@ async function analyzeWithClaude(
   if (!apiKey) {
     return {
       urgency: "medium",
-      impact: "Impossible d'analyser (ANTHROPIC_API_KEY manquante)",
+      userImpact: { level: "silent", description: "Impossible d'analyser (ANTHROPIC_API_KEY manquante)" },
       diagnosis: issue.issueTitle,
       remediation: "Vérifier manuellement dans Sentry",
     };
@@ -130,39 +154,56 @@ ${stacktrace || "(aucune stacktrace disponible)"}
 Réponds UNIQUEMENT avec un JSON valide:
 {
   "urgency": "critical|high|medium|low|noise",
-  "impact": "description courte de l'impact utilisateur (1 phrase)",
+  "userImpact": {
+    "level": "none|silent|degraded|blocking",
+    "description": "Ce que l'utilisateur voit ou fait concrètement. Commence par 'L'utilisateur...'. 1 à 2 phrases."
+  },
   "diagnosis": "explication technique de la cause (2-3 phrases max)",
   "remediation": "plan de correction concret (fichier à modifier, approche, 2-3 phrases max)"
 }
 
-Règles:
+Règles de priorisation technique (urgency):
 - "noise" = erreur d'extension navigateur, bot, ou erreur non-actionnable
 - "critical" = perte de données, paiement échoué, auth cassée
 - "high" = fonctionnalité principale cassée pour les utilisateurs
 - "medium" = bug visible mais contournable
-- "low" = cosmétique, edge case rare`;
+- "low" = cosmétique, edge case rare
+
+Règles d'impact utilisateur (userImpact.level) — OBLIGATOIRE, s'évalue séparément de urgency:
+- "none" = l'utilisateur ne perçoit absolument rien (script tiers, handler pagehide/unload, erreur silencieuse, bot)
+- "silent" = erreur visible uniquement en devtools, aucune gêne fonctionnelle
+- "degraded" = expérience dégradée mais utilisable (feature secondaire cassée, fallback, latence)
+- "blocking" = l'utilisateur est bloqué et ne peut pas accomplir son action
+
+Avant de choisir le level, parcours cette checklist:
+1. L'erreur vient-elle d'un script tiers (PostHog, Google Analytics, Stripe.js, extension) sans notre code dans la stack ? → level ≤ silent
+2. L'erreur se déclenche-t-elle pendant pagehide, unload, visibilitychange, beforeunload ? → level = none (l'utilisateur a déjà quitté)
+3. L'erreur est-elle handled (try/catch, mécanisme handled:true) ? → level ≤ silent
+4. La stack ou le contexte prouvent-ils un crash visuel, un message d'erreur UI, ou une action bloquée ? → sinon level ≠ blocking
+
+Règle d'or: "level" décrit ce que voit ou fait l'utilisateur, pas ce qui se passe en interne. Dans le doute, préfère "none" ou "silent". Ne jamais inventer un impact non prouvé par la stack.`;
 
   const resp = await client.messages.create({
     model: ANTHROPIC_MODEL,
-    max_tokens: 500,
+    max_tokens: 600,
     messages: [{ role: "user", content: prompt }],
   });
 
   const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
   if (!tb) {
-    return { urgency: "medium", impact: "Analyse indisponible", diagnosis: issue.issueTitle, remediation: "Vérifier manuellement" };
+    return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: issue.issueTitle, remediation: "Vérifier manuellement" };
   }
 
   try {
     const raw = tb.text.trim();
     const jsonStr = raw.startsWith("{") ? raw : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
-    const parsed = JSON.parse(jsonStr) as AnalysisResult;
-    if (!parsed.urgency || !parsed.impact || !parsed.diagnosis || !parsed.remediation) {
-      return { urgency: "medium", impact: "Analyse incomplète", diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
+    const parsed = JSON.parse(jsonStr) as Partial<AnalysisResult>;
+    if (!parsed.urgency || !parsed.diagnosis || !parsed.remediation || !isValidUserImpact(parsed.userImpact)) {
+      return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
     }
-    return parsed;
+    return parsed as AnalysisResult;
   } catch {
-    return { urgency: "medium", impact: "Analyse malformée", diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
+    return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
   }
 }
 
@@ -196,7 +237,7 @@ async function sendAnalysisEmail(
       culprit: issue.culprit,
       urgency: analysis.urgency,
       urgencyLabel,
-      impact: analysis.impact,
+      userImpact: analysis.userImpact,
       diagnosis: analysis.diagnosis,
       remediation: analysis.remediation,
       sentryUrl,
@@ -227,7 +268,7 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
       issueTitle: issue.issueTitle,
       culprit: issue.culprit,
       urgencyLabel,
-      impact: analysis.impact,
+      userImpact: analysis.userImpact,
       diagnosis: analysis.diagnosis,
       remediation: analysis.remediation,
       sentryUrl,

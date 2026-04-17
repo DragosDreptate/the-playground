@@ -130,25 +130,36 @@ export async function notifySlackNewComment(params: {
   });
 }
 
+type UserImpactSlackLevel = "none" | "silent" | "degraded" | "blocking";
+
+const USER_IMPACT_SLACK: Record<UserImpactSlackLevel, { emoji: string; label: string }> = {
+  none: { emoji: "🟢", label: "Aucun impact utilisateur" },
+  silent: { emoji: "⚪", label: "Impact silencieux" },
+  degraded: { emoji: "🟠", label: "Experience degradee" },
+  blocking: { emoji: "🔴", label: "Utilisateur bloque" },
+};
+
 export async function notifySlackSentryIssue(params: {
   issueShortId: string;
   issueTitle: string;
   culprit: string;
   urgencyLabel: string;
-  impact: string;
+  userImpact: { level: UserImpactSlackLevel; description: string };
   diagnosis: string;
   remediation: string;
   sentryUrl: string;
 }): Promise<void> {
+  const impactMeta = USER_IMPACT_SLACK[params.userImpact.level];
   await sendSlack({
     text: `🚨 [Sentry ${params.urgencyLabel}] ${params.issueShortId} — ${params.issueTitle}`,
     blocks: [
       { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${params.urgencyLabel}`, emoji: true } },
       { type: "section", text: { type: "mrkdwn", text: `*${params.issueShortId}*\n${params.issueTitle}` } },
       { type: "divider" },
+      { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${params.userImpact.description}` } },
+      { type: "divider" },
       { type: "section", fields: [
         { type: "mrkdwn", text: `*Culprit*\n\`${params.culprit}\`` },
-        { type: "mrkdwn", text: `*Impact*\n${params.impact}` },
       ]},
       { type: "section", text: { type: "mrkdwn", text: `*Diagnostic*\n${params.diagnosis}` } },
       { type: "section", text: { type: "mrkdwn", text: `*Remediation*\n${params.remediation}` } },
