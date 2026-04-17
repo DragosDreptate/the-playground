@@ -1513,6 +1513,7 @@
       "radar": "The Radar",
       "share": "Share your event",
       "members": "Manage members",
+      "coHosts": "Co-organizers",
       "inviteMembers": "Invite members",
       "approvalRegistrations": "Approve registrations",
       "payments": "Enable payments"
@@ -1688,6 +1689,21 @@
         "title": "Manage community members",
         "intro": "From your community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
         "outro": "Members automatically join your community when they register for one of your events."
+      },
+      "coHosts": {
+        "title": "Share management with co-organizers",
+        "intro": "You can delegate community management to other members by <strong>promoting them to co-organizer</strong>. A co-organizer has almost all the same powers as you, except for a few sensitive actions that stay with the owner.",
+        "rightsIntro": "A co-organizer can:",
+        "right1": "Create, edit, publish and delete events",
+        "right2": "Approve or reject registrations and membership requests",
+        "right3": "Update community settings and broadcast messages to members",
+        "right4": "Receive the same notifications you do (new registrations, comments, etc.)",
+        "limitsIntro": "Only the owner can:",
+        "limit1": "Delete the community",
+        "limit2": "Manage the Stripe Connect account (for paid events)",
+        "limit3": "Promote, demote, or remove another co-organizer",
+        "howTo": "To promote a member: on the <strong>Members</strong> page of your community, open the <strong>⋮</strong> menu next to their name and click <strong>Promote to co-organizer</strong>. They'll receive an email confirming their new rights, and can immediately start helping you manage the community.",
+        "demote": "To revoke a co-organizer's rights, open the same menu and click Demote to member. The person remains a member of the community but loses their management rights, and receives a plain email informing them of the change."
       },
       "inviteMembers": {
         "title": "Invite members",

@@ -1513,6 +1513,7 @@
       "radar": "Le Radar",
       "share": "Partager l'événement",
       "members": "Gérer les membres",
+      "coHosts": "Co-organisateurs",
       "inviteMembers": "Inviter des membres",
       "approvalRegistrations": "Valider les inscriptions",
       "payments": "Activer les paiements"
@@ -1688,6 +1689,21 @@
         "title": "Gérer les membres de votre communauté",
         "intro": "Depuis la page de votre communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
         "outro": "Les membres rejoignent automatiquement votre communauté lorsqu'ils s'inscrivent à l'un de vos événements."
+      },
+      "coHosts": {
+        "title": "Partager la gestion avec des co-organisateurs",
+        "intro": "Vous pouvez déléguer la gestion de votre communauté à d'autres membres en les <strong>promouvant co-organisateurs</strong>. Un co-organisateur a presque les mêmes pouvoirs que vous, sauf les actions les plus sensibles qui restent réservées au propriétaire.",
+        "rightsIntro": "Un co-organisateur peut :",
+        "right1": "Créer, éditer, publier et supprimer des événements",
+        "right2": "Approuver ou rejeter les inscriptions et les demandes d'adhésion",
+        "right3": "Modifier les paramètres de la communauté et diffuser des messages aux membres",
+        "right4": "Recevoir les mêmes notifications que vous (nouvelles inscriptions, commentaires, etc.)",
+        "limitsIntro": "Seul le propriétaire peut :",
+        "limit1": "Supprimer la communauté",
+        "limit2": "Gérer le compte Stripe Connect (pour les événements payants)",
+        "limit3": "Promouvoir, rétrograder ou retirer un autre co-organisateur",
+        "howTo": "Pour promouvoir un membre : sur la page <strong>Membres</strong> de votre communauté, ouvrez le menu <strong>⋮</strong> à côté de son nom et cliquez sur <strong>Promouvoir en co-organisateur</strong>. La personne reçoit un email lui confirmant ses nouveaux droits, et peut immédiatement commencer à gérer la communauté.",
+        "demote": "Pour retirer les droits d'un co-organisateur, ouvrez le même menu et cliquez sur Rétrograder en participant. La personne reste membre de la communauté mais perd ses droits de gestion, et reçoit un email sobre l'informant du changement."
       },
       "inviteMembers": {
         "title": "Inviter des membres",

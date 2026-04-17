@@ -107,6 +107,7 @@ export default async function HelpPage() {
         { id: "radar", label: t("sidebar.radar") },
         { id: "share", label: t("sidebar.share") },
         { id: "members", label: t("sidebar.members") },
+        { id: "coHosts", label: t("sidebar.coHosts") },
         { id: "inviteMembers", label: t("sidebar.inviteMembers") },
         { id: "approvalRegistrations", label: t("sidebar.approvalRegistrations") },
         { id: "payments", label: t("sidebar.payments") },
@@ -542,6 +543,39 @@ export default async function HelpPage() {
               </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t("organizer.members.outro")}
+              </p>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Co-organisateurs */}
+            <div className="space-y-4">
+              <SectionH3 id="coHosts">{t("organizer.coHosts.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.coHosts.intro", rich)}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.coHosts.rightsIntro", rich)}
+              </p>
+              <ul className="space-y-2 ml-6 list-disc text-sm leading-relaxed text-muted-foreground">
+                <li>{t("organizer.coHosts.right1")}</li>
+                <li>{t("organizer.coHosts.right2")}</li>
+                <li>{t("organizer.coHosts.right3")}</li>
+                <li>{t("organizer.coHosts.right4")}</li>
+              </ul>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.coHosts.limitsIntro", rich)}
+              </p>
+              <ul className="space-y-2 ml-6 list-disc text-sm leading-relaxed text-muted-foreground">
+                <li>{t("organizer.coHosts.limit1")}</li>
+                <li>{t("organizer.coHosts.limit2")}</li>
+                <li>{t("organizer.coHosts.limit3")}</li>
+              </ul>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.coHosts.howTo", rich)}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("organizer.coHosts.demote")}
               </p>
             </div>
 

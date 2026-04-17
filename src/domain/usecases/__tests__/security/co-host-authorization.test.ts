@@ -161,7 +161,7 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
 
     await expect(
       onboardStripeConnect(
-        { circleId: CIRCLE_ID, userId: CO_HOST_ID, returnUrl: "https://example.com/r", refreshUrl: "https://example.com/rf" },
+        { circleId: CIRCLE_ID, userId: CO_HOST_ID, returnUrl: "https://example.com/r" },
         {
           circleRepository: circleRepo,
           paymentService: createMockPaymentService(),
