@@ -184,6 +184,18 @@ export const prismaCircleRepository: CircleRepository = {
     return toDomainMembership(record);
   },
 
+  async updateMembershipRole(
+    circleId: string,
+    userId: string,
+    role: CircleMemberRole
+  ): Promise<CircleMembership> {
+    const record = await prisma.circleMembership.update({
+      where: { userId_circleId: { userId, circleId } },
+      data: { role },
+    });
+    return toDomainMembership(record);
+  },
+
   async findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]> {
     const records = await prisma.circleMembership.findMany({
       where: { circleId, status: "PENDING" },

@@ -8,6 +8,9 @@ export {
   CannotRemoveHostError,
   CannotRemoveSelfError,
   MembershipNotPendingError,
+  CannotPromotePendingMemberError,
+  InvalidPromotionTargetError,
+  InvalidDemotionTargetError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,

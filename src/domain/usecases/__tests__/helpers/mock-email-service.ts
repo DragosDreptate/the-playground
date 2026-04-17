@@ -28,6 +28,8 @@ export function createMockEmailService(
     sendApprovalNotification: vi.fn().mockResolvedValue(undefined),
     sendHostPaidCancellation: vi.fn().mockResolvedValue(undefined),
     sendOnboardingWelcome: vi.fn().mockResolvedValue(undefined),
+    sendCoHostPromoted: vi.fn().mockResolvedValue(undefined),
+    sendCoHostDemoted: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

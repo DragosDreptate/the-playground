@@ -24,6 +24,8 @@ import type {
   ApprovalNotificationEmailData,
   HostPaidCancellationEmailData,
   OnboardingWelcomeEmailData,
+  CoHostPromotedEmailData,
+  CoHostDemotedEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -44,6 +46,8 @@ import { RegistrationRemovedByHostEmail } from "./templates/registration-removed
 import { ApprovalNotificationEmail } from "./templates/approval-notification";
 import { HostPaidCancellationEmail } from "./templates/host-paid-cancellation";
 import { OnboardingWelcomeEmail } from "./templates/onboarding-welcome";
+import { CoHostPromotedEmail } from "./templates/co-host-promoted";
+import { CoHostDemotedEmail } from "./templates/co-host-demoted";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -413,6 +417,24 @@ export function createResendEmailService(): EmailService {
         replyTo: onboardingWelcomeContent.replyTo,
         subject: onboardingWelcomeContent.subject,
         react: OnboardingWelcomeEmail({ firstName: data.firstName, baseUrl }),
+      });
+    },
+
+    async sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: CoHostPromotedEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendCoHostDemoted(data: CoHostDemotedEmailData): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: CoHostDemotedEmail({ ...data, baseUrl }),
       });
     },
   };

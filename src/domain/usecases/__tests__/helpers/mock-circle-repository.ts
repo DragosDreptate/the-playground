@@ -28,6 +28,7 @@ export function createMockCircleRepository(
     getPublicCirclesForUser: vi.fn<CircleRepository["getPublicCirclesForUser"]>().mockResolvedValue([]),
     findFeatured: vi.fn<CircleRepository["findFeatured"]>().mockResolvedValue([]),
     updateMembershipStatus: vi.fn<CircleRepository["updateMembershipStatus"]>().mockResolvedValue(makeMembership()),
+    updateMembershipRole: vi.fn<CircleRepository["updateMembershipRole"]>().mockResolvedValue(makeMembership()),
     findPendingMemberships: vi.fn<CircleRepository["findPendingMemberships"]>().mockResolvedValue([]),
     countPendingMemberships: vi.fn<CircleRepository["countPendingMemberships"]>().mockResolvedValue(0),
     ...overrides,

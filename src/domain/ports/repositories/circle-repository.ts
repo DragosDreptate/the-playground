@@ -98,6 +98,7 @@ export interface CircleRepository {
   slugExists(slug: string): Promise<boolean>;
   addMembership(circleId: string, userId: string, role: CircleMemberRole, status?: MembershipStatus): Promise<CircleMembership>;
   updateMembershipStatus(circleId: string, userId: string, status: MembershipStatus): Promise<CircleMembership>;
+  updateMembershipRole(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
   findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]>;
   countPendingMemberships(circleId: string): Promise<number>;
   findAllByUserId(userId: string): Promise<CircleWithRole[]>;
