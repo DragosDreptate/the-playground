@@ -15,23 +15,19 @@ keywords:
 
 *Récit d'un Product Builder depuis les tranchées.*
 
-## Ce que j'ai construit, en bref
+On est le 17 avril 2026. Le premier commit du projet est daté du 19 février : `Initial commit: Next.js 16 + Auth.js v5 + Prisma 7 + i18n`. Deux mois pile.
 
-19 février 2026, 19h53 : premier commit, un `Initial commit: Next.js 16 + Auth.js v5 + Prisma 7 + i18n`.
+Entre les deux, [The Playground](https://the-playground.fr) : une plateforme gratuite pour animer des communautés autour d'événements. Créée en France, code ouvert sur [GitHub](https://github.com/DragosDreptate/the-playground), serveurs en Europe. Le modèle communautaire de [Meetup](https://www.meetup.com), l'expérience premium de [Luma](https://lu.ma), zéro commission. En production, avec ses premiers utilisateurs, communautés et événements.
 
-16 avril 2026, 22h23 : `docs(spec): ajouter la spec statut Proposé et vote Communauté sur un événement`.
+1 780 commits, 373 PR, 64 000 lignes, 110 fichiers de tests, dix versions livrées, architecture hexagonale stricte. Stack : Next.js 16, Auth.js v5, Prisma 7 + Neon, Stripe Connect, Resend, Sentry, PostHog, Vercel. Un seul développeur. Mes soirées et mes week-ends.
 
-Deux mois pile. Entre les deux, [The Playground](https://the-playground.fr) : une plateforme gratuite pour animer des communautés autour d'événements, **créée en France, en code ouvert sur GitHub, déployée sur des serveurs en Europe**. Le modèle communautaire de [Meetup](https://www.meetup.com), l'expérience premium de [Luma](https://lu.ma), gratuite, zéro commission. En production, avec ses premiers utilisateurs, communautés et événements.
-
-1 780 commits, 373 PR, 64 000 lignes, 110 fichiers de tests, 10 versions livrées, architecture hexagonale stricte. Stack : Next.js 16, Auth.js v5, Prisma 7 + Neon, Stripe Connect, Resend, Sentry, PostHog, Vercel. Un seul développeur, ses soirées et ses week-ends.
-
-Le tout construit avec [Claude Code](https://claude.com/claude-code). Je n'ai jamais tapé la moindre ligne de code. Je n'ai jamais relu ce qu'il a écrit non plus. Ce qui vérifie le code n'est pas mon œil humain, c'est une chaîne d'agents et d'outils.
+Tout a été construit avec [Claude Code](https://claude.com/claude-code). Je n'ai jamais tapé une ligne de code. Je n'ai jamais relu ce qu'il a écrit non plus. Ce qui vérifie le code n'est pas mon œil humain, c'est une chaîne d'agents et d'outils.
 
 C'est le cœur du récit qui suit.
 
 ---
 
-## Jour 1 : neuf commits pour un socle qui tient
+## Premier soir
 
 Le premier soir, en moins de quatre heures, la plateforme était déployée sur Vercel avec :
 
@@ -53,7 +49,7 @@ Et comme le socle était en place, la soirée ne s'est pas arrêtée là. Avant 
 
 ---
 
-## Le vrai rôle de Claude Code : pas un copilote, un binôme exigeant
+## Le copilote, très peu pour moi
 
 Il y a une image qui circule beaucoup sur l'IA et le code. Le "copilote". Tu tapes quelques lignes, l'IA complète le reste. Autocomplétion sous stéroïdes.
 
@@ -79,7 +75,7 @@ Quand je m'égare (par exemple, je demande un shortcut qui violerait la séparat
 
 ---
 
-## L'architecture comme garde-fou : l'IA amplifie la dette autant qu'elle amplifie la vélocité
+## L'architecture redevient centrale
 
 Voici ce que personne ne dit assez fort.
 
@@ -109,7 +105,7 @@ Ce n'est pas une option. C'est une règle.
 
 ---
 
-## La mémoire long terme, ou comment ne pas répéter les mêmes conneries
+## Une mémoire qui n'oublie pas
 
 Claude Code maintient un répertoire de mémoire persistante. Des fichiers markdown que l'agent écrit pour lui-même, et qu'il relit au début de chaque session.
 
@@ -133,7 +129,7 @@ Au bout de deux mois, j'ai une documentation vivante de mes préférences d'ing�
 
 ---
 
-## Produit, spec, exploratoire : comment on décide quoi construire
+## Le produit se construit dans la conversation
 
 Jusqu'ici j'ai parlé de code, d'architecture, de tests. C'est la moitié du sujet.
 
@@ -246,7 +242,7 @@ Ce que cette chaîne permet : je peux livrer une feature à 23h sans avoir lu un
 
 ---
 
-## L'observabilité : la dernière ligne de défense
+## L'observabilité, dernière ligne de défense
 
 Un truc dont on parle peu : un projet fait avec l'IA ne marche vraiment que si **la boucle de feedback est quasi temps réel**.
 
@@ -267,7 +263,7 @@ Sans cette boucle, l'IA produirait du code dans le vide. C'est l'observabilité,
 
 ---
 
-## Ce qui reste profondément humain
+## Ce qui reste humain
 
 Voilà où je veux arriver.
 

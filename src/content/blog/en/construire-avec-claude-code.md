@@ -15,15 +15,11 @@ keywords:
 
 *A Product Builder's story from the trenches.*
 
-## What I built, in brief
+It's April 17, 2026. The project's first commit is dated February 19: `Initial commit: Next.js 16 + Auth.js v5 + Prisma 7 + i18n`. Two months exactly.
 
-February 19, 2026, 7:53pm: first commit, an `Initial commit: Next.js 16 + Auth.js v5 + Prisma 7 + i18n`.
+Between the two, [The Playground](https://the-playground.fr): a free platform to run communities around events. Built in France, open-source on [GitHub](https://github.com/DragosDreptate/the-playground), servers in Europe. Meetup's community model, Luma's premium experience, zero commission. Live in production, with its first users, communities and events.
 
-April 16, 2026, 10:23pm: `docs(spec): add Proposed status spec and Community voting on an event`.
-
-Two months exactly. Between the two, [The Playground](https://the-playground.fr): a free platform to run communities around events, **built in France, open-source on GitHub, deployed on European servers**. Meetup's community model, Luma's premium experience, free, zero commission. Live in production, with its first users, communities and events.
-
-1,780 commits, 373 PRs, 64,000 lines, 110 test files, 10 versions shipped, strict hexagonal architecture. Stack: Next.js 16, Auth.js v5, Prisma 7 + Neon, Stripe Connect, Resend, Sentry, PostHog, Vercel. One developer, evenings and weekends.
+1,780 commits, 373 PRs, 64,000 lines, 110 test files, ten versions shipped, strict hexagonal architecture. Stack: Next.js 16, Auth.js v5, Prisma 7 + Neon, Stripe Connect, Resend, Sentry, PostHog, Vercel. One developer. Evenings and weekends.
 
 All of it built with [Claude Code](https://claude.com/claude-code). I never typed a single line of code. I never read what it wrote either. What checks the code is not my human eye, it's a chain of agents and tools.
 
@@ -31,7 +27,7 @@ That's the heart of the story that follows.
 
 ---
 
-## Day 1: nine commits for a solid foundation
+## First evening
 
 The first evening, in less than four hours, the platform was deployed on Vercel with:
 
@@ -53,7 +49,7 @@ And since the foundation was in place, the evening didn't stop there. Before mid
 
 ---
 
-## Claude Code's real role: not a copilot, a demanding partner
+## The copilot? No thanks.
 
 There's an image that circulates a lot about AI and code. The "copilot". You type a few lines, the AI completes the rest. Autocomplete on steroids.
 
@@ -79,7 +75,7 @@ When I drift (for example, I ask for a shortcut that would violate layer separat
 
 ---
 
-## Architecture as guardrail: AI amplifies debt as much as it amplifies velocity
+## Architecture becomes central again
 
 Here's what no one says loud enough.
 
@@ -109,7 +105,7 @@ It's not optional. It's a rule.
 
 ---
 
-## Long-term memory, or how not to repeat the same mistakes
+## A memory that doesn't forget
 
 Claude Code maintains a persistent memory directory. Markdown files the agent writes for itself, and re-reads at the start of every session.
 
@@ -133,7 +129,7 @@ Two months in, I have a living documentation of my engineering preferences that 
 
 ---
 
-## Product, spec, exploration: how we decide what to build
+## Product is built in the conversation
 
 Up to now I've talked about code, architecture, tests. That's half the subject.
 
@@ -246,7 +242,7 @@ What this chain enables: I can ship a feature at 11pm without having read a sing
 
 ---
 
-## Observability: the last line of defense
+## Observability, the last line of defense
 
 Something people talk about too little: an AI-built project only really works if **the feedback loop is near real-time**.
 
@@ -267,7 +263,7 @@ Without this loop, AI would produce code in a vacuum. It's observability, paired
 
 ---
 
-## What remains deeply human
+## What remains human
 
 Here's where I'm getting to.
 
