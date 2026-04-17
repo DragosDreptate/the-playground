@@ -23,7 +23,7 @@
     },
     {
       "path": "/api/cron/transition-past-moments",
-      "schedule": "*/5 * * * *"
+      "schedule": "*/30 * * * *"
     }
   ]
 }
