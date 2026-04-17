@@ -375,10 +375,10 @@ export default async function AboutPage() {
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
-            { value: "1 700+", label: isFr ? "commits" : "commits" },
-            { value: "360+", label: isFr ? "pull requests" : "pull requests" },
-            { value: "73", label: isFr ? "cas d'usage" : "use cases" },
-            { value: "900+", label: isFr ? "tests" : "tests" },
+            { value: "1 800+", label: isFr ? "commits" : "commits" },
+            { value: "380+", label: isFr ? "pull requests" : "pull requests" },
+            { value: "75", label: isFr ? "cas d'usage" : "use cases" },
+            { value: "960+", label: isFr ? "tests" : "tests" },
           ].map(({ value, label }) => (
             <div key={label} className="text-center">
               <p className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
