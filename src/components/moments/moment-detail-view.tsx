@@ -67,7 +67,7 @@ type HostViewProps = CommonProps & {
 type PublicViewProps = CommonProps & {
   variant: "public";
   isAuthenticated: boolean;
-  isHost: boolean;
+  isOrganizer: boolean;
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
@@ -320,7 +320,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 <DeleteMomentDialog momentId={moment.id} circleSlug={props.circleSlug} />
               </div>
             )}
-            {!isHostView && props.isHost && (
+            {!isHostView && props.isOrganizer && (
               <Button asChild size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
                   <ExternalLink className="size-3.5" />
@@ -604,7 +604,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 isFull={props.isFull}
                 spotsRemaining={props.spotsRemaining}
                 registrationCount={registeredCount}
-                isHost={props.isHost}
+                isOrganizer={props.isOrganizer}
                 calendarData={props.calendarData}
                 appUrl={props.appUrl}
                 waitlistPosition={props.waitlistPosition}
@@ -761,7 +761,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             momentId={moment.id}
             comments={props.comments}
             currentUserId={props.currentUserId}
-            isHost={isHostView || (!isHostView && (props as PublicViewProps).isHost)}
+            isOrganizer={isHostView || (!isHostView && (props as PublicViewProps).isOrganizer)}
             isPastMoment={moment.status === "PAST"}
             signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
           />

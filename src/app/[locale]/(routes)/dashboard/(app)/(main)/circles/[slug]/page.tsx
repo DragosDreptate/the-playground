@@ -78,7 +78,7 @@ export default async function CircleDetailPage({
   const membership = await circleRepo.findMembership(circle.id, session.user.id);
   if (!membership) notFound();
 
-  const isHost = membership.role === "HOST";
+  const isOrganizer = membership.role === "HOST";
 
 
   const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
@@ -90,12 +90,12 @@ export default async function CircleDetailPage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    isHost ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
+    isOrganizer ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
     prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isHost));
+  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
   // Récupère compteurs + inscriptions utilisateur pour TOUS les moments (upcoming + past)
@@ -128,10 +128,10 @@ export default async function CircleDetailPage({
           {circle.name}
         </span>
         <Badge
-          variant={isHost ? "outline" : "secondary"}
-          className={isHost ? "border-primary/40 text-primary" : ""}
+          variant={isOrganizer ? "outline" : "secondary"}
+          className={isOrganizer ? "border-primary/40 text-primary" : ""}
         >
-          {isHost ? tDashboard("role.host") : tDashboard("role.player")}
+          {isOrganizer ? tDashboard("role.host") : tDashboard("role.player")}
         </Badge>
       </div>
 
@@ -243,7 +243,7 @@ export default async function CircleDetailPage({
           </div>
 
           {/* Quitter la Communauté — Participant uniquement */}
-          {!isHost && (
+          {!isOrganizer && (
             <div className="px-1">
               <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
             </div>
@@ -266,7 +266,7 @@ export default async function CircleDetailPage({
                 ))}
               </p>
             )}
-            {isHost && (
+            {isOrganizer && (
               <div className="flex shrink-0 gap-2">
                 <Button asChild size="sm">
                   <Link href={`/dashboard/circles/${circle.slug}/edit`}>
@@ -434,7 +434,7 @@ export default async function CircleDetailPage({
           </div>
 
           {/* Partager & Inviter — visible Organisateurs uniquement */}
-          {isHost && (
+          {isOrganizer && (
             <>
             <div className="border-border border-t" />
             <CircleShareInviteCard
@@ -465,7 +465,7 @@ export default async function CircleDetailPage({
             upcomingLabel={t("detail.upcomingMoments")}
             pastLabel={t("detail.pastMoments")}
             upcomingAction={
-              isHost ? (
+              isOrganizer ? (
                 <Button asChild size="sm" className="w-full md:w-auto">
                   <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
                     {tMoment("create.title")}
@@ -489,7 +489,7 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isHost={isHost}
+                      isOrganizer={isOrganizer}
                       isLast={i === upcomingMoments.length - 1}
                     />
                   ))}
@@ -512,7 +512,7 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isHost={isHost}
+                      isOrganizer={isOrganizer}
                       isLast={i === pastMoments.length - 1}
                     />
                   ))}
@@ -525,7 +525,7 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Demandes en attente — visible Organisateurs uniquement si requiresApproval */}
-          {isHost && circle.requiresApproval && (
+          {isOrganizer && circle.requiresApproval && (
             <div className="border-border bg-card rounded-2xl border p-6">
               {pendingMemberships.length > 0 ? (
                 <PendingMembershipsList
@@ -543,7 +543,7 @@ export default async function CircleDetailPage({
 
           {/* Membres */}
           <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
-            <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} circleId={circle.id} />
+            <CircleMembersList hosts={hosts} players={players} variant={isOrganizer ? "host" : "player"} circleId={circle.id} />
           </div>
         </div>
       </div>

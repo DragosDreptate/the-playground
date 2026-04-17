@@ -42,7 +42,7 @@ type CommentThreadProps = {
   momentId: string;
   comments: CommentWithUser[];
   currentUserId: string | null;
-  isHost: boolean;
+  isOrganizer: boolean;
   isPastMoment: boolean;
   signInUrl: string;
 };
@@ -177,7 +177,7 @@ export function CommentThread({
   momentId,
   comments,
   currentUserId,
-  isHost,
+  isOrganizer,
   isPastMoment,
   signInUrl,
 }: CommentThreadProps) {
@@ -307,7 +307,7 @@ export function CommentThread({
           <div className="space-y-4">
             {comments.map((comment) => {
               const canDelete =
-                currentUserId === comment.user.id || isHost;
+                currentUserId === comment.user.id || isOrganizer;
               return (
                 <div key={comment.id} className="flex gap-3">
                   {/* Avatar */}

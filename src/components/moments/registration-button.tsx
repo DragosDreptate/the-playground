@@ -40,7 +40,7 @@ type RegistrationButtonProps = {
   isFull: boolean;
   spotsRemaining: number | null;
   registrationCount: number;
-  isHost?: boolean;
+  isOrganizer?: boolean;
   calendarData?: CalendarEventData;
   appUrl?: string;
   waitlistPosition?: number;
@@ -90,7 +90,7 @@ export function RegistrationButton({
   isFull,
   spotsRemaining,
   registrationCount,
-  isHost = false,
+  isOrganizer = false,
   calendarData,
   appUrl,
   waitlistPosition,
@@ -262,11 +262,11 @@ export function RegistrationButton({
           )}
 
           {/* Ligne 3 — Actions */}
-          {(isRegistered || !isHost) && (
+          {(isRegistered || !isOrganizer) && (
             <>
               <div className="border-border ml-[3.25rem] border-t" />
               <div className="flex items-center justify-end gap-1.5 px-4 py-3">
-                {!isHost && (
+                {!isOrganizer && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button

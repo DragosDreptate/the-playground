@@ -153,15 +153,15 @@ export default async function PublicCirclePage({
 
   const isMember = isMemberResult === "ACTIVE";
   const isPendingMember = isMemberResult === "PENDING";
-  const isHost = session?.user?.id
+  const isOrganizer = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;
   const isConnected = !!session?.user?.id;
   // Membres visibles : connecté + (circle public OU membre/organisateur)
-  const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
+  const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
   const showSignInToJoin = !isConnected;
-  const showMemberBadge = isMember && !isHost;
+  const showMemberBadge = isMember && !isOrganizer;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
   const pastMoments = allMoments.filter(
@@ -325,10 +325,10 @@ export default async function PublicCirclePage({
           </div>
 
           {/* Badge Organisateur — visible pour les Organisateurs */}
-          {isHost && (
+          {isOrganizer && (
             <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
               <Crown className="size-4 shrink-0" aria-hidden="true" />
-              {t("detail.isHost")}
+              {t("detail.isOrganizer")}
             </div>
           )}
 
@@ -397,7 +397,7 @@ export default async function PublicCirclePage({
                 ))}
               </p>
             )}
-            {isHost && (
+            {isOrganizer && (
               <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}`}>
                   <ExternalLink className="size-3.5" />
@@ -581,7 +581,7 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isHost={false}
+                      isOrganizer={false}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
@@ -606,7 +606,7 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isHost={false}
+                      isOrganizer={false}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}

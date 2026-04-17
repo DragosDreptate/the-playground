@@ -39,10 +39,10 @@ export default async function EditCirclePage({
   const membership = session?.user?.id
     ? await circleRepo.findMembership(circle.id, session.user.id)
     : null;
-  const isHost = membership?.role === "HOST";
+  const isOrganizer = membership?.role === "HOST";
 
   let stripeConnect;
-  if (isHost) {
+  if (isOrganizer) {
     // Default: no account (shows "Activer les paiements" button)
     let hasAccount = false;
     let status = null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null;

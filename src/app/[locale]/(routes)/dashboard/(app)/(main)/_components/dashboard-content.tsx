@@ -111,7 +111,7 @@ export async function DashboardContent({
                   key={item.data.id}
                   variant="participant"
                   registration={item.data}
-                  isHost={hostCircleSlugs.has(item.data.moment.circleSlug)}
+                  isOrganizer={hostCircleSlugs.has(item.data.moment.circleSlug)}
                   isLast={i === filteredUpcoming.length - 1 && filteredPast.length === 0}
                 />
               ) : (
@@ -153,7 +153,7 @@ export async function DashboardContent({
                     key={item.data.id}
                     variant="participant"
                     registration={item.data}
-                    isHost={hostCircleSlugs.has(item.data.moment.circleSlug)}
+                    isOrganizer={hostCircleSlugs.has(item.data.moment.circleSlug)}
                     isLast={i === filteredPast.length - 1}
                     isPast
                   />

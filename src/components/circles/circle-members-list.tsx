@@ -36,8 +36,8 @@ export function CircleMembersList({
   const tCommon = useTranslations("Common");
 
   const allMembers = [
-    ...hosts.map((m) => ({ ...m, isHost: true })),
-    ...players.map((m) => ({ ...m, isHost: false })),
+    ...hosts.map((m) => ({ ...m, isOrganizer: true })),
+    ...players.map((m) => ({ ...m, isOrganizer: false })),
   ];
   const totalMembers = allMembers.length;
 
@@ -59,9 +59,9 @@ export function CircleMembersList({
           <MemberRow
             key={member.id}
             member={member}
-            isHost={member.isHost}
+            isOrganizer={member.isOrganizer}
             showEmail={variant === "host"}
-            canRemove={variant === "host" && !member.isHost}
+            canRemove={variant === "host" && !member.isOrganizer}
             circleId={circleId}
           />
         ))}
@@ -83,13 +83,13 @@ export function CircleMembersList({
 
 function MemberRow({
   member,
-  isHost = false,
+  isOrganizer = false,
   showEmail = false,
   canRemove = false,
   circleId,
 }: {
   member: CircleMemberWithUser;
-  isHost?: boolean;
+  isOrganizer?: boolean;
   showEmail?: boolean;
   canRemove?: boolean;
   circleId?: string;
@@ -125,7 +125,7 @@ function MemberRow({
             <p className="text-muted-foreground truncate text-xs">{user.email}</p>
           )}
         </div>
-        {isHost && (
+        {isOrganizer && (
           <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
             <Crown className="size-3" />
             {t("role.host")}

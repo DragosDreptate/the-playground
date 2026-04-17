@@ -11,9 +11,9 @@ export async function DashboardFilterBar({
   userId: string;
 }) {
   const circles = await getCachedDashboardCircles(userId);
-  const isHost = circles.some((c) => c.memberRole === "HOST");
+  const isOrganizer = circles.some((c) => c.memberRole === "HOST");
 
-  if (!isHost) return null;
+  if (!isOrganizer) return null;
 
   return <HostOnlyFilter active={hostOnly} activeTab={activeTab} />;
 }

@@ -331,7 +331,7 @@
       "joined": "Member",
       "pendingApproval": "Request pending approval",
       "isMember": "You are a member",
-      "isHost": "You are an organizer",
+      "isOrganizer": "You are an organizer",
       "manageCircle": "Manage this community",
       "shareableLink": "Shareable link",
       "signInToSeeMembers": "Sign in to see the members of this community",
