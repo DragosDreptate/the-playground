@@ -1,3 +1,5 @@
+import type { CircleMemberRole } from "@/domain/models/circle";
+
 export type UserRole = "USER" | "ADMIN";
 
 /** Sous-ensemble minimal d'un User pour l'affichage d'avatar (initiales + gradient ou image). */
@@ -31,7 +33,7 @@ export type PublicCircleMembership = {
   circleSlug: string;
   circleName: string;
   circleCover: string | null;
-  role: "HOST" | "PLAYER";
+  role: CircleMemberRole;
 };
 
 export type PublicMomentRegistration = {

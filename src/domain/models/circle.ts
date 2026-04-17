@@ -7,9 +7,20 @@ export type CoverImageAttribution = {
   url: string;
 };
 
-export type CircleMemberRole = "HOST" | "PLAYER";
+export type CircleMemberRole = "HOST" | "CO_HOST" | "PLAYER";
 
 export type MembershipStatus = "PENDING" | "ACTIVE";
+
+export function isOrganizerRole(role: CircleMemberRole): boolean {
+  return role === "HOST" || role === "CO_HOST";
+}
+
+export function isActiveOrganizer(
+  membership: Pick<CircleMembership, "role" | "status"> | null | undefined
+): boolean {
+  if (!membership) return false;
+  return membership.status === "ACTIVE" && isOrganizerRole(membership.role);
+}
 
 export type CircleCategory =
   | "TECH"

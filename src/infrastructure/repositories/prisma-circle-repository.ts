@@ -577,9 +577,10 @@ export const prismaCircleRepository: CircleRepository = {
       orderBy: { joinedAt: "asc" },
     });
 
-    // Tri : HOSTs d'abord, puis PLAYERs — alpha dans chaque groupe
+    // Tri : HOST d'abord, puis CO_HOST, puis PLAYER — alpha dans chaque groupe
+    const roleOrder: Record<string, number> = { HOST: 0, CO_HOST: 1, PLAYER: 2 };
     memberships.sort((a, b) => {
-      if (a.role !== b.role) return a.role === "HOST" ? -1 : 1;
+      if (a.role !== b.role) return roleOrder[a.role] - roleOrder[b.role];
       return a.circle.name.localeCompare(b.circle.name);
     });
 
@@ -587,7 +588,7 @@ export const prismaCircleRepository: CircleRepository = {
       circleSlug: m.circle.slug,
       circleName: m.circle.name,
       circleCover: m.circle.coverImage,
-      role: m.role as "HOST" | "PLAYER",
+      role: m.role,
     }));
   },
 };
