@@ -5,6 +5,7 @@ import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
 import { onboardStripeConnect, getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { ConnectAccountStatus } from "@/domain/ports/services/payment-service";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
@@ -64,7 +65,7 @@ export async function getStripeLoginLinkAction(
   }
 
   const membership = await circleRepo.findMembership(circleId, userId);
-  if (!membership || membership.role !== "HOST") {
+  if (!isActivePrimaryHost(membership)) {
     return { success: false, error: "Not authorized", code: "UNAUTHORIZED_CIRCLE_ACTION" };
   }
 
@@ -85,7 +86,7 @@ export async function cancelStripeConnectAction(
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
   const membership = await circleRepo.findMembership(circleId, userId);
-  if (!membership || membership.role !== "HOST") {
+  if (!isActivePrimaryHost(membership)) {
     return { success: false, error: "Not authorized", code: "UNAUTHORIZED_CIRCLE_ACTION" };
   }
 

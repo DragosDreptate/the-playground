@@ -1,3 +1,4 @@
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { PaymentService, ConnectAccountStatus } from "@/domain/ports/services/payment-service";
 import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
@@ -30,7 +31,7 @@ export async function onboardStripeConnect(
     input.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActivePrimaryHost(membership)) {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
   }
 
@@ -91,7 +92,7 @@ export async function getStripeConnectStatus(
     input.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActivePrimaryHost(membership)) {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
   }
 

@@ -13,6 +13,7 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isActiveOrganizer } from "@/domain/models/circle";
 
 export default async function MomentDetailPage({
   params,
@@ -53,9 +54,7 @@ export default async function MomentDetailPage({
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
   if (!hasActiveMembership && !hasActiveRegistration) notFound();
 
-  const isOrganizer =
-    hasActiveMembership &&
-    (membership!.role === "HOST" || membership!.role === "CO_HOST");
+  const isOrganizer = isActiveOrganizer(membership);
 
   const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),

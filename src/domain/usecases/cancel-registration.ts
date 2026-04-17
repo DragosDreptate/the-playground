@@ -1,5 +1,5 @@
 import type { Registration } from "@/domain/models/registration";
-import { isOrganizerRole } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -45,15 +45,15 @@ export async function cancelRegistration(
     throw new UnauthorizedRegistrationActionError();
   }
 
-  // An organizer (Host or Co-Host) cannot cancel their own registration
-  // to an event of the Community they organize (D16)
+  // D16 : un organisateur actif ne peut pas annuler sa propre inscription
+  // à un événement de sa Communauté.
   const moment = await momentRepository.findById(registration.momentId);
   if (moment) {
     const membership = await circleRepository.findMembership(
       moment.circleId,
       input.userId
     );
-    if (membership && isOrganizerRole(membership.role)) {
+    if (isActiveOrganizer(membership)) {
       throw new OrganizerCannotCancelRegistrationError();
     }
   }

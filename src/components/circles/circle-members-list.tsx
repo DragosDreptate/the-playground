@@ -71,7 +71,6 @@ export function CircleMembersList({
           <MemberRow
             key={member.id}
             member={member}
-            isDashboardOrganizer={isDashboardOrganizer}
             callerRole={callerRole}
             showEmail={isDashboardOrganizer}
             circleId={circleId}
@@ -95,8 +94,6 @@ export function CircleMembersList({
 
 type MemberRowProps = {
   member: CircleMemberWithUser;
-  /** True quand on est dans le dashboard et que l'appelant peut potentiellement agir. */
-  isDashboardOrganizer: boolean;
   callerRole: CircleMemberRole | undefined;
   showEmail: boolean;
   circleId: string | undefined;
@@ -104,7 +101,6 @@ type MemberRowProps = {
 
 function MemberRow({
   member,
-  isDashboardOrganizer,
   callerRole,
   showEmail,
   circleId,
@@ -185,7 +181,7 @@ function MemberRow({
           )}
         </div>
 
-        <MemberBadge role={member.role} isDashboardView={isDashboardOrganizer} />
+        <MemberBadge role={member.role} />
 
         {hasMenuActions && circleId && (
           <DropdownMenu>
@@ -247,12 +243,9 @@ function MemberRow({
   );
 }
 
-function MemberBadge({ role }: { role: CircleMemberRole; isDashboardView: boolean }) {
+function MemberBadge({ role }: { role: CircleMemberRole }) {
   const t = useTranslations("Dashboard");
-
   if (role === "PLAYER") return null;
-
-  // Badge unique "Organisateur" pour HOST et CO_HOST, partout (dashboard + public).
   return (
     <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
       <Crown className="size-3" />

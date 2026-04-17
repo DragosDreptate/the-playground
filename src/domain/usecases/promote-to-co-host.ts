@@ -1,4 +1,5 @@
 import type { CircleMembership } from "@/domain/models/circle";
+import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
 import type { EmailService } from "@/domain/ports/services/email-service";
@@ -7,7 +8,6 @@ import {
   NotMemberOfCircleError,
   CannotPromotePendingMemberError,
   InvalidPromotionTargetError,
-  CircleNotFoundError,
 } from "@/domain/errors";
 
 type PromoteToCoHostInput = {
@@ -48,46 +48,32 @@ export async function promoteToCoHost(
 ): Promise<CircleMembership> {
   const { circleRepository, userRepository, emailService, emailStrings } = deps;
 
-  // 1. Seul le HOST principal peut promouvoir (D3)
-  const callerMembership = await circleRepository.findMembership(
-    input.circleId,
-    input.hostUserId
-  );
-  if (
-    !callerMembership ||
-    callerMembership.role !== "HOST" ||
-    callerMembership.status !== "ACTIVE"
-  ) {
+  // D3 : seul le HOST principal peut promouvoir (garde strict HOST, pas CO_HOST).
+  const [callerMembership, targetMembership] = await Promise.all([
+    circleRepository.findMembership(input.circleId, input.hostUserId),
+    circleRepository.findMembership(input.circleId, input.targetUserId),
+  ]);
+  if (!isActivePrimaryHost(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, input.circleId);
   }
-
-  // 2. Charger la membership de la cible
-  const targetMembership = await circleRepository.findMembership(
-    input.circleId,
-    input.targetUserId
-  );
   if (!targetMembership) {
     throw new NotMemberOfCircleError(input.circleId);
   }
-
-  // 3. Guard D22 : uniquement les membres ACTIVE peuvent être promus
+  // D22 : uniquement les membres ACTIVE peuvent être promus.
   if (targetMembership.status !== "ACTIVE") {
     throw new CannotPromotePendingMemberError();
   }
-
-  // 4. Seul un PLAYER peut être promu en CO_HOST
   if (targetMembership.role !== "PLAYER") {
     throw new InvalidPromotionTargetError(targetMembership.role);
   }
 
-  // 5. Promotion
   const updated = await circleRepository.updateMembershipRole(
     input.circleId,
     input.targetUserId,
     "CO_HOST"
   );
 
-  // 6. Email de promotion (D19) — best-effort, n'annule pas la promotion en cas d'échec
+  // D19 : email de promotion best-effort — un échec ne bloque pas la promotion.
   if (emailService && emailStrings) {
     try {
       const [targetUser, inviter, circle] = await Promise.all([
@@ -95,10 +81,7 @@ export async function promoteToCoHost(
         userRepository.findById(input.hostUserId),
         circleRepository.findById(input.circleId),
       ]);
-
-      if (!targetUser || !inviter || !circle) {
-        if (!circle) throw new CircleNotFoundError(input.circleId);
-      } else {
+      if (targetUser && inviter && circle) {
         const inviterName =
           [inviter.firstName, inviter.lastName].filter(Boolean).join(" ") ||
           inviter.email;
@@ -117,7 +100,7 @@ export async function promoteToCoHost(
         });
       }
     } catch {
-      // L'échec d'envoi d'email ne bloque pas la promotion en base.
+      // Swallowed on purpose — see D19.
     }
   }
 
