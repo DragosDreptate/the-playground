@@ -192,12 +192,12 @@ describe("promoteToCoHost", () => {
           .mockResolvedValueOnce(makeUser({ id: HOST_ID, firstName: "Alice", lastName: "Martin" })),
       });
 
-      const promotedBy = vi.fn().mockResolvedValue({
+      const promotedBy = vi.fn(async ({ inviterName: _n }: { inviterName: string; circleName: string }) => ({
         subject: "s", heading: "h", intro: "i",
         rightsTitle: "t", rightCreateEvents: "r1", rightManageRegistrations: "r2",
         rightUpdateCircle: "r3", rightBroadcast: "r4", rightReceiveNotifications: "r5",
         limitsNote: "l", ctaLabel: "c", footer: "f", leaveLink: "ll",
-      });
+      }));
 
       await promoteToCoHost(makeInput(), {
         circleRepository: circleRepo,
@@ -207,7 +207,10 @@ describe("promoteToCoHost", () => {
       });
 
       expect(emailService.sendCoHostPromoted).toHaveBeenCalledTimes(1);
-      expect(promotedBy).toHaveBeenCalledWith("Alice Martin");
+      expect(promotedBy).toHaveBeenCalledWith({
+        inviterName: "Alice Martin",
+        circleName: "My Circle",
+      });
     });
 
     it("should not throw when email sending fails (best-effort)", async () => {

@@ -157,7 +157,7 @@ describe("demoteFromCoHost", () => {
         userRepository: userRepo,
         emailService,
         emailStrings: {
-          demoted: async () => ({
+          demoted: async (_args: { circleName: string }) => ({
             subject: "s", heading: "h", intro: "i", newRoleLabel: "n",
             registrationsNote: "r", ctaLabel: "c", footer: "f", preferencesLink: "p",
           }),

@@ -202,13 +202,19 @@ function MemberRow({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {canPromote && (
-                <DropdownMenuItem onSelect={handlePromote}>
+                <DropdownMenuItem
+                  className="focus:bg-muted focus:text-foreground"
+                  onSelect={handlePromote}
+                >
                   <Star className="size-4" />
                   {tCircle("promoteToCoHost.action")}
                 </DropdownMenuItem>
               )}
               {canDemote && (
-                <DropdownMenuItem onSelect={handleDemote}>
+                <DropdownMenuItem
+                  className="focus:bg-muted focus:text-foreground"
+                  onSelect={handleDemote}
+                >
                   <ChevronDown className="size-4" />
                   {tCircle("demoteFromCoHost.action")}
                 </DropdownMenuItem>
@@ -216,7 +222,7 @@ function MemberRow({
               {(canPromote || canDemote) && canRemove && <DropdownMenuSeparator />}
               {canRemove && (
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  className="text-destructive focus:text-destructive focus:bg-muted"
                   onSelect={() => setRemoveDialogOpen(true)}
                 >
                   <Trash2 className="size-4" />
@@ -241,25 +247,16 @@ function MemberRow({
   );
 }
 
-function MemberBadge({
-  role,
-  isDashboardView,
-}: {
-  role: CircleMemberRole;
-  isDashboardView: boolean;
-}) {
+function MemberBadge({ role }: { role: CircleMemberRole; isDashboardView: boolean }) {
   const t = useTranslations("Dashboard");
 
   if (role === "PLAYER") return null;
 
-  // D8 + D23 : côté public, un seul badge "Organisateur" pour HOST et CO_HOST.
-  // Dans le dashboard de gestion, distinction "Propriétaire" (HOST) vs "Organisateur" (CO_HOST).
-  const label = isDashboardView && role === "HOST" ? t("role.owner") : t("role.host");
-
+  // Badge unique "Organisateur" pour HOST et CO_HOST, partout (dashboard + public).
   return (
     <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
       <Crown className="size-3" />
-      {label}
+      {t("role.host")}
     </Badge>
   );
 }

@@ -20,7 +20,7 @@ type DemoteFromCoHostDeps = {
   userRepository: UserRepository;
   emailService?: EmailService;
   emailStrings?: {
-    demoted: () => Promise<{
+    demoted: (args: { circleName: string }) => Promise<{
       subject: string;
       heading: string;
       intro: string;
@@ -84,7 +84,7 @@ export async function demoteFromCoHost(
       if (!targetUser || !circle) {
         if (!circle) throw new CircleNotFoundError(input.circleId);
       } else {
-        const strings = await emailStrings.demoted();
+        const strings = await emailStrings.demoted({ circleName: circle.name });
         await emailService.sendCoHostDemoted({
           to: targetUser.email,
           recipientName: targetUser.firstName ?? targetUser.email,

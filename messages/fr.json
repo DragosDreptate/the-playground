@@ -246,7 +246,6 @@
     },
     "noCirclesMember": "Vous n'êtes membre d'aucune communauté.",
     "role": {
-      "owner": "Propriétaire",
       "host": "Organisateur",
       "coHost": "Co-organisateur",
       "player": "Participant"
@@ -745,7 +744,6 @@
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",
       "roleBadge": {
-        "owner": "Propriétaire",
         "host": "Organisateur",
         "member": "Membre",
         "pending": "En attente de validation"

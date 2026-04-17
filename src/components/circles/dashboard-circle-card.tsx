@@ -98,7 +98,7 @@ export async function DashboardCircleCard({ circle }: Props) {
                 {circle.membershipStatus === "PENDING"
                   ? <><Clock className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span></>
                   : isOrganizerRole(circle.memberRole)
-                    ? <><Crown className="size-3" /><span className="hidden sm:inline">{circle.memberRole === "HOST" ? t("circleCard.roleBadge.owner") : t("circleCard.roleBadge.host")}</span></>
+                    ? <><Crown className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span></>
                     : <><Users className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span></>}
               </Badge>
             </div>

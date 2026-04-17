@@ -30,10 +30,7 @@ export function CoHostDemotedEmail({
       <Text style={note}>{strings.registrationsNote}</Text>
 
       <Section style={ctaSection}>
-        <Button
-          style={{ ...ctaButton, background: "transparent", color: "#18181b", border: "1px solid #e4e4e7", backgroundImage: "none" }}
-          href={circleUrl}
-        >
+        <Button style={ctaButton} href={circleUrl}>
           {strings.ctaLabel}
         </Button>
       </Section>

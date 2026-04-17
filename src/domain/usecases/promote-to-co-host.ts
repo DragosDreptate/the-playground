@@ -21,7 +21,10 @@ type PromoteToCoHostDeps = {
   userRepository: UserRepository;
   emailService?: EmailService;
   emailStrings?: {
-    promotedBy: (inviterName: string) => Promise<{
+    promotedBy: (args: {
+      inviterName: string;
+      circleName: string;
+    }) => Promise<{
       subject: string;
       heading: string;
       intro: string;
@@ -99,7 +102,10 @@ export async function promoteToCoHost(
         const inviterName =
           [inviter.firstName, inviter.lastName].filter(Boolean).join(" ") ||
           inviter.email;
-        const strings = await emailStrings.promotedBy(inviterName);
+        const strings = await emailStrings.promotedBy({
+          inviterName,
+          circleName: circle.name,
+        });
         await emailService.sendCoHostPromoted({
           to: targetUser.email,
           recipientName: targetUser.firstName ?? targetUser.email,

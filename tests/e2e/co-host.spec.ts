@@ -48,12 +48,12 @@ test.describe("Co-organisateurs — UI HOST", () => {
     await expect(page.getByText("Promouvoir en co-organisateur")).toBeVisible();
   });
 
-  test("should show the Propriétaire badge on the Circle HOST", async ({ page }) => {
+  test("should show the single Organisateur badge on the Circle HOST", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
     const membersSection = page.locator("#members-section");
-    // Dans le dashboard (variant = "host"), le HOST voit "Propriétaire"
-    await expect(membersSection).toContainText(/Propriétaire/);
+    // Badge unique "Organisateur" pour HOST et CO_HOST, partout (D8 simplifié)
+    await expect(membersSection).toContainText(/Organisateur/);
   });
 });
 
@@ -61,10 +61,7 @@ test.describe("Co-organisateurs — UI public", () => {
   test("should show a single Organisateur badge on the public Circle page", async ({ page }) => {
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
-    // D8 : côté public, pas de distinction HOST / CO_HOST — badge unique
-    // L'utilisation de toContainText vérifie que la page affiche bien "Organisateur"
+    // Badge unique "Organisateur" côté public comme dashboard — HOST et CO_HOST confondus
     await expect(page.locator("body")).toContainText(/Organisateur/);
-    // Et ne doit PAS afficher "Propriétaire" côté public
-    await expect(page.locator("body")).not.toContainText(/Propriétaire/);
   });
 });

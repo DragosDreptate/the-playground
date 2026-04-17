@@ -592,9 +592,9 @@ export async function promoteToCoHostAction(
         userRepository: prismaUserRepository,
         emailService,
         emailStrings: {
-          promotedBy: async (inviterName: string) => ({
-            subject: t("subject", { inviterName }),
-            heading: t("heading"),
+          promotedBy: async ({ inviterName, circleName }) => ({
+            subject: t("subject", { circleName }),
+            heading: t("heading", { circleName }),
             intro: t("intro", { inviterName }),
             rightsTitle: t("rightsTitle"),
             rightCreateEvents: t("rightCreateEvents"),
@@ -636,10 +636,10 @@ export async function demoteFromCoHostAction(
         userRepository: prismaUserRepository,
         emailService,
         emailStrings: {
-          demoted: async () => ({
-            subject: t("subject"),
-            heading: t("heading"),
-            intro: t("intro"),
+          demoted: async ({ circleName }) => ({
+            subject: t("subject", { circleName }),
+            heading: t("heading", { circleName }),
+            intro: t("intro", { circleName }),
             newRoleLabel: t("newRoleLabel"),
             registrationsNote: t("registrationsNote"),
             ctaLabel: t("ctaLabel"),
