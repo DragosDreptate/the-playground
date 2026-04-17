@@ -368,6 +368,27 @@ export const prismaCircleRepository: CircleRepository = {
     }));
   },
 
+  async findOrganizers(circleId: string): Promise<CircleMemberWithUser[]> {
+    const records = await prisma.circleMembership.findMany({
+      where: { circleId, role: { in: ["HOST", "CO_HOST"] }, status: "ACTIVE" },
+      include: {
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true, image: true, publicId: true },
+        },
+      },
+      orderBy: { joinedAt: "asc" },
+    });
+    // Tri HOST > CO_HOST (par ordre d'arrivée dans chaque groupe)
+    records.sort((a, b) => {
+      if (a.role === b.role) return 0;
+      return a.role === "HOST" ? -1 : 1;
+    });
+    return records.map((r) => ({
+      ...toDomainMembership(r),
+      user: r.user,
+    }));
+  },
+
   async countMembers(circleId: string): Promise<number> {
     return prisma.circleMembership.count({ where: { circleId, status: "ACTIVE" } });
   },

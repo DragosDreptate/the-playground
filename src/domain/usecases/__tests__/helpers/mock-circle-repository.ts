@@ -19,6 +19,7 @@ export function createMockCircleRepository(
     findAllByUserIdWithStats: vi.fn<CircleRepository["findAllByUserIdWithStats"]>().mockResolvedValue([]),
     findMembership: vi.fn<CircleRepository["findMembership"]>().mockResolvedValue(null),
     findMembersByRole: vi.fn<CircleRepository["findMembersByRole"]>().mockResolvedValue([]),
+    findOrganizers: vi.fn<CircleRepository["findOrganizers"]>().mockResolvedValue([]),
     countMembers: vi.fn<CircleRepository["countMembers"]>().mockResolvedValue(0),
     countMoments: vi.fn<CircleRepository["countMoments"]>().mockResolvedValue(0),
     findPublic: vi.fn<CircleRepository["findPublic"]>().mockResolvedValue([]),
