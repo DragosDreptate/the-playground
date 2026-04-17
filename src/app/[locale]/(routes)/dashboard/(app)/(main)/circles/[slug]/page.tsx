@@ -274,7 +274,9 @@ export default async function CircleDetailPage({
                     {tCommon("edit")}
                   </Link>
                 </Button>
-                <DeleteCircleDialog circleId={circle.id} />
+                {membership.role === "HOST" && (
+                  <DeleteCircleDialog circleId={circle.id} />
+                )}
               </div>
             )}
           </div>
