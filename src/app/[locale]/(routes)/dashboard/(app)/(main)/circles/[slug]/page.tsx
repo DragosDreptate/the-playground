@@ -78,7 +78,8 @@ export default async function CircleDetailPage({
   const membership = await circleRepo.findMembership(circle.id, session.user.id);
   if (!membership) notFound();
 
-  const isOrganizer = membership.role === "HOST";
+  const isOrganizer = membership.role === "HOST" || membership.role === "CO_HOST";
+  const callerRole = membership.role;
 
 
   const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
@@ -543,7 +544,13 @@ export default async function CircleDetailPage({
 
           {/* Membres */}
           <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
-            <CircleMembersList hosts={hosts} players={players} variant={isOrganizer ? "host" : "player"} circleId={circle.id} />
+            <CircleMembersList
+              hosts={hosts}
+              players={players}
+              variant={isOrganizer ? "host" : "player"}
+              callerRole={callerRole}
+              circleId={circle.id}
+            />
           </div>
         </div>
       </div>

@@ -19,6 +19,8 @@ import { leaveCircle } from "@/domain/usecases/leave-circle";
 import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
+import { promoteToCoHost } from "@/domain/usecases/promote-to-co-host";
+import { demoteFromCoHost } from "@/domain/usecases/demote-from-co-host";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
@@ -568,5 +570,88 @@ async function notifyHostCircleJoin(
       }
     );
   }
+}
+
+export async function promoteToCoHostAction(
+  circleId: string,
+  targetUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const hostUserId = session.user.id;
+
+  return toActionResult(async () => {
+    const t = await getTranslations("Email.coHostPromoted");
+    await promoteToCoHost(
+      { circleId, hostUserId, targetUserId },
+      {
+        circleRepository: prismaCircleRepository,
+        userRepository: prismaUserRepository,
+        emailService,
+        emailStrings: {
+          promotedBy: async (inviterName: string) => ({
+            subject: t("subject", { inviterName }),
+            heading: t("heading"),
+            intro: t("intro", { inviterName }),
+            rightsTitle: t("rightsTitle"),
+            rightCreateEvents: t("rightCreateEvents"),
+            rightManageRegistrations: t("rightManageRegistrations"),
+            rightUpdateCircle: t("rightUpdateCircle"),
+            rightBroadcast: t("rightBroadcast"),
+            rightReceiveNotifications: t("rightReceiveNotifications"),
+            limitsNote: t("limitsNote"),
+            ctaLabel: t("ctaLabel"),
+            footer: t("footer"),
+            leaveLink: t("leaveLink"),
+          }),
+        },
+      }
+    );
+
+    invalidateDashboardCache(hostUserId);
+    invalidateDashboardCache(targetUserId);
+  });
+}
+
+export async function demoteFromCoHostAction(
+  circleId: string,
+  targetUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const hostUserId = session.user.id;
+
+  return toActionResult(async () => {
+    const t = await getTranslations("Email.coHostDemoted");
+    await demoteFromCoHost(
+      { circleId, hostUserId, targetUserId },
+      {
+        circleRepository: prismaCircleRepository,
+        userRepository: prismaUserRepository,
+        emailService,
+        emailStrings: {
+          demoted: async () => ({
+            subject: t("subject"),
+            heading: t("heading"),
+            intro: t("intro"),
+            newRoleLabel: t("newRoleLabel"),
+            registrationsNote: t("registrationsNote"),
+            ctaLabel: t("ctaLabel"),
+            footer: t("footer"),
+            preferencesLink: t("preferencesLink"),
+          }),
+        },
+      }
+    );
+
+    invalidateDashboardCache(hostUserId);
+    invalidateDashboardCache(targetUserId);
+  });
 }
 

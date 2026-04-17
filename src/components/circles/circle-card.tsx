@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Globe, Lock, Users, ImageIcon, Crown, User } from "lucide-react";
 import { getMomentGradient } from "@/lib/gradient";
 import type { Circle, CircleMemberRole } from "@/domain/models/circle";
+import { isOrganizerRole } from "@/domain/models/circle";
 
 type CircleCardProps = {
   circle: Circle;
@@ -88,11 +89,13 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
       </Link>
 
       {/* Colonne droite : Organisateur uniquement */}
-      {role === "HOST" && (
+      {role && isOrganizerRole(role) && (
         <div className="flex shrink-0 flex-col items-end justify-center gap-2">
           <Badge variant="outline" className="gap-1 border-primary/40 text-primary">
             <Crown className="size-3" />
-            <span className="hidden sm:inline">{tDashboard("role.host")}</span>
+            <span className="hidden sm:inline">
+              {role === "HOST" ? tDashboard("role.owner") : tDashboard("role.host")}
+            </span>
           </Badge>
           <Button asChild size="sm" className="h-7 px-3 text-xs">
             <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>

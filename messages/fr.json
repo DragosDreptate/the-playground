@@ -246,7 +246,9 @@
     },
     "noCirclesMember": "Vous n'êtes membre d'aucune communauté.",
     "role": {
+      "owner": "Propriétaire",
       "host": "Organisateur",
+      "coHost": "Co-organisateur",
       "player": "Participant"
     },
     "pendingRequests": {
@@ -343,6 +345,19 @@
       "description": "{name} perdra l'accès à cette communauté. Ses inscriptions aux événements à venir seront annulées automatiquement.",
       "confirm": "Retirer",
       "cancel": "Annuler"
+    },
+    "memberActions": {
+      "label": "Actions"
+    },
+    "promoteToCoHost": {
+      "action": "Promouvoir en co-organisateur",
+      "success": "{name} est désormais co-organisateur",
+      "error": "Impossible de promouvoir ce membre"
+    },
+    "demoteFromCoHost": {
+      "action": "Rétrograder en participant",
+      "success": "{name} est désormais participant",
+      "error": "Impossible de rétrograder ce co-organisateur"
     },
     "errors": {
       "notFound": "Communauté introuvable",
@@ -730,6 +745,7 @@
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",
       "roleBadge": {
+        "owner": "Propriétaire",
         "host": "Organisateur",
         "member": "Membre",
         "pending": "En attente de validation"
@@ -932,6 +948,31 @@
     "signOut": "Se déconnecter"
   },
   "Email": {
+    "coHostPromoted": {
+      "subject": "Vous êtes co-organisateur de {circleName}",
+      "heading": "Vous êtes co-organisateur de {circleName}",
+      "intro": "{inviterName} vient de vous promouvoir co-organisateur de sa Communauté. Vous pouvez désormais l'aider à gérer les événements et les membres.",
+      "rightsTitle": "Vos nouveaux droits",
+      "rightCreateEvents": "Créer et éditer des événements",
+      "rightManageRegistrations": "Gérer les inscriptions et la liste d'attente",
+      "rightUpdateCircle": "Modifier les paramètres de la Communauté",
+      "rightBroadcast": "Diffuser des messages à la Communauté",
+      "rightReceiveNotifications": "Recevoir les notifications d'Organisateur",
+      "limitsNote": "Seul le propriétaire peut supprimer la Communauté, gérer le compte Stripe ou promouvoir d'autres co-organisateurs.",
+      "ctaLabel": "Ouvrir le dashboard",
+      "footer": "Vous recevez cet email parce que vous avez été promu co-organisateur d'une Communauté dont vous êtes membre.",
+      "leaveLink": "Quitter la Communauté"
+    },
+    "coHostDemoted": {
+      "subject": "Votre rôle a changé dans {circleName}",
+      "heading": "Votre rôle a changé dans {circleName}",
+      "intro": "Vous n'êtes plus co-organisateur de {circleName}. Vous restez membre de la Communauté en tant que participant.",
+      "newRoleLabel": "Vous êtes désormais Participant",
+      "registrationsNote": "Vos inscriptions aux événements existants ne sont pas impactées. Vous continuez à recevoir les communications de la Communauté.",
+      "ctaLabel": "Voir la Communauté",
+      "footer": "Vous recevez cet email parce que votre rôle a changé dans une Communauté dont vous êtes membre.",
+      "preferencesLink": "Gérer mes préférences de notifications"
+    },
     "registration": {
       "subject": "Inscription confirmée : {momentTitle}",
       "heading": "Inscription confirmée !",

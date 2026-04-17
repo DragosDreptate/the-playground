@@ -1,21 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Crown, MoreVertical } from "lucide-react";
+import { Crown, MoreVertical, ChevronDown, Star, Trash2 } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
 import { Link } from "@/i18n/navigation";
 import { getDisplayName } from "@/lib/display-name";
-import type { CircleMemberWithUser } from "@/domain/models/circle";
+import type {
+  CircleMemberRole,
+  CircleMemberWithUser,
+} from "@/domain/models/circle";
+import {
+  promoteToCoHostAction,
+  demoteFromCoHostAction,
+} from "@/app/actions/circle";
 
 const PAGE_SIZE = 10;
 
@@ -23,6 +33,8 @@ type CircleMembersListProps = {
   hosts: CircleMemberWithUser[];
   players: CircleMemberWithUser[];
   variant?: "host" | "player" | "member-view";
+  /** Rôle de l'utilisateur connecté dans ce Circle — déclenche l'affichage des actions de gestion. */
+  callerRole?: CircleMemberRole;
   circleId?: string;
 };
 
@@ -30,20 +42,20 @@ export function CircleMembersList({
   hosts,
   players,
   variant = "player",
+  callerRole,
   circleId,
 }: CircleMembersListProps) {
   const t = useTranslations("Circle");
   const tCommon = useTranslations("Common");
 
-  const allMembers = [
-    ...hosts.map((m) => ({ ...m, isOrganizer: true })),
-    ...players.map((m) => ({ ...m, isOrganizer: false })),
-  ];
+  const allMembers = [...hosts, ...players];
   const totalMembers = allMembers.length;
 
   const [showAll, setShowAll] = useState(false);
   const displayed = showAll ? allMembers : allMembers.slice(0, PAGE_SIZE);
   const hasMore = totalMembers > PAGE_SIZE;
+
+  const isDashboardOrganizer = variant === "host";
 
   return (
     <div className="space-y-4">
@@ -59,9 +71,9 @@ export function CircleMembersList({
           <MemberRow
             key={member.id}
             member={member}
-            isOrganizer={member.isOrganizer}
-            showEmail={variant === "host"}
-            canRemove={variant === "host" && !member.isOrganizer}
+            isDashboardOrganizer={isDashboardOrganizer}
+            callerRole={callerRole}
+            showEmail={isDashboardOrganizer}
             circleId={circleId}
           />
         ))}
@@ -81,25 +93,72 @@ export function CircleMembersList({
   );
 }
 
+type MemberRowProps = {
+  member: CircleMemberWithUser;
+  /** True quand on est dans le dashboard et que l'appelant peut potentiellement agir. */
+  isDashboardOrganizer: boolean;
+  callerRole: CircleMemberRole | undefined;
+  showEmail: boolean;
+  circleId: string | undefined;
+};
+
 function MemberRow({
   member,
-  isOrganizer = false,
-  showEmail = false,
-  canRemove = false,
+  isDashboardOrganizer,
+  callerRole,
+  showEmail,
   circleId,
-}: {
-  member: CircleMemberWithUser;
-  isOrganizer?: boolean;
-  showEmail?: boolean;
-  canRemove?: boolean;
-  circleId?: string;
-}) {
+}: MemberRowProps) {
   const t = useTranslations("Dashboard");
-  const tRemove = useTranslations("Circle.removeMember");
+  const tCircle = useTranslations("Circle");
   const { user } = member;
   const displayName = getDisplayName(user.firstName, user.lastName, user.email);
+  const router = useRouter();
 
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  // Matrice d'actions (D10, D11, D22)
+  const canPromote =
+    circleId !== undefined &&
+    callerRole === "HOST" &&
+    member.role === "PLAYER" &&
+    member.status === "ACTIVE";
+  const canDemote =
+    circleId !== undefined &&
+    callerRole === "HOST" &&
+    member.role === "CO_HOST";
+  const canRemove =
+    circleId !== undefined &&
+    ((callerRole === "HOST" && member.role !== "HOST") ||
+      (callerRole === "CO_HOST" && member.role === "PLAYER"));
+  const hasMenuActions = canPromote || canDemote || canRemove;
+
+  const handlePromote = () => {
+    if (!circleId) return;
+    startTransition(async () => {
+      const result = await promoteToCoHostAction(circleId, user.id);
+      if (result.success) {
+        toast.success(tCircle("promoteToCoHost.success", { name: displayName }));
+        router.refresh();
+      } else {
+        toast.error(tCircle("promoteToCoHost.error"));
+      }
+    });
+  };
+
+  const handleDemote = () => {
+    if (!circleId) return;
+    startTransition(async () => {
+      const result = await demoteFromCoHostAction(circleId, user.id);
+      if (result.success) {
+        toast.success(tCircle("demoteFromCoHost.success", { name: displayName }));
+        router.refresh();
+      } else {
+        toast.error(tCircle("demoteFromCoHost.error"));
+      }
+    });
+  };
 
   return (
     <>
@@ -125,31 +184,45 @@ function MemberRow({
             <p className="text-muted-foreground truncate text-xs">{user.email}</p>
           )}
         </div>
-        {isOrganizer && (
-          <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
-            <Crown className="size-3" />
-            {t("role.host")}
-          </Badge>
-        )}
-        {canRemove && circleId && (
+
+        <MemberBadge role={member.role} isDashboardView={isDashboardOrganizer} />
+
+        {hasMenuActions && circleId && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
                 className="size-8 p-0 shrink-0"
-                aria-label={tRemove("action")}
+                aria-label={tCircle("memberActions.label")}
+                disabled={isPending}
               >
                 <MoreVertical className="size-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive focus:bg-destructive/10"
-                onSelect={() => setDialogOpen(true)}
-              >
-                {tRemove("action")}
-              </DropdownMenuItem>
+              {canPromote && (
+                <DropdownMenuItem onSelect={handlePromote}>
+                  <Star className="size-4" />
+                  {tCircle("promoteToCoHost.action")}
+                </DropdownMenuItem>
+              )}
+              {canDemote && (
+                <DropdownMenuItem onSelect={handleDemote}>
+                  <ChevronDown className="size-4" />
+                  {tCircle("demoteFromCoHost.action")}
+                </DropdownMenuItem>
+              )}
+              {(canPromote || canDemote) && canRemove && <DropdownMenuSeparator />}
+              {canRemove && (
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                  onSelect={() => setRemoveDialogOpen(true)}
+                >
+                  <Trash2 className="size-4" />
+                  {tCircle("removeMember.action")}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -160,10 +233,33 @@ function MemberRow({
           circleId={circleId}
           userId={user.id}
           memberName={displayName}
-          open={dialogOpen}
-          onOpenChange={setDialogOpen}
+          open={removeDialogOpen}
+          onOpenChange={setRemoveDialogOpen}
         />
       )}
     </>
+  );
+}
+
+function MemberBadge({
+  role,
+  isDashboardView,
+}: {
+  role: CircleMemberRole;
+  isDashboardView: boolean;
+}) {
+  const t = useTranslations("Dashboard");
+
+  if (role === "PLAYER") return null;
+
+  // D8 + D23 : côté public, un seul badge "Organisateur" pour HOST et CO_HOST.
+  // Dans le dashboard de gestion, distinction "Propriétaire" (HOST) vs "Organisateur" (CO_HOST).
+  const label = isDashboardView && role === "HOST" ? t("role.owner") : t("role.host");
+
+  return (
+    <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
+      <Crown className="size-3" />
+      {label}
+    </Badge>
   );
 }

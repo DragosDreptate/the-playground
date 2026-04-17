@@ -7,6 +7,7 @@ import {
   prismaMomentRepository,
 } from "@/infrastructure/repositories";
 import { getUserPublicProfile } from "@/domain/usecases/get-user-public-profile";
+import { isOrganizerRole } from "@/domain/models/circle";
 import { Link } from "@/i18n/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -193,11 +194,11 @@ export default async function UserPublicProfilePage({
                 </p>
 
                 <Badge
-                  variant={membership.role === "HOST" ? "default" : "secondary"}
+                  variant={isOrganizerRole(membership.role) ? "default" : "secondary"}
                   className="shrink-0 gap-1"
                 >
-                  {membership.role === "HOST" && <Crown className="size-3" />}
-                  {membership.role === "HOST" ? t("roleHost") : t("rolePlayer")}
+                  {isOrganizerRole(membership.role) && <Crown className="size-3" />}
+                  {isOrganizerRole(membership.role) ? t("roleHost") : t("rolePlayer")}
                 </Badge>
               </Link>
             ))}

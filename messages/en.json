@@ -246,7 +246,9 @@
     },
     "noCirclesMember": "You are not a member of any community yet.",
     "role": {
+      "owner": "Owner",
       "host": "Organizer",
+      "coHost": "Co-organizer",
       "player": "Member"
     },
     "pendingRequests": {
@@ -343,6 +345,19 @@
       "description": "{name} will lose access to this community. Their registrations for upcoming events will be automatically cancelled.",
       "confirm": "Remove",
       "cancel": "Cancel"
+    },
+    "memberActions": {
+      "label": "Actions"
+    },
+    "promoteToCoHost": {
+      "action": "Promote to co-organizer",
+      "success": "{name} is now a co-organizer",
+      "error": "Unable to promote this member"
+    },
+    "demoteFromCoHost": {
+      "action": "Demote to member",
+      "success": "{name} is now a member",
+      "error": "Unable to demote this co-organizer"
     },
     "errors": {
       "notFound": "Community not found",
@@ -730,6 +745,7 @@
       "noUpcomingMoments": "No upcoming Events",
       "nextMoment": "Next Event",
       "roleBadge": {
+        "owner": "Owner",
         "host": "Organizer",
         "member": "Member",
         "pending": "Pending approval"
@@ -932,6 +948,31 @@
     "signOut": "Sign out"
   },
   "Email": {
+    "coHostPromoted": {
+      "subject": "You're a co-organizer of {circleName}",
+      "heading": "You're a co-organizer of {circleName}",
+      "intro": "{inviterName} just promoted you to co-organizer of their Community. You can now help manage events and members.",
+      "rightsTitle": "Your new rights",
+      "rightCreateEvents": "Create and edit events",
+      "rightManageRegistrations": "Manage registrations and the waitlist",
+      "rightUpdateCircle": "Update Community settings",
+      "rightBroadcast": "Broadcast messages to the Community",
+      "rightReceiveNotifications": "Receive Organizer notifications",
+      "limitsNote": "Only the owner can delete the Community, manage the Stripe account, or promote other co-organizers.",
+      "ctaLabel": "Open dashboard",
+      "footer": "You're receiving this email because you were promoted to co-organizer of a Community you belong to.",
+      "leaveLink": "Leave the Community"
+    },
+    "coHostDemoted": {
+      "subject": "Your role changed in {circleName}",
+      "heading": "Your role changed in {circleName}",
+      "intro": "You are no longer a co-organizer of {circleName}. You remain a member of the Community.",
+      "newRoleLabel": "You are now a Member",
+      "registrationsNote": "Your existing event registrations are not affected. You continue to receive Community updates.",
+      "ctaLabel": "View Community",
+      "footer": "You're receiving this email because your role changed in a Community you belong to.",
+      "preferencesLink": "Manage my notification preferences"
+    },
     "registration": {
       "subject": "You've joined {momentTitle}",
       "heading": "Registration confirmed!",
