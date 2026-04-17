@@ -53,7 +53,9 @@ export default async function MomentDetailPage({
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
   if (!hasActiveMembership && !hasActiveRegistration) notFound();
 
-  const isOrganizer = hasActiveMembership && membership!.role === "HOST";
+  const isOrganizer =
+    hasActiveMembership &&
+    (membership!.role === "HOST" || membership!.role === "CO_HOST");
 
   const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
