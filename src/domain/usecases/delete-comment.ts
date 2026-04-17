@@ -1,3 +1,4 @@
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { CommentRepository } from "@/domain/ports/repositories/comment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -32,7 +33,7 @@ export async function deleteComment(
     throw new CommentNotFoundError(input.commentId);
   }
 
-  // Check authorization: author or host can delete
+  // Check authorization: author or organizer (HOST or CO_HOST, ACTIVE) can delete
   const isAuthor = comment.userId === input.userId;
   if (!isAuthor) {
     const moment = await momentRepository.findById(comment.momentId);
@@ -43,7 +44,7 @@ export async function deleteComment(
       moment.circleId,
       input.userId
     );
-    if (membership?.role !== "HOST") {
+    if (!isActiveOrganizer(membership)) {
       throw new UnauthorizedCommentDeletionError();
     }
   }

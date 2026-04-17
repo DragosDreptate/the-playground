@@ -1,4 +1,5 @@
 import type { Registration } from "@/domain/models/registration";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -48,11 +49,11 @@ export async function approveMomentRegistration(
     throw new RegistrationNotFoundError(input.registrationId);
   }
 
-  const hostMembership = await circleRepository.findMembership(
+  const callerMembership = await circleRepository.findMembership(
     moment.circleId,
     input.hostUserId
   );
-  if (!hostMembership || hostMembership.role !== "HOST" || hostMembership.status !== "ACTIVE") {
+  if (!isActiveOrganizer(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, moment.circleId);
   }
 

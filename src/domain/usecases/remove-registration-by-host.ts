@@ -1,4 +1,5 @@
 import type { Registration } from "@/domain/models/registration";
+import { isActiveOrganizer, isOrganizerRole } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -51,14 +52,17 @@ export async function removeRegistrationByHost(
     circleRepository.findMembership(moment.circleId, registration.userId),
   ]);
 
-  // 3a. Vérifie que l'appelant est HOST du Circle
-  if (!callerMembership || callerMembership.role !== "HOST") {
+  // 3a. Vérifie que l'appelant est Organisateur ACTIF (HOST ou CO_HOST)
+  if (!isActiveOrganizer(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, moment.circleId);
   }
 
-  // 3b. Empêche de retirer l'inscription d'un autre HOST
-  if (targetMembership?.role === "HOST") {
-    throw new CannotRemoveHostRegistrationError();
+  // 3b. Empêche un CO_HOST de retirer l'inscription d'un autre Organisateur (D11)
+  // Un HOST peut retirer un CO_HOST. La contrainte DB empêche de toute façon deux HOSTs.
+  if (targetMembership && isOrganizerRole(targetMembership.role)) {
+    if (callerMembership!.role !== "HOST") {
+      throw new CannotRemoveHostRegistrationError();
+    }
   }
 
   const wasRegistered = registration.status === "REGISTERED";

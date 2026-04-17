@@ -1,4 +1,5 @@
 import type { Moment } from "@/domain/models/moment";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import {
@@ -36,7 +37,7 @@ export async function publishMoment(
     existing.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedMomentActionError();
   }
 

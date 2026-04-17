@@ -22,6 +22,7 @@ import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membersh
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
@@ -362,8 +363,8 @@ export async function inviteToCircleByEmailAction(
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
   const membership = await circleRepo.findMembership(circleId, userId);
-  if (!membership || membership.role !== "HOST") {
-    return { success: false, error: "Only hosts can send invitations", code: "UNAUTHORIZED" };
+  if (!isActiveOrganizer(membership)) {
+    return { success: false, error: "Only organizers can send invitations", code: "UNAUTHORIZED" };
   }
 
   const circle = await circleRepo.findById(circleId);

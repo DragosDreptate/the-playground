@@ -1,4 +1,5 @@
 import type { Registration } from "@/domain/models/registration";
+import { isOrganizerRole } from "@/domain/models/circle";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -7,7 +8,7 @@ import { refundRegistration } from "./refund-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  HostCannotCancelRegistrationError,
+  OrganizerCannotCancelRegistrationError,
 } from "@/domain/errors";
 
 type CancelRegistrationInput = {
@@ -44,15 +45,16 @@ export async function cancelRegistration(
     throw new UnauthorizedRegistrationActionError();
   }
 
-  // A Host cannot cancel their own registration
+  // An organizer (Host or Co-Host) cannot cancel their own registration
+  // to an event of the Community they organize (D16)
   const moment = await momentRepository.findById(registration.momentId);
   if (moment) {
     const membership = await circleRepository.findMembership(
       moment.circleId,
       input.userId
     );
-    if (membership?.role === "HOST") {
-      throw new HostCannotCancelRegistrationError();
+    if (membership && isOrganizerRole(membership.role)) {
+      throw new OrganizerCannotCancelRegistrationError();
     }
   }
 

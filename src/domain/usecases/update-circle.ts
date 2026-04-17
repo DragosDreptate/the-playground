@@ -1,4 +1,5 @@
 import type { Circle, CircleVisibility, CircleCategory, CoverImageAttribution } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import { CircleNotFoundError, UnauthorizedCircleActionError } from "@/domain/errors";
 
@@ -40,7 +41,7 @@ export async function updateCircle(
     input.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedCircleActionError(input.userId, input.circleId);
   }
 
