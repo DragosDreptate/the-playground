@@ -191,9 +191,13 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
 export async function MomentDetailView(props: MomentDetailViewProps) {
   const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments } =
     props;
-  // "Organisé par" n'affiche que le HOST principal (les CO_HOST figurent dans la liste des membres).
+  // "Organisé par" affiche le créateur de l'événement (HOST ou CO_HOST).
+  // Si le créateur n'est plus organisateur (rétrogradé / parti), on retombe sur le HOST principal.
   // On garde `hosts` complet pour les autres usages (exclusions notifications, hostUserIds...).
-  const primaryHosts = hosts.filter((h) => h.role === "HOST");
+  const creator = moment.createdById
+    ? hosts.find((h) => h.user.id === moment.createdById)
+    : null;
+  const primaryHosts = creator ? [creator] : hosts.filter((h) => h.role === "HOST");
   const isHostView = props.variant === "host";
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
   const isAuthenticated = isHostView || (props as PublicViewProps).isAuthenticated;
