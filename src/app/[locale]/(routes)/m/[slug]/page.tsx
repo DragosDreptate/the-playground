@@ -120,7 +120,7 @@ export default async function PublicMomentPage({
     await measureTime("moment-page:data", () =>
       Promise.all([
         getCircle(moment.circleId),
-        prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+        prismaCircleRepository.findOrganizers(moment.circleId),
         isAuthenticated
           ? getUserRegistration(
               { momentId: moment.id, userId: session!.user!.id! },
@@ -139,7 +139,7 @@ export default async function PublicMomentPage({
 
   if (!circle) notFound();
 
-  const isHost = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
+  const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   const registeredCount = allAttendees.filter((r) => r.status === "REGISTERED").length;
 
@@ -274,7 +274,7 @@ export default async function PublicMomentPage({
         attachments={attachments}
         currentUserId={session?.user?.id ?? null}
         isAuthenticated={isAuthenticated}
-        isHost={isHost}
+        isOrganizer={isOrganizer}
         existingRegistration={existingRegistration}
         signInUrl={signInUrl}
         isFull={isFull}

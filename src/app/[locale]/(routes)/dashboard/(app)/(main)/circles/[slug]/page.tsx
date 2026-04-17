@@ -78,11 +78,12 @@ export default async function CircleDetailPage({
   const membership = await circleRepo.findMembership(circle.id, session.user.id);
   if (!membership) notFound();
 
-  const isHost = membership.role === "HOST";
+  const isOrganizer = membership.role === "HOST" || membership.role === "CO_HOST";
+  const callerRole = membership.role;
 
 
   const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
-    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaCircleRepository.findOrganizers(circle.id),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
     getCircleMoments(
@@ -90,12 +91,12 @@ export default async function CircleDetailPage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    isHost ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
+    isOrganizer ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
     prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isHost));
+  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
   // Récupère compteurs + inscriptions utilisateur pour TOUS les moments (upcoming + past)
@@ -128,10 +129,10 @@ export default async function CircleDetailPage({
           {circle.name}
         </span>
         <Badge
-          variant={isHost ? "outline" : "secondary"}
-          className={isHost ? "border-primary/40 text-primary" : ""}
+          variant={isOrganizer ? "outline" : "secondary"}
+          className={isOrganizer ? "border-primary/40 text-primary" : ""}
         >
-          {isHost ? tDashboard("role.host") : tDashboard("role.player")}
+          {isOrganizer ? tDashboard("role.host") : tDashboard("role.player")}
         </Badge>
       </div>
 
@@ -190,14 +191,16 @@ export default async function CircleDetailPage({
             </p>
           )}
 
-          {/* Hosts bloc */}
-          {hosts.length > 0 && (
+          {/* Hosts bloc — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres) */}
+          {(() => {
+            const primaryHosts = hosts.filter((h) => h.role === "HOST");
+            return primaryHosts.length > 0 ? (
             <div className="space-y-2 px-1">
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.hosts")}
               </p>
               <div className="flex flex-wrap items-center gap-1.5">
-                {hosts.slice(0, 5).map((host) => (
+                {primaryHosts.map((host) => (
                   <div
                     key={host.id}
                     className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
@@ -207,22 +210,18 @@ export default async function CircleDetailPage({
                     {getCircleUserInitials(host.user)}
                   </div>
                 ))}
-                {hosts.length > 5 && (
-                  <span className="text-muted-foreground text-xs">
-                    +{hosts.length - 5}
-                  </span>
-                )}
               </div>
               <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
-                {hosts.map((h, i) => (
+                {primaryHosts.map((h, i) => (
                   <span key={h.user.id}>
                     <HostLink user={h.user} />
-                    {i < hosts.length - 1 && ", "}
+                    {i < primaryHosts.length - 1 && ", "}
                   </span>
                 ))}
               </p>
             </div>
-          )}
+            ) : null;
+          })()}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -243,7 +242,7 @@ export default async function CircleDetailPage({
           </div>
 
           {/* Quitter la Communauté — Participant uniquement */}
-          {!isHost && (
+          {!isOrganizer && (
             <div className="px-1">
               <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
             </div>
@@ -253,27 +252,32 @@ export default async function CircleDetailPage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" + actions Host */}
+          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {hosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" />
-                    {i < hosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
-            {isHost && (
+            {(() => {
+              const primaryHosts = hosts.filter((h) => h.role === "HOST");
+              return primaryHosts.length > 0 ? (
+                <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                  {t("detail.hostedBy")}
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id} className="flex items-center gap-1">
+                      <HostLink user={h.user} className="text-foreground font-medium" />
+                      {i < primaryHosts.length - 1 && <span>,</span>}
+                    </span>
+                  ))}
+                </p>
+              ) : null;
+            })()}
+            {isOrganizer && (
               <div className="flex shrink-0 gap-2">
                 <Button asChild size="sm">
                   <Link href={`/dashboard/circles/${circle.slug}/edit`}>
                     {tCommon("edit")}
                   </Link>
                 </Button>
-                <DeleteCircleDialog circleId={circle.id} />
+                {membership.role === "HOST" && (
+                  <DeleteCircleDialog circleId={circle.id} />
+                )}
               </div>
             )}
           </div>
@@ -434,7 +438,7 @@ export default async function CircleDetailPage({
           </div>
 
           {/* Partager & Inviter — visible Organisateurs uniquement */}
-          {isHost && (
+          {isOrganizer && (
             <>
             <div className="border-border border-t" />
             <CircleShareInviteCard
@@ -465,7 +469,7 @@ export default async function CircleDetailPage({
             upcomingLabel={t("detail.upcomingMoments")}
             pastLabel={t("detail.pastMoments")}
             upcomingAction={
-              isHost ? (
+              isOrganizer ? (
                 <Button asChild size="sm" className="w-full md:w-auto">
                   <Link href={`/dashboard/circles/${circle.slug}/moments/new`}>
                     {tMoment("create.title")}
@@ -489,7 +493,7 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isHost={isHost}
+                      isOrganizer={isOrganizer}
                       isLast={i === upcomingMoments.length - 1}
                     />
                   ))}
@@ -512,7 +516,7 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isHost={isHost}
+                      isOrganizer={isOrganizer}
                       isLast={i === pastMoments.length - 1}
                     />
                   ))}
@@ -525,7 +529,7 @@ export default async function CircleDetailPage({
           <div className="border-border border-t" />
 
           {/* Demandes en attente — visible Organisateurs uniquement si requiresApproval */}
-          {isHost && circle.requiresApproval && (
+          {isOrganizer && circle.requiresApproval && (
             <div className="border-border bg-card rounded-2xl border p-6">
               {pendingMemberships.length > 0 ? (
                 <PendingMembershipsList
@@ -543,7 +547,13 @@ export default async function CircleDetailPage({
 
           {/* Membres */}
           <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
-            <CircleMembersList hosts={hosts} players={players} variant={isHost ? "host" : "player"} circleId={circle.id} />
+            <CircleMembersList
+              hosts={hosts}
+              players={players}
+              variant={isOrganizer ? "host" : "player"}
+              callerRole={callerRole}
+              circleId={circle.id}
+            />
           </div>
         </div>
       </div>

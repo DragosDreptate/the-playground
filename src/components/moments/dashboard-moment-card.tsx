@@ -18,7 +18,7 @@ type ParticipantProps = {
   variant: "participant";
   registration: RegistrationWithMoment;
   isLast: boolean;
-  isHost?: boolean;
+  isOrganizer?: boolean;
   isPast?: boolean;
 };
 
@@ -37,13 +37,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const tMoment = useTranslations("Moment");
   const locale = useLocale();
 
-  const isOrganizer = props.variant === "organizer";
+  const isOrganizerView = props.variant === "organizer";
   const isPast = props.isPast ?? false;
   const isLast = props.isLast;
-  const isDraft = isOrganizer && (props as OrganizerProps).moment.status === "DRAFT";
+  const isDraft = isOrganizerView && (props as OrganizerProps).moment.status === "DRAFT";
 
   // Extraire les données selon le variant
-  const momentData = isOrganizer
+  const momentData = isOrganizerView
     ? {
         slug: props.moment.slug,
         title: props.moment.title,
@@ -77,19 +77,19 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     setIsToday(momentData.startsAt.toDateString() === now.toDateString());
   }, [momentData.startsAt]);
 
-  const isHost = !isOrganizer && (props as ParticipantProps).isHost === true;
+  const isOrganizer = !isOrganizerView && (props as ParticipantProps).isOrganizer === true;
   const isRegistered =
+    !isOrganizerView &&
     !isOrganizer &&
-    !isHost &&
     (props.registration.status === "REGISTERED" ||
       props.registration.status === "CHECKED_IN");
-  const isWaitlisted = !isOrganizer && !isHost && props.registration.status === "WAITLISTED";
+  const isWaitlisted = !isOrganizerView && !isOrganizer && props.registration.status === "WAITLISTED";
 
   const dotClass = isPast
     ? "bg-border"
     : isDraft
       ? "bg-muted-foreground/40"
-      : isOrganizer || isHost
+      : isOrganizerView || isOrganizer
         ? "bg-primary"
         : isRegistered
           ? "bg-primary"
@@ -115,7 +115,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         : momentData.locationName;
 
   const roleBadge = !isPast && !isDraft ? (
-    isOrganizer || isHost ? (
+    isOrganizerView || isOrganizer ? (
       <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
         <Crown className="size-3" />
         <span className="hidden sm:inline">{t("role.host")}</span>

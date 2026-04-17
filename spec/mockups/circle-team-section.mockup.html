@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Équipe d'organisation — paramètres Communauté — The Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --accent: #4fe0c2;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --destructive: #e8457a;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26,27,46,0.05);
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --input: #383a55;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: var(--foreground); background: var(--background); min-height: 100vh; }
+
+.site-header { height: 56px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+.site-logo { font-size: 16px; font-weight: 800; color: var(--primary); margin-right: auto; }
+.nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #06b6d4); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 600; }
+
+.dashboard { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+.breadcrumb { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted-foreground); margin-bottom: 8px; }
+.breadcrumb a { color: var(--muted-foreground); text-decoration: none; }
+.breadcrumb a:hover { color: var(--foreground); }
+.breadcrumb .sep { font-size: 11px; }
+.breadcrumb .current { color: var(--foreground); font-weight: 500; }
+
+.page-title { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 4px; }
+.page-desc { font-size: 13px; color: var(--muted-foreground); margin-bottom: 28px; }
+
+/* Settings nav tabs (simplified context) */
+.context-tabs { display: flex; gap: 4px; padding: 4px; background: var(--muted); border-radius: 10px; margin-bottom: 24px; width: fit-content; opacity: 0.6; }
+.context-tab { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: var(--muted-foreground); cursor: pointer; }
+.context-tab.active { background: var(--card); color: var(--foreground); opacity: 1; box-shadow: var(--shadow-sm); }
+
+/* Section header */
+.section-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.section-desc { font-size: 13px; color: var(--muted-foreground); margin-bottom: 20px; line-height: 1.55; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.badge-owner { border: 1px solid rgba(232,69,122,0.4); color: var(--primary); }
+.badge-org { border: 1px solid rgba(79,224,194,0.4); color: var(--accent); }
+.badge-outline { border: 1px solid var(--border); color: var(--muted-foreground); background: var(--muted); font-size: 10px; padding: 1px 6px; }
+
+/* Team card */
+.team-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
+
+/* Team row */
+.team-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); position: relative; }
+.team-row:last-of-type { border-bottom: none; padding-bottom: 4px; }
+.team-row:first-of-type { padding-top: 4px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; flex-shrink: 0; }
+.member-info { flex: 1; min-width: 0; }
+.member-name { font-size: 14px; font-weight: 500; line-height: 1.3; display: flex; align-items: center; gap: 6px; }
+.member-email { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+.role-pill { font-size: 12px; color: var(--muted-foreground); margin-top: 1px; }
+
+/* Menu button */
+.menu-btn { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; cursor: pointer; color: var(--muted-foreground); transition: all 0.15s; }
+.menu-btn:hover { background: var(--muted); color: var(--foreground); }
+
+/* Add button */
+.add-section { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 4px; border-top: 1px solid var(--border); margin-top: 8px; }
+.add-hint { font-size: 12px; color: var(--muted-foreground); }
+.btn-outline { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 500; border: 1px solid var(--border); background: transparent; color: var(--foreground); cursor: pointer; transition: all 0.15s; font-family: inherit; }
+.btn-outline:hover { background: var(--muted); border-color: var(--muted-foreground); }
+
+/* Info callout */
+.info-callout { margin-top: 16px; padding: 12px 14px; background: var(--muted); border: 1px solid var(--border); border-radius: 10px; display: flex; gap: 10px; align-items: flex-start; }
+.info-callout svg { color: var(--accent); flex-shrink: 0; margin-top: 2px; }
+.info-callout p { font-size: 12.5px; color: var(--muted-foreground); line-height: 1.55; }
+.info-callout strong { color: var(--foreground); font-weight: 600; }
+
+/* Dropdown */
+.dropdown { position: absolute; right: 0; top: 52px; z-index: 20; background: var(--card); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 20px 60px -10px rgba(0,0,0,0.6); padding: 4px; min-width: 240px; }
+.dropdown-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--foreground); transition: background 0.1s; }
+.dropdown-item:hover { background: var(--muted); }
+.dropdown-item.destructive { color: var(--destructive); }
+.dropdown-item.destructive:hover { background: rgba(232,69,122,0.08); }
+.dropdown-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+.dropdown-item svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+/* State label (mockup only) */
+.state-hint { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; background: rgba(232,69,122,0.1); color: var(--primary); margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-logo">The Playground</div>
+  <div class="nav-avatar">D</div>
+</header>
+
+<main class="dashboard">
+  <div class="breadcrumb">
+    <a href="#">Mon espace</a>
+    <span class="sep">›</span>
+    <a href="#">Paris AI Builders</a>
+    <span class="sep">›</span>
+    <span class="current">Paramètres</span>
+  </div>
+  <h1 class="page-title">Paramètres</h1>
+  <p class="page-desc">Paris AI Builders</p>
+
+  <div class="context-tabs">
+    <div class="context-tab">Général</div>
+    <div class="context-tab">Apparence</div>
+    <div class="context-tab active">Équipe</div>
+    <div class="context-tab">Paiements</div>
+    <div class="context-tab">Zone de danger</div>
+  </div>
+
+  <div class="state-hint">Vue Propriétaire (HOST) — actions complètes disponibles</div>
+
+  <h2 class="section-title">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Équipe d'organisation
+  </h2>
+  <p class="section-desc">Les co-organisateurs peuvent gérer les événements et les membres de la Communauté. Ils partagent vos droits, sauf la suppression de la Communauté, la gestion Stripe Connect et la promotion d'autres co-organisateurs.</p>
+
+  <div class="team-card">
+
+    <div class="team-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #e8457a, #9333ea);">DD</div>
+      <div class="member-info">
+        <div class="member-name">Dragos Dreptate<span class="badge badge-outline">Vous</span></div>
+        <div class="member-email">dragos@example.com</div>
+      </div>
+      <span class="badge badge-owner">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Propriétaire
+      </span>
+    </div>
+
+    <div class="team-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">AM</div>
+      <div class="member-info">
+        <div class="member-name">Alice Martin</div>
+        <div class="member-email">alice.martin@example.com</div>
+      </div>
+      <span class="badge badge-org">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <div class="dropdown">
+        <div class="dropdown-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          Rétrograder en participant
+        </div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item destructive">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Retirer de la Communauté
+        </div>
+      </div>
+    </div>
+
+    <div class="team-row">
+      <div class="avatar" style="background: linear-gradient(135deg, #10b981, #059669);">MR</div>
+      <div class="member-info">
+        <div class="member-name">Marc Robin</div>
+        <div class="member-email">marc.robin@example.com</div>
+      </div>
+      <span class="badge badge-org">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m2 4 3 12h14l3-12-6 7.5-4-5.5-4 5.5z"/></svg>
+        Organisateur
+      </span>
+      <button class="menu-btn" aria-label="Actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+    </div>
+
+    <div class="add-section">
+      <span class="add-hint">Promouvoir un membre depuis la liste complète</span>
+      <a href="#" class="btn-outline">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Voir tous les membres
+      </a>
+    </div>
+  </div>
+
+  <div class="info-callout">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    <p><strong>Comment promouvoir un membre ?</strong> Depuis la page des membres, ouvrez le menu d'un participant ACTIF et choisissez "Promouvoir en co-organisateur". Le membre reçoit un email de confirmation et gagne immédiatement les droits d'organisateur.</p>
+  </div>
+</main>
+
+</body>
+</html>

@@ -65,3 +65,27 @@ export class MembershipNotPendingError extends DomainError {
     super(`Membership for user ${userId} in circle ${circleId} is not pending approval`);
   }
 }
+
+export class CannotPromotePendingMemberError extends DomainError {
+  readonly code = "CANNOT_PROMOTE_PENDING_MEMBER";
+
+  constructor() {
+    super("Only an active member can be promoted to co-organizer (D22)");
+  }
+}
+
+export class InvalidPromotionTargetError extends DomainError {
+  readonly code = "INVALID_PROMOTION_TARGET";
+
+  constructor(currentRole: string) {
+    super(`Cannot promote to co-organizer: target role is ${currentRole} (expected PLAYER)`);
+  }
+}
+
+export class InvalidDemotionTargetError extends DomainError {
+  readonly code = "INVALID_DEMOTION_TARGET";
+
+  constructor(currentRole: string) {
+    super(`Cannot demote from co-organizer: target role is ${currentRole} (expected CO_HOST)`);
+  }
+}

@@ -131,7 +131,7 @@ export default async function PublicCirclePage({
     Promise<import("@/domain/models/circle").MembershipStatus | null>,
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
-    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaCircleRepository.findOrganizers(circle.id),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
     getCircleMoments(
       circle.id,
@@ -153,15 +153,15 @@ export default async function PublicCirclePage({
 
   const isMember = isMemberResult === "ACTIVE";
   const isPendingMember = isMemberResult === "PENDING";
-  const isHost = session?.user?.id
+  const isOrganizer = session?.user?.id
     ? hosts.some((h) => h.user.id === session.user!.id)
     : false;
   const isConnected = !!session?.user?.id;
   // Membres visibles : connecté + (circle public OU membre/organisateur)
-  const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isHost);
+  const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
   const showSignInToJoin = !isConnected;
-  const showMemberBadge = isMember && !isHost;
+  const showMemberBadge = isMember && !isOrganizer;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
   const pastMoments = allMoments.filter(
@@ -272,39 +272,37 @@ export default async function PublicCirclePage({
             </p>
           )}
 
-          {/* Hosts */}
-          {hosts.length > 0 && (
-            <div className="space-y-2 px-1">
-              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                {t("detail.hosts")}
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {hosts.slice(0, 5).map((host) => (
-                  <div
-                    key={host.id}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
-                    style={{ background: getMomentGradient(host.user.email) }}
-                    title={host.user.firstName ?? host.user.email}
-                  >
-                    {getCircleUserInitials(host.user)}
-                  </div>
-                ))}
-                {hosts.length > 5 && (
-                  <span className="text-muted-foreground text-xs">
-                    +{hosts.length - 5}
-                  </span>
-                )}
+          {/* Hosts — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres avec leur badge) */}
+          {(() => {
+            const primaryHosts = hosts.filter((h) => h.role === "HOST");
+            return primaryHosts.length > 0 ? (
+              <div className="space-y-2 px-1">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                  {t("detail.hosts")}
+                </p>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {primaryHosts.map((host) => (
+                    <div
+                      key={host.id}
+                      className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
+                      style={{ background: getMomentGradient(host.user.email) }}
+                      title={host.user.firstName ?? host.user.email}
+                    >
+                      {getCircleUserInitials(host.user)}
+                    </div>
+                  ))}
+                </div>
+                <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id}>
+                      <HostLink user={h.user} linkDisabled={!isConnected} />
+                      {i < primaryHosts.length - 1 && ", "}
+                    </span>
+                  ))}
+                </p>
               </div>
-              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
-                {hosts.map((h, i) => (
-                  <span key={h.user.id}>
-                    <HostLink user={h.user} linkDisabled={!isConnected} />
-                    {i < hosts.length - 1 && ", "}
-                  </span>
-                ))}
-              </p>
-            </div>
-          )}
+            ) : null;
+          })()}
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
@@ -325,10 +323,10 @@ export default async function PublicCirclePage({
           </div>
 
           {/* Badge Organisateur — visible pour les Organisateurs */}
-          {isHost && (
+          {isOrganizer && (
             <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
               <Crown className="size-4 shrink-0" aria-hidden="true" />
-              {t("detail.isHost")}
+              {t("detail.isOrganizer")}
             </div>
           )}
 
@@ -384,20 +382,23 @@ export default async function PublicCirclePage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" + raccourci Organisateur */}
+          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres avec leur badge */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {hosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
-                    {i < hosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
-            {isHost && (
+            {(() => {
+              const primaryHosts = hosts.filter((h) => h.role === "HOST");
+              return primaryHosts.length > 0 ? (
+                <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+                  {t("detail.hostedBy")}
+                  {primaryHosts.map((h, i) => (
+                    <span key={h.user.id} className="flex items-center gap-1">
+                      <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
+                      {i < primaryHosts.length - 1 && <span>,</span>}
+                    </span>
+                  ))}
+                </p>
+              ) : null;
+            })()}
+            {isOrganizer && (
               <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}`}>
                   <ExternalLink className="size-3.5" />
@@ -581,7 +582,7 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isHost={false}
+                      isOrganizer={false}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
@@ -606,7 +607,7 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isHost={false}
+                      isOrganizer={false}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}

@@ -33,6 +33,7 @@ enum CircleCategory {
 
 enum CircleMemberRole {
   HOST
+  CO_HOST
   PLAYER
 }
 

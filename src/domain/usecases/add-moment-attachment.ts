@@ -4,6 +4,7 @@ import {
   MAX_ATTACHMENT_SIZE_BYTES,
   ALLOWED_ATTACHMENT_CONTENT_TYPES,
 } from "@/domain/models/moment-attachment";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentAttachmentRepository } from "@/domain/ports/repositories/moment-attachment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -60,7 +61,7 @@ export async function addMomentAttachment(
     attachmentRepository.countByMoment(input.momentId),
   ]);
 
-  if (!membership || membership.role !== "HOST") {
+  if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedMomentActionError();
   }
   if (count >= MAX_ATTACHMENTS_PER_MOMENT) {

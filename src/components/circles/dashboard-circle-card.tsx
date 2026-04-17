@@ -8,6 +8,7 @@ import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack"
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
+import { isOrganizerRole } from "@/domain/models/circle";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
@@ -96,7 +97,7 @@ export async function DashboardCircleCard({ circle }: Props) {
               <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
                 {circle.membershipStatus === "PENDING"
                   ? <><Clock className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span></>
-                  : circle.memberRole === "HOST"
+                  : isOrganizerRole(circle.memberRole)
                     ? <><Crown className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span></>
                     : <><Users className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span></>}
               </Badge>

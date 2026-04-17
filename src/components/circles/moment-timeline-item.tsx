@@ -16,7 +16,7 @@ type Props = {
   circleSlug: string;
   registrationCount: number;
   userRegistrationStatus: RegistrationStatus | null;
-  isHost: boolean;
+  isOrganizer: boolean;
   isLast: boolean;
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
@@ -30,7 +30,7 @@ export async function MomentTimelineItem({
   circleSlug,
   registrationCount,
   userRegistrationStatus,
-  isHost,
+  isOrganizer,
   isLast,
   variant = "dashboard",
   topAttendees = [],
@@ -134,7 +134,7 @@ export async function MomentTimelineItem({
                     <>
                       {isDraft ? (
                         <DraftBadge label={t("status.draft")} />
-                      ) : isHost ? (
+                      ) : isOrganizer ? (
                         <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
                           <Crown className="size-3" />
                           <span className="hidden sm:inline">{tDashboard("role.host")}</span>

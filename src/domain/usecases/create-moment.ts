@@ -1,4 +1,5 @@
 import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
@@ -53,7 +54,7 @@ export async function createMoment(
     input.userId
   );
 
-  if (!membership || membership.role !== "HOST") {
+  if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedMomentActionError();
   }
 

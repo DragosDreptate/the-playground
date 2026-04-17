@@ -17,6 +17,7 @@ import {
 import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
 import { isAdminInHostMode } from "@/lib/admin-host-mode";
+import { isActiveOrganizer } from "@/domain/models/circle";
 
 const emailService = createResendEmailService();
 
@@ -56,10 +57,10 @@ export async function broadcastMomentAction(
       moment.circleId,
       session.user.id
     );
-    if (!membership || membership.role !== "HOST") {
+    if (!isActiveOrganizer(membership)) {
       return {
         success: false,
-        error: "Seul l'organisateur peut diffuser",
+        error: "Seul un organisateur peut diffuser",
         code: "FORBIDDEN",
       };
     }

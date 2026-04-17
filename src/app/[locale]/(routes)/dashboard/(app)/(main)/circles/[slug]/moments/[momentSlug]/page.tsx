@@ -44,7 +44,7 @@ export default async function MomentDetailPage({
   // Parallélise membership + hosts + registration (indépendants)
   const [membership, hosts, userRegistration] = await Promise.all([
     circleRepo.findMembership(circle.id, session.user.id),
-    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaCircleRepository.findOrganizers(circle.id),
     prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 
@@ -53,7 +53,9 @@ export default async function MomentDetailPage({
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
   if (!hasActiveMembership && !hasActiveRegistration) notFound();
 
-  const isHost = hasActiveMembership && membership!.role === "HOST";
+  const isOrganizer =
+    hasActiveMembership &&
+    (membership!.role === "HOST" || membership!.role === "CO_HOST");
 
   const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
@@ -61,7 +63,7 @@ export default async function MomentDetailPage({
       { momentId: moment.id },
       { commentRepository: prismaCommentRepository }
     ),
-    isHost ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
+    isOrganizer ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
     prismaMomentAttachmentRepository.findByMoment(moment.id),
   ]);
   const registeredCount = allAttendees.filter(
@@ -73,7 +75,7 @@ export default async function MomentDetailPage({
 
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/m/${moment.slug}`;
 
-  if (!isHost) {
+  if (!isOrganizer) {
     const [existingRegistration, upcomingCircleMoments] = await Promise.all([
       prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
       prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),
@@ -100,7 +102,7 @@ export default async function MomentDetailPage({
         attachments={attachments}
         currentUserId={session.user.id}
         isAuthenticated={true}
-        isHost={false}
+        isOrganizer={false}
         existingRegistration={existingRegistration}
         signInUrl=""
         isFull={moment.capacity !== null && registeredCount >= moment.capacity}

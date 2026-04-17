@@ -26,7 +26,7 @@ import {
   UnauthorizedCircleActionError,
   UnauthorizedMomentActionError,
   UnauthorizedRegistrationActionError,
-  HostCannotCancelRegistrationError,
+  OrganizerCannotCancelRegistrationError,
   UnauthorizedCommentDeletionError,
   MomentNotFoundError,
 } from "@/domain/errors";
@@ -363,7 +363,7 @@ describe("Security — RBAC", () => {
       ).rejects.toThrow(UnauthorizedRegistrationActionError);
     });
 
-    it("should throw HostCannotCancelRegistrationError when a HOST tries to cancel their own registration", async () => {
+    it("should throw OrganizerCannotCancelRegistrationError when a HOST tries to cancel their own registration", async () => {
       const registrationRepo = createMockRegistrationRepository({
         findById: vi.fn().mockResolvedValue(
           makeRegistration({ userId: "host-user", status: "REGISTERED" })
@@ -387,7 +387,7 @@ describe("Security — RBAC", () => {
             circleRepository: circleRepo,
           }
         )
-      ).rejects.toThrow(HostCannotCancelRegistrationError);
+      ).rejects.toThrow(OrganizerCannotCancelRegistrationError);
     });
 
     it("should allow a PLAYER to cancel their own registration", async () => {

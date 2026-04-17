@@ -19,9 +19,12 @@ import { leaveCircle } from "@/domain/usecases/leave-circle";
 import { removeCircleMember } from "@/domain/usecases/remove-circle-member";
 import { approveCircleMembership } from "@/domain/usecases/approve-circle-membership";
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
+import { promoteToCoHost } from "@/domain/usecases/promote-to-co-host";
+import { demoteFromCoHost } from "@/domain/usecases/demote-from-co-host";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
@@ -362,8 +365,8 @@ export async function inviteToCircleByEmailAction(
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
   const membership = await circleRepo.findMembership(circleId, userId);
-  if (!membership || membership.role !== "HOST") {
-    return { success: false, error: "Only hosts can send invitations", code: "UNAUTHORIZED" };
+  if (!isActiveOrganizer(membership)) {
+    return { success: false, error: "Only organizers can send invitations", code: "UNAUTHORIZED" };
   }
 
   const circle = await circleRepo.findById(circleId);
@@ -524,7 +527,7 @@ async function notifyHostCircleJoin(
 
   if (pendingApproval) {
     // Demande d'adhésion en attente → notifier les HOSTs
-    const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
+    const hosts = await prismaCircleRepository.findOrganizers(circleId);
     const hostUserIds = hosts.map((h) => h.userId);
     const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
 
@@ -567,5 +570,88 @@ async function notifyHostCircleJoin(
       }
     );
   }
+}
+
+export async function promoteToCoHostAction(
+  circleId: string,
+  targetUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const hostUserId = session.user.id;
+
+  return toActionResult(async () => {
+    const t = await getTranslations("Email.coHostPromoted");
+    await promoteToCoHost(
+      { circleId, hostUserId, targetUserId },
+      {
+        circleRepository: prismaCircleRepository,
+        userRepository: prismaUserRepository,
+        emailService,
+        emailStrings: {
+          promotedBy: async ({ inviterName, circleName }) => ({
+            subject: t("subject", { circleName }),
+            heading: t("heading", { circleName }),
+            intro: t("intro", { inviterName }),
+            rightsTitle: t("rightsTitle"),
+            rightCreateEvents: t("rightCreateEvents"),
+            rightManageRegistrations: t("rightManageRegistrations"),
+            rightUpdateCircle: t("rightUpdateCircle"),
+            rightBroadcast: t("rightBroadcast"),
+            rightReceiveNotifications: t("rightReceiveNotifications"),
+            limitsNote: t("limitsNote"),
+            ctaLabel: t("ctaLabel"),
+            footer: t("footer"),
+            leaveLink: t("leaveLink"),
+          }),
+        },
+      }
+    );
+
+    invalidateDashboardCache(hostUserId);
+    invalidateDashboardCache(targetUserId);
+  });
+}
+
+export async function demoteFromCoHostAction(
+  circleId: string,
+  targetUserId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const hostUserId = session.user.id;
+
+  return toActionResult(async () => {
+    const t = await getTranslations("Email.coHostDemoted");
+    await demoteFromCoHost(
+      { circleId, hostUserId, targetUserId },
+      {
+        circleRepository: prismaCircleRepository,
+        userRepository: prismaUserRepository,
+        emailService,
+        emailStrings: {
+          demoted: async ({ circleName }) => ({
+            subject: t("subject", { circleName }),
+            heading: t("heading", { circleName }),
+            intro: t("intro", { circleName }),
+            newRoleLabel: t("newRoleLabel"),
+            registrationsNote: t("registrationsNote"),
+            ctaLabel: t("ctaLabel"),
+            footer: t("footer"),
+            preferencesLink: t("preferencesLink"),
+          }),
+        },
+      }
+    );
+
+    invalidateDashboardCache(hostUserId);
+    invalidateDashboardCache(targetUserId);
+  });
 }
 

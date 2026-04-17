@@ -3,7 +3,7 @@ import { cancelRegistration } from "@/domain/usecases/cancel-registration";
 import {
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  HostCannotCancelRegistrationError,
+  OrganizerCannotCancelRegistrationError,
 } from "@/domain/errors";
 import {
   createMockRegistrationRepository,
@@ -130,7 +130,7 @@ describe("CancelRegistration", () => {
   });
 
   describe("given a Host trying to cancel their registration", () => {
-    it("should throw HostCannotCancelRegistrationError", async () => {
+    it("should throw OrganizerCannotCancelRegistrationError", async () => {
       const registrationRepo = createMockRegistrationRepository({
         findById: vi.fn().mockResolvedValue(
           makeRegistration({ status: "REGISTERED" })
@@ -150,7 +150,7 @@ describe("CancelRegistration", () => {
           defaultInput,
           makeDeps({ registrationRepo, momentRepo, circleRepo })
         )
-      ).rejects.toThrow(HostCannotCancelRegistrationError);
+      ).rejects.toThrow(OrganizerCannotCancelRegistrationError);
     });
   });
 

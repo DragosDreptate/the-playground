@@ -131,7 +131,7 @@ export function RegistrationsList({
                 reg.user.email
               );
               const isWaitlisted = reg.status === "WAITLISTED";
-              const isHost = hostUserIds.has(reg.user.id);
+              const isOrganizer = hostUserIds.has(reg.user.id);
               return (
                 <div key={reg.id} className="flex items-center gap-3 py-2.5">
                   <UserAvatar
@@ -157,19 +157,19 @@ export function RegistrationsList({
                       </p>
                     )}
                   </div>
-                  {isHost && (
+                  {isOrganizer && (
                     <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
                       <Crown className="size-3" />
                       {tDashboard("role.host")}
                     </Badge>
                   )}
-                  {isWaitlisted && !isHost && (
+                  {isWaitlisted && !isOrganizer && (
                     <Badge variant="secondary" className="shrink-0 gap-1">
                       <Clock className="size-3" />
                       {t("registrations.status.waitlisted")}
                     </Badge>
                   )}
-                  {variant === "host" && !isHost && (
+                  {variant === "host" && !isOrganizer && (
                     <Button
                       variant="outline"
                       size="sm"

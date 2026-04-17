@@ -1,4 +1,5 @@
 import type { CircleMembership } from "@/domain/models/circle";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import {
   UnauthorizedCircleActionError,
@@ -22,12 +23,12 @@ export async function approveCircleMembership(
 ): Promise<CircleMembership> {
   const { circleRepository } = deps;
 
-  // 1. Vérifier que l'appelant est HOST du Circle
-  const hostMembership = await circleRepository.findMembership(
+  // 1. Vérifier que l'appelant est Organisateur ACTIF du Circle (HOST ou CO_HOST)
+  const callerMembership = await circleRepository.findMembership(
     input.circleId,
     input.hostUserId
   );
-  if (!hostMembership || hostMembership.role !== "HOST" || hostMembership.status !== "ACTIVE") {
+  if (!isActiveOrganizer(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, input.circleId);
   }
 

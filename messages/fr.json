@@ -247,6 +247,7 @@
     "noCirclesMember": "Vous n'êtes membre d'aucune communauté.",
     "role": {
       "host": "Organisateur",
+      "coHost": "Co-organisateur",
       "player": "Participant"
     },
     "pendingRequests": {
@@ -331,7 +332,7 @@
       "joined": "Membre",
       "pendingApproval": "Demande en cours de validation",
       "isMember": "Vous êtes membre",
-      "isHost": "Vous êtes organisateur",
+      "isOrganizer": "Vous êtes organisateur",
       "manageCircle": "Gérer cette communauté",
       "shareableLink": "Lien partageable",
       "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté",
@@ -343,6 +344,19 @@
       "description": "{name} perdra l'accès à cette communauté. Ses inscriptions aux événements à venir seront annulées automatiquement.",
       "confirm": "Retirer",
       "cancel": "Annuler"
+    },
+    "memberActions": {
+      "label": "Actions"
+    },
+    "promoteToCoHost": {
+      "action": "Promouvoir en co-organisateur",
+      "success": "{name} est désormais co-organisateur",
+      "error": "Impossible de promouvoir ce membre"
+    },
+    "demoteFromCoHost": {
+      "action": "Rétrograder en participant",
+      "success": "{name} est désormais participant",
+      "error": "Impossible de rétrograder ce co-organisateur"
     },
     "errors": {
       "notFound": "Communauté introuvable",
@@ -932,6 +946,31 @@
     "signOut": "Se déconnecter"
   },
   "Email": {
+    "coHostPromoted": {
+      "subject": "Vous êtes co-organisateur de {circleName}",
+      "heading": "Vous êtes co-organisateur de {circleName}",
+      "intro": "{inviterName} vient de vous promouvoir co-organisateur de sa Communauté. Vous pouvez désormais l'aider à gérer les événements et les membres.",
+      "rightsTitle": "Vos nouveaux droits",
+      "rightCreateEvents": "Créer et éditer des événements",
+      "rightManageRegistrations": "Gérer les inscriptions et la liste d'attente",
+      "rightUpdateCircle": "Modifier les paramètres de la Communauté",
+      "rightBroadcast": "Diffuser des messages à la Communauté",
+      "rightReceiveNotifications": "Recevoir les notifications d'Organisateur",
+      "limitsNote": "Seul le propriétaire peut supprimer la Communauté, gérer le compte Stripe ou promouvoir d'autres co-organisateurs.",
+      "ctaLabel": "Ouvrir le dashboard",
+      "footer": "Vous recevez cet email parce que vous avez été promu co-organisateur d'une Communauté dont vous êtes membre.",
+      "leaveLink": "Quitter la Communauté"
+    },
+    "coHostDemoted": {
+      "subject": "Votre rôle a changé dans {circleName}",
+      "heading": "Votre rôle a changé dans {circleName}",
+      "intro": "Vous n'êtes plus co-organisateur de {circleName}. Vous restez membre de la Communauté en tant que participant.",
+      "newRoleLabel": "Vous êtes désormais Participant",
+      "registrationsNote": "Vos inscriptions aux événements existants ne sont pas impactées. Vous continuez à recevoir les communications de la Communauté.",
+      "ctaLabel": "Voir la Communauté",
+      "footer": "Vous recevez cet email parce que votre rôle a changé dans une Communauté dont vous êtes membre.",
+      "preferencesLink": "Gérer mes préférences de notifications"
+    },
     "registration": {
       "subject": "Inscription confirmée : {momentTitle}",
       "heading": "Inscription confirmée !",
@@ -1472,6 +1511,7 @@
       "radar": "Le Radar",
       "share": "Partager l'événement",
       "members": "Gérer les membres",
+      "coHosts": "Co-organisateurs",
       "inviteMembers": "Inviter des membres",
       "approvalRegistrations": "Valider les inscriptions",
       "payments": "Activer les paiements"
@@ -1647,6 +1687,21 @@
         "title": "Gérer les membres de votre communauté",
         "intro": "Depuis la page de votre communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
         "outro": "Les membres rejoignent automatiquement votre communauté lorsqu'ils s'inscrivent à l'un de vos événements."
+      },
+      "coHosts": {
+        "title": "Partager la gestion avec des co-organisateurs",
+        "intro": "Vous pouvez déléguer la gestion de votre communauté à d'autres membres en les <strong>promouvant co-organisateurs</strong>. Un co-organisateur a presque les mêmes pouvoirs que vous, sauf les actions les plus sensibles qui restent réservées au propriétaire.",
+        "rightsIntro": "Un co-organisateur peut :",
+        "right1": "Créer, éditer, publier et supprimer des événements",
+        "right2": "Approuver ou rejeter les inscriptions et les demandes d'adhésion",
+        "right3": "Modifier les paramètres de la communauté et diffuser des messages aux membres",
+        "right4": "Recevoir les mêmes notifications que vous (nouvelles inscriptions, commentaires, etc.)",
+        "limitsIntro": "Seul le propriétaire peut :",
+        "limit1": "Supprimer la communauté",
+        "limit2": "Gérer le compte Stripe Connect (pour les événements payants)",
+        "limit3": "Promouvoir, rétrograder ou retirer un autre co-organisateur",
+        "howTo": "Pour promouvoir un membre : sur la page <strong>Membres</strong> de votre communauté, ouvrez le menu <strong>⋮</strong> à côté de son nom et cliquez sur <strong>Promouvoir en co-organisateur</strong>. La personne reçoit un email lui confirmant ses nouveaux droits, et peut immédiatement commencer à gérer la communauté.",
+        "demote": "Pour retirer les droits d'un co-organisateur, ouvrez le même menu et cliquez sur Rétrograder en participant. La personne reste membre de la communauté mais perd ses droits de gestion, et reçoit un email sobre l'informant du changement."
       },
       "inviteMembers": {
         "title": "Inviter des membres",

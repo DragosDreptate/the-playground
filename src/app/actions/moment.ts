@@ -24,6 +24,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 import { partitionMomentUpdateRecipients } from "./helpers/moment-update-recipients";
@@ -320,7 +321,7 @@ async function sendMomentUpdateEmails(
   const [circle, registrations, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(moment.circleId),
   ]);
   if (!circle) return;
 
@@ -444,10 +445,10 @@ export async function deleteMomentAction(
     }
 
     // Skip notifications only when admin moderates someone else's event.
-    const isHostOfEvent = momentToDelete
-      ? (await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))?.role === "HOST"
+    const isOrganizerOfEvent = momentToDelete
+      ? isActiveOrganizer(await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))
       : false;
-    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isHostOfEvent);
+    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isOrganizerOfEvent);
     if (shouldNotify) {
       sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
         (err) => Sentry.captureException(err)

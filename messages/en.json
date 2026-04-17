@@ -247,6 +247,7 @@
     "noCirclesMember": "You are not a member of any community yet.",
     "role": {
       "host": "Organizer",
+      "coHost": "Co-organizer",
       "player": "Member"
     },
     "pendingRequests": {
@@ -331,7 +332,7 @@
       "joined": "Member",
       "pendingApproval": "Request pending approval",
       "isMember": "You are a member",
-      "isHost": "You are an organizer",
+      "isOrganizer": "You are an organizer",
       "manageCircle": "Manage this community",
       "shareableLink": "Shareable link",
       "signInToSeeMembers": "Sign in to see the members of this community",
@@ -343,6 +344,19 @@
       "description": "{name} will lose access to this community. Their registrations for upcoming events will be automatically cancelled.",
       "confirm": "Remove",
       "cancel": "Cancel"
+    },
+    "memberActions": {
+      "label": "Actions"
+    },
+    "promoteToCoHost": {
+      "action": "Promote to co-organizer",
+      "success": "{name} is now a co-organizer",
+      "error": "Unable to promote this member"
+    },
+    "demoteFromCoHost": {
+      "action": "Demote to member",
+      "success": "{name} is now a member",
+      "error": "Unable to demote this co-organizer"
     },
     "errors": {
       "notFound": "Community not found",
@@ -932,6 +946,31 @@
     "signOut": "Sign out"
   },
   "Email": {
+    "coHostPromoted": {
+      "subject": "You're a co-organizer of {circleName}",
+      "heading": "You're a co-organizer of {circleName}",
+      "intro": "{inviterName} just promoted you to co-organizer of their Community. You can now help manage events and members.",
+      "rightsTitle": "Your new rights",
+      "rightCreateEvents": "Create and edit events",
+      "rightManageRegistrations": "Manage registrations and the waitlist",
+      "rightUpdateCircle": "Update Community settings",
+      "rightBroadcast": "Broadcast messages to the Community",
+      "rightReceiveNotifications": "Receive Organizer notifications",
+      "limitsNote": "Only the owner can delete the Community, manage the Stripe account, or promote other co-organizers.",
+      "ctaLabel": "Open dashboard",
+      "footer": "You're receiving this email because you were promoted to co-organizer of a Community you belong to.",
+      "leaveLink": "Leave the Community"
+    },
+    "coHostDemoted": {
+      "subject": "Your role changed in {circleName}",
+      "heading": "Your role changed in {circleName}",
+      "intro": "You are no longer a co-organizer of {circleName}. You remain a member of the Community.",
+      "newRoleLabel": "You are now a Member",
+      "registrationsNote": "Your existing event registrations are not affected. You continue to receive Community updates.",
+      "ctaLabel": "View Community",
+      "footer": "You're receiving this email because your role changed in a Community you belong to.",
+      "preferencesLink": "Manage my notification preferences"
+    },
     "registration": {
       "subject": "You've joined {momentTitle}",
       "heading": "Registration confirmed!",
@@ -1472,6 +1511,7 @@
       "radar": "The Radar",
       "share": "Share your event",
       "members": "Manage members",
+      "coHosts": "Co-organizers",
       "inviteMembers": "Invite members",
       "approvalRegistrations": "Approve registrations",
       "payments": "Enable payments"
@@ -1647,6 +1687,21 @@
         "title": "Manage community members",
         "intro": "From your community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
         "outro": "Members automatically join your community when they register for one of your events."
+      },
+      "coHosts": {
+        "title": "Share management with co-organizers",
+        "intro": "You can delegate community management to other members by <strong>promoting them to co-organizer</strong>. A co-organizer has almost all the same powers as you, except for a few sensitive actions that stay with the owner.",
+        "rightsIntro": "A co-organizer can:",
+        "right1": "Create, edit, publish and delete events",
+        "right2": "Approve or reject registrations and membership requests",
+        "right3": "Update community settings and broadcast messages to members",
+        "right4": "Receive the same notifications you do (new registrations, comments, etc.)",
+        "limitsIntro": "Only the owner can:",
+        "limit1": "Delete the community",
+        "limit2": "Manage the Stripe Connect account (for paid events)",
+        "limit3": "Promote, demote, or remove another co-organizer",
+        "howTo": "To promote a member: on the <strong>Members</strong> page of your community, open the <strong>⋮</strong> menu next to their name and click <strong>Promote to co-organizer</strong>. They'll receive an email confirming their new rights, and can immediately start helping you manage the community.",
+        "demote": "To revoke a co-organizer's rights, open the same menu and click Demote to member. The person remains a member of the community but loses their management rights, and receives a plain email informing them of the change."
       },
       "inviteMembers": {
         "title": "Invite members",

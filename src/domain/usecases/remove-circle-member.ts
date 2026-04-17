@@ -1,3 +1,4 @@
+import { isActiveOrganizer, isOrganizerRole } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
@@ -29,12 +30,12 @@ export async function removeCircleMember(
 ): Promise<RemoveCircleMemberResult> {
   const { circleRepository, registrationRepository } = deps;
 
-  // 1. Vérifie que l'appelant est HOST
+  // 1. Vérifie que l'appelant est Organisateur ACTIF (HOST ou CO_HOST)
   const callerMembership = await circleRepository.findMembership(
     input.circleId,
     input.hostUserId
   );
-  if (!callerMembership || callerMembership.role !== "HOST") {
+  if (!isActiveOrganizer(callerMembership)) {
     throw new UnauthorizedCircleActionError(input.hostUserId, input.circleId);
   }
 
@@ -52,9 +53,16 @@ export async function removeCircleMember(
     throw new NotMemberOfCircleError(input.circleId);
   }
 
-  // 4. On ne peut pas retirer un HOST via cette action
-  if (targetMembership.role === "HOST") {
-    throw new CannotRemoveHostError();
+  // 4. Matrice de retrait (D10 / D11) :
+  //    - HOST peut retirer un CO_HOST et un PLAYER (pas un autre HOST — impossible par contrainte DB)
+  //    - CO_HOST peut retirer uniquement un PLAYER (pas un autre CO_HOST ni un HOST)
+  if (isOrganizerRole(targetMembership.role)) {
+    if (callerMembership!.role !== "HOST") {
+      throw new CannotRemoveHostError();
+    }
+    if (targetMembership.role === "HOST") {
+      throw new CannotRemoveHostError();
+    }
   }
 
   // 5. Annule les inscriptions actives à venir (REGISTERED + WAITLIST)

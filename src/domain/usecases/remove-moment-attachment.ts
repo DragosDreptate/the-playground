@@ -1,3 +1,4 @@
+import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentAttachmentRepository } from "@/domain/ports/repositories/moment-attachment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -41,7 +42,7 @@ export async function removeMomentAttachment(
     moment.circleId,
     input.userId
   );
-  if (!membership || membership.role !== "HOST") {
+  if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedMomentActionError();
   }
 

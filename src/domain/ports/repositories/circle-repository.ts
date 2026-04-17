@@ -98,12 +98,18 @@ export interface CircleRepository {
   slugExists(slug: string): Promise<boolean>;
   addMembership(circleId: string, userId: string, role: CircleMemberRole, status?: MembershipStatus): Promise<CircleMembership>;
   updateMembershipStatus(circleId: string, userId: string, status: MembershipStatus): Promise<CircleMembership>;
+  updateMembershipRole(circleId: string, userId: string, role: CircleMemberRole): Promise<CircleMembership>;
   findPendingMemberships(circleId: string): Promise<CircleMemberWithUser[]>;
   countPendingMemberships(circleId: string): Promise<number>;
   findAllByUserId(userId: string): Promise<CircleWithRole[]>;
   findAllByUserIdWithStats(userId: string): Promise<DashboardCircle[]>;
   findMembership(circleId: string, userId: string): Promise<CircleMembership | null>;
   findMembersByRole(circleId: string, role: CircleMemberRole): Promise<CircleMemberWithUser[]>;
+  /**
+   * Renvoie les Organisateurs ACTIFS d'un Circle (HOST + CO_HOST, status ACTIVE).
+   * Remplace les appels `findMembersByRole(circleId, "HOST")` côté notifications et affichage.
+   */
+  findOrganizers(circleId: string): Promise<CircleMemberWithUser[]>;
   countMembers(circleId: string): Promise<number>;
   countMoments(circleId: string): Promise<number>;
   /** Renvoie une Map circleId → nombre de membres pour une liste de Circles (une seule requête GROUP BY). */

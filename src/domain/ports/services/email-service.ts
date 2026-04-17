@@ -393,6 +393,50 @@ export type OnboardingWelcomeEmailData = {
   firstName: string | null;
 };
 
+// --- Co-host role changes (D19) ---
+
+export type CoHostPromotedEmailData = {
+  to: string;
+  recipientName: string;
+  inviterName: string;
+  circleName: string;
+  circleSlug: string;
+  circleCoverImage: string | null;
+  strings: {
+    subject: string;
+    heading: string;
+    intro: string;
+    rightsTitle: string;
+    rightCreateEvents: string;
+    rightManageRegistrations: string;
+    rightUpdateCircle: string;
+    rightBroadcast: string;
+    rightReceiveNotifications: string;
+    limitsNote: string;
+    ctaLabel: string;
+    footer: string;
+    leaveLink: string;
+  };
+};
+
+export type CoHostDemotedEmailData = {
+  to: string;
+  recipientName: string;
+  circleName: string;
+  circleSlug: string;
+  circleCoverImage: string | null;
+  strings: {
+    subject: string;
+    heading: string;
+    intro: string;
+    newRoleLabel: string;
+    registrationsNote: string;
+    ctaLabel: string;
+    footer: string;
+    preferencesLink: string;
+  };
+};
+
 // --- Port interface ---
 
 export interface EmailService {
@@ -421,4 +465,6 @@ export interface EmailService {
   sendApprovalNotification(data: ApprovalNotificationEmailData): Promise<void>;
   sendHostPaidCancellation(data: HostPaidCancellationEmailData): Promise<void>;
   sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
+  sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void>;
+  sendCoHostDemoted(data: CoHostDemotedEmailData): Promise<void>;
 }

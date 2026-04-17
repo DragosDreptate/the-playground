@@ -67,7 +67,7 @@ type HostViewProps = CommonProps & {
 type PublicViewProps = CommonProps & {
   variant: "public";
   isAuthenticated: boolean;
-  isHost: boolean;
+  isOrganizer: boolean;
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
@@ -191,6 +191,13 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
 export async function MomentDetailView(props: MomentDetailViewProps) {
   const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments } =
     props;
+  // "Organisé par" affiche le créateur de l'événement (HOST ou CO_HOST).
+  // Si le créateur n'est plus organisateur (rétrogradé / parti), on retombe sur le HOST principal.
+  // On garde `hosts` complet pour les autres usages (exclusions notifications, hostUserIds...).
+  const creator = moment.createdById
+    ? hosts.find((h) => h.user.id === moment.createdById)
+    : null;
+  const primaryHosts = creator ? [creator] : hosts.filter((h) => h.role === "HOST");
   const isHostView = props.variant === "host";
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
   const isAuthenticated = isHostView || (props as PublicViewProps).isAuthenticated;
@@ -280,10 +287,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* "Organisé par" + actions Host */}
           <div className="flex items-center justify-between gap-4">
-            {hosts.length > 0 && (
+            {primaryHosts.length > 0 && (
               <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
                 {t("public.hostedBy")}{" "}
-                {hosts.map((h, i) => (
+                {primaryHosts.map((h, i) => (
                   <span key={h.user.id} className="flex items-center gap-1">
                     {isAuthenticated && h.user.publicId ? (
                       <Link
@@ -302,7 +309,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                         {tCommon("you")}
                       </Badge>
                     )}
-                    {i < hosts.length - 1 && <span>,</span>}
+                    {i < primaryHosts.length - 1 && <span>,</span>}
                   </span>
                 ))}
               </p>
@@ -320,7 +327,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 <DeleteMomentDialog momentId={moment.id} circleSlug={props.circleSlug} />
               </div>
             )}
-            {!isHostView && props.isHost && (
+            {!isHostView && props.isOrganizer && (
               <Button asChild size="sm" className="shrink-0 gap-1.5">
                 <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
                   <ExternalLink className="size-3.5" />
@@ -604,7 +611,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 isFull={props.isFull}
                 spotsRemaining={props.spotsRemaining}
                 registrationCount={registeredCount}
-                isHost={props.isHost}
+                isOrganizer={props.isOrganizer}
                 calendarData={props.calendarData}
                 appUrl={props.appUrl}
                 waitlistPosition={props.waitlistPosition}
@@ -761,7 +768,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             momentId={moment.id}
             comments={props.comments}
             currentUserId={props.currentUserId}
-            isHost={isHostView || (!isHostView && (props as PublicViewProps).isHost)}
+            isOrganizer={isHostView || (!isHostView && (props as PublicViewProps).isOrganizer)}
             isPastMoment={moment.status === "PAST"}
             signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
           />

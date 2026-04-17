@@ -8,6 +8,9 @@ export {
   CannotRemoveHostError,
   CannotRemoveSelfError,
   MembershipNotPendingError,
+  CannotPromotePendingMemberError,
+  InvalidPromotionTargetError,
+  InvalidDemotionTargetError,
 } from "./circle-errors";
 export {
   MomentNotFoundError,
@@ -41,7 +44,7 @@ export {
   AlreadyRegisteredError,
   RegistrationNotFoundError,
   UnauthorizedRegistrationActionError,
-  HostCannotCancelRegistrationError,
+  OrganizerCannotCancelRegistrationError,
   CannotRemoveHostRegistrationError,
   RegistrationNotPendingApprovalError,
 } from "./registration-errors";
