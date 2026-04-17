@@ -44,7 +44,7 @@ export default async function MomentDetailPage({
   // Parallélise membership + hosts + registration (indépendants)
   const [membership, hosts, userRegistration] = await Promise.all([
     circleRepo.findMembership(circle.id, session.user.id),
-    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaCircleRepository.findOrganizers(circle.id),
     prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 

@@ -187,7 +187,7 @@ async function sendCommentNotifications(
   // Récupère inscrits actifs et hosts en parallèle
   const [registrations, hosts] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(moment.circleId),
   ]);
 
   // Combine inscrits + hosts, déduplique par userId

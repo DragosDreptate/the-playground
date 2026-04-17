@@ -525,7 +525,7 @@ async function notifyHostCircleJoin(
 
   if (pendingApproval) {
     // Demande d'adhésion en attente → notifier les HOSTs
-    const hosts = await prismaCircleRepository.findMembersByRole(circleId, "HOST");
+    const hosts = await prismaCircleRepository.findOrganizers(circleId);
     const hostUserIds = hosts.map((h) => h.userId);
     const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
 

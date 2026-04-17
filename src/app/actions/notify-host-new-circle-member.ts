@@ -21,7 +21,7 @@ export async function notifyHostNewCircleMember(
   }
 ): Promise<void> {
   const [hosts, memberCount] = await Promise.all([
-    prismaCircleRepository.findMembersByRole(circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(circleId),
     prismaCircleRepository.countMembers(circleId),
   ]);
 

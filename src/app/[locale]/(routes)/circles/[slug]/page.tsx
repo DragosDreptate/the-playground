@@ -131,7 +131,7 @@ export default async function PublicCirclePage({
     Promise<import("@/domain/models/circle").MembershipStatus | null>,
     ReturnType<typeof prismaCircleRepository.findMembersByRole>,
   ] = [
-    prismaCircleRepository.findMembersByRole(circle.id, "HOST"),
+    prismaCircleRepository.findOrganizers(circle.id),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
     getCircleMoments(
       circle.id,

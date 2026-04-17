@@ -120,7 +120,7 @@ export default async function PublicMomentPage({
     await measureTime("moment-page:data", () =>
       Promise.all([
         getCircle(moment.circleId),
-        prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+        prismaCircleRepository.findOrganizers(moment.circleId),
         isAuthenticated
           ? getUserRegistration(
               { momentId: moment.id, userId: session!.user!.id! },

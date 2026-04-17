@@ -163,7 +163,7 @@ async function sendHostPaidCancellationEmail(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const hosts = await prismaCircleRepository.findMembersByRole(circle.id, "HOST");
+  const hosts = await prismaCircleRepository.findOrganizers(circle.id);
   if (hosts.length === 0) return;
 
   const locale = await getLocale();
@@ -292,7 +292,7 @@ export async function sendRegistrationEmails(
 
   // Send notification to each Host of the Circle (skip if host = player)
   const [hosts, registeredCount] = await Promise.all([
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(moment.circleId),
     prismaRegistrationRepository.countByMomentIdAndStatus(momentId, "REGISTERED"),
   ]);
 
@@ -604,7 +604,7 @@ async function notifyHostsPendingApproval(
 
   const [circle, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(moment.circleId),
   ]);
   if (!circle) return;
 

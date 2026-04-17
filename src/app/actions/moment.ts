@@ -321,7 +321,7 @@ async function sendMomentUpdateEmails(
   const [circle, registrations, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
-    prismaCircleRepository.findMembersByRole(moment.circleId, "HOST"),
+    prismaCircleRepository.findOrganizers(moment.circleId),
   ]);
   if (!circle) return;
 
