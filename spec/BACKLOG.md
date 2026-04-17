@@ -11,13 +11,115 @@
 
 ## Table des matières
 
-1. [Fait (livré)](#fait-livré)
-2. [À faire — Produit](#à-faire--produit)
-3. [À faire — Infrastructure & Qualité](#à-faire--infrastructure--qualité)
-4. [Phase 2 (post-MVP)](#phase-2-post-mvp)
-5. [Bugs connus](#bugs-connus)
-6. [Améliorations futures — Stripe](#améliorations-futures--stripe)
+1. [À faire — Produit](#à-faire--produit)
+2. [À faire — Infrastructure & Qualité](#à-faire--infrastructure--qualité)
+3. [Phase 2 (post-MVP)](#phase-2-post-mvp)
+4. [Bugs connus](#bugs-connus)
+5. [Améliorations futures — Stripe](#améliorations-futures--stripe)
+6. [Fait (livré)](#fait-livré)
 7. [Décisions clés](#décisions-clés)
+
+---
+
+## À faire — Produit
+
+> Référence UX complète : `spec/product/ux-parcours-jtbd.md` (8 personas, 25 JTBD, 7 parcours, matrice gaps).
+
+### Haute priorité — Rétention & croissance
+
+| # | Feature | Contexte | Gap |
+| --- | --- | --- | --- |
+| P-01 | **Rappel 1h avant événement** | Infra 24h en place (cron, template, batch). Ajout incrémental : champ `reminder1hSentAt`, fenêtre 50min-70min. | — |
+| P-02 | **CTA "Créer le prochain événement" depuis un événement PAST** | Vue Organisateur événement passé : bouton "Programmer le prochain événement" (pré-remplir même Communauté). Capitaliser sur l'élan post-événement. | H-2 |
+| P-03 | **Guide onboarding Organisateur** | Stepper 3 étapes (Créer Communauté → Créer événement → Partager le lien). Objectif : time-to-first-event < 5 min. La welcome page oriente déjà, mais sans guide pas-à-pas. | H-7 |
+
+### Moyenne priorité
+
+| # | Feature | Contexte | Spec |
+| --- | --- | --- | --- |
+| P-05 | **Co-Organisateurs** | Plusieurs Organisateurs par Communauté. Nécessite un modèle de permissions. | `spec/features/co-organisateurs.md` |
+| P-06 | **Export données Organisateur étendu** | CSV membres Communauté, historique événements, inscrits cumulés. L'export CSV inscrits par événement existe déjà. | — |
+| P-07 | **Assistant IA basique** | Description événement, email invitation, suggestions Communauté. SDK Anthropic (Claude). | — |
+| P-08 | **Stats Communauté basiques** | Métriques sur la page Communauté Organisateur (tendance membres, taux de remplissage, etc.). | — |
+| P-09 | **Notification désinscription (opt-in Organisateur)** | Option dans le profil Organisateur pour recevoir (ou non) une notification quand un Participant se désinscrit d'un événement gratuit. Actuellement seuls les événements payants notifient l'Organisateur. Alignement Meetup (qui notifie systématiquement). | — |
+| P-10 | **Refonte UX édition d'événement : transitions de statut via actions contextuelles** | Aujourd'hui le formulaire d'édition expose un combobox de statut. Avec l'ajout de `PROPOSED`, chaque transition a des side-effects distincts (archivage commentaires, reset votes, envoi d'emails, refunds Stripe). Remplacer le combobox par des boutons d'action contextuels propres à chaque statut courant du Moment (ex. `DRAFT` → boutons "Publier" / "Proposer au vote" / "Annuler" ; `PUBLISHED` → "Annuler l'événement"). Voir recommandation dans `spec/features/moment-proposed-vote.md`. | — |
+
+---
+
+## À faire — Infrastructure & Qualité
+
+| # | Feature | Contexte | Spec |
+| --- | --- | --- | --- |
+| I-01 | **Stratégie migrations DB + rollback prod** | Passer de `db:push` à `prisma migrate`. `db:push` peut silencieusement supprimer des données en prod (drop+recreate sur renommage). Snapshot Neon + PITR comme filet. | `spec/infra/db-migration-rollback-strategy.md` |
+| I-02 | **Corriger vulnérabilités dépendances** | `pnpm audit` remontait 6 high + 5 moderate (état 2026-02-27). À réévaluer. | — |
+| I-03 | **Pre-commit hooks (Husky + lint-staged)** | Aucun hook git local — erreurs TS/lint détectées uniquement en CI. Hook `pre-commit` + `commit-msg`. | — |
+| I-04 | **Retirer \****`unsafe-eval`**\*\* du CSP** | `script-src` inclut `'unsafe-eval'`. Solution : nonces CSP via middleware Next.js. | — |
+| I-05 | **CI : \****`pnpm audit --audit-level=high`**\*\* gate bloquant** | Gate manquant en CI. | — |
+| I-06 | **CI : Tests d'intégration** | Job dédié avec service PostgreSQL GitHub Actions. | — |
+| I-07 | **CI : Lighthouse CI** | Pages clés (`/m/[slug]`, `/`). Seuils : Performance ≥ 90, A11y ≥ 90. | — |
+| I-08 | **Rate limiting actions sensibles** | Aucune protection anti-abus. Solution : Upstash Rate Limit. Limites : 10 inscriptions/min/IP, 5 créations/heure/user. | — |
+| I-09 | **Accessibilité axe-core dans Playwright** | Intégrer axe-core dans les tests E2E existants. | — |
+| I-10 | **Bundle analyzer** | `@next/bundle-analyzer`. Aucune visibilité sur la taille du bundle JS. | — |
+| I-11 | **Diagramme d'architecture** | L'architecture hexagonale est documentée textuellement (CLAUDE.md) mais sans schéma visuel. C4 niveau 2 dans `spec/architecture.md`. | — |
+| I-12 | **Test unitaire \****`joinCircleDirectly`** | Fichier de test dédié manquant. | — |
+| I-13 | **E2E : rejoindre Communauté directement** | Parcours `JoinCircleButton` (sans événement) non couvert en E2E. | — |
+
+---
+
+## Phase 2 (post-MVP)
+
+### Performance DB
+
+- [x] **Migrer vers le driver WebSocket Neon** (`@neondatabase/serverless` Pool mode)
+  - Connexions TCP concurrentes sur cold start Vercel causent 650-750ms d'attente
+  - WebSocket = HTTP upgrade, plus rapide, conçu pour Vercel Serverless + Neon
+  - Pré-requis : baseline propre post React.cache() (déjà en place)
+
+### Fonctionnalités produit
+
+- [ ] **Track** — Série d'événements récurrents dans une Communauté (retiré du MVP v1)
+- [ ] **Check-in** — Marquer présent sur place (retiré du MVP v1)
+- [ ] **Galerie photos post-événement** — Upload par Participants et Organisateur après un événement PAST. Galerie sur `/m/[slug]` et page Communauté. Modération par l'Organisateur. CTA "Voir les photos" dans l'email post-événement. Infrastructure `StorageService` (Vercel Blob) déjà en place.
+- [ ] **Dupliquer un événement** — Bouton "Dupliquer" sur un événement existant pour pré-remplir le formulaire de création avec les mêmes infos (titre, lieu, description, capacité, prix). Gain de temps pour les événements récurrents similaires.
+- [ ] **Statut "Proposé" + vote Communauté** — Nouveau statut d'événement `PROPOSED` (en plus de `DRAFT`, `PUBLISHED`, `PAST`), visible uniquement des Membres `ACTIVE` de la Communauté. Permet aux Membres de voter (pour / contre / peut-être) sur la proposition (lieu, date, description) afin de guider l'Organisateur dans sa décision de publier ou de modifier. Objectif : recueillir un feedback en amont, impliquer les Membres, réduire le risque qu'un événement publié ne corresponde pas aux attentes. Sens du workflow : `DRAFT → PROPOSED → PUBLISHED` (avec retour possible à `DRAFT` pour modification). Spec : `spec/features/moment-proposed-vote.md`
+- [ ] **API publique v1** — Permettre aux organisateurs de créer/gérer des événements et récupérer les données via API REST + webhooks sortants. Débloque les intégrations avec des systèmes internes (automatisation, CRM, bots). Spec : `spec/features/public-api-v1.md`
+- [ ] **Plan Pro** — Analytics avancés, branding personnalisé, IA avancée, API, notifications multi-canal
+- [x] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
+- [ ] **White-label / mono-community** — `spec/product/white-label-mono-community.md`
+
+### Qualité & Sécurité
+
+- [ ] **Visual regression testing** (Chromatic/Percy)
+- [ ] **SAST complet** (Snyk/SonarCloud) — le DAST ZAP baseline est déjà en CI
+- [ ] **Load testing** (k6/Artillery) — uniquement en phase pré-lancement
+- [ ] **Pentest externe** — pré-lancement
+
+---
+
+## Bugs connus
+
+| # | Description | Statut | Détail |
+| --- | --- | --- | --- |
+| B-01 | OAuth Google bloquée depuis les navigateurs in-app (Instagram, WhatsApp, Facebook) | **Workaround utilisateur** | Google refuse les WebViews (`Error 403: disallowed_useragent`). Fix possible : détecter le user-agent et afficher un message explicatif sur `/auth/error`. |
+| B-04 | Page `/changelog` uniquement en français | **Ouvert** | Contenu de `CHANGELOG.md` rédigé en FR uniquement. Fix possible : deux fichiers FR/EN, ou afficher le même contenu FR (acceptable pour un changelog technique). |
+
+> **Résolus** : B-02 (RangeError changelog, `3fd5a2b`), B-03 (OAuth `redirect_uri_mismatch`, config Vercel `AUTH_URL`).
+
+---
+
+## Améliorations futures — Stripe / Événements payants
+
+> Issues identifiées pendant l'implémentation Stripe Connect (mars 2026). Non bloquantes pour le MVP.
+
+| # | Sujet | Détail |
+| --- | --- | --- |
+| S-01 | Redesign bloc CTA + Participants | Dédupliquer les stats (inscrits + places) entre le bloc CTA et le bloc Participants. Intégrer la mention de politique de remboursement. |
+| S-02 | Section Paiements à la création de Communauté | Afficher la section "Paiements" en mode désactivé sur la page de création (message : "Disponible après la création"). |
+| ~~S-03~~ | ~~Banner vert confirmation inscription~~ | Résolu : banner redesigné en style card (`bg-card`) avec icône check emerald. |
+| S-04 | Sécuriser checkout-return URL | Remplacer `userId`/`momentId` dans les query params par le Stripe Checkout Session ID. Récupérer les metadata côté serveur. |
+| S-05 | Renommer `isDemoEmail` | Le nom est trompeur (filtre aussi `@test.playground`). Renommer en `isFilteredEmail` ou `isNonDeliverableEmail`. |
+| S-06 | Frais Stripe non rembours��s | Stripe ne rembourse pas ses frais (~0,59€/transaction). Si abus, ajouter limite temporelle (ex: remboursable jusqu'à 24h avant). |
+| S-07 | Guard payant + approbation | Interdire la combinaison `price > 0 AND requiresApproval=true`. Le webhook crée REGISTERED directement, bypass l'approbation. Court terme : guard dans `createMoment`. |
 
 ---
 
@@ -248,108 +350,6 @@
 | 16 specs E2E Playwright (auth, join, host-flow, cancel, comments, onboarding, waitlist, explore, dashboard-mode, broadcast, circle-invite, approval, network, attachments, public-profiles, stripe-payment) | — | — |
 | Infrastructure E2E : globalSetup + globalTeardown (nettoyage `@test.playground`) | — | — |
 | Audit sécurité complet | — | `spec/docs/security/AUDIT-2026-04-01.md` |
-
----
-
-## À faire — Produit
-
-> Référence UX complète : `spec/product/ux-parcours-jtbd.md` (8 personas, 25 JTBD, 7 parcours, matrice gaps).
-
-### Haute priorité — Rétention & croissance
-
-| # | Feature | Contexte | Gap |
-| --- | --- | --- | --- |
-| P-01 | **Rappel 1h avant événement** | Infra 24h en place (cron, template, batch). Ajout incrémental : champ `reminder1hSentAt`, fenêtre 50min-70min. | — |
-| P-02 | **CTA "Créer le prochain événement" depuis un événement PAST** | Vue Organisateur événement passé : bouton "Programmer le prochain événement" (pré-remplir même Communauté). Capitaliser sur l'élan post-événement. | H-2 |
-| P-03 | **Guide onboarding Organisateur** | Stepper 3 étapes (Créer Communauté → Créer événement → Partager le lien). Objectif : time-to-first-event < 5 min. La welcome page oriente déjà, mais sans guide pas-à-pas. | H-7 |
-
-### Moyenne priorité
-
-| # | Feature | Contexte | Spec |
-| --- | --- | --- | --- |
-| P-05 | **Co-Organisateurs** | Plusieurs Organisateurs par Communauté. Nécessite un modèle de permissions. | `spec/features/co-organisateurs.md` |
-| P-06 | **Export données Organisateur étendu** | CSV membres Communauté, historique événements, inscrits cumulés. L'export CSV inscrits par événement existe déjà. | — |
-| P-07 | **Assistant IA basique** | Description événement, email invitation, suggestions Communauté. SDK Anthropic (Claude). | — |
-| P-08 | **Stats Communauté basiques** | Métriques sur la page Communauté Organisateur (tendance membres, taux de remplissage, etc.). | — |
-| P-09 | **Notification désinscription (opt-in Organisateur)** | Option dans le profil Organisateur pour recevoir (ou non) une notification quand un Participant se désinscrit d'un événement gratuit. Actuellement seuls les événements payants notifient l'Organisateur. Alignement Meetup (qui notifie systématiquement). | — |
-| P-10 | **Refonte UX édition d'événement : transitions de statut via actions contextuelles** | Aujourd'hui le formulaire d'édition expose un combobox de statut. Avec l'ajout de `PROPOSED`, chaque transition a des side-effects distincts (archivage commentaires, reset votes, envoi d'emails, refunds Stripe). Remplacer le combobox par des boutons d'action contextuels propres à chaque statut courant du Moment (ex. `DRAFT` → boutons "Publier" / "Proposer au vote" / "Annuler" ; `PUBLISHED` → "Annuler l'événement"). Voir recommandation dans `spec/features/moment-proposed-vote.md`. | — |
-
----
-
-## À faire — Infrastructure & Qualité
-
-| # | Feature | Contexte | Spec |
-| --- | --- | --- | --- |
-| I-01 | **Stratégie migrations DB + rollback prod** | Passer de `db:push` à `prisma migrate`. `db:push` peut silencieusement supprimer des données en prod (drop+recreate sur renommage). Snapshot Neon + PITR comme filet. | `spec/infra/db-migration-rollback-strategy.md` |
-| I-02 | **Corriger vulnérabilités dépendances** | `pnpm audit` remontait 6 high + 5 moderate (état 2026-02-27). À réévaluer. | — |
-| I-03 | **Pre-commit hooks (Husky + lint-staged)** | Aucun hook git local — erreurs TS/lint détectées uniquement en CI. Hook `pre-commit` + `commit-msg`. | — |
-| I-04 | **Retirer \****`unsafe-eval`**\*\* du CSP** | `script-src` inclut `'unsafe-eval'`. Solution : nonces CSP via middleware Next.js. | — |
-| I-05 | **CI : \****`pnpm audit --audit-level=high`**\*\* gate bloquant** | Gate manquant en CI. | — |
-| I-06 | **CI : Tests d'intégration** | Job dédié avec service PostgreSQL GitHub Actions. | — |
-| I-07 | **CI : Lighthouse CI** | Pages clés (`/m/[slug]`, `/`). Seuils : Performance ≥ 90, A11y ≥ 90. | — |
-| I-08 | **Rate limiting actions sensibles** | Aucune protection anti-abus. Solution : Upstash Rate Limit. Limites : 10 inscriptions/min/IP, 5 créations/heure/user. | — |
-| I-09 | **Accessibilité axe-core dans Playwright** | Intégrer axe-core dans les tests E2E existants. | — |
-| I-10 | **Bundle analyzer** | `@next/bundle-analyzer`. Aucune visibilité sur la taille du bundle JS. | — |
-| I-11 | **Diagramme d'architecture** | L'architecture hexagonale est documentée textuellement (CLAUDE.md) mais sans schéma visuel. C4 niveau 2 dans `spec/architecture.md`. | — |
-| I-12 | **Test unitaire \****`joinCircleDirectly`** | Fichier de test dédié manquant. | — |
-| I-13 | **E2E : rejoindre Communauté directement** | Parcours `JoinCircleButton` (sans événement) non couvert en E2E. | — |
-
----
-
-## Phase 2 (post-MVP)
-
-### Performance DB
-
-- [x] **Migrer vers le driver WebSocket Neon** (`@neondatabase/serverless` Pool mode)
-  - Connexions TCP concurrentes sur cold start Vercel causent 650-750ms d'attente
-  - WebSocket = HTTP upgrade, plus rapide, conçu pour Vercel Serverless + Neon
-  - Pré-requis : baseline propre post React.cache() (déjà en place)
-
-### Fonctionnalités produit
-
-- [ ] **Track** — Série d'événements récurrents dans une Communauté (retiré du MVP v1)
-- [ ] **Check-in** — Marquer présent sur place (retiré du MVP v1)
-- [ ] **Galerie photos post-événement** — Upload par Participants et Organisateur après un événement PAST. Galerie sur `/m/[slug]` et page Communauté. Modération par l'Organisateur. CTA "Voir les photos" dans l'email post-événement. Infrastructure `StorageService` (Vercel Blob) déjà en place.
-- [ ] **Dupliquer un événement** — Bouton "Dupliquer" sur un événement existant pour pré-remplir le formulaire de création avec les mêmes infos (titre, lieu, description, capacité, prix). Gain de temps pour les événements récurrents similaires.
-- [ ] **Statut "Proposé" + vote Communauté** — Nouveau statut d'événement `PROPOSED` (en plus de `DRAFT`, `PUBLISHED`, `PAST`), visible uniquement des Membres `ACTIVE` de la Communauté. Permet aux Membres de voter (pour / contre / peut-être) sur la proposition (lieu, date, description) afin de guider l'Organisateur dans sa décision de publier ou de modifier. Objectif : recueillir un feedback en amont, impliquer les Membres, réduire le risque qu'un événement publié ne corresponde pas aux attentes. Sens du workflow : `DRAFT → PROPOSED → PUBLISHED` (avec retour possible à `DRAFT` pour modification). Spec : `spec/features/moment-proposed-vote.md`
-- [ ] **API publique v1** — Permettre aux organisateurs de créer/gérer des événements et récupérer les données via API REST + webhooks sortants. Débloque les intégrations avec des systèmes internes (automatisation, CRM, bots). Spec : `spec/features/public-api-v1.md`
-- [ ] **Plan Pro** — Analytics avancés, branding personnalisé, IA avancée, API, notifications multi-canal
-- [x] **Suppression lien d'invitation** — Remplacer le système de token par email uniquement — `spec/features/remove-invite-token.md`
-- [ ] **White-label / mono-community** — `spec/product/white-label-mono-community.md`
-
-### Qualité & Sécurité
-
-- [ ] **Visual regression testing** (Chromatic/Percy)
-- [ ] **SAST complet** (Snyk/SonarCloud) — le DAST ZAP baseline est déjà en CI
-- [ ] **Load testing** (k6/Artillery) — uniquement en phase pré-lancement
-- [ ] **Pentest externe** — pré-lancement
-
----
-
-## Bugs connus
-
-| # | Description | Statut | Détail |
-| --- | --- | --- | --- |
-| B-01 | OAuth Google bloquée depuis les navigateurs in-app (Instagram, WhatsApp, Facebook) | **Workaround utilisateur** | Google refuse les WebViews (`Error 403: disallowed_useragent`). Fix possible : détecter le user-agent et afficher un message explicatif sur `/auth/error`. |
-| B-04 | Page `/changelog` uniquement en français | **Ouvert** | Contenu de `CHANGELOG.md` rédigé en FR uniquement. Fix possible : deux fichiers FR/EN, ou afficher le même contenu FR (acceptable pour un changelog technique). |
-
-> **Résolus** : B-02 (RangeError changelog, `3fd5a2b`), B-03 (OAuth `redirect_uri_mismatch`, config Vercel `AUTH_URL`).
-
----
-
-## Améliorations futures — Stripe / Événements payants
-
-> Issues identifiées pendant l'implémentation Stripe Connect (mars 2026). Non bloquantes pour le MVP.
-
-| # | Sujet | Détail |
-| --- | --- | --- |
-| S-01 | Redesign bloc CTA + Participants | Dédupliquer les stats (inscrits + places) entre le bloc CTA et le bloc Participants. Intégrer la mention de politique de remboursement. |
-| S-02 | Section Paiements à la création de Communauté | Afficher la section "Paiements" en mode désactivé sur la page de création (message : "Disponible après la création"). |
-| ~~S-03~~ | ~~Banner vert confirmation inscription~~ | Résolu : banner redesigné en style card (`bg-card`) avec icône check emerald. |
-| S-04 | Sécuriser checkout-return URL | Remplacer `userId`/`momentId` dans les query params par le Stripe Checkout Session ID. Récupérer les metadata côté serveur. |
-| S-05 | Renommer `isDemoEmail` | Le nom est trompeur (filtre aussi `@test.playground`). Renommer en `isFilteredEmail` ou `isNonDeliverableEmail`. |
-| S-06 | Frais Stripe non rembours��s | Stripe ne rembourse pas ses frais (~0,59€/transaction). Si abus, ajouter limite temporelle (ex: remboursable jusqu'à 24h avant). |
-| S-07 | Guard payant + approbation | Interdire la combinaison `price > 0 AND requiresApproval=true`. Le webhook crée REGISTERED directement, bypass l'approbation. Court terme : guard dans `createMoment`. |
 
 ---
 
