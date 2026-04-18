@@ -141,12 +141,14 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
             type="email"
             placeholder={t("signIn.emailPlaceholder")}
             aria-invalid={emailState?.error === "INVALID_EMAIL" || undefined}
-            aria-describedby={emailState?.error === "INVALID_EMAIL" ? "email-error" : undefined}
+            aria-describedby={emailState?.error ? "email-error" : undefined}
             required
           />
-          {emailState?.error === "INVALID_EMAIL" && (
+          {emailState?.error && (
             <p id="email-error" className="text-sm text-destructive">
-              {t("signIn.invalidEmail")}
+              {emailState.error === "INVALID_EMAIL"
+                ? t("signIn.invalidEmail")
+                : t("signIn.sendFailed")}
             </p>
           )}
           <SubmitButton label={t("signIn.magicLink")} />
