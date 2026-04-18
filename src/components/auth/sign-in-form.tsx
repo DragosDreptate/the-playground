@@ -134,7 +134,7 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
           <Separator className="flex-1" />
         </div>
 
-        <form action={emailAction} className="space-y-3" noValidate>
+        <form action={emailAction} className="space-y-3">
           {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
           <Input
             name="email"
