@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { ExternalLink } from "lucide-react";
@@ -13,10 +14,21 @@ export default function AuthErrorPage() {
   const error = searchParams.get("error");
   const t = useTranslations("Auth");
   const [webview, setWebview] = useState(false);
+  const capturedRef = useRef<string | null>(null);
 
   useEffect(() => {
     setWebview(isInAppBrowser());
   }, []);
+
+  useEffect(() => {
+    if (error && capturedRef.current !== error) {
+      capturedRef.current = error;
+      Sentry.captureMessage(`auth-error-page: ${error}`, {
+        level: "warning",
+        tags: { context: "auth", error_code: error },
+      });
+    }
+  }, [error]);
 
   const errorMessage = error
     ? t(`errors.${error}`, { defaultValue: t("errors.Default") })
