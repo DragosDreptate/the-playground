@@ -175,7 +175,7 @@ Contient :
   - Confirmation liste d'attente ✅
   - Promotion liste d'attente ✅
   - Rappel 24h avant ✅ (livré v1.15.0)
-  - ~~Rappel 1h avant~~ *(pas encore implémenté — backlog #003)*
+  - ~~Rappel 1h avant~~ *(pas encore implémenté — backlog #004)*
   - Notification de changement (lieu, horaire) ✅
   - Notification d'annulation ✅
 - Commenter sur le fil de l'événement ✅
