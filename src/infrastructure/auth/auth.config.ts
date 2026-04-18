@@ -35,6 +35,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (error) {
+          Sentry.captureException(error, {
+            tags: { context: "magic_link" },
+            extra: {
+              email_domain: identifier.split("@")[1] ?? "unknown",
+              resend_message: error.message,
+              resend_name: error.name,
+            },
+          });
           throw new Error(`[AUTH] Magic link email failed: ${error.message}`);
         }
       },
@@ -48,6 +56,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   logger: {
     error(error) {
       console.error("[AUTH ERROR]", error);
+      Sentry.captureException(error, { tags: { context: "auth" } });
+    },
+    warn(code) {
+      console.warn("[AUTH WARN]", code);
+      Sentry.captureMessage(`auth:${code}`, {
+        level: "warning",
+        tags: { context: "auth" },
+      });
     },
   },
   callbacks: {
