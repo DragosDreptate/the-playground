@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Github, Loader2, Mail } from "lucide-react";
-import { signInWithGitHub, signInWithGoogle, signInWithEmail } from "@/app/actions/auth";
+import {
+  signInWithGitHub,
+  signInWithGoogle,
+  signInWithEmail,
+  type SignInWithEmailState,
+} from "@/app/actions/auth";
 import { isInAppBrowser } from "@/lib/detect-webview";
 
 function GoogleIcon() {
@@ -76,6 +81,10 @@ type SignInFormProps = {
 export function SignInForm({ callbackUrl }: SignInFormProps) {
   const t = useTranslations("Auth");
   const [webview, setWebview] = useState(false);
+  const [emailState, emailAction] = useActionState<SignInWithEmailState, FormData>(
+    signInWithEmail,
+    null
+  );
 
   useEffect(() => {
     setWebview(isInAppBrowser());
@@ -125,14 +134,21 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
           <Separator className="flex-1" />
         </div>
 
-        <form action={signInWithEmail} className="space-y-3">
+        <form action={emailAction} className="space-y-3" noValidate>
           {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
           <Input
             name="email"
             type="email"
             placeholder={t("signIn.emailPlaceholder")}
+            aria-invalid={emailState?.error === "INVALID_EMAIL" || undefined}
+            aria-describedby={emailState?.error === "INVALID_EMAIL" ? "email-error" : undefined}
             required
           />
+          {emailState?.error === "INVALID_EMAIL" && (
+            <p id="email-error" className="text-sm text-destructive">
+              {t("signIn.invalidEmail")}
+            </p>
+          )}
           <SubmitButton label={t("signIn.magicLink")} />
         </form>
       </div>

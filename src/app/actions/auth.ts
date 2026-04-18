@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
+import { isValidEmail } from "@/lib/email";
 import { safeCallbackUrl } from "@/lib/url";
 
 async function setCallbackCookie(callbackUrl: string) {
@@ -26,11 +27,20 @@ export async function signInWithGoogle(formData: FormData) {
   await signIn("google", { redirectTo: "/dashboard/profile/setup" });
 }
 
-export async function signInWithEmail(formData: FormData) {
-  const email = formData.get("email") as string;
+export type SignInWithEmailState = { error: "INVALID_EMAIL" } | null;
+
+export async function signInWithEmail(
+  _prev: SignInWithEmailState,
+  formData: FormData
+): Promise<SignInWithEmailState> {
+  const email = ((formData.get("email") as string | null) ?? "").trim();
+  if (!isValidEmail(email)) {
+    return { error: "INVALID_EMAIL" };
+  }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   await signIn("resend", { email, redirectTo: "/dashboard/profile/setup" });
+  return null;
 }
 
 export async function signOutAction() {
