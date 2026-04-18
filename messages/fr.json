@@ -137,6 +137,8 @@
       "magicLink": "Envoyer un lien magique",
       "or": "ou",
       "linkedin": "Continuer avec LinkedIn",
+      "invalidEmail": "Adresse email invalide. Vérifiez votre saisie.",
+      "sendFailed": "Impossible d'envoyer l'email pour le moment. Réessayez dans un instant.",
       "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous — elle fonctionne partout.",
       "webviewTooltip": "Non disponible depuis un navigateur intégré. Utilisez la connexion par email."
     },

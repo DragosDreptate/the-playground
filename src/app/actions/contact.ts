@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { Resend } from "resend";
 import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
+import { isValidEmail } from "@/lib/email";
 import type { ActionResult } from "./types";
 
 const CONTACT_MAX_REQUESTS = 5;
@@ -40,8 +41,7 @@ export async function sendContactMessageAction(
     return { success: false, error: "MISSING_FIELDS", code: "VALIDATION_ERROR" };
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!isValidEmail(email)) {
     return { success: false, error: "INVALID_EMAIL", code: "INVALID_EMAIL" };
   }
 

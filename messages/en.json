@@ -137,6 +137,8 @@
       "magicLink": "Send a magic link",
       "or": "or",
       "linkedin": "Continue with LinkedIn",
+      "invalidEmail": "Invalid email address. Please check your input.",
+      "sendFailed": "Couldn't send the email right now. Please try again in a moment.",
       "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below — it works everywhere.",
       "webviewTooltip": "Not available from an in-app browser. Use the email sign-in."
     },
