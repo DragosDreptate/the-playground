@@ -511,7 +511,7 @@ Statut à la création :
 
 Pour un Moment en `PROPOSED`, les boutons d'action contextuels sont documentés dans la section "Page `/m/[slug]` en statut `PROPOSED`" (Publier, Réinitialiser les votes, Annuler la proposition).
 
-Pour les autres statuts (`DRAFT`, `PUBLISHED`), la refonte complète du combobox d'édition actuel vers des boutons d'action contextuels est **hors scope de cette spec**. Voir l'entrée **P-10** dans le BACKLOG. Dans le cadre de cette PR, s'assurer simplement que :
+Pour les autres statuts (`DRAFT`, `PUBLISHED`), la refonte complète du combobox d'édition actuel vers des boutons d'action contextuels est **hors scope de cette spec**. Voir l'entrée **#011** dans le BACKLOG. Dans le cadre de cette PR, s'assurer simplement que :
 - L'option `PROPOSED` ne figure **pas** dans le combobox d'édition existant (seulement à la création).
 - Le combobox d'édition actuel conserve son comportement actuel pour `DRAFT` / `PUBLISHED` / `CANCELLED`.
 
@@ -582,7 +582,7 @@ Pour les autres statuts (`DRAFT`, `PUBLISHED`), la refonte complète du combobox
 - Bouton "Réinitialiser les votes" : confirmation bloquante "Effacer les X votes reçus ?" (disabled si 0 vote)
 - Bouton "Annuler la proposition" : confirmation bloquante "Annuler cette proposition ? Les X votes reçus seront effacés." (variante destructive, `variant="destructive"`)
 
-**Multi-Organisateurs** : si la Communauté a plusieurs `HOST` (cf. feature future Co-Organisateurs, BACKLOG P-05), tous voient la même vue Organisateur et peuvent tous agir sur les 3 boutons. Pas de verrouillage pessimiste. **Premier qui agit gagne** : si un second HOST tente une action alors que le statut a déjà changé (ex. tentative de publier un Moment déjà publié par un autre HOST), le usecase serveur renvoie l'erreur correspondante (`MomentNotProposedError`), traduite côté UI par un message explicite ("Cet événement a déjà été publié par un autre Organisateur") et un rechargement de la page.
+**Multi-Organisateurs** : si la Communauté a plusieurs `HOST` (cf. feature future Co-Organisateurs, BACKLOG #006), tous voient la même vue Organisateur et peuvent tous agir sur les 3 boutons. Pas de verrouillage pessimiste. **Premier qui agit gagne** : si un second HOST tente une action alors que le statut a déjà changé (ex. tentative de publier un Moment déjà publié par un autre HOST), le usecase serveur renvoie l'erreur correspondante (`MomentNotProposedError`), traduite côté UI par un message explicite ("Cet événement a déjà été publié par un autre Organisateur") et un rechargement de la page.
 
 ### Page `/m/[slug]` en statut `PUBLISHED` issu d'un `PROPOSED`
 

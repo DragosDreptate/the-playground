@@ -4,7 +4,6 @@
 > Page `/explorer` : vitrine publique des Communautés et événements ouverts à tous.
 >
 > Référence produit : `spec/ux-parcours-jtbd.md` (parcours cold traffic, persona Host débutant)
-> Référence backlog : section "Explorer"
 >
 > **Terminologie** : "Explorer" (FR) / "Explore" (EN). Route : `/explorer`. Clé i18n : `Explorer`.
 

@@ -2,8 +2,6 @@
 
 > Interface d'administration pour la gestion globale de la plateforme.
 > Pages `/admin/*`, réservées aux utilisateurs avec `role: ADMIN`.
->
-> Référence backlog : section "Admin plateforme"
 
 ---
 

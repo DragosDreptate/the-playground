@@ -2,8 +2,6 @@
 
 > Emails envoyés automatiquement lors d'actions clés du parcours Participant et Organisateur.
 > Architecture : Resend + react-email, fire-and-forget depuis les server actions.
->
-> Référence backlog : section "Notifications email"
 
 ---
 
