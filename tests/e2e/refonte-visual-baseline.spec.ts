@@ -22,7 +22,9 @@ import { SLUGS, AUTH } from "./fixtures";
  * Vérifier (après refactor) :
  *   pnpm test:e2e refonte-visual-baseline
  *
- * Les snapshots sont stockés dans refonte-visual-baseline.spec.ts-snapshots/.
+ * Les snapshots sont stockés dans refonte-visual-baseline.spec.ts-snapshots/
+ * et committés dans la branche pour survivre entre sessions (rendu macOS
+ * uniquement, CI skippé).
  *
  * Limites connues :
  *   - Les textes de dates relatives ("il y a 2 mois") drift sur plusieurs jours.
