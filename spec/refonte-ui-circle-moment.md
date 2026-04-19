@@ -136,10 +136,18 @@ Les 4 surfaces partagent le même pattern **2 colonnes sticky** desktop :
 
 - Création du worktree `feat/ui-refonte-circle-moment` et du fichier de suivi.
 - Audit code des 4 surfaces : chemins, composants, sections, responsive, composants partagés, forces, dettes. Voir section **Baseline**.
+- Décision approche : petites touches d'abord, refactor/extraction composants à la fin une fois le design stabilisé. Voir **Décisions design prises**.
 
 ## Décisions design prises
 
-> À compléter au fil des itérations.
+### 2026-04-19 — Approche : petites touches, refactor à la fin
+
+Stratégie validée :
+
+1. **Phase 1 — itération design** : modifications par petites touches sur les 4 surfaces, sans se préoccuper de la duplication de code. On duplique volontairement si besoin, on applique le cross-view alert à chaque modif, on laisse le design se stabiliser.
+2. **Phase 2 — refactor / extraction** : une fois le design stabilisé (validation utilisateur), on extrait les composants partagés (CoverCard, HostsBlock, MetaRow unifié, ShareSection, potentiellement CircleDetailView à la manière de MomentDetailView). Zéro changement visuel pendant cette phase.
+
+Rationale : le design n'est pas encore figé. Factoriser trop tôt risque de nous enfermer dans des composants qui ne survivront pas aux itérations. On garde la liberté visuelle d'abord, la propreté de code après.
 
 ## Questions ouvertes
 
@@ -147,7 +155,19 @@ Les 4 surfaces partagent le même pattern **2 colonnes sticky** desktop :
 
 ## Reste à faire
 
+### Phase 1 — petites touches (en cours)
+
 - [x] Audit code baseline (4 surfaces)
+- [x] Décision approche (petites touches, refactor à la fin)
 - [ ] Captures visuelles des 4 surfaces × 2 breakpoints (optionnel, à la demande)
 - [ ] Création Draft PR pour activer les previews Vercel
-- [ ] Première itération sur une surface (à définir avec l'utilisateur)
+- [ ] Premières modifs design par petites touches (avec cross-view alert)
+
+### Phase 2 — refactor / extraction (après stabilisation design)
+
+- [ ] Extraction `CoverCard` (4 usages)
+- [ ] Extraction `HostsBlock` (4 usages)
+- [ ] Unification `MetaRow` entre Communauté et événement
+- [ ] Extraction `ShareSection` (CircleShareInviteCard + MomentShareCard)
+- [ ] Éventuel `CircleDetailView` à la manière de `MomentDetailView`
+- [ ] Mise à jour tests E2E + page Aide si pertinent
