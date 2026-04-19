@@ -850,6 +850,10 @@
       "tabs": {
         "circles": "Communautés",
         "moments": "Événements"
+      },
+      "featuredToggle": {
+        "label": "Afficher la section « À la une »",
+        "description": "Quand activée, la section « À la une » apparaît en haut de la page Découvrir. Sinon, elle est masquée pour tous les visiteurs."
       }
     },
     "viewPublicPage": "Voir la page",

@@ -850,6 +850,10 @@
       "tabs": {
         "circles": "Communities",
         "moments": "Events"
+      },
+      "featuredToggle": {
+        "label": "Show the \"Featured\" section",
+        "description": "When enabled, the \"Featured\" section appears at the top of Explore. Otherwise, it is hidden from all visitors."
       }
     },
     "viewPublicPage": "View page",

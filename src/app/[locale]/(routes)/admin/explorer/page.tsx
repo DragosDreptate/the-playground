@@ -15,8 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ExcludedToggle, OverrideScoreInput, RecalculateScoresButton } from "@/components/admin/explorer-controls";
+import { FeaturedCirclesToggle } from "@/components/admin/featured-circles-toggle";
 import { AdminExplorerTabs } from "@/components/admin/admin-explorer-tabs";
 import type { ExplorerFilter } from "@/domain/ports/repositories/admin-repository";
+import { getSiteSettings } from "@/domain/usecases/get-site-settings";
+import { prismaSiteSettingsRepository } from "@/infrastructure/repositories";
 
 const PAGE_SIZE = 20;
 const BASE = "/admin/explorer";
@@ -58,7 +61,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
     />
   );
 
-  const [circles, total] = await Promise.all([
+  const [circles, total, siteSettings] = await Promise.all([
     prismaAdminRepository.findAllExplorerCircles({
       search,
       filter,
@@ -68,6 +71,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
       sortOrder: order,
     }),
     prismaAdminRepository.countExplorerCircles({ search, filter }),
+    getSiteSettings({ siteSettingsRepository: prismaSiteSettingsRepository }),
   ]);
 
   const filterHref = (f: ExplorerFilter) => {
@@ -83,6 +87,8 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
       </div>
 
       <AdminExplorerTabs activeTab="circles" />
+
+      <FeaturedCirclesToggle initialEnabled={siteSettings.featuredCirclesEnabled} />
 
       {/* Filtres */}
       <div className="flex gap-2">

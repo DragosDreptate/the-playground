@@ -13,6 +13,8 @@ import { getCachedSession } from "@/lib/auth-cache";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import { getFeaturedCircles } from "@/domain/usecases/get-featured-circles";
+import { getSiteSettings } from "@/domain/usecases/get-site-settings";
+import { prismaSiteSettingsRepository } from "@/infrastructure/repositories";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerFeatured } from "@/components/explorer/explorer-featured";
 import { ExplorerGrid } from "@/components/explorer/explorer-grid";
@@ -64,6 +66,10 @@ export default async function ExplorerPage({
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();
+  const siteSettings = await getSiteSettings({
+    siteSettingsRepository: prismaSiteSettingsRepository,
+  });
+  const showFeatured = activeTab === "circles" && siteSettings.featuredCirclesEnabled;
 
   // Fetch only the active tab to avoid over-fetching
   const [circlesRaw, momentsRaw, userCircles, featuredCircles] = await measureTime(
@@ -85,7 +91,7 @@ export default async function ExplorerPage({
         session?.user?.id
           ? prismaCircleRepository.findAllByUserId(session.user.id)
           : Promise.resolve([]),
-        activeTab === "circles"
+        showFeatured
           ? getFeaturedCircles({ circleRepository: prismaCircleRepository })
           : Promise.resolve([]),
       ])
