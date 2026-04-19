@@ -79,3 +79,7 @@ exports/
 
 # spec — marketing local uniquement
 /spec/mkt/
+
+# backlog — fichier unique en local, source de vérité dans le repo principal,
+# symlink dans les worktrees (créé par scripts/worktree-new.sh)
+/spec/BACKLOG.md

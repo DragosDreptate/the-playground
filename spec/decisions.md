@@ -32,3 +32,4 @@
 | 2026-03-03 | Broadcast cooldown 24h (remplace le verrou permanent "envoi unique"). `broadcastSentAt` écrasé à chaque envoi. |
 | 2026-03-14 | Statut DRAFT : tout événement créé est en Brouillon. DRAFT → PUBLISHED via `publishMoment` (sens unique). Notifications déplacées à la publication. |
 | 2026-04-18 | Refonte du backlog : fichier unique `spec/BACKLOG.md` au format minimaliste (5 champs fixes), items ajoutés uniquement sur demande explicite. Phase 2 + Stripe déplacés dans `spec/ideas.md`, décisions clés dans `spec/decisions.md`. |
+| 2026-04-19 | `spec/BACKLOG.md` sorti du tracking git. Source unique dans le repo principal, symlink dans les worktrees créé automatiquement par `scripts/worktree-new.sh`. Modifications en local sans commit / PR. |

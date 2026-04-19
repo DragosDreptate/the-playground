@@ -1,7 +1,7 @@
 # Idées — The Playground
 
 > Parking d'idées non qualifiées. **Ne pas traiter directement.**
-> Une idée devient actionable uniquement quand elle est **promue** dans `spec/BACKLOG.md` (sur demande explicite, avec cadrage en 5 champs).
+> Une idée devient actionable uniquement quand elle est **promue** dans `spec/BACKLOG.md` (sur demande explicite, avec cadrage en 5 champs). Ce fichier est local à chaque machine (non tracké, source unique dans le repo principal, symlink dans les worktrees).
 > Ce fichier peut contenir du bruit, des doublons, des demi-phrases. C'est normal, c'est le rôle du parking.
 
 ---
