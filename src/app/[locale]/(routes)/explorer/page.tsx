@@ -66,13 +66,9 @@ export default async function ExplorerPage({
 
   const t = await getTranslations("Explorer");
   const session = await getCachedSession();
-  const siteSettings = await getSiteSettings({
-    siteSettingsRepository: prismaSiteSettingsRepository,
-  });
-  const showFeatured = activeTab === "circles" && siteSettings.featuredCirclesEnabled;
 
   // Fetch only the active tab to avoid over-fetching
-  const [circlesRaw, momentsRaw, userCircles, featuredCircles] = await measureTime(
+  const [circlesRaw, momentsRaw, userCircles, featuredCirclesRaw, siteSettings] = await measureTime(
     "explorer:data",
     () =>
       Promise.all([
@@ -91,11 +87,14 @@ export default async function ExplorerPage({
         session?.user?.id
           ? prismaCircleRepository.findAllByUserId(session.user.id)
           : Promise.resolve([]),
-        showFeatured
+        activeTab === "circles"
           ? getFeaturedCircles({ circleRepository: prismaCircleRepository })
           : Promise.resolve([]),
+        getSiteSettings({ siteSettingsRepository: prismaSiteSettingsRepository }),
       ])
   );
+
+  const featuredCircles = siteSettings.featuredCirclesEnabled ? featuredCirclesRaw : [];
 
   // Over-fetch pattern: fetch FETCH_SIZE, display PAGE_SIZE
   const circlesHasMore = circlesRaw.length > PAGE_SIZE;

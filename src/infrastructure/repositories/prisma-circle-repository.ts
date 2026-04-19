@@ -529,7 +529,6 @@ export const prismaCircleRepository: CircleRepository = {
       coverImage: { not: null as null },
       excludedFromExplorer: false,
       isDemo: false,
-      // Communauté active : au moins un événement publié à venir ou passé dans les 30 derniers jours
       moments: {
         some: {
           status: { in: ["PUBLISHED", "PAST"] satisfies MomentStatus[] },

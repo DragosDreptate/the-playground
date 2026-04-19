@@ -1,28 +1,7 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { setFeaturedCirclesEnabled } from "@/domain/usecases/admin/set-featured-circles-enabled";
 import { AdminUnauthorizedError } from "@/domain/errors";
-import type { SiteSettings } from "@/domain/models/site-settings";
-import type { SiteSettingsRepository } from "@/domain/ports/repositories/site-settings-repository";
-
-function makeSiteSettings(overrides: Partial<SiteSettings> = {}): SiteSettings {
-  return {
-    featuredCirclesEnabled: true,
-    updatedAt: new Date("2026-04-19T10:00:00Z"),
-    ...overrides,
-  };
-}
-
-function createMockSiteSettingsRepository(
-  overrides: Partial<SiteSettingsRepository> = {}
-): SiteSettingsRepository {
-  return {
-    getSettings: vi.fn<SiteSettingsRepository["getSettings"]>().mockResolvedValue(makeSiteSettings()),
-    setFeaturedCirclesEnabled: vi
-      .fn<SiteSettingsRepository["setFeaturedCirclesEnabled"]>()
-      .mockImplementation(async (enabled) => makeSiteSettings({ featuredCirclesEnabled: enabled })),
-    ...overrides,
-  };
-}
+import { createMockSiteSettingsRepository } from "@/domain/usecases/__tests__/helpers/mock-site-settings-repository";
 
 describe("setFeaturedCirclesEnabled", () => {
   describe("given a non-admin caller", () => {

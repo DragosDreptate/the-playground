@@ -4,24 +4,15 @@ import type { SiteSettingsRepository } from "@/domain/ports/repositories/site-se
 
 const SETTINGS_ID = "default";
 
-function toDomain(record: {
-  featuredCirclesEnabled: boolean;
-  updatedAt: Date;
-}): SiteSettings {
-  return {
-    featuredCirclesEnabled: record.featuredCirclesEnabled,
-    updatedAt: record.updatedAt,
-  };
-}
-
 export const prismaSiteSettingsRepository: SiteSettingsRepository = {
   async getSettings(): Promise<SiteSettings> {
     const record = await prisma.siteSettings.upsert({
       where: { id: SETTINGS_ID },
       update: {},
       create: { id: SETTINGS_ID },
+      select: { featuredCirclesEnabled: true },
     });
-    return toDomain(record);
+    return record;
   },
 
   async setFeaturedCirclesEnabled(enabled: boolean): Promise<SiteSettings> {
@@ -29,7 +20,8 @@ export const prismaSiteSettingsRepository: SiteSettingsRepository = {
       where: { id: SETTINGS_ID },
       update: { featuredCirclesEnabled: enabled },
       create: { id: SETTINGS_ID, featuredCirclesEnabled: enabled },
+      select: { featuredCirclesEnabled: true },
     });
-    return toDomain(record);
+    return record;
   },
 };
