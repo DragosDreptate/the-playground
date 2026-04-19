@@ -136,7 +136,13 @@ Les 4 surfaces partagent le même pattern **2 colonnes sticky** desktop :
 
 - Création du worktree `feat/ui-refonte-circle-moment` et du fichier de suivi.
 - Audit code des 4 surfaces : chemins, composants, sections, responsive, composants partagés, forces, dettes. Voir section **Baseline**.
-- Décision approche : petites touches d'abord, refactor/extraction composants à la fin une fois le design stabilisé. Voir **Décisions design prises**.
+- Décision approche : compromis entre petites touches et refactor préparatoire. Phase 0 légère pour les atomes stables, puis Phase 1 (petites touches), Phase 2 (refactor final).
+- Setup visual regression baseline : spec Playwright `refonte-visual-baseline.spec.ts`, 20 snapshots (4 surfaces × 2-3 états auth × 2 viewports), skip CI, snapshots gitignorés.
+- Phase 0 exécutée :
+  - **CoverBlock extrait** (commit `82ab257`) : composant `src/components/circles/cover-block.tsx`, remplace 2 usages inline, 20/20 snapshots matchent la baseline.
+  - **HostsBlock skipped** : patterns visuels différents entre Circle (bloc avatars + noms labellé) et Moment (texte inline "Organisé par X"). Unifier aurait été un changement design, violant la règle Phase 0.
+  - **CircleDetailView skipped** : analyse détaillée a révélé ~900 lignes, 15+ props, 7 namespaces i18n, différences profondes de fetch / tracking / SEO / guards. Ratio risque/gain jugé défavorable pour un refactor "zéro visual change". On gardera les 2 pages Circle distinctes.
+- Phase 0 terminée. Prochaine étape : Phase 1 (petites touches avec cross-view alert).
 
 ## Décisions design prises
 
@@ -163,10 +169,20 @@ Rationale : le design n'est pas encore figé. Factoriser trop tôt risque de nou
 - [ ] Création Draft PR pour activer les previews Vercel
 - [ ] Premières modifs design par petites touches (avec cross-view alert)
 
+### Phase 0 — extractions préparatoires (terminée)
+
+- [x] Setup visual regression baseline (20 snapshots)
+- [x] Extraction `CoverBlock` (Circle publique + dashboard)
+- [~] ~~Extraction `HostsBlock`~~ skipped (patterns visuels différents Circle/Moment)
+- [~] ~~Extraction `CircleDetailView`~~ skipped (ratio risque/gain défavorable, ~900 lignes)
+
 ### Phase 2 — refactor / extraction (après stabilisation design)
 
-- [ ] Extraction `CoverCard` (4 usages)
-- [ ] Extraction `HostsBlock` (4 usages)
+À ré-évaluer une fois le design stabilisé. Candidats potentiels :
+
+- [ ] Extraction `HostsBlock` (si le design du bloc Organisateur s'aligne entre Circle et Moment)
+- [ ] Extraction `CircleStatsBlock` (stats membres / événements)
+- [ ] Extraction `CircleMetaRows` (7 items catégorie/ville/site/etc.)
 - [ ] Unification `MetaRow` entre Communauté et événement
 - [ ] Extraction `ShareSection` (CircleShareInviteCard + MomentShareCard)
 - [ ] Éventuel `CircleDetailView` à la manière de `MomentDetailView`
