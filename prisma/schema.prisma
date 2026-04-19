@@ -409,3 +409,12 @@ model CircleNetworkMembership {
   @@map("circle_network_memberships")
 }
 
+// Singleton de configuration globale de la plateforme. Une seule row avec id = "default".
+model SiteSettings {
+  id                      String   @id
+  featuredCirclesEnabled  Boolean  @default(true) @map("featured_circles_enabled")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+

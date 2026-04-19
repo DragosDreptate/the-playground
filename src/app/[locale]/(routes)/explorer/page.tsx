@@ -13,6 +13,8 @@ import { getCachedSession } from "@/lib/auth-cache";
 import { getPublicCircles } from "@/domain/usecases/get-public-circles";
 import { getPublicUpcomingMoments } from "@/domain/usecases/get-public-upcoming-moments";
 import { getFeaturedCircles } from "@/domain/usecases/get-featured-circles";
+import { getSiteSettings } from "@/domain/usecases/get-site-settings";
+import { prismaSiteSettingsRepository } from "@/infrastructure/repositories";
 import { ExplorerFilterBar } from "@/components/explorer/explorer-filter-bar";
 import { ExplorerFeatured } from "@/components/explorer/explorer-featured";
 import { ExplorerGrid } from "@/components/explorer/explorer-grid";
@@ -66,7 +68,7 @@ export default async function ExplorerPage({
   const session = await getCachedSession();
 
   // Fetch only the active tab to avoid over-fetching
-  const [circlesRaw, momentsRaw, userCircles, featuredCircles] = await measureTime(
+  const [circlesRaw, momentsRaw, userCircles, featuredCirclesRaw, siteSettings] = await measureTime(
     "explorer:data",
     () =>
       Promise.all([
@@ -88,8 +90,11 @@ export default async function ExplorerPage({
         activeTab === "circles"
           ? getFeaturedCircles({ circleRepository: prismaCircleRepository })
           : Promise.resolve([]),
+        getSiteSettings({ siteSettingsRepository: prismaSiteSettingsRepository }),
       ])
   );
+
+  const featuredCircles = siteSettings.featuredCirclesEnabled ? featuredCirclesRaw : [];
 
   // Over-fetch pattern: fetch FETCH_SIZE, display PAGE_SIZE
   const circlesHasMore = circlesRaw.length > PAGE_SIZE;

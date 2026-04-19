@@ -7,3 +7,4 @@ export { prismaCommentAttachmentRepository } from "./prisma-comment-attachment-r
 export { prismaMomentAttachmentRepository } from "./prisma-moment-attachment-repository";
 export { prismaAdminRepository } from "./prisma-admin-repository";
 export { prismaCircleNetworkRepository } from "./prisma-circle-network-repository";
+export { prismaSiteSettingsRepository } from "./prisma-site-settings-repository";

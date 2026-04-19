@@ -16,6 +16,8 @@ import { getAdminExplorerCircles } from "@/domain/usecases/admin/get-admin-explo
 import { getAdminExplorerMoments } from "@/domain/usecases/admin/get-admin-explorer-moments";
 import { adminUpdateCircleExcluded } from "@/domain/usecases/admin/admin-update-circle-excluded";
 import { adminUpdateCircleOverrideScore } from "@/domain/usecases/admin/admin-update-circle-override-score";
+import { setFeaturedCirclesEnabled } from "@/domain/usecases/admin/set-featured-circles-enabled";
+import { prismaSiteSettingsRepository } from "@/infrastructure/repositories";
 import { getAdminMoments } from "@/domain/usecases/admin/get-admin-moments";
 import { getAdminMoment } from "@/domain/usecases/admin/get-admin-moment";
 import { adminDeleteMoment } from "@/domain/usecases/admin/admin-delete-moment";
@@ -252,6 +254,22 @@ export async function adminRecalculateAllScoresAction(): Promise<
     revalidatePath("/admin/explorer");
     revalidatePath("/admin/explorer/moments");
     return result;
+  });
+}
+
+export async function setFeaturedCirclesEnabledAction(
+  enabled: boolean
+): Promise<ActionResult<{ enabled: boolean }>> {
+  const check = await requireAdmin();
+  if (!check.success) return check;
+
+  return toActionResult(async () => {
+    await setFeaturedCirclesEnabled(check.data.role, enabled, {
+      siteSettingsRepository: prismaSiteSettingsRepository,
+    });
+    revalidatePath("/admin/explorer");
+    revalidatePath("/explorer");
+    return { enabled };
   });
 }
 
