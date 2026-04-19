@@ -4,9 +4,17 @@ import { SLUGS, AUTH } from "./fixtures";
 /**
  * Visual regression baseline — Refonte UI Circle + Moment (2026-04-19)
  *
- * Capture la baseline visuelle des 4 surfaces concernées par la refonte.
- * Ré-exécuté après chaque extraction de composant en Phase 0 pour garantir
- * zéro changement visuel pendant les refactors.
+ * Capture la baseline visuelle des 4 surfaces × 3 états d'auth × 2 viewports
+ * concernés par la refonte. Ré-exécuté après chaque extraction de composant
+ * en Phase 0 pour garantir zéro changement visuel pendant les refactors.
+ *
+ * Matrice d'états :
+ *   Circle public    : guest, player, host
+ *   Circle dashboard : player, host
+ *   Moment public    : guest, player, host
+ *   Moment dashboard : player, host
+ *
+ * = 10 états × 2 viewports = 20 snapshots
  *
  * Générer / mettre à jour la baseline :
  *   pnpm test:e2e refonte-visual-baseline --update-snapshots
@@ -18,37 +26,60 @@ import { SLUGS, AUTH } from "./fixtures";
  *
  * Limites connues :
  *   - Les textes de dates relatives ("il y a 2 mois") drift sur plusieurs jours.
- *     Si la baseline est ancienne, regénérer les snapshots au début d'une
- *     nouvelle session de travail.
- *   - Le seed des données de test est déterministe (même slugs, mêmes users),
- *     mais les dates createdAt peuvent varier selon le moment du seed.
+ *     Si la baseline est ancienne, regénérer les snapshots.
+ *   - Le seed est déterministe (slugs, users), mais createdAt peut varier.
  */
 
 const DESKTOP = { width: 1440, height: 900 };
 const MOBILE = { width: 375, height: 812 };
 
-const SURFACES = [
+type AuthState = {
+  label: "guest" | "player" | "host";
+  storage: string | undefined;
+};
+
+type Surface = {
+  name: string;
+  url: string;
+  authStates: AuthState[];
+};
+
+const SURFACES: Surface[] = [
   {
     name: "circle-public",
     url: `/fr/circles/${SLUGS.CIRCLE}`,
-    auth: AUTH.HOST,
+    authStates: [
+      { label: "guest", storage: undefined },
+      { label: "player", storage: AUTH.PLAYER },
+      { label: "host", storage: AUTH.HOST },
+    ],
   },
   {
     name: "circle-dashboard",
     url: `/fr/dashboard/circles/${SLUGS.CIRCLE}`,
-    auth: AUTH.HOST,
+    authStates: [
+      { label: "player", storage: AUTH.PLAYER },
+      { label: "host", storage: AUTH.HOST },
+    ],
   },
   {
     name: "moment-public",
     url: `/fr/m/${SLUGS.PUBLISHED_MOMENT}`,
-    auth: AUTH.HOST,
+    authStates: [
+      { label: "guest", storage: undefined },
+      { label: "player", storage: AUTH.PLAYER },
+      { label: "host", storage: AUTH.HOST },
+    ],
   },
   {
     name: "moment-dashboard",
     url: `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${SLUGS.PUBLISHED_MOMENT}`,
-    auth: AUTH.HOST,
+    authStates: [
+      { label: "player", storage: AUTH.PLAYER },
+      { label: "host", storage: AUTH.HOST },
+    ],
   },
-] as const;
+];
 
 async function waitForStableRender(page: Page) {
   await page.waitForLoadState("networkidle");
@@ -58,42 +89,50 @@ async function waitForStableRender(page: Page) {
 }
 
 for (const surface of SURFACES) {
-  test.describe(`Visual baseline — ${surface.name}`, () => {
-    test.skip(
-      !!process.env.CI,
-      "Visual regression runs locally only (rendering differs macOS vs Linux). Outil temporaire de la Phase 0.",
-    );
+  for (const authState of surface.authStates) {
+    test.describe(`Visual baseline — ${surface.name} (${authState.label})`, () => {
+      test.skip(
+        !!process.env.CI,
+        "Visual regression runs locally only (rendering differs macOS vs Linux). Outil temporaire de la Phase 0.",
+      );
 
-    test("desktop", async ({ browser }) => {
-      const context = await browser.newContext({
-        storageState: surface.auth,
-        viewport: DESKTOP,
+      test("desktop", async ({ browser }) => {
+        const context = await browser.newContext({
+          storageState: authState.storage,
+          viewport: DESKTOP,
+        });
+        const page = await context.newPage();
+        await page.goto(surface.url);
+        await waitForStableRender(page);
+        await expect(page).toHaveScreenshot(
+          `${surface.name}-${authState.label}-desktop.png`,
+          {
+            fullPage: true,
+            animations: "disabled",
+            maxDiffPixelRatio: 0.01,
+          },
+        );
+        await context.close();
       });
-      const page = await context.newPage();
-      await page.goto(surface.url);
-      await waitForStableRender(page);
-      await expect(page).toHaveScreenshot(`${surface.name}-desktop.png`, {
-        fullPage: true,
-        animations: "disabled",
-        maxDiffPixelRatio: 0.01,
-      });
-      await context.close();
-    });
 
-    test("mobile", async ({ browser }) => {
-      const context = await browser.newContext({
-        storageState: surface.auth,
-        viewport: MOBILE,
+      test("mobile", async ({ browser }) => {
+        const context = await browser.newContext({
+          storageState: authState.storage,
+          viewport: MOBILE,
+        });
+        const page = await context.newPage();
+        await page.goto(surface.url);
+        await waitForStableRender(page);
+        await expect(page).toHaveScreenshot(
+          `${surface.name}-${authState.label}-mobile.png`,
+          {
+            fullPage: true,
+            animations: "disabled",
+            maxDiffPixelRatio: 0.01,
+          },
+        );
+        await context.close();
       });
-      const page = await context.newPage();
-      await page.goto(surface.url);
-      await waitForStableRender(page);
-      await expect(page).toHaveScreenshot(`${surface.name}-mobile.png`, {
-        fullPage: true,
-        animations: "disabled",
-        maxDiffPixelRatio: 0.01,
-      });
-      await context.close();
     });
-  });
+  }
 }
