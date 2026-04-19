@@ -30,7 +30,7 @@ import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
-import Image from "next/image";
+import { CoverBlock } from "@/components/circles/cover-block";
 import { isValidSlug } from "@/lib/slug";
 import {
   Globe,
@@ -224,55 +224,14 @@ export default async function PublicCirclePage({
         {/* ─── LEFT column : cover + hosts + stats ────────────── */}
         <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
 
-          {/* Cover */}
-          <div className="relative">
-            <div
-              className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl"
-              style={{ background: gradient }}
-            />
-            <div
-              className="relative w-full overflow-hidden rounded-2xl"
-              style={{ aspectRatio: "1 / 1" }}
-            >
-              {circle.coverImage ? (
-                <Image
-                  src={circle.coverImage}
-                  alt={circle.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 340px"
-                  priority
-                />
-              ) : (
-                <>
-                  <div className="size-full" style={{ background: gradient }} />
-                  <div className="absolute inset-0 bg-black/20" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                      <Users className="size-6 text-white" />
-                    </div>
-                  </div>
-                </>
-              )}
-              {circle.isDemo && <DemoBadge label={tExplorer("circleCard.demo")} size="lg" />}
-            </div>
-          </div>
-
-          {/* Attribution photographe */}
-          {circle.coverImageAttribution && (
-            <p className="text-muted-foreground px-1 text-xs">
-              Photo par{" "}
-              <a
-                href={circle.coverImageAttribution.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-foreground underline"
-              >
-                {circle.coverImageAttribution.name}
-              </a>{" "}
-              sur Unsplash
-            </p>
-          )}
+          <CoverBlock
+            coverImage={circle.coverImage}
+            coverImageAttribution={circle.coverImageAttribution}
+            gradient={gradient}
+            altText={circle.name}
+          >
+            {circle.isDemo && <DemoBadge label={tExplorer("circleCard.demo")} size="lg" />}
+          </CoverBlock>
 
           {/* Hosts — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres avec leur badge) */}
           {primaryHosts.length > 0 && (
