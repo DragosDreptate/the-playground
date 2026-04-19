@@ -12,7 +12,7 @@ import type {
 import { seededShuffle } from "@/lib/seeded-shuffle";
 import type { Circle, CircleCategory, CircleMembership, CircleMemberRole, CircleMemberWithUser, CircleWithRole, CoverImageAttribution, DashboardCircle, MembershipStatus } from "@/domain/models/circle";
 import type { PublicCircleMembership } from "@/domain/models/user";
-import type { Circle as PrismaCircle, CircleMembership as PrismaMembership } from "@prisma/client";
+import type { Circle as PrismaCircle, CircleMembership as PrismaMembership, MomentStatus } from "@prisma/client";
 
 function toDomainCircle(record: PrismaCircle): Circle {
   return {
@@ -521,11 +521,21 @@ export const prismaCircleRepository: CircleRepository = {
   },
 
   async findFeatured(): Promise<FeaturedCircle[]> {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
     const featuredWhere = {
       visibility: "PUBLIC" as const,
       coverImage: { not: null as null },
       excludedFromExplorer: false,
       isDemo: false,
+      // Communauté active : au moins un événement publié à venir ou passé dans les 30 derniers jours
+      moments: {
+        some: {
+          status: { in: ["PUBLISHED", "PAST"] satisfies MomentStatus[] },
+          startsAt: { gte: thirtyDaysAgo },
+        },
+      },
       NOT: excludeTestHostFilter(),
     };
 
@@ -538,11 +548,10 @@ export const prismaCircleRepository: CircleRepository = {
     if (rows.length === 0) return [];
 
     // Seed = date du jour (YYYY-MM-DD) → sélection stable sur 24h
-    const today = new Date().toISOString().slice(0, 10);
+    const today = now.toISOString().slice(0, 10);
     const selectedIds = seededShuffle(rows, today).slice(0, 3).map((r) => r.id);
 
     // Charger uniquement les 3 circles sélectionnés avec toutes leurs colonnes
-    const now = new Date();
     const circles = await prisma.circle.findMany({
       where: { id: { in: selectedIds } },
       select: {

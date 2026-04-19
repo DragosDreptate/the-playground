@@ -120,6 +120,10 @@ export interface CircleRepository {
   findPlayersForNewMomentNotification(circleId: string, excludeUserId: string): Promise<CircleFollowerInfo[]>;
   /** Communautés publiques dont l'utilisateur est membre — pour la page profil public. */
   getPublicCirclesForUser(userId: string): Promise<PublicCircleMembership[]>;
-  /** 3 communautés sélectionnées aléatoirement (seed = date du jour) pour la section "À la une". */
+  /**
+   * 3 communautés sélectionnées aléatoirement (seed = date du jour) pour la section "À la une".
+   * Restreint aux Communautés actives : au moins un événement publié, à venir
+   * ou passé dans les 30 derniers jours.
+   */
   findFeatured(): Promise<FeaturedCircle[]>;
 }
