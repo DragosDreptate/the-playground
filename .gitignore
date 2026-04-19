@@ -65,6 +65,10 @@ playwright-report/
 playwright-report-mobile/
 test-results/
 
+# visual regression snapshots — outil temporaire de la Phase 0 refonte UI
+# Générés localement (macOS), non committés (rendu macOS vs Linux diverge)
+tests/e2e/refonte-visual-baseline.spec.ts-snapshots/
+
 # sentry
 .sentryclirc
 
