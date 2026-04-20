@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -102,8 +103,20 @@ export function CircleMembersDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger type="button" className={triggerClassName}>
-        {children}
+      <DialogTrigger asChild>
+        <div
+          role="button"
+          tabIndex={0}
+          className={triggerClassName}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen(true);
+            }
+          }}
+        >
+          {children}
+        </div>
       </DialogTrigger>
       <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
         <DialogHeader className="space-y-3 p-6 pb-4">
@@ -113,6 +126,9 @@ export function CircleMembersDialog({
           <DialogTitle className="text-xl font-bold">
             {t("detail.memberCount", { count: initialTotal })}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("detail.members")}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">

@@ -26,7 +26,6 @@ import { CoverBlock } from "@/components/circles/cover-block";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
 import { UserAvatar } from "@/components/user-avatar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
@@ -305,36 +304,34 @@ export default async function CircleDetailPage({
                     showEmails={isOrganizer}
                     triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                   >
-                    <TooltipProvider>
-                      <span className="flex -space-x-1.5">
-                        {visibleMemberAvatars.map((m) => {
-                          const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
-                          return (
-                            <Tooltip key={m.id}>
-                              <TooltipTrigger asChild>
-                                <span
-                                  className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
-                                  style={{ background: getMomentGradient(m.user.email) }}
-                                >
-                                  {m.user.image ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img
-                                      src={m.user.image}
-                                      alt={displayName}
-                                      referrerPolicy="no-referrer"
-                                      className="absolute inset-0 size-full object-cover"
-                                    />
-                                  ) : (
-                                    getCircleUserInitials(m.user)
-                                  )}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>{displayName}</TooltipContent>
-                            </Tooltip>
-                          );
-                        })}
-                      </span>
-                    </TooltipProvider>
+                    <span className="flex -space-x-1.5">
+                      {visibleMemberAvatars.map((m) => {
+                        const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
+                        return (
+                          <span key={m.id} className="group/avatar relative">
+                            <span
+                              className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
+                              style={{ background: getMomentGradient(m.user.email) }}
+                            >
+                              {m.user.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={m.user.image}
+                                  alt={displayName}
+                                  referrerPolicy="no-referrer"
+                                  className="absolute inset-0 size-full object-cover"
+                                />
+                              ) : (
+                                getCircleUserInitials(m.user)
+                              )}
+                            </span>
+                            <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
+                              {displayName}
+                            </span>
+                          </span>
+                        );
+                      })}
+                    </span>
                     <span className="text-sm font-medium underline-offset-2 group-hover:underline">
                       {membersMetaText}
                     </span>
