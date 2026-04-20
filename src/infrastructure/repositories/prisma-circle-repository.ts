@@ -389,6 +389,79 @@ export const prismaCircleRepository: CircleRepository = {
     }));
   },
 
+  async findMembersPaginated(
+    circleId: string,
+    options: { offset: number; limit: number; priorityUserId?: string | null },
+  ): Promise<{ members: CircleMemberWithUser[]; total: number; hasMore: boolean }> {
+    const { offset, limit, priorityUserId } = options;
+
+    const total = await prisma.circleMembership.count({
+      where: { circleId, status: "ACTIVE" },
+    });
+
+    type Row = {
+      id: string;
+      circleId: string;
+      userId: string;
+      role: CircleMemberRole;
+      status: MembershipStatus;
+      joinedAt: Date;
+      firstName: string | null;
+      lastName: string | null;
+      email: string;
+      image: string | null;
+      publicId: string | null;
+    };
+
+    // Tri : user courant d'abord (si fourni), puis HOST > CO_HOST > PLAYER, puis joinedAt asc.
+    // `priorityUserId` est passé avec COALESCE pour supporter null proprement.
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        m.id,
+        m."circleId",
+        m."userId",
+        m.role,
+        m.status,
+        m."joinedAt",
+        u."firstName",
+        u."lastName",
+        u.email,
+        u.image,
+        u.public_id AS "publicId"
+      FROM circle_memberships m
+      INNER JOIN users u ON u.id = m."userId"
+      WHERE m."circleId" = ${circleId} AND m.status = 'ACTIVE'
+      ORDER BY
+        CASE WHEN m."userId" = ${priorityUserId ?? ""} THEN 0 ELSE 1 END,
+        CASE m.role WHEN 'HOST' THEN 0 WHEN 'CO_HOST' THEN 1 ELSE 2 END,
+        m."joinedAt" ASC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    const members: CircleMemberWithUser[] = rows.map((r) => ({
+      id: r.id,
+      circleId: r.circleId,
+      userId: r.userId,
+      role: r.role,
+      status: r.status,
+      joinedAt: r.joinedAt,
+      user: {
+        id: r.userId,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        email: r.email,
+        image: r.image,
+        publicId: r.publicId,
+      },
+    }));
+
+    return {
+      members,
+      total,
+      hasMore: offset + members.length < total,
+    };
+  },
+
   async countMembers(circleId: string): Promise<number> {
     return prisma.circleMembership.count({ where: { circleId, status: "ACTIVE" } });
   },

@@ -5,7 +5,7 @@ type UserAvatarProps = {
   name?: string | null;
   email: string;
   image?: string | null;
-  size?: "sm" | "default" | "lg" | "xl";
+  size?: "sm" | "default" | "md" | "lg" | "xl";
 };
 
 function getInitials(name?: string | null, email?: string): string {
@@ -27,6 +27,7 @@ export function UserAvatar({ name, email, image, size = "default" }: UserAvatarP
       className={cn(
         size === "sm" && "size-7 text-xs",
         size === "default" && "size-8 text-sm",
+        size === "md" && "size-10 text-base",
         size === "lg" && "size-16 text-xl",
         size === "xl" && "size-24 text-3xl",
       )}

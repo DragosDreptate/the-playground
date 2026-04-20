@@ -1,0 +1,278 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import { Link } from "@/i18n/navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UserAvatar } from "@/components/user-avatar";
+import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
+import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2 } from "lucide-react";
+import { getDisplayName } from "@/lib/display-name";
+import {
+  getCircleMembersPageAction,
+  promoteToCoHostAction,
+  demoteFromCoHostAction,
+} from "@/app/actions/circle";
+import type {
+  CircleMemberRole,
+  CircleMemberWithUser,
+} from "@/domain/models/circle";
+
+const PAGE_SIZE = 20;
+
+type Props = {
+  circleId: string;
+  initialMembers: CircleMemberWithUser[];
+  initialTotal: number;
+  initialHasMore: boolean;
+  /** Rôle de l'utilisateur connecté dans ce Circle (active les actions de gestion). */
+  callerRole?: CircleMemberRole;
+  /** Afficher l'email des membres (dashboard Organisateur). */
+  showEmails?: boolean;
+  /** Classes CSS appliquées au bouton trigger rendu par DialogTrigger. */
+  triggerClassName?: string;
+  /** Contenu du trigger (texte, avatars+texte, etc.) — DialogTrigger rend lui-même le <button> wrappant. */
+  children: React.ReactNode;
+};
+
+export function CircleMembersDialog({
+  circleId,
+  initialMembers,
+  initialTotal,
+  initialHasMore,
+  callerRole,
+  showEmails = false,
+  triggerClassName,
+  children,
+}: Props) {
+  const t = useTranslations("Circle");
+  const [open, setOpen] = useState(false);
+  const [members, setMembers] = useState<CircleMemberWithUser[]>(initialMembers);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [isLoading, startLoad] = useTransition();
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Reset les données à la fermeture pour repartir propre à la prochaine ouverture
+  useEffect(() => {
+    if (!open) {
+      setMembers(initialMembers);
+      setHasMore(initialHasMore);
+    }
+  }, [open, initialMembers, initialHasMore]);
+
+  const loadMore = useCallback(() => {
+    if (isLoading || !hasMore) return;
+    const currentOffset = members.length;
+    startLoad(async () => {
+      const result = await getCircleMembersPageAction(circleId, currentOffset, PAGE_SIZE);
+      setMembers((prev) => [...prev, ...result.members]);
+      setHasMore(result.hasMore);
+    });
+  }, [circleId, members.length, hasMore, isLoading]);
+
+  useEffect(() => {
+    if (!open || !hasMore || !sentinelRef.current) return;
+    const sentinel = sentinelRef.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMore();
+      },
+      { rootMargin: "120px" },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [open, hasMore, loadMore]);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger type="button" className={triggerClassName}>
+        {children}
+      </DialogTrigger>
+      <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+        <DialogHeader className="space-y-3 p-6 pb-4">
+          <div className="bg-primary/10 flex size-10 items-center justify-center rounded-full">
+            <UsersIcon className="text-primary size-5" />
+          </div>
+          <DialogTitle className="text-xl font-bold">
+            {t("detail.memberCount", { count: initialTotal })}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+          <ul className="divide-border divide-y">
+            {members.map((member) => (
+              <MemberRow
+                key={member.id}
+                member={member}
+                callerRole={callerRole}
+                showEmail={showEmails}
+                circleId={circleId}
+              />
+            ))}
+          </ul>
+          {hasMore && (
+            <div ref={sentinelRef} className="text-muted-foreground py-4 text-center text-xs">
+              {isLoading ? "…" : ""}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+type MemberRowProps = {
+  member: CircleMemberWithUser;
+  callerRole: CircleMemberRole | undefined;
+  showEmail: boolean;
+  circleId: string;
+};
+
+function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) {
+  const t = useTranslations("Dashboard");
+  const tCircle = useTranslations("Circle");
+  const { user } = member;
+  const displayName = getDisplayName(user.firstName, user.lastName, user.email);
+  const router = useRouter();
+
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  const isManager = callerRole === "HOST" || callerRole === "CO_HOST";
+  const canPromote =
+    callerRole === "HOST" && member.role === "PLAYER" && member.status === "ACTIVE";
+  const canDemote = callerRole === "HOST" && member.role === "CO_HOST";
+  const canRemove =
+    (callerRole === "HOST" && member.role !== "HOST") ||
+    (callerRole === "CO_HOST" && member.role === "PLAYER");
+  const hasMenuActions = canPromote || canDemote || canRemove;
+
+  const handlePromote = () => {
+    startTransition(async () => {
+      const result = await promoteToCoHostAction(circleId, user.id);
+      if (result.success) {
+        toast.success(tCircle("promoteToCoHost.success", { name: displayName }));
+        router.refresh();
+      } else {
+        toast.error(tCircle("promoteToCoHost.error"));
+      }
+    });
+  };
+
+  const handleDemote = () => {
+    startTransition(async () => {
+      const result = await demoteFromCoHostAction(circleId, user.id);
+      if (result.success) {
+        toast.success(tCircle("demoteFromCoHost.success", { name: displayName }));
+        router.refresh();
+      } else {
+        toast.error(tCircle("demoteFromCoHost.error"));
+      }
+    });
+  };
+
+  return (
+    <>
+      <div className="flex items-center gap-3 py-2.5">
+        <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
+        <div className="min-w-0 flex-1">
+          {user.publicId ? (
+            <Link
+              href={`/u/${user.publicId}`}
+              className="text-sm leading-snug font-medium hover:underline underline-offset-2"
+            >
+              {displayName}
+            </Link>
+          ) : (
+            <p className="text-sm leading-snug font-medium">{displayName}</p>
+          )}
+          {showEmail && (
+            <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+          )}
+        </div>
+
+        {(member.role === "HOST" || member.role === "CO_HOST") && (
+          <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
+            <Crown className="size-3" />
+            {t("role.host")}
+          </Badge>
+        )}
+
+        {isManager && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="size-8 shrink-0 p-0"
+                aria-label={tCircle("memberActions.label")}
+                disabled={!hasMenuActions || isPending}
+              >
+                <MoreVertical className="size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            {hasMenuActions && (
+              <DropdownMenuContent align="end">
+                {canPromote && (
+                  <DropdownMenuItem
+                    className="focus:bg-muted focus:text-foreground"
+                    onSelect={handlePromote}
+                  >
+                    <Star className="size-4" />
+                    {tCircle("promoteToCoHost.action")}
+                  </DropdownMenuItem>
+                )}
+                {canDemote && (
+                  <DropdownMenuItem
+                    className="focus:bg-muted focus:text-foreground"
+                    onSelect={handleDemote}
+                  >
+                    <ChevronDown className="size-4" />
+                    {tCircle("demoteFromCoHost.action")}
+                  </DropdownMenuItem>
+                )}
+                {(canPromote || canDemote) && canRemove && <DropdownMenuSeparator />}
+                {canRemove && (
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive focus:bg-muted"
+                    onSelect={() => setRemoveDialogOpen(true)}
+                  >
+                    <Trash2 className="size-4" />
+                    {tCircle("removeMember.action")}
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            )}
+          </DropdownMenu>
+        )}
+      </div>
+
+      {canRemove && (
+        <RemoveMemberDialog
+          circleId={circleId}
+          userId={user.id}
+          memberName={displayName}
+          open={removeDialogOpen}
+          onOpenChange={setRemoveDialogOpen}
+        />
+      )}
+    </>
+  );
+}

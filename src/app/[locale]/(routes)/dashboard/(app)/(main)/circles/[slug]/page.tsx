@@ -19,13 +19,14 @@ import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
-import { CircleMembersList } from "@/components/circles/circle-members-list";
+import { CircleMembersDialog } from "@/components/circles/circle-members-dialog";
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
 import { CoverBlock } from "@/components/circles/cover-block";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName } from "@/lib/display-name";
+import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
 import { UserAvatar } from "@/components/user-avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
@@ -41,7 +42,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Network,
+  Tag,
 } from "lucide-react";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -84,7 +87,7 @@ export default async function CircleDetailPage({
   const isOrganizer = isActiveOrganizer(membership);
   const callerRole = membership.role;
 
-  const [hosts, players, allMoments, pendingMemberships, circleNetworks] = await Promise.all([
+  const [hosts, players, allMoments, pendingMemberships, circleNetworks, membersFirstPage] = await Promise.all([
     prismaCircleRepository.findOrganizers(circle.id),
     prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
     // Le Circle est déjà chargé — skipCircleCheck évite un findById redondant
@@ -95,10 +98,14 @@ export default async function CircleDetailPage({
     ),
     isOrganizer ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
     prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+    prismaCircleRepository.findMembersPaginated(circle.id, {
+      offset: 0,
+      limit: 20,
+      priorityUserId: session.user.id,
+    }),
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const primaryHosts = hosts.filter((h) => h.role === "HOST");
   const sortOrganizersByName = (a: CircleMemberWithUser, b: CircleMemberWithUser) => {
     const nameA = getDisplayName(a.user.firstName, a.user.lastName, a.user.email);
     const nameB = getDisplayName(b.user.firstName, b.user.lastName, b.user.email);
@@ -108,6 +115,20 @@ export default async function CircleDetailPage({
     ...hosts.filter((h) => h.role === "HOST").sort(sortOrganizersByName),
     ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
   ];
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+  const MEMBER_AVATARS_MAX = 5;
+  const allMembersForMeta = [...hosts, ...players].sort(
+    (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
+  );
+  const visibleMemberAvatars = allMembersForMeta.slice(0, MEMBER_AVATARS_MAX);
+  const memberNamesToShow = allMembersForMeta
+    .slice(0, 2)
+    .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
+  const memberOthersCount = Math.max(0, totalMembers - memberNamesToShow.length);
+  const membersMetaText =
+    memberOthersCount > 0
+      ? `${memberNamesToShow.join(", ")} ${t("detail.andOthers", { count: memberOthersCount })}`
+      : memberNamesToShow.join(", ");
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
@@ -128,7 +149,7 @@ export default async function CircleDetailPage({
   return (
     <div className="space-y-8">
 
-      {/* Breadcrumb + role badge */}
+      {/* Breadcrumb */}
       <div className="text-muted-foreground flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm">
         <Link
           href="/dashboard"
@@ -140,19 +161,13 @@ export default async function CircleDetailPage({
         <span className="text-foreground font-medium">
           {circle.name}
         </span>
-        <Badge
-          variant={isOrganizer ? "outline" : "secondary"}
-          className={isOrganizer ? "border-primary/40 text-primary" : ""}
-        >
-          {isOrganizer ? tDashboard("role.host") : tDashboard("role.player")}
-        </Badge>
       </div>
 
       {/* ── Two-column layout ─────────────────────────────────── */}
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
         {/* ─── LEFT column : cover + hosts + stats ────────────── */}
-        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
+        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-20">
 
           <CoverBlock
             coverImage={circle.coverImage}
@@ -166,7 +181,7 @@ export default async function CircleDetailPage({
             <>
               <div className="space-y-2 px-1">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  {t("detail.hosts")}
+                  {t("detail.hostedBy")}
                 </p>
                 <ul className="space-y-2">
                   {circleOrganizers.map((host) => (
@@ -192,9 +207,17 @@ export default async function CircleDetailPage({
           {/* Stats */}
           <div className="flex gap-6 px-1">
             <div>
-              <a href="#members-section" className="text-2xl font-bold hover:underline underline-offset-2">
+              <CircleMembersDialog
+                circleId={circle.id}
+                initialMembers={membersFirstPage.members}
+                initialTotal={membersFirstPage.total}
+                initialHasMore={membersFirstPage.hasMore}
+                callerRole={callerRole}
+                showEmails={isOrganizer}
+                triggerClassName="cursor-pointer text-2xl font-bold underline-offset-2 hover:underline"
+              >
                 {totalMembers}
-              </a>
+              </CircleMembersDialog>
               <p className="text-muted-foreground text-xs">
                 {t("detail.members")}
               </p>
@@ -207,6 +230,20 @@ export default async function CircleDetailPage({
             </div>
           </div>
 
+          {/* Actions Organisateur — Modifier + Supprimer (Supprimer réservé au HOST) */}
+          {isOrganizer && (
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="flex-1">
+                <Link href={`/dashboard/circles/${circle.slug}/edit`}>
+                  {tCommon("edit")}
+                </Link>
+              </Button>
+              {membership.role === "HOST" && (
+                <DeleteCircleDialog circleId={circle.id} triggerClassName="flex-1" />
+              )}
+            </div>
+          )}
+
           {/* Quitter la Communauté — Participant uniquement */}
           {!isOrganizer && (
             <div className="px-1">
@@ -218,32 +255,13 @@ export default async function CircleDetailPage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres */}
-          <div className="flex items-center justify-between gap-4">
-            {primaryHosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {primaryHosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" />
-                    {i < primaryHosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
-            {isOrganizer && (
-              <div className="flex shrink-0 gap-2">
-                <Button asChild size="sm">
-                  <Link href={`/dashboard/circles/${circle.slug}/edit`}>
-                    {tCommon("edit")}
-                  </Link>
-                </Button>
-                {membership.role === "HOST" && (
-                  <DeleteCircleDialog circleId={circle.id} />
-                )}
-              </div>
-            )}
-          </div>
+          {/* Catégorie (pill) */}
+          {categoryLabel && (
+            <Badge variant="outline" className="w-fit gap-1.5 px-3 py-1 text-sm">
+              <Tag className="size-4" />
+              {categoryLabel}
+            </Badge>
+          )}
 
           {/* Titre */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
@@ -256,7 +274,9 @@ export default async function CircleDetailPage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <CollapsibleDescription text={circle.description} />
+              <div className="border-primary border-l-2 pl-4">
+                <CollapsibleDescription text={circle.description} />
+              </div>
             </div>
           )}
 
@@ -266,23 +286,59 @@ export default async function CircleDetailPage({
           {/* Meta */}
           <div className="flex flex-col gap-3">
 
-            {/* Catégorie */}
-            {circle.category && (
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-base">🏷</span>
+            {/* Membres — avatars + texte clicables (ouvre la modale) */}
+            {visibleMemberAvatars.length > 0 && (
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Users className="text-primary size-5" />
                 </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">
-                    {t("form.category")}
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                    {t("detail.members")}
                   </p>
-                  <p className="text-sm font-medium">
-                    <Badge variant="secondary" className="text-xs">
-                      {circle.category === "OTHER" && circle.customCategory
-                        ? circle.customCategory
-                        : tCategory(circle.category)}
-                    </Badge>
-                  </p>
+                  <CircleMembersDialog
+                    circleId={circle.id}
+                    initialMembers={membersFirstPage.members}
+                    initialTotal={membersFirstPage.total}
+                    initialHasMore={membersFirstPage.hasMore}
+                    callerRole={callerRole}
+                    showEmails={isOrganizer}
+                    triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
+                  >
+                    <TooltipProvider>
+                      <span className="flex -space-x-1.5">
+                        {visibleMemberAvatars.map((m) => {
+                          const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
+                          return (
+                            <Tooltip key={m.id}>
+                              <TooltipTrigger asChild>
+                                <span
+                                  className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
+                                  style={{ background: getMomentGradient(m.user.email) }}
+                                >
+                                  {m.user.image ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                      src={m.user.image}
+                                      alt={displayName}
+                                      referrerPolicy="no-referrer"
+                                      className="absolute inset-0 size-full object-cover"
+                                    />
+                                  ) : (
+                                    getCircleUserInitials(m.user)
+                                  )}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>{displayName}</TooltipContent>
+                            </Tooltip>
+                          );
+                        })}
+                      </span>
+                    </TooltipProvider>
+                    <span className="text-sm font-medium underline-offset-2 group-hover:underline">
+                      {membersMetaText}
+                    </span>
+                  </CircleMembersDialog>
                 </div>
               </div>
             )}
@@ -290,11 +346,11 @@ export default async function CircleDetailPage({
             {/* Ville */}
             {circle.city && (
               <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <MapPin className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <MapPin className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {t("form.city")}
                   </p>
                   <p className="text-sm font-medium">{circle.city}</p>
@@ -305,11 +361,11 @@ export default async function CircleDetailPage({
             {/* Site web */}
             {circle.website && (
               <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <Globe className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Globe className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {t("form.website")}
                   </p>
                   <a
@@ -326,15 +382,15 @@ export default async function CircleDetailPage({
 
             {/* Visibilité */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
                 {circle.visibility === "PUBLIC" ? (
-                  <Globe className="text-primary size-4" />
+                  <Globe className="text-primary size-5" />
                 ) : (
-                  <Lock className="text-primary size-4" />
+                  <Lock className="text-primary size-5" />
                 )}
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("detail.visibility")}
                 </p>
                 <p className="text-sm font-medium">
@@ -345,28 +401,13 @@ export default async function CircleDetailPage({
               </div>
             </div>
 
-            {/* Membres */}
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <Users className="text-primary size-4" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("detail.members")}
-                </p>
-                <p className="text-sm font-medium">
-                  {t("detail.memberCount", { count: totalMembers })}
-                </p>
-              </div>
-            </div>
-
             {/* Créé le */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="text-primary size-4" />
+              <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-5" />
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
@@ -382,11 +423,11 @@ export default async function CircleDetailPage({
             {/* Réseaux */}
             {circleNetworks.map((network) => (
               <div key={network.id} className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <Network className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {tNetwork("memberOf")}
                   </p>
                   <Link
@@ -400,27 +441,47 @@ export default async function CircleDetailPage({
             ))}
           </div>
 
+          {/* Demandes en attente — visible Organisateurs uniquement si requiresApproval */}
+          {isOrganizer && circle.requiresApproval && (
+            <>
+              <div className="border-border border-t" />
+              <div className="border-border bg-card rounded-2xl border p-6">
+                {pendingMemberships.length > 0 ? (
+                  <PendingMembershipsList
+                    circleId={circle.id}
+                    pendingMemberships={pendingMemberships}
+                  />
+                ) : (
+                  <div className="flex items-center gap-3 text-muted-foreground">
+                    <ShieldCheck className="size-5 shrink-0" />
+                    <p className="text-sm">{t("detail.noPendingMemberships")}</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
           {/* Partager & Inviter — visible Organisateurs uniquement */}
           {isOrganizer && (
             <>
-            <div className="border-border border-t" />
-            <CircleShareInviteCard
-              circleId={circle.id}
-              circleSlug={circle.slug}
-              publicUrl={publicUrl}
-              t={{
-                cardTitle: t("invite.cardTitle"),
-                shareableLink: t("invite.shareableLink"),
-                emailTitle: t("invite.emailTitle"),
-                emailPlaceholder: t("invite.emailPlaceholder"),
-                emailSend: t("invite.emailSend"),
-                emailSendMultiple: t("invite.emailSendMultiple"),
-                emailSent: t("invite.emailSent"),
-                emailInvalid: t("invite.emailInvalid"),
-                emailAddMore: t("invite.emailAddMore"),
-                emailMaxReached: t("invite.emailMaxReached", { max: 10 }),
-              }}
-            />
+              <div className="border-border border-t" />
+              <CircleShareInviteCard
+                circleId={circle.id}
+                circleSlug={circle.slug}
+                publicUrl={publicUrl}
+                t={{
+                  cardTitle: t("invite.cardTitle"),
+                  shareableLink: t("invite.shareableLink"),
+                  emailTitle: t("invite.emailTitle"),
+                  emailPlaceholder: t("invite.emailPlaceholder"),
+                  emailSend: t("invite.emailSend"),
+                  emailSendMultiple: t("invite.emailSendMultiple"),
+                  emailSent: t("invite.emailSent"),
+                  emailInvalid: t("invite.emailInvalid"),
+                  emailAddMore: t("invite.emailAddMore"),
+                  emailMaxReached: t("invite.emailMaxReached", { max: 10 }),
+                }}
+              />
             </>
           )}
 
@@ -488,36 +549,6 @@ export default async function CircleDetailPage({
             }
           />
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
-
-          {/* Demandes en attente — visible Organisateurs uniquement si requiresApproval */}
-          {isOrganizer && circle.requiresApproval && (
-            <div className="border-border bg-card rounded-2xl border p-6">
-              {pendingMemberships.length > 0 ? (
-                <PendingMembershipsList
-                  circleId={circle.id}
-                  pendingMemberships={pendingMemberships}
-                />
-              ) : (
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <ShieldCheck className="size-5 shrink-0" />
-                  <p className="text-sm">{t("detail.noPendingMemberships")}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Membres */}
-          <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
-            <CircleMembersList
-              hosts={hosts}
-              players={players}
-              variant={isOrganizer ? "host" : "player"}
-              callerRole={callerRole}
-              circleId={circle.id}
-            />
-          </div>
         </div>
       </div>
     </div>

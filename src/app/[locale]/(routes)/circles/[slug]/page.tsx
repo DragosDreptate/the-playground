@@ -14,14 +14,15 @@ import { auth } from "@/infrastructure/auth/auth.config";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getCircleMoments } from "@/domain/usecases/get-circle-moments";
 import { CircleViewTracker } from "@/components/circles/circle-view-tracker";
-import { CircleMembersList } from "@/components/circles/circle-members-list";
+import { CircleMembersDialog } from "@/components/circles/circle-members-dialog";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
-import { getDisplayName } from "@/lib/display-name";
+import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
 import { UserAvatar } from "@/components/user-avatar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -41,10 +42,11 @@ import {
   ChevronRight,
   MapPin,
   ExternalLink,
-  Crown,
   Clock,
   Network,
+  Tag,
 } from "lucide-react";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 export const revalidate = 60;
 
@@ -169,6 +171,20 @@ export default async function PublicCirclePage({
     ...hosts.filter((h) => h.role === "HOST").sort(sortOrganizersByName),
     ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
   ];
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+  const MEMBER_AVATARS_MAX = 5;
+  const allMembersForMeta = [...hosts, ...players].sort(
+    (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
+  );
+  const visibleMemberAvatars = allMembersForMeta.slice(0, MEMBER_AVATARS_MAX);
+  const memberNamesToShow = allMembersForMeta
+    .slice(0, 2)
+    .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
+  const memberOthersCount = Math.max(0, memberCount - memberNamesToShow.length);
+  const membersMetaText =
+    memberOthersCount > 0
+      ? `${memberNamesToShow.join(", ")} ${t("detail.andOthers", { count: memberOthersCount })}`
+      : memberNamesToShow.join(", ");
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -181,10 +197,17 @@ export default async function PublicCirclePage({
   );
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
-  const [countByMomentId, topAttendeesByMomentId, circleNetworks] = await Promise.all([
+  const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
     prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
     prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
     prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+    canSeeMembers
+      ? prismaCircleRepository.findMembersPaginated(circle.id, {
+          offset: 0,
+          limit: 20,
+          priorityUserId: session?.user?.id ?? null,
+        })
+      : Promise.resolve({ members: [], total: 0, hasMore: false }),
   ]);
 
   const gradient = getMomentGradient(circle.name);
@@ -232,7 +255,7 @@ export default async function PublicCirclePage({
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
         {/* ─── LEFT column : cover + hosts + stats ────────────── */}
-        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
+        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-20">
 
           <CoverBlock
             coverImage={circle.coverImage}
@@ -248,7 +271,7 @@ export default async function PublicCirclePage({
             <>
               <div className="space-y-2 px-1">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  {t("detail.hosts")}
+                  {t("detail.hostedBy")}
                 </p>
                 <ul className="space-y-2">
                   {circleOrganizers.map((host) => (
@@ -275,10 +298,16 @@ export default async function PublicCirclePage({
           {/* Stats */}
           <div className="flex gap-6 px-1">
             <div>
-              {isConnected ? (
-                <a href="#members-section" className="text-2xl font-bold hover:underline underline-offset-2">
+              {canSeeMembers ? (
+                <CircleMembersDialog
+                  circleId={circle.id}
+                  initialMembers={membersFirstPage.members}
+                  initialTotal={membersFirstPage.total}
+                  initialHasMore={membersFirstPage.hasMore}
+                  triggerClassName="cursor-pointer text-2xl font-bold underline-offset-2 hover:underline"
+                >
                   {memberCount}
-                </a>
+                </CircleMembersDialog>
               ) : (
                 <p className="text-2xl font-bold">{memberCount}</p>
               )}
@@ -290,12 +319,14 @@ export default async function PublicCirclePage({
             </div>
           </div>
 
-          {/* Badge Organisateur — visible pour les Organisateurs */}
+          {/* CTA "Gérer cette communauté" — visible pour les Organisateurs */}
           {isOrganizer && (
-            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
-              <Crown className="size-4 shrink-0" aria-hidden="true" />
-              {t("detail.isOrganizer")}
-            </div>
+            <Button asChild size="sm" className="w-full gap-2">
+              <Link href={`/dashboard/circles/${circle.slug}`}>
+                <ExternalLink className="size-4" />
+                {t("detail.manageCircle")}
+              </Link>
+            </Button>
           )}
 
           {/* Badge Membre — visible pour les membres non-Organisateurs */}
@@ -350,28 +381,13 @@ export default async function PublicCirclePage({
         {/* ─── RIGHT column ─────────────────────────────────── */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
-          {/* "Organisé par" : affiche uniquement le HOST principal ; les CO_HOST sont visibles dans la liste des membres avec leur badge */}
-          <div className="flex items-center justify-between gap-4">
-            {primaryHosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("detail.hostedBy")}
-                {primaryHosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    <HostLink user={h.user} className="text-foreground font-medium" linkDisabled={!isConnected} />
-                    {i < primaryHosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
-            {isOrganizer && (
-              <Button asChild variant="ghost" size="sm" className="shrink-0 gap-1.5">
-                <Link href={`/dashboard/circles/${circle.slug}`}>
-                  <ExternalLink className="size-3.5" />
-                  {t("detail.manageCircle")}
-                </Link>
-              </Button>
-            )}
-          </div>
+          {/* Catégorie (pill) */}
+          {categoryLabel && (
+            <Badge variant="outline" className="w-fit gap-1.5 px-3 py-1 text-sm">
+              <Tag className="size-4" />
+              {categoryLabel}
+            </Badge>
+          )}
 
           {/* Titre */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
@@ -384,7 +400,9 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <CollapsibleDescription text={circle.description} />
+              <div className="border-primary border-l-2 pl-4">
+                <CollapsibleDescription text={circle.description} />
+              </div>
             </div>
           )}
 
@@ -394,23 +412,93 @@ export default async function PublicCirclePage({
           {/* Meta */}
           <div className="flex flex-col gap-3">
 
-            {/* Catégorie */}
-            {circle.category && (
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <span className="text-primary text-base">🏷</span>
+            {/* Membres — avatars + texte clicables si canSeeMembers, sinon statique */}
+            {visibleMemberAvatars.length > 0 && (
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Users className="text-primary size-5" />
                 </div>
-                <div>
-                  <p className="text-muted-foreground text-xs">
-                    {t("form.category")}
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                    {t("detail.members")}
                   </p>
-                  <p className="text-sm font-medium">
-                    <Badge variant="secondary" className="text-xs">
-                      {circle.category === "OTHER" && circle.customCategory
-                        ? circle.customCategory
-                        : tCategory(circle.category)}
-                    </Badge>
-                  </p>
+                  {canSeeMembers ? (
+                    <CircleMembersDialog
+                      circleId={circle.id}
+                      initialMembers={membersFirstPage.members}
+                      initialTotal={membersFirstPage.total}
+                      initialHasMore={membersFirstPage.hasMore}
+                      triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
+                    >
+                      <TooltipProvider>
+                        <span className="flex -space-x-1.5">
+                          {visibleMemberAvatars.map((m) => {
+                            const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
+                            return (
+                              <Tooltip key={m.id}>
+                                <TooltipTrigger asChild>
+                                  <span
+                                    className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
+                                    style={{ background: getMomentGradient(m.user.email) }}
+                                  >
+                                    {m.user.image ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        src={m.user.image}
+                                        alt={displayName}
+                                        referrerPolicy="no-referrer"
+                                        className="absolute inset-0 size-full object-cover"
+                                      />
+                                    ) : (
+                                      getCircleUserInitials(m.user)
+                                    )}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>{displayName}</TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </span>
+                      </TooltipProvider>
+                      <span className="text-sm font-medium underline-offset-2 group-hover:underline">
+                        {membersMetaText}
+                      </span>
+                    </CircleMembersDialog>
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <TooltipProvider>
+                        <span className="flex -space-x-1.5">
+                          {visibleMemberAvatars.map((m) => {
+                            const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
+                            return (
+                              <Tooltip key={m.id}>
+                                <TooltipTrigger asChild>
+                                  <span
+                                    className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
+                                    style={{ background: getMomentGradient(m.user.email) }}
+                                  >
+                                    {m.user.image ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
+                                      <img
+                                        src={m.user.image}
+                                        alt={displayName}
+                                        referrerPolicy="no-referrer"
+                                        className="absolute inset-0 size-full object-cover"
+                                      />
+                                    ) : (
+                                      getCircleUserInitials(m.user)
+                                    )}
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>{displayName}</TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </span>
+                      </TooltipProvider>
+                      <span className="text-sm font-medium">{membersMetaText}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -418,11 +506,11 @@ export default async function PublicCirclePage({
             {/* Ville */}
             {circle.city && (
               <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <MapPin className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <MapPin className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {t("form.city")}
                   </p>
                   <p className="text-sm font-medium">{circle.city}</p>
@@ -433,11 +521,11 @@ export default async function PublicCirclePage({
             {/* Site web */}
             {circle.website && (
               <div className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <Globe className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Globe className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {t("form.website")}
                   </p>
                   <a
@@ -454,15 +542,15 @@ export default async function PublicCirclePage({
 
             {/* Visibilité */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+              <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
                 {circle.visibility === "PUBLIC" ? (
-                  <Globe className="text-primary size-4" />
+                  <Globe className="text-primary size-5" />
                 ) : (
-                  <Lock className="text-primary size-4" />
+                  <Lock className="text-primary size-5" />
                 )}
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("detail.visibility")}
                 </p>
                 <p className="text-sm font-medium">
@@ -473,28 +561,13 @@ export default async function PublicCirclePage({
               </div>
             </div>
 
-            {/* Membres */}
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <Users className="text-primary size-4" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-xs">
-                  {t("detail.members")}
-                </p>
-                <p className="text-sm font-medium">
-                  {t("detail.memberCount", { count: memberCount })}
-                </p>
-              </div>
-            </div>
-
             {/* Créé le */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="text-primary size-4" />
+              <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-5" />
               </div>
               <div>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
@@ -506,11 +579,11 @@ export default async function PublicCirclePage({
             {/* Réseaux */}
             {circleNetworks.map((network) => (
               <div key={network.id} className="flex items-center gap-3">
-                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-                  <Network className="text-primary size-4" />
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Network className="text-primary size-5" />
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                     {tNetwork("memberOf")}
                   </p>
                   <Link
@@ -583,22 +656,6 @@ export default async function PublicCirclePage({
             }
           />
 
-          {/* Section Membres */}
-          {(canSeeMembers || !isConnected) && (
-            <div id="members-section" className="border-border bg-card rounded-2xl border p-6">
-              {canSeeMembers ? (
-                <CircleMembersList
-                  hosts={hosts}
-                  players={players}
-                  variant="member-view"
-                />
-              ) : (
-                <p className="text-muted-foreground text-center text-sm py-4">
-                  {t("detail.signInToSeeMembers")}
-                </p>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </div>

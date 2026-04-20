@@ -21,6 +21,10 @@ import { approveCircleMembership } from "@/domain/usecases/approve-circle-member
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { promoteToCoHost } from "@/domain/usecases/promote-to-co-host";
 import { demoteFromCoHost } from "@/domain/usecases/demote-from-co-host";
+import {
+  getCircleMembersPage,
+  type GetCircleMembersPageResult,
+} from "@/domain/usecases/get-circle-members-page";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
 import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
@@ -653,5 +657,25 @@ export async function demoteFromCoHostAction(
     invalidateDashboardCache(hostUserId);
     invalidateDashboardCache(targetUserId);
   });
+}
+
+/**
+ * Liste paginée des membres d'un Circle (pour modale avec infinite scroll).
+ * Renvoie un résultat vide en cas d'erreur (non-auth, non-membre d'un Circle privé, etc.).
+ */
+export async function getCircleMembersPageAction(
+  circleId: string,
+  offset: number,
+  limit: number,
+): Promise<GetCircleMembersPageResult> {
+  const session = await auth();
+  try {
+    return await getCircleMembersPage(
+      { circleId, offset, limit, callerUserId: session?.user?.id ?? null },
+      { circleRepository: prismaCircleRepository },
+    );
+  } catch {
+    return { members: [], total: 0, hasMore: false };
+  }
 }
 
