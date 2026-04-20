@@ -1477,10 +1477,10 @@
       "notFound": "Profil introuvable",
       "signInToView": "Connecte-toi pour voir ce profil",
       "roleHost": "Organisateur",
-      "rolePlayer": "Participant"
-    },
-    "socialLinks": {
-      "website": "Site web"
+      "rolePlayer": "Participant",
+      "socialLinks": {
+        "website": "Site web"
+      }
     }
   },
   "Help": {

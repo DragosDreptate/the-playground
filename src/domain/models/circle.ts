@@ -84,6 +84,10 @@ export type CircleMemberWithUser = CircleMembership & {
     email: string;
     image: string | null;
     publicId: string | null;
+    website?: string | null;
+    linkedinUrl?: string | null;
+    twitterUrl?: string | null;
+    githubUrl?: string | null;
   };
 };
 

@@ -273,21 +273,38 @@ export default async function PublicCirclePage({
                   {t("detail.hostedBy")}
                 </p>
                 <ul className="space-y-2">
-                  {circleOrganizers.map((host) => (
-                    <li key={host.id} className="flex items-center gap-3">
+                  {circleOrganizers.map((host) => {
+                    const hostDisplayName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+                    const avatar = (
                       <UserAvatar
-                        name={getDisplayName(host.user.firstName, host.user.lastName, host.user.email)}
+                        name={hostDisplayName}
                         email={host.user.email}
                         image={host.user.image}
                         size="sm"
                       />
-                      <HostLink
-                        user={host.user}
-                        className="text-sm font-medium leading-snug"
-                        linkDisabled={!isConnected}
-                      />
-                    </li>
-                  ))}
+                    );
+                    const linkable = isConnected && host.user.publicId;
+                    return (
+                      <li key={host.id}>
+                        {linkable ? (
+                          <Link
+                            href={`/u/${host.user.publicId}`}
+                            className="group/organizer flex items-center gap-3"
+                          >
+                            {avatar}
+                            <span className="text-sm font-medium leading-snug group-hover/organizer:underline underline-offset-2">
+                              {hostDisplayName}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            {avatar}
+                            <span className="text-sm font-medium leading-snug">{hostDisplayName}</span>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
               <div className="border-border border-t" />

@@ -411,6 +411,10 @@ export const prismaCircleRepository: CircleRepository = {
       email: string;
       image: string | null;
       publicId: string | null;
+      website: string | null;
+      linkedinUrl: string | null;
+      twitterUrl: string | null;
+      githubUrl: string | null;
     };
 
     // Tri : user courant d'abord (si fourni), puis HOST > CO_HOST > PLAYER, puis joinedAt asc.
@@ -427,7 +431,11 @@ export const prismaCircleRepository: CircleRepository = {
         u."lastName",
         u.email,
         u.image,
-        u.public_id AS "publicId"
+        u.public_id AS "publicId",
+        u.website,
+        u.linkedin_url AS "linkedinUrl",
+        u.twitter_url AS "twitterUrl",
+        u.github_url AS "githubUrl"
       FROM circle_memberships m
       INNER JOIN users u ON u.id = m."userId"
       WHERE m."circleId" = ${circleId} AND m.status = 'ACTIVE'
@@ -452,6 +460,10 @@ export const prismaCircleRepository: CircleRepository = {
         email: r.email,
         image: r.image,
         publicId: r.publicId,
+        website: r.website,
+        linkedinUrl: r.linkedinUrl,
+        twitterUrl: r.twitterUrl,
+        githubUrl: r.githubUrl,
       },
     }));
 

@@ -24,7 +24,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
-import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2 } from "lucide-react";
+import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2, Globe, Linkedin, Github } from "lucide-react";
+import { XIcon } from "@/components/icons/x-icon";
 import { getDisplayName } from "@/lib/display-name";
 import {
   getCircleMembersPageAction,
@@ -119,9 +120,9 @@ export function CircleMembersDialog({
         </div>
       </DialogTrigger>
       <DialogContent className="flex max-h-[85vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
-        <DialogHeader className="space-y-3 p-6 pb-4">
-          <div className="bg-primary/10 flex size-10 items-center justify-center rounded-full">
-            <UsersIcon className="text-primary size-5" />
+        <DialogHeader className="border-border flex-row items-center gap-3 space-y-0 border-b p-6">
+          <div className="bg-primary/10 flex size-14 shrink-0 items-center justify-center rounded-full">
+            <UsersIcon className="text-primary size-7" />
           </div>
           <DialogTitle className="text-xl font-bold">
             {t("detail.memberCount", { count: initialTotal })}
@@ -131,7 +132,7 @@ export function CircleMembersDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-6">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">
           <ul className="divide-border divide-y">
             {members.map((member) => (
               <MemberRow
@@ -207,29 +208,64 @@ function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) 
   return (
     <>
       <div className="flex items-center gap-3 py-2.5">
-        <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
-        <div className="min-w-0 flex-1">
-          {user.publicId ? (
-            <Link
-              href={`/u/${user.publicId}`}
-              className="text-sm leading-snug font-medium hover:underline underline-offset-2"
-            >
-              {displayName}
-            </Link>
-          ) : (
-            <p className="text-sm leading-snug font-medium">{displayName}</p>
-          )}
-          {showEmail && (
-            <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-          )}
-        </div>
-
-        {(member.role === "HOST" || member.role === "CO_HOST") && (
-          <Badge variant="outline" className="border-primary/40 text-primary shrink-0 gap-1">
-            <Crown className="size-3" />
-            {t("role.host")}
-          </Badge>
+        {user.publicId ? (
+          <Link
+            href={`/u/${user.publicId}`}
+            className="group/member flex min-w-0 flex-1 items-center gap-3"
+          >
+            <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm leading-snug font-medium group-hover/member:underline underline-offset-2">
+                  {displayName}
+                </span>
+                {(member.role === "HOST" || member.role === "CO_HOST") && (
+                  <span className="group/role relative shrink-0">
+                    <Badge
+                      variant="outline"
+                      className="border-primary/40 text-primary flex size-6 items-center justify-center p-0"
+                    >
+                      <Crown className="size-3" />
+                    </Badge>
+                    <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/role:opacity-100">
+                      {t("role.host")}
+                    </span>
+                  </span>
+                )}
+              </div>
+              {showEmail && (
+                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+              )}
+            </div>
+          </Link>
+        ) : (
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-sm leading-snug font-medium">{displayName}</span>
+                {(member.role === "HOST" || member.role === "CO_HOST") && (
+                  <span className="group/role relative shrink-0">
+                    <Badge
+                      variant="outline"
+                      className="border-primary/40 text-primary flex size-6 items-center justify-center p-0"
+                    >
+                      <Crown className="size-3" />
+                    </Badge>
+                    <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/role:opacity-100">
+                      {t("role.host")}
+                    </span>
+                  </span>
+                )}
+              </div>
+              {showEmail && (
+                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+              )}
+            </div>
+          </div>
         )}
+
+        <SocialLinks user={user} />
 
         {isManager && (
           <DropdownMenu>
@@ -290,5 +326,37 @@ function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) 
         />
       )}
     </>
+  );
+}
+
+type SocialLinksProps = {
+  user: CircleMemberWithUser["user"];
+};
+
+function SocialLinks({ user }: SocialLinksProps) {
+  const links: Array<{ url: string; icon: React.ReactNode; title: string }> = [];
+  if (user.website) links.push({ url: user.website, icon: <Globe className="size-3.5" />, title: "Site web" });
+  if (user.linkedinUrl) links.push({ url: user.linkedinUrl, icon: <Linkedin className="size-3.5" />, title: "LinkedIn" });
+  if (user.twitterUrl) links.push({ url: user.twitterUrl, icon: <XIcon className="size-3.5" />, title: "Twitter / X" });
+  if (user.githubUrl) links.push({ url: user.githubUrl, icon: <Github className="size-3.5" />, title: "GitHub" });
+
+  if (links.length === 0) return null;
+
+  return (
+    <div className="flex shrink-0 items-center gap-1">
+      {links.map((l) => (
+        <a
+          key={l.url}
+          href={l.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={l.title}
+          onClick={(e) => e.stopPropagation()}
+          className="text-muted-foreground hover:text-foreground flex size-7 items-center justify-center rounded-md transition-colors hover:bg-muted"
+        >
+          {l.icon}
+        </a>
+      ))}
+    </div>
   );
 }

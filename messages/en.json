@@ -1477,10 +1477,10 @@
       "notFound": "Profile not found",
       "signInToView": "Sign in to view this profile",
       "roleHost": "Organizer",
-      "rolePlayer": "Member"
-    },
-    "socialLinks": {
-      "website": "Website"
+      "rolePlayer": "Member",
+      "socialLinks": {
+        "website": "Website"
+      }
     }
   },
   "Help": {
