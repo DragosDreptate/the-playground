@@ -20,7 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
-import { getCircleUserInitials } from "@/lib/display-name";
+import { getDisplayName } from "@/lib/display-name";
+import { UserAvatar } from "@/components/user-avatar";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -159,6 +160,15 @@ export default async function PublicCirclePage({
     : false;
   const isConnected = !!session?.user?.id;
   const primaryHosts = hosts.filter((h) => h.role === "HOST");
+  const sortOrganizersByName = (a: CircleMemberWithUser, b: CircleMemberWithUser) => {
+    const nameA = getDisplayName(a.user.firstName, a.user.lastName, a.user.email);
+    const nameB = getDisplayName(b.user.firstName, b.user.lastName, b.user.email);
+    return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+  };
+  const circleOrganizers = [
+    ...hosts.filter((h) => h.role === "HOST").sort(sortOrganizersByName),
+    ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
+  ];
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -233,33 +243,33 @@ export default async function PublicCirclePage({
             {circle.isDemo && <DemoBadge label={tExplorer("circleCard.demo")} size="lg" />}
           </CoverBlock>
 
-          {/* Hosts — affiche uniquement le HOST principal (les CO_HOST figurent dans la liste des membres avec leur badge) */}
-          {primaryHosts.length > 0 && (
-            <div className="space-y-2 px-1">
-              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                {t("detail.hosts")}
-              </p>
-              <div className="flex flex-wrap items-center gap-1.5">
-                {primaryHosts.map((host) => (
-                  <div
-                    key={host.id}
-                    className="flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
-                    style={{ background: getMomentGradient(host.user.email) }}
-                    title={host.user.firstName ?? host.user.email}
-                  >
-                    {getCircleUserInitials(host.user)}
-                  </div>
-                ))}
+          {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
+          {circleOrganizers.length > 0 && (
+            <>
+              <div className="space-y-2 px-1">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                  {t("detail.hosts")}
+                </p>
+                <ul className="space-y-2">
+                  {circleOrganizers.map((host) => (
+                    <li key={host.id} className="flex items-center gap-3">
+                      <UserAvatar
+                        name={getDisplayName(host.user.firstName, host.user.lastName, host.user.email)}
+                        email={host.user.email}
+                        image={host.user.image}
+                        size="sm"
+                      />
+                      <HostLink
+                        user={host.user}
+                        className="text-sm font-medium leading-snug"
+                        linkDisabled={!isConnected}
+                      />
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <p className="flex flex-wrap gap-x-1 text-sm font-medium leading-snug">
-                {primaryHosts.map((h, i) => (
-                  <span key={h.user.id}>
-                    <HostLink user={h.user} linkDisabled={!isConnected} />
-                    {i < primaryHosts.length - 1 && ", "}
-                  </span>
-                ))}
-              </p>
-            </div>
+              <div className="border-border border-t" />
+            </>
           )}
 
           {/* Stats */}
