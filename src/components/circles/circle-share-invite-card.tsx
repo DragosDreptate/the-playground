@@ -76,10 +76,10 @@ export function CircleShareInviteCard({ circleId, circleSlug, publicUrl, t }: Pr
 
   return (
     <div className="bg-card border-border rounded-2xl border p-6">
-      {/* Card title */}
-      <div className="mb-4 flex items-center gap-2">
-        <p className="text-[17px] font-semibold">{t.cardTitle}</p>
-      </div>
+      {/* Title */}
+      <p className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+        {t.cardTitle}
+      </p>
 
       {/* ── Row 1 : Lien partageable ── */}
       <div className="flex items-start gap-3 pt-0 pb-3">
