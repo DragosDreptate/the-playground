@@ -8,81 +8,65 @@ import {
   infoLabel,
   infoValue,
 } from "../email/templates/components/email-styles";
-import type { UserImpact, UserImpactLevel } from "./analyze-issue";
+import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "./analysis-meta";
+import type { IssueInput } from "./analyze-issue";
 
 type Props = {
-  issueShortId: string;
-  issueTitle: string;
-  urgency: string;
-  urgencyLabel: string;
-  trigger: string;
-  functionalConsequence: string;
-  userImpact: UserImpact;
-  technical: string;
+  issue: Pick<IssueInput, "issueShortId" | "issueTitle">;
+  analysis: AnalysisResult;
   sentryUrl: string;
 };
 
-const URGENCY_COLORS: Record<string, string> = {
-  critical: "#dc2626",
-  high: "#ea580c",
-  medium: "#ca8a04",
-  low: "#2563eb",
-  noise: "#71717a",
+type InfoRowProps = {
+  label: string;
+  body: string;
+  accentColor?: string;
+  labelBold?: boolean;
 };
 
-const USER_IMPACT_META: Record<UserImpactLevel, { label: string; color: string }> = {
-  none: { label: "AUCUN IMPACT UTILISATEUR", color: "#16a34a" },
-  silent: { label: "IMPACT SILENCIEUX", color: "#71717a" },
-  degraded: { label: "EXPÉRIENCE DÉGRADÉE", color: "#ea580c" },
-  blocking: { label: "UTILISATEUR BLOQUÉ", color: "#dc2626" },
-};
+function InfoRow({ label, body, accentColor, labelBold }: InfoRowProps) {
+  const sectionStyle = accentColor
+    ? { ...infoCard, borderLeft: `4px solid ${accentColor}` }
+    : infoCard;
+  const finalLabelStyle = accentColor
+    ? { ...infoLabel, color: accentColor, fontWeight: labelBold ? 700 : infoLabel.fontWeight }
+    : infoLabel;
+  return (
+    <Section style={sectionStyle}>
+      <Text style={finalLabelStyle}>{label}</Text>
+      <Text style={bodyText}>{body}</Text>
+    </Section>
+  );
+}
 
-export function SentryIssueAnalysisEmail({
-  issueShortId,
-  issueTitle,
-  urgency,
-  urgencyLabel,
-  trigger,
-  functionalConsequence,
-  userImpact,
-  technical,
-  sentryUrl,
-}: Props) {
-  const color = URGENCY_COLORS[urgency] ?? "#71717a";
-  const impactMeta = USER_IMPACT_META[userImpact.level];
+export function SentryIssueAnalysisEmail({ issue, analysis, sentryUrl }: Props) {
+  const urgencyMeta = URGENCY_META[analysis.urgency];
+  const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
 
   return (
     <EmailLayout
-      preview={`[${urgencyLabel}] ${issueShortId} — ${issueTitle.slice(0, 60)}`}
+      preview={`[${urgencyMeta.label}] ${issue.issueShortId} — ${issue.issueTitle.slice(0, 60)}`}
       footer="Sentry Issue Analysis — The Playground"
     >
-      <Text style={{ ...urgencyBadge, backgroundColor: color }}>
-        {urgencyLabel}
+      <Text style={{ ...urgencyBadge, backgroundColor: urgencyMeta.color }}>
+        {urgencyMeta.label}
       </Text>
 
-      <Text style={heading}>{issueShortId}</Text>
-      <Text style={titleStyle}>{issueTitle}</Text>
+      <Text style={heading}>{issue.issueShortId}</Text>
+      <Text style={titleStyle}>{issue.issueTitle}</Text>
 
-      <Section style={infoCard}>
-        <Text style={infoLabel}>Déclencheur</Text>
-        <Text style={bodyText}>{trigger}</Text>
-      </Section>
-
-      <Section style={infoCard}>
-        <Text style={infoLabel}>Conséquence fonctionnelle</Text>
-        <Text style={bodyText}>{functionalConsequence}</Text>
-      </Section>
-
-      <Section style={{ ...infoCard, borderLeft: `4px solid ${impactMeta.color}` }}>
-        <Text style={{ ...infoLabel, color: impactMeta.color, fontWeight: 700 }}>
-          {impactMeta.label}
-        </Text>
-        <Text style={bodyText}>{userImpact.description}</Text>
-      </Section>
+      <InfoRow label="Déclencheur" body={analysis.trigger} />
+      <InfoRow label="Conséquence fonctionnelle" body={analysis.functionalConsequence} />
+      <InfoRow
+        label={impactMeta.label}
+        body={analysis.userImpact.description}
+        accentColor={impactMeta.color}
+        labelBold
+      />
 
       <Section style={technicalCard}>
         <Text style={technicalLabel}>Détails techniques</Text>
-        <Text style={technicalBody}>{technical}</Text>
+        <Text style={technicalBody}>{analysis.technical}</Text>
       </Section>
 
       <Section style={ctaSection}>

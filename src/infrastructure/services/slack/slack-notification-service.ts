@@ -1,3 +1,5 @@
+import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "../sentry/analysis-meta";
+
 const WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
 
 export function isAdminEmailEnabled(): boolean {
@@ -130,38 +132,26 @@ export async function notifySlackNewComment(params: {
   });
 }
 
-type UserImpactSlackLevel = "none" | "silent" | "degraded" | "blocking";
-
-const USER_IMPACT_SLACK: Record<UserImpactSlackLevel, { emoji: string; label: string }> = {
-  none: { emoji: "🟢", label: "Aucun impact utilisateur" },
-  silent: { emoji: "⚪", label: "Impact silencieux" },
-  degraded: { emoji: "🟠", label: "Experience degradee" },
-  blocking: { emoji: "🔴", label: "Utilisateur bloque" },
-};
-
 export async function notifySlackSentryIssue(params: {
-  issueShortId: string;
-  issueTitle: string;
-  urgencyLabel: string;
-  trigger: string;
-  functionalConsequence: string;
-  userImpact: { level: UserImpactSlackLevel; description: string };
-  technical: string;
+  issue: { issueShortId: string; issueTitle: string };
+  analysis: AnalysisResult;
   sentryUrl: string;
 }): Promise<void> {
-  const impactMeta = USER_IMPACT_SLACK[params.userImpact.level];
+  const { issue, analysis, sentryUrl } = params;
+  const urgencyLabel = URGENCY_META[analysis.urgency].label;
+  const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
   await sendSlack({
-    text: `🚨 [Sentry ${params.urgencyLabel}] ${params.issueShortId} — ${params.issueTitle}`,
+    text: `🚨 [Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle}`,
     blocks: [
-      { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${params.urgencyLabel}`, emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${params.issueShortId}*\n${params.issueTitle}` } },
+      { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${urgencyLabel}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${issue.issueShortId}*\n${issue.issueTitle}` } },
       { type: "divider" },
-      { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${params.trigger}` } },
-      { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${params.functionalConsequence}` } },
-      { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${params.userImpact.description}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${analysis.trigger}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${analysis.functionalConsequence}` } },
+      { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${analysis.userImpact.description}` } },
       { type: "divider" },
-      { type: "context", elements: [{ type: "mrkdwn", text: `_Détails techniques_\n\`\`\`${params.technical}\`\`\`` }] },
-      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: params.sentryUrl, style: "danger" }] },
+      { type: "context", elements: [{ type: "mrkdwn", text: `_Détails techniques_\n\`\`\`${analysis.technical}\`\`\`` }] },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: sentryUrl, style: "danger" }] },
     ],
   });
 }
