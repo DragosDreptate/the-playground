@@ -142,11 +142,11 @@ const USER_IMPACT_SLACK: Record<UserImpactSlackLevel, { emoji: string; label: st
 export async function notifySlackSentryIssue(params: {
   issueShortId: string;
   issueTitle: string;
-  culprit: string;
   urgencyLabel: string;
+  trigger: string;
+  functionalConsequence: string;
   userImpact: { level: UserImpactSlackLevel; description: string };
-  diagnosis: string;
-  remediation: string;
+  technical: string;
   sentryUrl: string;
 }): Promise<void> {
   const impactMeta = USER_IMPACT_SLACK[params.userImpact.level];
@@ -156,13 +156,11 @@ export async function notifySlackSentryIssue(params: {
       { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${params.urgencyLabel}`, emoji: true } },
       { type: "section", text: { type: "mrkdwn", text: `*${params.issueShortId}*\n${params.issueTitle}` } },
       { type: "divider" },
+      { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${params.trigger}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${params.functionalConsequence}` } },
       { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${params.userImpact.description}` } },
       { type: "divider" },
-      { type: "section", fields: [
-        { type: "mrkdwn", text: `*Culprit*\n\`${params.culprit}\`` },
-      ]},
-      { type: "section", text: { type: "mrkdwn", text: `*Diagnostic*\n${params.diagnosis}` } },
-      { type: "section", text: { type: "mrkdwn", text: `*Remediation*\n${params.remediation}` } },
+      { type: "context", elements: [{ type: "mrkdwn", text: `_Détails techniques_\n\`\`\`${params.technical}\`\`\`` }] },
       { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: params.sentryUrl, style: "danger" }] },
     ],
   });

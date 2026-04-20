@@ -13,12 +13,12 @@ import type { UserImpact, UserImpactLevel } from "./analyze-issue";
 type Props = {
   issueShortId: string;
   issueTitle: string;
-  culprit: string;
   urgency: string;
   urgencyLabel: string;
+  trigger: string;
+  functionalConsequence: string;
   userImpact: UserImpact;
-  diagnosis: string;
-  remediation: string;
+  technical: string;
   sentryUrl: string;
 };
 
@@ -40,12 +40,12 @@ const USER_IMPACT_META: Record<UserImpactLevel, { label: string; color: string }
 export function SentryIssueAnalysisEmail({
   issueShortId,
   issueTitle,
-  culprit,
   urgency,
   urgencyLabel,
+  trigger,
+  functionalConsequence,
   userImpact,
-  diagnosis,
-  remediation,
+  technical,
   sentryUrl,
 }: Props) {
   const color = URGENCY_COLORS[urgency] ?? "#71717a";
@@ -56,13 +56,22 @@ export function SentryIssueAnalysisEmail({
       preview={`[${urgencyLabel}] ${issueShortId} — ${issueTitle.slice(0, 60)}`}
       footer="Sentry Issue Analysis — The Playground"
     >
-      {/* Urgency badge */}
       <Text style={{ ...urgencyBadge, backgroundColor: color }}>
         {urgencyLabel}
       </Text>
 
       <Text style={heading}>{issueShortId}</Text>
       <Text style={titleStyle}>{issueTitle}</Text>
+
+      <Section style={infoCard}>
+        <Text style={infoLabel}>Déclencheur</Text>
+        <Text style={bodyText}>{trigger}</Text>
+      </Section>
+
+      <Section style={infoCard}>
+        <Text style={infoLabel}>Conséquence fonctionnelle</Text>
+        <Text style={bodyText}>{functionalConsequence}</Text>
+      </Section>
 
       <Section style={{ ...infoCard, borderLeft: `4px solid ${impactMeta.color}` }}>
         <Text style={{ ...infoLabel, color: impactMeta.color, fontWeight: 700 }}>
@@ -71,19 +80,9 @@ export function SentryIssueAnalysisEmail({
         <Text style={bodyText}>{userImpact.description}</Text>
       </Section>
 
-      <Section style={infoCard}>
-        <Text style={infoLabel}>Culprit</Text>
-        <Text style={infoValue}>{culprit}</Text>
-      </Section>
-
-      <Section style={infoCard}>
-        <Text style={infoLabel}>Diagnostic</Text>
-        <Text style={bodyText}>{diagnosis}</Text>
-      </Section>
-
-      <Section style={infoCard}>
-        <Text style={infoLabel}>Remédiation</Text>
-        <Text style={bodyText}>{remediation}</Text>
+      <Section style={technicalCard}>
+        <Text style={technicalLabel}>Détails techniques</Text>
+        <Text style={technicalBody}>{technical}</Text>
       </Section>
 
       <Section style={ctaSection}>
@@ -120,6 +119,25 @@ const bodyText: React.CSSProperties = {
   color: "#18181b",
   margin: "0",
   lineHeight: "22px",
+};
+
+const technicalCard: React.CSSProperties = {
+  ...infoCard,
+  backgroundColor: "#fafafa",
+  borderLeft: "3px solid #d4d4d8",
+};
+
+const technicalLabel: React.CSSProperties = {
+  ...infoLabel,
+  color: "#a1a1aa",
+};
+
+const technicalBody: React.CSSProperties = {
+  ...infoValue,
+  fontSize: "13px",
+  color: "#71717a",
+  lineHeight: "20px",
+  fontFamily: "'SF Mono', ui-monospace, Menlo, monospace",
 };
 
 const ctaSection: React.CSSProperties = {
