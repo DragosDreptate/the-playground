@@ -496,7 +496,7 @@ export default async function PublicCirclePage({
                           );
                         })}
                       </span>
-                      <span className="text-sm font-medium group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                      <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         {membersMetaText}
                       </span>
                     </CircleMembersDialog>

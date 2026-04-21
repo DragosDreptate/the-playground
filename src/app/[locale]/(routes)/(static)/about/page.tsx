@@ -410,7 +410,7 @@ export default async function AboutPage() {
         >
           <Github className="size-8 shrink-0 text-foreground" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-foreground group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+            <p className="font-semibold text-foreground group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
               DragosDreptate / the-playground
             </p>
             <p className="text-sm text-muted-foreground truncate">

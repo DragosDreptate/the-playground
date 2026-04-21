@@ -257,7 +257,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 />
               )}
               <div className="min-w-0">
-                <p className="text-sm font-semibold leading-snug group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                <p className="text-sm font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                   {circleName}
                 </p>
                 {circleDescription && (

@@ -182,7 +182,7 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
                 : { background: getMomentGradient(circle.name) }
             }
           />
-          <p className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
             {circle.name}
           </p>
         </div>
@@ -622,7 +622,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                           );
                         })}
                       </span>
-                      <span className="text-sm font-medium group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                      <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         {participantsMetaText}
                       </span>
                     </MomentRegistrationsDialog>
@@ -677,7 +677,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="flex items-center gap-1.5 text-sm font-semibold leading-snug">
-                      <span className="truncate group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                      <span className="truncate group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         {locationLabel}
                       </span>
                       <ArrowUpRight className="text-muted-foreground group-hover:text-foreground size-3.5 shrink-0 transition-colors" />
@@ -831,12 +831,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* Prochains événements du Circle — public view uniquement */}
           {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
             <div className="border-border bg-card rounded-2xl border p-6">
-              <div className="mb-4">
-                <h2 className="text-lg font-semibold">
-                  {t("public.upcomingInCircle")}
-                </h2>
-                <p className="text-muted-foreground text-sm">{circle.name}</p>
-              </div>
+              <h2 className="text-muted-foreground mb-4 text-xs font-semibold uppercase tracking-wider">
+                {t("public.upcomingInCircle")}
+              </h2>
               <div className="divide-border divide-y">
                 {(props as PublicViewProps).upcomingCircleMoments.map((upcoming) => {
                   const upcomingGradient = getMomentGradient(upcoming.title);
@@ -856,12 +853,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       className="hover:bg-muted/50 -mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition-colors"
                     >
                       <div
-                        className="size-12 shrink-0 rounded-lg"
-                        style={
-                          upcoming.coverImage
-                            ? undefined
-                            : { background: upcomingGradient }
-                        }
+                        className="size-12 shrink-0 overflow-hidden rounded-lg"
+                        style={upcoming.coverImage ? undefined : { background: upcomingGradient }}
                       >
                         {upcoming.coverImage && (
                           <Image
@@ -869,16 +862,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                             alt={upcoming.title}
                             width={48}
                             height={48}
-                            className="size-12 rounded-lg object-cover"
+                            className="size-12 object-cover"
                           />
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{upcoming.title}</p>
                         <p className="text-muted-foreground mt-0.5 text-xs">
-                          {dateLabel}
-                          {" · "}
-                          {locationLabel}
+                          {dateLabel} · {locationLabel}
                         </p>
                       </div>
                       <ChevronRight className="text-muted-foreground size-4 shrink-0" />
@@ -889,7 +880,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="border-border mt-4 border-t pt-4 text-center">
                 <Link
                   href={`/circles/${circle.slug}`}
-                  className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:text-foreground transition-colors"
+                  className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:text-primary/70 transition-colors"
                 >
                   {t("public.seeAllCircleEvents")}
                   <ArrowRight className="size-3.5" />
