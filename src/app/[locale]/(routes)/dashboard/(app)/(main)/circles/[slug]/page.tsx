@@ -166,14 +166,21 @@ export default async function CircleDetailPage({
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
         {/* ─── LEFT column : cover + hosts + stats ────────────── */}
-        <div className="order-2 flex w-full flex-col gap-4 lg:order-1 lg:w-[340px] lg:shrink-0 lg:sticky lg:top-20">
+        {/* Sur mobile, le wrapper s'aplatit (max-lg:contents) pour permettre d'intercaler les blocs left/right via order-X */}
+        <div className="max-lg:contents lg:flex lg:w-[340px] lg:shrink-0 lg:flex-col lg:gap-4 lg:sticky lg:top-20">
 
-          <CoverBlock
-            coverImage={circle.coverImage}
-            coverImageAttribution={circle.coverImageAttribution}
-            gradient={gradient}
-            altText={circle.name}
-          />
+          {/* Groupe 1 — Cover (mobile: order-2, juste après le breadcrumb) */}
+          <div className="max-lg:order-2">
+            <CoverBlock
+              coverImage={circle.coverImage}
+              coverImageAttribution={circle.coverImageAttribution}
+              gradient={gradient}
+              altText={circle.name}
+            />
+          </div>
+
+          {/* Groupe 2 — Organisateurs + Stats + CTA (mobile: order-4) */}
+          <div className="flex flex-col gap-4 max-lg:order-4">
 
           {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
           {circleOrganizers.length > 0 && (
@@ -225,29 +232,26 @@ export default async function CircleDetailPage({
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
-            <div>
-              <CircleMembersDialog
-                circleId={circle.id}
-                initialMembers={membersFirstPage.members}
-                initialTotal={membersFirstPage.total}
-                initialHasMore={membersFirstPage.hasMore}
-                callerRole={callerRole}
-                showEmails={isOrganizer}
-                triggerClassName="cursor-pointer text-2xl font-bold underline-offset-2 hover:underline"
-              >
-                {totalMembers}
-              </CircleMembersDialog>
-              <p className="text-muted-foreground text-xs">
-                {t("detail.members")}
-              </p>
-            </div>
-            <div className="border-l pl-6">
-              <p className="text-2xl font-bold">{allMoments.length}</p>
-              <p className="text-muted-foreground text-xs">
-                {t("detail.moments")}
-              </p>
+            <CircleMembersDialog
+              circleId={circle.id}
+              initialMembers={membersFirstPage.members}
+              initialTotal={membersFirstPage.total}
+              initialHasMore={membersFirstPage.hasMore}
+              callerRole={callerRole}
+              showEmails={isOrganizer}
+              triggerClassName="group/stat flex cursor-pointer items-baseline gap-2"
+            >
+              <span className="text-2xl font-bold underline-offset-2 group-hover/stat:underline">{totalMembers}</span>
+              <span className="text-muted-foreground text-sm">{t("detail.members")}</span>
+            </CircleMembersDialog>
+            <div className="flex items-baseline gap-2 border-l pl-6">
+              <span className="text-2xl font-bold">{allMoments.length}</span>
+              <span className="text-muted-foreground text-sm">{t("detail.moments")}</span>
             </div>
           </div>
+
+          {/* Séparateur — desktop uniquement */}
+          <div className="border-border border-t max-lg:hidden" />
 
           {/* Actions Organisateur — Modifier + Supprimer (Supprimer réservé au HOST) */}
           {isOrganizer && (
@@ -269,10 +273,15 @@ export default async function CircleDetailPage({
               <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
             </div>
           )}
+          </div>
+          {/* /Groupe 2 */}
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
-        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+        <div className="max-lg:contents lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:gap-5">
+
+          {/* Groupe 3 — Pill + Titre + À propos (mobile: order-3) */}
+          <div className="flex flex-col gap-5 max-lg:order-3">
 
           {/* Catégorie (pill) */}
           {categoryLabel && (
@@ -298,6 +307,12 @@ export default async function CircleDetailPage({
               </div>
             </div>
           )}
+
+          </div>
+          {/* /Groupe 3 */}
+
+          {/* Groupe 4 — Meta + Demandes + Partage + Événements (mobile: order-5) */}
+          <div className="flex flex-col gap-5 max-lg:order-5">
 
           {/* Séparateur */}
           <div className="border-border border-t" />
@@ -565,6 +580,9 @@ export default async function CircleDetailPage({
               )
             }
           />
+
+          </div>
+          {/* /Groupe 4 */}
 
         </div>
       </div>
