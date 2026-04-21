@@ -432,7 +432,7 @@ export default async function PublicCirclePage({
               <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                 {t("detail.about")}
               </p>
-              <div className="border-primary border-l-2 pl-4">
+              <div className="lg:border-primary lg:border-l-2 lg:pl-4">
                 <CollapsibleDescription text={circle.description} />
               </div>
             </div>
