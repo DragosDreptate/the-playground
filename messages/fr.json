@@ -623,6 +623,7 @@
         "waitlisted": "Liste d'attente"
       },
       "exportCsv": "Exporter CSV",
+      "actionsLabel": "Actions",
       "removeAction": "Retirer",
       "removeTitle": "Retirer {name} ?",
       "removeDescription": "L'inscription de {name} à cet événement sera annulée. Si une liste d'attente existe, le premier inscrit sera promu automatiquement.",

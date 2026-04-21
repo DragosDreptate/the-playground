@@ -115,7 +115,9 @@ export default async function PublicMomentPage({
 
   // Une seule vague de queries en parallèle : aucune query ne dépend des résultats
   // des autres (toutes consomment moment.id / moment.circleId / session.user.id).
-  // registeredCount est dérivé de allAttendees en JS (évite un round-trip supplémentaire).
+  // registeredCount et participantsFirstPage sont dérivés de allAttendees en JS
+  // (évite un round-trip supplémentaire — findActiveWithUserByMomentId retourne déjà
+  // REGISTERED + WAITLISTED avec les champs sociaux).
   const [circle, hosts, existingRegistration, allAttendees, comments, upcomingCircleMoments, attachments] =
     await measureTime("moment-page:data", () =>
       Promise.all([
@@ -136,6 +138,13 @@ export default async function PublicMomentPage({
         prismaMomentAttachmentRepository.findByMoment(moment.id),
       ])
     );
+
+  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  const participantsFirstPage = {
+    participants: registeredParticipants.slice(0, 20),
+    total: registeredParticipants.length,
+    hasMore: registeredParticipants.length > 20,
+  };
 
   if (!circle) notFound();
 
@@ -283,6 +292,7 @@ export default async function PublicMomentPage({
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
         upcomingCircleMoments={upcomingCircleMoments}
+        participantsFirstPage={participantsFirstPage}
       />
     </main>
   );

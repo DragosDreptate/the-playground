@@ -95,7 +95,7 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
                   <TableCell>
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="font-medium hover:underline"
+                      className="font-medium link-hover"
                     >
                       {[user.firstName, user.lastName].filter(Boolean).join(" ") || "—"}
                     </Link>

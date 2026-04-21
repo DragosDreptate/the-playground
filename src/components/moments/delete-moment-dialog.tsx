@@ -20,11 +20,13 @@ import { deleteMomentAction } from "@/app/actions/moment";
 type DeleteMomentDialogProps = {
   momentId: string;
   circleSlug: string;
+  triggerClassName?: string;
 };
 
 export function DeleteMomentDialog({
   momentId,
   circleSlug,
+  triggerClassName,
 }: DeleteMomentDialogProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
@@ -52,7 +54,7 @@ export function DeleteMomentDialog({
         <Button
           variant="outline"
           size="sm"
-          className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+          className={`border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`}
         >
           {tCommon("delete")}
         </Button>

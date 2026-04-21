@@ -51,7 +51,7 @@ export function CollapsibleDescription({ text, maxLines = 10 }: Props) {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="text-primary mt-2 inline-flex cursor-pointer items-center gap-1 text-sm hover:underline"
+          className="text-primary mt-2 inline-flex cursor-pointer items-center gap-1 text-sm hover:text-foreground transition-colors"
         >
           {expanded ? (
             <>

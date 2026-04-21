@@ -201,7 +201,7 @@ export default async function CircleDetailPage({
                       />
                     );
                     const nameText = (
-                      <span className="text-sm font-medium leading-snug group-hover/organizer:underline underline-offset-2">
+                      <span className="text-sm font-medium leading-snug group-hover/organizer:text-primary dark:group-hover/organizer:text-[oklch(0.76_0.27_341)] transition-colors">
                         {hostDisplayName}
                       </span>
                     );
@@ -241,7 +241,7 @@ export default async function CircleDetailPage({
               showEmails={isOrganizer}
               triggerClassName="group/stat flex cursor-pointer items-baseline gap-2"
             >
-              <span className="text-2xl font-bold underline-offset-2 group-hover/stat:underline">{totalMembers}</span>
+              <span className="text-2xl font-bold group-hover/stat:text-primary dark:group-hover/stat:text-[oklch(0.76_0.27_341)] transition-colors">{totalMembers}</span>
               <span className="text-muted-foreground text-sm">{t("detail.members")}</span>
             </CircleMembersDialog>
             <div className="flex items-baseline gap-2 border-l pl-6">
@@ -367,7 +367,7 @@ export default async function CircleDetailPage({
                         );
                       })}
                     </span>
-                    <span className="text-sm font-medium underline-offset-2 group-hover:underline">
+                    <span className="text-sm font-medium group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
                       {membersMetaText}
                     </span>
                   </CircleMembersDialog>
@@ -404,7 +404,7 @@ export default async function CircleDetailPage({
                     href={circle.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium hover:underline underline-offset-2"
+                    className="text-sm font-medium link-hover"
                   >
                     {stripProtocol(circle.website)}
                   </a>
@@ -464,7 +464,7 @@ export default async function CircleDetailPage({
                   </p>
                   <Link
                     href={`/networks/${network.slug}`}
-                    className="text-sm font-medium underline-offset-2 hover:underline"
+                    className="text-sm font-medium link-hover"
                   >
                     {network.name}
                   </Link>

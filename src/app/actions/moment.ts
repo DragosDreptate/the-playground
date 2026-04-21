@@ -22,6 +22,10 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
+import {
+  getMomentParticipantsPage,
+  type GetMomentParticipantsPageResult,
+} from "@/domain/usecases/get-moment-participants-page";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
@@ -628,4 +632,24 @@ function sendMomentPublishedNotifications(moment: Moment, userId: string): void 
       console.error(err);
       Sentry.captureException(err);
     });
+}
+
+export async function getMomentParticipantsPageAction(
+  momentId: string,
+  offset: number,
+  limit: number,
+): Promise<GetMomentParticipantsPageResult> {
+  const session = await auth();
+  try {
+    return await getMomentParticipantsPage(
+      { momentId, offset, limit, callerUserId: session?.user?.id ?? null },
+      {
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+        registrationRepository: prismaRegistrationRepository,
+      },
+    );
+  } catch {
+    return { participants: [], total: 0, hasMore: false };
+  }
 }

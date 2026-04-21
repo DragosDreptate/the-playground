@@ -45,7 +45,7 @@ export default async function ContactPage() {
       {/* Note */}
       <p className="mt-6 text-center text-sm text-muted-foreground">
         {t("notePrefix")}{" "}
-        <Link href="/help" className="text-primary hover:underline">
+        <Link href="/help" className="text-primary hover:text-foreground transition-colors">
           {t("noteHelpLink")}
         </Link>
         {t("noteSuffix")}

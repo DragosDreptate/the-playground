@@ -240,7 +240,7 @@ function MemberRow({
             <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm leading-snug font-medium group-hover/member:underline underline-offset-2">
+                <span className="text-sm leading-snug font-medium group-hover/member:text-primary dark:group-hover/member:text-[oklch(0.76_0.27_341)] transition-colors">
                   {displayName}
                 </span>
                 {(member.role === "HOST" || member.role === "CO_HOST") && (

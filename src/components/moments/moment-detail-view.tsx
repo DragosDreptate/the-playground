@@ -6,12 +6,12 @@ import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
 import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dialog";
 import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
-import { RegistrationsList } from "@/components/moments/registrations-list";
 import { PendingRegistrationsList } from "@/components/circles/pending-requests-list";
+import { MomentRegistrationsDialog } from "@/components/moments/moment-registrations-dialog";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName } from "@/lib/display-name";
+import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
 import type { Moment } from "@/domain/models/moment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
@@ -20,9 +20,10 @@ import type { CommentWithUser } from "@/domain/models/comment";
 import { MomentAttachmentsList } from "@/components/moments/moment-attachments-list";
 import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
-import { formatDateRange } from "@/lib/format-date";
+import { formatDateRange, formatLongDateWithWeekday, formatLocalizedTime } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { UserAvatar } from "@/components/user-avatar";
 import Image from "next/image";
 import {
   CalendarIcon,
@@ -36,6 +37,7 @@ import {
   ChevronRight,
   Users,
   ArrowRight,
+  ArrowUpRight,
   ShieldCheck,
 } from "lucide-react";
 
@@ -51,6 +53,12 @@ type CommonProps = {
   comments: CommentWithUser[];
   attachments: MomentAttachment[];
   currentUserId: string | null;
+  /** Première page des participants REGISTERED pour la modale (server-fetched, avec total). */
+  participantsFirstPage: {
+    participants: RegistrationWithUser[];
+    total: number;
+    hasMore: boolean;
+  };
 };
 
 type HostViewProps = CommonProps & {
@@ -105,46 +113,48 @@ function MomentCoverBlock({
   sizes, demoLabel,
 }: MomentCoverBlockProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="relative">
-        <div className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl" style={{ background: gradient }} />
-        <div
-          className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" ? "opacity-70 grayscale" : ""}`}
-          style={{ aspectRatio: "1 / 1" }}
-        >
-          {coverImage ? (
-            <Image src={coverImage} alt={title} fill className="object-cover" sizes={sizes} priority />
-          ) : (
-            <>
-              <div className="size-full" style={{ background: gradient }} />
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                  <ImageIcon className="size-6 text-white" />
-                </div>
+    <div className="relative">
+      <div className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl" style={{ background: gradient }} />
+      <div
+        className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" ? "opacity-70 grayscale" : ""}`}
+        style={{ aspectRatio: "1 / 1" }}
+      >
+        {coverImage ? (
+          <Image src={coverImage} alt={title} fill className="object-cover" sizes={sizes} priority />
+        ) : (
+          <>
+            <div className="size-full" style={{ background: gradient }} />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex size-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                <ImageIcon className="size-6 text-white" />
               </div>
-            </>
-          )}
-
-          {/* Demo badge on cover */}
-          {isDemo && (
-            <div className="absolute top-3 left-3 z-10">
-              <span className="inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary backdrop-blur-sm">
-                {demoLabel}
-              </span>
             </div>
-          )}
-        </div>
+          </>
+        )}
+
+        {/* Demo badge on cover */}
+        {isDemo && (
+          <div className="absolute top-3 left-3 z-10">
+            <span className="inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary backdrop-blur-sm">
+              {demoLabel}
+            </span>
+          </div>
+        )}
+
+        {/* Crédit photo Unsplash — overlay bas */}
+        {coverImageAttribution && (
+          <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 to-transparent px-3 pt-8 pb-2">
+            <p className="text-[0.65rem] leading-tight text-white/80">
+              Photo par{" "}
+              <a href={coverImageAttribution.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-white">
+                {coverImageAttribution.name}
+              </a>{" "}
+              sur Unsplash
+            </p>
+          </div>
+        )}
       </div>
-      {coverImageAttribution && (
-        <p className="text-muted-foreground px-1 text-xs">
-          Photo par{" "}
-          <a href={coverImageAttribution.url} target="_blank" rel="noopener noreferrer" className="hover:text-foreground underline">
-            {coverImageAttribution.name}
-          </a>{" "}
-          sur Unsplash
-        </p>
-      )}
     </div>
   );
 }
@@ -161,25 +171,27 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
       <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
         {proposedByLabel}
       </p>
-      <Link href={circleHref} className="group flex items-start gap-3 px-1">
-        <div
-          className="mt-0.5 size-9 shrink-0 rounded-lg bg-cover bg-center"
-          style={
-            circle.coverImage
-              ? { backgroundImage: `url(${circle.coverImage})` }
-              : { background: getMomentGradient(circle.name) }
-          }
-        />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold leading-snug group-hover:underline">
+      <Link href={circleHref} className="group flex flex-col gap-2 px-1">
+        {/* Ligne 1 : cover + titre */}
+        <div className="flex items-center gap-3">
+          <div
+            className="size-9 shrink-0 rounded-lg bg-cover bg-center"
+            style={
+              circle.coverImage
+                ? { backgroundImage: `url(${circle.coverImage})` }
+                : { background: getMomentGradient(circle.name) }
+            }
+          />
+          <p className="min-w-0 flex-1 truncate text-sm font-semibold leading-snug group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
             {circle.name}
           </p>
-          {circle.description && (
-            <p className="text-muted-foreground mt-0.5 line-clamp-3 text-xs leading-relaxed">
-              {circle.description}
-            </p>
-          )}
         </div>
+        {/* Ligne 2 : description pleine largeur */}
+        {circle.description && (
+          <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed">
+            {circle.description}
+          </p>
+        )}
       </Link>
     </>
   );
@@ -189,7 +201,7 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
 // ── Component ────────────────────────────────────────────────
 
 export async function MomentDetailView(props: MomentDetailViewProps) {
-  const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments } =
+  const { moment, circle, hosts, registrations, registeredCount, waitlistedCount, attachments, participantsFirstPage } =
     props;
   // "Organisé par" affiche le créateur de l'événement (HOST ou CO_HOST).
   // Si le créateur n'est plus organisateur (rétrogradé / parti), on retombe sur le HOST principal.
@@ -223,6 +235,18 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
     moment.locationAddress
       ? `https://maps.google.com/?q=${encodeURIComponent(moment.locationAddress)}`
       : null;
+
+  const PARTICIPANT_AVATARS_MAX = 5;
+  const registeredParticipants = registrations.filter((r) => r.status === "REGISTERED");
+  const visibleParticipantAvatars = registeredParticipants.slice(0, PARTICIPANT_AVATARS_MAX);
+  const participantNamesToShow = registeredParticipants
+    .slice(0, 2)
+    .map((r) => getDisplayName(r.user.firstName, r.user.lastName, r.user.email));
+  const participantOthersCount = Math.max(0, registeredCount - participantNamesToShow.length);
+  const participantsMetaText =
+    participantOthersCount > 0
+      ? `${participantNamesToShow.join(", ")} ${tCircle("detail.andOthers", { count: participantOthersCount })}`
+      : participantNamesToShow.join(", ");
 
   const circleHref = isHostView
     ? `/dashboard/circles/${props.circleSlug}`
@@ -260,7 +284,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
         {/* ─── LEFT column : cover + circle info ────────────── */}
-        <div className="order-2 hidden w-full flex-col gap-4 lg:order-1 lg:flex lg:w-[340px] lg:shrink-0 lg:sticky lg:top-6">
+        <div className="order-2 hidden w-full flex-col gap-4 lg:order-1 lg:flex lg:w-[340px] lg:shrink-0 lg:sticky lg:top-20">
 
           {/* Cover — carré, glow blur */}
           <MomentCoverBlock
@@ -280,62 +304,150 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             circleHref={circleHref}
             proposedByLabel={t("public.proposedByCommunity")}
           />
-        </div>
 
-        {/* ─── RIGHT column ─────────────────────────────────── */}
-        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+          {/* Organisé par — HOSTs de l'événement (design aligné Circle) */}
+          {primaryHosts.length > 0 && (
+            <>
+              <div className="border-border border-t" />
+              <div className="space-y-2 px-1">
+                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                  {t("public.hostedBy")}
+                </p>
+                <ul className="space-y-2">
+                  {primaryHosts.map((h) => {
+                    const hostDisplayName = getDisplayName(h.user.firstName, h.user.lastName, h.user.email);
+                    const avatar = (
+                      <UserAvatar
+                        name={hostDisplayName}
+                        email={h.user.email}
+                        image={h.user.image}
+                        size="sm"
+                      />
+                    );
+                    const linkable = isAuthenticated && h.user.publicId;
+                    return (
+                      <li key={h.id}>
+                        {linkable ? (
+                          <Link
+                            href={`/u/${h.user.publicId}`}
+                            className="group/organizer flex items-center gap-3"
+                          >
+                            {avatar}
+                            <span className="text-sm font-medium leading-snug group-hover/organizer:text-primary dark:group-hover/organizer:text-[oklch(0.76_0.27_341)] transition-colors">
+                              {hostDisplayName}
+                            </span>
+                          </Link>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            {avatar}
+                            <span className="text-sm font-medium leading-snug">{hostDisplayName}</span>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </>
+          )}
 
-          {/* "Organisé par" + actions Host */}
-          <div className="flex items-center justify-between gap-4">
-            {primaryHosts.length > 0 && (
-              <p className="text-muted-foreground flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
-                {t("public.hostedBy")}{" "}
-                {primaryHosts.map((h, i) => (
-                  <span key={h.user.id} className="flex items-center gap-1">
-                    {isAuthenticated && h.user.publicId ? (
-                      <Link
-                        href={`/u/${h.user.publicId}`}
-                        className="text-foreground font-medium hover:underline underline-offset-2"
-                      >
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </Link>
-                    ) : (
-                      <span className="text-foreground font-medium">
-                        {getDisplayName(h.user.firstName, h.user.lastName, h.user.email)}
-                      </span>
-                    )}
-                    {h.user.id === props.currentUserId && (
-                      <Badge variant="secondary" className="px-1.5 py-0 text-xs">
-                        {tCommon("you")}
-                      </Badge>
-                    )}
-                    {i < primaryHosts.length - 1 && <span>,</span>}
-                  </span>
-                ))}
-              </p>
-            )}
-            {isHostView && (
-              <div className="flex shrink-0 gap-2">
-                {moment.status === "DRAFT" && (
-                  <PublishMomentButton momentId={moment.id} circleSlug={props.circleSlug} momentSlug={props.momentSlug} />
-                )}
-                <Button asChild size="sm" variant={moment.status === "DRAFT" ? "outline" : "default"}>
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
+          {/* CTAs — selon le contexte (host / public organizer / public non-organizer par statut) */}
+          {isHostView ? (
+            <div className="flex flex-col gap-2">
+              {moment.status === "DRAFT" && (
+                <PublishMomentButton
+                  momentId={moment.id}
+                  circleSlug={props.circleSlug}
+                  momentSlug={props.momentSlug}
+                />
+              )}
+              <div className="flex gap-2">
+                <Button
+                  asChild
+                  size="sm"
+                  variant={moment.status === "DRAFT" ? "outline" : "default"}
+                  className="flex-1"
+                >
                   <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
                     {tCommon("edit")}
                   </Link>
                 </Button>
-                <DeleteMomentDialog momentId={moment.id} circleSlug={props.circleSlug} />
+                <DeleteMomentDialog
+                  momentId={moment.id}
+                  circleSlug={props.circleSlug}
+                  triggerClassName="flex-1"
+                />
               </div>
-            )}
-            {!isHostView && props.isOrganizer && (
-              <Button asChild size="sm" className="shrink-0 gap-1.5">
-                <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
-                  <ExternalLink className="size-3.5" />
-                  {tCircle("detail.manageMoment")}
-                </Link>
-              </Button>
-            )}
-          </div>
+            </div>
+          ) : props.isOrganizer ? (
+            <Button asChild size="sm" className="w-full gap-1.5">
+              <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
+                <ExternalLink className="size-3.5" />
+                {tCircle("detail.manageMoment")}
+              </Link>
+            </Button>
+          ) : moment.status === "DRAFT" ? (
+            <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-4">
+              <p className="font-semibold">{t("public.draftTitle")}</p>
+              <p className="text-muted-foreground text-sm">{t("public.draftBody")}</p>
+            </div>
+          ) : moment.status === "PAST" ? (
+            <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-4">
+              <p className="font-semibold">{t("public.eventEnded")}</p>
+              {registeredCount > 0 && (
+                <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                  <Users className="size-4 shrink-0" />
+                  <span>{t("public.attendedCount", { count: registeredCount })}</span>
+                </div>
+              )}
+              <Link
+                href={circleHref}
+                className="text-primary inline-flex items-center gap-1 text-sm hover:text-foreground transition-colors"
+              >
+                {t("public.viewCircleMoments")}
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          ) : moment.status === "CANCELLED" ? (
+            <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-4">
+              <p className="font-semibold">{t("public.eventCancelled")}</p>
+              <Link
+                href={circleHref}
+                className="text-primary inline-flex items-center gap-1 text-sm hover:text-foreground transition-colors"
+              >
+                {t("public.viewCircleMoments")}
+                <ArrowRight className="size-3.5" />
+              </Link>
+            </div>
+          ) : (
+            <RegistrationButton
+              momentId={moment.id}
+              slug={moment.slug}
+              circleId={circle.id}
+              circleName={circle.name}
+              price={moment.price}
+              currency={moment.currency}
+              isAuthenticated={props.isAuthenticated}
+              existingRegistration={props.existingRegistration}
+              signInUrl={props.signInUrl}
+              isFull={props.isFull}
+              spotsRemaining={props.spotsRemaining}
+              registrationCount={registeredCount}
+              isOrganizer={props.isOrganizer}
+              calendarData={props.calendarData}
+              appUrl={props.appUrl}
+              waitlistPosition={props.waitlistPosition}
+              requiresApproval={moment.requiresApproval}
+              refundable={moment.refundable}
+            />
+          )}
+        </div>
+
+        {/* ─── RIGHT column ─────────────────────────────────── */}
+        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
 
           {/* Titre */}
           <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
@@ -389,51 +501,215 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Description */}
           {moment.description && (
-            <CollapsibleDescription text={moment.description} />
+            <div className="lg:border-primary lg:border-l-2 lg:pl-4">
+              <CollapsibleDescription text={moment.description} />
+            </div>
           )}
 
-          {/* Quand & Où */}
+          {/* Quand & Où — style Luma : valeur principale en bold, détail en muted dessous */}
           <div className="flex flex-col gap-4">
             {/* Date */}
             <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="size-4" />
+              <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="text-primary size-5" />
               </div>
-              <div>
-                <p className="text-muted-foreground text-xs">{t("detail.when")}</p>
-                <p className="text-sm font-medium">
-                  {formatDateRange(moment.startsAt, moment.endsAt, locale)}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold leading-snug">
+                  {formatLongDateWithWeekday(moment.startsAt, locale)}
+                </p>
+                <p className="text-muted-foreground text-sm">
+                  {formatLocalizedTime(moment.startsAt, locale)}
+                  {moment.endsAt && ` – ${formatLocalizedTime(moment.endsAt, locale)}`}
                 </p>
               </div>
+              {props.calendarData && props.appUrl && moment.status !== "PAST" && moment.status !== "CANCELLED" && (
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-muted-foreground hidden lg:inline text-sm">
+                    {t("public.addToCalendar.label")}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="group/gcal relative">
+                      <a
+                        href={buildGoogleCalendarUrl(props.calendarData, props.appUrl, {
+                          join: t("public.addToCalendar.calendarJoin"),
+                          organizedBy: t("public.addToCalendar.calendarOrganizedBy"),
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={t("public.addToCalendar.google")}
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted flex size-8 items-center justify-center rounded-md transition-colors"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                      </a>
+                      <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/gcal:opacity-100">
+                        {t("public.addToCalendar.google")}
+                      </span>
+                    </span>
+                    <span className="group/ics relative">
+                      <a
+                        href={`/api/moments/${moment.slug}/calendar`}
+                        download={`${moment.slug}.ics`}
+                        aria-label={t("public.addToCalendar.ics")}
+                        className="text-muted-foreground hover:text-foreground hover:bg-muted flex size-8 items-center justify-center rounded-md transition-colors"
+                      >
+                        <Download className="size-3.5" />
+                      </a>
+                      <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/ics:opacity-100">
+                        {t("public.addToCalendar.ics")}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Participants — équivalent au bloc Membres de la page Communauté (cliquable → modale) */}
+            {visibleParticipantAvatars.length > 0 && (
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                  <Users className="text-primary size-5" />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+                    {t("registrations.title")}
+                  </p>
+                  {isAuthenticated ? (
+                    <MomentRegistrationsDialog
+                      momentId={moment.id}
+                      initialParticipants={participantsFirstPage.participants}
+                      initialTotal={participantsFirstPage.total}
+                      initialHasMore={participantsFirstPage.hasMore}
+                      capacity={moment.capacity}
+                      hostUserIds={hosts.map((h) => h.user.id)}
+                      waitlistedRegistrations={registrations.filter((r) => r.status === "WAITLISTED")}
+                      allRegistrationsForExport={registrations}
+                      isHostView={isHostView}
+                      momentSlug={moment.slug}
+                      momentTitle={moment.title}
+                      momentStartsAt={moment.startsAt}
+                      triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
+                    >
+                      <span className="flex -space-x-1.5">
+                        {visibleParticipantAvatars.map((r) => {
+                          const displayName = getDisplayName(r.user.firstName, r.user.lastName, r.user.email);
+                          return (
+                            <span key={r.id} className="group/avatar relative">
+                              <span
+                                className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
+                                style={{ background: getMomentGradient(r.user.email) }}
+                              >
+                                {r.user.image ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={r.user.image}
+                                    alt={displayName}
+                                    referrerPolicy="no-referrer"
+                                    className="absolute inset-0 size-full object-cover"
+                                  />
+                                ) : (
+                                  getCircleUserInitials(r.user)
+                                )}
+                              </span>
+                              <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
+                                {displayName}
+                              </span>
+                            </span>
+                          );
+                        })}
+                      </span>
+                      <span className="text-sm font-medium group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                        {participantsMetaText}
+                      </span>
+                    </MomentRegistrationsDialog>
+                  ) : (
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="flex -space-x-1.5">
+                        {visibleParticipantAvatars.map((r) => {
+                          const displayName = getDisplayName(r.user.firstName, r.user.lastName, r.user.email);
+                          return (
+                            <span key={r.id} className="group/avatar relative">
+                              <span
+                                className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
+                                style={{ background: getMomentGradient(r.user.email) }}
+                              >
+                                {r.user.image ? (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={r.user.image}
+                                    alt={displayName}
+                                    referrerPolicy="no-referrer"
+                                    className="absolute inset-0 size-full object-cover"
+                                  />
+                                ) : (
+                                  getCircleUserInitials(r.user)
+                                )}
+                              </span>
+                              <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
+                                {displayName}
+                              </span>
+                            </span>
+                          );
+                        })}
+                      </span>
+                      <span className="text-sm font-medium">{participantsMetaText}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Lieu */}
-            <div className="flex items-start gap-3">
-              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                <LocationIcon className="size-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-muted-foreground text-xs">{t("detail.where")}</p>
-                <p className="text-sm font-medium">{locationLabel}</p>
-                {moment.locationAddress && (
-                  <p className="text-muted-foreground mt-0.5 truncate text-xs">
-                    {moment.locationAddress}
-                  </p>
-                )}
-                {moment.videoLink && (
-                  <a
-                    href={moment.videoLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary mt-1 block truncate text-xs hover:underline"
-                  >
-                    {moment.videoLink}
-                  </a>
-                )}
-              </div>
+            <div className="flex flex-col gap-1">
+              {mapsUrl ? (
+                <a
+                  href={mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3"
+                >
+                  <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                    <LocationIcon className="text-primary size-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-1.5 text-sm font-semibold leading-snug">
+                      <span className="truncate group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
+                        {locationLabel}
+                      </span>
+                      <ArrowUpRight className="text-muted-foreground group-hover:text-foreground size-3.5 shrink-0 transition-colors" />
+                    </p>
+                    <p className="text-muted-foreground truncate text-sm">
+                      {moment.locationAddress}
+                    </p>
+                  </div>
+                </a>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 flex size-11 shrink-0 items-center justify-center rounded-lg">
+                    <LocationIcon className="text-primary size-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold leading-snug">{locationLabel}</p>
+                  </div>
+                </div>
+              )}
+              {moment.videoLink && (
+                <a
+                  href={moment.videoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary ml-14 block truncate text-sm hover:text-foreground transition-colors"
+                >
+                  {moment.videoLink}
+                </a>
+              )}
             </div>
 
-            {/* Carte — seulement si adresse physique et clé API configurée */}
+            {/* Carte — l'iframe embed gère déjà le zoom/pan et propose son propre lien "Maps" */}
             {moment.locationAddress && process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
               <div className="border-border overflow-hidden rounded-xl border">
                 <iframe
@@ -443,29 +719,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   referrerPolicy="no-referrer-when-downgrade"
                   title={moment.locationAddress}
                 />
-                <div className="flex items-center justify-between px-3 py-2.5">
-                  <div className="min-w-0">
-                    {moment.locationName && (
-                      <p className="truncate text-sm font-medium">
-                        {moment.locationName}
-                      </p>
-                    )}
-                    <p className="text-muted-foreground truncate text-xs">
-                      {moment.locationAddress}
-                    </p>
-                  </div>
-                  {mapsUrl && (
-                    <a
-                      href={mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary ml-3 inline-flex shrink-0 items-center gap-1 text-xs hover:underline"
-                    >
-                      <ExternalLink className="size-3" />
-                      {t("public.viewOnMap")}
-                    </a>
-                  )}
-                </div>
               </div>
             )}
           </div>
@@ -473,81 +726,40 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* Host : Partager mon événement */}
           {isHostView && (
             <div className="border-border bg-card rounded-2xl border p-6">
-              <h2 className="mb-4 text-lg font-semibold">{t("detail.shareTitle")}</h2>
+              <p className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
+                {t("detail.shareTitle")}
+              </p>
 
               {/* Ligne 1 — Lien partageable */}
-              <div className="flex items-start gap-3 py-3">
+              <div className="flex items-start gap-3 pt-0 pb-3">
                 <div className="bg-primary/10 text-primary mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg">
-                  <LinkIcon className="size-4" />
+                  <LinkIcon className="size-[15px]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="mb-1.5 text-sm font-medium">{t("detail.shareableLink")}</p>
+                  <p className="mb-1.5 text-[13px] font-medium">{t("detail.shareableLink")}</p>
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/m/${moment.slug}`}
                       target="_blank"
-                      className="border-border bg-muted/50 hover:border-primary hover:bg-primary/5 min-w-0 flex-1 rounded-lg border px-3 py-2 transition-colors"
+                      className="border-border bg-muted/50 hover:border-primary min-w-0 flex-1 truncate rounded-lg border px-3 py-1.5 font-mono text-xs text-muted-foreground transition-colors"
                     >
-                      <span className="text-muted-foreground block truncate font-mono text-sm">
-                        {props.publicUrl.replace(/^https?:\/\//, "")}
-                      </span>
+                      {props.publicUrl.replace(/^https?:\/\//, "")}
                     </Link>
                     <CopyLinkButton value={props.publicUrl} />
                   </div>
                 </div>
               </div>
 
-              {/* Ligne 2 — Calendrier */}
-              {props.calendarData && props.appUrl && moment.status !== "PAST" && (
-                <>
-                  <div className="border-border ml-11 border-t" />
-                  <div className="flex items-center gap-3 py-3">
-                    <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                      <CalendarIcon className="size-4" />
-                    </div>
-                    <p className="min-w-0 flex-1 text-sm font-medium">{t("public.addToCalendar.label")}</p>
-                    <div className="flex shrink-0 gap-1.5">
-                      <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={buildGoogleCalendarUrl(props.calendarData, props.appUrl, { join: t("public.addToCalendar.calendarJoin"), organizedBy: t("public.addToCalendar.calendarOrganizedBy") })}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {/* Google G — multicolor official */}
-                          <svg width="14" height="14" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                            <path fill="none" d="M0 0h48v48H0z"/>
-                          </svg>
-                          Google
-                        </a>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <a
-                          href={`/api/moments/${moment.slug}/calendar`}
-                          download={`${moment.slug}.ics`}
-                        >
-                          <Download className="size-3.5" />
-                          .ics
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Ligne 3 — Inviter ma Communauté */}
+              {/* Ligne 2 — Inviter ma Communauté */}
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
                 <>
                   <div className="border-border ml-11 border-t" />
                   <div className="flex items-center gap-3 py-3">
                     <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                      <Mail className="size-4" />
+                      <Mail className="size-[15px]" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium">{t("broadcast.triggerButton")}</p>
+                      <p className="text-[13px] font-medium">{t("broadcast.triggerButton")}</p>
                       <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
                     </div>
                     <BroadcastMomentDialog
@@ -560,65 +772,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </>
               )}
             </div>
-          )}
-
-          {/* Public : inscription ou carte de statut */}
-          {!isHostView && (
-            moment.status === "DRAFT" ? (
-              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
-                <p className="font-semibold">{t("public.draftTitle")}</p>
-                <p className="text-muted-foreground text-sm">{t("public.draftBody")}</p>
-              </div>
-            ) : moment.status === "PAST" ? (
-              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
-                <p className="font-semibold">{t("public.eventEnded")}</p>
-                {registeredCount > 0 && (
-                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <Users className="size-4 shrink-0" />
-                    <span>{t("public.attendedCount", { count: registeredCount })}</span>
-                  </div>
-                )}
-                <Link
-                  href={circleHref}
-                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
-                >
-                  {t("public.viewCircleMoments")}
-                  <ArrowRight className="size-3.5" />
-                </Link>
-              </div>
-            ) : moment.status === "CANCELLED" ? (
-              <div className="border-border bg-muted/30 space-y-3 rounded-2xl border p-6">
-                <p className="font-semibold">{t("public.eventCancelled")}</p>
-                <Link
-                  href={circleHref}
-                  className="text-primary inline-flex items-center gap-1 text-sm hover:underline"
-                >
-                  {t("public.viewCircleMoments")}
-                  <ArrowRight className="size-3.5" />
-                </Link>
-              </div>
-            ) : (
-              <RegistrationButton
-                momentId={moment.id}
-                slug={moment.slug}
-                circleId={circle.id}
-                circleName={circle.name}
-                price={moment.price}
-                currency={moment.currency}
-                isAuthenticated={props.isAuthenticated}
-                existingRegistration={props.existingRegistration}
-                signInUrl={props.signInUrl}
-                isFull={props.isFull}
-                spotsRemaining={props.spotsRemaining}
-                registrationCount={registeredCount}
-                isOrganizer={props.isOrganizer}
-                calendarData={props.calendarData}
-                appUrl={props.appUrl}
-                waitlistPosition={props.waitlistPosition}
-                requiresApproval={moment.requiresApproval}
-                refundable={moment.refundable}
-              />
-            )
           )}
 
           {/* Demandes en attente — Host uniquement si requiresApproval */}
@@ -664,24 +817,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               attachments={attachments}
               momentSlug={moment.slug}
             />
-          )}
-
-          {/* Liste des participants */}
-          {registrations.length > 0 && (
-            <div className="border-border bg-card rounded-2xl border p-6">
-              <RegistrationsList
-                registrations={registrations}
-                registeredCount={registeredCount}
-                waitlistedCount={waitlistedCount}
-                capacity={moment.capacity}
-                variant={isHostView ? "host" : "public"}
-                hostUserIds={new Set(hosts.map((h) => h.user.id))}
-                momentSlug={isHostView ? moment.slug : undefined}
-                momentTitle={isHostView ? moment.title : undefined}
-                momentStartsAt={isHostView ? moment.startsAt : undefined}
-                isConnected={isAuthenticated}
-              />
-            </div>
           )}
 
           {/* Circle info — mobile uniquement (dupliquée depuis LEFT column) */}
@@ -754,7 +889,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               <div className="border-border mt-4 border-t pt-4 text-center">
                 <Link
                   href={`/circles/${circle.slug}`}
-                  className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+                  className="text-primary inline-flex items-center gap-1.5 text-sm font-medium hover:text-foreground transition-colors"
                 >
                   {t("public.seeAllCircleEvents")}
                   <ArrowRight className="size-3.5" />

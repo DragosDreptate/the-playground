@@ -79,7 +79,7 @@ export default async function AdminInsightMembersPage({ searchParams }: Props) {
                   <TableCell>
                     <Link
                       href={`/admin/users/${m.userId}`}
-                      className="font-medium hover:underline"
+                      className="font-medium link-hover"
                     >
                       {m.userName ?? "—"}
                     </Link>
@@ -89,7 +89,7 @@ export default async function AdminInsightMembersPage({ searchParams }: Props) {
                     <Link
                       href={`/circles/${m.circleSlug}`}
                       target="_blank"
-                      className="flex items-center gap-1 hover:underline"
+                      className="flex items-center gap-1 link-hover"
                     >
                       {m.circleName}
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />

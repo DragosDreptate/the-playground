@@ -156,11 +156,11 @@ export async function MomentTimelineItem({
 
                 {/* Title */}
                 {!isCancelled && variant === "dashboard" ? (
-                  <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                  <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
                     {moment.title}
                   </p>
                 ) : (
-                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:underline"}`}>
+                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
                     {moment.title}
                   </p>
                 )}

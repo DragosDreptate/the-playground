@@ -57,7 +57,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
             <Row
               label={t("momentDetail.circle")}
               value={
-                <Link href={`/admin/circles/${moment.circleId}`} className="hover:underline">
+                <Link href={`/admin/circles/${moment.circleId}`} className="link-hover">
                   {moment.circleName}
                 </Link>
               }
@@ -126,7 +126,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
                   <div>
                     <Link
                       href={`/admin/users/${reg.userId}`}
-                      className="text-sm font-medium hover:underline"
+                      className="text-sm font-medium link-hover"
                     >
                       {reg.userName || reg.userEmail}
                     </Link>

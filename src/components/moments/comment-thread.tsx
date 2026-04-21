@@ -450,7 +450,7 @@ export function CommentThread({
         ) : (
           <a
             href={signInUrl}
-            className="text-primary text-sm hover:underline"
+            className="text-primary text-sm hover:text-foreground transition-colors"
           >
             {t("comments.signInToComment")}
           </a>

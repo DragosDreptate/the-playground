@@ -65,6 +65,13 @@ export default async function MomentDetailPage({
     isOrganizer ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
     prismaMomentAttachmentRepository.findByMoment(moment.id),
   ]);
+
+  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  const participantsFirstPage = {
+    participants: registeredParticipants.slice(0, 20),
+    total: registeredParticipants.length,
+    hasMore: registeredParticipants.length > 20,
+  };
   const registeredCount = allAttendees.filter(
     (r) => r.status === "REGISTERED"
   ).length;
@@ -122,6 +129,7 @@ export default async function MomentDetailPage({
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
         upcomingCircleMoments={upcomingCircleMoments}
+        participantsFirstPage={participantsFirstPage}
       />
     );
   }
@@ -163,6 +171,7 @@ export default async function MomentDetailPage({
       appUrl={appUrl}
       pendingRegistrations={pendingRegistrations}
       paymentSummary={paymentSummary}
+      participantsFirstPage={participantsFirstPage}
     />
   );
 }

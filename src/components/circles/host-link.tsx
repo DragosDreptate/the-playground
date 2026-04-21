@@ -24,7 +24,7 @@ export function HostLink({ user, className, linkDisabled }: Props) {
     return (
       <Link
         href={`/u/${user.publicId}`}
-        className={cn("hover:underline underline-offset-2", className)}
+        className={cn("link-hover", className)}
       >
         {name}
       </Link>

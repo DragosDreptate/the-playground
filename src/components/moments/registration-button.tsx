@@ -3,9 +3,8 @@
 import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Check, Clock, Download, X } from "lucide-react";
+import { Clock } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +23,7 @@ import {
 import { createCheckoutAction } from "@/app/actions/checkout";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
-import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
+import type { CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
 
 type RegistrationButtonProps = {
@@ -114,7 +113,7 @@ export function RegistrationButton({
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
-        <Button className="w-full rounded-full" size="lg" asChild>
+        <Button className="w-full" size="lg" asChild>
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
@@ -127,7 +126,7 @@ export function RegistrationButton({
     if (isFull) {
       return (
         <div className="flex items-center justify-between gap-3">
-          <Button className="w-full rounded-full" size="lg" disabled>
+          <Button className="w-full" size="lg" disabled>
             {t("public.eventFull")}
           </Button>
           <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
@@ -139,8 +138,8 @@ export function RegistrationButton({
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-3">
           <Button
-            className="w-full rounded-full"
-            size="lg"
+            className="w-full"
+            size="sm"
             disabled={isPending}
             onClick={() => {
               startTransition(async () => {
@@ -198,151 +197,66 @@ export function RegistrationButton({
     );
   }
 
-  // Already registered or waitlisted
+  // Already registered or waitlisted → CTA simple "Annuler mon inscription"
+  // (le "Vous êtes inscrit" + nb inscrits + calendrier sont affichés ailleurs dans la page :
+  //  meta Participants, meta Date → Ajouter au calendrier, etc.)
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
-    const isRegistered = localStatus === "REGISTERED";
+    if (isOrganizer) return null;
     return (
-      <div className="space-y-3">
-
-        {/* Card unifiée inscription */}
-        <div className={`border-border bg-card overflow-hidden rounded-2xl border ${!isRegistered ? "border-amber-500/30 bg-amber-500/[0.06]" : ""}`}>
-
-          {/* Ligne 1 — Statut */}
-          <div className="flex items-center gap-3 p-4">
-            <div className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${isRegistered ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-500"}`}>
-              {isRegistered ? <Check className="size-4" strokeWidth={3} /> : <Clock className="size-4" />}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button size="sm" className="w-full">
+            {t("public.cancelRegistration")}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("public.cancelConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("public.cancelConfirmDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
+            <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
+              {refundable
+                ? t("public.cancelRefundableInfo")
+                : t("public.cancelNonRefundableWarning")}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">
-                {isRegistered ? t("public.registeredBannerTitle") : t("public.waitlistedBannerTitle")}
-              </p>
-              <p className="text-muted-foreground text-xs">
-                {t("public.registrantsCount", { count: registrationCount })}
-                {!isRegistered && waitlistPosition != null && waitlistPosition > 0
-                  ? ` · ${t("public.waitlistPosition", { position: waitlistPosition })}`
-                  : !isFull && spotsRemaining !== null
-                    ? ` · ${t("public.spotsRemaining", { count: spotsRemaining })}`
-                    : isFull
-                      ? ` · ${t("public.eventFull")}`
-                      : ""}
-              </p>
+          )}
+          {error && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {error}
             </div>
-          </div>
-
-          {/* Ligne 2 — Calendrier (inscrits confirmés uniquement) */}
-          {isRegistered && calendarData && appUrl && (
-            <>
-              <div className="border-border ml-[3.25rem] border-t" />
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                  <CalendarIcon className="size-4" />
-                </div>
-                <p className="min-w-0 flex-1 text-sm font-medium">{t("public.addToCalendar.label")}</p>
-                <div className="flex shrink-0 gap-1.5">
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={buildGoogleCalendarUrl(calendarData, appUrl, { join: t("public.addToCalendar.calendarJoin"), organizedBy: t("public.addToCalendar.calendarOrganizedBy") })} target="_blank" rel="noopener noreferrer">
-                      <svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                      </svg>
-                      Google
-                    </a>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`/api/moments/${calendarData.slug}/calendar`} download={`${calendarData.slug}.ics`}>
-                      <Download className="size-3.5" />
-                      .ics
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </>
           )}
-
-          {/* Ligne 3 — Actions */}
-          {(isRegistered || !isOrganizer) && (
-            <>
-              <div className="border-border ml-[3.25rem] border-t" />
-              <div className="flex items-center justify-end gap-1.5 px-4 py-3">
-                {!isOrganizer && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-muted-foreground"
-                      >
-                        {t("public.cancelRegistration")}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {t("public.cancelConfirmTitle")}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t("public.cancelConfirmDescription")}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
-                        <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
-                          {refundable
-                            ? t("public.cancelRefundableInfo")
-                            : t("public.cancelNonRefundableWarning")}
-                        </div>
-                      )}
-                      {error && (
-                        <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                          {error}
-                        </div>
-                      )}
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-                        <AlertDialogAction
-                          variant="destructive"
-                          disabled={isPending}
-                          onClick={() => {
-                            if (!localRegistrationId) return;
-                            startTransition(async () => {
-                              setError(null);
-                              const result = await cancelRegistrationAction(
-                                localRegistrationId
-                              );
-                              if (result.success) {
-                                posthog.capture("registration_cancelled", {
-                                  moment_id: momentId,
-                                  circle_id: circleId,
-                                });
-                                setLocalStatus(null);
-                                setLocalRegistrationId(null);
-                                router.refresh();
-                              } else {
-                                setError(result.error);
-                              }
-                            });
-                          }}
-                        >
-                          {isPending ? tCommon("loading") : t("public.confirmCancel")}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-                {isRegistered && (
-                  <Button size="sm" asChild>
-                    <Link href="/dashboard?tab=moments">
-                      {t("public.viewInDashboard")}
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </>
-          )}
-
-        </div>
-      </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isPending}
+              onClick={() => {
+                if (!localRegistrationId) return;
+                startTransition(async () => {
+                  setError(null);
+                  const result = await cancelRegistrationAction(localRegistrationId);
+                  if (result.success) {
+                    posthog.capture("registration_cancelled", {
+                      moment_id: momentId,
+                      circle_id: circleId,
+                    });
+                    setLocalStatus(null);
+                    setLocalRegistrationId(null);
+                    router.refresh();
+                  } else {
+                    setError(result.error);
+                  }
+                });
+              }}
+            >
+              {isPending ? tCommon("loading") : t("public.confirmCancel")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     );
   }
 
@@ -351,8 +265,8 @@ export function RegistrationButton({
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <Button
-          className="w-full rounded-full"
-          size="lg"
+          className="w-full"
+          size="sm"
           disabled={isPending}
           onClick={() => {
             startTransition(async () => {

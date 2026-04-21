@@ -87,7 +87,7 @@ export function ExplorerFeatured({ circles }: Props) {
                     <CategoryBadge label={categoryLabel} className="min-w-0 truncate" />
                   )}
                   {/* Ligne 2 : nom */}
-                  <p className="truncate text-base font-bold text-foreground group-hover:underline">
+                  <p className="truncate text-base font-bold text-foreground group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
                     {circle.name}
                   </p>
                   {/* Ligne 3 : ville */}

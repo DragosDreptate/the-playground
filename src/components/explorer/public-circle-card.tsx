@@ -81,7 +81,7 @@ export function PublicCircleCard({ circle, membershipRole, hideNextMoment }: Pro
               </div>
             )}
             {/* Titre — pleine largeur */}
-            <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:underline">
+            <h3 className="min-w-0 truncate text-sm sm:text-base font-semibold leading-snug group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
               {circle.name}
             </h3>
             <p className="text-muted-foreground line-clamp-1 sm:line-clamp-2 text-xs sm:text-sm">

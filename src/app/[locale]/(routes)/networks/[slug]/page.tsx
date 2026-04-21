@@ -194,7 +194,7 @@ export default async function NetworkPage({ params }: Props) {
                     href={network.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium hover:underline underline-offset-2"
+                    className="text-sm font-medium link-hover"
                   >
                     {stripProtocol(network.website)}
                   </a>

@@ -79,4 +79,16 @@ export interface RegistrationRepository {
    * Une seule requête batch (évite le N+1). Résultats triés par date d'inscription croissante.
    */
   findTopRegistrantsByMomentIds(momentIds: string[], limit: number): Promise<Map<string, RegistrationWithUser[]>>;
+  /**
+   * Renvoie une page paginée des participants REGISTERED d'un Moment, triés par registeredAt ASC.
+   * Utilisé par la modale "Participants" avec infinite scroll.
+   */
+  findParticipantsPaginated(
+    momentId: string,
+    options: { offset: number; limit: number }
+  ): Promise<{
+    participants: RegistrationWithUser[];
+    total: number;
+    hasMore: boolean;
+  }>;
 }

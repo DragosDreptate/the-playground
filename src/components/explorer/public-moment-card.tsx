@@ -117,7 +117,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
               {moment.circle.name}
             </span>
-            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:underline">
+            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
               {moment.title}
             </h3>
             {moment.description && (

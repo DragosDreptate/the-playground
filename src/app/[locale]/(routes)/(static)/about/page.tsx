@@ -250,7 +250,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold hover:underline"
+                    className="text-foreground font-semibold link-hover"
                   >
                     Dragos Dreptate
                   </a>
@@ -260,7 +260,7 @@ export default async function AboutPage() {
                     href="https://thespark.fr"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold hover:underline"
+                    className="text-foreground font-semibold link-hover"
                   >
                     The Spark
                   </a>
@@ -273,7 +273,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold hover:underline"
+                    className="text-foreground font-semibold link-hover"
                   >
                     Dragos Dreptate
                   </a>
@@ -283,7 +283,7 @@ export default async function AboutPage() {
                     href="https://thespark.fr"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold hover:underline"
+                    className="text-foreground font-semibold link-hover"
                   >
                     The Spark
                   </a>
@@ -304,7 +304,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary font-semibold hover:underline"
+                    className="text-primary font-semibold hover:text-foreground transition-colors"
                   >
                     Retrouvez-moi sur LinkedIn.
                   </a>
@@ -316,7 +316,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary font-semibold hover:underline"
+                    className="text-primary font-semibold hover:text-foreground transition-colors"
                   >
                     Find me on LinkedIn.
                   </a>
@@ -410,7 +410,7 @@ export default async function AboutPage() {
         >
           <Github className="size-8 shrink-0 text-foreground" />
           <div className="min-w-0 flex-1">
-            <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
+            <p className="font-semibold text-foreground group-hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
               DragosDreptate / the-playground
             </p>
             <p className="text-sm text-muted-foreground truncate">

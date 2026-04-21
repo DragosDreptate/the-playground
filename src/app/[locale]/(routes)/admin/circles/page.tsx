@@ -75,7 +75,7 @@ export default async function AdminCirclesPage({ searchParams }: Props) {
                   <TableCell>
                     <Link
                       href={`/admin/circles/${circle.id}`}
-                      className="font-medium hover:underline"
+                      className="font-medium link-hover"
                     >
                       {circle.name}
                     </Link>

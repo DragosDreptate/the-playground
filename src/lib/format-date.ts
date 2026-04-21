@@ -37,6 +37,15 @@ export function formatTime(date: Date): string {
   return `${hour}:${minute}`;
 }
 
+/** Heure formatée selon la locale de l'utilisateur ("22:00" en FR/EN-GB, "10:00 PM" en EN-US) */
+export function formatLocalizedTime(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 /** "sam. 25 févr." / "Sat 25 Feb" */
 export function formatShortDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
@@ -97,6 +106,16 @@ export function formatLongDate(date: Date, locale: string): string {
     day: "numeric",
     month: "long",
     year: "numeric",
+  }).format(date);
+}
+
+/** "mardi 21 avril" / "Tuesday 21 April" */
+export function formatLongDateWithWeekday(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
   }).format(date);
 }
 

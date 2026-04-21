@@ -95,13 +95,13 @@ export default async function AdminExplorerMomentsPage({ searchParams }: Props) 
                   <TableCell>
                     <Link
                       href={`/admin/moments/${moment.id}`}
-                      className="font-medium hover:underline"
+                      className="font-medium link-hover"
                     >
                       {moment.title}
                     </Link>
                   </TableCell>
                   <TableCell className="text-muted-foreground text-sm">
-                    <Link href={`/admin/circles`} className="hover:underline">
+                    <Link href={`/admin/circles`} className="link-hover">
                       {moment.circleName}
                     </Link>
                   </TableCell>

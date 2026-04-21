@@ -33,7 +33,7 @@ export default function GlobalError({
             </a>
             <button
               onClick={reset}
-              className="text-muted-foreground text-sm hover:underline"
+              className="text-muted-foreground text-sm link-hover"
             >
               Réessayer
             </button>

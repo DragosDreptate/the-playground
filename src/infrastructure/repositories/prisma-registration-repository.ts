@@ -37,6 +37,10 @@ type PrismaRegistrationWithUser = PrismaRegistration & {
     email: string;
     image: string | null;
     publicId: string | null;
+    website?: string | null;
+    linkedinUrl?: string | null;
+    twitterUrl?: string | null;
+    githubUrl?: string | null;
   };
 };
 
@@ -52,6 +56,10 @@ function toDomainRegistrationWithUser(
       email: record.user.email,
       image: record.user.image,
       publicId: record.user.publicId,
+      website: record.user.website ?? null,
+      linkedinUrl: record.user.linkedinUrl ?? null,
+      twitterUrl: record.user.twitterUrl ?? null,
+      githubUrl: record.user.githubUrl ?? null,
     },
   };
 }
@@ -120,6 +128,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             email: true,
             image: true,
             publicId: true,
+            website: true,
+            linkedinUrl: true,
+            twitterUrl: true,
+            githubUrl: true,
           },
         },
       },
@@ -520,6 +532,44 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       paidCount: paidResult._count,
       totalAmount: (paidResult._count) * (moment?.price ?? 0),
       refundedCount: refundedResult._count,
+    };
+  },
+
+  async findParticipantsPaginated(
+    momentId: string,
+    { offset, limit }: { offset: number; limit: number }
+  ) {
+    const [records, total] = await Promise.all([
+      prisma.registration.findMany({
+        where: { momentId, status: "REGISTERED" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              image: true,
+              publicId: true,
+              website: true,
+              linkedinUrl: true,
+              twitterUrl: true,
+              githubUrl: true,
+            },
+          },
+        },
+        orderBy: { registeredAt: "asc" },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.registration.count({
+        where: { momentId, status: "REGISTERED" },
+      }),
+    ]);
+    return {
+      participants: records.map(toDomainRegistrationWithUser),
+      total,
+      hasMore: offset + records.length < total,
     };
   },
 };
