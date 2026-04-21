@@ -67,6 +67,7 @@ export function CircleMembersDialog({
   const t = useTranslations("Circle");
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState<CircleMemberWithUser[]>(initialMembers);
+  const [total, setTotal] = useState(initialTotal);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, startLoad] = useTransition();
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -75,9 +76,10 @@ export function CircleMembersDialog({
   useEffect(() => {
     if (!open) {
       setMembers(initialMembers);
+      setTotal(initialTotal);
       setHasMore(initialHasMore);
     }
-  }, [open, initialMembers, initialHasMore]);
+  }, [open, initialMembers, initialTotal, initialHasMore]);
 
   const loadMore = useCallback(() => {
     if (isLoading || !hasMore) return;
@@ -88,6 +90,15 @@ export function CircleMembersDialog({
       setHasMore(result.hasMore);
     });
   }, [circleId, members.length, hasMore, isLoading]);
+
+  const handleMemberRemoved = useCallback((userId: string) => {
+    setMembers((prev) => prev.filter((m) => m.user.id !== userId));
+    setTotal((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const handleMemberRoleChanged = useCallback((userId: string, role: CircleMemberRole) => {
+    setMembers((prev) => prev.map((m) => (m.user.id === userId ? { ...m, role } : m)));
+  }, []);
 
   useEffect(() => {
     if (!open || !hasMore || !sentinelRef.current) return;
@@ -125,7 +136,7 @@ export function CircleMembersDialog({
             <UsersIcon className="text-primary size-7" />
           </div>
           <DialogTitle className="text-xl font-bold">
-            {t("detail.memberCount", { count: initialTotal })}
+            {t("detail.memberCount", { count: total })}
           </DialogTitle>
           <DialogDescription className="sr-only">
             {t("detail.members")}
@@ -141,6 +152,8 @@ export function CircleMembersDialog({
                 callerRole={callerRole}
                 showEmail={showEmails}
                 circleId={circleId}
+                onRemoved={handleMemberRemoved}
+                onRoleChanged={handleMemberRoleChanged}
               />
             ))}
           </ul>
@@ -160,9 +173,18 @@ type MemberRowProps = {
   callerRole: CircleMemberRole | undefined;
   showEmail: boolean;
   circleId: string;
+  onRemoved: (userId: string) => void;
+  onRoleChanged: (userId: string, role: CircleMemberRole) => void;
 };
 
-function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) {
+function MemberRow({
+  member,
+  callerRole,
+  showEmail,
+  circleId,
+  onRemoved,
+  onRoleChanged,
+}: MemberRowProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
   const { user } = member;
@@ -186,6 +208,7 @@ function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) 
       const result = await promoteToCoHostAction(circleId, user.id);
       if (result.success) {
         toast.success(tCircle("promoteToCoHost.success", { name: displayName }));
+        onRoleChanged(user.id, "CO_HOST");
         router.refresh();
       } else {
         toast.error(tCircle("promoteToCoHost.error"));
@@ -198,6 +221,7 @@ function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) 
       const result = await demoteFromCoHostAction(circleId, user.id);
       if (result.success) {
         toast.success(tCircle("demoteFromCoHost.success", { name: displayName }));
+        onRoleChanged(user.id, "PLAYER");
         router.refresh();
       } else {
         toast.error(tCircle("demoteFromCoHost.error"));
@@ -323,6 +347,7 @@ function MemberRow({ member, callerRole, showEmail, circleId }: MemberRowProps) 
           memberName={displayName}
           open={removeDialogOpen}
           onOpenChange={setRemoveDialogOpen}
+          onRemoved={() => onRemoved(user.id)}
         />
       )}
     </>

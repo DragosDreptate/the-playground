@@ -330,7 +330,7 @@ export default async function CircleDetailPage({
                         return (
                           <span key={m.id} className="group/avatar relative">
                             <span
-                              className="ring-card relative flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.65rem] font-semibold text-white ring-2"
+                              className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
                               style={{ background: getMomentGradient(m.user.email) }}
                             >
                               {m.user.image ? (

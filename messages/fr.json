@@ -253,7 +253,7 @@
       "player": "Participant"
     },
     "pendingRequests": {
-      "membershipsTitle": "Demandes de membership en attente",
+      "membershipsTitle": "Demandes d'adhésion en attente",
       "registrationsTitle": "Inscriptions en attente de validation",
       "approve": "Approuver",
       "reject": "Refuser"
@@ -1665,7 +1665,7 @@
         "event4": "Si vous approuvez : le participant reçoit un email de confirmation et est inscrit (ou placé en liste d'attente si l'événement est complet)",
         "event5": "Si vous refusez : le participant reçoit un email de notification",
         "communityLabel": "Pour une communauté avec validation activée :",
-        "community1": "Les demandes de membership (depuis la page communauté ou via lien d'invitation) sont soumises à votre approbation",
+        "community1": "Les demandes d'adhésion (depuis la page communauté ou via lien d'invitation) sont soumises à votre approbation",
         "community2": "Depuis le tableau de bord de la communauté, une section « Demandes en attente » vous permet d'approuver ou refuser chaque demande",
         "callout": "La validation est indépendante sur chaque entité — activer la validation sur une communauté n'active pas automatiquement la validation sur ses événements, et inversement."
       },

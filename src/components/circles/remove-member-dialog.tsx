@@ -21,6 +21,7 @@ type RemoveMemberDialogProps = {
   memberName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRemoved?: () => void;
 };
 
 export function RemoveMemberDialog({
@@ -29,6 +30,7 @@ export function RemoveMemberDialog({
   memberName,
   open,
   onOpenChange,
+  onRemoved,
 }: RemoveMemberDialogProps) {
   const router = useRouter();
   const t = useTranslations("Circle.removeMember");
@@ -43,6 +45,7 @@ export function RemoveMemberDialog({
 
     if (result.success) {
       onOpenChange(false);
+      onRemoved?.();
       router.refresh();
     } else {
       setError(result.error);
