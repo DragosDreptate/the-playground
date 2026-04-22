@@ -222,7 +222,10 @@ export async function updateMomentAction(
     return { success: false, error: "Title cannot be empty", code: "VALIDATION" };
   }
 
-  const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : undefined;
+  // capacityRaw === null → champ absent du form, ne pas toucher (undefined)
+  // capacityRaw === "" → user a explicitement effacé la limite → null (illimité)
+  // sinon parse → number (fallback null si invalide)
+  const capacity = capacityRaw === null ? undefined : parseInt(capacityRaw, 10) || null;
   const price = priceRaw !== null ? parseInt(priceRaw, 10) || 0 : undefined;
   // Refundable only meaningful for paid events; default to true when price becomes 0
   const refundable = price !== undefined
