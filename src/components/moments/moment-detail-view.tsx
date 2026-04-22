@@ -21,7 +21,7 @@ import { MomentAttachmentsList } from "@/components/moments/moment-attachments-l
 import { AddToCalendarMenu } from "@/components/moments/add-to-calendar-menu";
 import type { CalendarEventData } from "@/lib/calendar";
 import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-repository";
-import { formatDateRange, formatLongDateWithWeekday, formatLocalizedTime } from "@/lib/format-date";
+import { formatDateRange, formatMomentDateTime } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { UserAvatar } from "@/components/user-avatar";
@@ -221,6 +221,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
   const locale = await getLocale();
 
   const gradient = getMomentGradient(moment.title);
+  const momentDateTime = formatMomentDateTime(moment.startsAt, moment.endsAt, locale);
 
   const locationLabel =
     moment.locationType === "ONLINE"
@@ -518,11 +519,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold leading-snug">
-                  {formatLongDateWithWeekday(moment.startsAt, locale)}
+                  {momentDateTime.dateLine}
                 </p>
                 <p className="text-muted-foreground text-sm">
-                  {formatLocalizedTime(moment.startsAt, locale)}
-                  {moment.endsAt && ` – ${formatLocalizedTime(moment.endsAt, locale)}`}
+                  {momentDateTime.timeLine}
                 </p>
               </div>
               {props.calendarData && props.appUrl && moment.status !== "PAST" && moment.status !== "CANCELLED" && (

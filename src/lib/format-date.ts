@@ -119,15 +119,51 @@ export function formatLongDateWithWeekday(date: Date, locale: string): string {
   }).format(date);
 }
 
-/** "sam. 25 févr. · 22:00 – 23:00" */
+/** "sam. 25 févr. · 22:00 – 23:00" (same-day) ou "sam. 25 févr. – dim. 26 févr. · 22:00 – 02:00" (multi-jour) */
 export function formatDateRange(
   startsAt: Date,
   endsAt: Date | null,
   locale: string,
 ): string {
-  const dateStr = formatShortDate(startsAt, locale);
+  const startDate = formatShortDate(startsAt, locale);
   const startTime = formatTime(startsAt);
-  if (!endsAt) return `${dateStr} · ${startTime}`;
+  if (!endsAt) return `${startDate} · ${startTime}`;
   const endTime = formatTime(endsAt);
-  return `${dateStr} · ${startTime} – ${endTime}`;
+  if (!isSameDayInParis(startsAt, endsAt)) {
+    const endDate = formatShortDate(endsAt, locale);
+    return `${startDate} – ${endDate} · ${startTime} – ${endTime}`;
+  }
+  return `${startDate} · ${startTime} – ${endTime}`;
+}
+
+/**
+ * Affichage meta "Quand" sur la page événement — 2 lignes (date bold, heure muted).
+ *
+ * - Pas de `endsAt`       → `{ dateLine: "mardi 22 avril", timeLine: "15:00" }`
+ * - Même jour (Paris)     → `{ dateLine: "mardi 22 avril", timeLine: "15:00 – 17:00" }`
+ * - Jours différents      → `{ dateLine: "mar. 22 avril – mer. 23 avril", timeLine: "22:00 – 02:00" }`
+ */
+export function formatMomentDateTime(
+  startsAt: Date,
+  endsAt: Date | null,
+  locale: string,
+): { dateLine: string; timeLine: string } {
+  const startTime = formatLocalizedTime(startsAt, locale);
+  if (!endsAt) {
+    return {
+      dateLine: formatLongDateWithWeekday(startsAt, locale),
+      timeLine: startTime,
+    };
+  }
+  const endTime = formatLocalizedTime(endsAt, locale);
+  if (!isSameDayInParis(startsAt, endsAt)) {
+    return {
+      dateLine: `${formatShortDate(startsAt, locale)} – ${formatShortDate(endsAt, locale)}`,
+      timeLine: `${startTime} – ${endTime}`,
+    };
+  }
+  return {
+    dateLine: formatLongDateWithWeekday(startsAt, locale),
+    timeLine: `${startTime} – ${endTime}`,
+  };
 }

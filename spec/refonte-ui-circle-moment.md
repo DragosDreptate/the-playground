@@ -248,7 +248,7 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 ### Notes / Idées à retravailler plus tard (session en cours)
 
 - [x] Menu "Ajouter à mon calendrier" refondu en DropdownMenu (desktop : label + chevron ; mobile : icône seule style Meetup). Composant client `AddToCalendarMenu` extrait. Options Google Calendar + Fichier .ics. Mockup `spec/mockups/moment-meta-add-to-calendar-dropdown.mockup.html`.
-- [ ] Bug d'affichage de la date d'un événement quand début et fin ne sont pas le même jour. À investiguer : vérifier `formatLongDateWithWeekday` + `formatLocalizedTime` → aujourd'hui on affiche `mardi 22 avril` + `15:00 – 17:00`, mais si `endsAt` est un autre jour, la plage horaire seule ne suffit pas.
+- [x] Bug date multi-jours corrigé (page événement uniquement). Nouveau helper `formatMomentDateTime(start, end, locale)` → `{ dateLine, timeLine }`. Règle : same-day (ou pas de `end`) affiche `mardi 22 avril` / `22:00 – 02:00` ; jours différents affiche `dim. 25 janv. – lun. 26 janv.` / `22:00 – 02:00`. `formatDateRange` (banner "événement passé") gère aussi la plage de dates. Emails et OG intentionnellement non touchés (pas de bug visible, juste info de fin absente — l'ICS attaché compense). Cards (Explorer/timeline) laissées en l'état.
 
 ---
 

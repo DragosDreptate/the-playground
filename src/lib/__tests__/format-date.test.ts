@@ -5,6 +5,7 @@ import {
   formatDayMonth,
   formatWeekdayAndDate,
   formatDateRange,
+  formatMomentDateTime,
 } from "@/lib/format-date";
 
 /**
@@ -132,6 +133,66 @@ describe("formatDateRange", () => {
     ])("should include month abbreviation for locale %s", (locale, monthPattern) => {
       const result = formatDateRange(EVENT_UTC, null, locale);
       expect(result).toMatch(monthPattern);
+    });
+  });
+
+  describe("given start and end on different days (multi-day)", () => {
+    // 25 janvier 22:00 Paris → 26 janvier 02:00 Paris
+    const NIGHT_END_UTC = new Date("2026-01-26T01:00:00.000Z"); // 01:00 UTC = 02:00 Paris (CET)
+
+    it("should include both dates and both times", () => {
+      const result = formatDateRange(EVENT_UTC, NIGHT_END_UTC, "fr");
+      expect(result).toContain("25");
+      expect(result).toContain("26");
+      expect(result).toContain("22:00");
+      expect(result).toContain("02:00");
+    });
+  });
+});
+
+describe("formatMomentDateTime", () => {
+  const START_UTC = new Date("2026-01-25T21:00:00.000Z"); // 22:00 Paris (CET)
+  const SAME_DAY_END_UTC = new Date("2026-01-25T22:30:00.000Z"); // 23:30 Paris
+  const NEXT_DAY_END_UTC = new Date("2026-01-26T01:00:00.000Z"); // 02:00 Paris
+
+  describe("given no end date", () => {
+    it("should return long date + single time", () => {
+      const { dateLine, timeLine } = formatMomentDateTime(START_UTC, null, "fr");
+      expect(dateLine).toMatch(/dimanche/i);
+      expect(dateLine).toContain("25");
+      expect(dateLine).toMatch(/janvier/i);
+      expect(timeLine).toBe("22:00");
+    });
+  });
+
+  describe("given start and end on the same day", () => {
+    it("should return long date + time range", () => {
+      const { dateLine, timeLine } = formatMomentDateTime(START_UTC, SAME_DAY_END_UTC, "fr");
+      expect(dateLine).toMatch(/dimanche/i);
+      expect(dateLine).toContain("25");
+      expect(timeLine).toBe("22:00 – 23:30");
+    });
+  });
+
+  describe("given start and end on different days", () => {
+    it("should return date range + time range (short weekday format)", () => {
+      const { dateLine, timeLine } = formatMomentDateTime(START_UTC, NEXT_DAY_END_UTC, "fr");
+      // Plage de dates : "dim. 25 janv. – lun. 26 janv."
+      expect(dateLine).toContain("25");
+      expect(dateLine).toContain("26");
+      expect(dateLine).toContain("–");
+      expect(dateLine).toMatch(/dim/i);
+      expect(dateLine).toMatch(/lun/i);
+      // Plage horaire toujours affichée
+      expect(timeLine).toBe("22:00 – 02:00");
+    });
+
+    it("should also work in English", () => {
+      const { dateLine, timeLine } = formatMomentDateTime(START_UTC, NEXT_DAY_END_UTC, "en");
+      expect(dateLine).toContain("25");
+      expect(dateLine).toContain("26");
+      expect(dateLine).toContain("–");
+      expect(timeLine).toBe("22:00 – 02:00");
     });
   });
 });
