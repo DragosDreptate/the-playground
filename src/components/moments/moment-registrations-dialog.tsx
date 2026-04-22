@@ -245,6 +245,9 @@ export function MomentRegistrationsDialog({
             if (!o) setRemoveTarget(null);
           }}
           willRefund={removeTarget.isPaid}
+          onRemoved={() => {
+            setParticipants((prev) => prev.filter((p) => p.id !== removeTarget.id));
+          }}
         />
       )}
     </Dialog>
