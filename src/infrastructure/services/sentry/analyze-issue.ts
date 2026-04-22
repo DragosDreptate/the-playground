@@ -3,11 +3,15 @@ import { Resend } from "resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackSentryIssue, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
+import { URGENCY_META, type AnalysisResult, type UserImpact, type UserImpactLevel } from "./analysis-meta";
+import { buildAnalysisPrompt } from "./build-prompt";
+
+export type { UserImpact, UserImpactLevel } from "./analysis-meta";
 
 const SENTRY_REGION = "https://de.sentry.io";
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 
-type IssueInput = {
+export type IssueInput = {
   issueId: string;
   issueShortId: string;
   issueTitle: string;
@@ -36,6 +40,7 @@ type SentryEvent = {
   eventID: string;
   title: string;
   tags: { key: string; value: string }[];
+  request?: { url?: string; method?: string };
   entries: {
     type: string;
     data: {
@@ -65,7 +70,14 @@ async function fetchLatestEvent(issueId: string, token: string): Promise<SentryE
   }
 }
 
-function extractStacktraceSummary(event: SentryEvent): string {
+type EventContext = {
+  stacktrace: string;
+  tags: Record<string, string>;
+  requestUrl?: string;
+  requestMethod?: string;
+};
+
+function extractEventContext(event: SentryEvent): EventContext {
   const lines: string[] = [];
 
   for (const entry of event.entries) {
@@ -82,34 +94,33 @@ function extractStacktraceSummary(event: SentryEvent): string {
     }
   }
 
-  const url = event.tags.find((t) => t.key === "url")?.value;
-  const browser = event.tags.find((t) => t.key === "browser")?.value;
-  const os = event.tags.find((t) => t.key === "os")?.value;
-  if (url) lines.push(`URL: ${url}`);
-  if (browser) lines.push(`Browser: ${browser}`);
-  if (os) lines.push(`OS: ${os}`);
+  const tags: Record<string, string> = {};
+  for (const t of event.tags ?? []) {
+    tags[t.key] = t.value;
+  }
 
-  return lines.join("\n");
+  return {
+    stacktrace: lines.join("\n"),
+    tags,
+    requestUrl: event.request?.url,
+    requestMethod: event.request?.method,
+  };
 }
-
-export type UserImpactLevel = "none" | "silent" | "degraded" | "blocking";
-
-export type UserImpact = {
-  level: UserImpactLevel;
-  description: string;
-};
-
-type AnalysisResult = {
-  urgency: "critical" | "high" | "medium" | "low" | "noise";
-  userImpact: UserImpact;
-  diagnosis: string;
-  remediation: string;
-};
 
 const FALLBACK_USER_IMPACT: UserImpact = {
   level: "silent",
   description: "Impact utilisateur non évalué, à vérifier manuellement dans Sentry",
 };
+
+function fallbackResult(issue: IssueInput, rawText?: string): AnalysisResult {
+  return {
+    urgency: "medium",
+    trigger: "Déclencheur non identifié — vérifier les tags Sentry (cron, url, action)",
+    functionalConsequence: "Conséquence fonctionnelle non identifiée — inspecter le handler concerné",
+    userImpact: FALLBACK_USER_IMPACT,
+    technical: rawText?.slice(0, 300) ?? `${issue.issueTitle} — analyse technique indisponible, ouvrir l'issue dans Sentry`,
+  };
+}
 
 function isValidUserImpact(value: unknown): value is UserImpact {
   if (!value || typeof value !== "object") return false;
@@ -123,97 +134,54 @@ function isValidUserImpact(value: unknown): value is UserImpact {
   );
 }
 
+function isValidAnalysisResult(value: unknown): value is AnalysisResult {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Partial<AnalysisResult>;
+  const validUrgencies: AnalysisResult["urgency"][] = ["critical", "high", "medium", "low", "noise"];
+  return (
+    typeof v.urgency === "string" && validUrgencies.includes(v.urgency as AnalysisResult["urgency"]) &&
+    typeof v.trigger === "string" && v.trigger.length > 0 &&
+    typeof v.functionalConsequence === "string" && v.functionalConsequence.length > 0 &&
+    typeof v.technical === "string" && v.technical.length > 0 &&
+    isValidUserImpact(v.userImpact)
+  );
+}
+
 async function analyzeWithClaude(
   issue: IssueInput,
-  stacktrace: string
+  context: EventContext
 ): Promise<AnalysisResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return {
-      urgency: "medium",
+      ...fallbackResult(issue),
       userImpact: { level: "silent", description: "Impossible d'analyser (ANTHROPIC_API_KEY manquante)" },
-      diagnosis: issue.issueTitle,
-      remediation: "Vérifier manuellement dans Sentry",
     };
   }
 
   const client = new Anthropic({ apiKey });
-
-  const prompt = `Analyse cette erreur Sentry d'une application Next.js (The Playground - plateforme de communautés/événements).
-
-Issue: ${issue.issueShortId}
-Titre: ${issue.issueTitle}
-Culprit: ${issue.culprit}
-Level: ${issue.level}
-Platform: ${issue.platform}
-Metadata: type=${issue.metadata.type}, filename=${issue.metadata.filename}, function=${issue.metadata.function}
-
-Stacktrace et contexte:
-${stacktrace || "(aucune stacktrace disponible)"}
-
-Réponds UNIQUEMENT avec un JSON valide:
-{
-  "urgency": "critical|high|medium|low|noise",
-  "userImpact": {
-    "level": "none|silent|degraded|blocking",
-    "description": "Ce que l'utilisateur voit ou fait concrètement. Commence par 'L'utilisateur...'. 1 à 2 phrases."
-  },
-  "diagnosis": "explication technique de la cause (2-3 phrases max)",
-  "remediation": "plan de correction concret (fichier à modifier, approche, 2-3 phrases max)"
-}
-
-Règles de priorisation technique (urgency):
-- "noise" = erreur d'extension navigateur, bot, ou erreur non-actionnable
-- "critical" = perte de données, paiement échoué, auth cassée
-- "high" = fonctionnalité principale cassée pour les utilisateurs
-- "medium" = bug visible mais contournable
-- "low" = cosmétique, edge case rare
-
-Règles d'impact utilisateur (userImpact.level) — OBLIGATOIRE, s'évalue séparément de urgency:
-- "none" = l'utilisateur ne perçoit absolument rien (script tiers, handler pagehide/unload, erreur silencieuse, bot)
-- "silent" = erreur visible uniquement en devtools, aucune gêne fonctionnelle
-- "degraded" = expérience dégradée mais utilisable (feature secondaire cassée, fallback, latence)
-- "blocking" = l'utilisateur est bloqué et ne peut pas accomplir son action
-
-Avant de choisir le level, parcours cette checklist:
-1. L'erreur vient-elle d'un script tiers (PostHog, Google Analytics, Stripe.js, extension) sans notre code dans la stack ? → level ≤ silent
-2. L'erreur se déclenche-t-elle pendant pagehide, unload, visibilitychange, beforeunload ? → level = none (l'utilisateur a déjà quitté)
-3. L'erreur est-elle handled (try/catch, mécanisme handled:true) ? → level ≤ silent
-4. La stack ou le contexte prouvent-ils un crash visuel, un message d'erreur UI, ou une action bloquée ? → sinon level ≠ blocking
-
-Règle d'or: "level" décrit ce que voit ou fait l'utilisateur, pas ce qui se passe en interne. Dans le doute, préfère "none" ou "silent". Ne jamais inventer un impact non prouvé par la stack.`;
+  const prompt = buildAnalysisPrompt(issue, context);
 
   const resp = await client.messages.create({
     model: ANTHROPIC_MODEL,
-    max_tokens: 600,
+    max_tokens: 900,
     messages: [{ role: "user", content: prompt }],
   });
 
   const tb = resp.content.find((b): b is Anthropic.Messages.TextBlock => b.type === "text");
-  if (!tb) {
-    return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: issue.issueTitle, remediation: "Vérifier manuellement" };
-  }
+  if (!tb) return fallbackResult(issue);
 
   try {
     const raw = tb.text.trim();
-    const jsonStr = raw.startsWith("{") ? raw : raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1);
-    const parsed = JSON.parse(jsonStr) as Partial<AnalysisResult>;
-    if (!parsed.urgency || !parsed.diagnosis || !parsed.remediation || !isValidUserImpact(parsed.userImpact)) {
-      return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
-    }
-    return parsed as AnalysisResult;
+    const openBrace = raw.indexOf("{");
+    const closeBrace = raw.lastIndexOf("}");
+    const jsonStr = openBrace >= 0 && closeBrace > openBrace ? raw.slice(openBrace, closeBrace + 1) : raw;
+    const parsed = JSON.parse(jsonStr);
+    return isValidAnalysisResult(parsed) ? parsed : fallbackResult(issue, tb.text);
   } catch {
-    return { urgency: "medium", userImpact: FALLBACK_USER_IMPACT, diagnosis: tb.text.slice(0, 200), remediation: "Vérifier manuellement" };
+    return fallbackResult(issue, tb.text);
   }
 }
-
-const URGENCY_LABELS: Record<string, string> = {
-  critical: "CRITIQUE",
-  high: "HAUTE",
-  medium: "MOYENNE",
-  low: "BASSE",
-  noise: "BRUIT",
-};
 
 async function sendAnalysisEmail(
   issue: IssueInput,
@@ -225,23 +193,13 @@ async function sendAnalysisEmail(
 
   const resend = new Resend(resendKey);
   const adminEmail = process.env.SENTRY_ALERT_EMAIL ?? "ddreptate@gmail.com";
-  const urgencyLabel = URGENCY_LABELS[analysis.urgency] ?? "INCONNUE";
+  const urgencyLabel = URGENCY_META[analysis.urgency].label;
 
   await resend.emails.send({
     from: getSender(),
     to: adminEmail,
     subject: `[Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle.slice(0, 80)}`,
-    react: SentryIssueAnalysisEmail({
-      issueShortId: issue.issueShortId,
-      issueTitle: issue.issueTitle,
-      culprit: issue.culprit,
-      urgency: analysis.urgency,
-      urgencyLabel,
-      userImpact: analysis.userImpact,
-      diagnosis: analysis.diagnosis,
-      remediation: analysis.remediation,
-      sentryUrl,
-    }),
+    react: SentryIssueAnalysisEmail({ issue, analysis, sentryUrl }),
   });
 }
 
@@ -251,27 +209,16 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
 
   const sentryOrg = process.env.SENTRY_ORG ?? "the-playground-id";
 
-  // 1. Fetch latest event with stacktrace
   const event = await fetchLatestEvent(issue.issueId, token);
-  const stacktrace = event ? extractStacktraceSummary(event) : "";
+  const context: EventContext = event
+    ? extractEventContext(event)
+    : { stacktrace: "", tags: {} };
 
-  // 2. Analyze with Claude
-  const analysis = await analyzeWithClaude(issue, stacktrace);
-
-  // 3. Send Slack + email (if enabled)
+  const analysis = await analyzeWithClaude(issue, context);
   const sentryUrl = `https://${sentryOrg}.sentry.io/issues/${issue.issueId}/`;
-  const urgencyLabel = URGENCY_LABELS[analysis.urgency] ?? "INCONNUE";
+
   await Promise.all([
     isAdminEmailEnabled() ? sendAnalysisEmail(issue, analysis, sentryUrl) : Promise.resolve(),
-    notifySlackSentryIssue({
-      issueShortId: issue.issueShortId,
-      issueTitle: issue.issueTitle,
-      culprit: issue.culprit,
-      urgencyLabel,
-      userImpact: analysis.userImpact,
-      diagnosis: analysis.diagnosis,
-      remediation: analysis.remediation,
-      sentryUrl,
-    }),
+    notifySlackSentryIssue({ issue, analysis, sentryUrl }),
   ]);
 }
