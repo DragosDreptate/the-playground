@@ -284,26 +284,34 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
         {/* ─── LEFT column : cover + circle info ────────────── */}
-        <div className="order-2 hidden w-full flex-col gap-4 lg:order-1 lg:flex lg:w-[340px] lg:shrink-0 lg:sticky lg:top-20">
+        {/* Sur mobile, le wrapper s'aplatit (max-lg:contents) pour permettre d'intercaler les blocs left/right via max-lg:order-X */}
+        <div className="max-lg:contents lg:flex lg:w-[340px] lg:shrink-0 lg:flex-col lg:gap-4 lg:order-1 lg:sticky lg:top-20">
 
-          {/* Cover — carré, glow blur */}
-          <MomentCoverBlock
-            coverImage={moment.coverImage}
-            coverImageAttribution={moment.coverImageAttribution}
-            title={moment.title}
-            status={moment.status}
-            isDemo={circle.isDemo}
-            gradient={gradient}
-            sizes="(max-width: 1024px) 100vw, 340px"
-            demoLabel={tCommon("demo")}
-          />
+          {/* Groupe 1 — Cover (mobile: order-2, juste après le breadcrumb) */}
+          <div className="max-lg:order-2">
+            <MomentCoverBlock
+              coverImage={moment.coverImage}
+              coverImageAttribution={moment.coverImageAttribution}
+              title={moment.title}
+              status={moment.status}
+              isDemo={circle.isDemo}
+              gradient={gradient}
+              sizes="(max-width: 1024px) 100vw, 340px"
+              demoLabel={tCommon("demo")}
+            />
+          </div>
 
-          {/* Circle — cliquable */}
-          <CircleInfoBlock
-            circle={circle}
-            circleHref={circleHref}
-            proposedByLabel={t("public.proposedByCommunity")}
-          />
+          {/* Groupe 2 — Circle info "Proposé par" (mobile: order-16, vers le bas après Documents) */}
+          <div className="max-lg:order-16">
+            <CircleInfoBlock
+              circle={circle}
+              circleHref={circleHref}
+              proposedByLabel={t("public.proposedByCommunity")}
+            />
+          </div>
+
+          {/* Groupe 3 — Organisé par + séparateur + CTAs (mobile: order-5, sous le titre H1) */}
+          <div className="flex flex-col gap-4 max-lg:order-5">
 
           {/* Organisé par — HOSTs de l'événement (design aligné Circle) */}
           {primaryHosts.length > 0 && (
@@ -428,19 +436,21 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               refundable={moment.refundable}
             />
           )}
+          </div>
+          {/* /Groupe 3 */}
         </div>
 
         {/* ─── RIGHT column ─────────────────────────────────── */}
-        <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+        <div className="max-lg:contents lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:gap-5 lg:order-2">
 
           {/* Titre */}
-          <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
+          <h1 className="text-3xl font-bold tracking-tight max-lg:order-4 lg:text-4xl">
             {moment.title}
           </h1>
 
           {/* Banner Moment brouillon — visible par tous, CTA Publier host only */}
           {moment.status === "DRAFT" && (
-            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3 max-lg:order-3">
               <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
               <p className="text-muted-foreground flex-1 text-sm">
                 {t("public.draftNotice")}
@@ -457,7 +467,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Banner Moment passé */}
           {moment.status === "PAST" && (
-            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3 max-lg:order-3">
               <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
               <p className="text-sm">
                 {t("public.eventTookPlace")}{" "}
@@ -476,31 +486,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
-          {/* Cover — mobile uniquement (dupliquée depuis LEFT column) */}
-          <div className="lg:hidden">
-            <MomentCoverBlock
-              coverImage={moment.coverImage}
-              coverImageAttribution={moment.coverImageAttribution}
-              title={moment.title}
-              status={moment.status}
-              isDemo={circle.isDemo}
-              gradient={gradient}
-              sizes="calc(100vw - 32px)"
-              demoLabel={tCommon("demo")}
-            />
-          </div>
-
           {/* Description */}
           {moment.description && (
-            <div className="lg:border-primary lg:border-l-2 lg:pl-4">
+            <div className="max-lg:order-7 lg:border-primary lg:border-l-2 lg:pl-4">
               <CollapsibleDescription text={moment.description} />
             </div>
           )}
 
-          {/* Séparateur */}
+          {/* Séparateur + Quand & Où — style Luma : valeur principale en bold, détail en muted dessous */}
+          <div className="flex flex-col gap-5 max-lg:order-9">
           <div className="border-border border-t" />
-
-          {/* Quand & Où — style Luma : valeur principale en bold, détail en muted dessous */}
           <div className="flex flex-col gap-4">
             {/* Date */}
             <div className="flex items-center gap-3">
@@ -680,10 +675,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
             )}
           </div>
+          </div>
+          {/* /Séparateur + Quand & Où */}
 
           {/* Host : Partager mon événement */}
           {isHostView && (
-            <div className="border-border bg-card rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6 max-lg:order-12">
               <p className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wider">
                 {t("detail.shareTitle")}
               </p>
@@ -734,7 +731,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Demandes en attente — Host uniquement si requiresApproval */}
           {isHostView && props.variant === "host" && moment.requiresApproval && (
-            <div className="border-border bg-card rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6 max-lg:order-13">
               {props.pendingRegistrations && props.pendingRegistrations.length > 0 ? (
                 <PendingRegistrationsList
                   pendingRegistrations={props.pendingRegistrations}
@@ -750,7 +747,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Résumé billetterie — Host uniquement, événements payants */}
           {isHostView && props.variant === "host" && props.paymentSummary && moment.price > 0 && (
-            <div className="border-border bg-card rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6 max-lg:order-14">
               <h3 className="mb-3 text-base font-semibold">{t("host.ticketingSummary")}</h3>
               <div className="text-sm">
                 <p>
@@ -771,24 +768,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Documents */}
           {attachments.length > 0 && (
-            <MomentAttachmentsList
-              attachments={attachments}
-              momentSlug={moment.slug}
-            />
+            <div className="max-lg:order-15">
+              <MomentAttachmentsList
+                attachments={attachments}
+                momentSlug={moment.slug}
+              />
+            </div>
           )}
-
-          {/* Circle info — mobile uniquement (dupliquée depuis LEFT column) */}
-          <div className="flex flex-col gap-4 lg:hidden">
-            <CircleInfoBlock
-              circle={circle}
-              circleHref={circleHref}
-              proposedByLabel={t("public.proposedByCommunity")}
-            />
-          </div>
 
           {/* Prochains événements du Circle — public view uniquement */}
           {!isHostView && (props as PublicViewProps).upcomingCircleMoments.length > 0 && (
-            <div className="border-border bg-card rounded-2xl border p-6">
+            <div className="border-border bg-card rounded-2xl border p-6 max-lg:order-17">
               <h2 className="text-muted-foreground mb-4 text-xs font-semibold uppercase tracking-wider">
                 {t("public.upcomingInCircle")}
               </h2>
@@ -848,14 +838,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           )}
 
           {/* Fil de commentaires */}
-          <CommentThread
-            momentId={moment.id}
-            comments={props.comments}
-            currentUserId={props.currentUserId}
-            isOrganizer={isHostView || (!isHostView && (props as PublicViewProps).isOrganizer)}
-            isPastMoment={moment.status === "PAST"}
-            signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
-          />
+          <div className="max-lg:order-18">
+            <CommentThread
+              momentId={moment.id}
+              comments={props.comments}
+              currentUserId={props.currentUserId}
+              isOrganizer={isHostView || (!isHostView && (props as PublicViewProps).isOrganizer)}
+              isPastMoment={moment.status === "PAST"}
+              signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
+            />
+          </div>
 
         </div>
       </div>
