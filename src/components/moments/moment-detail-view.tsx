@@ -310,8 +310,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             />
           </div>
 
-          {/* Groupe 3 — Organisé par + séparateur + CTAs (mobile: order-5, sous le titre H1) */}
-          <div className="flex flex-col gap-4 max-lg:order-5">
+          {/* Groupe 3 — Organisé par + séparateur + CTAs (mobile: order-7, après la description) */}
+          <div className="flex flex-col gap-4 max-lg:order-7">
 
           {/* Organisé par — HOSTs de l'événement (design aligné Circle) */}
           {primaryHosts.length > 0 && (
@@ -488,7 +488,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* Description */}
           {moment.description && (
-            <div className="max-lg:order-7 lg:border-primary lg:border-l-2 lg:pl-4">
+            <div className="max-lg:order-5 lg:border-primary lg:border-l-2 lg:pl-4">
               <CollapsibleDescription text={moment.description} />
             </div>
           )}
