@@ -180,12 +180,10 @@ export default async function PublicCirclePage({
     .slice(0, 2)
     .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
   const memberOthersCount = Math.max(0, memberCount - memberNamesToShow.length);
-  const memberOthersText = memberOthersCount > 0 ? t("detail.andOthers", { count: memberOthersCount }) : "";
-  const membersMetaText = memberOthersText
-    ? `${memberNamesToShow.join(", ")} ${memberOthersText}`
-    : memberNamesToShow.join(", ");
-  // Mobile : avatars + juste "et X autres" (ou les noms si pas d'autres)
-  const membersMetaMobileText = memberOthersText || memberNamesToShow.join(", ");
+  const membersMetaText =
+    memberOthersCount > 0
+      ? `${memberNamesToShow.join(", ")} ${t("detail.andOthers", { count: memberOthersCount })}`
+      : memberNamesToShow.join(", ");
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -499,8 +497,7 @@ export default async function PublicCirclePage({
                         })}
                       </span>
                       <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
-                        <span className="lg:hidden">{membersMetaMobileText}</span>
-                        <span className="hidden lg:inline">{membersMetaText}</span>
+                        {membersMetaText}
                       </span>
                     </CircleMembersDialog>
                   ) : (
@@ -533,10 +530,7 @@ export default async function PublicCirclePage({
                           );
                         })}
                       </span>
-                      <span className="text-sm font-medium">
-                        <span className="lg:hidden">{membersMetaMobileText}</span>
-                        <span className="hidden lg:inline">{membersMetaText}</span>
-                      </span>
+                      <span className="text-sm font-medium">{membersMetaText}</span>
                     </div>
                   )}
                 </div>

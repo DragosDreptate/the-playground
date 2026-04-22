@@ -124,12 +124,10 @@ export default async function CircleDetailPage({
     .slice(0, 2)
     .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
   const memberOthersCount = Math.max(0, totalMembers - memberNamesToShow.length);
-  const memberOthersText = memberOthersCount > 0 ? t("detail.andOthers", { count: memberOthersCount }) : "";
-  const membersMetaText = memberOthersText
-    ? `${memberNamesToShow.join(", ")} ${memberOthersText}`
-    : memberNamesToShow.join(", ");
-  // Mobile : avatars + juste "et X autres" (ou les noms si pas d'autres)
-  const membersMetaMobileText = memberOthersText || memberNamesToShow.join(", ");
+  const membersMetaText =
+    memberOthersCount > 0
+      ? `${memberNamesToShow.join(", ")} ${t("detail.andOthers", { count: memberOthersCount })}`
+      : memberNamesToShow.join(", ");
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
@@ -388,8 +386,7 @@ export default async function CircleDetailPage({
                       })}
                     </span>
                     <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
-                      <span className="lg:hidden">{membersMetaMobileText}</span>
-                      <span className="hidden lg:inline">{membersMetaText}</span>
+                      {membersMetaText}
                     </span>
                   </CircleMembersDialog>
                 </div>
