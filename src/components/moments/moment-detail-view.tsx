@@ -101,10 +101,10 @@ type MomentCoverBlockProps = {
 };
 
 const breadcrumbStatusStyle: Record<string, string> = {
-  DRAFT: "border-amber-500/40 text-amber-500",
-  PUBLISHED: "border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
-  CANCELLED: "border-destructive/40 text-destructive",
-  PAST: "border-muted-foreground/40 text-muted-foreground",
+  DRAFT: "border-amber-500/40 bg-amber-500/5 text-amber-500",
+  PUBLISHED: "border-emerald-500/40 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400",
+  CANCELLED: "border-destructive/40 bg-destructive/5 text-destructive",
+  PAST: "border-muted-foreground/40 bg-muted/50 text-muted-foreground",
 };
 
 function MomentCoverBlock({
@@ -274,7 +274,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           <span className="text-foreground font-medium">
             {moment.title}
           </span>
-          <span className={`shrink-0 rounded-md border px-2 py-0.5 text-xs font-medium ${breadcrumbStatusStyle[moment.status]}`}>
+          <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${breadcrumbStatusStyle[moment.status]}`}>
             {t(`status.${moment.status.toLowerCase()}`)}
           </span>
         </div>
