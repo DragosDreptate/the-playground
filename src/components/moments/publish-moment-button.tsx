@@ -31,8 +31,8 @@ export function PublishMomentButton({ momentId, circleSlug, momentSlug }: Props)
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      <Button size="sm" onClick={handlePublish} disabled={isPending} className="w-full">
+    <div className="flex flex-col items-end gap-1">
+      <Button size="sm" onClick={handlePublish} disabled={isPending}>
         {isPending ? t("actions.publishing") : t("actions.publish")}
       </Button>
       {error && <p className="text-destructive text-xs">{error}</p>}

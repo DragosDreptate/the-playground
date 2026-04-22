@@ -357,31 +357,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
           {/* CTAs — selon le contexte (host / public organizer / public non-organizer par statut) */}
           {isHostView ? (
-            <div className="flex flex-col gap-2">
-              {moment.status === "DRAFT" && (
-                <PublishMomentButton
-                  momentId={moment.id}
-                  circleSlug={props.circleSlug}
-                  momentSlug={props.momentSlug}
-                />
-              )}
-              <div className="flex gap-2">
-                <Button
-                  asChild
-                  size="sm"
-                  variant={moment.status === "DRAFT" ? "outline" : "default"}
-                  className="flex-1"
-                >
-                  <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
-                    {tCommon("edit")}
-                  </Link>
-                </Button>
-                <DeleteMomentDialog
-                  momentId={moment.id}
-                  circleSlug={props.circleSlug}
-                  triggerClassName="flex-1"
-                />
-              </div>
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="flex-1">
+                <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
+                  {tCommon("edit")}
+                </Link>
+              </Button>
+              <DeleteMomentDialog
+                momentId={moment.id}
+                circleSlug={props.circleSlug}
+                triggerClassName="flex-1"
+              />
             </div>
           ) : props.isOrganizer ? (
             <Button asChild size="sm" className="w-full gap-1.5">
@@ -455,13 +441,20 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             {moment.title}
           </h1>
 
-          {/* Banner Moment brouillon — visible par tous */}
+          {/* Banner Moment brouillon — visible par tous, CTA Publier host only */}
           {moment.status === "DRAFT" && (
             <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
               <CalendarIcon className="text-muted-foreground size-4 shrink-0" />
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground flex-1 text-sm">
                 {t("public.draftNotice")}
               </p>
+              {isHostView && (
+                <PublishMomentButton
+                  momentId={moment.id}
+                  circleSlug={(props as HostViewProps).circleSlug}
+                  momentSlug={(props as HostViewProps).momentSlug}
+                />
+              )}
             </div>
           )}
 

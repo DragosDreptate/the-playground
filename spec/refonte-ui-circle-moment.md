@@ -249,6 +249,7 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 
 - [x] Menu "Ajouter à mon calendrier" refondu en DropdownMenu (desktop : label + chevron ; mobile : icône seule style Meetup). Composant client `AddToCalendarMenu` extrait. Options Google Calendar + Fichier .ics. Mockup `spec/mockups/moment-meta-add-to-calendar-dropdown.mockup.html`.
 - [x] Bug date multi-jours corrigé (page événement uniquement). Nouveau helper `formatMomentDateTime(start, end, locale)` → `{ line1, line2, isMultiDay }`. Règle : same-day ou pas de `end` → ligne 1 date longue bold (`mardi 22 avril`), ligne 2 heure(s) muted (`22:00 – 23:30`). Multi-jour → 2 lignes équivalentes bold, chacune date courte + heure (`dim. 25 janv. · 22:00` / `lun. 26 janv. · 02:00`). `formatDateRange` (banner "événement passé") gère aussi la plage de dates au format compact. Emails et OG intentionnellement non touchés (pas de bug visible, juste info de fin absente — l'ICS attaché compense). Cards (Explorer/timeline) laissées en l'état.
+- [x] CTAs host DRAFT simplifiés. Bouton "Publier" déplacé dans le banner DRAFT (host only, à droite du texte explicatif) — plus contextualisé. Colonne gauche passe de 3 CTAs à 2 : Modifier (primary, rose) + Supprimer (outline destructive). `PublishMomentButton` rendu inline-friendly (retrait `w-full`, `items-end` pour alignement à droite dans le banner).
 
 ---
 
