@@ -315,12 +315,12 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           </div>
 
           {/* Groupe 3 — Organisé par + séparateur + CTAs (mobile: order-7, après la description) */}
-          <div className="flex flex-col gap-4 max-lg:order-7">
+          <div className="flex flex-col gap-4 max-lg:gap-6 max-lg:order-7">
 
           {/* Organisé par — HOSTs de l'événement (design aligné Circle) */}
           {primaryHosts.length > 0 && (
             <>
-              <div className="border-border border-t" />
+              <div className="border-border border-t max-lg:hidden" />
               <div className="space-y-2 px-1">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("public.hostedBy")}
@@ -363,8 +363,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </>
           )}
 
-          {/* Séparateur */}
-          <div className="border-border border-t" />
+          {/* Séparateur — desktop uniquement */}
+          <div className="border-border border-t max-lg:hidden" />
 
           {/* CTAs — selon le contexte (host / public organizer / public non-organizer par statut) */}
           {isHostView ? (
