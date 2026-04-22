@@ -229,6 +229,12 @@ export async function updateMomentAction(
     ? (price > 0 ? formData.get("refundable") === "on" : true)
     : undefined;
 
+  // Intent = "draft" (default) or "publish" — mirrors createMomentAction.
+  // Only meaningful when editing a DRAFT; otherwise the form doesn't expose
+  // the Publier button.
+  const intent = formData.get("intent") as string | null;
+  const shouldPublishAfterUpdate = intent === "publish";
+
   const userId = session.user.id;
   return toActionResult(async () => {
     // Récupère l'ancienne cover pour cleanup si besoin
@@ -307,6 +313,32 @@ export async function updateMomentAction(
     // Invalide uniquement la page de cet événement (les deux locales)
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
+
+    // Publish-after-update path : symétrique à createMomentAction.
+    // Si `publishMoment` échoue, on loggue dans Sentry et on renvoie le
+    // moment mis à jour (toujours DRAFT) pour ne pas perdre la modification.
+    if (shouldPublishAfterUpdate && result.moment.status === "DRAFT") {
+      try {
+        const publishResult = await publishMoment(
+          { momentId: result.moment.id, userId },
+          { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
+        );
+
+        sendMomentPublishedNotifications(publishResult.moment, userId);
+
+        revalidatePath(`/dashboard/circles/${publishResult.moment.circleId}`);
+        revalidatePath(`/m/${publishResult.moment.slug}`);
+        revalidatePath(`/en/m/${publishResult.moment.slug}`);
+
+        invalidateDashboardCache(userId);
+        return publishResult.moment;
+      } catch (publishError) {
+        Sentry.captureException(publishError, {
+          tags: { context: "publish_after_update" },
+          extra: { momentId: result.moment.id, circleId: result.moment.circleId },
+        });
+      }
+    }
 
     invalidateDashboardCache(session.user.id);
     return result.moment;
