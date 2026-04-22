@@ -113,7 +113,7 @@ export function RegistrationButton({
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-between gap-3">
-        <Button className="w-full" size="lg" asChild>
+        <Button className="w-full" size="sm" asChild>
           <a href={signInUrl}>{t("public.signInToRegister")}</a>
         </Button>
         <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
@@ -126,7 +126,7 @@ export function RegistrationButton({
     if (isFull) {
       return (
         <div className="flex items-center justify-between gap-3">
-          <Button className="w-full" size="lg" disabled>
+          <Button className="w-full" size="sm" disabled>
             {t("public.eventFull")}
           </Button>
           <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
