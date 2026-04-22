@@ -247,7 +247,7 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 
 ### Notes / Idées à retravailler plus tard (session en cours)
 
-- [ ] Refonte du menu "Ajouter à mon calendrier" sur modèle Meetup (plus d'options : Google, Outlook, Apple Calendar, Office 365, .ics ; éventuellement preview avant confirmation).
+- [x] Menu "Ajouter à mon calendrier" refondu en DropdownMenu (desktop : label + chevron ; mobile : icône seule style Meetup). Composant client `AddToCalendarMenu` extrait. Options Google Calendar + Fichier .ics. Mockup `spec/mockups/moment-meta-add-to-calendar-dropdown.mockup.html`.
 - [ ] Bug d'affichage de la date d'un événement quand début et fin ne sont pas le même jour. À investiguer : vérifier `formatLongDateWithWeekday` + `formatLocalizedTime` → aujourd'hui on affiche `mardi 22 avril` + `15:00 – 17:00`, mais si `endsAt` est un autre jour, la plage horaire seule ne suffit pas.
 
 ---
