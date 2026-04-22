@@ -24,7 +24,7 @@ export function HostLink({ user, className, linkDisabled }: Props) {
     return (
       <Link
         href={`/u/${user.publicId}`}
-        className={cn("link-hover", className)}
+        className={cn("hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors", className)}
       >
         {name}
       </Link>

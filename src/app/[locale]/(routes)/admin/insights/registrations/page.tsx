@@ -94,7 +94,7 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
                   <TableCell>
                     <Link
                       href={`/admin/users/${reg.userId}`}
-                      className="font-medium link-hover"
+                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {reg.userName ?? "—"}
                     </Link>
@@ -104,7 +104,7 @@ export default async function AdminInsightRegistrationsPage({ searchParams }: Pr
                     <Link
                       href={`/m/${reg.momentSlug}`}
                       target="_blank"
-                      className="flex items-center gap-1 link-hover"
+                      className="flex items-center gap-1 hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {reg.momentTitle}
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />

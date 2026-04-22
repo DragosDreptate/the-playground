@@ -86,7 +86,7 @@ export default async function AdminMomentsPage({ searchParams }: Props) {
                   <TableCell>
                     <Link
                       href={`/admin/moments/${moment.id}`}
-                      className="font-medium link-hover"
+                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {moment.title}
                     </Link>

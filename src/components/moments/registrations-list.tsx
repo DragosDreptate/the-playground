@@ -144,7 +144,7 @@ export function RegistrationsList({
                     {isConnected && reg.user.publicId ? (
                       <Link
                         href={`/u/${reg.user.publicId}`}
-                        className="text-sm font-medium leading-snug link-hover"
+                        className="text-sm font-medium leading-snug hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                       >
                         {displayName}
                       </Link>

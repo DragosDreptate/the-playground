@@ -566,7 +566,7 @@ export default async function PublicCirclePage({
                     href={circle.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium link-hover"
+                    className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     {stripProtocol(circle.website)}
                   </a>
@@ -622,7 +622,7 @@ export default async function PublicCirclePage({
                   </p>
                   <Link
                     href={`/networks/${network.slug}`}
-                    className="text-sm font-medium link-hover"
+                    className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     {network.name}
                   </Link>

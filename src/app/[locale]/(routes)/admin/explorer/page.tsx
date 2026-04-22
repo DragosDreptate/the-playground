@@ -138,7 +138,7 @@ export default async function AdminExplorerPage({ searchParams }: Props) {
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/admin/circles/${circle.id}`}
-                        className="font-medium link-hover"
+                        className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                       >
                         {circle.name}
                       </Link>

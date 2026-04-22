@@ -218,10 +218,12 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 
 - [x] Audit code baseline (4 surfaces)
 - [x] Décision approche (petites touches, refactor à la fin)
-- [x] Touches sur pages Communauté (publique + dashboard) — voir "État au 2026-04-21" ci-dessus
+- [x] Touches sur pages Communauté (publique + dashboard) — voir "État au 2026-04-21"
 - [x] Modale membres avec infinite scroll
-- [ ] Attaquer la **page événement** (publique `/m/[slug]` + dashboard) avec les mêmes patterns stabilisés
-- [ ] Vérifier le rendu mobile une fois les touches desktop validées
+- [x] Page événement (publique `/m/[slug]` + dashboard) — voir "État au 2026-04-22"
+- [x] Modale participants (MomentRegistrationsDialog) avec liste attente + export CSV
+- [x] Hover uniformisé site-wide (cards + liens textuels)
+- [ ] Vérifier le rendu mobile événement une fois les touches desktop validées
 - [ ] Création Draft PR pour activer les previews Vercel (optionnel)
 
 ### Phase 0 — extractions préparatoires (terminée)
@@ -242,3 +244,107 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 - [ ] Extraction `ShareSection` (CircleShareInviteCard + MomentShareCard)
 - [ ] Éventuel `CircleDetailView` à la manière de `MomentDetailView`
 - [ ] Mise à jour tests E2E + page Aide si pertinent
+
+### Notes / Idées à retravailler plus tard (session en cours)
+
+- [ ] Refonte du menu "Ajouter à mon calendrier" sur modèle Meetup (plus d'options : Google, Outlook, Apple Calendar, Office 365, .ics ; éventuellement preview avant confirmation).
+- [ ] Bug d'affichage de la date d'un événement quand début et fin ne sont pas le même jour. À investiguer : vérifier `formatLongDateWithWeekday` + `formatLocalizedTime` → aujourd'hui on affiche `mardi 22 avril` + `15:00 – 17:00`, mais si `endsAt` est un autre jour, la plage horaire seule ne suffit pas.
+
+---
+
+## État au 2026-04-22 — Phase 1 événement terminée
+
+### Ce qui a été fait (4 commits depuis le snapshot précédent)
+
+- `dc91f42` — Layout mobile Communauté réordonné via `max-lg:contents` + `max-lg:order-X` + stats inline
+- `7e322fe` — Barre rose À propos desktop-only (mobile enlevé)
+- `5f3152c` — Gros commit refonte page événement + hover uniformisé site-wide (57 fichiers)
+- `ffc723c` — Titres de section harmonisés + fix hover cards dark mode
+
+### Patterns visuels stabilisés sur la page événement
+
+Page événement publique (`/m/[slug]`) et dashboard (`dashboard/.../moments/[momentSlug]`) partagent le même composant `MomentDetailView`. Tout ce qui suit vaut pour les 2 vues.
+
+**Colonne gauche (340px sticky top-20)** :
+- MomentCoverBlock (1:1, overlay bas avec crédit Unsplash, Demo badge top-left)
+- CircleInfoBlock ("PROPOSÉ PAR LA COMMUNAUTÉ" + cover+nom ligne 1, description ligne 2 line-clamp-2)
+- Bloc ORGANISÉ PAR (aligné sur le bloc Circle : label uppercase + avatars `UserAvatar size-sm` + noms cliquables). Basé sur `primaryHosts` (creator event, fallback HOSTs)
+- Séparateur `border-t`
+- Bloc CTAs conditionnel :
+  - Host view : Publier (DRAFT) full-width + Modifier/Supprimer flex-1 chacun
+  - Public organizer : "Gérer cet événement" full-width default
+  - Public non-organizer, statut PUBLISHED : RegistrationButton (simplifié au bouton principal `size=sm w-full`, card "Vous participez" retirée)
+  - Public non-organizer + statut DRAFT/PAST/CANCELLED : card muted/30 p-4 rounded-2xl avec texte + lien vers Circle
+  - Public déjà inscrit : CTA "Annuler mon inscription" en `default` full-width (AlertDialog confirm)
+
+**Colonne droite (flex-1)** :
+- Breadcrumb (host only)
+- Actions host minimales retirées (déplacées en left column)
+- H1 titre
+- Banners conditionnelles DRAFT / PAST
+- Description avec barre rose `lg:border-l-2 lg:border-primary lg:pl-4` (desktop only)
+- **Séparateur `border-t`**
+- Section "Quand & Où" (style Luma) :
+  - **Date** : badge icon `size-11 bg-primary/10` + CalendarIcon `size-5 text-primary` | formatée locale-aware (`formatLongDateWithWeekday` "mardi 22 avril" + `formatLocalizedTime` "15:00 – 17:00") | desktop-only : label "Ajouter à mon calendrier" + 2 boutons icônes (Google G + Download .ics) à droite
+  - **Participants** : badge icon `size-11` + UsersIcon + label "PARTICIPANTS" uppercase + avatars `size-6 ring-2` (stack -space-x-1.5) + texte "Name1, Name2 et N autres". Cliquable → `MomentRegistrationsDialog` si authentifié
+  - **Lieu** : badge icon `size-11` + MapPin/Globe `size-5 text-primary` + nom lieu `text-sm font-semibold` + adresse `text-muted-foreground text-sm`. Si `mapsUrl` : wrap entier dans `<a target="_blank">` avec icône `ArrowUpRight size-3.5` à droite du titre. VideoLink (ONLINE/HYBRID) séparé en dessous
+  - **Carte Google Maps embed** : iframe non wrappée (zoom/pan natifs), footer lieu+adresse+bouton externe retiré (redondant)
+- Section "Partager" (host only) : titre uppercase + row LinkIcon + row Mail (BroadcastMomentDialog). Ligne calendrier retirée (déplacée en meta Date)
+- Demandes en attente / Payment summary (host)
+- **Documents** (`MomentAttachmentsList`) : card englobante `rounded-2xl border p-6` + titre "DOCUMENTS" uppercase + `divide-y` avec rows cliquables (button type, `cursor-pointer`, `hover:bg-muted/50 -mx-2 rounded-xl`)
+- **Aussi dans cette communauté** (public) : même pattern card englobante + titre uppercase + divide-y, rows `hover:bg-muted/50 -mx-2`, cover 48px, lien "Voir tous" footer bordé
+- **CommentThread** : card englobante + titre "COMMENTAIRES" uppercase (count retiré). Chaque message : header (avatar size-sm + nom bold + date + delete) puis **texte indenté avec barre rose `border-l-2 border-primary pl-3 mt-1.5`**
+
+### Hover uniformisé site-wide (patterns verbose)
+
+Passage global de `hover:underline` vers un changement de couleur, 51+ occurrences dans 37 fichiers :
+
+- **Hover direct** (liens inline, admin tables, pages static) : `hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors`
+- **Hover via `.group` parent** (titre de card, nom Circle, etc.) : `group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors` — **bien `dark:group-hover:` pas `dark:hover:`** (sinon seul le hover direct du texte déclenche l'éclaircissement dark, pas le hover card)
+- **Named groups** (`/organizer`, `/member`, `/stat`) : idem avec le namespace `group-hover/X:` et `dark:group-hover/X:`
+- **Texte `text-primary`** (déjà rose) : `hover:text-primary/60 transition-colors` ou `hover:text-foreground transition-colors`
+- Les `ui/button.tsx` et `ui/badge.tsx` conservent le `hover:underline` pour le variant `link` du design system
+- Itérations testées et rejetées : `pink-300`, `fuchsia-300`, `rose-300`, `emerald-300` (trop contrastés ou hors teinte primary), `text-shadow glow currentColor` (invisible en dark), `underline animé growing` (fragile, débordait du texte). Solution retenue : passage primary direct + variante éclaircie en dark uniquement
+
+### Architecture MomentRegistrationsDialog (modale participants)
+
+Identique au pattern `CircleMembersDialog` :
+- **Port** `RegistrationRepository.findParticipantsPaginated(momentId, { offset, limit })` → `{ participants, total, hasMore }`
+- **Adapter Prisma** : `Promise.all([findMany(status: REGISTERED), count])`. Le `select` user de `findActiveWithUserByMomentId` aussi étendu avec les 4 champs sociaux (`website`, `linkedinUrl`, `twitterUrl`, `githubUrl`) pour que la première page soit dérivable côté JS sans round-trip supplémentaire
+- **Usecase** `getMomentParticipantsPage` avec guard (auth + (circle PUBLIC ou membre ACTIF))
+- **Server action** `getMomentParticipantsPageAction`
+- **Type domaine** `RegistrationWithUser.user` étendu avec les 4 liens sociaux optionnels
+- **Composant** `MomentRegistrationsDialog` (client) :
+  - Header : UsersIcon badge size-14 + "X inscrits" en titre + "Y places restantes" / "Complet" subtitle + bouton "Exporter CSV" (ghost, host only)
+  - Rows : avatar `size-md` + nom + badge Crown (tooltip CSS) + email (host only) + SocialLinks (Globe/Linkedin/X/Github) + DropdownMenu MoreVertical avec action "Retirer" (host only, non-host)
+  - Section "Liste d'attente" (si `waitlistedRegistrations.length > 0`) : label Clock + count, même rows
+  - Infinite scroll via IntersectionObserver + sentinel
+  - `hostUserIds` = `[moment.createdById]` seulement (badge Crown uniquement sur le créateur de l'event, pas tous les HOSTs du Circle)
+- **Optim serveur** : `participantsFirstPage` est dérivé côté JS depuis `allAttendees` (filter REGISTERED + slice 20). `findParticipantsPaginated` n'est appelé QUE côté client pour les pages suivantes de l'infinite scroll. Économie : 1 round-trip DB par rendu de page événement
+
+### Autres features livrées
+
+- **Layout 2 pages Circle mobile** (`max-lg:contents` + `max-lg:order-X`) : cover → pill+titre+À propos → organisateurs+stats+CTA → meta+partage+events. Sticky desktop préservé
+- **Stats inline** Circle : valeur + libellé sur la même ligne (flex items-baseline)
+- **Séparateur Stats/CTA Communauté** desktop-only (`max-lg:hidden`)
+- **PublishMomentButton** devient full-width (support CTA stack)
+- **DeleteMomentDialog** : prop `triggerClassName` pour `flex-1`
+- **Cover crédit photo Unsplash** : déplacé en overlay bas de l'image (gain de hauteur)
+- **Description événement** : barre rose gauche `lg:border-l-2 lg:border-primary lg:pl-4`
+- **Participants modale** : menu 3-points contextuel (DropdownMenu) au lieu du bouton "Retirer" inline, pattern `CircleMembersDialog`
+- Helpers format-date ajoutés : `formatLongDateWithWeekday`, `formatLocalizedTime`
+
+### Règles durables créées (memory feedbacks)
+
+- `feedback_sticky_column_under_header.md` : sticky `lg:top-20` minimum (SiteHeader h-14)
+- `feedback_no_radix_tooltip_in_dialog_trigger.md` : jamais Radix Tooltip dans un DialogTrigger/button → hydration mismatch. Pattern tooltip CSS-pur
+- `feedback_no_auto_visual_regression.md` : ne jamais lancer `pnpm test:e2e refonte-visual-baseline` sans demande explicite
+- `feedback_note_vs_backlog.md` : "noter" = fichier spec de la session, jamais BACKLOG.md. Backlog seulement si "ajoute au backlog" explicite
+
+### Reste à faire
+
+- [ ] Valider visuellement l'ensemble de la refonte en dev server
+- [ ] Mobile événement : vérifier que le layout tient bien (actuellement left column `hidden lg:flex`, le bloc CTAs + organisateurs n'est pas visible sur mobile)
+- [ ] Refactor layout mobile événement avec `max-lg:contents` comme Circle (phase suivante)
+- [ ] Draft PR pour previews Vercel
+- [ ] Page Aide à mettre à jour (nouvelle modale participants, nouveaux CTAs)

@@ -77,7 +77,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                 <div key={circle.id} className="flex items-center justify-between rounded-md border px-3 py-2">
                   <Link
                     href={`/admin/circles/${circle.id}`}
-                    className="text-sm font-medium link-hover"
+                    className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     {circle.name}
                   </Link>
@@ -106,7 +106,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                   <div className="min-w-0 flex-1">
                     <Link
                       href={`/m/${moment.slug}`}
-                      className="text-sm font-medium link-hover"
+                      className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {moment.title}
                     </Link>

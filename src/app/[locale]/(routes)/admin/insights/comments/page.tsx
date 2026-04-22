@@ -82,7 +82,7 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
                   <TableCell>
                     <Link
                       href={`/admin/users/${c.userId}`}
-                      className="font-medium link-hover"
+                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {c.userName ?? "—"}
                     </Link>
@@ -95,7 +95,7 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
                     <Link
                       href={`/m/${c.momentSlug}`}
                       target="_blank"
-                      className="flex items-center gap-1 link-hover"
+                      className="flex items-center gap-1 hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {c.momentTitle}
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />

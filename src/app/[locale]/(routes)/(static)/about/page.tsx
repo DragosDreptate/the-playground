@@ -250,7 +250,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold link-hover"
+                    className="text-foreground font-semibold hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     Dragos Dreptate
                   </a>
@@ -260,7 +260,7 @@ export default async function AboutPage() {
                     href="https://thespark.fr"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold link-hover"
+                    className="text-foreground font-semibold hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     The Spark
                   </a>
@@ -273,7 +273,7 @@ export default async function AboutPage() {
                     href="https://www.linkedin.com/in/dragosdreptate/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold link-hover"
+                    className="text-foreground font-semibold hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     Dragos Dreptate
                   </a>
@@ -283,7 +283,7 @@ export default async function AboutPage() {
                     href="https://thespark.fr"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-foreground font-semibold link-hover"
+                    className="text-foreground font-semibold hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     The Spark
                   </a>

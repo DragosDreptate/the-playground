@@ -506,6 +506,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
             </div>
           )}
 
+          {/* Séparateur */}
+          <div className="border-border border-t" />
+
           {/* Quand & Où — style Luma : valeur principale en bold, détail en muted dessous */}
           <div className="flex flex-col gap-4">
             {/* Date */}
@@ -585,7 +588,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       initialTotal={participantsFirstPage.total}
                       initialHasMore={participantsFirstPage.hasMore}
                       capacity={moment.capacity}
-                      hostUserIds={hosts.map((h) => h.user.id)}
+                      hostUserIds={moment.createdById ? [moment.createdById] : []}
                       waitlistedRegistrations={registrations.filter((r) => r.status === "WAITLISTED")}
                       allRegistrationsForExport={registrations}
                       isHostView={isHostView}

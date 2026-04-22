@@ -57,7 +57,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
             <Row
               label={t("momentDetail.circle")}
               value={
-                <Link href={`/admin/circles/${moment.circleId}`} className="link-hover">
+                <Link href={`/admin/circles/${moment.circleId}`} className="hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors">
                   {moment.circleName}
                 </Link>
               }
@@ -126,7 +126,7 @@ export default async function AdminMomentDetailPage({ params }: Props) {
                   <div>
                     <Link
                       href={`/admin/users/${reg.userId}`}
-                      className="text-sm font-medium link-hover"
+                      className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {reg.userName || reg.userEmail}
                     </Link>

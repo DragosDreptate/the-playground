@@ -143,7 +143,7 @@ export default async function AdminInsightActivationPage({ searchParams }: Props
                   <TableCell>
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="font-medium link-hover"
+                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {[user.firstName, user.lastName].filter(Boolean).join(" ") || "—"}
                     </Link>
