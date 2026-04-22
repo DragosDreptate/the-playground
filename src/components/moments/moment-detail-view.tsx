@@ -101,7 +101,7 @@ type MomentCoverBlockProps = {
 };
 
 const breadcrumbStatusStyle: Record<string, string> = {
-  DRAFT: "border-muted-foreground/40 text-muted-foreground",
+  DRAFT: "border-amber-500/40 text-amber-500",
   PUBLISHED: "border-emerald-500/40 text-emerald-600 dark:text-emerald-400",
   CANCELLED: "border-destructive/40 text-destructive",
   PAST: "border-muted-foreground/40 text-muted-foreground",
