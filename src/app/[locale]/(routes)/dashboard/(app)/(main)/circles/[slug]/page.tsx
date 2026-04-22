@@ -267,11 +267,29 @@ export default async function CircleDetailPage({
             </div>
           )}
 
-          {/* Quitter la Communauté — Participant uniquement */}
+          {/* Badge Membre + Quitter — Participant uniquement */}
           {!isOrganizer && (
-            <div className="px-1">
-              <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
-            </div>
+            <>
+              <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                {t("detail.isMember")}
+              </div>
+              <div className="px-1">
+                <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
+              </div>
+            </>
           )}
           </div>
           {/* /Groupe 2 */}

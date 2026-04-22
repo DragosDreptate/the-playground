@@ -197,13 +197,38 @@ export function RegistrationButton({
     );
   }
 
-  // Already registered or waitlisted → CTA simple "Annuler mon inscription"
-  // (le "Vous êtes inscrit" + nb inscrits + calendrier sont affichés ailleurs dans la page :
-  //  meta Participants, meta Date → Ajouter au calendrier, etc.)
+  // Already registered or waitlisted → badge de statut + CTA "Annuler mon inscription"
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
     if (isOrganizer) return null;
+    const isRegistered = localStatus === "REGISTERED";
     return (
-      <AlertDialog>
+      <div className="space-y-3">
+        {isRegistered ? (
+          <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {t("public.youAreRegistered")}
+          </div>
+        ) : (
+          <div className="flex w-full items-center justify-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-sm font-medium text-amber-500">
+            <Clock className="size-4" />
+            {waitlistPosition && waitlistPosition > 0
+              ? t("public.youAreWaitlistedWithPosition", { position: waitlistPosition })
+              : t("public.youAreWaitlisted")}
+          </div>
+        )}
+        <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button size="sm" className="w-full">
             {t("public.cancelRegistration")}
@@ -257,6 +282,7 @@ export function RegistrationButton({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      </div>
     );
   }
 
