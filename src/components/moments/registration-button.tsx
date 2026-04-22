@@ -179,20 +179,9 @@ export function RegistrationButton({
   // Pending approval
   if (localStatus === "PENDING_APPROVAL") {
     return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 rounded-xl bg-amber-500/[0.06] p-4">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
-            <Clock className="size-4" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">
-              {t("public.pendingApprovalBannerTitle")}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              {t("public.pendingApprovalBannerDescription")}
-            </p>
-          </div>
-        </div>
+      <div className="flex w-full items-center justify-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-sm font-medium text-amber-500">
+        <Clock className="size-4" />
+        {t("public.pendingApproval")}
       </div>
     );
   }
