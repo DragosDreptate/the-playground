@@ -162,8 +162,6 @@ export default async function PublicMomentPage({
 
   const isFull =
     moment.capacity !== null && registeredCount >= moment.capacity;
-  const spotsRemaining =
-    moment.capacity !== null ? moment.capacity - registeredCount : null;
   const signInUrl = `/${locale}/auth/sign-in?callbackUrl=/${locale}/m/${slug}`;
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
@@ -287,7 +285,6 @@ export default async function PublicMomentPage({
         existingRegistration={existingRegistration}
         signInUrl={signInUrl}
         isFull={isFull}
-        spotsRemaining={spotsRemaining}
         calendarData={calendarData}
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}

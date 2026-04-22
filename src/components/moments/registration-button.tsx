@@ -37,8 +37,6 @@ type RegistrationButtonProps = {
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
-  spotsRemaining: number | null;
-  registrationCount: number;
   isOrganizer?: boolean;
   calendarData?: CalendarEventData;
   appUrl?: string;
@@ -46,35 +44,6 @@ type RegistrationButtonProps = {
   requiresApproval?: boolean;
   refundable?: boolean;
 };
-
-function StatsInfo({
-  count,
-  spotsRemaining,
-  isFull,
-}: {
-  count: number;
-  spotsRemaining: number | null;
-  isFull: boolean;
-}) {
-  const t = useTranslations("Moment");
-  return (
-    <div className="hidden shrink-0 flex-col items-end gap-0.5">
-      <span className="text-sm font-semibold">
-        {t("public.registrantsCount", { count })}
-      </span>
-      {!isFull && spotsRemaining !== null && (
-        <span className="text-muted-foreground text-xs">
-          {t("public.spotsRemaining", { count: spotsRemaining })}
-        </span>
-      )}
-      {isFull && (
-        <span className="text-xs text-amber-400">
-          {t("public.eventFull")}
-        </span>
-      )}
-    </div>
-  );
-}
 
 export function RegistrationButton({
   momentId,
@@ -87,8 +56,6 @@ export function RegistrationButton({
   existingRegistration,
   signInUrl,
   isFull,
-  spotsRemaining,
-  registrationCount,
   isOrganizer = false,
   calendarData,
   appUrl,
@@ -112,12 +79,9 @@ export function RegistrationButton({
   // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-between gap-3">
-        <Button className="w-full" size="sm" asChild>
-          <a href={signInUrl}>{t("public.signInToRegister")}</a>
-        </Button>
-        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
+      <Button className="w-full" size="sm" asChild>
+        <a href={signInUrl}>{t("public.signInToRegister")}</a>
+      </Button>
     );
   }
 
@@ -125,48 +89,42 @@ export function RegistrationButton({
   if (price > 0 && !localStatus) {
     if (isFull) {
       return (
-        <div className="flex items-center justify-between gap-3">
-          <Button className="w-full" size="sm" disabled>
-            {t("public.eventFull")}
-          </Button>
-          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-        </div>
+        <Button className="w-full" size="sm" disabled>
+          {t("public.eventFull")}
+        </Button>
       );
     }
 
     return (
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            className="w-full"
-            size="sm"
-            disabled={isPending}
-            onClick={() => {
-              startTransition(async () => {
-                setError(null);
-                const baseUrl = window.location.origin;
-                const result = await createCheckoutAction(
-                  momentId,
-                  slug,
-                  `${baseUrl}/m/${slug}`
-                );
-                if (result.success) {
-                  window.location.href = result.data.url;
-                } else {
-                  setError(result.error);
-                }
-              });
-            }}
-          >
-            {isPending
-              ? tCommon("loading")
-              : t("public.registerPaid", {
-                  price: formatPrice(price, currency, locale),
-                  currency,
-                })}
-          </Button>
-          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-        </div>
+        <Button
+          className="w-full"
+          size="sm"
+          disabled={isPending}
+          onClick={() => {
+            startTransition(async () => {
+              setError(null);
+              const baseUrl = window.location.origin;
+              const result = await createCheckoutAction(
+                momentId,
+                slug,
+                `${baseUrl}/m/${slug}`
+              );
+              if (result.success) {
+                window.location.href = result.data.url;
+              } else {
+                setError(result.error);
+              }
+            });
+          }}
+        >
+          {isPending
+            ? tCommon("loading")
+            : t("public.registerPaid", {
+                price: formatPrice(price, currency, locale),
+                currency,
+              })}
+        </Button>
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
             {error}
@@ -278,41 +236,38 @@ export function RegistrationButton({
   // Default: register or join waitlist
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <Button
-          className="w-full"
-          size="sm"
-          disabled={isPending}
-          onClick={() => {
-            startTransition(async () => {
-              setError(null);
-              const result = await joinMomentAction(momentId);
-              if (result.success) {
-                setLocalStatus(result.data.status);
-                setLocalRegistrationId(result.data.id);
-                posthog.capture("moment_joined", {
-                  moment_id: momentId,
-                  circle_id: circleId,
-                  circle_name: circleName,
-                  registration_status: result.data.status,
-                });
-                router.refresh();
-              } else {
-                setError(result.error);
-              }
-            });
-          }}
-        >
-          {isPending
-            ? tCommon("loading")
-            : requiresApproval
-              ? t("public.requestToJoin")
-              : isFull
-                ? t("public.joinWaitlist")
-                : t("public.registerFree")}
-        </Button>
-        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
+      <Button
+        className="w-full"
+        size="sm"
+        disabled={isPending}
+        onClick={() => {
+          startTransition(async () => {
+            setError(null);
+            const result = await joinMomentAction(momentId);
+            if (result.success) {
+              setLocalStatus(result.data.status);
+              setLocalRegistrationId(result.data.id);
+              posthog.capture("moment_joined", {
+                moment_id: momentId,
+                circle_id: circleId,
+                circle_name: circleName,
+                registration_status: result.data.status,
+              });
+              router.refresh();
+            } else {
+              setError(result.error);
+            }
+          });
+        }}
+      >
+        {isPending
+          ? tCommon("loading")
+          : requiresApproval
+            ? t("public.requestToJoin")
+            : isFull
+              ? t("public.joinWaitlist")
+              : t("public.registerFree")}
+      </Button>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {error}

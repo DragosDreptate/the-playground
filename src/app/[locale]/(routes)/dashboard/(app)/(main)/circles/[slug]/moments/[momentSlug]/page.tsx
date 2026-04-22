@@ -112,9 +112,6 @@ export default async function MomentDetailPage({
         existingRegistration={existingRegistration}
         signInUrl=""
         isFull={moment.capacity !== null && registeredCount >= moment.capacity}
-        spotsRemaining={
-          moment.capacity !== null ? moment.capacity - registeredCount : null
-        }
         calendarData={{
           title: moment.title,
           startsAt: moment.startsAt,

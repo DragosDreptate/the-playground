@@ -79,7 +79,6 @@ type PublicViewProps = CommonProps & {
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
-  spotsRemaining: number | null;
   calendarData: CalendarEventData;
   appUrl: string;
   waitlistPosition: number;
@@ -421,8 +420,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               existingRegistration={props.existingRegistration}
               signInUrl={props.signInUrl}
               isFull={props.isFull}
-              spotsRemaining={props.spotsRemaining}
-              registrationCount={registeredCount}
               isOrganizer={props.isOrganizer}
               calendarData={props.calendarData}
               appUrl={props.appUrl}
