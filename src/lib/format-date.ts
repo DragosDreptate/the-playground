@@ -137,33 +137,39 @@ export function formatDateRange(
 }
 
 /**
- * Affichage meta "Quand" sur la page événement — 2 lignes (date bold, heure muted).
+ * Affichage meta "Quand" sur la page événement — toujours 2 lignes.
  *
- * - Pas de `endsAt`       → `{ dateLine: "mardi 22 avril", timeLine: "15:00" }`
- * - Même jour (Paris)     → `{ dateLine: "mardi 22 avril", timeLine: "15:00 – 17:00" }`
- * - Jours différents      → `{ dateLine: "mar. 22 avril – mer. 23 avril", timeLine: "22:00 – 02:00" }`
+ * - Pas de `endsAt`       → `{ line1: "mardi 22 avril", line2: "15:00", isMultiDay: false }`
+ * - Même jour (Paris)     → `{ line1: "mardi 22 avril", line2: "15:00 – 17:00", isMultiDay: false }`
+ * - Jours différents      → `{ line1: "dim. 25 janv. · 22:00", line2: "lun. 26 janv. · 02:00", isMultiDay: true }`
+ *
+ * Le flag `isMultiDay` permet au composant d'adapter la typo : hiérarchie bold/muted en
+ * single-day, 2 lignes équivalentes bold en multi-day.
  */
 export function formatMomentDateTime(
   startsAt: Date,
   endsAt: Date | null,
   locale: string,
-): { dateLine: string; timeLine: string } {
+): { line1: string; line2: string; isMultiDay: boolean } {
   const startTime = formatLocalizedTime(startsAt, locale);
   if (!endsAt) {
     return {
-      dateLine: formatLongDateWithWeekday(startsAt, locale),
-      timeLine: startTime,
+      line1: formatLongDateWithWeekday(startsAt, locale),
+      line2: startTime,
+      isMultiDay: false,
     };
   }
   const endTime = formatLocalizedTime(endsAt, locale);
   if (!isSameDayInParis(startsAt, endsAt)) {
     return {
-      dateLine: `${formatShortDate(startsAt, locale)} – ${formatShortDate(endsAt, locale)}`,
-      timeLine: `${startTime} – ${endTime}`,
+      line1: `${formatShortDate(startsAt, locale)} · ${startTime}`,
+      line2: `${formatShortDate(endsAt, locale)} · ${endTime}`,
+      isMultiDay: true,
     };
   }
   return {
-    dateLine: formatLongDateWithWeekday(startsAt, locale),
-    timeLine: `${startTime} – ${endTime}`,
+    line1: formatLongDateWithWeekday(startsAt, locale),
+    line2: `${startTime} – ${endTime}`,
+    isMultiDay: false,
   };
 }

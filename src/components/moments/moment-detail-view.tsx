@@ -519,10 +519,16 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold leading-snug">
-                  {momentDateTime.dateLine}
+                  {momentDateTime.line1}
                 </p>
-                <p className="text-muted-foreground text-sm">
-                  {momentDateTime.timeLine}
+                <p
+                  className={
+                    momentDateTime.isMultiDay
+                      ? "text-sm font-semibold leading-snug"
+                      : "text-muted-foreground text-sm"
+                  }
+                >
+                  {momentDateTime.line2}
                 </p>
               </div>
               {props.calendarData && props.appUrl && moment.status !== "PAST" && moment.status !== "CANCELLED" && (

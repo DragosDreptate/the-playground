@@ -248,7 +248,7 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 ### Notes / Idées à retravailler plus tard (session en cours)
 
 - [x] Menu "Ajouter à mon calendrier" refondu en DropdownMenu (desktop : label + chevron ; mobile : icône seule style Meetup). Composant client `AddToCalendarMenu` extrait. Options Google Calendar + Fichier .ics. Mockup `spec/mockups/moment-meta-add-to-calendar-dropdown.mockup.html`.
-- [x] Bug date multi-jours corrigé (page événement uniquement). Nouveau helper `formatMomentDateTime(start, end, locale)` → `{ dateLine, timeLine }`. Règle : same-day (ou pas de `end`) affiche `mardi 22 avril` / `22:00 – 02:00` ; jours différents affiche `dim. 25 janv. – lun. 26 janv.` / `22:00 – 02:00`. `formatDateRange` (banner "événement passé") gère aussi la plage de dates. Emails et OG intentionnellement non touchés (pas de bug visible, juste info de fin absente — l'ICS attaché compense). Cards (Explorer/timeline) laissées en l'état.
+- [x] Bug date multi-jours corrigé (page événement uniquement). Nouveau helper `formatMomentDateTime(start, end, locale)` → `{ line1, line2, isMultiDay }`. Règle : same-day ou pas de `end` → ligne 1 date longue bold (`mardi 22 avril`), ligne 2 heure(s) muted (`22:00 – 23:30`). Multi-jour → 2 lignes équivalentes bold, chacune date courte + heure (`dim. 25 janv. · 22:00` / `lun. 26 janv. · 02:00`). `formatDateRange` (banner "événement passé") gère aussi la plage de dates au format compact. Emails et OG intentionnellement non touchés (pas de bug visible, juste info de fin absente — l'ICS attaché compense). Cards (Explorer/timeline) laissées en l'état.
 
 ---
 
