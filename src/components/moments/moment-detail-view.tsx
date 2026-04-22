@@ -166,7 +166,7 @@ type CircleInfoBlockProps = {
 
 function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBlockProps) {
   return (
-    <>
+    <div className="space-y-2">
       <p className="text-muted-foreground px-1 text-xs font-medium uppercase tracking-wide">
         {proposedByLabel}
       </p>
@@ -192,7 +192,7 @@ function CircleInfoBlock({ circle, circleHref, proposedByLabel }: CircleInfoBloc
           </p>
         )}
       </Link>
-    </>
+    </div>
   );
 }
 
