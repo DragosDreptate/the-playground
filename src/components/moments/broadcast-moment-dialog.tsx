@@ -80,15 +80,17 @@ export function BroadcastMomentDialog({
     }
   }
 
+  const triggerLabel = inCooldown ? t("alreadySentShort") : t("sendButton");
   const trigger = (
     <Button
       variant="outline"
       size="sm"
       disabled={inCooldown}
-      className="shrink-0 gap-1.5"
+      aria-label={triggerLabel}
+      className="shrink-0 gap-1.5 max-lg:w-8 max-lg:px-0"
     >
       <Mail className="size-4" />
-      {inCooldown ? t("alreadySentShort") : t("sendButton")}
+      <span className="hidden lg:inline">{triggerLabel}</span>
     </Button>
   );
 
