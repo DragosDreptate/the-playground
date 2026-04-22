@@ -243,10 +243,14 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
     .slice(0, 2)
     .map((r) => getDisplayName(r.user.firstName, r.user.lastName, r.user.email));
   const participantOthersCount = Math.max(0, registeredCount - participantNamesToShow.length);
-  const participantsMetaText =
-    participantOthersCount > 0
-      ? `${participantNamesToShow.join(", ")} ${tCircle("detail.andOthers", { count: participantOthersCount })}`
-      : participantNamesToShow.join(", ");
+  const participantOthersText = participantOthersCount > 0
+    ? tCircle("detail.andOthers", { count: participantOthersCount })
+    : "";
+  const participantsMetaText = participantOthersText
+    ? `${participantNamesToShow.join(", ")} ${participantOthersText}`
+    : participantNamesToShow.join(", ");
+  // Mobile : avatars + juste "et X autres" (ou les noms si pas d'autres)
+  const participantsMetaMobileText = participantOthersText || participantNamesToShow.join(", ");
 
   const circleHref = isHostView
     ? `/dashboard/circles/${props.circleSlug}`
@@ -576,7 +580,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                         })}
                       </span>
                       <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
-                        {participantsMetaText}
+                        <span className="lg:hidden">{participantsMetaMobileText}</span>
+                        <span className="hidden lg:inline">{participantsMetaText}</span>
                       </span>
                     </MomentRegistrationsDialog>
                   ) : (
@@ -609,7 +614,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                           );
                         })}
                       </span>
-                      <span className="text-sm font-medium">{participantsMetaText}</span>
+                      <span className="text-sm font-medium">
+                        <span className="lg:hidden">{participantsMetaMobileText}</span>
+                        <span className="hidden lg:inline">{participantsMetaText}</span>
+                      </span>
                     </div>
                   )}
                 </div>
