@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
+import { Clock, LogOut } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -177,7 +177,12 @@ export function RegistrationButton({
         )}
         <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button size="sm" className="w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          >
+            <LogOut className="size-3.5" />
             {t("public.cancelRegistration")}
           </Button>
         </AlertDialogTrigger>
