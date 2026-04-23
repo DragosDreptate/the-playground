@@ -113,7 +113,11 @@ test.describe("F8 — Lien 'Voir mon profil public' depuis la page profil dashbo
 });
 
 test.describe("F1/F6 — Section membres sur la page Communauté", () => {
-  test("given an authenticated user, the members section should be visible on a public circle page", async ({
+  // Depuis la refonte Circle (commit 76e4510), la section membres inline
+  // (#members-section) a été remplacée par la modale CircleMembersDialog,
+  // ouverte via le bloc stats "X Membres" ou le bloc avatars.
+
+  test("given an authenticated user, the members modal should be accessible on a public circle page", async ({
     browser,
   }) => {
     const context = await browser.newContext({ storageState: AUTH.PLAYER });
@@ -121,30 +125,29 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
 
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
-    // La section membres doit être présente
-    // .first() — la page peut rendre 2 éléments #members-section (mobile + desktop)
-    const membersSection = page.locator("#members-section").first();
-    await expect(membersSection).toBeVisible();
+    // Le trigger de la modale membres (bouton "X Membres") doit être présent
+    const trigger = page.getByRole("button", { name: /\d+ membres?/i }).first();
+    await expect(trigger).toBeVisible();
 
     await context.close();
   });
 
-  test("given an unauthenticated visitor, should see a sign-in placeholder instead of members", async ({
+  test("given an unauthenticated visitor, the member count should NOT open a modal", async ({
     page,
   }) => {
     await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
 
-    // Le placeholder "Connecte-toi" doit être visible
-    // .first() — la page peut rendre 2 éléments #members-section (mobile + desktop)
-    await expect(page.locator("#members-section").first()).toContainText(
-      /connecte-toi|sign in/i
-    );
-    // Aucun lien vers /u/ dans la section membres
-    const profileLinks = page.locator("#members-section a[href*='/u/']");
+    // Pour les guests : le bloc "X Membres" est un div statique, pas un button.
+    // Aucun bouton cliquable matchant /membres/ donc pas d'accès à la liste.
+    const triggers = page.getByRole("button", { name: /\d+ membres?/i });
+    await expect(triggers).toHaveCount(0);
+
+    // Aucun lien vers /u/ visible (la modale n'est pas accessible)
+    const profileLinks = page.locator("a[href*='/u/']");
     await expect(profileLinks).toHaveCount(0);
   });
 
-  test("given an authenticated user, member names in the circle page should be links to public profiles", async ({
+  test("given an authenticated user, member names in the circle modal should be links to public profiles", async ({
     browser,
   }) => {
     const context = await browser.newContext({ storageState: AUTH.PLAYER });
@@ -152,14 +155,20 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
 
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
-    // Des liens vers /u/ doivent exister dans la section membres
-    const profileLinks = page.locator("#members-section a[href*='/u/']");
+    // Ouvrir la modale membres
+    const trigger = page.getByRole("button", { name: /\d+ membres?/i }).first();
+    await trigger.click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+
+    // Des liens vers /u/ doivent exister dans la modale
+    const profileLinks = dialog.locator("a[href*='/u/']");
     await expect(profileLinks.first()).toBeVisible();
 
     await context.close();
   });
 
-  test("given an authenticated user, clicking the member count scrolls to the members section", async ({
+  test("given an authenticated user, clicking the member count opens the members modal", async ({
     browser,
   }) => {
     const context = await browser.newContext({ storageState: AUTH.PLAYER });
@@ -167,22 +176,13 @@ test.describe("F1/F6 — Section membres sur la page Communauté", () => {
 
     await page.goto(`/fr/circles/${SLUGS.CIRCLE}`);
 
-    // Le compteur de membres doit être un lien ancre pour les connectés
-    // .first() — la page peut avoir plusieurs liens vers #members-section (mobile + desktop)
-    const memberCountLink = page.locator("a[href='#members-section']").first();
-    await expect(memberCountLink).toBeVisible();
+    // Le compteur de membres est cliquable (trigger de la modale)
+    const trigger = page.getByRole("button", { name: /\d+ membres?/i }).first();
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
 
     await context.close();
-  });
-
-  test("given an unauthenticated visitor, the member count should NOT be a link", async ({
-    page,
-  }) => {
-    await page.goto(`/fr/circles/${SLUGS.PUBLIC_CIRCLE}`);
-
-    // Pas de lien ancre vers #members-section pour les non-connectés
-    const memberCountLink = page.locator("a[href='#members-section']");
-    await expect(memberCountLink).toHaveCount(0);
   });
 });
 

@@ -34,7 +34,7 @@ async function ensurePlayer3PendingOnCircle(browser: import("@playwright/test").
   }
 
   // If pending approval banner is showing, we're already pending — done
-  const pendingBanner = page.getByText(/en attente de validation|pending/i);
+  const pendingBanner = page.getByText(/en cours de validation|pending/i);
   if (await pendingBanner.isVisible({ timeout: 2000 }).catch(() => false)) {
     await ctx.close();
     return;
@@ -217,7 +217,7 @@ test.describe.serial("Event registration approval", () => {
     const cta = main.getByRole("button", { name: /soumis à validation|subject to approval/i });
     await cta.click();
 
-    await expect(main.getByText(/demande envoyée|request sent/i)).toBeVisible({ timeout: 10000 });
+    await expect(main.getByText(/en cours de validation|pending approval/i)).toBeVisible({ timeout: 10000 });
     await ctx.close();
   });
 
@@ -266,7 +266,7 @@ test.describe.serial("Event registration approval", () => {
     const reCta = main.getByRole("button", { name: /soumis à validation|subject to approval/i });
     await expect(reCta).toBeVisible();
     await reCta.click();
-    await expect(main.getByText(/demande envoyée|request sent/i)).toBeVisible({ timeout: 10000 });
+    await expect(main.getByText(/en cours de validation|pending approval/i)).toBeVisible({ timeout: 10000 });
     await playerCtx.close();
   });
 
@@ -289,9 +289,9 @@ test.describe.serial("Event registration approval", () => {
     await navigateToMoment(playerPage, SLUGS.MOMENT_WITH_APPROVAL);
 
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous participez|you're attending/i)).toBeVisible();
-    // Calendar buttons visible
-    await expect(main.getByText(/google/i).first()).toBeVisible();
+    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
+    // Le menu calendrier est maintenant un DropdownMenu avec le trigger "Ajouter à mon calendrier"
+    await expect(main.getByText(/ajouter à mon calendrier|add to calendar/i).first()).toBeVisible();
     await playerCtx.close();
   });
 });
@@ -318,7 +318,7 @@ test.describe("Cross-flow D2 — event no approval + Circle with approval", () =
     if (await cta.isVisible({ timeout: 3000 }).catch(() => false)) {
       await cta.click();
       // Immediately registered
-      await expect(main.getByText(/vous participez|you're attending/i)).toBeVisible({ timeout: 10000 });
+      await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible({ timeout: 10000 });
     }
 
     await ctx.close();
@@ -344,7 +344,7 @@ test.describe("Cross-flow D2 — event no approval + Circle with approval", () =
     await navigateToMoment(playerPage, SLUGS.MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE);
 
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous participez|you're attending/i)).toBeVisible();
+    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
 
     // Dashboard access not 404
     await playerPage.goto(`/fr/dashboard/circles/${SLUGS.APPROVAL_CIRCLE}/moments/${SLUGS.MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE}`);
@@ -370,7 +370,7 @@ test.describe.serial("Double approval — event + Circle both require approval",
 
     // Submit the request in the same test to avoid serial state issues
     await cta.click();
-    await expect(main.getByText(/demande envoyée|request sent/i)).toBeVisible({ timeout: 10000 });
+    await expect(main.getByText(/en cours de validation|pending approval/i)).toBeVisible({ timeout: 10000 });
     await ctx.close();
   });
 
@@ -392,7 +392,7 @@ test.describe.serial("Double approval — event + Circle both require approval",
     const playerPage = await playerCtx.newPage();
     await navigateToMoment(playerPage, SLUGS.MOMENT_BOTH_APPROVAL);
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous participez|you're attending/i)).toBeVisible();
+    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
     await playerCtx.close();
   });
 });
@@ -424,7 +424,9 @@ test.describe("Dashboard participant — pending states", () => {
     await circlesTab.click();
     await playerPage.waitForTimeout(1000);
 
-    await expect(playerPage.getByText(/en attente de validation|pending approval/i).first()).toBeVisible({ timeout: 10000 });
+    // Le badge dashboard utilise "En attente de validation" (Circle.circleCard.roleBadge.pending)
+    // alors que le banner Moment/Circle utilise "Demande en cours de validation".
+    await expect(playerPage.getByText(/en attente de validation|en cours de validation|pending approval/i).first()).toBeVisible({ timeout: 10000 });
     await playerCtx.close();
   });
 });

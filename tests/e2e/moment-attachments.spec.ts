@@ -120,8 +120,8 @@ test.describe("Pièces jointes — page publique", () => {
     );
 
     await expect(sectionHeading).toBeVisible();
-    // At least one card rendered as a <li> inside the attachments list
-    await expect(page.locator("ul[role='list']").first()).toBeVisible();
+    // Refonte : liste rendue en div.divide-y avec <button> pour chaque attachment
+    await expect(page.locator("div.divide-y > button").first()).toBeVisible();
   });
 
   test("should open the viewer modal when clicking an attachment card", async ({

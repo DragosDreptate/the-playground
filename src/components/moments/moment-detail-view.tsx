@@ -320,7 +320,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           {/* Organisé par — HOSTs de l'événement (design aligné Circle) */}
           {primaryHosts.length > 0 && (
             <>
-              <div className="border-border border-t max-lg:hidden" />
+              <div className="border-border border-t" />
               <div className="space-y-2 px-1">
                 <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
                   {t("public.hostedBy")}

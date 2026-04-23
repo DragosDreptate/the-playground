@@ -41,8 +41,13 @@ test.describe("Page Moment publique — affichage", () => {
   });
 
   test("should display social proof with registered attendees count", async ({ page }) => {
-    // Social proof : au moins 4 inscrits (host, player1, player2, player4) seedés
-    await expect(page.locator("main").first()).toContainText(/[1-9]\d* (participant|inscrit|member)/i);
+    // Social proof : le bloc Participants (label uppercase) est rendu avec les avatars
+    // des inscrits seedés (host, player1, player2, player4). Le texte de détail est
+    // dédoublé (1 span mobile + 1 span desktop) — on cible la version desktop visible
+    // dans le viewport Playwright par défaut via .last().
+    const main = page.locator("main").first();
+    await expect(main.getByText(/^PARTICIPANTS$|^MEMBERS$/i).first()).toBeVisible();
+    await expect(main.getByText(/et \d+ autres|\d+ others/i).last()).toBeVisible();
   });
 
   test("should display a link to the Circle", async ({ page }) => {

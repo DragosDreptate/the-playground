@@ -67,7 +67,7 @@ test.describe("Événement payant — participant inscrit (PAID)", () => {
   test("should show registered state on paid event", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.PAID_MOMENT_REFUNDABLE}`);
     const main = page.locator("main").first();
-    await expect(main.locator("text=Vous participez")).toBeVisible();
+    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
   });
 
   test("should show cancel link on paid event", async ({ page }) => {
