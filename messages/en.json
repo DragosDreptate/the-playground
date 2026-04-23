@@ -351,6 +351,23 @@
     "memberActions": {
       "label": "Actions"
     },
+    "membersExport": {
+      "action": "Export",
+      "error": "Failed to export members",
+      "csvHeaders": {
+        "circleName": "Community",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "role": "Role",
+        "joinedAt": "Joined on"
+      },
+      "roleLabels": {
+        "host": "Host",
+        "coHost": "Co-organizer",
+        "player": "Member"
+      }
+    },
     "promoteToCoHost": {
       "action": "Promote to co-organizer",
       "success": "{name} is now a co-organizer",
@@ -625,7 +642,7 @@
         "registered": "Joined",
         "waitlisted": "Waitlisted"
       },
-      "exportCsv": "Export CSV",
+      "exportCsv": "Export",
       "actionsLabel": "Actions",
       "removeAction": "Remove",
       "removeTitle": "Remove {name}?",

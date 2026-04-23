@@ -241,6 +241,8 @@ export default async function CircleDetailPage({
               initialHasMore={membersFirstPage.hasMore}
               callerRole={callerRole}
               showEmails={isOrganizer}
+              circleName={circle.name}
+              circleSlug={circle.slug}
               triggerClassName="group/stat flex cursor-pointer items-baseline gap-2"
             >
               <span className="text-2xl font-bold group-hover/stat:text-primary dark:group-hover/stat:text-[oklch(0.76_0.27_341)] transition-colors">{totalMembers}</span>
@@ -360,6 +362,8 @@ export default async function CircleDetailPage({
                     initialHasMore={membersFirstPage.hasMore}
                     callerRole={callerRole}
                     showEmails={isOrganizer}
+                    circleName={circle.name}
+                    circleSlug={circle.slug}
                     triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                   >
                     <span className="flex -space-x-1.5">

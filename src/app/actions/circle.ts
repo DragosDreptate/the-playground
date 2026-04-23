@@ -25,8 +25,9 @@ import {
   getCircleMembersPage,
   type GetCircleMembersPageResult,
 } from "@/domain/usecases/get-circle-members-page";
+import { exportCircleMembers } from "@/domain/usecases/export-circle-members";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
-import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
+import type { CircleVisibility, CircleCategory, CircleMembership, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
@@ -677,5 +678,21 @@ export async function getCircleMembersPageAction(
   } catch {
     return { members: [], total: 0, hasMore: false };
   }
+}
+
+/**
+ * Export complet des membres ACTIFS d'un Circle pour génération CSV côté client.
+ * Réservé aux HOST et CO_HOST du Circle (vérifié dans le usecase).
+ */
+export async function exportCircleMembersAction(
+  circleId: string,
+): Promise<ActionResult<CircleMemberWithUser[]>> {
+  const session = await auth();
+  return toActionResult(() =>
+    exportCircleMembers(
+      { circleId, callerUserId: session?.user?.id ?? null },
+      { circleRepository: prismaCircleRepository },
+    ),
+  );
 }
 

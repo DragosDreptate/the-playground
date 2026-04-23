@@ -24,13 +24,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
-import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2, Globe, Linkedin, Github } from "lucide-react";
+import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2, Globe, Linkedin, Github, Download } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
 import { getDisplayName } from "@/lib/display-name";
+import { generateSlug } from "@/lib/slug";
 import {
   getCircleMembersPageAction,
   promoteToCoHostAction,
   demoteFromCoHostAction,
+  exportCircleMembersAction,
 } from "@/app/actions/circle";
 import type {
   CircleMemberRole,
@@ -48,6 +50,10 @@ type Props = {
   callerRole?: CircleMemberRole;
   /** Afficher l'email des membres (dashboard Organisateur). */
   showEmails?: boolean;
+  /** Nom du Circle (utilisé comme meta row dans l'export CSV). */
+  circleName?: string;
+  /** Slug du Circle (nom du fichier CSV). */
+  circleSlug?: string;
   /** Classes CSS appliquées au bouton trigger rendu par DialogTrigger. */
   triggerClassName?: string;
   /** Contenu du trigger (texte, avatars+texte, etc.) — DialogTrigger rend lui-même le <button> wrappant. */
@@ -61,6 +67,8 @@ export function CircleMembersDialog({
   initialHasMore,
   callerRole,
   showEmails = false,
+  circleName,
+  circleSlug,
   triggerClassName,
   children,
 }: Props) {
@@ -70,7 +78,53 @@ export function CircleMembersDialog({
   const [total, setTotal] = useState(initialTotal);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, startLoad] = useTransition();
+  const [isExporting, startExport] = useTransition();
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const canExport = callerRole === "HOST" || callerRole === "CO_HOST";
+
+  function handleExportCsv() {
+    startExport(async () => {
+      const result = await exportCircleMembersAction(circleId);
+      if (!result.success) {
+        toast.error(t("membersExport.error"));
+        return;
+      }
+      const headers = [
+        t("membersExport.csvHeaders.circleName"),
+        t("membersExport.csvHeaders.firstName"),
+        t("membersExport.csvHeaders.lastName"),
+        t("membersExport.csvHeaders.email"),
+        t("membersExport.csvHeaders.role"),
+        t("membersExport.csvHeaders.joinedAt"),
+      ];
+      const name = circleName ?? "";
+      const metaRow = [name, ...Array(headers.length - 1).fill("")];
+      const rows = result.data.map((m) => [
+        name,
+        m.user.firstName ?? "",
+        m.user.lastName ?? "",
+        m.user.email,
+        t(
+          `membersExport.roleLabels.${
+            m.role === "HOST" ? "host" : m.role === "CO_HOST" ? "coHost" : "player"
+          }`,
+        ),
+        new Date(m.joinedAt).toLocaleDateString(),
+      ]);
+      const csv = [metaRow, headers, ...rows]
+        .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const slug = circleSlug ?? (name ? generateSlug(name).slice(0, 50) : "circle");
+      a.download = `members-${slug}-${dateStr}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  }
 
   // Reset les données à la fermeture pour repartir propre à la prochaine ouverture
   useEffect(() => {
@@ -135,9 +189,21 @@ export function CircleMembersDialog({
           <div className="bg-primary/10 flex size-14 shrink-0 items-center justify-center rounded-full">
             <UsersIcon className="text-primary size-7" />
           </div>
-          <DialogTitle className="text-xl font-bold">
+          <DialogTitle className="min-w-0 flex-1 text-xl font-bold">
             {t("detail.memberCount", { count: total })}
           </DialogTitle>
+          {canExport && total > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExportCsv}
+              disabled={isExporting}
+              className="shrink-0"
+            >
+              <Download className="size-3.5" />
+              {t("membersExport.action")}
+            </Button>
+          )}
           <DialogDescription className="sr-only">
             {t("detail.members")}
           </DialogDescription>
