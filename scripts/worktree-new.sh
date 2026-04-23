@@ -12,7 +12,9 @@
 #   2. Crée un worktree à côté du repo principal, avec une nouvelle branche
 #      partant d'origin/main
 #   3. Installe les dépendances (--prefer-offline, rapide grâce au store pnpm partagé)
-#   4. Copie .env.local depuis le repo principal si présent
+#   4. Crée un symlink .env.local vers le fichier du repo principal
+#      (source unique partagée : un `pnpm db:dev:reset` depuis n'importe
+#      quel worktree met à jour les credentials pour tous les worktrees)
 #   5. Crée un symlink spec/BACKLOG.md vers le fichier du repo principal
 #      (source unique, non trackée, partagée entre tous les worktrees)
 #   6. Affiche un message de fin avec la commande pour lancer le dev server
@@ -57,8 +59,8 @@ cd "$worktree_dir"
 pnpm install --prefer-offline --silent
 
 if [ -f "$main_root/.env.local" ]; then
-  echo "→ Copy .env.local"
-  cp "$main_root/.env.local" .env.local
+  echo "→ Symlink .env.local → repo principal"
+  ln -sf "$main_root/.env.local" .env.local
 fi
 
 if [ -f "$main_root/spec/BACKLOG.md" ]; then

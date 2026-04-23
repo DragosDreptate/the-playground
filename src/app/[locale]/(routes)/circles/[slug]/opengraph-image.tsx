@@ -2,11 +2,16 @@ import { ImageResponse } from "next/og";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
+import { getMomentGradient } from "@/lib/gradient";
+import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
 
 export const runtime = "nodejs";
 export const alt = "Community — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+const COVER_SIZE = 630;
+const CONTENT_WIDTH = size.width - COVER_SIZE;
 
 export default async function OgImage({
   params,
@@ -34,10 +39,15 @@ export default async function OgImage({
   const memberCount = await prismaCircleRepository.countMembers(circle.id);
 
   const description = circle.description
-    ? circle.description.length > 120
-      ? circle.description.slice(0, 117) + "..."
+    ? circle.description.length > 140
+      ? circle.description.slice(0, 137) + "..."
       : circle.description
     : "";
+
+  const gradient = getMomentGradient(circle.id);
+  const coverDataUrl = circle.coverImage
+    ? await loadOgCoverAsDataUrl(circle.coverImage)
+    : null;
 
   return new ImageResponse(
     (
@@ -46,13 +56,12 @@ export default async function OgImage({
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           background: "linear-gradient(180deg, #0c0a14 0%, #1a1028 100%)",
-          padding: "48px 56px",
           position: "relative",
         }}
       >
-        {/* Top gradient bar */}
+        {/* Top gradient bar, full width */}
         <div
           style={{
             position: "absolute",
@@ -64,117 +73,178 @@ export default async function OgImage({
           }}
         />
 
-        {/* Icon + Circle label */}
+        {/* Left: square cover (or gradient fallback) */}
         <div
           style={{
+            width: COVER_SIZE,
+            height: COVER_SIZE,
             display: "flex",
-            alignItems: "center",
-            gap: "16px",
-            marginBottom: "24px",
+            flexShrink: 0,
+            position: "relative",
           }}
         >
+          {coverDataUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverDataUrl}
+              alt=""
+              width={COVER_SIZE}
+              height={COVER_SIZE}
+              style={{ width: COVER_SIZE, height: COVER_SIZE, objectFit: "cover" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: COVER_SIZE,
+                height: COVER_SIZE,
+                background: gradient,
+              }}
+            />
+          )}
+        </div>
+
+        {/* Right: content */}
+        <div
+          style={{
+            width: CONTENT_WIDTH,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            padding: "40px 48px 44px 48px",
+          }}
+        >
+          {/* Top: branding, aligned to the right */}
           <div
             style={{
               display: "flex",
+              justifyContent: "flex-end",
               alignItems: "center",
-              justifyContent: "center",
-              width: "56px",
-              height: "56px",
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, #ec4899, #a855f7)",
-            }}
-          >
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </div>
-          <span
-            style={{
-              fontSize: "18px",
-              fontWeight: 600,
-              color: "#ec4899",
-              textTransform: "uppercase",
-              letterSpacing: "2px",
-            }}
-          >
-            {locale === "fr" ? "Communauté" : "Community"}
-          </span>
-        </div>
-
-        {/* Circle name */}
-        <div
-          style={{
-            fontSize: "52px",
-            fontWeight: 700,
-            color: "white",
-            lineHeight: 1.15,
-            letterSpacing: "-1px",
-            marginBottom: "20px",
-            maxWidth: "900px",
-          }}
-        >
-          {circle.name.length > 60
-            ? circle.name.slice(0, 57) + "..."
-            : circle.name}
-        </div>
-
-        {/* Description */}
-        {description && (
-          <div
-            style={{
-              fontSize: "22px",
-              color: "rgba(255, 255, 255, 0.6)",
-              lineHeight: 1.5,
-              flex: 1,
-              maxWidth: "800px",
-            }}
-          >
-            {description}
-          </div>
-        )}
-
-        {/* Bottom info */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-          }}
-        >
-          {/* Stats */}
-          <div
-            style={{
-              display: "flex",
-              gap: "32px",
             }}
           >
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
-                fontSize: "20px",
-                color: "rgba(255, 255, 255, 0.7)",
+                gap: "12px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "36px",
+                  height: "36px",
+                  borderRadius: "9px",
+                  background: "linear-gradient(135deg, #ec4899, #a855f7)",
+                }}
+              >
+                <svg width="14" height="16" viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline" }}>
+                <span
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    color: "rgba(255, 255, 255, 0.4)",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  {"the "}
+                </span>
+                <span
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 700,
+                    color: "#e8457a",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  playground
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Middle: community label + name + description, centered vertically */}
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                fontSize: "18px",
+                fontWeight: 600,
+                color: "#ec4899",
+                textTransform: "uppercase",
+                letterSpacing: "2.5px",
+                marginBottom: "18px",
+              }}
+            >
+              {locale === "fr" ? "Communauté" : "Community"}
+            </div>
+
+            <div
+              style={{
+                fontSize: "52px",
+                fontWeight: 700,
+                color: "white",
+                lineHeight: 1.12,
+                letterSpacing: "-1.2px",
+                marginBottom: description ? "18px" : "0",
+                display: "flex",
+              }}
+            >
+              {circle.name.length > 60
+                ? circle.name.slice(0, 57) + "..."
+                : circle.name}
+            </div>
+
+            {description && (
+              <div
+                style={{
+                  fontSize: "22px",
+                  color: "rgba(255, 255, 255, 0.65)",
+                  lineHeight: 1.4,
+                  display: "flex",
+                }}
+              >
+                {description}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom: members + city */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                fontSize: "26px",
+                color: "rgba(255, 255, 255, 0.85)",
               }}
             >
               <svg
-                width="20"
-                height="20"
+                width="26"
+                height="26"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="rgba(255,255,255,0.5)"
+                stroke="rgba(255,255,255,0.6)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -188,19 +258,20 @@ export default async function OgImage({
                 ? `${memberCount} membre${memberCount !== 1 ? "s" : ""}`
                 : `${memberCount} member${memberCount !== 1 ? "s" : ""}`}
             </div>
+
             {circle.city && (
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "8px",
-                  fontSize: "20px",
-                  color: "rgba(255, 255, 255, 0.7)",
+                  gap: "12px",
+                  fontSize: "22px",
+                  color: "rgba(255, 255, 255, 0.6)",
                 }}
               >
                 <svg
-                  width="20"
-                  height="20"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="rgba(255,255,255,0.5)"
@@ -214,53 +285,6 @@ export default async function OgImage({
                 {circle.city}
               </div>
             )}
-          </div>
-
-          {/* Branding */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "28px",
-                height: "28px",
-                borderRadius: "7px",
-                background: "linear-gradient(135deg, #ec4899, #a855f7)",
-              }}
-            >
-              <svg width="11" height="13" viewBox="0 0 13 15" fill="none">
-                <polygon points="0,0 0,15 13,7.5" fill="white" />
-              </svg>
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <span
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "rgba(255, 255, 255, 0.4)",
-                  letterSpacing: "-0.4px",
-                }}
-              >
-                {"the\u2009"}
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "#e8457a",
-                  letterSpacing: "-0.4px",
-                }}
-              >
-                playground
-              </span>
-            </div>
           </div>
         </div>
       </div>
