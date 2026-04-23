@@ -199,10 +199,10 @@ export default async function OgImage({
             {circle && (
               <div
                 style={{
-                  fontSize: "32px",
+                  fontSize: "26px",
                   fontWeight: 600,
                   color: "#ec4899",
-                  marginBottom: "24px",
+                  marginBottom: "20px",
                   display: "flex",
                   alignItems: "center",
                 }}
@@ -213,11 +213,11 @@ export default async function OgImage({
 
             <div
               style={{
-                fontSize: "60px",
+                fontSize: "52px",
                 fontWeight: 700,
                 color: "white",
-                lineHeight: 1.1,
-                letterSpacing: "-1.5px",
+                lineHeight: 1.12,
+                letterSpacing: "-1.2px",
                 display: "flex",
               }}
             >
@@ -239,14 +239,14 @@ export default async function OgImage({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "14px",
-                fontSize: "32px",
+                gap: "12px",
+                fontSize: "26px",
                 color: "rgba(255, 255, 255, 0.85)",
               }}
             >
               <svg
-                width="32"
-                height="32"
+                width="26"
+                height="26"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="rgba(255,255,255,0.6)"
@@ -267,14 +267,14 @@ export default async function OgImage({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "14px",
-                  fontSize: "28px",
+                  gap: "12px",
+                  fontSize: "22px",
                   color: "rgba(255, 255, 255, 0.6)",
                 }}
               >
                 <svg
-                  width="28"
-                  height="28"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="rgba(255,255,255,0.5)"

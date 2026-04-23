@@ -181,12 +181,12 @@ export default async function OgImage({
               style={{
                 display: "flex",
                 alignItems: "center",
-                fontSize: "22px",
+                fontSize: "18px",
                 fontWeight: 600,
                 color: "#ec4899",
                 textTransform: "uppercase",
-                letterSpacing: "3px",
-                marginBottom: "20px",
+                letterSpacing: "2.5px",
+                marginBottom: "18px",
               }}
             >
               {locale === "fr" ? "Communauté" : "Community"}
@@ -194,12 +194,12 @@ export default async function OgImage({
 
             <div
               style={{
-                fontSize: "60px",
+                fontSize: "52px",
                 fontWeight: 700,
                 color: "white",
-                lineHeight: 1.1,
-                letterSpacing: "-1.5px",
-                marginBottom: description ? "22px" : "0",
+                lineHeight: 1.12,
+                letterSpacing: "-1.2px",
+                marginBottom: description ? "18px" : "0",
                 display: "flex",
               }}
             >
@@ -211,7 +211,7 @@ export default async function OgImage({
             {description && (
               <div
                 style={{
-                  fontSize: "24px",
+                  fontSize: "22px",
                   color: "rgba(255, 255, 255, 0.65)",
                   lineHeight: 1.4,
                   display: "flex",
@@ -234,14 +234,14 @@ export default async function OgImage({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "14px",
-                fontSize: "32px",
+                gap: "12px",
+                fontSize: "26px",
                 color: "rgba(255, 255, 255, 0.85)",
               }}
             >
               <svg
-                width="32"
-                height="32"
+                width="26"
+                height="26"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="rgba(255,255,255,0.6)"
@@ -264,14 +264,14 @@ export default async function OgImage({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "14px",
-                  fontSize: "28px",
+                  gap: "12px",
+                  fontSize: "22px",
                   color: "rgba(255, 255, 255, 0.6)",
                 }}
               >
                 <svg
-                  width="28"
-                  height="28"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="rgba(255,255,255,0.5)"
