@@ -339,10 +339,13 @@ export default async function PublicCirclePage({
                 <span className="text-muted-foreground text-sm">{t("detail.members")}</span>
               </div>
             )}
-            <div className="flex items-baseline gap-2 border-l pl-6">
-              <span className="text-2xl font-bold">{allMoments.length}</span>
+            <a
+              href="#moments"
+              className="group/stat flex items-baseline gap-2 border-l pl-6"
+            >
+              <span className="text-2xl font-bold group-hover/stat:text-primary dark:group-hover/stat:text-[oklch(0.76_0.27_341)] transition-colors">{allMoments.length}</span>
               <span className="text-muted-foreground text-sm">{t("detail.moments")}</span>
-            </div>
+            </a>
           </div>
 
           {/* Séparateur — desktop uniquement */}
@@ -641,6 +644,7 @@ export default async function PublicCirclePage({
           <div className="border-border border-t" />
 
           {/* Moments — toggle + timeline */}
+          <div id="moments" className="scroll-mt-24">
           <CircleMomentTabs
             upcomingLabel={t("detail.upcomingMoments")}
             pastLabel={t("detail.pastMoments")}
@@ -695,6 +699,7 @@ export default async function PublicCirclePage({
               )
             }
           />
+          </div>
 
           </div>
           {/* /Groupe 4 */}
