@@ -8,13 +8,19 @@
 
 set -euo pipefail
 
+# Source de vérité unique : le .env.local du repo principal. Les worktrees
+# pointent dessus via symlink (cf. scripts/worktree-new.sh), donc un reset
+# depuis n'importe quel worktree met à jour les credentials pour tous.
+MAIN_ROOT="$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)"
+ENV_FILE="${MAIN_ROOT}/.env.local"
+
 # Load env vars
-if [ -f .env.local ]; then
-  export $(grep -E '^(NEON_API_KEY|NEON_PROJECT_ID|NEON_PROD_BRANCH_ID)=' .env.local | xargs)
+if [ -f "$ENV_FILE" ]; then
+  export $(grep -E '^(NEON_API_KEY|NEON_PROJECT_ID|NEON_PROD_BRANCH_ID)=' "$ENV_FILE" | xargs)
 fi
 
 if [ -z "${NEON_API_KEY:-}" ] || [ -z "${NEON_PROJECT_ID:-}" ] || [ -z "${NEON_PROD_BRANCH_ID:-}" ]; then
-  echo "❌ Missing NEON_API_KEY, NEON_PROJECT_ID, or NEON_PROD_BRANCH_ID in .env.local"
+  echo "❌ Missing NEON_API_KEY, NEON_PROJECT_ID, or NEON_PROD_BRANCH_ID in $ENV_FILE"
   exit 1
 fi
 
@@ -69,18 +75,15 @@ NEW_URL="postgresql://${ROLE}:${PASSWORD}@${POOLER_HOST}/${DB}?sslmode=require"
 echo ""
 echo "✅ Dev branch created: $NEW_BRANCH_ID"
 echo ""
-echo "📋 Update DATABASE_URL in .env.local:"
-echo "   DATABASE_URL=\"${NEW_URL}\""
-echo ""
 
-# Auto-update .env.local
+# Auto-update le .env.local du repo principal (les worktrees pointent dessus via symlink)
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' "s|^DATABASE_URL=.*|DATABASE_URL=\"${NEW_URL}\"|" .env.local
+  sed -i '' "s|^DATABASE_URL=.*|DATABASE_URL=\"${NEW_URL}\"|" "$ENV_FILE"
 else
-  sed -i "s|^DATABASE_URL=.*|DATABASE_URL=\"${NEW_URL}\"|" .env.local
+  sed -i "s|^DATABASE_URL=.*|DATABASE_URL=\"${NEW_URL}\"|" "$ENV_FILE"
 fi
 
-echo "✅ .env.local updated automatically."
+echo "✅ ${ENV_FILE} updated automatically."
 echo ""
 echo "🔄 Regenerating Prisma client..."
 npx prisma generate --no-hints 2>/dev/null
