@@ -6,11 +6,16 @@ import {
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
+import { getMomentGradient } from "@/lib/gradient";
+import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
 
 export const runtime = "nodejs";
 export const alt = "Event — The Playground";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+const COVER_SIZE = 630;
+const CONTENT_WIDTH = size.width - COVER_SIZE;
 
 export default async function OgImage({
   params,
@@ -58,6 +63,11 @@ export default async function OgImage({
         ? hybridLabel
         : moment.locationName ?? moment.locationAddress ?? "";
 
+  const gradient = getMomentGradient(moment.id);
+  const coverDataUrl = moment.coverImage
+    ? await loadOgCoverAsDataUrl(moment.coverImage)
+    : null;
+
   return new ImageResponse(
     (
       <div
@@ -65,13 +75,12 @@ export default async function OgImage({
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           background: "linear-gradient(180deg, #0c0a14 0%, #1a1028 100%)",
-          padding: "48px 56px",
           position: "relative",
         }}
       >
-        {/* Top gradient bar */}
+        {/* Top gradient bar, full width */}
         <div
           style={{
             position: "absolute",
@@ -83,93 +92,104 @@ export default async function OgImage({
           }}
         />
 
-        {/* Circle name */}
-        {circle && (
-          <div
-            style={{
-              fontSize: "20px",
-              fontWeight: 600,
-              color: "#ec4899",
-              marginBottom: "16px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {circle.name}
-          </div>
-        )}
-
-        {/* Moment title */}
+        {/* Left: square cover (or gradient fallback) */}
         <div
           style={{
-            fontSize: "52px",
-            fontWeight: 700,
-            color: "white",
-            lineHeight: 1.15,
-            letterSpacing: "-1px",
-            flex: 1,
+            width: COVER_SIZE,
+            height: COVER_SIZE,
             display: "flex",
-            alignItems: "flex-start",
-            maxWidth: "900px",
+            flexShrink: 0,
+            position: "relative",
           }}
         >
-          {moment.title.length > 80
-            ? moment.title.slice(0, 77) + "..."
-            : moment.title}
+          {coverDataUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={coverDataUrl}
+              alt=""
+              width={COVER_SIZE}
+              height={COVER_SIZE}
+              style={{ width: COVER_SIZE, height: COVER_SIZE, objectFit: "cover" }}
+            />
+          ) : (
+            <div
+              style={{
+                width: COVER_SIZE,
+                height: COVER_SIZE,
+                background: gradient,
+              }}
+            />
+          )}
         </div>
 
-        {/* Bottom info */}
+        {/* Right: content */}
         <div
           style={{
+            width: CONTENT_WIDTH,
+            height: "100%",
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
+            flexDirection: "column",
+            padding: "48px 48px 40px 44px",
           }}
         >
+          {/* Circle name */}
+          {circle && (
+            <div
+              style={{
+                fontSize: "20px",
+                fontWeight: 600,
+                color: "#ec4899",
+                marginBottom: "18px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {circle.name}
+            </div>
+          )}
+
+          {/* Moment title */}
+          <div
+            style={{
+              fontSize: "44px",
+              fontWeight: 700,
+              color: "white",
+              lineHeight: 1.15,
+              letterSpacing: "-1px",
+              flex: 1,
+              display: "flex",
+              alignItems: "flex-start",
+            }}
+          >
+            {moment.title.length > 90
+              ? moment.title.slice(0, 87) + "..."
+              : moment.title}
+          </div>
+
+          {/* Bottom info */}
           <div
             style={{
               display: "flex",
-              flexDirection: "column",
-              gap: "8px",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
             }}
           >
-            {/* Date + time */}
             <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                fontSize: "22px",
-                color: "rgba(255, 255, 255, 0.8)",
+                flexDirection: "column",
+                gap: "8px",
+                maxWidth: CONTENT_WIDTH - 180,
               }}
             >
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="rgba(255,255,255,0.6)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                <line x1="16" x2="16" y1="2" y2="6" />
-                <line x1="8" x2="8" y1="2" y2="6" />
-                <line x1="3" x2="21" y1="10" y2="10" />
-              </svg>
-              {date} · {time}
-            </div>
-
-            {/* Location */}
-            {location && (
+              {/* Date + time */}
               <div
                 style={{
                   display: "flex",
                   alignItems: "center",
                   gap: "10px",
                   fontSize: "20px",
-                  color: "rgba(255, 255, 255, 0.6)",
+                  color: "rgba(255, 255, 255, 0.8)",
                 }}
               >
                 <svg
@@ -177,65 +197,95 @@ export default async function OgImage({
                   height="20"
                   viewBox="0 0 24 24"
                   fill="none"
-                  stroke="rgba(255,255,255,0.5)"
+                  stroke="rgba(255,255,255,0.6)"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
-                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                  <circle cx="12" cy="10" r="3" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                  <line x1="16" x2="16" y1="2" y2="6" />
+                  <line x1="8" x2="8" y1="2" y2="6" />
+                  <line x1="3" x2="21" y1="10" y2="10" />
                 </svg>
-                {location.length > 60
-                  ? location.slice(0, 57) + "..."
-                  : location}
+                {date} · {time}
               </div>
-            )}
-          </div>
 
-          {/* Bottom-right branding */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
-          >
+              {/* Location */}
+              {location && (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    fontSize: "18px",
+                    color: "rgba(255, 255, 255, 0.6)",
+                  }}
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.5)"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {location.length > 36
+                    ? location.slice(0, 33) + "..."
+                    : location}
+                </div>
+              )}
+            </div>
+
+            {/* Bottom-right branding */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center",
-                width: "28px",
-                height: "28px",
-                borderRadius: "7px",
-                background: "linear-gradient(135deg, #ec4899, #a855f7)",
+                gap: "10px",
               }}
             >
-              <svg width="11" height="13" viewBox="0 0 13 15" fill="none">
-                <polygon points="0,0 0,15 13,7.5" fill="white" />
-              </svg>
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <span
+              <div
                 style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "rgba(255, 255, 255, 0.4)",
-                  letterSpacing: "-0.4px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "7px",
+                  background: "linear-gradient(135deg, #ec4899, #a855f7)",
                 }}
               >
-                {"the\u2009"}
-              </span>
-              <span
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 700,
-                  color: "#e8457a",
-                  letterSpacing: "-0.4px",
-                }}
-              >
-                playground
-              </span>
+                <svg width="11" height="13" viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline" }}>
+                <span
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 700,
+                    color: "rgba(255, 255, 255, 0.4)",
+                    letterSpacing: "-0.4px",
+                  }}
+                >
+                  {"the "}
+                </span>
+                <span
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 700,
+                    color: "#e8457a",
+                    letterSpacing: "-0.4px",
+                  }}
+                >
+                  playground
+                </span>
+              </div>
             </div>
           </div>
         </div>
