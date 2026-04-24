@@ -150,7 +150,7 @@ export default async function PublicMomentPage({
 
   const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
-  const registeredCount = allAttendees.filter((r) => r.status === "REGISTERED").length;
+  const registeredCount = registeredParticipants.length;
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =

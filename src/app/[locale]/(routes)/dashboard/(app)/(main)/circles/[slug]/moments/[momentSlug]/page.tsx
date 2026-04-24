@@ -72,9 +72,7 @@ export default async function MomentDetailPage({
     total: registeredParticipants.length,
     hasMore: registeredParticipants.length > 20,
   };
-  const registeredCount = allAttendees.filter(
-    (r) => r.status === "REGISTERED"
-  ).length;
+  const registeredCount = registeredParticipants.length;
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
   ).length;
