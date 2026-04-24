@@ -23,6 +23,7 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -140,8 +141,9 @@ export default async function PublicMomentPage({
     );
 
   const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session?.user?.id ?? null);
   const participantsFirstPage = {
-    participants: registeredParticipants.slice(0, 20),
+    participants: sortedForDisplay.slice(0, 20),
     total: registeredParticipants.length,
     hasMore: registeredParticipants.length > 20,
   };
