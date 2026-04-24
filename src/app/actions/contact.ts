@@ -1,7 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
-import { Resend } from "resend";
+import { createSafeResend } from "@/lib/email/safe-resend";
 import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 import { isValidEmail } from "@/lib/email";
 import type { ActionResult } from "./types";
@@ -45,7 +45,7 @@ export async function sendContactMessageAction(
     return { success: false, error: "INVALID_EMAIL", code: "INVALID_EMAIL" };
   }
 
-  const resend = new Resend(process.env.AUTH_RESEND_KEY ?? "re_not_configured");
+  const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
   const from = process.env.EMAIL_FROM ?? process.env.AUTH_EMAIL_FROM ?? "onboarding@resend.dev";
 
   try {

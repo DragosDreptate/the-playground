@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import { createSafeResend } from "@/lib/email/safe-resend";
 import type {
   EmailService,
   RegistrationConfirmationEmailData,
@@ -86,7 +86,7 @@ export function createResendEmailService(): EmailService {
   // Utiliser un placeholder si la clé est absente pour éviter de crasher au chargement
   // du module (notify-new-moment.ts l'appelle au top-level). Les envois échoueront
   // silencieusement en CI/dev sans clé — fire-and-forget côté serveur actions.
-  const resend = new Resend(process.env.AUTH_RESEND_KEY ?? "re_not_configured");
+  const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
   const from = getSender();
   const baseUrl = getBaseUrl();
 
