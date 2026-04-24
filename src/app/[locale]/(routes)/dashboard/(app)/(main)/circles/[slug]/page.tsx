@@ -29,7 +29,6 @@ import { getDisplayName } from "@/lib/display-name";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
-import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import {
   Globe,
@@ -44,7 +43,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
-import { computeMembersMeta } from "@/lib/circle-helpers";
+import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -109,15 +108,7 @@ export default async function CircleDetailPage({
   ]);
 
   const totalMembers = hosts.length + players.length;
-  const sortOrganizersByName = (a: CircleMemberWithUser, b: CircleMemberWithUser) => {
-    const nameA = getDisplayName(a.user.firstName, a.user.lastName, a.user.email);
-    const nameB = getDisplayName(b.user.firstName, b.user.lastName, b.user.email);
-    return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
-  };
-  const circleOrganizers = [
-    ...hosts.filter((h) => h.role === "HOST").sort(sortOrganizersByName),
-    ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
-  ];
+  const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
     computeMembersMeta(hosts, players, totalMembers, t);

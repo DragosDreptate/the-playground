@@ -28,7 +28,6 @@ import { LeaveCircleDialog } from "@/components/circles/leave-circle-dialog";
 import { MomentTimelineItem } from "@/components/circles/moment-timeline-item";
 import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
-import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { CoverBlock } from "@/components/circles/cover-block";
 import { isValidSlug } from "@/lib/slug";
@@ -45,7 +44,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
-import { computeMembersMeta } from "@/lib/circle-helpers";
+import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -160,15 +159,7 @@ export default async function PublicCirclePage({
     : false;
   const isConnected = !!session?.user?.id;
   const primaryHosts = hosts.filter((h) => h.role === "HOST");
-  const sortOrganizersByName = (a: CircleMemberWithUser, b: CircleMemberWithUser) => {
-    const nameA = getDisplayName(a.user.firstName, a.user.lastName, a.user.email);
-    const nameB = getDisplayName(b.user.firstName, b.user.lastName, b.user.email);
-    return nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
-  };
-  const circleOrganizers = [
-    ...hosts.filter((h) => h.role === "HOST").sort(sortOrganizersByName),
-    ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
-  ];
+  const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
     computeMembersMeta(hosts, players, memberCount, t);
