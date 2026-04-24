@@ -41,8 +41,8 @@ function normalizeRecipients(to: string | string[] | undefined): string[] {
 }
 
 /**
- * Retourne une instance Resend. En staging, wrap `emails.send()` avec un guard
- * qui bloque les envois vers des adresses hors allowlist.
+ * Retourne une instance Resend. En staging, wrap `emails.send()` et `batch.send()`
+ * avec un guard qui bloque les envois vers des adresses hors allowlist.
  */
 export function createSafeResend(apiKey?: string): Resend {
   const resend = new Resend(apiKey ?? "re_not_configured");
@@ -52,8 +52,9 @@ export function createSafeResend(apiKey?: string): Resend {
   }
 
   const allowlist = parseAllowlist(process.env.STAGING_EMAIL_ALLOWLIST ?? "");
-  const originalSend = resend.emails.send.bind(resend.emails);
 
+  // Intercept resend.emails.send — envois unitaires
+  const originalSend = resend.emails.send.bind(resend.emails);
   resend.emails.send = (async (...args: Parameters<typeof originalSend>) => {
     const payload = args[0] as { to?: string | string[] } | undefined;
     const recipients = normalizeRecipients(payload?.to);
@@ -72,6 +73,40 @@ export function createSafeResend(apiKey?: string): Resend {
 
     return originalSend(...args);
   }) as typeof originalSend;
+
+  // Intercept resend.batch.send — envois en masse (notifications membres, etc.)
+  const originalBatchSend = resend.batch.send.bind(resend.batch);
+  resend.batch.send = (async (payload: Parameters<typeof originalBatchSend>[0], options?: Parameters<typeof originalBatchSend>[1]) => {
+    const emails = (payload ?? []) as ReadonlyArray<{ to?: string | string[] }>;
+
+    const allowed: typeof emails[number][] = [];
+    const blocked: string[] = [];
+    for (const email of emails) {
+      const recipients = normalizeRecipients(email.to);
+      const hasBlocked = recipients.some((to) => !isAllowedInStaging(to, allowlist));
+      if (hasBlocked) {
+        blocked.push(...recipients);
+      } else {
+        allowed.push(email);
+      }
+    }
+
+    if (blocked.length > 0) {
+      console.warn(
+        `[staging-guard] Blocked batch: ${blocked.length} recipient(s):`,
+        blocked,
+      );
+    }
+
+    if (allowed.length === 0) {
+      return {
+        data: { data: [] },
+        error: null,
+      } as Awaited<ReturnType<typeof originalBatchSend>>;
+    }
+
+    return originalBatchSend(allowed as Parameters<typeof originalBatchSend>[0], options);
+  }) as typeof originalBatchSend;
 
   return resend;
 }

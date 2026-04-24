@@ -75,10 +75,12 @@ describe("normalizeRecipients", () => {
 // Mock the `resend` module so we can intercept actual API calls.
 // The mock uses a class (not a vi.fn) because `new Resend()` needs a real constructor.
 const mockSend = vi.fn();
+const mockBatchSend = vi.fn();
 
 vi.mock("resend", () => {
   class ResendMock {
     emails = { send: mockSend };
+    batch = { send: mockBatchSend };
   }
   return { Resend: ResendMock };
 });
@@ -93,6 +95,8 @@ describe("createSafeResend — integration", () => {
     delete process.env.STAGING_EMAIL_ALLOWLIST;
     mockSend.mockReset();
     mockSend.mockResolvedValue({ data: { id: "real-send" }, error: null });
+    mockBatchSend.mockReset();
+    mockBatchSend.mockResolvedValue({ data: { data: [{ id: "real-batch" }] }, error: null });
   });
 
   afterEach(() => {
@@ -211,6 +215,92 @@ describe("createSafeResend — integration", () => {
       } as Parameters<typeof resend.emails.send>[0]);
 
       expect(mockSend).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("batch.send — envois en masse", () => {
+    describe("given IS_STAGING is not set (production mode)", () => {
+      it("forwards the batch as-is", async () => {
+        const resend = createSafeResend("re_fake");
+
+        await resend.batch.send([
+          { from: "x@y.com", to: "random@gmail.com", subject: "a", html: "<p>a</p>" },
+          { from: "x@y.com", to: "other@gmail.com", subject: "b", html: "<p>b</p>" },
+        ] as Parameters<typeof resend.batch.send>[0]);
+
+        expect(mockBatchSend).toHaveBeenCalledOnce();
+        const batchArg = mockBatchSend.mock.calls[0]![0]!;
+        expect(batchArg).toHaveLength(2);
+      });
+    });
+
+    describe("given IS_STAGING=true with an allowlist", () => {
+      beforeEach(() => {
+        process.env.IS_STAGING = "true";
+        process.env.STAGING_EMAIL_ALLOWLIST = "dragos@gmail.com";
+      });
+
+      it("filters out emails to non-allowed recipients", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        const resend = createSafeResend("re_fake");
+
+        await resend.batch.send([
+          { from: "x@y.com", to: "dragos@gmail.com", subject: "keep", html: "<p>a</p>" },
+          { from: "x@y.com", to: "random@gmail.com", subject: "drop", html: "<p>b</p>" },
+          { from: "x@y.com", to: "player1@test.playground", subject: "keep", html: "<p>c</p>" },
+        ] as Parameters<typeof resend.batch.send>[0]);
+
+        expect(mockBatchSend).toHaveBeenCalledOnce();
+        const batchArg = mockBatchSend.mock.calls[0]![0]! as Array<{ subject: string }>;
+        expect(batchArg).toHaveLength(2);
+        expect(batchArg.map((e) => e.subject)).toEqual(["keep", "keep"]);
+      });
+
+      it("does not call Resend at all if all emails are blocked", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        const resend = createSafeResend("re_fake");
+
+        await resend.batch.send([
+          { from: "x@y.com", to: "random1@gmail.com", subject: "a", html: "<p>a</p>" },
+          { from: "x@y.com", to: "random2@gmail.com", subject: "b", html: "<p>b</p>" },
+        ] as Parameters<typeof resend.batch.send>[0]);
+
+        expect(mockBatchSend).not.toHaveBeenCalled();
+      });
+
+      it("logs the blocked recipients", async () => {
+        const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const resend = createSafeResend("re_fake");
+
+        await resend.batch.send([
+          { from: "x@y.com", to: "random@gmail.com", subject: "a", html: "<p>a</p>" },
+        ] as Parameters<typeof resend.batch.send>[0]);
+
+        expect(warnSpy).toHaveBeenCalledOnce();
+        expect(warnSpy.mock.calls[0]![0]).toContain("[staging-guard] Blocked batch");
+      });
+    });
+
+    describe("given IS_STAGING=true with empty allowlist (fail-closed)", () => {
+      beforeEach(() => {
+        process.env.IS_STAGING = "true";
+        process.env.STAGING_EMAIL_ALLOWLIST = "";
+      });
+
+      it("blocks all non-@test/@demo emails in the batch", async () => {
+        vi.spyOn(console, "warn").mockImplementation(() => {});
+        const resend = createSafeResend("re_fake");
+
+        await resend.batch.send([
+          { from: "x@y.com", to: "admin@the-playground.fr", subject: "a", html: "<p>a</p>" },
+          { from: "x@y.com", to: "demo@demo.playground", subject: "b", html: "<p>b</p>" },
+        ] as Parameters<typeof resend.batch.send>[0]);
+
+        expect(mockBatchSend).toHaveBeenCalledOnce();
+        const batchArg = mockBatchSend.mock.calls[0]![0]! as Array<{ to: string }>;
+        expect(batchArg).toHaveLength(1);
+        expect(batchArg[0]!.to).toBe("demo@demo.playground");
+      });
     });
   });
 });
