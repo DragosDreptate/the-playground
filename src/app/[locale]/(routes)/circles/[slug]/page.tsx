@@ -146,10 +146,7 @@ export default async function PublicCirclePage({
     session?.user?.id
       ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status ?? null)
       : Promise.resolve(null),
-    // Players chargés uniquement pour les connectés (section membres)
-    session?.user?.id
-      ? prismaCircleRepository.findMembersByRole(circle.id, "PLAYER")
-      : Promise.resolve([]),
+    prismaCircleRepository.findMembersByRole(circle.id, "PLAYER"),
   ];
 
   const [hosts, allMoments, memberCount, isMemberResult, players] =

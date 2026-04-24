@@ -252,6 +252,24 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 - [x] CTAs host DRAFT simplifiés. Bouton "Publier" déplacé dans le banner DRAFT (host only, à droite du texte explicatif) — plus contextualisé. Colonne gauche passe de 3 CTAs à 2 : Modifier (primary, rose) + Supprimer (outline destructive). `PublishMomentButton` rendu inline-friendly (retrait `w-full`, `items-end` pour alignement à droite dans le banner).
 - [ ] **Focus résiduel non souhaitable** sur composants graphiques (ex. bouton "Ajouter à mon calendrier", potentiellement d'autres DropdownMenu / Button ghost / Dialog triggers). Après manipulation, le composant garde un ring/outline rose (focus-visible) qui reste affiché même après fermeture ou blur. À traiter : recherche exhaustive des composants concernés (DropdownMenu triggers, Dialog triggers, Buttons utilisés comme CTA ponctuels post-action) + correction (blur explicite après action, ou override styles focus-visible si non pertinent pour l'interaction terminée).
 
+### Exposition des membres / participants aux visiteurs non connectés — décision 2026-04-24
+
+**Intention retenue (Option B, "transparence pleine")** : un visiteur non connecté voit la rangée d'avatars + noms + compteur des membres/participants sur les 3 pages publiques concernées, mais **sans interaction** (pas de modale cliquable, pas de lien vers les profils). L'accès aux profils reste gated par le login.
+
+**Pourquoi** :
+- Social proof fort (levier de conversion)
+- Cohérence cross-page : la page événement expose déjà les inscrits, la page Communauté s'aligne
+- Le bouton d'inscription / rejoindre est la porte vers le monde connecté — pas la rangée d'avatars
+- Les données exposées (prénom, avatar, initiales) sont volontairement limitées : pas d'email, pas de profil détaillé
+
+**Alternatives écartées** :
+- *Option A, "protection forte"* : bloc MEMBRES caché aux non-connectés. Rejetée car on perd le social proof et crée une friction inutile sur une plateforme community-centric.
+- *Option C, "compteur seul"* : affiche « 17 membres » sans avatars ni noms. Rejetée car moins engageante que B, sans gain RGPD significatif (les données exposées en B sont très limitées).
+
+**Implémentation** : la page Communauté publique (`/circles/[slug]`) charge maintenant les `PLAYER` pour tout le monde, peu importe la session. La branche `canSeeMembers` (connecté + accès) contrôle uniquement la cliquabilité (modale), pas la présence de la rangée d'avatars.
+
+**Limite connue** : aujourd'hui le chargement des `PLAYER` passe par `findMembersByRole` qui retourne tous les membres. Sur un gros Circle, c'est coûteux pour afficher 5 avatars. Ce sujet est traité dans le finding R1 (consolidation des 3 requêtes membres en une) — à reprendre dans un ticket dédié post-merge.
+
 ---
 
 ## État au 2026-04-22 — Phase 1 événement terminée
