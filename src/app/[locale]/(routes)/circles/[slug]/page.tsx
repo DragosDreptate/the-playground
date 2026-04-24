@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { getDisplayName } from "@/lib/display-name";
-import { UserAvatar } from "@/components/user-avatar";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -48,6 +47,7 @@ import {
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
+import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
 export const revalidate = 60;
 
@@ -272,50 +272,11 @@ export default async function PublicCirclePage({
           <div className="flex flex-col gap-4 max-lg:order-4">
 
           {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
-          {circleOrganizers.length > 0 && (
-            <>
-              <div className="space-y-2 px-1">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  {t("detail.hostedBy")}
-                </p>
-                <ul className="space-y-2">
-                  {circleOrganizers.map((host) => {
-                    const hostDisplayName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-                    const avatar = (
-                      <UserAvatar
-                        name={hostDisplayName}
-                        email={host.user.email}
-                        image={host.user.image}
-                        size="sm"
-                      />
-                    );
-                    const linkable = isConnected && host.user.publicId;
-                    return (
-                      <li key={host.id}>
-                        {linkable ? (
-                          <Link
-                            href={`/u/${host.user.publicId}`}
-                            className="group/organizer flex items-center gap-3"
-                          >
-                            {avatar}
-                            <span className="text-sm font-medium leading-snug group-hover/organizer:text-primary dark:group-hover/organizer:text-[oklch(0.76_0.27_341)] transition-colors">
-                              {hostDisplayName}
-                            </span>
-                          </Link>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            {avatar}
-                            <span className="text-sm font-medium leading-snug">{hostDisplayName}</span>
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-              <div className="border-border border-t" />
-            </>
-          )}
+          <CircleOrganizersList
+            organizers={circleOrganizers}
+            linkable={isConnected}
+            label={t("detail.hostedBy")}
+          />
 
           {/* Stats */}
           <div className="flex gap-6 px-1">

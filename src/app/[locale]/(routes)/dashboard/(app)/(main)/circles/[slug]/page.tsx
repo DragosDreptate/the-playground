@@ -26,7 +26,6 @@ import { PendingMembershipsList } from "@/components/circles/pending-requests-li
 import { CoverBlock } from "@/components/circles/cover-block";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName } from "@/lib/display-name";
-import { UserAvatar } from "@/components/user-avatar";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
@@ -47,6 +46,7 @@ import {
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
+import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -186,53 +186,11 @@ export default async function CircleDetailPage({
           {/* Groupe 2 — Organisateurs + Stats + CTA (mobile: order-4) */}
           <div className="flex flex-col gap-4 max-lg:order-4">
 
-          {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
-          {circleOrganizers.length > 0 && (
-            <>
-              <div className="space-y-2 px-1">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
-                  {t("detail.hostedBy")}
-                </p>
-                <ul className="space-y-2">
-                  {circleOrganizers.map((host) => {
-                    const hostDisplayName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-                    const avatar = (
-                      <UserAvatar
-                        name={hostDisplayName}
-                        email={host.user.email}
-                        image={host.user.image}
-                        size="sm"
-                      />
-                    );
-                    const nameText = (
-                      <span className="text-sm font-medium leading-snug group-hover/organizer:text-primary dark:group-hover/organizer:text-[oklch(0.76_0.27_341)] transition-colors">
-                        {hostDisplayName}
-                      </span>
-                    );
-                    return (
-                      <li key={host.id}>
-                        {host.user.publicId ? (
-                          <Link
-                            href={`/u/${host.user.publicId}`}
-                            className="group/organizer flex items-center gap-3"
-                          >
-                            {avatar}
-                            {nameText}
-                          </Link>
-                        ) : (
-                          <div className="flex items-center gap-3">
-                            {avatar}
-                            <span className="text-sm font-medium leading-snug">{hostDisplayName}</span>
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-              <div className="border-border border-t" />
-            </>
-          )}
+          <CircleOrganizersList
+            organizers={circleOrganizers}
+            linkable
+            label={t("detail.hostedBy")}
+          />
 
           {/* Stats */}
           <div className="flex gap-6 px-1">
