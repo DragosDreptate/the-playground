@@ -298,62 +298,35 @@ function MemberRow({
   return (
     <>
       <div className="flex items-center gap-3 py-2.5">
-        {user.publicId ? (
-          <Link
-            href={`/u/${user.publicId}`}
-            className="group/member flex min-w-0 flex-1 items-center gap-3"
-          >
-            <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm leading-snug font-medium group-hover/member:text-primary dark:group-hover/member:text-[oklch(0.76_0.27_341)] transition-colors">
-                  {displayName}
+        <Link
+          href={`/u/${user.publicId}`}
+          className="group/member flex min-w-0 flex-1 items-center gap-3"
+        >
+          <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-sm leading-snug font-medium group-hover/member:text-primary dark:group-hover/member:text-[oklch(0.76_0.27_341)] transition-colors">
+                {displayName}
+              </span>
+              {(member.role === "HOST" || member.role === "CO_HOST") && (
+                <span className="group/role relative shrink-0">
+                  <Badge
+                    variant="outline"
+                    className="border-primary/40 text-primary flex size-6 items-center justify-center p-0"
+                  >
+                    <Crown className="size-3" />
+                  </Badge>
+                  <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/role:opacity-100">
+                    {t("role.host")}
+                  </span>
                 </span>
-                {(member.role === "HOST" || member.role === "CO_HOST") && (
-                  <span className="group/role relative shrink-0">
-                    <Badge
-                      variant="outline"
-                      className="border-primary/40 text-primary flex size-6 items-center justify-center p-0"
-                    >
-                      <Crown className="size-3" />
-                    </Badge>
-                    <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/role:opacity-100">
-                      {t("role.host")}
-                    </span>
-                  </span>
-                )}
-              </div>
-              {showEmail && (
-                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
               )}
             </div>
-          </Link>
-        ) : (
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-sm leading-snug font-medium">{displayName}</span>
-                {(member.role === "HOST" || member.role === "CO_HOST") && (
-                  <span className="group/role relative shrink-0">
-                    <Badge
-                      variant="outline"
-                      className="border-primary/40 text-primary flex size-6 items-center justify-center p-0"
-                    >
-                      <Crown className="size-3" />
-                    </Badge>
-                    <span className="bg-foreground text-background pointer-events-none absolute top-full left-1/2 z-50 mt-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/role:opacity-100">
-                      {t("role.host")}
-                    </span>
-                  </span>
-                )}
-              </div>
-              {showEmail && (
-                <p className="text-muted-foreground truncate text-xs">{user.email}</p>
-              )}
-            </div>
+            {showEmail && (
+              <p className="text-muted-foreground truncate text-xs">{user.email}</p>
+            )}
           </div>
-        )}
+        </Link>
 
         <SocialLinks user={user} />
 
