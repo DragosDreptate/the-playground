@@ -44,7 +44,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
-import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
+import { computeMembersMeta } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -119,19 +119,8 @@ export default async function CircleDetailPage({
     ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
   ];
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
-  const allMembersForMeta = [...hosts, ...players].sort(
-    (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
-  );
-  const visibleMemberAvatars = allMembersForMeta.slice(0, MEMBER_AVATARS_MAX);
-  const memberNamesToShow = allMembersForMeta
-    .slice(0, 2)
-    .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
-  const memberOthersCount = Math.max(0, totalMembers - memberNamesToShow.length);
-  const memberOthersText = memberOthersCount > 0 ? t("detail.andOthers", { count: memberOthersCount }) : "";
-  const membersMetaText = memberOthersText
-    ? `${memberNamesToShow.join(", ")} ${memberOthersText}`
-    : memberNamesToShow.join(", ");
-  const membersMetaMobileText = memberOthersText || memberNamesToShow.join(", ");
+  const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
+    computeMembersMeta(hosts, players, totalMembers, t);
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
