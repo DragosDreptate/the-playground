@@ -8,10 +8,11 @@ import { PublishMomentButton } from "@/components/moments/publish-moment-button"
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { PendingRegistrationsList } from "@/components/circles/pending-requests-list";
 import { MomentRegistrationsDialog } from "@/components/moments/moment-registrations-dialog";
+import { ParticipantAvatarStack } from "@/components/moments/participant-avatar-stack";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
+import { getDisplayName } from "@/lib/display-name";
 import type { Moment } from "@/domain/models/moment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { Circle, CircleMemberWithUser } from "@/domain/models/circle";
@@ -537,34 +538,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       momentStartsAt={moment.startsAt}
                       triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                     >
-                      <span className="flex -space-x-1.5">
-                        {visibleParticipantAvatars.map((r) => {
-                          const displayName = getDisplayName(r.user.firstName, r.user.lastName, r.user.email);
-                          return (
-                            <span key={r.id} className="group/avatar relative">
-                              <span
-                                className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
-                                style={{ background: getMomentGradient(r.user.email) }}
-                              >
-                                {r.user.image ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
-                                    src={r.user.image}
-                                    alt={displayName}
-                                    referrerPolicy="no-referrer"
-                                    className="absolute inset-0 size-full object-cover"
-                                  />
-                                ) : (
-                                  getCircleUserInitials(r.user)
-                                )}
-                              </span>
-                              <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
-                                {displayName}
-                              </span>
-                            </span>
-                          );
-                        })}
-                      </span>
+                      <ParticipantAvatarStack participants={visibleParticipantAvatars} />
                       <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         <span className="lg:hidden">{participantsMetaMobileText}</span>
                         <span className="hidden lg:inline">{participantsMetaText}</span>
@@ -572,34 +546,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     </MomentRegistrationsDialog>
                   ) : (
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <span className="flex -space-x-1.5">
-                        {visibleParticipantAvatars.map((r) => {
-                          const displayName = getDisplayName(r.user.firstName, r.user.lastName, r.user.email);
-                          return (
-                            <span key={r.id} className="group/avatar relative">
-                              <span
-                                className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
-                                style={{ background: getMomentGradient(r.user.email) }}
-                              >
-                                {r.user.image ? (
-                                  // eslint-disable-next-line @next/next/no-img-element
-                                  <img
-                                    src={r.user.image}
-                                    alt={displayName}
-                                    referrerPolicy="no-referrer"
-                                    className="absolute inset-0 size-full object-cover"
-                                  />
-                                ) : (
-                                  getCircleUserInitials(r.user)
-                                )}
-                              </span>
-                              <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
-                                {displayName}
-                              </span>
-                            </span>
-                          );
-                        })}
-                      </span>
+                      <ParticipantAvatarStack participants={visibleParticipantAvatars} />
                       <span className="text-sm font-medium">
                         <span className="lg:hidden">{participantsMetaMobileText}</span>
                         <span className="hidden lg:inline">{participantsMetaText}</span>
