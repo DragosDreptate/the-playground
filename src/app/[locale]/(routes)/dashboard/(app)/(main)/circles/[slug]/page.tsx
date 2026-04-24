@@ -25,7 +25,7 @@ import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-
 import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
 import { CoverBlock } from "@/components/circles/cover-block";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
+import { getDisplayName } from "@/lib/display-name";
 import { UserAvatar } from "@/components/user-avatar";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
+import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -367,34 +368,7 @@ export default async function CircleDetailPage({
                     circleSlug={circle.slug}
                     triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                   >
-                    <span className="flex -space-x-1.5">
-                      {visibleMemberAvatars.map((m) => {
-                        const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
-                        return (
-                          <span key={m.id} className="group/avatar relative">
-                            <span
-                              className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
-                              style={{ background: getMomentGradient(m.user.email) }}
-                            >
-                              {m.user.image ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={m.user.image}
-                                  alt={displayName}
-                                  referrerPolicy="no-referrer"
-                                  className="absolute inset-0 size-full object-cover"
-                                />
-                              ) : (
-                                getCircleUserInitials(m.user)
-                              )}
-                            </span>
-                            <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">
-                              {displayName}
-                            </span>
-                          </span>
-                        );
-                      })}
-                    </span>
+                    <MemberAvatarStack members={visibleMemberAvatars} />
                     <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                       <span className="lg:hidden">{membersMetaMobileText}</span>
                       <span className="hidden lg:inline">{membersMetaText}</span>
