@@ -52,7 +52,7 @@ export default async function AdminNetworksPage() {
                   <TableCell>
                     <Link
                       href={`/admin/networks/${network.id}`}
-                      className="font-medium hover:underline"
+                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
                       {network.name}
                     </Link>

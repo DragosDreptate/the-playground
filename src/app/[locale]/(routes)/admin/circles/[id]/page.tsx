@@ -63,7 +63,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
                     href={circle.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:underline underline-offset-2"
+                    className="hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     {stripProtocol(circle.website)}
                   </a>
@@ -86,7 +86,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
                 <Link
                   key={host.id}
                   href={`/admin/users/${host.id}`}
-                  className="text-sm font-medium hover:underline"
+                  className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                 >
                   {[host.firstName, host.lastName].filter(Boolean).join(" ") || host.email}
                 </Link>
@@ -164,7 +164,7 @@ export default async function AdminCircleDetailPage({ params }: Props) {
                 <div key={moment.id} className="flex items-center justify-between rounded-md border px-3 py-2">
                   <Link
                     href={`/admin/moments/${moment.id}`}
-                    className="text-sm font-medium hover:underline"
+                    className="text-sm font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                   >
                     {moment.title}
                   </Link>

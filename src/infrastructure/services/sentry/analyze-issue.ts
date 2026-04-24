@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { Resend } from "resend";
+import { createSafeResend } from "@/lib/email/safe-resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackSentryIssue, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
@@ -191,7 +191,7 @@ async function sendAnalysisEmail(
   const resendKey = process.env.AUTH_RESEND_KEY;
   if (!resendKey) return;
 
-  const resend = new Resend(resendKey);
+  const resend = createSafeResend(resendKey);
   const adminEmail = process.env.SENTRY_ALERT_EMAIL ?? "ddreptate@gmail.com";
   const urgencyLabel = URGENCY_META[analysis.urgency].label;
 

@@ -473,7 +473,7 @@ export function MomentFormRadar({
                       <button
                         type="button"
                         onClick={() => removeKeyword(kw)}
-                        className="hover:text-primary/60 transition-colors"
+                        className="hover:text-foreground transition-colors"
                         aria-label={`Supprimer ${kw}`}
                       >
                         <X className="size-3" />

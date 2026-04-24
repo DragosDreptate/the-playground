@@ -48,7 +48,7 @@ export function RegistrationsList({
 
   function handleExportCsv() {
     const momentDate = momentStartsAt ? new Date(momentStartsAt) : null;
-    const eventDate = momentDate ? momentDate.toLocaleDateString() : "";
+    const eventDate = momentDate ? momentDate.toISOString().slice(0, 10) : "";
     const title = momentTitle ?? "";
     const headers = [
       t("registrations.csvHeaders.eventName"),
@@ -67,7 +67,7 @@ export function RegistrationsList({
       r.user.lastName ?? "",
       r.user.email,
       t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted" | "pending_approval" | "rejected"}`),
-      new Date(r.registeredAt).toLocaleDateString(),
+      new Date(r.registeredAt).toISOString().slice(0, 10),
     ]);
     const csv = [metaRow, headers, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
@@ -144,7 +144,7 @@ export function RegistrationsList({
                     {isConnected && reg.user.publicId ? (
                       <Link
                         href={`/u/${reg.user.publicId}`}
-                        className="text-sm font-medium leading-snug hover:underline underline-offset-2"
+                        className="text-sm font-medium leading-snug hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                       >
                         {displayName}
                       </Link>

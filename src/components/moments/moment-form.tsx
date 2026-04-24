@@ -3,7 +3,7 @@
 import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import posthog from "posthog-js";
 import { useTranslations } from "next-intl";
-import { AlignLeft, Lock, ShieldCheck } from "lucide-react";
+import { AlignLeft, FileText, Lock, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -64,6 +64,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
+  const isDraft = moment?.status === "DRAFT";
   const router = useRouter();
   const attachmentsEditorRef = useRef<MomentAttachmentsEditorHandle>(null);
   const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
@@ -257,7 +258,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 />
               )}
               <div className="min-w-0">
-                <p className="text-sm font-semibold leading-snug group-hover:underline">
+                <p className="text-sm font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                   {circleName}
                 </p>
                 {circleDescription && (
@@ -272,6 +273,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
 
         {/* Right column — Form fields */}
         <div className="order-1 flex min-w-0 flex-1 flex-col gap-5 lg:order-2">
+          {/* Banner DRAFT — visible tant que l'événement n'est pas publié */}
+          {isDraft && (
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+              <FileText className="text-muted-foreground size-4 shrink-0" />
+              <p className="text-muted-foreground text-sm">
+                {t("form.draftNotice")}
+              </p>
+            </div>
+          )}
+
           {/* Status select (edit mode, PUBLISHED/CANCELLED only — DRAFT uses publish button) */}
           {moment && moment.status !== "DRAFT" && (
             <div className="flex justify-end">
@@ -452,16 +463,15 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 ? t("form.uploadingAttachments")
                 : isPending
                   ? tCommon("loading")
-                  : moment
+                  : moment && !isDraft
                     ? tCommon("save")
                     : t("form.createMoment")}
             </Button>
 
-            {/* Publier directement — création uniquement, desktop uniquement.
-                En édition un bouton "Publier" existe déjà sur la page du Moment
-                (PublishMomentButton). Sur mobile on garde le flux par défaut
-                (brouillon → puis publier depuis la page). */}
-            {!moment && (
+            {/* Publier directement — création ou édition d'un DRAFT, desktop uniquement.
+                Sur mobile on garde le flux par défaut (enregistrer puis publier
+                depuis la page du Moment via PublishMomentButton). */}
+            {(!moment || isDraft) && (
               <Button
                 type="submit"
                 name="intent"

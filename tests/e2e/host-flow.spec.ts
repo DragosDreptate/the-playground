@@ -153,14 +153,14 @@ test.describe("Flux Host — création d'un Moment", () => {
 });
 
 /**
- * Tests E2E — Flux Host : publication directe depuis le formulaire de création
+ * Tests E2E — Flux Host : publication directe depuis le formulaire (création + édition DRAFT)
  *
- * Vérifie la feature "Publier directement" (PR #362) :
- *   - Desktop : le form a 2 boutons submit (draft + publish)
- *   - Cliquer "Enregistrer le brouillon" crée un DRAFT (comportement inchangé)
- *   - Cliquer "Publier" crée ET publie l'événement en une seule action
+ * Vérifie la feature "Publier directement" :
+ *   - Desktop : le form a 2 boutons submit (draft + publish) en création ET en édition DRAFT
+ *   - Cliquer "Enregistrer le brouillon" crée/met à jour un DRAFT (comportement inchangé)
+ *   - Cliquer "Publier" crée/publie l'événement en une seule action
  *   - Sur mobile, le bouton Publier est masqué (hidden sm:inline-flex)
- *   - En mode édition d'un brouillon existant, le bouton Publier n'est pas dans le form
+ *   - En édition d'un PUBLISHED, le bouton Publier n'apparaît pas (sélecteur de statut à la place)
  *   - Presser Enter dans un input soumet en mode draft par défaut (1er submit button
  *     dans le DOM) — aucun risque de publication accidentelle au clavier
  */
@@ -231,15 +231,13 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     ).toBeVisible({ timeout: 8_000 });
   });
 
-  test("should NOT show the 'Publier' button when editing an existing DRAFT moment", async ({ page }) => {
+  test("should publish an existing DRAFT when clicking 'Publier' in the edit form", async ({ page }) => {
     // 1. Créer un moment DRAFT pour avoir une cible d'édition
-    const title = `E2E Edit ${Date.now()}`;
+    const title = `E2E Edit Publish ${Date.now()}`;
     await fillMomentForm(page, title);
     await page.locator("button[name='intent'][value='draft']").click();
 
     // Attendre explicitement que la redirect aille sur la page du moment (pas /moments/new).
-    // Le regex précédent `/moments\//` matchait aussi `/moments/new` → faux positif possible.
-    // On attend une URL qui se termine par un slug différent de "new".
     await page.waitForURL(
       (url) => {
         const path = new URL(url).pathname;
@@ -262,11 +260,50 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     // Le form d'édition doit être visible (timeout large car cold render possible en CI)
     await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
 
-    // Le bouton "Publier" du form NE doit PAS être présent en mode édition
-    // (wrappé dans `{!moment && ...}` côté React → pas du tout rendu)
-    await expect(page.locator("button[name='intent'][value='publish']")).toHaveCount(0);
+    // Le banner "brouillon" doit être visible dans le form d'édition
+    await expect(page.getByText(/brouillon/i).first()).toBeVisible();
 
-    // En revanche le bouton draft (qui devient "Enregistrer" en mode édition) reste présent
+    // Le bouton "Publier" du form DOIT être présent en édition d'un DRAFT (desktop)
+    const publishButton = page.locator("button[name='intent'][value='publish']");
+    await expect(publishButton).toBeVisible();
+
+    // Cliquer sur Publier → l'événement passe en PUBLISHED, redirection sur la page du moment
+    await publishButton.click();
+    await expect(page).toHaveURL(
+      new RegExp(`/dashboard/circles/[^/]+/moments/${momentSlug}$`),
+      { timeout: 15_000 }
+    );
+
+    // Le banner "en cours de préparation" de la page détail ne doit PLUS apparaître
+    await expect(page.getByText(/en cours de préparation/i)).toHaveCount(0);
+  });
+
+  test("should NOT show the 'Publier' button when editing a PUBLISHED moment", async ({ page }) => {
+    // 1. Créer un moment puis le publier immédiatement via le 2e submit
+    const title = `E2E Edit Published ${Date.now()}`;
+    await fillMomentForm(page, title);
+    await page.locator("button[name='intent'][value='publish']").click();
+
+    await page.waitForURL(
+      (url) => {
+        const path = new URL(url).pathname;
+        return /\/dashboard\/circles\/[^/]+\/moments\/[^/]+$/.test(path) && !path.endsWith("/moments/new");
+      },
+      { timeout: 15_000 }
+    );
+
+    const momentSlug = new URL(page.url()).pathname.split("/").pop();
+    if (!momentSlug || momentSlug === "new") {
+      throw new Error(`Unexpected moment URL after creation: ${page.url()}`);
+    }
+
+    // 2. Ouvrir la page d'édition du moment PUBLISHED
+    await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}/edit`);
+    await page.waitForLoadState("domcontentloaded");
+    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
+
+    // En édition PUBLISHED, le bouton Publier n'existe pas (le statut se gère via le select)
+    await expect(page.locator("button[name='intent'][value='publish']")).toHaveCount(0);
     await expect(page.locator("button[name='intent'][value='draft']")).toBeVisible();
   });
 });

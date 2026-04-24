@@ -24,7 +24,8 @@ export function CopyLinkButton({ value }: CopyLinkButtonProps) {
       type="button"
       variant="outline"
       size="sm"
-      className="h-8 shrink-0 gap-1.5 px-3"
+      aria-label={copied ? t("copied") : t("copyLink")}
+      className="h-8 shrink-0 gap-1.5 max-lg:w-8 max-lg:px-0 lg:px-3"
       onClick={handleCopy}
     >
       {copied ? (
@@ -32,7 +33,9 @@ export function CopyLinkButton({ value }: CopyLinkButtonProps) {
       ) : (
         <Copy className="size-3.5" />
       )}
-      {copied ? t("copied") : t("copyLink")}
+      <span className="hidden lg:inline">
+        {copied ? t("copied") : t("copyLink")}
+      </span>
     </Button>
   );
 }

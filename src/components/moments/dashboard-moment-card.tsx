@@ -201,7 +201,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               {/* Title */}
               <p
                 className={`truncate font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:underline"
+                  isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
                 }`}
               >
                 {momentData.title}

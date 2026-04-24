@@ -22,6 +22,10 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
+import {
+  getMomentParticipantsPage,
+  type GetMomentParticipantsPageResult,
+} from "@/domain/usecases/get-moment-participants-page";
 import type { LocationType, Moment } from "@/domain/models/moment";
 import type { RegistrationWithUser } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
@@ -218,12 +222,21 @@ export async function updateMomentAction(
     return { success: false, error: "Title cannot be empty", code: "VALIDATION" };
   }
 
-  const capacity = capacityRaw ? parseInt(capacityRaw, 10) || null : undefined;
+  // capacityRaw === null → champ absent du form, ne pas toucher (undefined)
+  // capacityRaw === "" → user a explicitement effacé la limite → null (illimité)
+  // sinon parse → number (fallback null si invalide)
+  const capacity = capacityRaw === null ? undefined : parseInt(capacityRaw, 10) || null;
   const price = priceRaw !== null ? parseInt(priceRaw, 10) || 0 : undefined;
   // Refundable only meaningful for paid events; default to true when price becomes 0
   const refundable = price !== undefined
     ? (price > 0 ? formData.get("refundable") === "on" : true)
     : undefined;
+
+  // Intent = "draft" (default) or "publish" — mirrors createMomentAction.
+  // Only meaningful when editing a DRAFT; otherwise the form doesn't expose
+  // the Publier button.
+  const intent = formData.get("intent") as string | null;
+  const shouldPublishAfterUpdate = intent === "publish";
 
   const userId = session.user.id;
   return toActionResult(async () => {
@@ -303,6 +316,32 @@ export async function updateMomentAction(
     // Invalide uniquement la page de cet événement (les deux locales)
     revalidatePath(`/m/${result.moment.slug}`);
     revalidatePath(`/en/m/${result.moment.slug}`);
+
+    // Publish-after-update path : symétrique à createMomentAction.
+    // Si `publishMoment` échoue, on loggue dans Sentry et on renvoie le
+    // moment mis à jour (toujours DRAFT) pour ne pas perdre la modification.
+    if (shouldPublishAfterUpdate && result.moment.status === "DRAFT") {
+      try {
+        const publishResult = await publishMoment(
+          { momentId: result.moment.id, userId },
+          { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
+        );
+
+        sendMomentPublishedNotifications(publishResult.moment, userId);
+
+        revalidatePath(`/dashboard/circles/${publishResult.moment.circleId}`);
+        revalidatePath(`/m/${publishResult.moment.slug}`);
+        revalidatePath(`/en/m/${publishResult.moment.slug}`);
+
+        invalidateDashboardCache(userId);
+        return publishResult.moment;
+      } catch (publishError) {
+        Sentry.captureException(publishError, {
+          tags: { context: "publish_after_update" },
+          extra: { momentId: result.moment.id, circleId: result.moment.circleId },
+        });
+      }
+    }
 
     invalidateDashboardCache(session.user.id);
     return result.moment;
@@ -628,4 +667,24 @@ function sendMomentPublishedNotifications(moment: Moment, userId: string): void 
       console.error(err);
       Sentry.captureException(err);
     });
+}
+
+export async function getMomentParticipantsPageAction(
+  momentId: string,
+  offset: number,
+  limit: number,
+): Promise<GetMomentParticipantsPageResult> {
+  const session = await auth();
+  try {
+    return await getMomentParticipantsPage(
+      { momentId, offset, limit, callerUserId: session?.user?.id ?? null },
+      {
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+        registrationRepository: prismaRegistrationRepository,
+      },
+    );
+  } catch {
+    return { participants: [], total: 0, hasMore: false };
+  }
 }

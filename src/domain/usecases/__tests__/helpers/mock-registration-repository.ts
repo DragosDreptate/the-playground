@@ -28,6 +28,7 @@ export function createMockRegistrationRepository(
     findByStripePaymentIntentId: vi.fn<RegistrationRepository["findByStripePaymentIntentId"]>().mockResolvedValue(null),
     getPaymentSummary: vi.fn<RegistrationRepository["getPaymentSummary"]>().mockResolvedValue({ paidCount: 0, totalAmount: 0, refundedCount: 0 }),
     findTopRegistrantsByMomentIds: vi.fn<RegistrationRepository["findTopRegistrantsByMomentIds"]>().mockResolvedValue(new Map()),
+    findParticipantsPaginated: vi.fn<RegistrationRepository["findParticipantsPaginated"]>().mockResolvedValue({ participants: [], total: 0, hasMore: false }),
     ...overrides,
   };
 }

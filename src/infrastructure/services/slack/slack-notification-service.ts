@@ -17,6 +17,13 @@ type SlackBlock =
 async function sendSlack(payload: { text: string; blocks?: SlackBlock[] }): Promise<void> {
   if (!WEBHOOK_URL) return;
 
+  // Staging guard — évite toute notification Slack depuis un env de test.
+  // Symétrique avec le staging guard de safe-resend (src/lib/email/safe-resend.ts).
+  if (process.env.IS_STAGING === "true") {
+    console.warn("[staging-guard] Blocked Slack notification:", payload.text);
+    return;
+  }
+
   try {
     await fetch(WEBHOOK_URL, {
       method: "POST",

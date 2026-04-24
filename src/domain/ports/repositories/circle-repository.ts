@@ -110,6 +110,17 @@ export interface CircleRepository {
    * Remplace les appels `findMembersByRole(circleId, "HOST")` côté notifications et affichage.
    */
   findOrganizers(circleId: string): Promise<CircleMemberWithUser[]>;
+  /**
+   * Renvoie une page de membres ACTIFS, triés :
+   *   1. L'utilisateur courant en premier (si `priorityUserId` est fourni et membre)
+   *   2. Par rôle : HOST > CO_HOST > PLAYER
+   *   3. Par date d'arrivée (joinedAt asc) au sein de chaque groupe
+   * Renvoie `total` (count global) et `hasMore`.
+   */
+  findMembersPaginated(
+    circleId: string,
+    options: { offset: number; limit: number; priorityUserId?: string | null },
+  ): Promise<{ members: CircleMemberWithUser[]; total: number; hasMore: boolean }>;
   countMembers(circleId: string): Promise<number>;
   countMoments(circleId: string): Promise<number>;
   /** Renvoie une Map circleId → nombre de membres pour une liste de Circles (une seule requête GROUP BY). */

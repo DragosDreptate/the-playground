@@ -85,6 +85,7 @@ export default async function HelpPage() {
         { id: "inscription", label: t("sidebar.inscription") },
         { id: "rejoindre", label: t("sidebar.rejoindre") },
         { id: "waitlist", label: t("sidebar.waitlist") },
+        { id: "calendar", label: t("sidebar.calendar") },
         { id: "cancel", label: t("sidebar.cancel") },
         { id: "paidEvents", label: t("sidebar.paidEvents") },
         { id: "comments", label: t("sidebar.comments") },
@@ -229,6 +230,27 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("participant.waitlist.intro", rich)}
               </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.waitlist.positionNote")}
+              </p>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Calendrier */}
+            <div className="space-y-4">
+              <SectionH3 id="calendar">{t("participant.calendar.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.calendar.intro")}
+              </p>
+              <ul className="space-y-2">
+                {(["item1", "item2"] as const).map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    {t(`participant.calendar.${item}`)}
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <hr className="border-border" />
@@ -236,6 +258,9 @@ export default async function HelpPage() {
             {/* Annuler */}
             <div className="space-y-4">
               <SectionH3 id="cancel">{t("participant.cancel.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.cancel.statusNote")}
+              </p>
               <p className="text-sm font-medium text-foreground">
                 {t.rich("participant.cancel.stepsLabel", rich)}
               </p>
@@ -340,6 +365,9 @@ export default async function HelpPage() {
             {/* Quitter */}
             <div className="space-y-4">
               <SectionH3 id="leave">{t("participant.leave.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.leave.memberBadge")}
+              </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("participant.leave.intro", rich)}
               </p>
@@ -491,6 +519,9 @@ export default async function HelpPage() {
             {/* Modifier ou annuler */}
             <div className="space-y-4">
               <SectionH3 id="editCancel">{t("organizer.editCancel.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("organizer.editCancel.statusBadge")}
+              </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t("organizer.editCancel.intro")}
               </p>

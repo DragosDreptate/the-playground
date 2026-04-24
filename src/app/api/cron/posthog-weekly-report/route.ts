@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { createSafeResend } from "@/lib/email/safe-resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackTrafficReport } from "@/infrastructure/services/slack/slack-notification-service";
 import {
@@ -69,7 +69,7 @@ async function handler(request: NextRequest) {
     patchUniqueVisitors(dashboard);
     const html = buildReportHtml(dashboard, new Date(), "week");
 
-    const resend = new Resend(process.env.AUTH_RESEND_KEY);
+    const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
     await resend.emails.send({
       from: getSender(),
       to: [recipient],

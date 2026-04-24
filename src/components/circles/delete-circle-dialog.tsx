@@ -15,13 +15,15 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { deleteCircleAction } from "@/app/actions/circle";
 
 type DeleteCircleDialogProps = {
   circleId: string;
+  triggerClassName?: string;
 };
 
-export function DeleteCircleDialog({ circleId }: DeleteCircleDialogProps) {
+export function DeleteCircleDialog({ circleId, triggerClassName }: DeleteCircleDialogProps) {
   const t = useTranslations("Circle");
   const tCommon = useTranslations("Common");
   const router = useRouter();
@@ -48,7 +50,10 @@ export function DeleteCircleDialog({ circleId }: DeleteCircleDialogProps) {
         <Button
           variant="outline"
           size="sm"
-          className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+          className={cn(
+            "border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive",
+            triggerClassName,
+          )}
         >
           {tCommon("delete")}
         </Button>

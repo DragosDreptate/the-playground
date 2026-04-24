@@ -57,13 +57,13 @@ export default async function BlogPage() {
                   {formatBlogDate(post.date, locale)}
                 </time>
               </div>
-              <h2 className="mt-2.5 text-lg font-bold tracking-tight group-hover:text-primary transition-colors">
+              <h2 className="mt-2.5 text-lg font-bold tracking-tight group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                 {post.title}
               </h2>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                 {post.description}
               </p>
-              <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">
+              <div className="mt-3 flex items-center gap-1.5 text-sm font-medium text-muted-foreground group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                 {t("readMore")}
                 <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
               </div>

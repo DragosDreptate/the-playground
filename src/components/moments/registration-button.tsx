@@ -3,9 +3,8 @@
 import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
-import { CalendarIcon, Check, Clock, Download, X } from "lucide-react";
+import { Clock, LogOut } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +23,7 @@ import {
 import { createCheckoutAction } from "@/app/actions/checkout";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
-import { buildGoogleCalendarUrl, type CalendarEventData } from "@/lib/calendar";
+import type { CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
 
 type RegistrationButtonProps = {
@@ -38,8 +37,6 @@ type RegistrationButtonProps = {
   existingRegistration: Registration | null;
   signInUrl: string;
   isFull: boolean;
-  spotsRemaining: number | null;
-  registrationCount: number;
   isOrganizer?: boolean;
   calendarData?: CalendarEventData;
   appUrl?: string;
@@ -47,35 +44,6 @@ type RegistrationButtonProps = {
   requiresApproval?: boolean;
   refundable?: boolean;
 };
-
-function StatsInfo({
-  count,
-  spotsRemaining,
-  isFull,
-}: {
-  count: number;
-  spotsRemaining: number | null;
-  isFull: boolean;
-}) {
-  const t = useTranslations("Moment");
-  return (
-    <div className="hidden shrink-0 flex-col items-end gap-0.5">
-      <span className="text-sm font-semibold">
-        {t("public.registrantsCount", { count })}
-      </span>
-      {!isFull && spotsRemaining !== null && (
-        <span className="text-muted-foreground text-xs">
-          {t("public.spotsRemaining", { count: spotsRemaining })}
-        </span>
-      )}
-      {isFull && (
-        <span className="text-xs text-amber-400">
-          {t("public.eventFull")}
-        </span>
-      )}
-    </div>
-  );
-}
 
 export function RegistrationButton({
   momentId,
@@ -88,8 +56,6 @@ export function RegistrationButton({
   existingRegistration,
   signInUrl,
   isFull,
-  spotsRemaining,
-  registrationCount,
   isOrganizer = false,
   calendarData,
   appUrl,
@@ -113,12 +79,9 @@ export function RegistrationButton({
   // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
     return (
-      <div className="flex items-center justify-between gap-3">
-        <Button className="w-full rounded-full" size="lg" asChild>
-          <a href={signInUrl}>{t("public.signInToRegister")}</a>
-        </Button>
-        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
+      <Button className="w-full" size="sm" asChild>
+        <a href={signInUrl}>{t("public.signInToRegister")}</a>
+      </Button>
     );
   }
 
@@ -126,48 +89,42 @@ export function RegistrationButton({
   if (price > 0 && !localStatus) {
     if (isFull) {
       return (
-        <div className="flex items-center justify-between gap-3">
-          <Button className="w-full rounded-full" size="lg" disabled>
-            {t("public.eventFull")}
-          </Button>
-          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-        </div>
+        <Button className="w-full" size="sm" disabled>
+          {t("public.eventFull")}
+        </Button>
       );
     }
 
     return (
       <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            className="w-full rounded-full"
-            size="lg"
-            disabled={isPending}
-            onClick={() => {
-              startTransition(async () => {
-                setError(null);
-                const baseUrl = window.location.origin;
-                const result = await createCheckoutAction(
-                  momentId,
-                  slug,
-                  `${baseUrl}/m/${slug}`
-                );
-                if (result.success) {
-                  window.location.href = result.data.url;
-                } else {
-                  setError(result.error);
-                }
-              });
-            }}
-          >
-            {isPending
-              ? tCommon("loading")
-              : t("public.registerPaid", {
-                  price: formatPrice(price, currency, locale),
-                  currency,
-                })}
-          </Button>
-          <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-        </div>
+        <Button
+          className="w-full"
+          size="sm"
+          disabled={isPending}
+          onClick={() => {
+            startTransition(async () => {
+              setError(null);
+              const baseUrl = window.location.origin;
+              const result = await createCheckoutAction(
+                momentId,
+                slug,
+                `${baseUrl}/m/${slug}`
+              );
+              if (result.success) {
+                window.location.href = result.data.url;
+              } else {
+                setError(result.error);
+              }
+            });
+          }}
+        >
+          {isPending
+            ? tCommon("loading")
+            : t("public.registerPaid", {
+                price: formatPrice(price, currency, locale),
+                currency,
+              })}
+        </Button>
         {error && (
           <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
             {error}
@@ -180,168 +137,103 @@ export function RegistrationButton({
   // Pending approval
   if (localStatus === "PENDING_APPROVAL") {
     return (
-      <div className="space-y-3">
-        <div className="flex items-center gap-3 rounded-xl bg-amber-500/[0.06] p-4">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-500">
-            <Clock className="size-4" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold">
-              {t("public.pendingApprovalBannerTitle")}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              {t("public.pendingApprovalBannerDescription")}
-            </p>
-          </div>
-        </div>
+      <div className="flex w-full items-center justify-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-sm font-medium text-amber-500">
+        <Clock className="size-4" />
+        {t("public.pendingApproval")}
       </div>
     );
   }
 
-  // Already registered or waitlisted
+  // Already registered or waitlisted → badge de statut + CTA "Annuler mon inscription"
   if (localStatus === "REGISTERED" || localStatus === "WAITLISTED") {
+    if (isOrganizer) return null;
     const isRegistered = localStatus === "REGISTERED";
     return (
       <div className="space-y-3">
-
-        {/* Card unifiée inscription */}
-        <div className={`border-border bg-card overflow-hidden rounded-2xl border ${!isRegistered ? "border-amber-500/30 bg-amber-500/[0.06]" : ""}`}>
-
-          {/* Ligne 1 — Statut */}
-          <div className="flex items-center gap-3 p-4">
-            <div className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${isRegistered ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-500"}`}>
-              {isRegistered ? <Check className="size-4" strokeWidth={3} /> : <Clock className="size-4" />}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold">
-                {isRegistered ? t("public.registeredBannerTitle") : t("public.waitlistedBannerTitle")}
-              </p>
-              <p className="text-muted-foreground text-xs">
-                {t("public.registrantsCount", { count: registrationCount })}
-                {!isRegistered && waitlistPosition != null && waitlistPosition > 0
-                  ? ` · ${t("public.waitlistPosition", { position: waitlistPosition })}`
-                  : !isFull && spotsRemaining !== null
-                    ? ` · ${t("public.spotsRemaining", { count: spotsRemaining })}`
-                    : isFull
-                      ? ` · ${t("public.eventFull")}`
-                      : ""}
-              </p>
-            </div>
+        {isRegistered ? (
+          <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            {t("public.youAreRegistered")}
           </div>
-
-          {/* Ligne 2 — Calendrier (inscrits confirmés uniquement) */}
-          {isRegistered && calendarData && appUrl && (
-            <>
-              <div className="border-border ml-[3.25rem] border-t" />
-              <div className="flex items-center gap-3 px-4 py-3">
-                <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                  <CalendarIcon className="size-4" />
-                </div>
-                <p className="min-w-0 flex-1 text-sm font-medium">{t("public.addToCalendar.label")}</p>
-                <div className="flex shrink-0 gap-1.5">
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={buildGoogleCalendarUrl(calendarData, appUrl, { join: t("public.addToCalendar.calendarJoin"), organizedBy: t("public.addToCalendar.calendarOrganizedBy") })} target="_blank" rel="noopener noreferrer">
-                      <svg width="14" height="14" viewBox="0 0 48 48" aria-hidden="true">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                      </svg>
-                      Google
-                    </a>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={`/api/moments/${calendarData.slug}/calendar`} download={`${calendarData.slug}.ics`}>
-                      <Download className="size-3.5" />
-                      .ics
-                    </a>
-                  </Button>
-                </div>
-              </div>
-            </>
+        ) : (
+          <div className="flex w-full items-center justify-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/5 px-4 py-2.5 text-sm font-medium text-amber-500">
+            <Clock className="size-4" />
+            {waitlistPosition && waitlistPosition > 0
+              ? t("public.youAreWaitlistedWithPosition", { position: waitlistPosition })
+              : t("public.youAreWaitlisted")}
+          </div>
+        )}
+        <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-2 border-primary/40 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          >
+            <LogOut className="size-3.5" />
+            {t("public.cancelRegistration")}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("public.cancelConfirmTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("public.cancelConfirmDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
+            <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
+              {refundable
+                ? t("public.cancelRefundableInfo")
+                : t("public.cancelNonRefundableWarning")}
+            </div>
           )}
-
-          {/* Ligne 3 — Actions */}
-          {(isRegistered || !isOrganizer) && (
-            <>
-              <div className="border-border ml-[3.25rem] border-t" />
-              <div className="flex items-center justify-end gap-1.5 px-4 py-3">
-                {!isOrganizer && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-muted-foreground"
-                      >
-                        {t("public.cancelRegistration")}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {t("public.cancelConfirmTitle")}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t("public.cancelConfirmDescription")}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      {price > 0 && existingRegistration?.paymentStatus === "PAID" && (
-                        <div className={`rounded-md p-3 text-sm ${refundable ? "bg-green-500/10 text-green-500" : "bg-amber-500/10 text-amber-500"}`}>
-                          {refundable
-                            ? t("public.cancelRefundableInfo")
-                            : t("public.cancelNonRefundableWarning")}
-                        </div>
-                      )}
-                      {error && (
-                        <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
-                          {error}
-                        </div>
-                      )}
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-                        <AlertDialogAction
-                          variant="destructive"
-                          disabled={isPending}
-                          onClick={() => {
-                            if (!localRegistrationId) return;
-                            startTransition(async () => {
-                              setError(null);
-                              const result = await cancelRegistrationAction(
-                                localRegistrationId
-                              );
-                              if (result.success) {
-                                posthog.capture("registration_cancelled", {
-                                  moment_id: momentId,
-                                  circle_id: circleId,
-                                });
-                                setLocalStatus(null);
-                                setLocalRegistrationId(null);
-                                router.refresh();
-                              } else {
-                                setError(result.error);
-                              }
-                            });
-                          }}
-                        >
-                          {isPending ? tCommon("loading") : t("public.confirmCancel")}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-                {isRegistered && (
-                  <Button size="sm" asChild>
-                    <Link href="/dashboard?tab=moments">
-                      {t("public.viewInDashboard")}
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </>
+          {error && (
+            <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
+              {error}
+            </div>
           )}
-
-        </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={isPending}
+              onClick={() => {
+                if (!localRegistrationId) return;
+                startTransition(async () => {
+                  setError(null);
+                  const result = await cancelRegistrationAction(localRegistrationId);
+                  if (result.success) {
+                    posthog.capture("registration_cancelled", {
+                      moment_id: momentId,
+                      circle_id: circleId,
+                    });
+                    setLocalStatus(null);
+                    setLocalRegistrationId(null);
+                    router.refresh();
+                  } else {
+                    setError(result.error);
+                  }
+                });
+              }}
+            >
+              {isPending ? tCommon("loading") : t("public.confirmCancel")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       </div>
     );
   }
@@ -349,41 +241,38 @@ export function RegistrationButton({
   // Default: register or join waitlist
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <Button
-          className="w-full rounded-full"
-          size="lg"
-          disabled={isPending}
-          onClick={() => {
-            startTransition(async () => {
-              setError(null);
-              const result = await joinMomentAction(momentId);
-              if (result.success) {
-                setLocalStatus(result.data.status);
-                setLocalRegistrationId(result.data.id);
-                posthog.capture("moment_joined", {
-                  moment_id: momentId,
-                  circle_id: circleId,
-                  circle_name: circleName,
-                  registration_status: result.data.status,
-                });
-                router.refresh();
-              } else {
-                setError(result.error);
-              }
-            });
-          }}
-        >
-          {isPending
-            ? tCommon("loading")
-            : requiresApproval
-              ? t("public.requestToJoin")
-              : isFull
-                ? t("public.joinWaitlist")
-                : t("public.registerFree")}
-        </Button>
-        <StatsInfo count={registrationCount} spotsRemaining={spotsRemaining} isFull={isFull} />
-      </div>
+      <Button
+        className="w-full"
+        size="sm"
+        disabled={isPending}
+        onClick={() => {
+          startTransition(async () => {
+            setError(null);
+            const result = await joinMomentAction(momentId);
+            if (result.success) {
+              setLocalStatus(result.data.status);
+              setLocalRegistrationId(result.data.id);
+              posthog.capture("moment_joined", {
+                moment_id: momentId,
+                circle_id: circleId,
+                circle_name: circleName,
+                registration_status: result.data.status,
+              });
+              router.refresh();
+            } else {
+              setError(result.error);
+            }
+          });
+        }}
+      >
+        {isPending
+          ? tCommon("loading")
+          : requiresApproval
+            ? t("public.requestToJoin")
+            : isFull
+              ? t("public.joinWaitlist")
+              : t("public.registerFree")}
+      </Button>
       {error && (
         <div className="bg-destructive/10 text-destructive rounded-md p-3 text-sm">
           {error}

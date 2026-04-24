@@ -291,11 +291,8 @@ export function CommentThread({
     <div className="border-border bg-card rounded-2xl border p-6">
       <div className="space-y-4">
         {/* Header */}
-        <h2 className="text-lg font-semibold">
-          {t("comments.title")}{" "}
-          <span className="text-muted-foreground text-base font-normal">
-            ({comments.length})
-          </span>
+        <h2 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">
+          {t("comments.title")}
         </h2>
 
         {/* Comment list */}
@@ -343,18 +340,20 @@ export function CommentThread({
                         />
                       )}
                     </div>
-                    <p className="mt-0.5 text-sm whitespace-pre-wrap break-words">
-                      {linkifyText(comment.content)}
-                    </p>
+                    <div className="border-primary mt-1.5 border-l-2 pl-3">
+                      <p className="text-sm whitespace-pre-wrap break-words">
+                        {linkifyText(comment.content)}
+                      </p>
 
-                    {/* Photos */}
-                    <CommentPhotos
-                      attachments={comment.attachments}
-                      onPhotoClick={(url, alt) => {
-                        setLightboxUrl(url);
-                        setLightboxAlt(alt);
-                      }}
-                    />
+                      {/* Photos */}
+                      <CommentPhotos
+                        attachments={comment.attachments}
+                        onPhotoClick={(url, alt) => {
+                          setLightboxUrl(url);
+                          setLightboxAlt(alt);
+                        }}
+                      />
+                    </div>
                   </div>
                 </div>
               );
@@ -450,7 +449,7 @@ export function CommentThread({
         ) : (
           <a
             href={signInUrl}
-            className="text-primary text-sm hover:underline"
+            className="text-primary text-sm hover:text-foreground transition-colors"
           >
             {t("comments.signInToComment")}
           </a>

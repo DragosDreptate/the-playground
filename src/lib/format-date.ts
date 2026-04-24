@@ -37,6 +37,15 @@ export function formatTime(date: Date): string {
   return `${hour}:${minute}`;
 }
 
+/** Heure formatée selon la locale de l'utilisateur ("22:00" en FR/EN-GB, "10:00 PM" en EN-US) */
+export function formatLocalizedTime(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
 /** "sam. 25 févr." / "Sat 25 Feb" */
 export function formatShortDate(date: Date, locale: string): string {
   return new Intl.DateTimeFormat(toIntlLocale(locale), {
@@ -100,15 +109,67 @@ export function formatLongDate(date: Date, locale: string): string {
   }).format(date);
 }
 
-/** "sam. 25 févr. · 22:00 – 23:00" */
+/** "mardi 21 avril" / "Tuesday 21 April" */
+export function formatLongDateWithWeekday(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(toIntlLocale(locale), {
+    timeZone: TIMEZONE,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(date);
+}
+
+/** "sam. 25 févr. · 22:00 – 23:00" (same-day) ou "sam. 25 févr. – dim. 26 févr. · 22:00 – 02:00" (multi-jour) */
 export function formatDateRange(
   startsAt: Date,
   endsAt: Date | null,
   locale: string,
 ): string {
-  const dateStr = formatShortDate(startsAt, locale);
+  const startDate = formatShortDate(startsAt, locale);
   const startTime = formatTime(startsAt);
-  if (!endsAt) return `${dateStr} · ${startTime}`;
+  if (!endsAt) return `${startDate} · ${startTime}`;
   const endTime = formatTime(endsAt);
-  return `${dateStr} · ${startTime} – ${endTime}`;
+  if (!isSameDayInParis(startsAt, endsAt)) {
+    const endDate = formatShortDate(endsAt, locale);
+    return `${startDate} – ${endDate} · ${startTime} – ${endTime}`;
+  }
+  return `${startDate} · ${startTime} – ${endTime}`;
+}
+
+/**
+ * Affichage meta "Quand" sur la page événement — toujours 2 lignes.
+ *
+ * - Pas de `endsAt`       → `{ line1: "mardi 22 avril", line2: "15:00", isMultiDay: false }`
+ * - Même jour (Paris)     → `{ line1: "mardi 22 avril", line2: "15:00 – 17:00", isMultiDay: false }`
+ * - Jours différents      → `{ line1: "dim. 25 janv. · 22:00", line2: "lun. 26 janv. · 02:00", isMultiDay: true }`
+ *
+ * Le flag `isMultiDay` permet au composant d'adapter la typo : hiérarchie bold/muted en
+ * single-day, 2 lignes équivalentes bold en multi-day.
+ */
+export function formatMomentDateTime(
+  startsAt: Date,
+  endsAt: Date | null,
+  locale: string,
+): { line1: string; line2: string; isMultiDay: boolean } {
+  const startTime = formatLocalizedTime(startsAt, locale);
+  if (!endsAt) {
+    return {
+      line1: formatLongDateWithWeekday(startsAt, locale),
+      line2: startTime,
+      isMultiDay: false,
+    };
+  }
+  const endTime = formatLocalizedTime(endsAt, locale);
+  if (!isSameDayInParis(startsAt, endsAt)) {
+    return {
+      line1: `${formatShortDate(startsAt, locale)} · ${startTime}`,
+      line2: `${formatShortDate(endsAt, locale)} · ${endTime}`,
+      isMultiDay: true,
+    };
+  }
+  return {
+    line1: formatLongDateWithWeekday(startsAt, locale),
+    line2: `${startTime} – ${endTime}`,
+    isMultiDay: false,
+  };
 }

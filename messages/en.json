@@ -296,7 +296,7 @@
       "visibilityPrivate": "Private — only accessible via invitation",
       "category": "Category",
       "categoryPlaceholder": "Choose a category",
-      "city": "City",
+      "city": "Location",
       "cityPlaceholder": "Paris, London, Remote...",
       "website": "Website",
       "websitePlaceholder": "https://my-site.com",
@@ -322,6 +322,7 @@
       "publicCircle": "Public community",
       "privateCircle": "Private community",
       "memberCount": "{count} members",
+      "andOthers": "and {count} others",
       "upcomingMoments": "Upcoming Events",
       "pastMoments": "Past Events",
       "noUpcomingMoments": "No upcoming Events.",
@@ -349,6 +350,23 @@
     },
     "memberActions": {
       "label": "Actions"
+    },
+    "membersExport": {
+      "action": "Export",
+      "error": "Failed to export members",
+      "csvHeaders": {
+        "circleName": "Community",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email",
+        "role": "Role",
+        "joinedAt": "Joined on"
+      },
+      "roleLabels": {
+        "host": "Host",
+        "coHost": "Co-organizer",
+        "player": "Member"
+      }
     },
     "promoteToCoHost": {
       "action": "Promote to co-organizer",
@@ -495,6 +513,7 @@
       "createMoment": "Save draft",
       "uploadingAttachments": "Uploading documents...",
       "pastDateReadOnly": "Date is read-only — this event is in the past.",
+      "draftNotice": "This event is a draft. Only Hosts can see it until you publish.",
       "requiresApproval": "Registration approval",
       "requiresApprovalDescription": "Requests must be approved manually from your dashboard.",
       "approvalDisabledByPrice": "Not available for paid events.",
@@ -570,12 +589,14 @@
       "refundPolicyNonRefundableShort": "Non-refundable",
       "registered": "Joined",
       "registeredBannerTitle": "You're attending this event",
-      "pendingApprovalBannerTitle": "Request sent",
-      "pendingApprovalBannerDescription": "The organizer will review your request manually.",
+      "pendingApproval": "Request pending approval",
       "waitlisted": "Waitlisted",
       "waitlistedBannerTitle": "You're on the waitlist",
       "joinWaitlist": "Join the waitlist",
       "cancelRegistration": "Cancel my registration",
+      "youAreRegistered": "You're registered",
+      "youAreWaitlisted": "You're on the waitlist",
+      "youAreWaitlistedWithPosition": "You're on the waitlist · #{position}",
       "cancelConfirmTitle": "Cancel registration",
       "cancelConfirmDescription": "Are you sure you want to cancel your registration for this Event?",
       "cancelRefundableInfo": "You will be refunded automatically within 5 to 10 business days.",
@@ -621,7 +642,8 @@
         "registered": "Joined",
         "waitlisted": "Waitlisted"
       },
-      "exportCsv": "Export CSV",
+      "exportCsv": "Export",
+      "actionsLabel": "Actions",
       "removeAction": "Remove",
       "removeTitle": "Remove {name}?",
       "removeDescription": "{name}'s registration for this event will be cancelled. If a waitlist exists, the first person on it will be automatically promoted.",
@@ -1476,10 +1498,10 @@
       "notFound": "Profile not found",
       "signInToView": "Sign in to view this profile",
       "roleHost": "Organizer",
-      "rolePlayer": "Member"
-    },
-    "socialLinks": {
-      "website": "Website"
+      "rolePlayer": "Member",
+      "socialLinks": {
+        "website": "Website"
+      }
     }
   },
   "Help": {
@@ -1501,6 +1523,7 @@
       "inscription": "Join an event",
       "rejoindre": "Join a community",
       "waitlist": "Waitlist",
+      "calendar": "Add to calendar",
       "cancel": "Cancel registration",
       "comments": "Comments",
       "mySpace": "My Dashboard",
@@ -1548,14 +1571,22 @@
       },
       "waitlist": {
         "title": "Waitlist",
-        "intro": "If an event shows as <strong>full</strong>, you can join the waitlist. If a spot opens up (after a cancellation), you are automatically registered and receive a confirmation email."
+        "intro": "If an event shows as <strong>full</strong>, you can join the waitlist. If a spot opens up (after a cancellation), you are automatically registered and receive a confirmation email.",
+        "positionNote": "Your position in the waitlist is shown directly on the event page (e.g. \"You are on the waitlist · #3\"), as an indicator displayed above the cancel button."
+      },
+      "calendar": {
+        "title": "Add to calendar",
+        "intro": "After registering, an \"Add to calendar\" button is available on the event page. Click it to choose your format:",
+        "item1": "Google Calendar: opens directly in your browser",
+        "item2": ".ics file: compatible with Apple Calendar, Outlook and most calendar apps"
       },
       "cancel": {
         "title": "Cancel your registration",
         "stepsLabel": "From <strong>Dashboard</strong>:",
         "step1": "Go to the event in question",
         "step2": "Click <strong>Cancel my registration</strong>",
-        "outro": "If you were on the waitlist, your spot is simply removed."
+        "outro": "If you were on the waitlist, your spot is simply removed.",
+        "statusNote": "While you are registered, a \"You are registered\" indicator appears on the event page, above the cancel button."
       },
       "paidEvents": {
         "title": "Paid events",
@@ -1597,7 +1628,8 @@
       },
       "leave": {
         "title": "Leave a community",
-        "intro": "From a community page in <strong>Dashboard</strong>, click <strong>Leave community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed."
+        "intro": "From a community page in <strong>Dashboard</strong>, click <strong>Leave community</strong>. Your registrations for upcoming events are not automatically cancelled — remember to cancel them separately if needed.",
+        "memberBadge": "While you are a member, a \"You are a member\" indicator is shown on the community page, above the Leave button."
       },
       "networks": {
         "title": "Networks",
@@ -1627,13 +1659,13 @@
         "field1Title": "Title",
         "field1Desc": "short and clear",
         "field2Title": "Date and time",
-        "field2Desc": "start and end",
+        "field2Desc": "start and end. If the event ends the next day or spans multiple days, both dates are shown on the event page",
         "field3Title": "Location",
         "field3Desc": "address (with autocomplete) or \"Online\" + connection link",
         "field4Title": "Description",
         "field4Desc": "context, agenda, what attendees need to know",
         "advancedLabel": "Advanced options (accessible via \"More options\"):",
-        "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist)",
+        "adv1": "<strong>Capacity</strong> — maximum number of attendees (automatically activates the waitlist). To switch back to unlimited capacity, click the × next to the field.",
         "adv2": "<strong>Price</strong> — if the event is paid, payment is handled via Stripe (attendees pay directly, The Playground takes no commission)",
         "adv3": "<strong>Cover image</strong>",
         "callout": "The event is created as a <strong>draft</strong>: it is not yet visible in Explore or open for registration. When it's ready, click <strong>Publish</strong> to make it public and notify community members. On desktop, you can also click <strong>Publish</strong> directly in the creation form to create and publish in a single step."
@@ -1648,11 +1680,11 @@
       },
       "manageRegistrations": {
         "title": "Manage registrations",
-        "intro": "From the event dashboard, you can access:",
-        "item1": "The <strong>registrant list</strong> (with names, emails, and status)",
-        "item2": "The <strong>waitlist</strong> (attendees waiting for a spot)",
-        "item3": "The <strong>remaining spots counter</strong> and real-time registrant count",
-        "item4": "<strong>CSV export</strong> of the full list"
+        "intro": "From the event dashboard, click the \"Members\" block to open the full list. You can access:",
+        "item1": "The <strong>registrant list</strong> with names, emails and status. The waitlist is displayed separately",
+        "item2": "<strong>Member profiles</strong>: click a name to view their public profile (links to their social accounts: website, LinkedIn, X, GitHub if they've added them)",
+        "item3": "<strong>Remove a member</strong> from the list (contextual menu next to their name)",
+        "item4": "<strong>CSV export</strong> of the full list (registered + waitlist)"
       },
       "approvalRegistrations": {
         "title": "Approve registrations",
@@ -1677,7 +1709,8 @@
         "intro": "From the event dashboard:",
         "item1": "<strong>Edit</strong> — update information at any time. Registered attendees are notified by email if the date or location changes. For a past event, the date can no longer be changed; other details (title, description, location) remain editable.",
         "item2": "<strong>Cancel</strong> — cancel the event. All attendees receive a cancellation email.",
-        "callout": "A cancelled event cannot be reactivated. If you simply want to reschedule, edit the date rather than cancelling."
+        "callout": "A cancelled event cannot be reactivated. If you simply want to reschedule, edit the date rather than cancelling.",
+        "statusBadge": "The event status is always visible in the breadcrumb of your dashboard: \"Draft\" (amber), \"Published\" (green), \"Cancelled\" (red) or \"Past\" (grey)."
       },
       "radar": {
         "title": "The Radar — avoid scheduling conflicts",

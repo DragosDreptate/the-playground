@@ -21,8 +21,13 @@ import { approveCircleMembership } from "@/domain/usecases/approve-circle-member
 import { rejectCircleMembership } from "@/domain/usecases/reject-circle-membership";
 import { promoteToCoHost } from "@/domain/usecases/promote-to-co-host";
 import { demoteFromCoHost } from "@/domain/usecases/demote-from-co-host";
+import {
+  getCircleMembersPage,
+  type GetCircleMembersPageResult,
+} from "@/domain/usecases/get-circle-members-page";
+import { exportCircleMembers } from "@/domain/usecases/export-circle-members";
 import { prismaRegistrationRepository, prismaUserRepository } from "@/infrastructure/repositories";
-import type { CircleVisibility, CircleCategory, CircleMembership } from "@/domain/models/circle";
+import type { CircleVisibility, CircleCategory, CircleMembership, CircleMemberWithUser } from "@/domain/models/circle";
 import type { Circle } from "@/domain/models/circle";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { ActionResult } from "./types";
@@ -653,5 +658,41 @@ export async function demoteFromCoHostAction(
     invalidateDashboardCache(hostUserId);
     invalidateDashboardCache(targetUserId);
   });
+}
+
+/**
+ * Liste paginée des membres d'un Circle (pour modale avec infinite scroll).
+ * Renvoie un résultat vide en cas d'erreur (non-auth, non-membre d'un Circle privé, etc.).
+ */
+export async function getCircleMembersPageAction(
+  circleId: string,
+  offset: number,
+  limit: number,
+): Promise<GetCircleMembersPageResult> {
+  const session = await auth();
+  try {
+    return await getCircleMembersPage(
+      { circleId, offset, limit, callerUserId: session?.user?.id ?? null },
+      { circleRepository: prismaCircleRepository },
+    );
+  } catch {
+    return { members: [], total: 0, hasMore: false };
+  }
+}
+
+/**
+ * Export complet des membres ACTIFS d'un Circle pour génération CSV côté client.
+ * Réservé aux HOST et CO_HOST du Circle (vérifié dans le usecase).
+ */
+export async function exportCircleMembersAction(
+  circleId: string,
+): Promise<ActionResult<CircleMemberWithUser[]>> {
+  const session = await auth();
+  return toActionResult(() =>
+    exportCircleMembers(
+      { circleId, callerUserId: session?.user?.id ?? null },
+      { circleRepository: prismaCircleRepository },
+    ),
+  );
 }
 

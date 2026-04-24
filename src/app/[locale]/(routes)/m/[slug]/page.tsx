@@ -23,6 +23,7 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -115,7 +116,9 @@ export default async function PublicMomentPage({
 
   // Une seule vague de queries en parallèle : aucune query ne dépend des résultats
   // des autres (toutes consomment moment.id / moment.circleId / session.user.id).
-  // registeredCount est dérivé de allAttendees en JS (évite un round-trip supplémentaire).
+  // registeredCount et participantsFirstPage sont dérivés de allAttendees en JS
+  // (évite un round-trip supplémentaire — findActiveWithUserByMomentId retourne déjà
+  // REGISTERED + WAITLISTED avec les champs sociaux).
   const [circle, hosts, existingRegistration, allAttendees, comments, upcomingCircleMoments, attachments] =
     await measureTime("moment-page:data", () =>
       Promise.all([
@@ -137,11 +140,19 @@ export default async function PublicMomentPage({
       ])
     );
 
+  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session?.user?.id ?? null);
+  const participantsFirstPage = {
+    participants: sortedForDisplay.slice(0, 20),
+    total: registeredParticipants.length,
+    hasMore: registeredParticipants.length > 20,
+  };
+
   if (!circle) notFound();
 
   const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
-  const registeredCount = allAttendees.filter((r) => r.status === "REGISTERED").length;
+  const registeredCount = registeredParticipants.length;
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =
@@ -153,8 +164,6 @@ export default async function PublicMomentPage({
 
   const isFull =
     moment.capacity !== null && registeredCount >= moment.capacity;
-  const spotsRemaining =
-    moment.capacity !== null ? moment.capacity - registeredCount : null;
   const signInUrl = `/${locale}/auth/sign-in?callbackUrl=/${locale}/m/${slug}`;
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
@@ -278,11 +287,11 @@ export default async function PublicMomentPage({
         existingRegistration={existingRegistration}
         signInUrl={signInUrl}
         isFull={isFull}
-        spotsRemaining={spotsRemaining}
         calendarData={calendarData}
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
         upcomingCircleMoments={upcomingCircleMoments}
+        participantsFirstPage={participantsFirstPage}
       />
     </main>
   );

@@ -80,7 +80,7 @@ export default async function ProfilePage({
         {user.publicId && (
           <Link
             href={`/u/${user.publicId}`}
-            className="text-xs text-primary underline-offset-4 hover:underline"
+            className="text-xs text-primary hover:text-foreground transition-colors"
           >
             ↗ {t("publicProfile.viewMyProfile")}
           </Link>

@@ -5,7 +5,7 @@ import Google from "next-auth/providers/google";
 import ResendProvider from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/infrastructure/db/prisma";
-import { Resend } from "resend";
+import { createSafeResend } from "@/lib/email/safe-resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
@@ -23,7 +23,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
       async sendVerificationRequest({ identifier, url }) {
-        const resend = new Resend(process.env.AUTH_RESEND_KEY);
+        const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 

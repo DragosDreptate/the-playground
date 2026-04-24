@@ -14,6 +14,7 @@ import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
+import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 export default async function MomentDetailPage({
   params,
@@ -65,9 +66,15 @@ export default async function MomentDetailPage({
     isOrganizer ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),
     prismaMomentAttachmentRepository.findByMoment(moment.id),
   ]);
-  const registeredCount = allAttendees.filter(
-    (r) => r.status === "REGISTERED"
-  ).length;
+
+  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session.user.id);
+  const participantsFirstPage = {
+    participants: sortedForDisplay.slice(0, 20),
+    total: registeredParticipants.length,
+    hasMore: registeredParticipants.length > 20,
+  };
+  const registeredCount = registeredParticipants.length;
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
   ).length;
@@ -105,9 +112,6 @@ export default async function MomentDetailPage({
         existingRegistration={existingRegistration}
         signInUrl=""
         isFull={moment.capacity !== null && registeredCount >= moment.capacity}
-        spotsRemaining={
-          moment.capacity !== null ? moment.capacity - registeredCount : null
-        }
         calendarData={{
           title: moment.title,
           startsAt: moment.startsAt,
@@ -122,6 +126,7 @@ export default async function MomentDetailPage({
         appUrl={appUrl}
         waitlistPosition={waitlistPosition}
         upcomingCircleMoments={upcomingCircleMoments}
+        participantsFirstPage={participantsFirstPage}
       />
     );
   }
@@ -163,6 +168,7 @@ export default async function MomentDetailPage({
       appUrl={appUrl}
       pendingRegistrations={pendingRegistrations}
       paymentSummary={paymentSummary}
+      participantsFirstPage={participantsFirstPage}
     />
   );
 }

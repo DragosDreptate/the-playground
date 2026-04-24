@@ -54,40 +54,38 @@ export function MomentAttachmentsList({
 
   return (
     <>
-      <section className="flex flex-col gap-3">
-        <h2 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+      <div className="border-border bg-card rounded-2xl border p-6">
+        <h2 className="text-muted-foreground mb-4 text-xs font-semibold uppercase tracking-wider">
           {t("sectionTitle")}
         </h2>
-
-        <ul role="list" className="flex flex-col gap-2">
+        <div className="divide-border divide-y">
           {attachments.map((attachment) => {
             const Icon = isImageAttachment(attachment.contentType) ? ImageIcon : FileText;
             return (
-              <li key={attachment.id} role="listitem">
-                <button
-                  type="button"
-                  onClick={() => handleCardClick(attachment)}
-                  className="border-border bg-card hover:bg-muted hover:border-primary/20 flex min-h-14 w-full items-center gap-3.5 rounded-lg border px-4 py-3 text-left transition-colors"
-                >
-                  <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
-                    <Icon className="size-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-foreground truncate text-sm font-medium">
-                      {formatAttachmentName(attachment.filename)}
-                    </p>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
-                      {formatAttachmentType(attachment.contentType)} ·{" "}
-                      {formatAttachmentSize(attachment.sizeBytes)}
-                    </p>
-                  </div>
-                  <ChevronRight className="text-muted-foreground size-4 shrink-0" />
-                </button>
-              </li>
+              <button
+                key={attachment.id}
+                type="button"
+                onClick={() => handleCardClick(attachment)}
+                className="hover:bg-muted/50 -mx-2 flex w-[calc(100%+1rem)] cursor-pointer items-center gap-3 rounded-xl px-2 py-3 text-left transition-colors"
+              >
+                <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-lg">
+                  <Icon className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-foreground truncate text-sm font-semibold">
+                    {formatAttachmentName(attachment.filename)}
+                  </p>
+                  <p className="text-muted-foreground mt-0.5 text-xs">
+                    {formatAttachmentType(attachment.contentType)} ·{" "}
+                    {formatAttachmentSize(attachment.sizeBytes)}
+                  </p>
+                </div>
+                <ChevronRight className="text-muted-foreground size-4 shrink-0" />
+              </button>
             );
           })}
-        </ul>
-      </section>
+        </div>
+      </div>
 
       <AttachmentViewerDialog
         attachment={openAttachment}
