@@ -46,6 +46,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
+import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
 
 export const revalidate = 60;
 
@@ -171,7 +172,6 @@ export default async function PublicCirclePage({
     ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
   ];
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
-  const MEMBER_AVATARS_MAX = 5;
   const allMembersForMeta = [...hosts, ...players].sort(
     (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
   );
@@ -420,7 +420,7 @@ export default async function PublicCirclePage({
 
           {/* Catégorie (pill) */}
           {categoryLabel && (
-            <Badge variant="outline" className="w-fit gap-1.5 px-3 py-1 text-sm">
+            <Badge variant="secondary" className="w-fit gap-1.5 border-border px-3 py-1 text-sm">
               <Tag className="size-4" />
               {categoryLabel}
             </Badge>

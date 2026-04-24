@@ -45,6 +45,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
+import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -117,7 +118,6 @@ export default async function CircleDetailPage({
     ...hosts.filter((h) => h.role === "CO_HOST").sort(sortOrganizersByName),
   ];
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
-  const MEMBER_AVATARS_MAX = 5;
   const allMembersForMeta = [...hosts, ...players].sort(
     (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
   );
