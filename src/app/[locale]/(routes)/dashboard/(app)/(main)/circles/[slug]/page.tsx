@@ -130,7 +130,6 @@ export default async function CircleDetailPage({
   const membersMetaText = memberOthersText
     ? `${memberNamesToShow.join(", ")} ${memberOthersText}`
     : memberNamesToShow.join(", ");
-  // Mobile : avatars + juste "et X autres" (ou les noms si pas d'autres)
   const membersMetaMobileText = memberOthersText || memberNamesToShow.join(", ");
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");

@@ -184,7 +184,6 @@ export default async function PublicCirclePage({
   const membersMetaText = memberOthersText
     ? `${memberNamesToShow.join(", ")} ${memberOthersText}`
     : memberNamesToShow.join(", ");
-  // Mobile : avatars + juste "et X autres" (ou les noms si pas d'autres)
   const membersMetaMobileText = memberOthersText || memberNamesToShow.join(", ");
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
