@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { stripProtocol } from "@/lib/url";
+import { formatLongDate } from "@/lib/format-date";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -55,8 +56,9 @@ export default async function CircleDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const [{ slug }, t, tCommon, tDashboard, tCategory, tMoment, tNetwork, session] = await Promise.all([
+  const [{ slug }, locale, t, tCommon, tDashboard, tCategory, tMoment, tNetwork, session] = await Promise.all([
     params,
+    getLocale(),
     getTranslations("Circle"),
     getTranslations("Common"),
     getTranslations("Dashboard"),
@@ -310,7 +312,7 @@ export default async function CircleDetailPage({
 
           {/* Catégorie (pill) */}
           {categoryLabel && (
-            <Badge variant="outline" className="w-fit gap-1.5 px-3 py-1 text-sm">
+            <Badge variant="secondary" className="w-fit gap-1.5 border-border px-3 py-1 text-sm">
               <Tag className="size-4" />
               {categoryLabel}
             </Badge>
@@ -471,11 +473,7 @@ export default async function CircleDetailPage({
                   {t("detail.created")}
                 </p>
                 <p className="text-sm font-medium">
-                  {circle.createdAt.toLocaleDateString(undefined, {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
+                  {formatLongDate(circle.createdAt, locale)}
                 </p>
               </div>
             </div>
