@@ -109,7 +109,7 @@ export function CircleMembersDialog({
             m.role === "HOST" ? "host" : m.role === "CO_HOST" ? "coHost" : "player"
           }`,
         ),
-        new Date(m.joinedAt).toLocaleDateString(),
+        new Date(m.joinedAt).toISOString().slice(0, 10),
       ]);
       const csv = [metaRow, headers, ...rows]
         .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))

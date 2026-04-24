@@ -85,7 +85,7 @@ export function MomentRegistrationsDialog({
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   function handleExportCsv() {
-    const eventDate = momentStartsAt.toLocaleDateString();
+    const eventDate = momentStartsAt.toISOString().slice(0, 10);
     const headers = [
       t("registrations.csvHeaders.eventName"),
       t("registrations.csvHeaders.eventDate"),
@@ -103,7 +103,7 @@ export function MomentRegistrationsDialog({
       r.user.lastName ?? "",
       r.user.email,
       t(`registrations.status.${r.status.toLowerCase() as "registered" | "waitlisted" | "pending_approval" | "rejected"}`),
-      new Date(r.registeredAt).toLocaleDateString(),
+      new Date(r.registeredAt).toISOString().slice(0, 10),
     ]);
     const csv = [metaRow, headers, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))
