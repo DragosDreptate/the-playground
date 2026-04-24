@@ -270,6 +270,19 @@ Sur la branche `feat/ui-refonte-circle-moment` (du plus ancien au plus récent) 
 
 **Limite connue** : aujourd'hui le chargement des `PLAYER` passe par `findMembersByRole` qui retourne tous les membres. Sur un gros Circle, c'est coûteux pour afficher 5 avatars. Ce sujet est traité dans le finding R1 (consolidation des 3 requêtes membres en une) — à reprendre dans un ticket dédié post-merge.
 
+### Findings RISKY du /simplify bloc Circle — à traiter post-merge
+
+Ces findings ont été identifiés lors du /simplify 2026-04-24. Gain réel mais risque de régression trop élevé pour être traités dans la branche de refonte. Chacun mérite un ticket dédié avec analyse d'impact et tests ciblés.
+
+**R1 — Consolider les 3 requêtes membres en une**
+Les pages Circle (publique + dashboard) chargent en parallèle `findOrganizers()`, `findMembersByRole(PLAYER)` et `findMembersPaginated(0, 20)` — 3 hits DB alors qu'une seule pourrait suffire pour l'affichage. Gain : 50-100 ms par SSR Circle. Risque : nécessite harmoniser les champs retournés (voir S5 pour les champs sociaux manquants dans `findMembersByRole`/`findOrganizers`), revoir la construction de `circleOrganizers` et `visibleMemberAvatars` côté pages. Changement cross-fichier non trivial.
+
+**R2 — Retirer `router.refresh()` après promote/demote**
+Dans `circle-members-dialog.tsx`, les handlers `handlePromote` et `handleDemote` appellent `router.refresh()` après avoir déjà fait un update optimiste via `onRoleChanged`. Conséquence : toute la page Circle (5 queries Promise.all + tous les moments) est rechargée pour une mutation locale à la modale. Gain : 200-500 ms par mutation. Risque : si une autre zone de la page dépend de l'état des rôles (ex: badge "Vous êtes organisateur"), elle ne serait plus actualisée sans `refresh`. Remplacement propre : `revalidateTag("circle:members")` côté usecase.
+
+**R3 — Query conditionnelle via ternaire Promise.resolve**
+`findMembersPaginated` est appelée dans un `Promise.all` avec `canSeeMembers ? findMembersPaginated(...) : Promise.resolve({ members: [], total: 0, hasMore: false })`. Structurel, gain marginal (~1-5 ms). Noté pour cohérence mais faible priorité.
+
 ---
 
 ## État au 2026-04-22 — Phase 1 événement terminée
