@@ -283,6 +283,31 @@ Dans `circle-members-dialog.tsx`, les handlers `handlePromote` et `handleDemote`
 **R3 — Query conditionnelle via ternaire Promise.resolve**
 `findMembersPaginated` est appelée dans un `Promise.all` avec `canSeeMembers ? findMembersPaginated(...) : Promise.resolve({ members: [], total: 0, hasMore: false })`. Structurel, gain marginal (~1-5 ms). Noté pour cohérence mais faible priorité.
 
+### Findings non-traités du /simplify bloc Moment — à considérer post-merge
+
+Ces findings ont été identifiés lors du /simplify 2026-04-24 sur le bloc Moment. Évalués non prioritaires ou trop risqués pour cette branche de refonte.
+
+**MM4 — Subdiviser `MomentDetailView` en `HostMomentView` + `PublicMomentView`**
+Le composant fait 842 lignes et utilise une discriminated union avec plusieurs casts `as HostViewProps` / `as PublicViewProps`. Split en 2 composants permettrait un narrow propre et faciliterait l'évolution host-only ou public-only. Risque : refactor structurel sur la page la plus critique du produit (hot path viral), 2-3h minimum avec tests visuels méticuleux. Mérite sa propre PR dédiée.
+
+**MM6 — Plafond sur l'infinite scroll participants**
+`MomentRegistrationsDialog` peut théoriquement déclencher 500+ requêtes serveur sur un événement avec 10k inscrits. Pas de plafond côté client. Préventif pour un cas pathologique qui n'arrive pas aujourd'hui (aucun événement > 500 inscrits en prod). À implémenter quand un événement blockbuster se profile. Même remarque pour `CircleMembersDialog` côté Circle — cross-view alert pour traiter les deux en cohérence.
+
+**MR1 — Optimisation COUNT query dans `findParticipantsPaginated`**
+Le repository fait `findMany` + `count` en parallèle à chaque pagination, alors que le total est déjà connu depuis la première page. Gain marginal (<5 ms par scroll) et changement de signature du repository qui affecte usecase + mocks + tests. À traiter dans un ticket de perf dédié avec benchmark réel.
+
+### Findings non-traités mais "skip définitif" (pas post-merge)
+
+Ces findings ont été évalués, on considère le comportement actuel comme bon (pas de ticket à prévoir) :
+
+- **MS1** (réutiliser `CircleOrganizersList` sur Moment) : skip car la sémantique diffère (organisateurs du Circle vs créateur du Moment). Réutiliser masquerait la divergence métier.
+- **MS2** (DialogTrigger wrapping `<div role="button">`) : skip identique à S3 Circle — le `<div>` neutre est un tradeoff conscient.
+- **MS4** (revalidatePath dans publishAfterUpdate) : skip car comportement actuel fonctionnellement correct.
+- **MM3** (helpers moment-status / registration-status) : skip, cas rare (nouveau statut), gain de type safety marginal vs coût de réorganisation.
+- **MM5** (exhaustiveness check cascade moment.status) : skip, risque d'oubli réel faible (nouveau statut = chantier produit majeur), pattern actuel défendable.
+- **MM7** (revalidate incohérent publique / dashboard) : skip — incohérence apparente = différenciation intentionnelle (publique = hot path cacheable, dashboard = fraîcheur requise).
+- **MM8** (cache pagination reset) : skip — reset à la fermeture est un choix défensif contre les données stale après mutations.
+
 ---
 
 ## État au 2026-04-22 — Phase 1 événement terminée
