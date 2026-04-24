@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; fi; if git diff --name-only HEAD~1 -- 'src/content/**' | grep -q .; then exit 1; fi; git diff --quiet HEAD~1 -- ':!CHANGELOG.md' ':!spec/**' ':!*.md' ':!.github/**'",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"staging\" ]; then exit 1; fi; if [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]; then exit 0; fi; if git diff --name-only HEAD~1 -- 'src/content/**' | grep -q .; then exit 1; fi; git diff --quiet HEAD~1 -- ':!CHANGELOG.md' ':!spec/**' ':!*.md' ':!.github/**'",
   "crons": [
     {
       "path": "/api/cron/recalculate-scores",
