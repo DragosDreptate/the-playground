@@ -537,39 +537,98 @@ export const prismaRegistrationRepository: RegistrationRepository = {
 
   async findParticipantsPaginated(
     momentId: string,
-    { offset, limit }: { offset: number; limit: number }
+    {
+      offset,
+      limit,
+      priorityUserId,
+    }: { offset: number; limit: number; priorityUserId?: string | null }
   ) {
-    const [records, total] = await Promise.all([
-      prisma.registration.findMany({
-        where: { momentId, status: "REGISTERED" },
-        include: {
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-              image: true,
-              publicId: true,
-              website: true,
-              linkedinUrl: true,
-              twitterUrl: true,
-              githubUrl: true,
-            },
-          },
-        },
-        orderBy: { registeredAt: "asc" },
-        skip: offset,
-        take: limit,
-      }),
-      prisma.registration.count({
-        where: { momentId, status: "REGISTERED" },
-      }),
-    ]);
+    const total = await prisma.registration.count({
+      where: { momentId, status: "REGISTERED" },
+    });
+
+    type Row = {
+      id: string;
+      momentId: string;
+      userId: string;
+      status: RegistrationStatus;
+      paymentStatus: PaymentStatus;
+      stripePaymentIntentId: string | null;
+      stripeReceiptUrl: string | null;
+      registeredAt: Date;
+      cancelledAt: Date | null;
+      checkedInAt: Date | null;
+      firstName: string | null;
+      lastName: string | null;
+      email: string;
+      image: string | null;
+      publicId: string | null;
+      website: string | null;
+      linkedinUrl: string | null;
+      twitterUrl: string | null;
+      githubUrl: string | null;
+    };
+
+    // Tri : user courant d'abord (si fourni), puis registeredAt ASC.
+    const rows = await prisma.$queryRaw<Row[]>`
+      SELECT
+        r.id,
+        r."momentId",
+        r."userId",
+        r.status,
+        r."paymentStatus",
+        r."stripePaymentIntentId",
+        r."stripeReceiptUrl",
+        r."registeredAt",
+        r."cancelledAt",
+        r."checkedInAt",
+        u."firstName",
+        u."lastName",
+        u.email,
+        u.image,
+        u.public_id AS "publicId",
+        u.website,
+        u.linkedin_url AS "linkedinUrl",
+        u.twitter_url AS "twitterUrl",
+        u.github_url AS "githubUrl"
+      FROM registrations r
+      INNER JOIN users u ON u.id = r."userId"
+      WHERE r."momentId" = ${momentId} AND r.status = 'REGISTERED'
+      ORDER BY
+        CASE WHEN r."userId" = ${priorityUserId ?? ""} THEN 0 ELSE 1 END,
+        r."registeredAt" ASC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    const participants: RegistrationWithUser[] = rows.map((r) => ({
+      id: r.id,
+      momentId: r.momentId,
+      userId: r.userId,
+      status: r.status,
+      paymentStatus: r.paymentStatus,
+      stripePaymentIntentId: r.stripePaymentIntentId,
+      stripeReceiptUrl: r.stripeReceiptUrl,
+      registeredAt: r.registeredAt,
+      cancelledAt: r.cancelledAt,
+      checkedInAt: r.checkedInAt,
+      user: {
+        id: r.userId,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        email: r.email,
+        image: r.image,
+        publicId: r.publicId,
+        website: r.website,
+        linkedinUrl: r.linkedinUrl,
+        twitterUrl: r.twitterUrl,
+        githubUrl: r.githubUrl,
+      },
+    }));
+
     return {
-      participants: records.map(toDomainRegistrationWithUser),
+      participants,
       total,
-      hasMore: offset + records.length < total,
+      hasMore: offset + participants.length < total,
     };
   },
 };

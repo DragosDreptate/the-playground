@@ -57,5 +57,6 @@ export async function getMomentParticipantsPage(
   return deps.registrationRepository.findParticipantsPaginated(momentId, {
     offset,
     limit,
+    priorityUserId: callerUserId,
   });
 }
