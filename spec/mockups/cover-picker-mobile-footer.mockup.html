@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cover picker — footer mobile (Options A & B)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --background: oklch(0.1649 0.0352 281.8285);
+      --card: oklch(0.2542 0.0611 281.1423);
+      --primary: oklch(0.6726 0.2904 341.4084);
+      --primary-foreground: oklch(1 0 0);
+      --foreground: oklch(0.9513 0.0074 260.7315);
+      --muted-foreground: oklch(0.6245 0.05 278.1046);
+      --border: oklch(0.3279 0.0832 280.789);
+      --input: oklch(0.3279 0.0832 280.789);
+      --muted: oklch(0.2123 0.0522 280.9917);
+    }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0a14;
+      color: var(--foreground);
+    }
+    .bg-background { background: var(--background); }
+    .bg-card { background: var(--card); }
+    .bg-primary { background: var(--primary); }
+    .bg-muted { background: var(--muted); }
+    .text-primary-foreground { color: var(--primary-foreground); }
+    .text-foreground { color: var(--foreground); }
+    .text-muted-foreground { color: var(--muted-foreground); }
+    .border-input { border-color: var(--input); }
+    .border-border { border-color: var(--border); }
+    .border-primary { border-color: var(--primary); }
+    .ring-primary { --tw-ring-color: var(--primary); }
+
+    /* iPhone shell */
+    .phone {
+      width: 375px;
+      height: 812px;
+      border-radius: 44px;
+      border: 10px solid #1a1a24;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,255,255,0.04);
+      overflow: hidden;
+      position: relative;
+      background: var(--background);
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130px;
+      height: 28px;
+      background: #1a1a24;
+      border-radius: 0 0 18px 18px;
+      z-index: 30;
+    }
+    .status-bar {
+      height: 44px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--foreground);
+      position: relative;
+      z-index: 5;
+    }
+    .status-icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .label {
+      position: absolute;
+      top: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+    }
+    .label-tag {
+      display: inline-block;
+      margin-left: 10px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      background: var(--primary);
+      color: white;
+      vertical-align: middle;
+    }
+
+    /* Form controls fidèles */
+    .tab {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .tab-active {
+      background: var(--card);
+      border: 2px solid var(--primary);
+      color: var(--foreground);
+    }
+    .tab-inactive {
+      color: var(--muted-foreground);
+    }
+
+    .input-search {
+      width: 100%;
+      padding: 10px 12px 10px 38px;
+      background: transparent;
+      border: 1px solid var(--input);
+      border-radius: 8px;
+      color: var(--foreground);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--primary-foreground);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--input);
+      color: var(--foreground);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted-foreground);
+    }
+    .btn-ghost:hover { color: var(--foreground); }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      padding-top: 44px; /* status bar */
+    }
+    .modal-header {
+      position: relative;
+      padding: 16px 16px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+    .modal-close {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted-foreground);
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .modal-body {
+      flex: 1;
+      padding: 0 16px;
+      overflow-y: auto;
+    }
+    .empty-state {
+      padding: 48px 16px;
+      text-align: center;
+      color: var(--muted-foreground);
+      font-size: 14px;
+    }
+    .modal-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* Layout fix-A : stack vertical mobile */
+    .footer-A {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 8px;
+    }
+    .footer-A .actions-row {
+      display: flex;
+      gap: 8px;
+    }
+    .footer-A .actions-row > .btn {
+      flex: 1;
+    }
+    .footer-A .remove-btn {
+      align-self: flex-start;
+    }
+
+    /* Layout fix-B : actions en haut, supprimer en bas (lien) */
+    .footer-B {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .footer-B .actions-row {
+      display: flex;
+      gap: 8px;
+    }
+    .footer-B .actions-row > .btn {
+      flex: 1;
+    }
+    .footer-B .remove-link {
+      align-self: center;
+      padding-top: 12px;
+      font-size: 13px;
+      color: var(--muted-foreground);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+    }
+    .footer-B .remove-link:hover { color: var(--foreground); }
+
+    /* Bug actuel */
+    .footer-bug {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: calc(100% + 80px); /* simule le débordement */
+    }
+    .footer-bug-wrapper {
+      overflow: visible;
+      position: relative;
+    }
+    .overflow-warning {
+      position: absolute;
+      top: -22px;
+      right: 0;
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #ef4444;
+      font-weight: 700;
+    }
+
+    .stage {
+      display: flex;
+      gap: 80px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 80px 40px 60px;
+      align-items: flex-start;
+    }
+    .stage-row { padding-top: 60px; }
+    .legend {
+      max-width: 760px;
+      margin: 0 auto 24px;
+      padding: 24px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.85);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .legend h2 {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: white;
+    }
+    .legend strong { color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="legend">
+    <h2>Mockup — fix débordement modale Cover (mobile 375px)</h2>
+    <p>
+      Trois rendus côte à côte : <strong>l'état actuel</strong> (bug : footer en flex-row qui déborde),
+      <strong>Option A</strong> (stack vertical, supprimer en haut), <strong>Option B</strong>
+      (stack vertical, actions en haut, supprimer en lien discret en bas).
+    </p>
+  </div>
+
+  <div class="stage stage-row">
+
+    <!-- ─── ÉTAT ACTUEL — BUG ─── -->
+    <div style="position: relative;">
+      <div class="label">État actuel <span class="label-tag" style="background:#ef4444">BUG</span></div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="modal">
+          <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+              <svg width="18" height="11" viewBox="0 0 18 11" fill="currentColor"><path d="M1 8h2v2H1zM5 6h2v4H5zM9 4h2v6H9zM13 2h2v8h-2z"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2C5.5 2 3.2 2.9 1.5 4.5L0 3C2.1 1.1 5 0 8 0s5.9 1.1 8 3l-1.5 1.5C12.8 2.9 10.5 2 8 2zm0 4C6.6 6 5.3 6.5 4.3 7.5L2.8 6c1.4-1.4 3.2-2 5.2-2s3.8.6 5.2 2l-1.5 1.5C10.7 6.5 9.4 6 8 6zm0 4l3-3c-.8-.8-1.9-1-3-1s-2.2.2-3 1l3 3z"/></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="currentColor"><rect x="1" y="1" width="22" height="10" rx="2.5" stroke="currentColor" fill="none" stroke-width="1"/><rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor"/><rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-header">
+            <div class="modal-title">Image de couverture</div>
+            <div class="modal-close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-body">
+            <div style="display: flex; gap: 4px; padding: 4px; background: var(--muted); border-radius: 8px; margin-bottom: 16px;">
+              <div class="tab tab-active">Photos</div>
+              <div class="tab tab-inactive">Importer</div>
+            </div>
+            <div style="position: relative;">
+              <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="input-search" value="Communauté WOLD" />
+            </div>
+            <div class="empty-state">Aucun résultat pour « Communauté WOLD »</div>
+          </div>
+
+          <div class="modal-footer footer-bug-wrapper">
+            <div class="overflow-warning">déborde →</div>
+            <div class="footer-bug">
+              <button class="btn btn-ghost" style="font-size:13px; flex-shrink:0;">Supprimer la couverture</button>
+              <button class="btn btn-outline" style="flex-shrink:0;">Annuler</button>
+              <button class="btn btn-primary" style="flex-shrink:0;">Appliquer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── OPTION A ─── -->
+    <div style="position: relative;">
+      <div class="label">Option A <span class="label-tag">recommandée</span></div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="modal">
+          <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+              <svg width="18" height="11" viewBox="0 0 18 11" fill="currentColor"><path d="M1 8h2v2H1zM5 6h2v4H5zM9 4h2v6H9zM13 2h2v8h-2z"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2C5.5 2 3.2 2.9 1.5 4.5L0 3C2.1 1.1 5 0 8 0s5.9 1.1 8 3l-1.5 1.5C12.8 2.9 10.5 2 8 2zm0 4C6.6 6 5.3 6.5 4.3 7.5L2.8 6c1.4-1.4 3.2-2 5.2-2s3.8.6 5.2 2l-1.5 1.5C10.7 6.5 9.4 6 8 6zm0 4l3-3c-.8-.8-1.9-1-3-1s-2.2.2-3 1l3 3z"/></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="currentColor"><rect x="1" y="1" width="22" height="10" rx="2.5" stroke="currentColor" fill="none" stroke-width="1"/><rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor"/><rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-header">
+            <div class="modal-title">Image de couverture</div>
+            <div class="modal-close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-body">
+            <div style="display: flex; gap: 4px; padding: 4px; background: var(--muted); border-radius: 8px; margin-bottom: 16px;">
+              <div class="tab tab-active">Photos</div>
+              <div class="tab tab-inactive">Importer</div>
+            </div>
+            <div style="position: relative;">
+              <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="input-search" value="Communauté WOLD" />
+            </div>
+            <div class="empty-state">Aucun résultat pour « Communauté WOLD »</div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="footer-A">
+              <div class="actions-row">
+                <button class="btn btn-outline">Annuler</button>
+                <button class="btn btn-primary">Appliquer</button>
+              </div>
+              <button class="btn btn-ghost remove-btn" style="font-size:13px; padding-left:0;">Supprimer la couverture</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── OPTION B ─── -->
+    <div style="position: relative;">
+      <div class="label">Option B</div>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="modal">
+          <div class="status-bar">
+            <span>09:41</span>
+            <div class="status-icons">
+              <svg width="18" height="11" viewBox="0 0 18 11" fill="currentColor"><path d="M1 8h2v2H1zM5 6h2v4H5zM9 4h2v6H9zM13 2h2v8h-2z"/></svg>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2C5.5 2 3.2 2.9 1.5 4.5L0 3C2.1 1.1 5 0 8 0s5.9 1.1 8 3l-1.5 1.5C12.8 2.9 10.5 2 8 2zm0 4C6.6 6 5.3 6.5 4.3 7.5L2.8 6c1.4-1.4 3.2-2 5.2-2s3.8.6 5.2 2l-1.5 1.5C10.7 6.5 9.4 6 8 6zm0 4l3-3c-.8-.8-1.9-1-3-1s-2.2.2-3 1l3 3z"/></svg>
+              <svg width="26" height="12" viewBox="0 0 26 12" fill="currentColor"><rect x="1" y="1" width="22" height="10" rx="2.5" stroke="currentColor" fill="none" stroke-width="1"/><rect x="3" y="3" width="18" height="6" rx="1" fill="currentColor"/><rect x="24" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-header">
+            <div class="modal-title">Image de couverture</div>
+            <div class="modal-close">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </div>
+          </div>
+
+          <div class="modal-body">
+            <div style="display: flex; gap: 4px; padding: 4px; background: var(--muted); border-radius: 8px; margin-bottom: 16px;">
+              <div class="tab tab-active">Photos</div>
+              <div class="tab tab-inactive">Importer</div>
+            </div>
+            <div style="position: relative;">
+              <svg style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted-foreground);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input class="input-search" value="Communauté WOLD" />
+            </div>
+            <div class="empty-state">Aucun résultat pour « Communauté WOLD »</div>
+          </div>
+
+          <div class="modal-footer">
+            <div class="footer-B">
+              <div class="actions-row">
+                <button class="btn btn-outline">Annuler</button>
+                <button class="btn btn-primary">Appliquer</button>
+              </div>
+              <a class="remove-link">Supprimer la couverture</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="legend" style="margin-top: 40px;">
+    <h2>Notes</h2>
+    <p>
+      <strong>Option A</strong> — Layout shadcn par défaut (`flex-col-reverse gap-2 sm:flex-row`).
+      Boutons d'action fullwidth (flex-1) en bas, "Supprimer la couverture" en bouton ghost discret au-dessus.
+      Diff minimal, pattern aligné avec le reste du projet.
+    </p>
+    <p style="margin-top: 8px;">
+      <strong>Option B</strong> — Actions principales en haut (zone du pouce), action destructive
+      transformée en lien underline en bas, plus discrète. Hiérarchie visuelle plus marquée mais
+      pattern lien-au-lieu-de-bouton inhabituel dans le projet.
+    </p>
+    <p style="margin-top: 8px;">
+      Dans les deux cas, le footer est aligné sur le pattern shadcn `flex-col-reverse … sm:flex-row`,
+      donc en desktop (≥640px) on retrouve la disposition horizontale d'origine — le fix est
+      strictement mobile.
+    </p>
+  </div>
+
+</body>
+</html>
