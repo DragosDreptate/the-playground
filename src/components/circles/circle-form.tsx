@@ -200,7 +200,7 @@ export function CircleForm({ circle, action, stripeConnect }: CircleFormProps) {
                     setLocalError(undefined);
                   }}
                 >
-                  <SelectTrigger className="h-9">
+                  <SelectTrigger className="h-9 w-full">
                     <SelectValue placeholder={t("form.categoryPlaceholder")} />
                   </SelectTrigger>
                   <SelectContent>
