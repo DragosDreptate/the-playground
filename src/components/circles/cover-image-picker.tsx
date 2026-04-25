@@ -351,12 +351,21 @@ export function CoverImagePicker({
           <div className="size-full" style={{ background: gradient }} />
         )}
 
-        {/* Overlay au survol */}
+        {/* Overlay au survol (desktop) */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
           <div className="flex translate-y-1 items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-black opacity-0 shadow transition-all group-hover:translate-y-0 group-hover:opacity-100">
             <Camera className="size-4" />
             {t("modifyButton")}
           </div>
+        </div>
+
+        {/* Badge permanent (mobile) — sur mobile, pas de hover, donc on signale
+            l'éditabilité avec une icône caméra discrète en bas à droite. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-3 right-3 flex size-9 items-center justify-center rounded-full bg-black/60 shadow backdrop-blur-sm sm:hidden"
+        >
+          <Camera className="size-[18px] text-white" />
         </div>
       </button>
 
