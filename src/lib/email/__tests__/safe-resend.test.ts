@@ -93,6 +93,7 @@ describe("createSafeResend — integration", () => {
   beforeEach(() => {
     delete process.env.IS_STAGING;
     delete process.env.STAGING_EMAIL_ALLOWLIST;
+    delete process.env.VERCEL_ENV;
     mockSend.mockReset();
     mockSend.mockResolvedValue({ data: { id: "real-send" }, error: null });
     mockBatchSend.mockReset();
@@ -104,7 +105,11 @@ describe("createSafeResend — integration", () => {
     vi.restoreAllMocks();
   });
 
-  describe("given IS_STAGING is not set (production mode)", () => {
+  describe("given VERCEL_ENV=production", () => {
+    beforeEach(() => {
+      process.env.VERCEL_ENV = "production";
+    });
+
     it("forwards all emails to Resend without checking", async () => {
       const resend = createSafeResend("re_fake");
 
@@ -120,9 +125,37 @@ describe("createSafeResend — integration", () => {
     });
   });
 
-  describe("given IS_STAGING=true with an allowlist", () => {
+  describe("given VERCEL_ENV unset (local/CI/staging — guard active by default)", () => {
+    it("blocks emails to non-allowlisted addresses without IS_STAGING set", async () => {
+      vi.spyOn(console, "warn").mockImplementation(() => {});
+      const resend = createSafeResend("re_fake");
+
+      await resend.emails.send({
+        from: "test@x.com",
+        to: "random@gmail.com",
+        subject: "hi",
+        html: "<p>hi</p>",
+      } as Parameters<typeof resend.emails.send>[0]);
+
+      expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it("still allows @test.playground emails (auto-whitelist)", async () => {
+      const resend = createSafeResend("re_fake");
+
+      await resend.emails.send({
+        from: "test@x.com",
+        to: "host@test.playground",
+        subject: "hi",
+        html: "<p>hi</p>",
+      } as Parameters<typeof resend.emails.send>[0]);
+
+      expect(mockSend).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("given guard active with an allowlist", () => {
     beforeEach(() => {
-      process.env.IS_STAGING = "true";
       process.env.STAGING_EMAIL_ALLOWLIST = "dragos@gmail.com";
     });
 
@@ -184,9 +217,8 @@ describe("createSafeResend — integration", () => {
     });
   });
 
-  describe("given IS_STAGING=true with empty allowlist (fail-closed)", () => {
+  describe("given guard active with empty allowlist (fail-closed)", () => {
     beforeEach(() => {
-      process.env.IS_STAGING = "true";
       process.env.STAGING_EMAIL_ALLOWLIST = "";
     });
 
@@ -219,7 +251,11 @@ describe("createSafeResend — integration", () => {
   });
 
   describe("batch.send — envois en masse", () => {
-    describe("given IS_STAGING is not set (production mode)", () => {
+    describe("given VERCEL_ENV=production", () => {
+      beforeEach(() => {
+        process.env.VERCEL_ENV = "production";
+      });
+
       it("forwards the batch as-is", async () => {
         const resend = createSafeResend("re_fake");
 
@@ -234,9 +270,8 @@ describe("createSafeResend — integration", () => {
       });
     });
 
-    describe("given IS_STAGING=true with an allowlist", () => {
+    describe("given guard active with an allowlist", () => {
       beforeEach(() => {
-        process.env.IS_STAGING = "true";
         process.env.STAGING_EMAIL_ALLOWLIST = "dragos@gmail.com";
       });
 
@@ -281,9 +316,8 @@ describe("createSafeResend — integration", () => {
       });
     });
 
-    describe("given IS_STAGING=true with empty allowlist (fail-closed)", () => {
+    describe("given guard active with empty allowlist (fail-closed)", () => {
       beforeEach(() => {
-        process.env.IS_STAGING = "true";
         process.env.STAGING_EMAIL_ALLOWLIST = "";
       });
 

@@ -119,7 +119,7 @@ test.describe("Flux Host — création d'un Moment", () => {
 
   test("should display the new Moment form within a Circle", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
-    await expect(page.locator("input[name='title']")).toBeVisible();
+    await expect(page.locator("input[name='title']").first()).toBeVisible();
   });
 
   test("should create a new Moment and redirect to its detail page", async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe("Flux Host — création d'un Moment", () => {
 
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
 
-    await page.fill("input[name='title']", uniqueTitle);
+    await page.locator("input[name='title']").first().fill(uniqueTitle);
 
     const dateInput = page.locator("input[name='startsAt'], input[type='datetime-local']").first();
     if (await dateInput.isVisible()) {
@@ -170,7 +170,9 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
 
   async function fillMomentForm(page: import("@playwright/test").Page, title: string) {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
-    await page.fill("input[name='title']", title);
+    // .first() pour contourner un état transitoire d'hydration (Next.js 16 +
+    // React 19) où le DOM expose temporairement deux <input name="title">.
+    await page.locator("input[name='title']").first().fill(title);
 
     const dateInput = page.locator("input[name='startsAt'], input[type='datetime-local']").first();
     if (await dateInput.isVisible()) {
@@ -222,7 +224,7 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     await fillMomentForm(page, title);
 
     // Enter dans l'input titre → HTML soumet via le 1er submit button du DOM = draft
-    await page.locator("input[name='title']").press("Enter");
+    await page.locator("input[name='title']").first().press("Enter");
     await expect(page).toHaveURL(/\/dashboard\/circles\/.*\/moments\//, { timeout: 15_000 });
 
     // Confirmer que c'est bien un DRAFT (pas un publish accidentel)
@@ -257,8 +259,10 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}/edit`);
     await page.waitForLoadState("domcontentloaded");
 
-    // Le form d'édition doit être visible (timeout large car cold render possible en CI)
-    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
+    // Le form d'édition doit être visible (timeout large car cold render possible en CI).
+    // .first() pour contourner un état transitoire d'hydration où Next.js 16 +
+    // React 19 expose temporairement deux <input name="title"> identiques.
+    await expect(page.locator("input[name='title']").first()).toBeVisible({ timeout: 15_000 });
 
     // Le banner "brouillon" doit être visible dans le form d'édition
     await expect(page.getByText(/brouillon/i).first()).toBeVisible();
@@ -300,7 +304,10 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     // 2. Ouvrir la page d'édition du moment PUBLISHED
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}/edit`);
     await page.waitForLoadState("domcontentloaded");
-    await expect(page.locator("input[name='title']")).toBeVisible({ timeout: 15_000 });
+    // .first() pour contourner un état transitoire d'hydration où Next.js 16 +
+    // React 19 expose temporairement deux <input name="title"> identiques dans
+    // le DOM pendant ~ms (cause profonde non résolue, voir spec/BACKLOG.md).
+    await expect(page.locator("input[name='title']").first()).toBeVisible({ timeout: 15_000 });
 
     // En édition PUBLISHED, le bouton Publier n'existe pas (le statut se gère via le select)
     await expect(page.locator("button[name='intent'][value='publish']")).toHaveCount(0);

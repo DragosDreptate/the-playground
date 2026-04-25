@@ -108,7 +108,10 @@ test.describe("Découvrir — page Communauté publique", () => {
     if (isVisible) {
       await eventLink.click();
       await expect(page).toHaveURL(/\/m\//);
-      await expect(page.locator("h1").first()).toBeVisible();
+      // Attendre la fin du DOM avant de chercher le h1 — la SPA navigation
+      // ne garantit pas que le contenu est hydraté au moment du click.
+      await page.waitForLoadState("domcontentloaded");
+      await expect(page.locator("h1").first()).toBeVisible({ timeout: 15_000 });
     }
   });
 });

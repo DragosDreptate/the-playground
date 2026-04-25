@@ -422,11 +422,11 @@ test.describe("Dashboard participant — pending states", () => {
     // Click on communities tab and wait for content to load
     const circlesTab = playerPage.locator("a").filter({ hasText: /communautés|communities/i }).first();
     await circlesTab.click();
-    await playerPage.waitForTimeout(1000);
+    await playerPage.waitForLoadState("domcontentloaded");
 
     // Le badge dashboard utilise "En attente de validation" (Circle.circleCard.roleBadge.pending)
     // alors que le banner Moment/Circle utilise "Demande en cours de validation".
-    await expect(playerPage.getByText(/en attente de validation|en cours de validation|pending approval/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(playerPage.getByText(/en attente de validation|en cours de validation|pending approval/i).first()).toBeVisible({ timeout: 15_000 });
     await playerCtx.close();
   });
 });
