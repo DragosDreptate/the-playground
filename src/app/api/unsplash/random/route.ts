@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { UnsplashPhoto } from "@/app/api/unsplash/search/route";
+import { parsePerPage } from "../_lib/parse-per-page";
 
-// Nombre de photos aléatoires par défaut (desktop) — borne 1-30 imposée par l'API
-// Unsplash /photos/random qui retourne un array quand `count` est fourni.
 const DEFAULT_RANDOM_COUNT = 8;
 
 type UnsplashRandomPhoto = {
@@ -17,13 +16,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unsplash not configured" }, { status: 503 });
   }
 
-  const perPageParam = parseInt(
-    request.nextUrl.searchParams.get("perPage") ?? String(DEFAULT_RANDOM_COUNT),
-    10
-  );
-  const count = Math.min(
-    30,
-    Math.max(1, Number.isFinite(perPageParam) ? perPageParam : DEFAULT_RANDOM_COUNT)
+  const count = parsePerPage(
+    request.nextUrl.searchParams.get("perPage"),
+    DEFAULT_RANDOM_COUNT
   );
 
   const url = new URL("https://api.unsplash.com/photos/random");

@@ -42,12 +42,11 @@ type Props = {
 const CONTEXT_QUERY_MAX_LENGTH = 80;
 const MIN_QUERY_LENGTH = 2;
 
-// Mobile (< sm:) reçoit moins de photos pour rester confortable au scroll : 6 (3 lignes
-// de 2) en recherche, 6 en fallback random. Desktop garde 12 / 8 — valeurs d'origine.
 const SEARCH_PER_PAGE_MOBILE = 6;
 const SEARCH_PER_PAGE_DESKTOP = 12;
 const RANDOM_PER_PAGE_MOBILE = 6;
 const RANDOM_PER_PAGE_DESKTOP = 8;
+// Tailwind v4 sm: = 40rem, on cible le viewport en-dessous.
 const MOBILE_BREAKPOINT_QUERY = "(max-width: 639px)";
 
 
@@ -132,10 +131,9 @@ export function CoverImagePicker({
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  // Viewport — pilote la pagination Unsplash (moins de photos sur mobile pour
-  // limiter le scroll et la consommation data). Pas de refetch sur resize :
-  // la valeur courante est figée pour le batch déjà chargé, le prochain fetch
-  // (pagination ou nouvelle recherche) prendra la valeur mise à jour.
+  // Pas de refetch sur resize : la valeur courante est figée pour le batch déjà
+  // chargé, le prochain fetch (pagination ou nouvelle recherche) prendra la
+  // valeur mise à jour.
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const mql = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
@@ -159,9 +157,12 @@ export function CoverImagePicker({
       setSearchError(null);
       setSearchPage(page);
       try {
-        const res = await fetch(
-          `/api/unsplash/search?q=${encodeURIComponent(value.trim())}&page=${page}&perPage=${searchPerPage}`
-        );
+        const params = new URLSearchParams({
+          q: value.trim(),
+          page: String(page),
+          perPage: String(searchPerPage),
+        });
+        const res = await fetch(`/api/unsplash/search?${params}`);
         if (res.ok) {
           const data = await res.json();
           setSearchResults(data.results);
@@ -215,7 +216,12 @@ export function CoverImagePicker({
     if (!query || isLoadingMore) return;
     setIsLoadingMore(true);
     try {
-      const res = await fetch(`/api/unsplash/search?q=${encodeURIComponent(query.trim())}&page=${page}&perPage=${searchPerPage}`);
+      const params = new URLSearchParams({
+        q: query.trim(),
+        page: String(page),
+        perPage: String(searchPerPage),
+      });
+      const res = await fetch(`/api/unsplash/search?${params}`);
       if (res.ok) {
         const data = await res.json();
         setSearchResults(data.results);
@@ -294,7 +300,7 @@ export function CoverImagePicker({
       } else if (defaultPhotos === null && !isLoadingDefaults) {
         // Fallback : photos random (première ouverture uniquement)
         setIsLoadingDefaults(true);
-        fetch(`/api/unsplash/random?perPage=${randomPerPage}`)
+        fetch(`/api/unsplash/random?${new URLSearchParams({ perPage: String(randomPerPage) })}`)
           .then((res) => (res.ok ? res.json() : null))
           .then((data) => {
             if (data?.results) setDefaultPhotos(data.results as UnsplashPhoto[]);
@@ -351,7 +357,6 @@ export function CoverImagePicker({
           <div className="size-full" style={{ background: gradient }} />
         )}
 
-        {/* Overlay au survol (desktop) */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40">
           <div className="flex translate-y-1 items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 text-sm font-medium text-black opacity-0 shadow transition-all group-hover:translate-y-0 group-hover:opacity-100">
             <Camera className="size-4" />
