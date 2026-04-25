@@ -573,6 +573,9 @@ export default async function HelpPage() {
                 {t.rich("organizer.members.intro", rich)}
               </p>
               <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("organizer.members.exportNote")}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {t("organizer.members.outro")}
               </p>
             </div>
