@@ -108,6 +108,9 @@ export function CoverImagePicker({
   const t = useTranslations("Circle.coverPicker");
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState<CoverSelection | null>(null);
+  // Si l'URL stockée pointe vers un blob supprimé (404), on retombe sur le
+  // gradient placeholder au lieu d'afficher une icône d'image cassée.
+  const [previewLoadError, setPreviewLoadError] = useState(false);
 
   // Default random photos (fetched once on first open, cached)
   const [defaultPhotos, setDefaultPhotos] = useState<UnsplashPhoto[] | null>(null);
@@ -336,6 +339,13 @@ export function CoverImagePicker({
           ? null
           : currentImage;
 
+  // Reset le flag d'erreur quand la source de la preview change
+  useEffect(() => {
+    setPreviewLoadError(false);
+  }, [previewImage]);
+
+  const showPreviewImage = previewImage && !previewLoadError;
+
   return (
     <>
       {/* Zone de couverture cliquable */}
@@ -346,12 +356,13 @@ export function CoverImagePicker({
         style={{ aspectRatio: "1 / 1" }}
         aria-label={t("ariaModify")}
       >
-        {previewImage ? (
+        {showPreviewImage ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={previewImage}
             alt="Image de couverture"
             className="size-full object-cover"
+            onError={() => setPreviewLoadError(true)}
           />
         ) : (
           <div className="size-full" style={{ background: gradient }} />
