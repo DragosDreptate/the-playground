@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parsePerPage } from "../_lib/parse-per-page";
 
 export type UnsplashPhoto = {
   id: string;
@@ -36,11 +37,12 @@ export async function GET(request: NextRequest) {
   }
 
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+  const perPage = parsePerPage(searchParams.get("perPage"), 12);
 
   const url = new URL("https://api.unsplash.com/search/photos");
   url.searchParams.set("query", q.trim());
   url.searchParams.set("orientation", "squarish");
-  url.searchParams.set("per_page", "12");
+  url.searchParams.set("per_page", String(perPage));
   url.searchParams.set("page", String(page));
 
   const response = await fetch(url.toString(), {

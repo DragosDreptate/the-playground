@@ -1,9 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import type { UnsplashPhoto } from "@/app/api/unsplash/search/route";
+import { parsePerPage } from "../_lib/parse-per-page";
 
-// Nombre de photos aléatoires à récupérer en une seule requête.
-// Unsplash /photos/random retourne un array quand `count` est fourni (max 30).
-const RANDOM_COUNT = 8;
+const DEFAULT_RANDOM_COUNT = 8;
 
 type UnsplashRandomPhoto = {
   id: string;
@@ -11,14 +10,19 @@ type UnsplashRandomPhoto = {
   user: { name: string; links: { html: string } };
 };
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const accessKey = process.env.UNSPLASH_ACCESS_KEY;
   if (!accessKey) {
     return NextResponse.json({ error: "Unsplash not configured" }, { status: 503 });
   }
 
+  const count = parsePerPage(
+    request.nextUrl.searchParams.get("perPage"),
+    DEFAULT_RANDOM_COUNT
+  );
+
   const url = new URL("https://api.unsplash.com/photos/random");
-  url.searchParams.set("count", String(RANDOM_COUNT));
+  url.searchParams.set("count", String(count));
   url.searchParams.set("orientation", "squarish");
 
   const response = await fetch(url.toString(), {
