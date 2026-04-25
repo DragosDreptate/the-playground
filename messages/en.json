@@ -1725,6 +1725,7 @@
       "members": {
         "title": "Manage community members",
         "intro": "From your community page, you can see the full member list with their emails. Each name is clickable and links to the member's public profile. You can remove a member via the <strong>⋮</strong> menu next to their name.",
+        "exportNote": "You can export the full member list as a CSV file via the «Export» button in the members modal. Useful for importing into an external tool or sending a bulk email.",
         "outro": "Members automatically join your community when they register for one of your events."
       },
       "coHosts": {

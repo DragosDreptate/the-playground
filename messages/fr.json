@@ -1725,6 +1725,7 @@
       "members": {
         "title": "Gérer les membres de votre communauté",
         "intro": "Depuis la page de votre communauté, vous voyez la liste complète des membres avec leurs emails. Chaque nom est cliquable et pointe vers le profil public du membre. Vous pouvez retirer un membre via le menu <strong>⋮</strong> à côté de son nom.",
+        "exportNote": "Vous pouvez exporter la liste complète des membres en CSV depuis le bouton «Exporter» dans la modale membres. Pratique pour importer dans un outil externe ou faire un envoi d'email.",
         "outro": "Les membres rejoignent automatiquement votre communauté lorsqu'ils s'inscrivent à l'un de vos événements."
       },
       "coHosts": {
