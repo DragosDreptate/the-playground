@@ -231,7 +231,7 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 - **i18n** : next-intl — FR/EN natif
 
 ### Services
-- **Email** : Resend + react-email (templates React)
+- **Email** : Resend + react-email (templates React) — wrapper `safe-resend.ts` qui bloque les envois vers de vraies adresses dès que `VERCEL_ENV !== "production"` (couvre local, CI, preview, staging). Workflow complet de test des emails en local et staging : voir [spec/email-testing.md](spec/email-testing.md).
 - **Analytics** : PostHog — product analytics, event tracking
 - **Error monitoring** : Sentry (`@sentry/nextjs`) — error capture in server actions + global error boundary
 - **IA** : SDK Anthropic (Claude) — appels API directs
