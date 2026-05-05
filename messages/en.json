@@ -866,7 +866,8 @@
       "actions": {
         "copyId": "Copy ID",
         "idCopied": "Copied",
-        "viewInSentry": "View in Sentry"
+        "viewInSentry": "View in Sentry",
+        "viewInPostHog": "View in PostHog"
       }
     },
     "circleDetail": {

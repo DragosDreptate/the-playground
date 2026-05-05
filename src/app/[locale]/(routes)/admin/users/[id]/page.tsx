@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CopyButton } from "@/components/ui/copy-button";
 import { formatLongDate } from "@/lib/format-date";
 import { buildSentryIssuesSearchUrl } from "@/lib/sentry-url";
+import { buildPostHogPersonUrl } from "@/lib/posthog-url";
 import { AdminUserDeleteButton } from "./delete-button";
 
 type Props = {
@@ -33,24 +34,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
           <p className="text-sm text-muted-foreground">{t("userDetail.title")}</p>
           <h1 className="text-2xl font-bold">{displayName}</h1>
         </div>
-        <div className="flex items-center gap-2">
-          <CopyButton
-            value={user.id}
-            label={t("userDetail.actions.copyId")}
-            copiedLabel={t("userDetail.actions.idCopied")}
-          />
-          <Button variant="ghost" size="sm" asChild>
-            <a
-              href={buildSentryIssuesSearchUrl(`user.email:${user.email}`)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <ExternalLink className="size-4" />
-              {t("userDetail.actions.viewInSentry")}
-            </a>
-          </Button>
-          <AdminUserDeleteButton userId={user.id} />
-        </div>
+        <AdminUserDeleteButton userId={user.id} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -137,6 +121,33 @@ export default async function AdminUserDetailPage({ params }: Props) {
             label={t("userDetail.auth.welcomeEmail")}
             value={formatDateOrNever(user.auth.welcomeEmailSentAt, locale, t("userDetail.auth.never"))}
           />
+          <div className="flex flex-wrap items-center gap-2 pt-3 border-t">
+            <CopyButton
+              value={user.id}
+              label={t("userDetail.actions.copyId")}
+              copiedLabel={t("userDetail.actions.idCopied")}
+            />
+            <Button variant="ghost" size="sm" asChild>
+              <a
+                href={buildSentryIssuesSearchUrl(`user.email:${user.email}`)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="size-4" />
+                {t("userDetail.actions.viewInSentry")}
+              </a>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <a
+                href={buildPostHogPersonUrl(user.id)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="size-4" />
+                {t("userDetail.actions.viewInPostHog")}
+              </a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
