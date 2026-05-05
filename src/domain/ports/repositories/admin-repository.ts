@@ -50,6 +50,7 @@ export type AdminUserDetail = AdminUserRow & {
   image: string | null;
   onboardingCompleted: boolean;
   registrationCount: number;
+  auth: AdminUserAuthInfo;
   circles: Array<{
     id: string;
     name: string;
@@ -64,6 +65,23 @@ export type AdminUserDetail = AdminUserRow & {
     status: string;
     circleName: string;
   }>;
+};
+
+export type AdminUserAuthInfo = {
+  /** Providers OAuth liés. Vide = magic link uniquement. */
+  providers: string[];
+  /** Date de vérification de l'email (premier login magic link réussi ou OAuth). */
+  emailVerified: Date | null;
+  /** Nombre de sessions actives (Auth.js). */
+  activeSessionsCount: number;
+  /** Date d'expiration de la session la plus récente (≈ dernière login + 30j). */
+  latestSessionExpires: Date | null;
+  /** Nombre de magic links non consommés en attente. */
+  pendingMagicLinksCount: number;
+  /** Date d'expiration du magic link en attente le plus récent. */
+  latestPendingMagicLinkExpires: Date | null;
+  /** Date d'envoi de l'email de bienvenue. */
+  welcomeEmailSentAt: Date | null;
 };
 
 // ─────────────────────────────────────────────

@@ -849,7 +849,25 @@
       "circles": "Communities",
       "noCircles": "No communities.",
       "moments": "Events",
-      "noMoments": "No Events."
+      "noMoments": "No Events.",
+      "auth": {
+        "title": "Authentication",
+        "providers": "Connected providers",
+        "magicLinkOnly": "Magic link only",
+        "emailVerified": "Email verified",
+        "activeSessions": "Active sessions",
+        "sessionsExpiring": "{count, plural, =1 {1 session, expires {date}} other {# sessions, latest expires {date}}}",
+        "pendingMagicLinks": "Pending magic links",
+        "tokensExpiring": "{count, plural, =1 {1 token, expires {date}} other {# tokens, latest expires {date}}}",
+        "welcomeEmail": "Welcome email",
+        "never": "Never",
+        "none": "None"
+      },
+      "actions": {
+        "copyId": "Copy ID",
+        "idCopied": "Copied",
+        "viewInSentry": "View in Sentry"
+      }
     },
     "circleDetail": {
       "title": "Community detail",

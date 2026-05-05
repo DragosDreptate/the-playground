@@ -5,6 +5,7 @@ import { notifySlackSentryIssue, isAdminEmailEnabled } from "@/infrastructure/se
 import { SentryIssueAnalysisEmail } from "./sentry-issue-analysis-email";
 import { URGENCY_META, type AnalysisResult, type UserImpact, type UserImpactLevel } from "./analysis-meta";
 import { buildAnalysisPrompt } from "./build-prompt";
+import { buildSentryIssueUrl } from "@/lib/sentry-url";
 
 export type { UserImpact, UserImpactLevel } from "./analysis-meta";
 
@@ -207,15 +208,13 @@ export async function analyzeSentryIssue(issue: IssueInput): Promise<void> {
   const token = process.env.SENTRY_AUTH_TOKEN;
   if (!token) return;
 
-  const sentryOrg = process.env.SENTRY_ORG ?? "the-playground-id";
-
   const event = await fetchLatestEvent(issue.issueId, token);
   const context: EventContext = event
     ? extractEventContext(event)
     : { stacktrace: "", tags: {} };
 
   const analysis = await analyzeWithClaude(issue, context);
-  const sentryUrl = `https://${sentryOrg}.sentry.io/issues/${issue.issueId}/`;
+  const sentryUrl = buildSentryIssueUrl(issue.issueId);
 
   await Promise.all([
     isAdminEmailEnabled() ? sendAnalysisEmail(issue, analysis, sentryUrl) : Promise.resolve(),

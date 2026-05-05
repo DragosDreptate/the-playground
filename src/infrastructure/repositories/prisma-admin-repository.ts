@@ -442,10 +442,18 @@ export const prismaAdminRepository: AdminRepository = {
   },
 
   async findUserById(id: string): Promise<AdminUserDetail | null> {
+    const now = new Date();
     const record = await prisma.user.findUnique({
       where: { id },
       include: {
         _count: { select: { memberships: true, registrations: true } },
+        accounts: { select: { provider: true } },
+        sessions: {
+          where: { expires: { gt: now } },
+          select: { expires: true },
+          orderBy: { expires: "desc" },
+          take: 1,
+        },
         memberships: {
           include: { circle: { select: { id: true, name: true, slug: true } } },
         },
@@ -460,6 +468,17 @@ export const prismaAdminRepository: AdminRepository = {
       },
     });
     if (!record) return null;
+
+    const [activeSessionsCount, pendingMagicLinksCount, latestPendingToken] = await Promise.all([
+      prisma.session.count({ where: { userId: id, expires: { gt: now } } }),
+      prisma.verificationToken.count({ where: { identifier: record.email, expires: { gt: now } } }),
+      prisma.verificationToken.findFirst({
+        where: { identifier: record.email, expires: { gt: now } },
+        select: { expires: true },
+        orderBy: { expires: "desc" },
+      }),
+    ]);
+
     return {
       id: record.id,
       email: record.email,
@@ -473,6 +492,15 @@ export const prismaAdminRepository: AdminRepository = {
       momentCount: record._count.registrations,
       registrationCount: record._count.registrations,
       createdAt: record.createdAt,
+      auth: {
+        providers: record.accounts.map((a) => a.provider),
+        emailVerified: record.emailVerified,
+        activeSessionsCount,
+        latestSessionExpires: record.sessions[0]?.expires ?? null,
+        pendingMagicLinksCount,
+        latestPendingMagicLinkExpires: latestPendingToken?.expires ?? null,
+        welcomeEmailSentAt: record.welcomeEmailSentAt,
+      },
       circles: record.memberships.map((m) => ({
         id: m.circle.id,
         name: m.circle.name,

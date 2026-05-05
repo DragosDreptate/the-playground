@@ -1,9 +1,14 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CopyButton } from "@/components/ui/copy-button";
+import { formatLongDate } from "@/lib/format-date";
+import { buildSentryIssuesSearchUrl } from "@/lib/sentry-url";
 import { AdminUserDeleteButton } from "./delete-button";
 
 type Props = {
@@ -14,6 +19,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
   const { id } = await params;
   const t = await getTranslations("Admin");
   const tRole = await getTranslations("Dashboard.role");
+  const locale = await getLocale();
   const user = await prismaAdminRepository.findUserById(id);
 
   if (!user) notFound();
@@ -22,12 +28,29 @@ export default async function AdminUserDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <p className="text-sm text-muted-foreground">{t("userDetail.title")}</p>
           <h1 className="text-2xl font-bold">{displayName}</h1>
         </div>
-        <AdminUserDeleteButton userId={user.id} />
+        <div className="flex items-center gap-2">
+          <CopyButton
+            value={user.id}
+            label={t("userDetail.actions.copyId")}
+            copiedLabel={t("userDetail.actions.idCopied")}
+          />
+          <Button variant="ghost" size="sm" asChild>
+            <a
+              href={buildSentryIssuesSearchUrl(`user.email:${user.email}`)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="size-4" />
+              {t("userDetail.actions.viewInSentry")}
+            </a>
+          </Button>
+          <AdminUserDeleteButton userId={user.id} />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -63,7 +86,60 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </Card>
       </div>
 
-      {/* Circles list */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("userDetail.auth.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-5 pt-0">
+          <Row
+            label={t("userDetail.auth.providers")}
+            value={
+              user.auth.providers.length === 0 ? (
+                <Badge variant="outline">{t("userDetail.auth.magicLinkOnly")}</Badge>
+              ) : (
+                <div className="flex flex-wrap gap-1 justify-end">
+                  {user.auth.providers.map((p) => (
+                    <Badge key={p} variant="secondary" className="capitalize">
+                      {p}
+                    </Badge>
+                  ))}
+                </div>
+              )
+            }
+          />
+          <Row
+            label={t("userDetail.auth.emailVerified")}
+            value={formatDateOrNever(user.auth.emailVerified, locale, t("userDetail.auth.never"))}
+          />
+          <Row
+            label={t("userDetail.auth.activeSessions")}
+            value={
+              user.auth.activeSessionsCount === 0 || !user.auth.latestSessionExpires
+                ? t("userDetail.auth.never")
+                : t("userDetail.auth.sessionsExpiring", {
+                    count: user.auth.activeSessionsCount,
+                    date: formatLongDate(user.auth.latestSessionExpires, locale),
+                  })
+            }
+          />
+          <Row
+            label={t("userDetail.auth.pendingMagicLinks")}
+            value={
+              user.auth.pendingMagicLinksCount === 0 || !user.auth.latestPendingMagicLinkExpires
+                ? t("userDetail.auth.none")
+                : t("userDetail.auth.tokensExpiring", {
+                    count: user.auth.pendingMagicLinksCount,
+                    date: formatLongDate(user.auth.latestPendingMagicLinkExpires, locale),
+                  })
+            }
+          />
+          <Row
+            label={t("userDetail.auth.welcomeEmail")}
+            value={formatDateOrNever(user.auth.welcomeEmailSentAt, locale, t("userDetail.auth.never"))}
+          />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("userDetail.circles")}</CardTitle>
@@ -91,7 +167,6 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </CardContent>
       </Card>
 
-      {/* Moments list */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t("userDetail.moments")}</CardTitle>
@@ -127,6 +202,10 @@ export default async function AdminUserDetailPage({ params }: Props) {
   );
 }
 
+function formatDateOrNever(date: Date | null, locale: string, neverLabel: string): string {
+  return date ? formatLongDate(date, locale) : neverLabel;
+}
+
 function statusVariant(status: string): "default" | "secondary" | "outline" | "destructive" {
   switch (status) {
     case "PUBLISHED": return "default";
@@ -139,9 +218,9 @@ function statusVariant(status: string): "default" | "secondary" | "outline" | "d
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
+    <div className="flex items-center justify-between text-sm gap-4">
+      <span className="text-muted-foreground shrink-0">{label}</span>
+      <span className="font-medium text-right">{value}</span>
     </div>
   );
 }
