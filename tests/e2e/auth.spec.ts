@@ -59,3 +59,43 @@ test.describe("Authentification — accès non authentifié", () => {
     await expect(page).not.toHaveURL(/\/auth\/sign-in/);
   });
 });
+
+test.describe("Magic link — protection contre les scanners email", () => {
+  test("HEAD on /api/auth/callback/resend should return 200 without consuming the token", async ({
+    request,
+  }) => {
+    // Les scanners email (Defender Safe Links) prefetchent en HEAD. On répond
+    // 200 sans toucher au token plutôt que de laisser Auth.js lever une erreur.
+    const response = await request.head(
+      "/api/auth/callback/resend?token=fake&email=test%40example.com"
+    );
+    expect(response.status()).toBe(200);
+  });
+
+  test("page /auth/confirm should render a POST form when token + email are present", async ({
+    page,
+  }) => {
+    await page.goto(
+      "/fr/auth/confirm?token=fake-token&email=user%40example.com&callbackUrl=%2Fdashboard"
+    );
+    const form = page.locator("form[method='POST'][action*='/api/auth/callback/resend']");
+    await expect(form).toBeVisible();
+    await expect(form).toHaveAttribute("action", /token=fake-token/);
+    await expect(form).toHaveAttribute("action", /email=user%40example.com/);
+    await expect(form.locator("button[type='submit']")).toBeVisible();
+  });
+
+  test("page /auth/confirm should reject a request without token", async ({ page }) => {
+    await page.goto("/fr/auth/confirm");
+    await expect(page.locator("form")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
+  });
+
+  test("page /auth/error?error=Verification should explain the corporate inbox case", async ({
+    page,
+  }) => {
+    await page.goto("/fr/auth/error?error=Verification");
+    await expect(page.getByText(/anti-phishing/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
+  });
+});

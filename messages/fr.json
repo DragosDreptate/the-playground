@@ -146,9 +146,23 @@
       "title": "Vérifiez votre email",
       "description": "Un lien de connexion a été envoyé à votre adresse email. Cliquez dessus pour vous connecter."
     },
+    "confirm": {
+      "title": "Confirmer votre connexion",
+      "description": "Cliquez sur le bouton ci-dessous pour finaliser votre connexion à The Playground.",
+      "submit": "Confirmer ma connexion",
+      "hint": "Cette étape protège votre lien des anti-phishing qui parcourent automatiquement les emails.",
+      "invalid": {
+        "title": "Lien invalide",
+        "description": "Ce lien de connexion est incomplet. Demandez-en un nouveau pour continuer.",
+        "cta": "Recevoir un nouveau lien"
+      }
+    },
     "error": {
       "title": "Erreur d'authentification",
       "backToSignIn": "Retour à la connexion",
+      "requestNewLink": "Recevoir un nouveau lien",
+      "verificationExplanation": "Si vous utilisez une boîte mail professionnelle (Outlook, Gmail Workspace), il est possible que votre anti-phishing ait visité le lien automatiquement et l'ait invalidé.",
+      "verificationAction": "Demandez un nouveau lien et cliquez-le rapidement, ou utilisez la connexion Google/GitHub.",
       "webviewExplanation": "Google et GitHub bloquent la connexion depuis les navigateurs intégrés (LinkedIn, Instagram, Facebook...).",
       "webviewAction": "Utilisez la connexion par email, ou ouvrez le site dans votre navigateur.",
       "openInBrowser": "Ouvrir dans le navigateur"
