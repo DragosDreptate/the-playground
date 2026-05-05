@@ -9,6 +9,8 @@ import { createSafeResend } from "@/lib/email/safe-resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
+import { buildMagicLinkConfirmUrl } from "@/lib/auth/magic-link-url";
+import { classifyAuthError } from "@/lib/auth/error-kinds";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -22,16 +24,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ResendProvider({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
-      async sendVerificationRequest({ identifier, url }) {
+      async sendVerificationRequest({ identifier, url, request }) {
         const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+        // On envoie l'utilisateur sur une page applicative inerte plutôt que
+        // directement sur le callback Auth.js. Les scanners email (Microsoft
+        // Defender Safe Links, Mimecast, Proofpoint…) prefetchent ce lien et
+        // consumeraient le token. La page de confirmation expose un bouton qui
+        // POST sur le callback, déclenchable uniquement par un humain.
+        const confirmUrl = buildMagicLinkConfirmUrl(url, request);
 
         const { error } = await resend.emails.send({
           from,
           to: identifier,
           subject: "Votre lien de connexion — The Playground",
-          react: MagicLinkEmail({ url, baseUrl }),
+          react: MagicLinkEmail({ url: confirmUrl, baseUrl }),
         });
 
         if (error) {
@@ -56,13 +65,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   logger: {
     error(error) {
       console.error("[AUTH ERROR]", error);
-      Sentry.captureException(error, { tags: { context: "auth" } });
+      const code = error?.name ?? "Unknown";
+      const kind = classifyAuthError(code);
+      // Les erreurs "attendues dans le flow utilisateur" (token expiré,
+      // prefetch scanner, refus OAuth) restent capturées mais en niveau
+      // warning pour ne pas spammer les alertes high-priority.
+      Sentry.captureException(error, {
+        level: kind === "expected_user_flow" ? "warning" : "error",
+        tags: {
+          context: "auth",
+          error_code: code,
+          auth_error_kind: kind,
+        },
+      });
     },
     warn(code) {
       console.warn("[AUTH WARN]", code);
       Sentry.captureMessage(`auth:${code}`, {
         level: "warning",
-        tags: { context: "auth" },
+        tags: {
+          context: "auth",
+          error_code: code,
+          auth_error_kind: classifyAuthError(code),
+        },
       });
     },
   },
