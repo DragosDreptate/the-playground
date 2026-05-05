@@ -113,6 +113,15 @@ export function makeAdminUserDetail(
     image: null,
     onboardingCompleted: true,
     registrationCount: 10,
+    auth: {
+      providers: [],
+      emailVerified: new Date("2026-01-01"),
+      activeSessionsCount: 1,
+      latestSessionExpires: new Date("2099-12-31"),
+      pendingMagicLinksCount: 0,
+      latestPendingMagicLinkExpires: null,
+      welcomeEmailSentAt: new Date("2026-01-01"),
+    },
     circles: [
       { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST" },
     ],
