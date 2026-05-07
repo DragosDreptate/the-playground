@@ -215,11 +215,11 @@ export async function MomentTimelineItem({
                   alt={moment.title}
                   width={100}
                   height={100}
-                  className={`size-[100px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-16 shrink-0 rounded-lg object-cover sm:size-[100px] ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[100px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-16 shrink-0 rounded-lg sm:size-[100px] ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}
