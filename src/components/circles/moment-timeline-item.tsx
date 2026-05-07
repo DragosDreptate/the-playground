@@ -154,7 +154,7 @@ export async function MomentTimelineItem({
             {/* Corps de la carte */}
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="min-w-0 flex-1 space-y-2">
                 {/* Heure + lieu */}
                 <div className={`flex items-center gap-3 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
                   <span className="flex shrink-0 items-center gap-1.5">
