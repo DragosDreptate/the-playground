@@ -171,6 +171,9 @@
       "Configuration": "Erreur de configuration du serveur.",
       "AccessDenied": "Accès refusé.",
       "Verification": "Le lien de vérification a expiré ou a déjà été utilisé.",
+      "OAuthAccountNotLinked": "Cet email est déjà associé à une autre méthode de connexion. Utilisez celle-ci pour continuer.",
+      "OAuthCallbackError": "La connexion via le fournisseur a échoué. Réessayez.",
+      "OAuthSignInError": "La connexion via le fournisseur n'a pas pu démarrer. Réessayez.",
       "Default": "Une erreur est survenue lors de la connexion."
     },
     "signOut": "Se déconnecter"

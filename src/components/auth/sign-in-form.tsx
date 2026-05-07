@@ -76,9 +76,10 @@ function DisabledOAuthButton({
 
 type SignInFormProps = {
   callbackUrl?: string;
+  error?: string;
 };
 
-export function SignInForm({ callbackUrl }: SignInFormProps) {
+export function SignInForm({ callbackUrl, error }: SignInFormProps) {
   const t = useTranslations("Auth");
   const [webview, setWebview] = useState(false);
   const [emailState, emailAction] = useActionState<SignInWithEmailState, FormData>(
@@ -93,6 +94,15 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
   return (
     <TooltipProvider>
       <div className="space-y-4">
+        {error && (
+          <div
+            role="alert"
+            className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {t(`errors.${error}`, { defaultValue: t("errors.Default") })}
+          </div>
+        )}
+
         {webview && (
           <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
