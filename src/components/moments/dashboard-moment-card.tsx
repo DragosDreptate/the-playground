@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
+import { MapPin, Globe, Clock } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -114,23 +114,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName;
 
-  const roleBadge = !isPast && !isDraft ? (
-    isOrganizerView || isOrganizer ? (
-      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-        <Crown className="size-3" />
-        <span className="hidden sm:inline">{t("role.host")}</span>
-      </Badge>
-    ) : isRegistered ? (
-      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-        <Check className="size-3" />
-        <span className="hidden sm:inline">{t("registrationStatus.registered")}</span>
-      </Badge>
-    ) : isWaitlisted ? (
-      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-        <Clock className="size-3" />
-        <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
-      </Badge>
-    ) : null
+  const roleBadge = !isPast && !isDraft && isWaitlisted ? (
+    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+      <Clock className="size-3" />
+      <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
+    </Badge>
   ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
