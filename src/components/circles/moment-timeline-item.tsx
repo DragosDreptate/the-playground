@@ -157,7 +157,7 @@ export async function MomentTimelineItem({
             {/* Corps de la carte */}
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-2">
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
                 {/* Heure + lieu (heure toujours masquée mobile ; ligne entière masquée mobile en variant dashboard) */}
                 <div
                   className={`${variant === "dashboard" ? "hidden sm:flex" : "flex"} items-center gap-3 text-xs ${
@@ -176,9 +176,11 @@ export async function MomentTimelineItem({
                   )}
                 </div>
 
-                {/* Title */}
+                {/* Title (en variant public, passe en première ligne sur mobile) */}
                 <p
                   className={`truncate font-semibold leading-snug ${
+                    variant === "public" ? "order-first sm:order-none" : ""
+                  } ${
                     isCancelled
                       ? "text-muted-foreground line-through"
                       : isPast
