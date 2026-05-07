@@ -179,11 +179,9 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Title (en variant public, passe en première ligne sur mobile) */}
+                {/* Title */}
                 <p
                   className={`line-clamp-2 font-semibold leading-snug ${
-                    variant === "public" ? "order-first sm:order-none" : ""
-                  } ${
                     isCancelled
                       ? "text-muted-foreground line-through"
                       : isPast
