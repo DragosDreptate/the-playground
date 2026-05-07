@@ -124,6 +124,9 @@ export async function MomentTimelineItem({
             <p className="text-sm font-medium leading-snug">{dateStr}</p>
           </>
         )}
+        <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+          {timeStr}
+        </p>
       </div>
 
       {/* Dot + vertical line */}
@@ -155,9 +158,9 @@ export async function MomentTimelineItem({
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-2">
-                {/* Heure + lieu */}
+                {/* Heure + lieu (heure masquée en mobile, déplacée dans la colonne date) */}
                 <div className={`flex items-center gap-3 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                  <span className="flex shrink-0 items-center gap-1.5">
+                  <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
                     <Clock className="size-3.5 shrink-0" />
                     {timeStr}
                   </span>

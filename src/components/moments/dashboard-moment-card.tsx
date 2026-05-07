@@ -159,6 +159,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
             </p>
           </>
         )}
+        <p
+          className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+          suppressHydrationWarning
+        >
+          {timeStr}
+        </p>
       </div>
 
       {/* Dot + vertical line */}
@@ -180,13 +186,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Heure + lieu */}
+              {/* Heure + lieu (heure masquée en mobile, déplacée dans la colonne date) */}
               <div
                 className={`flex items-center gap-3 text-xs ${
                   isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                 }`}
               >
-                <span className="flex shrink-0 items-center gap-1.5">
+                <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
                   <Clock className="size-3.5 shrink-0" />
                   <span suppressHydrationWarning>{timeStr}</span>
                 </span>
