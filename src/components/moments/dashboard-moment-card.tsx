@@ -222,10 +222,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </div>
               )}
 
-              {/* Badge + Communauté */}
+              {/* Communauté + badge */}
               <div className="flex items-center gap-2">
-                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                {roleBadge}
                 <span
                   className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
                     isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
@@ -233,6 +231,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 >
                   {momentData.circleName}
                 </span>
+                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                {roleBadge}
               </div>
             </div>
 
