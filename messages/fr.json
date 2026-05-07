@@ -140,14 +140,7 @@
       "invalidEmail": "Adresse email invalide. Vérifiez votre saisie.",
       "sendFailed": "Impossible d'envoyer l'email pour le moment. Réessayez dans un instant.",
       "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous — elle fonctionne partout.",
-      "webviewTooltip": "Non disponible depuis un navigateur intégré. Utilisez la connexion par email.",
-      "errors": {
-        "OAuthAccountNotLinked": "Cet email est déjà associé à une autre méthode de connexion. Utilisez celle-ci pour continuer.",
-        "OAuthCallbackError": "La connexion via le fournisseur a échoué. Réessayez.",
-        "OAuthSignInError": "La connexion via le fournisseur n'a pas pu démarrer. Réessayez.",
-        "AccessDenied": "Accès refusé.",
-        "Default": "Une erreur est survenue lors de la connexion. Réessayez."
-      }
+      "webviewTooltip": "Non disponible depuis un navigateur intégré. Utilisez la connexion par email."
     },
     "verifyRequest": {
       "title": "Vérifiez votre email",
@@ -178,6 +171,9 @@
       "Configuration": "Erreur de configuration du serveur.",
       "AccessDenied": "Accès refusé.",
       "Verification": "Le lien de vérification a expiré ou a déjà été utilisé.",
+      "OAuthAccountNotLinked": "Cet email est déjà associé à une autre méthode de connexion. Utilisez celle-ci pour continuer.",
+      "OAuthCallbackError": "La connexion via le fournisseur a échoué. Réessayez.",
+      "OAuthSignInError": "La connexion via le fournisseur n'a pas pu démarrer. Réessayez.",
       "Default": "Une erreur est survenue lors de la connexion."
     },
     "signOut": "Se déconnecter"

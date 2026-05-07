@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
 import { SignInForm } from "@/components/auth/sign-in-form";
 import { safeCallbackUrl } from "@/lib/url";
@@ -17,17 +17,7 @@ export default async function SignInPage({
     redirect(callbackUrl ?? "/dashboard");
   }
 
-  return <SignInContent callbackUrl={callbackUrl} error={params.error} />;
-}
-
-function SignInContent({
-  callbackUrl,
-  error,
-}: {
-  callbackUrl?: string;
-  error?: string;
-}) {
-  const t = useTranslations("Auth");
+  const t = await getTranslations("Auth");
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
@@ -36,7 +26,7 @@ function SignInContent({
           <h1 className="text-2xl font-bold tracking-tight">{t("signIn.title")}</h1>
           <p className="text-muted-foreground text-sm">{t("signIn.subtitle")}</p>
         </div>
-        <SignInForm callbackUrl={callbackUrl} error={error} />
+        <SignInForm callbackUrl={callbackUrl} error={params.error} />
       </div>
     </div>
   );

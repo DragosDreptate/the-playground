@@ -20,7 +20,6 @@ import {
   type SignInWithEmailState,
 } from "@/app/actions/auth";
 import { isInAppBrowser } from "@/lib/detect-webview";
-import { mapSignInErrorToKey } from "@/lib/auth/signin-error-key";
 
 function GoogleIcon() {
   return (
@@ -92,17 +91,15 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
     setWebview(isInAppBrowser());
   }, []);
 
-  const errorKey = error ? mapSignInErrorToKey(error) : null;
-
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {errorKey && (
+        {error && (
           <div
             role="alert"
             className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
-            {t(`signIn.errors.${errorKey}`)}
+            {t(`errors.${error}`, { defaultValue: t("errors.Default") })}
           </div>
         )}
 
