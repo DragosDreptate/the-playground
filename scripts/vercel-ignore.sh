@@ -10,7 +10,8 @@
 #   - Branche `staging` : toujours build
 #   - Branche `main` :
 #       - build si src/content/** a changé (posts blog qui impactent les routes)
-#       - skip si uniquement CHANGELOG.md, spec/**, *.md, .github/** ont changé (docs-only)
+#       - skip si uniquement docs/scripts hors-build ont changé (CHANGELOG.md,
+#         spec/**, memory/**, *.md, .github/**, .gitignore, scripts/**)
 #       - build sinon
 #   - Autres branches : skip (les preview builds sont désactivés sauf staging)
 # ─────────────────────────────────────────────
@@ -29,4 +30,11 @@ if git diff --name-only HEAD~1 -- 'src/content/**' | grep -q .; then
   exit 1
 fi
 
-git diff --quiet HEAD~1 -- ':!CHANGELOG.md' ':!spec/**' ':!*.md' ':!.github/**'
+git diff --quiet HEAD~1 -- \
+  ':!CHANGELOG.md' \
+  ':!spec/**' \
+  ':!memory/**' \
+  ':!*.md' \
+  ':!.github/**' \
+  ':!.gitignore' \
+  ':!scripts/**'
