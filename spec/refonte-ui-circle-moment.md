@@ -397,7 +397,7 @@ Identique au pattern `CircleMembersDialog` :
 - `feedback_sticky_column_under_header.md` : sticky `lg:top-20` minimum (SiteHeader h-14)
 - `feedback_no_radix_tooltip_in_dialog_trigger.md` : jamais Radix Tooltip dans un DialogTrigger/button → hydration mismatch. Pattern tooltip CSS-pur
 - `feedback_no_auto_visual_regression.md` : ne jamais lancer `pnpm test:e2e refonte-visual-baseline` sans demande explicite
-- `feedback_note_vs_backlog.md` : "noter" = fichier spec de la session, jamais BACKLOG.md. Backlog seulement si "ajoute au backlog" explicite
+- `feedback_note_vs_backlog.md` : "noter" = fichier spec de la session, jamais une issue backlog. Backlog seulement si "ajoute au backlog" explicite
 
 ### Reste à faire
 

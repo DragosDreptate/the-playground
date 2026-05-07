@@ -1,7 +1,7 @@
 # Idées — The Playground
 
 > Parking d'idées non qualifiées. **Ne pas traiter directement.**
-> Une idée devient actionable uniquement quand elle est **promue** dans `spec/BACKLOG.md` (sur demande explicite, avec cadrage en 5 champs). Ce fichier est local à chaque machine (non tracké, source unique dans le repo principal, symlink dans les worktrees).
+> Une idée devient actionable uniquement quand elle est **promue** en issue GitHub sur le repo (sur demande explicite, avec cadrage : titre, problème, piste, lien spec si nécessaire). Le backlog vit dans GitHub Issues + Project v2 « Backlog » : https://github.com/users/DragosDreptate/projects/1.
 > Ce fichier peut contenir du bruit, des doublons, des demi-phrases. C'est normal, c'est le rôle du parking.
 
 ---

@@ -15,9 +15,7 @@
 #   4. Crée un symlink .env.local vers le fichier du repo principal
 #      (source unique partagée : un `pnpm db:dev:reset` depuis n'importe
 #      quel worktree met à jour les credentials pour tous les worktrees)
-#   5. Crée un symlink spec/BACKLOG.md vers le fichier du repo principal
-#      (source unique, non trackée, partagée entre tous les worktrees)
-#   6. Affiche un message de fin avec la commande pour lancer le dev server
+#   5. Affiche un message de fin avec la commande pour lancer le dev server
 #      sur un port alternatif (3001) pour ne pas entrer en conflit avec le
 #      dev server du repo principal
 
@@ -61,12 +59,6 @@ pnpm install --prefer-offline --silent
 if [ -f "$main_root/.env.local" ]; then
   echo "→ Symlink .env.local → repo principal"
   ln -sf "$main_root/.env.local" .env.local
-fi
-
-if [ -f "$main_root/spec/BACKLOG.md" ]; then
-  echo "→ Symlink spec/BACKLOG.md → repo principal"
-  mkdir -p spec
-  ln -sf "$main_root/spec/BACKLOG.md" spec/BACKLOG.md
 fi
 
 echo ""
