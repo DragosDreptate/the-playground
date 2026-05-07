@@ -182,7 +182,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors sm:items-center ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors ${cardBorderClass}`}
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
