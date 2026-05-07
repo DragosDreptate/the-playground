@@ -67,20 +67,12 @@ export async function DashboardCircleCard({ circle }: Props) {
             <p className="text-muted-foreground line-clamp-1 text-xs">
               {circle.description}
             </p>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
-              {circle.city && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="size-3.5 shrink-0" />
-                  <span>{circle.city}</span>
-                </div>
-              )}
-              {circle.upcomingMomentCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="size-3.5 shrink-0" />
-                  <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-                </div>
-              )}
-            </div>
+            {circle.city && (
+              <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                <MapPin className="size-3.5 shrink-0" />
+                <span>{circle.city}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               {circle.memberCount > 0 && (
                 <AttendeeAvatarStack
