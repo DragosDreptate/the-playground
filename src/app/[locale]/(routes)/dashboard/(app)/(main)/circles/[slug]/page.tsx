@@ -115,11 +115,12 @@ export default async function CircleDetailPage({
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
-  // Récupère compteurs + inscriptions utilisateur pour TOUS les moments (upcoming + past)
+  // Récupère compteurs + inscriptions utilisateur + top inscrits (avatars) pour TOUS les moments
   const allMomentIds = allMoments.map((m) => m.id);
-  const [countByMomentId, userRegistrationsByMomentId] = await Promise.all([
+  const [countByMomentId, userRegistrationsByMomentId, topAttendeesByMomentId] = await Promise.all([
     prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
     prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
+    prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
   ]);
   const userStatusByMomentId = new Map(
     [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
@@ -489,6 +490,7 @@ export default async function CircleDetailPage({
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isOrganizer={isOrganizer}
                       isLast={i === upcomingMoments.length - 1}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
                   ))}
                 </PaginatedMomentList>
@@ -512,6 +514,7 @@ export default async function CircleDetailPage({
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isOrganizer={isOrganizer}
                       isLast={i === pastMoments.length - 1}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
                   ))}
                 </PaginatedMomentList>

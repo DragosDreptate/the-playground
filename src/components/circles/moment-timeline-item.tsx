@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
+import { MapPin, Globe, Check, Clock, XCircle, Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -21,7 +21,7 @@ type Props = {
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
   variant?: "dashboard" | "public";
-  /** Premiers inscrits pour l'avatar stack (variant public). */
+  /** Premiers inscrits pour l'avatar stack. */
   topAttendees?: Attendee[];
 };
 
@@ -155,24 +155,20 @@ export async function MomentTimelineItem({
                 </div>
 
                 {/* Title */}
-                {!isCancelled && variant === "dashboard" ? (
-                  <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
-                    {moment.title}
-                  </p>
-                ) : (
-                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
-                    {moment.title}
-                  </p>
-                )}
+                <p
+                  className={`truncate font-semibold leading-snug ${
+                    isCancelled
+                      ? "text-muted-foreground line-through"
+                      : isPast
+                        ? "text-muted-foreground"
+                        : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                  }`}
+                >
+                  {moment.title}
+                </p>
 
                 {/* Inscrits */}
-                {!isCancelled && registrationCount > 0 && variant === "dashboard" && (
-                  <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                    <Users className="size-3 shrink-0" />
-                    <span>{t("registrations.registered", { count: registrationCount })}</span>
-                  </div>
-                )}
-                {!isCancelled && registrationCount > 0 && variant === "public" && (
+                {!isCancelled && registrationCount > 0 && (
                   <div className={isPast ? "opacity-60" : ""}>
                     <AttendeeAvatarStack
                       attendees={topAttendees}
