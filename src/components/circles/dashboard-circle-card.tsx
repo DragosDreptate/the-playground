@@ -53,7 +53,7 @@ export async function DashboardCircleCard({ circle }: Props) {
           </div>
 
           {/* Body */}
-          <div className="flex min-w-0 flex-1 flex-col gap-[5px] sm:gap-1.5">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             {/* Badges — catégorie */}
             {categoryLabel && (
               <div className="flex items-center gap-2">
