@@ -94,7 +94,7 @@ export async function DashboardCircleCard({ circle }: Props) {
           {/* Colonne droite — desktop uniquement */}
           <div className="hidden sm:flex shrink-0 items-center ml-4">
             {hasNextMoment ? (
-              <div className="flex w-[140px] min-w-0 flex-col gap-1 overflow-hidden rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+              <div className="flex w-[160px] min-w-0 flex-col gap-1 overflow-hidden rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                   <CalendarIcon className="size-3 shrink-0 text-foreground" />
                   <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
