@@ -82,6 +82,34 @@ export async function MomentTimelineItem({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
+  const statusBadge =
+    isCancelled || variant !== "dashboard"
+      ? null
+      : isDraft
+        ? <DraftBadge label={t("status.draft")} />
+        : isOrganizer
+          ? (
+              <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
+                <Crown className="size-3" />
+                {tDashboard("role.host")}
+              </Badge>
+            )
+          : isRegistered
+            ? (
+                <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
+                  <Check className="size-3" />
+                  {tDashboard("registrationStatus.registered")}
+                </Badge>
+              )
+            : isWaitlisted
+              ? (
+                  <Badge variant="secondary" className="gap-1 text-xs">
+                    <Clock className="size-3" />
+                    {tDashboard("registrationStatus.waitlisted")}
+                  </Badge>
+                )
+              : null;
+
   return (
     <div className="flex gap-0">
       {/* Date column */}
@@ -127,30 +155,17 @@ export async function MomentTimelineItem({
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="min-w-0 flex-1 space-y-1.5">
-                {/* Time + badge rôle — sur la même ligne */}
-                <div className="flex items-center gap-2">
-                  <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
-                  {!isCancelled && variant === "dashboard" && (
-                    <>
-                      {isDraft ? (
-                        <DraftBadge label={t("status.draft")} />
-                      ) : isOrganizer ? (
-                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                          <Crown className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("role.host")}</span>
-                        </Badge>
-                      ) : isRegistered ? (
-                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                          <Check className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("registrationStatus.registered")}</span>
-                        </Badge>
-                      ) : isWaitlisted ? (
-                        <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                          <Clock className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("registrationStatus.waitlisted")}</span>
-                        </Badge>
-                      ) : null}
-                    </>
+                {/* Heure + lieu */}
+                <div className={`flex items-center gap-3 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <Clock className="size-3.5 shrink-0" />
+                    {timeStr}
+                  </span>
+                  {locationLabel && (
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <LocationIcon className="size-3.5 shrink-0" />
+                      <span className="truncate">{locationLabel}</span>
+                    </span>
                   )}
                 </div>
 
@@ -182,13 +197,8 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Location */}
-                {locationLabel && (
-                  <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                    <LocationIcon className="size-3.5 shrink-0" />
-                    <span className="truncate">{locationLabel}</span>
-                  </div>
-                )}
+                {/* Badge statut/rôle */}
+                {statusBadge && <div>{statusBadge}</div>}
               </div>
 
               {/* Thumbnail */}
