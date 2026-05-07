@@ -149,9 +149,8 @@ export async function MomentTimelineItem({
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="flex min-w-0 flex-1 flex-col gap-2">
-                {/* Heure + lieu (heure toujours masquée mobile ; ligne entière masquée mobile en variant dashboard) */}
                 <div
-                  className={`${variant === "dashboard" ? "hidden sm:flex" : "flex"} items-center gap-3 text-xs ${
+                  className={`flex items-center gap-3 text-xs ${
                     isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                   }`}
                 >
@@ -167,19 +166,7 @@ export async function MomentTimelineItem({
                   )}
                 </div>
 
-                {/* Lieu seul sur sa ligne, mobile only, variant dashboard (la ligne heure+lieu est cachée mobile dashboard) */}
-                {variant === "dashboard" && locationLabel && (
-                  <div
-                    className={`flex items-center gap-1.5 text-xs sm:hidden ${
-                      isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                    }`}
-                  >
-                    <LocationIcon className="size-3.5 shrink-0" />
-                    <span className="truncate">{locationLabel}</span>
-                  </div>
-                )}
 
-                {/* Title */}
                 <p
                   className={`line-clamp-2 font-semibold leading-snug ${
                     isCancelled
@@ -192,7 +179,6 @@ export async function MomentTimelineItem({
                   {moment.title}
                 </p>
 
-                {/* Inscrits */}
                 {!isCancelled && registrationCount > 0 && (
                   <div className={isPast ? "opacity-60" : ""}>
                     <AttendeeAvatarStack
@@ -207,7 +193,6 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Badge statut/rôle (desktop only) */}
                 {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
               </div>
 

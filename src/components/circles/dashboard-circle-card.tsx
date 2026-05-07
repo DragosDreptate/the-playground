@@ -26,7 +26,6 @@ export async function DashboardCircleCard({ circle }: Props) {
   const nextMomentStart = circle.nextMoment?.startsAt ?? null;
   const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
-  const hasNextMoment = !!(circle.nextMoment && nextMomentDate);
 
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
@@ -35,7 +34,6 @@ export async function DashboardCircleCard({ circle }: Props) {
       <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-4 sm:gap-5">
 
-          {/* Thumbnail */}
           <div
             className="size-[100px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
@@ -52,15 +50,12 @@ export async function DashboardCircleCard({ circle }: Props) {
             )}
           </div>
 
-          {/* Body */}
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            {/* Badges — catégorie */}
             {categoryLabel && (
               <div className="flex items-center gap-2">
                 <CategoryBadge label={categoryLabel} />
               </div>
             )}
-            {/* Titre — pleine largeur */}
             <h3 className="truncate text-sm font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
               {circle.name}
             </h3>
@@ -91,9 +86,8 @@ export async function DashboardCircleCard({ circle }: Props) {
             </div>
           </div>
 
-          {/* Colonne droite — desktop uniquement */}
           <div className="hidden sm:flex shrink-0 items-center ml-4">
-            {hasNextMoment ? (
+            {circle.nextMoment ? (
               <div className="flex w-[180px] min-w-0 flex-col gap-1 overflow-hidden rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                 <p className="text-muted-foreground/70 text-[0.6rem] font-medium uppercase tracking-wider">
                   {t("circleCard.nextMoment")}

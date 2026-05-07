@@ -114,7 +114,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName;
 
-  const roleBadge = !isPast && !isDraft && isWaitlisted ? (
+  const waitlistedBadge = !isPast && !isDraft && isWaitlisted ? (
     <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
       <Clock className="size-3" />
       <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
@@ -172,9 +172,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           <div
             className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors ${cardBorderClass}`}
           >
-            {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Heure + lieu (ligne entière masquée mobile : heure dans la colonne date, lieu non affiché) */}
               <div
                 className={`hidden items-center gap-3 text-xs sm:flex ${
                   isPast ? "text-muted-foreground/60" : "text-muted-foreground"
@@ -192,7 +190,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 )}
               </div>
 
-              {/* Title */}
               <p
                 className={`line-clamp-2 font-semibold leading-snug ${
                   isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
@@ -201,7 +198,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 {momentData.title}
               </p>
 
-              {/* Inscrits */}
               {momentData.registrationCount > 0 && (
                 <div className={isPast ? "opacity-60" : ""}>
                   <AttendeeAvatarStack
@@ -216,7 +212,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </div>
               )}
 
-              {/* Communauté + badges (badges desktop only) */}
               <div className="flex items-center gap-2">
                 <span
                   className={`flex min-w-0 items-center gap-1.5 rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
@@ -228,12 +223,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 </span>
                 <div className="hidden items-center gap-2 sm:flex">
                   {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                  {roleBadge}
+                  {waitlistedBadge}
                 </div>
               </div>
             </div>
 
-            {/* Cover — RIGHT, alignée avec le titre */}
             {momentData.coverImage ? (
               <Image
                 src={momentData.coverImage}
