@@ -95,6 +95,9 @@ export async function DashboardCircleCard({ circle }: Props) {
           <div className="hidden sm:flex shrink-0 items-center ml-4">
             {hasNextMoment ? (
               <div className="flex w-[180px] min-w-0 flex-col gap-1 overflow-hidden rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                <p className="text-muted-foreground/70 text-[0.6rem] font-medium uppercase tracking-wider">
+                  {t("circleCard.nextMoment")}
+                </p>
                 <div className="flex items-center gap-1.5">
                   <CalendarIcon className="size-3 shrink-0 text-foreground" />
                   <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
