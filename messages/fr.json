@@ -779,8 +779,8 @@
       "moments": "Aucun événement à venir pour cette thématique."
     },
     "circleCard": {
-      "members": "{count} membres",
-      "moreMembers": "+{count} membres",
+      "members": "{count, plural, one {# membre} other {# membres}}",
+      "moreMembers": "+{count, plural, one {# membre} other {# membres}}",
       "upcomingMoments": "{count} événement(s) à venir",
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",
@@ -1060,7 +1060,7 @@
       "subject": "{playerName} a rejoint {circleName}",
       "heading": "Nouveau membre",
       "message": "{playerName} a rejoint votre communauté {circleName}.",
-      "memberCountInfo": "{count} membre(s)",
+      "memberCountInfo": "{count, plural, one {# membre} other {# membres}}",
       "manageMembersCta": "Voir les membres"
     },
     "hostNotification": {
