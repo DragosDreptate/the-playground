@@ -20,6 +20,7 @@ import {
   type SignInWithEmailState,
 } from "@/app/actions/auth";
 import { isInAppBrowser } from "@/lib/detect-webview";
+import { mapSignInErrorToKey } from "@/lib/auth/signin-error-key";
 
 function GoogleIcon() {
   return (
@@ -76,9 +77,10 @@ function DisabledOAuthButton({
 
 type SignInFormProps = {
   callbackUrl?: string;
+  error?: string;
 };
 
-export function SignInForm({ callbackUrl }: SignInFormProps) {
+export function SignInForm({ callbackUrl, error }: SignInFormProps) {
   const t = useTranslations("Auth");
   const [webview, setWebview] = useState(false);
   const [emailState, emailAction] = useActionState<SignInWithEmailState, FormData>(
@@ -90,9 +92,20 @@ export function SignInForm({ callbackUrl }: SignInFormProps) {
     setWebview(isInAppBrowser());
   }, []);
 
+  const errorKey = error ? mapSignInErrorToKey(error) : null;
+
   return (
     <TooltipProvider>
       <div className="space-y-4">
+        {errorKey && (
+          <div
+            role="alert"
+            className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          >
+            {t(`signIn.errors.${errorKey}`)}
+          </div>
+        )}
+
         {webview && (
           <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">

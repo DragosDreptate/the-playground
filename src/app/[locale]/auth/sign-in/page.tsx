@@ -7,7 +7,7 @@ import { safeCallbackUrl } from "@/lib/url";
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ callbackUrl?: string }>;
+  searchParams: Promise<{ callbackUrl?: string; error?: string }>;
 }) {
   const session = await getCachedSession();
   const params = await searchParams;
@@ -17,10 +17,16 @@ export default async function SignInPage({
     redirect(callbackUrl ?? "/dashboard");
   }
 
-  return <SignInContent callbackUrl={callbackUrl} />;
+  return <SignInContent callbackUrl={callbackUrl} error={params.error} />;
 }
 
-function SignInContent({ callbackUrl }: { callbackUrl?: string }) {
+function SignInContent({
+  callbackUrl,
+  error,
+}: {
+  callbackUrl?: string;
+  error?: string;
+}) {
   const t = useTranslations("Auth");
 
   return (
@@ -30,7 +36,7 @@ function SignInContent({ callbackUrl }: { callbackUrl?: string }) {
           <h1 className="text-2xl font-bold tracking-tight">{t("signIn.title")}</h1>
           <p className="text-muted-foreground text-sm">{t("signIn.subtitle")}</p>
         </div>
-        <SignInForm callbackUrl={callbackUrl} />
+        <SignInForm callbackUrl={callbackUrl} error={error} />
       </div>
     </div>
   );

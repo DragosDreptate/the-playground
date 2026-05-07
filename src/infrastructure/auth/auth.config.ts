@@ -19,8 +19,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
-    GitHub,
-    Google,
+    // allowDangerousEmailAccountLinking : si un User existe déjà avec le même email
+    // (créé via magic link ou autre provider), Auth.js linke automatiquement le
+    // compte OAuth au lieu de jeter `OAuthAccountNotLinked`. Sans cette flag,
+    // l'utilisateur reste bloqué silencieusement sur /auth/sign-in?error=... sans
+    // feedback. Risque : un attaquant qui contrôlerait un compte OAuth avec un
+    // email primaire correspondant à un User existant pourrait usurper. Mitigé
+    // pour Google (email_verified=true requis via OIDC) et pour GitHub (verif
+    // email obligatoire avant de marquer une adresse comme primary).
+    GitHub({ allowDangerousEmailAccountLinking: true }),
+    Google({ allowDangerousEmailAccountLinking: true }),
     ResendProvider({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
