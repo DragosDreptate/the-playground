@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Check, Clock, XCircle, Crown } from "lucide-react";
+import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -16,7 +16,6 @@ type Props = {
   circleSlug: string;
   registrationCount: number;
   userRegistrationStatus: RegistrationStatus | null;
-  isOrganizer: boolean;
   isLast: boolean;
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
@@ -30,7 +29,6 @@ export async function MomentTimelineItem({
   circleSlug,
   registrationCount,
   userRegistrationStatus,
-  isOrganizer,
   isLast,
   variant = "dashboard",
   topAttendees = [],
@@ -87,28 +85,21 @@ export async function MomentTimelineItem({
       ? null
       : isDraft
         ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
-        : isOrganizer
+        : isRegistered
           ? (
               <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
-                <Crown className="size-3" />
-                {tDashboard("role.host")}
+                <Check className="size-3" />
+                {tDashboard("registrationStatus.registered")}
               </Badge>
             )
-          : isRegistered
+          : isWaitlisted
             ? (
-                <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
-                  <Check className="size-3" />
-                  {tDashboard("registrationStatus.registered")}
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Clock className="size-3" />
+                  {tDashboard("registrationStatus.waitlisted")}
                 </Badge>
               )
-            : isWaitlisted
-              ? (
-                  <Badge variant="secondary" className="gap-1 text-xs">
-                    <Clock className="size-3" />
-                    {tDashboard("registrationStatus.waitlisted")}
-                  </Badge>
-                )
-              : null;
+            : null;
 
   return (
     <div className="flex gap-0">
@@ -206,8 +197,8 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Badge statut/rôle */}
-                {statusBadge && <div>{statusBadge}</div>}
+                {/* Badge statut/rôle (desktop only) */}
+                {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
               </div>
 
               {/* Thumbnail */}

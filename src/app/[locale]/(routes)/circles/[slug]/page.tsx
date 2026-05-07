@@ -548,7 +548,6 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isOrganizer={false}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
@@ -573,7 +572,6 @@ export default async function PublicCirclePage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={null}
-                      isOrganizer={false}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}

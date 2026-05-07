@@ -488,7 +488,6 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isOrganizer={isOrganizer}
                       isLast={i === upcomingMoments.length - 1}
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
@@ -512,7 +511,6 @@ export default async function CircleDetailPage({
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
-                      isOrganizer={isOrganizer}
                       isLast={i === pastMoments.length - 1}
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
                     />
