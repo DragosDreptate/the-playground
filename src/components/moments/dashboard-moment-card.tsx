@@ -180,22 +180,22 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           >
             {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Time + community pill */}
-              <div className="flex items-center gap-2">
-                <p
-                  className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-                  suppressHydrationWarning
-                >
-                  {timeStr}
-                </p>
-                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                <span
-                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
-                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
-                  }`}
-                >
-                  {momentData.circleName}
+              {/* Heure + lieu */}
+              <div
+                className={`flex items-center gap-3 text-xs ${
+                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                }`}
+              >
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <Clock className="size-3.5 shrink-0" />
+                  <span suppressHydrationWarning>{timeStr}</span>
                 </span>
+                {locationLabel && (
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
+                  </span>
+                )}
               </div>
 
               {/* Title */}
@@ -207,35 +207,33 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 {momentData.title}
               </p>
 
-              {/* Location */}
-              {locationLabel && (
-                <div
-                  className={`flex items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                  }`}
-                >
-                  <LocationIcon className="size-3 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
+              {/* Inscrits */}
+              {momentData.registrationCount > 0 && (
+                <div className={isPast ? "opacity-60" : ""}>
+                  <AttendeeAvatarStack
+                    attendees={momentData.topAttendees}
+                    totalCount={momentData.registrationCount}
+                    label={
+                      momentData.topAttendees.length < momentData.registrationCount
+                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+                        : tMoment("registrations.registered", { count: momentData.registrationCount })
+                    }
+                  />
                 </div>
               )}
 
-              {/* Inscrits + badge rôle */}
-              {(momentData.registrationCount > 0 || roleBadge) && (
-                <div className={`flex items-center gap-2 ${isPast ? "opacity-60" : ""}`}>
-                  {momentData.registrationCount > 0 && (
-                    <AttendeeAvatarStack
-                      attendees={momentData.topAttendees}
-                      totalCount={momentData.registrationCount}
-                      label={
-                        momentData.topAttendees.length < momentData.registrationCount
-                          ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
-                          : tMoment("registrations.registered", { count: momentData.registrationCount })
-                      }
-                    />
-                  )}
-                  {roleBadge}
-                </div>
-              )}
+              {/* Badge + Communauté */}
+              <div className="flex items-center gap-2">
+                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                {roleBadge}
+                <span
+                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
+                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
+                  }`}
+                >
+                  {momentData.circleName}
+                </span>
+              </div>
             </div>
 
             {/* Cover — RIGHT, alignée avec le titre */}
