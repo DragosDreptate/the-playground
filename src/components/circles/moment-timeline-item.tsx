@@ -91,21 +91,21 @@ export async function MomentTimelineItem({
           ? (
               <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
                 <Crown className="size-3" />
-                {tDashboard("role.host")}
+                <span className="hidden sm:inline">{tDashboard("role.host")}</span>
               </Badge>
             )
           : isRegistered
             ? (
                 <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
                   <Check className="size-3" />
-                  {tDashboard("registrationStatus.registered")}
+                  <span className="hidden sm:inline">{tDashboard("registrationStatus.registered")}</span>
                 </Badge>
               )
             : isWaitlisted
               ? (
                   <Badge variant="secondary" className="gap-1 text-xs">
                     <Clock className="size-3" />
-                    {tDashboard("registrationStatus.waitlisted")}
+                    <span className="hidden sm:inline">{tDashboard("registrationStatus.waitlisted")}</span>
                   </Badge>
                 )
               : null;
