@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Clock } from "lucide-react";
+import { MapPin, Globe, Clock, Users } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -219,11 +219,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               {/* Communauté + badges (badges desktop only) */}
               <div className="flex items-center gap-2">
                 <span
-                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
+                  className={`flex min-w-0 items-center gap-1.5 rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
                     isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
                   }`}
                 >
-                  {momentData.circleName}
+                  <Users className="size-3 shrink-0" />
+                  <span className="truncate">{momentData.circleName}</span>
                 </span>
                 <div className="hidden items-center gap-2 sm:flex">
                   {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
