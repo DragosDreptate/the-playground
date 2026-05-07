@@ -6,9 +6,11 @@ type Props = {
   /** "cover" → overlay on image (matches DemoBadge size="lg" + FileEdit icon)
    *  "badge" → inline Badge component for card lists (default) */
   variant?: "cover" | "badge";
+  /** Affiche le label aussi sur mobile (défaut : false → icône seule sur mobile). */
+  showLabelOnMobile?: boolean;
 };
 
-export function DraftBadge({ label, variant = "badge" }: Props) {
+export function DraftBadge({ label, variant = "badge", showLabelOnMobile = false }: Props) {
   if (variant === "cover") {
     return (
       <span className="absolute left-3 top-3 z-10 inline-flex items-center gap-1 rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-sm leading-none text-primary">
@@ -21,7 +23,7 @@ export function DraftBadge({ label, variant = "badge" }: Props) {
   return (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
       <FileEdit className="size-3" />
-      <span className="hidden sm:inline">{label}</span>
+      {showLabelOnMobile ? label : <span className="hidden sm:inline">{label}</span>}
     </Badge>
   );
 }

@@ -86,7 +86,7 @@ export async function MomentTimelineItem({
     isCancelled || variant !== "dashboard"
       ? null
       : isDraft
-        ? <DraftBadge label={t("status.draft")} />
+        ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
         : isOrganizer
           ? (
               <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
