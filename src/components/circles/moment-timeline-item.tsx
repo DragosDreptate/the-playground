@@ -167,6 +167,18 @@ export async function MomentTimelineItem({
                   )}
                 </div>
 
+                {/* Lieu seul sur sa ligne, mobile only, variant dashboard (la ligne heure+lieu est cachée mobile dashboard) */}
+                {variant === "dashboard" && locationLabel && (
+                  <div
+                    className={`flex items-center gap-1.5 text-xs sm:hidden ${
+                      isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
+                  </div>
+                )}
+
                 {/* Title (en variant public, passe en première ligne sur mobile) */}
                 <p
                   className={`line-clamp-2 font-semibold leading-snug ${
