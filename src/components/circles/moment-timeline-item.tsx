@@ -178,7 +178,7 @@ export async function MomentTimelineItem({
 
                 {/* Title (en variant public, passe en première ligne sur mobile) */}
                 <p
-                  className={`truncate font-semibold leading-snug ${
+                  className={`line-clamp-2 font-semibold leading-snug ${
                     variant === "public" ? "order-first sm:order-none" : ""
                   } ${
                     isCancelled
