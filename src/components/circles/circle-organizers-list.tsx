@@ -1,8 +1,15 @@
-import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { UserAvatar } from "@/components/user-avatar";
+import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 import { getDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+
+type ContactOrganizerConfig = {
+  circleId: string;
+  senderEmail: string | null;
+  /** Non-null = visiteur non auth → le lien redirige vers signin. */
+  signInUrl: string | null;
+};
 
 type Props = {
   organizers: CircleMemberWithUser[];
@@ -10,15 +17,18 @@ type Props = {
   linkable: boolean;
   /** Label de section, déjà traduit. */
   label: string;
-  /** Contenu optionnel rendu sous la liste, dans le même bloc (avant le séparateur). */
-  footer?: ReactNode;
+  /**
+   * Si fourni, affiche un lien discret "Contacter l'organisateur" sous la liste.
+   * À ne PAS passer si le visiteur est lui-même organisateur du Circle.
+   */
+  contactOrganizer?: ContactOrganizerConfig;
 };
 
 /**
  * Bloc "Organisé par" de la colonne gauche des pages Circle (publique + dashboard).
  * Liste les organisateurs triés (HOST puis CO_HOST) avec avatar + nom.
  */
-export function CircleOrganizersList({ organizers, linkable, label, footer }: Props) {
+export function CircleOrganizersList({ organizers, linkable, label, contactOrganizer }: Props) {
   if (organizers.length === 0) return null;
 
   return (
@@ -60,7 +70,14 @@ export function CircleOrganizersList({ organizers, linkable, label, footer }: Pr
             );
           })}
         </ul>
-        {footer}
+        {contactOrganizer && (
+          <ContactOrganizerLink
+            circleId={contactOrganizer.circleId}
+            senderEmail={contactOrganizer.senderEmail}
+            signInUrl={contactOrganizer.signInUrl}
+            variant="circle"
+          />
+        )}
       </div>
       <div className="border-border border-t" />
     </>

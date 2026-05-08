@@ -180,6 +180,15 @@ export default async function CircleDetailPage({
             organizers={circleOrganizers}
             linkable
             label={t("detail.hostedBy")}
+            contactOrganizer={
+              isOrganizer
+                ? undefined
+                : {
+                    circleId: circle.id,
+                    senderEmail: session.user.email ?? null,
+                    signInUrl: null,
+                  }
+            }
           />
 
           {/* Stats */}
