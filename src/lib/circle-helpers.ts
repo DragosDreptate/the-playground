@@ -25,10 +25,15 @@ export function sortCircleOrganizers(
 }
 
 /**
- * Prépare les données d'aperçu "Membres" pour la colonne meta des pages Circle :
- * - avatars visibles (jusqu'à MEMBER_AVATARS_MAX, triés par joinedAt)
- * - texte desktop ("Alice, Bob et X autres")
- * - texte mobile ("et X autres" seul, ou les noms si pas d'autres)
+ * Prépare les données d'aperçu "Membres" pour la colonne meta des pages Circle.
+ *
+ * Le compteur "et X autres" est calculé par rapport à ce qui est *visible*
+ * dans chaque contexte d'affichage, pour éviter une lecture fausse :
+ * - desktop affiche `NAMES_TO_SHOW` noms → compteur = total − noms affichés
+ * - mobile n'affiche que les avatars → compteur = total − avatars visibles
+ *
+ * Sans cette distinction, un mobile à 5 avatars affichait "et 4 autres" pour
+ * 6 inscrits (calcul desktop appliqué au mobile), donnant l'illusion de 9.
  */
 export function computeMembersMeta(
   hosts: CircleMemberWithUser[],
@@ -47,11 +52,19 @@ export function computeMembersMeta(
   const namesToShow = allMembers
     .slice(0, NAMES_TO_SHOW)
     .map((m) => getDisplayName(m.user.firstName, m.user.lastName, m.user.email));
-  const othersCount = Math.max(0, totalCount - namesToShow.length);
-  const othersText = othersCount > 0 ? t("detail.andOthers", { count: othersCount }) : "";
-  const metaText = othersText
-    ? `${namesToShow.join(", ")} ${othersText}`
+
+  const desktopOthersCount = Math.max(0, totalCount - namesToShow.length);
+  const desktopOthersText = desktopOthersCount > 0
+    ? t("detail.andOthers", { count: desktopOthersCount })
+    : "";
+  const metaText = desktopOthersText
+    ? `${namesToShow.join(", ")} ${desktopOthersText}`
     : namesToShow.join(", ");
-  const metaMobileText = othersText || namesToShow.join(", ");
+
+  const mobileOthersCount = Math.max(0, totalCount - visibleAvatars.length);
+  const metaMobileText = mobileOthersCount > 0
+    ? t("detail.andOthers", { count: mobileOthersCount })
+    : "";
+
   return { visibleAvatars, metaText, metaMobileText };
 }

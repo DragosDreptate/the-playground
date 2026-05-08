@@ -234,19 +234,28 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
       : null;
 
   const PARTICIPANT_AVATARS_MAX = 5;
+  const PARTICIPANT_NAMES_TO_SHOW = 2;
   const registeredParticipants = registrations.filter((r) => r.status === "REGISTERED");
   const visibleParticipantAvatars = registeredParticipants.slice(0, PARTICIPANT_AVATARS_MAX);
   const participantNamesToShow = registeredParticipants
-    .slice(0, 2)
+    .slice(0, PARTICIPANT_NAMES_TO_SHOW)
     .map((r) => getDisplayName(r.user.firstName, r.user.lastName, r.user.email));
-  const participantOthersCount = Math.max(0, registeredCount - participantNamesToShow.length);
-  const participantOthersText = participantOthersCount > 0
-    ? tCircle("detail.andOthers", { count: participantOthersCount })
+
+  // Desktop affiche les noms ; mobile n'affiche que les avatars. Le compteur
+  // "et X autres" doit donc référencer ce qui est visible dans chaque contexte
+  // pour éviter qu'un mobile lise "5 avatars + et 4 autres = 9" au lieu de 6.
+  const desktopOthersCount = Math.max(0, registeredCount - participantNamesToShow.length);
+  const desktopOthersText = desktopOthersCount > 0
+    ? tCircle("detail.andOthers", { count: desktopOthersCount })
     : "";
-  const participantsMetaText = participantOthersText
-    ? `${participantNamesToShow.join(", ")} ${participantOthersText}`
+  const participantsMetaText = desktopOthersText
+    ? `${participantNamesToShow.join(", ")} ${desktopOthersText}`
     : participantNamesToShow.join(", ");
-  const participantsMetaMobileText = participantOthersText || participantNamesToShow.join(", ");
+
+  const mobileOthersCount = Math.max(0, registeredCount - visibleParticipantAvatars.length);
+  const participantsMetaMobileText = mobileOthersCount > 0
+    ? tCircle("detail.andOthers", { count: mobileOthersCount })
+    : "";
 
   const circleHref = isHostView
     ? `/dashboard/circles/${props.circleSlug}`
