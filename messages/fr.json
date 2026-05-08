@@ -339,7 +339,7 @@
       "publicCircle": "Communauté publique",
       "privateCircle": "Communauté privée",
       "memberCount": "{count} membres",
-      "andOthers": "et {count} autres",
+      "andOthers": "{count, plural, =1 {et 1 autre} other {et # autres}}",
       "upcomingMoments": "Prochains événements",
       "pastMoments": "Événements passés",
       "noUpcomingMoments": "Aucun événement à venir.",
