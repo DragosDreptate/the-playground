@@ -1,7 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { getLocale, getTranslations } from "next-intl/server";
 import { fileTypeFromBuffer } from "file-type";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
@@ -25,6 +24,10 @@ import {
 import type { Comment } from "@/domain/models/comment";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
+import {
+  buildEmailLocaleResolver,
+  type EmailLocaleResolver,
+} from "@/lib/email/email-locale";
 
 const emailService = createResendEmailService();
 
@@ -123,10 +126,9 @@ export async function addCommentAction(
     );
 
     // Resolve i18n in the request context (before fire-and-forget)
-    const locale = await getLocale();
-    const t = await getTranslations("Email");
+    const resolver = await buildEmailLocaleResolver(userId);
 
-    sendCommentNotifications(momentId, userId, content, t, locale).catch(
+    sendCommentNotifications(momentId, userId, content, resolver).catch(
       (err) => {
         console.error(err);
         Sentry.captureException(err);
@@ -162,14 +164,11 @@ export async function deleteCommentAction(
 
 // --- Fire-and-forget email helpers ---
 
-type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
-
 async function sendCommentNotifications(
   momentId: string,
   commenterId: string,
   content: string,
-  t: TranslationFunction,
-  _locale: string
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [commenter, moment] = await Promise.all([
     prismaUserRepository.findById(commenterId),
@@ -226,25 +225,12 @@ async function sendCommentNotifications(
   const prefsMap =
     await prismaUserRepository.findNotificationPreferencesByIds(recipientIds);
 
-  const emailStrings = {
-    subject: t("commentNotification.subject", {
-      playerName,
-      momentTitle: moment.title,
-    }),
-    heading: t("commentNotification.heading"),
-    message: t("commentNotification.message", {
-      playerName,
-      momentTitle: moment.title,
-    }),
-    commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
-    viewCommentCta: t("commentNotification.viewCommentCta"),
-    footer: t("common.footer"),
-  };
-
   await Promise.all(
     [...recipientMap.values()].map(async (recipient) => {
       const prefs = prefsMap.get(recipient.userId);
       if (!prefs?.notifyNewComment) return;
+
+      const t = await resolver.translationsFor(recipient.userId);
 
       return emailService.sendNewComment({
         to: recipient.email,
@@ -253,7 +239,20 @@ async function sendCommentNotifications(
         momentTitle: moment.title,
         momentSlug: moment.slug,
         commentPreview,
-        strings: emailStrings,
+        strings: {
+          subject: t("commentNotification.subject", {
+            playerName,
+            momentTitle: moment.title,
+          }),
+          heading: t("commentNotification.heading"),
+          message: t("commentNotification.message", {
+            playerName,
+            momentTitle: moment.title,
+          }),
+          commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
+          viewCommentCta: t("commentNotification.viewCommentCta"),
+          footer: t("common.footer"),
+        },
       });
     })
   );

@@ -2,7 +2,7 @@
 
 import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { prisma } from "@/infrastructure/db/prisma";
@@ -44,6 +44,11 @@ import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import { isValidUrl } from "@/lib/url";
 import { invalidateDashboardCache } from "@/lib/dashboard-cache";
+import {
+  buildEmailLocaleResolver,
+  DEFAULT_RECIPIENT_LOCALE,
+  type EmailLocaleResolver,
+} from "@/lib/email/email-locale";
 
 export async function createCircleAction(
   formData: FormData
@@ -261,8 +266,8 @@ export async function joinCircleDirectlyAction(
     );
 
     if (!alreadyMember) {
-      const t = await getTranslations("Email");
-      notifyHostCircleJoin(circleId, userId, pendingApproval, t).catch((err) => {
+      const resolver = await buildEmailLocaleResolver(userId);
+      notifyHostCircleJoin(circleId, userId, pendingApproval, resolver).catch((err) => {
         console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
         Sentry.captureException(err);
       });
@@ -314,7 +319,8 @@ export async function removeCircleMemberAction(
       }
     );
 
-    const t = await getTranslations("Email");
+    // Déclencheur = Host, destinataire = membre retiré → membre ≠ déclencheur → FR par défaut
+    const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
         const [targetUser, circle] = await Promise.all([
@@ -324,6 +330,7 @@ export async function removeCircleMemberAction(
         if (!targetUser || !circle) return;
 
         const memberName = getDisplayName(targetUser.firstName, targetUser.lastName, targetUser.email);
+        const t = await resolver.translationsFor(targetUserId);
         const footer = t("common.footer");
 
         await emailService.sendMemberRemovedFromCircle({
@@ -383,7 +390,12 @@ export async function inviteToCircleByEmailAction(
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const circleUrl = `${baseUrl}/circles/${circle.slug}`;
     const inviterName = session.user.name ?? session.user.email ?? "";
-    const t = await getTranslations("Email.circleInvitation");
+    // Invités = adresses email seules → impossible de les rattacher à un userId.
+    // Tous traités comme "tiers" → locale par défaut FR.
+    const t = await getTranslations({
+      locale: DEFAULT_RECIPIENT_LOCALE,
+      namespace: "Email.circleInvitation",
+    });
 
     after(async () => {
       try {
@@ -430,7 +442,8 @@ export async function approveCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    const t = await getTranslations("Email");
+    // Déclencheur = Host, destinataire = membre approuvé → ≠ déclencheur → FR par défaut
+    const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
         const [circle, user] = await Promise.all([
@@ -439,6 +452,7 @@ export async function approveCircleMembershipAction(
         ]);
         if (!circle || !user) return;
         const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        const t = await resolver.translationsFor(memberUserId);
         await emailService.sendApprovalNotification({
           to: user.email,
           recipientName: playerName,
@@ -478,7 +492,8 @@ export async function rejectCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    const t = await getTranslations("Email");
+    // Déclencheur = Host, destinataire = membre rejeté → ≠ déclencheur → FR par défaut
+    const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
         const [circle, user] = await Promise.all([
@@ -487,6 +502,7 @@ export async function rejectCircleMembershipAction(
         ]);
         if (!circle || !user) return;
         const playerName = getDisplayName(user.firstName, user.lastName, user.email);
+        const t = await resolver.translationsFor(memberUserId);
         await emailService.sendApprovalNotification({
           to: user.email,
           recipientName: playerName,
@@ -515,7 +531,7 @@ async function notifyHostCircleJoin(
   circleId: string,
   userId: string,
   pendingApproval: boolean,
-  t: Awaited<ReturnType<typeof getTranslations<"Email">>>,
+  resolver: EmailLocaleResolver,
   circleSlug?: string,
   circleName?: string,
 ): Promise<void> {
@@ -540,6 +556,7 @@ async function notifyHostCircleJoin(
       hosts.map(async (host) => {
         const prefs = prefsMap.get(host.userId);
         if (!prefs?.notifyNewRegistration) return;
+        const t = await resolver.translationsFor(host.userId);
         const hostName =
           [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") || host.user.email;
         return emailService.sendApprovalNotification({
@@ -559,6 +576,8 @@ async function notifyHostCircleJoin(
     );
   } else {
     // Membre accepté directement → notification classique
+    // Les Hosts ne sont pas le déclencheur ici → tous reçoivent en locale par défaut.
+    const t = await resolver.defaultTranslations();
     await notifyHostNewCircleMember(
       circleId,
       circle.slug,
@@ -589,7 +608,10 @@ export async function promoteToCoHostAction(
   const hostUserId = session.user.id;
 
   return toActionResult(async () => {
-    const t = await getTranslations("Email.coHostPromoted");
+    // Déclencheur = Host, destinataire = co-host promu → ≠ déclencheur → FR par défaut
+    const resolver = await buildEmailLocaleResolver(hostUserId);
+    const targetLocale = resolver.resolveFor(targetUserId);
+    const t = await getTranslations({ locale: targetLocale, namespace: "Email.coHostPromoted" });
     await promoteToCoHost(
       { circleId, hostUserId, targetUserId },
       {
@@ -633,7 +655,10 @@ export async function demoteFromCoHostAction(
   const hostUserId = session.user.id;
 
   return toActionResult(async () => {
-    const t = await getTranslations("Email.coHostDemoted");
+    // Déclencheur = Host, destinataire = co-host dégradé → ≠ déclencheur → FR par défaut
+    const resolver = await buildEmailLocaleResolver(hostUserId);
+    const targetLocale = resolver.resolveFor(targetUserId);
+    const t = await getTranslations({ locale: targetLocale, namespace: "Email.coHostDemoted" });
     await demoteFromCoHost(
       { circleId, hostUserId, targetUserId },
       {

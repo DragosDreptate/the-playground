@@ -4,7 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { formatInTimeZone } from "date-fns-tz";
 import { fr } from "date-fns/locale/fr";
 import { enUS } from "date-fns/locale/en-US";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 const PLATFORM_TIMEZONE = "Europe/Paris";
 import { revalidatePath } from "next/cache";
@@ -18,6 +18,7 @@ import { createResendEmailService } from "@/infrastructure/services";
 import type { ActionResult } from "./types";
 import { isAdminInHostMode } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
+import { DEFAULT_RECIPIENT_LOCALE } from "@/lib/email/email-locale";
 
 const emailService = createResendEmailService();
 
@@ -92,9 +93,10 @@ export async function broadcastMomentAction(
   const allUserIds = members.map((r) => r.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(allUserIds);
 
-  // Résoudre la locale dans le contexte de la request
-  const locale = await getLocale();
-  const t = await getTranslations("Email.broadcastMoment");
+  // Tous les destinataires (membres du Circle) sont des "tiers" vis-à-vis du
+  // déclencheur Host → broadcast formaté dans la locale par défaut FR.
+  const locale = DEFAULT_RECIPIENT_LOCALE;
+  const t = await getTranslations({ locale, namespace: "Email.broadcastMoment" });
 
   const momentDate = formatMomentDate(moment.startsAt, locale);
   const momentDateMonth = formatMomentDateMonth(moment.startsAt, locale);

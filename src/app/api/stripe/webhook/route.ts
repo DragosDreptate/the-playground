@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -9,6 +8,7 @@ import {
 import { createStripePaymentService } from "@/infrastructure/services";
 import { handlePaymentWebhook } from "@/domain/usecases/handle-payment-webhook";
 import { sendRegistrationEmails } from "@/app/actions/registration";
+import { buildEmailLocaleResolver } from "@/lib/email/email-locale";
 
 const paymentService = createStripePaymentService();
 
@@ -36,14 +36,15 @@ export async function POST(request: Request) {
     );
 
     if (result.handled) {
-      // Send confirmation email (fire-and-forget — don't block the webhook response)
-      const t = await getTranslations("Email");
+      // Webhook : pas de contexte i18n côté requête → resolver retombe sur la
+      // locale par défaut FR pour tous les destinataires (comportement
+      // historique préservé).
+      const resolver = await buildEmailLocaleResolver(result.registration.userId);
       sendRegistrationEmails(
         result.registration.momentId,
         result.registration.userId,
         result.registration,
-        t,
-        "fr" // Default locale for webhook-triggered emails
+        resolver
       ).catch((error) => Sentry.captureException(error));
 
       return NextResponse.json({
