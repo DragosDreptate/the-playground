@@ -24,6 +24,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     id: record.id,
     slug: record.slug,
     circleId: record.circleId,
+    circleVenueId: record.circleVenueId,
     createdById: record.createdById,
     title: record.title,
     description: record.description,
@@ -56,6 +57,7 @@ export const prismaMomentRepository: MomentRepository = {
       data: {
         slug: input.slug,
         circleId: input.circleId,
+        circleVenueId: input.circleVenueId ?? null,
         createdById: input.createdById,
         title: input.title,
         description: input.description,
@@ -108,6 +110,7 @@ export const prismaMomentRepository: MomentRepository = {
         }),
         ...(input.startsAt !== undefined && { startsAt: input.startsAt }),
         ...(input.endsAt !== undefined && { endsAt: input.endsAt }),
+        ...(input.circleVenueId !== undefined && { circleVenueId: input.circleVenueId }),
         ...(input.locationType !== undefined && { locationType: input.locationType }),
         ...(input.locationName !== undefined && { locationName: input.locationName }),
         ...(input.locationAddress !== undefined && { locationAddress: input.locationAddress }),

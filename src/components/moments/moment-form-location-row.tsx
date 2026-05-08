@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { usePlaceAutocomplete } from "@/hooks/use-place-autocomplete";
 import type { LocationType } from "@/domain/models/moment";
+import type { CircleVenue } from "@/domain/models/circle-venue";
 
 type VideoPlatform = "meet" | "zoom" | "teams";
 
@@ -116,9 +117,12 @@ type MomentFormLocationRowProps = {
   onOpenChange: (open: boolean) => void;
   locationType: LocationType;
   onLocationTypeChange: (type: LocationType) => void;
-  defaultLocationName?: string;
-  defaultLocationAddress?: string;
   defaultVideoLink?: string;
+  venues?: CircleVenue[];
+  selectedVenueId: string;
+  onVenueChange: (venueId: string) => void;
+  locationName: string;
+  locationAddress: string;
   onLocationNameChange?: (value: string) => void;
   onLocationAddressChange?: (value: string) => void;
 };
@@ -128,9 +132,12 @@ export function MomentFormLocationRow({
   onOpenChange,
   locationType,
   onLocationTypeChange,
-  defaultLocationName = "",
-  defaultLocationAddress = "",
   defaultVideoLink = "",
+  venues = [],
+  selectedVenueId,
+  onVenueChange,
+  locationName,
+  locationAddress,
   onLocationNameChange,
   onLocationAddressChange,
 }: MomentFormLocationRowProps) {
@@ -139,8 +146,6 @@ export function MomentFormLocationRow({
   const showPhysical = locationType === "IN_PERSON" || locationType === "HYBRID";
   const showVirtual = locationType === "ONLINE" || locationType === "HYBRID";
 
-  // Controlled state for address (autocomplete BAN)
-  const [locationAddress, setLocationAddress] = useState(defaultLocationAddress);
   const addressAutocomplete = usePlaceAutocomplete();
 
   // Controlled state for video link (needed for platform detection)
@@ -154,6 +159,11 @@ export function MomentFormLocationRow({
     <Collapsible open={open} onOpenChange={onOpenChange}>
       {/* Hidden input always in DOM — guarantees locationType is submitted */}
       <input type="hidden" name="locationType" value={locationType} />
+      <input
+        type="hidden"
+        name="circleVenueId"
+        value={showPhysical && selectedVenueId !== "manual" ? selectedVenueId : ""}
+      />
 
       <CollapsibleTrigger asChild>
         <button
@@ -207,6 +217,31 @@ export function MomentFormLocationRow({
           {/* Physical venue fields */}
           {showPhysical && (
             <div className="space-y-3">
+              {venues.length > 0 && (
+                <div className="space-y-1">
+                  <Label htmlFor="circleVenueIdSelect" className="text-xs">
+                    {t("form.savedVenue")}
+                  </Label>
+                  <Select
+                    value={selectedVenueId}
+                    onValueChange={onVenueChange}
+                  >
+                    <SelectTrigger id="circleVenueIdSelect" className="h-9">
+                      <SelectValue placeholder={t("form.savedVenuePlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manual">
+                        {t("form.manualVenue")}
+                      </SelectItem>
+                      {venues.map((venue) => (
+                        <SelectItem key={venue.id} value={venue.id}>
+                          {venue.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div className="space-y-1">
                 <Label htmlFor="locationName" className="text-xs">
                   {t("form.locationName")}
@@ -215,7 +250,7 @@ export function MomentFormLocationRow({
                   id="locationName"
                   name="locationName"
                   placeholder={t("form.locationNamePlaceholder")}
-                  defaultValue={defaultLocationName}
+                  value={locationName}
                   className="h-9"
                   onChange={(e) => onLocationNameChange?.(e.target.value)}
                 />
@@ -229,12 +264,11 @@ export function MomentFormLocationRow({
                   name="locationAddress"
                   placeholder={t("form.locationAddressPlaceholder")}
                   value={locationAddress}
-                  onChange={(v) => { setLocationAddress(v); onLocationAddressChange?.(v); }}
+                  onChange={(v) => { onLocationAddressChange?.(v); }}
                   suggestions={addressAutocomplete.suggestions}
                   isLoading={addressAutocomplete.isLoading}
                   onQueryChange={addressAutocomplete.suggest}
                   onSelect={(s) => {
-                    setLocationAddress(s.fullAddress);
                     onLocationAddressChange?.(s.fullAddress);
                     addressAutocomplete.clear();
                     addressAutocomplete.resetSession();

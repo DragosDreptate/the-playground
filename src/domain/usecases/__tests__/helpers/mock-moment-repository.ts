@@ -32,6 +32,7 @@ export function makeMoment(overrides: Partial<Moment> = {}): Moment {
     id: "moment-1",
     slug: "weekly-meetup",
     circleId: "circle-1",
+    circleVenueId: null,
     createdById: "user-1",
     title: "Weekly Meetup",
     description: "A weekly community meetup",

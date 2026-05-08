@@ -1,4 +1,5 @@
 export { prismaCircleRepository } from "./prisma-circle-repository";
+export { prismaCircleVenueRepository } from "./prisma-circle-venue-repository";
 export { prismaMomentRepository } from "./prisma-moment-repository";
 export { prismaRegistrationRepository } from "./prisma-registration-repository";
 export { prismaUserRepository } from "./prisma-user-repository";

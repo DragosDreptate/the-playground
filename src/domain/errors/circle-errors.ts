@@ -8,6 +8,14 @@ export class CircleNotFoundError extends DomainError {
   }
 }
 
+export class CircleVenueNotFoundError extends DomainError {
+  readonly code = "CIRCLE_VENUE_NOT_FOUND";
+
+  constructor(identifier: string) {
+    super(`Circle venue not found: ${identifier}`);
+  }
+}
+
 export class SlugAlreadyExistsError extends DomainError {
   readonly code = "SLUG_ALREADY_EXISTS";
 

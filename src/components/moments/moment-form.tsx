@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Moment, LocationType } from "@/domain/models/moment";
+import type { CircleVenue } from "@/domain/models/circle-venue";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
@@ -41,6 +42,7 @@ type MomentFormProps = {
   stripeConnectActive?: boolean;
   priceLocked?: boolean;
   initialAttachments?: MomentAttachment[];
+  venues?: CircleVenue[];
   action: (formData: FormData) => Promise<ActionResult<Moment>>;
 };
 
@@ -60,7 +62,7 @@ function getDefaultEndDate(start: Date): Date {
   return d;
 }
 
-export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, initialAttachments = [], action }: MomentFormProps) {
+export function MomentForm({ moment, circleSlug, circleName, circleDescription, circleCoverImage, stripeConnectActive = false, priceLocked = false, initialAttachments = [], venues = [], action }: MomentFormProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const isPast = moment?.status === "PAST";
@@ -87,6 +89,9 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const [descriptionValue, setDescriptionValue] = useState(moment?.description ?? "");
   const [locationNameValue, setLocationNameValue] = useState(moment?.locationName ?? "");
   const [locationAddressValue, setLocationAddressValue] = useState(moment?.locationAddress ?? "");
+  const [selectedVenueId, setSelectedVenueId] = useState(
+    moment?.circleVenueId ?? "manual"
+  );
 
   // --- Cover state ---
   const [coverSelection, setCoverSelection] = useState<CoverSelection | null>(null);
@@ -122,6 +127,31 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
   const [approvalEnabled, setApprovalEnabled] = useState(moment?.requiresApproval ?? false);
   const hasPaidPrice = currentPriceCents > 0;
   const handlePriceCentsChange = useCallback((cents: number) => setCurrentPriceCents(cents), []);
+  const handleVenueChange = useCallback(
+    (venueId: string) => {
+      setSelectedVenueId(venueId);
+      const venue = venues.find((v) => v.id === venueId);
+      if (venue) {
+        setLocationNameValue(venue.name);
+        setLocationAddressValue(venue.address);
+      }
+    },
+    [venues]
+  );
+  const handleLocationTypeChange = useCallback((type: LocationType) => {
+    setLocationType(type);
+    if (type === "ONLINE") {
+      setSelectedVenueId("manual");
+    }
+  }, []);
+  const handleManualLocationNameChange = useCallback((value: string) => {
+    setSelectedVenueId("manual");
+    setLocationNameValue(value);
+  }, []);
+  const handleManualLocationAddressChange = useCallback((value: string) => {
+    setSelectedVenueId("manual");
+    setLocationAddressValue(value);
+  }, []);
 
   // --- Form submission ---
   async function handleSubmit(
@@ -346,12 +376,15 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             open={locationOpen}
             onOpenChange={setLocationOpen}
             locationType={locationType}
-            onLocationTypeChange={setLocationType}
-            defaultLocationName={moment?.locationName ?? ""}
-            defaultLocationAddress={moment?.locationAddress ?? ""}
+            onLocationTypeChange={handleLocationTypeChange}
             defaultVideoLink={moment?.videoLink ?? ""}
-            onLocationNameChange={setLocationNameValue}
-            onLocationAddressChange={setLocationAddressValue}
+            venues={venues}
+            selectedVenueId={selectedVenueId}
+            onVenueChange={handleVenueChange}
+            locationName={locationNameValue}
+            locationAddress={locationAddressValue}
+            onLocationNameChange={handleManualLocationNameChange}
+            onLocationAddressChange={handleManualLocationAddressChange}
           />
 
           {/* Separator */}

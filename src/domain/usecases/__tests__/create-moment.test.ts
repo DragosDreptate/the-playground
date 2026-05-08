@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createMoment } from "@/domain/usecases/create-moment";
 import {
+  CircleVenueNotFoundError,
   MomentSlugAlreadyExistsError,
   UnauthorizedMomentActionError,
   PaidMomentCannotRequireApprovalError,
@@ -13,6 +14,10 @@ import {
   createMockCircleRepository,
   makeMembership,
 } from "./helpers/mock-circle-repository";
+import {
+  createMockCircleVenueRepository,
+  makeCircleVenue,
+} from "./helpers/mock-circle-venue-repository";
 import { createMockRegistrationRepository } from "./helpers/mock-registration-repository";
 
 describe("CreateMoment", () => {
@@ -99,6 +104,101 @@ describe("CreateMoment", () => {
       });
 
       expect(circleRepo.findMembership).toHaveBeenCalledWith("circle-1", "user-1");
+    });
+
+    it("should keep the selected venue id and location snapshot", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository();
+      const registrationRepo = createMockRegistrationRepository();
+      const circleVenueRepo = createMockCircleVenueRepository({
+        findById: vi.fn().mockResolvedValue(makeCircleVenue({ id: "venue-1", circleId: "circle-1" })),
+      });
+
+      await createMoment(
+        {
+          ...defaultInput,
+          circleVenueId: "venue-1",
+          locationName: "La Base",
+          locationAddress: "10 rue Oberkampf, Paris",
+        },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          circleVenueRepository: circleVenueRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          circleVenueId: "venue-1",
+          locationName: "La Base",
+          locationAddress: "10 rue Oberkampf, Paris",
+        })
+      );
+      expect(circleVenueRepo.findById).toHaveBeenCalledWith("venue-1");
+    });
+
+    it("should reject a selected venue from another circle", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository();
+      const registrationRepo = createMockRegistrationRepository();
+      const circleVenueRepo = createMockCircleVenueRepository({
+        findById: vi.fn().mockResolvedValue(makeCircleVenue({ id: "venue-2", circleId: "circle-2" })),
+      });
+
+      await expect(
+        createMoment(
+          {
+            ...defaultInput,
+            circleVenueId: "venue-2",
+          },
+          {
+            momentRepository: momentRepo,
+            circleRepository: circleRepo,
+            circleVenueRepository: circleVenueRepo,
+            registrationRepository: registrationRepo,
+          }
+        )
+      ).rejects.toThrow(CircleVenueNotFoundError);
+      expect(momentRepo.create).not.toHaveBeenCalled();
+    });
+
+    it("should clear physical location fields for ONLINE moments", async () => {
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const momentRepo = createMockMomentRepository();
+      const registrationRepo = createMockRegistrationRepository();
+
+      await createMoment(
+        {
+          ...defaultInput,
+          locationType: "ONLINE",
+          circleVenueId: "venue-1",
+          locationName: "La Base",
+          locationAddress: "10 rue Oberkampf, Paris",
+          videoLink: "https://meet.example.com/room",
+        },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          registrationRepository: registrationRepo,
+        }
+      );
+
+      expect(momentRepo.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          locationType: "ONLINE",
+          circleVenueId: null,
+          locationName: null,
+          locationAddress: null,
+        })
+      );
     });
   });
 

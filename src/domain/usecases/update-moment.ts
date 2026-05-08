@@ -2,10 +2,12 @@ import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { CircleVenueRepository } from "@/domain/ports/repositories/circle-venue-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
 import { refundRegistration } from "./refund-registration";
 import {
+  CircleVenueNotFoundError,
   MomentNotFoundError,
   MomentPastDateError,
   UnauthorizedMomentActionError,
@@ -25,6 +27,7 @@ type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  circleVenueId?: string | null;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;
@@ -40,6 +43,7 @@ type UpdateMomentInput = {
 type UpdateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  circleVenueRepository?: CircleVenueRepository;
   registrationRepository?: RegistrationRepository;
   paymentService?: PaymentService;
 };
@@ -139,7 +143,19 @@ export async function updateMoment(
     throw new MomentPastDateError();
   }
 
+  if (input.locationType !== "ONLINE" && input.circleVenueId) {
+    const venue = await deps.circleVenueRepository?.findById(input.circleVenueId);
+    if (!venue || venue.circleId !== existing.circleId) {
+      throw new CircleVenueNotFoundError(input.circleVenueId);
+    }
+  }
+
   const { momentId: _, userId: __, ...updates } = input;
+  if (input.locationType === "ONLINE") {
+    updates.circleVenueId = null;
+    updates.locationName = null;
+    updates.locationAddress = null;
+  }
 
   const moment = await momentRepository.update(input.momentId, updates);
 

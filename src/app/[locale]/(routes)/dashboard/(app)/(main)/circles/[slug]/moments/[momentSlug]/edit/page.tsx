@@ -5,6 +5,7 @@ import {
   prismaMomentRepository,
   prismaRegistrationRepository,
   prismaMomentAttachmentRepository,
+  prismaCircleVenueRepository,
 } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
@@ -58,7 +59,10 @@ export default async function EditMomentPage({
     priceLocked = paidCount > 0;
   }
 
-  const initialAttachments = await prismaMomentAttachmentRepository.findByMoment(moment.id);
+  const [initialAttachments, venues] = await Promise.all([
+    prismaMomentAttachmentRepository.findByMoment(moment.id),
+    prismaCircleVenueRepository.findByCircleId(circle.id),
+  ]);
 
   const tDashboard = await getTranslations("Dashboard");
   const tCommon = await getTranslations("Common");
@@ -88,7 +92,7 @@ export default async function EditMomentPage({
           {tCommon("edit")}
         </span>
       </div>
-      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCoverImage={circle.coverImage} stripeConnectActive={!!circle.stripeConnectAccountId} priceLocked={priceLocked} initialAttachments={initialAttachments} action={boundAction} />
+      <MomentForm moment={moment} circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCoverImage={circle.coverImage} stripeConnectActive={!!circle.stripeConnectAccountId} priceLocked={priceLocked} initialAttachments={initialAttachments} venues={venues} action={boundAction} />
     </div>
   );
 }

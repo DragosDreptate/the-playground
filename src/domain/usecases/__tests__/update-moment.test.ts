@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import {
+  CircleVenueNotFoundError,
   MomentNotFoundError,
   UnauthorizedMomentActionError,
   PriceLockedError,
@@ -16,6 +17,10 @@ import {
   makeCircle,
   makeMembership,
 } from "./helpers/mock-circle-repository";
+import {
+  createMockCircleVenueRepository,
+  makeCircleVenue,
+} from "./helpers/mock-circle-venue-repository";
 import {
   createMockRegistrationRepository,
   makeRegistration,
@@ -110,6 +115,7 @@ describe("UpdateMoment", () => {
         "moment-1",
         expect.objectContaining({
           locationType: "ONLINE",
+          circleVenueId: null,
           locationName: null,
           locationAddress: null,
           videoLink: "https://meet.example.com/room",
@@ -117,6 +123,85 @@ describe("UpdateMoment", () => {
       );
       expect(result.moment.locationType).toBe("ONLINE");
     });
+  });
+
+  describe("given a HOST selecting a saved venue", () => {
+    it("should pass the venue id and location snapshot to the repository", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
+      const updated = makeMoment({
+        id: "moment-1",
+        circleVenueId: "venue-1",
+        locationName: "La Base",
+        locationAddress: "10 rue Oberkampf, Paris",
+      });
+
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const circleVenueRepo = createMockCircleVenueRepository({
+        findById: vi.fn().mockResolvedValue(makeCircleVenue({ id: "venue-1", circleId: "circle-1" })),
+      });
+
+      const result = await updateMoment(
+        {
+          momentId: "moment-1",
+          userId: "user-1",
+          circleVenueId: "venue-1",
+          locationName: "La Base",
+          locationAddress: "10 rue Oberkampf, Paris",
+        },
+        {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+          circleVenueRepository: circleVenueRepo,
+        }
+      );
+
+      expect(momentRepo.update).toHaveBeenCalledWith(
+        "moment-1",
+        expect.objectContaining({
+          circleVenueId: "venue-1",
+          locationName: "La Base",
+          locationAddress: "10 rue Oberkampf, Paris",
+        })
+      );
+      expect(result.moment.circleVenueId).toBe("venue-1");
+      expect(circleVenueRepo.findById).toHaveBeenCalledWith("venue-1");
+    });
+
+    it("should reject a selected venue from another circle", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+      const circleVenueRepo = createMockCircleVenueRepository({
+        findById: vi.fn().mockResolvedValue(makeCircleVenue({ id: "venue-2", circleId: "circle-2" })),
+      });
+
+      await expect(
+        updateMoment(
+          {
+            momentId: "moment-1",
+            userId: "user-1",
+            circleVenueId: "venue-2",
+          },
+          {
+            momentRepository: momentRepo,
+            circleRepository: circleRepo,
+            circleVenueRepository: circleVenueRepo,
+          }
+        )
+      ).rejects.toThrow(CircleVenueNotFoundError);
+      expect(momentRepo.update).not.toHaveBeenCalled();
+    });
+
   });
 
   describe("given a HOST updating the coverImage of a Moment", () => {
