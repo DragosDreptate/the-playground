@@ -60,6 +60,30 @@ export function OgCoverBackground({
   );
 }
 
+/**
+ * Layout og:image en mode "cover pure" : juste la cover plein cadre + la pill
+ * de branding. Utilisé quand une cover est disponible — le titre, la date et
+ * la description ne sont pas rasterisés dans l'image puisque les clients
+ * (WhatsApp, iMessage, Slack…) les affichent déjà sous l'image via og:title
+ * et og:description. Évite la triple redondance.
+ */
+export function OgPureCoverLayout({ coverDataUrl }: { coverDataUrl: string }) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        position: "relative",
+        background: OG_COLORS.bgDark,
+      }}
+    >
+      <OgCoverBackground coverDataUrl={coverDataUrl} />
+      <OgBrandingPill />
+    </div>
+  );
+}
+
 export function OgBrandingPill() {
   return (
     <div

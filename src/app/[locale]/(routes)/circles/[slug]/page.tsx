@@ -60,6 +60,10 @@ const getCachedCircle = cache(async (slug: string) => {
   }
 });
 
+const getCachedMemberCount = cache((circleId: string) =>
+  prismaCircleRepository.countMembers(circleId),
+);
+
 // ── Helpers ───────────────────────────────────────────────────
 
 // ── Metadata ──────────────────────────────────────────────────
@@ -77,7 +81,7 @@ export async function generateMetadata({
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
     const [memberCount, t] = await Promise.all([
-      prismaCircleRepository.countMembers(circle.id),
+      getCachedMemberCount(circle.id),
       getTranslations({ locale, namespace: "Explorer.circleCard" }),
     ]);
     const memberLabel = t("members", { count: memberCount });
@@ -154,7 +158,7 @@ export default async function PublicCirclePage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    prismaCircleRepository.countMembers(circle.id),
+    getCachedMemberCount(circle.id),
     session?.user?.id
       ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status ?? null)
       : Promise.resolve(null),

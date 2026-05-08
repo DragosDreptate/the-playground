@@ -10,6 +10,7 @@ import {
   OG_COLORS,
   OgBrandingPill,
   OgCoverBackground,
+  OgPureCoverLayout,
 } from "@/lib/og/components";
 
 export const runtime = "nodejs";
@@ -47,26 +48,10 @@ export default async function OgImage({
     ? await loadOgCoverAsDataUrl(circle.coverImage)
     : null;
 
-  // Cover présente → cover pure + branding seulement. Le nom et la meta sont
-  // déjà repris par og:title + og:description sous l'image — éviter la redondance.
   if (coverDataUrl) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            position: "relative",
-            background: OG_COLORS.bgDark,
-          }}
-        >
-          <OgCoverBackground coverDataUrl={coverDataUrl} />
-          <OgBrandingPill />
-        </div>
-      ),
-      { ...size },
-    );
+    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
+      ...size,
+    });
   }
 
   // Pas de cover → fallback content-rich : titre et meta dans l'image.
