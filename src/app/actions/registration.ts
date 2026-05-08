@@ -1,11 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { formatInTimeZone } from "date-fns-tz";
-import { fr } from "date-fns/locale/fr";
-import { enUS } from "date-fns/locale/en-US";
-
-const PLATFORM_TIMEZONE = "Europe/Paris";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import {
@@ -30,31 +25,12 @@ import {
   buildEmailLocaleResolver,
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
-
-function getDateFnsLocale(locale: string) {
-  return locale === "fr" ? fr : enUS;
-}
-
-function formatLocationText(
-  locationType: string,
-  locationName: string | null,
-  locationAddress: string | null,
-  videoLink: string | null,
-  locale: string
-): string {
-  if (locationType === "ONLINE") {
-    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
-  }
-  return (
-    [locationName, locationAddress].filter(Boolean).join(", ") ||
-    (locale === "fr" ? "À définir" : "TBD")
-  );
-}
 
 export async function joinMomentAction(
   momentId: string
@@ -75,24 +51,14 @@ export async function joinMomentAction(
       }
     );
 
-    if (!result.pendingApproval) {
+    if (!isAdminUser(session)) {
+      // Pas de after() : Vercel serverless peut couper la lambda avant que l'after se déclenche.
       const resolver = await buildEmailLocaleResolver(userId);
-      if (!isAdminUser(session)) sendRegistrationEmails(
-        momentId,
-        userId,
-        result.registration,
-        resolver
-      ).catch((err) => {
+      const fireAndForget = result.pendingApproval
+        ? notifyHostsPendingApproval(momentId, userId, resolver)
+        : sendRegistrationEmails(momentId, userId, result.registration, resolver);
+      fireAndForget.catch((err) => {
         console.error(err);
-        Sentry.captureException(err);
-      });
-    } else {
-      // Pending approval flow — fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
-      const resolver = await buildEmailLocaleResolver(userId);
-      if (!isAdminUser(session)) notifyHostsPendingApproval(
-        momentId, userId, resolver
-      ).catch((err) => {
-        console.error("[approval-notification] Error:", err);
         Sentry.captureException(err);
       });
     }
@@ -222,22 +188,11 @@ export async function sendRegistrationEmails(
   const isWaitlisted = registration.status === "WAITLISTED";
   const stringPrefix = isWaitlisted ? "waitlist" : "registration";
 
-  // Bloc Player — locale dépend de la position du Player vs déclencheur
+  // Le Player peut être le déclencheur (self-join) ou non (Host qui approuve) — resolveFor() arbitre.
   const playerT = await resolver.translationsFor(userId);
   const playerLocale = resolver.resolveFor(userId);
-  const playerDateFns = getDateFnsLocale(playerLocale);
-  const playerMomentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: playerDateFns });
-  const playerMomentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: playerDateFns });
-  const playerMomentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const playerLocationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    playerLocale
-  );
+  const playerCtx = buildMomentEmailContext(moment, playerLocale);
 
-  // Generate .ics calendar attachment (REGISTERED only — not for waitlist)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const icsContent = !isWaitlisted
     ? generateIcs({
@@ -246,7 +201,7 @@ export async function sendRegistrationEmails(
         description: moment.description,
         startsAt: moment.startsAt,
         endsAt: moment.endsAt,
-        location: playerLocationText,
+        location: playerCtx.locationText,
         videoLink: moment.videoLink,
         url: `${baseUrl}/m/${moment.slug}`,
         organizerName: circle.name,
@@ -260,10 +215,10 @@ export async function sendRegistrationEmails(
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate: playerMomentDate,
-    momentDateMonth: playerMomentDateMonth,
-    momentDateDay: playerMomentDateDay,
-    locationText: playerLocationText,
+    momentDate: playerCtx.momentDate,
+    momentDateMonth: playerCtx.momentDateMonth,
+    momentDateDay: playerCtx.momentDateDay,
+    locationText: playerCtx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     status: registration.status,
@@ -289,18 +244,26 @@ export async function sendRegistrationEmails(
     },
   });
 
-  // Bloc Hosts — chaque destinataire reçoit dans sa locale (déclencheur garde sa locale, autres → FR)
-  const [hosts, registeredCount] = await Promise.all([
+  const [hosts, registeredCount, defaultT] = await Promise.all([
     prismaCircleRepository.findOrganizers(moment.circleId),
     prismaRegistrationRepository.countByMomentIdAndStatus(momentId, "REGISTERED"),
+    resolver.defaultTranslations(),
   ]);
 
   const filteredHosts = hosts.filter((host) => host.userId !== userId);
   const hostUserIds = filteredHosts.map((h) => h.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
 
-  await Promise.all(
-    filteredHosts.map(async (host) => {
+  // registrationInfo dans la locale par défaut, réutilisé pour Slack et pour les
+  // destinataires non-déclencheur (cas typique : tous les Hosts).
+  const formatRegistrationInfo = (t: typeof defaultT) =>
+    moment.capacity
+      ? t("hostNotification.registrationInfo", { count: registeredCount, capacity: moment.capacity })
+      : t("hostNotification.registrationInfoUnlimited", { count: registeredCount });
+  const defaultRegistrationInfo = formatRegistrationInfo(defaultT);
+
+  await Promise.all([
+    ...filteredHosts.map(async (host) => {
       const prefs = prefsMap.get(host.userId);
       if (!prefs?.notifyNewRegistration) return;
 
@@ -309,14 +272,8 @@ export async function sendRegistrationEmails(
         [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
         host.user.email;
 
-      const registrationInfo = moment.capacity
-        ? hostT("hostNotification.registrationInfo", {
-            count: registeredCount,
-            capacity: moment.capacity,
-          })
-        : hostT("hostNotification.registrationInfoUnlimited", {
-            count: registeredCount,
-          });
+      const registrationInfo =
+        hostT === defaultT ? defaultRegistrationInfo : formatRegistrationInfo(hostT);
 
       return emailService.sendHostNewRegistration({
         to: host.user.email,
@@ -327,40 +284,22 @@ export async function sendRegistrationEmails(
         circleSlug: circle.slug,
         registrationInfo,
         strings: {
-          subject: hostT("hostNotification.subject", {
-            playerName,
-            momentTitle: moment.title,
-          }),
+          subject: hostT("hostNotification.subject", { playerName, momentTitle: moment.title }),
           heading: hostT("hostNotification.heading"),
-          message: hostT("hostNotification.message", {
-            playerName,
-            momentTitle: moment.title,
-          }),
+          message: hostT("hostNotification.message", { playerName, momentTitle: moment.title }),
           manageRegistrationsCta: hostT("hostNotification.manageRegistrationsCta"),
           footer: hostT("common.footer"),
         },
       });
-    })
-  );
-
-  // Slack — toujours dans la locale par défaut (canal interne)
-  const slackT = await resolver.defaultTranslations();
-  const slackRegistrationInfo = moment.capacity
-    ? slackT("hostNotification.registrationInfo", {
-        count: registeredCount,
-        capacity: moment.capacity,
-      })
-    : slackT("hostNotification.registrationInfoUnlimited", {
-        count: registeredCount,
-      });
-
-  await notifySlackNewRegistration({
-    playerName,
-    momentTitle: moment.title,
-    circleName: circle.name,
-    registrationInfo: slackRegistrationInfo,
-    momentUrl: `${baseUrl}/m/${moment.slug}`,
-  });
+    }),
+    notifySlackNewRegistration({
+      playerName,
+      momentTitle: moment.title,
+      circleName: circle.name,
+      registrationInfo: defaultRegistrationInfo,
+      momentUrl: `${baseUrl}/m/${moment.slug}`,
+    }),
+  ]);
 }
 
 async function sendPromotionEmail(
@@ -378,21 +317,7 @@ async function sendPromotionEmail(
 
   const t = await resolver.translationsFor(promotedRegistration.userId);
   const locale = resolver.resolveFor(promotedRegistration.userId);
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const ctx = buildMomentEmailContext(moment, locale);
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
@@ -405,7 +330,7 @@ async function sendPromotionEmail(
     description: moment.description,
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
-    location: locationText,
+    location: ctx.locationText,
     videoLink: moment.videoLink,
     url: `${promotionBaseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
@@ -418,10 +343,10 @@ async function sendPromotionEmail(
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     icsContent,
@@ -497,22 +422,7 @@ async function sendRemovedByHostEmail(
   if (!circle) return;
 
   const t = await resolver.translationsFor(userId);
-  const locale = resolver.resolveFor(userId);
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
   const playerName = getDisplayName(user.firstName, user.lastName, user.email);
 
   await emailService.sendRegistrationRemovedByHost({
@@ -520,10 +430,10 @@ async function sendRemovedByHostEmail(
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     strings: {

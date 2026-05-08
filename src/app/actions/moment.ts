@@ -1,11 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { formatInTimeZone } from "date-fns-tz";
-import { fr } from "date-fns/locale/fr";
-import { enUS } from "date-fns/locale/en-US";
-
-const PLATFORM_TIMEZONE = "Europe/Paris";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
@@ -40,31 +35,13 @@ import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import {
   buildEmailLocaleResolver,
+  DEFAULT_RECIPIENT_LOCALE,
   type EmailLocaleResolver,
 } from "@/lib/email/email-locale";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
-
-function getDateFnsLocale(locale: string) {
-  return locale === "fr" ? fr : enUS;
-}
-
-function formatLocationText(
-  locationType: string,
-  locationName: string | null,
-  locationAddress: string | null,
-  videoLink: string | null,
-  locale: string
-): string {
-  if (locationType === "ONLINE") {
-    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
-  }
-  return (
-    [locationName, locationAddress].filter(Boolean).join(", ") ||
-    (locale === "fr" ? "À définir" : "TBD")
-  );
-}
 
 export async function createMomentAction(
   circleId: string,
@@ -373,22 +350,7 @@ async function sendMomentUpdateEmails(
   // Tous les destinataires d'un batch update sont des "tiers" (≠ déclencheur Host)
   // → locale par défaut FR pour rester cohérent et formaté en français.
   const t = await resolver.defaultTranslations();
-  const locale = resolver.defaultLocale;
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const icsContent = generateIcs({
@@ -397,7 +359,7 @@ async function sendMomentUpdateEmails(
     description: moment.description,
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
-    location: locationText,
+    location: ctx.locationText,
     videoLink: moment.videoLink,
     url: `${baseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
@@ -417,10 +379,10 @@ async function sendMomentUpdateEmails(
   const commonFields = {
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     dateChanged,
@@ -518,19 +480,7 @@ async function sendMomentCancelledEmails(
 
   // Tous les destinataires sont des participants ≠ déclencheur Host → FR par défaut.
   const t = await resolver.defaultTranslations();
-  const locale = resolver.defaultLocale;
-  const dateFnsLocale = getDateFnsLocale(locale);
-
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
 
   const strings = {
     subject: t("momentCancelled.subject", { momentTitle: moment.title }),
@@ -540,7 +490,6 @@ async function sendMomentCancelledEmails(
     footer: t("common.footer"),
   };
 
-  // Notifier REGISTERED et WAITLISTED (tous les participants actifs) en batch
   const recipients = registrations
     .filter((r) => r.user?.email)
     .map((r) => ({
@@ -552,10 +501,10 @@ async function sendMomentCancelledEmails(
     await emailService.sendMomentCancelledBatch({
       recipients,
       momentTitle: moment.title,
-      momentDate,
-      momentDateMonth,
-      momentDateDay,
-      locationText,
+      momentDate: ctx.momentDate,
+      momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+      momentDateDay: ctx.momentDateDay,
+      locationText: ctx.locationText,
       circleName: circle.name,
       circleSlug: circle.slug,
       strings,
@@ -622,18 +571,7 @@ function sendMomentPublishedNotifications(
 
       // Le Host est le déclencheur : il garde la locale de la requête.
       const t = await resolver.translationsFor(userId);
-      const locale = resolver.resolveFor(userId);
-      const dateFnsLocale = getDateFnsLocale(locale);
-      const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-      const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-      const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-      const locationText = formatLocationText(
-        moment.locationType,
-        moment.locationName,
-        moment.locationAddress,
-        moment.videoLink,
-        locale
-      );
+      const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
       const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -643,7 +581,7 @@ function sendMomentPublishedNotifications(
         description: moment.description,
         startsAt: moment.startsAt,
         endsAt: moment.endsAt,
-        location: locationText,
+        location: ctx.locationText,
         videoLink: moment.videoLink,
         url: `${appUrl}/m/${moment.slug}`,
         organizerName: circle.name,
@@ -657,10 +595,10 @@ function sendMomentPublishedNotifications(
         momentTitle: moment.title,
         momentSlug: moment.slug,
         circleSlug: circle.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        locationText: ctx.locationText,
         circleName: circle.name,
         icsContent,
         strings: {

@@ -1,4 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { routing } from "@/i18n/routing";
+
+type Locale = (typeof routing.locales)[number];
 
 /**
  * Locale appliquée à tout destinataire qui n'est pas le déclencheur de l'action.
@@ -6,7 +9,7 @@ import { getLocale, getTranslations } from "next-intl/server";
  * le défaut de la plateforme. À remplacer par une lecture de `User.preferredLocale`
  * lorsque le champ existera.
  */
-export const DEFAULT_RECIPIENT_LOCALE = "fr";
+export const DEFAULT_RECIPIENT_LOCALE: Locale = routing.defaultLocale;
 
 type EmailTranslations = Awaited<ReturnType<typeof getTranslations<"Email">>>;
 
@@ -23,28 +26,25 @@ type EmailTranslations = Awaited<ReturnType<typeof getTranslations<"Email">>>;
  * une notification EN à des Hosts francophones — et le cas symétrique.
  */
 export type EmailLocaleResolver = {
-  triggerLocale: string;
-  defaultLocale: string;
-  resolveFor: (recipientUserId: string | null | undefined) => string;
+  resolveFor: (recipientUserId: string | null | undefined) => Locale;
   translationsFor: (
     recipientUserId: string | null | undefined,
   ) => Promise<EmailTranslations>;
   defaultTranslations: () => Promise<EmailTranslations>;
-  triggerTranslations: () => Promise<EmailTranslations>;
 };
 
 /**
  * Construit un resolver pour une action déclenchée par `triggerUserId`.
- * Mémoïse les deux instances `t` (déclencheur + défaut) pour éviter les
- * rechargements lors d'un envoi vers plusieurs destinataires.
+ * Mémoïse les traductions chargées par locale pour éviter les rechargements
+ * lors d'un envoi vers plusieurs destinataires.
  */
 export async function buildEmailLocaleResolver(
   triggerUserId: string | null | undefined,
 ): Promise<EmailLocaleResolver> {
-  const triggerLocale = await getLocale();
-  const cache = new Map<string, Promise<EmailTranslations>>();
+  const triggerLocale = (await getLocale()) as Locale;
+  const cache = new Map<Locale, Promise<EmailTranslations>>();
 
-  const loadTranslations = (locale: string) => {
+  const loadTranslations = (locale: Locale) => {
     let cached = cache.get(locale);
     if (!cached) {
       cached = getTranslations({ locale, namespace: "Email" });
@@ -53,7 +53,7 @@ export async function buildEmailLocaleResolver(
     return cached;
   };
 
-  const resolveFor = (recipientUserId: string | null | undefined): string => {
+  const resolveFor = (recipientUserId: string | null | undefined): Locale => {
     if (triggerUserId && recipientUserId && recipientUserId === triggerUserId) {
       return triggerLocale;
     }
@@ -61,12 +61,9 @@ export async function buildEmailLocaleResolver(
   };
 
   return {
-    triggerLocale,
-    defaultLocale: DEFAULT_RECIPIENT_LOCALE,
     resolveFor,
     translationsFor: (recipientUserId) =>
       loadTranslations(resolveFor(recipientUserId)),
     defaultTranslations: () => loadTranslations(DEFAULT_RECIPIENT_LOCALE),
-    triggerTranslations: () => loadTranslations(triggerLocale),
   };
 }

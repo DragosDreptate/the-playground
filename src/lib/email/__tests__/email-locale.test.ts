@@ -28,8 +28,6 @@ describe("buildEmailLocaleResolver", () => {
 
       const resolver = await buildEmailLocaleResolver("trigger-user");
 
-      expect(resolver.triggerLocale).toBe("en");
-      expect(resolver.defaultLocale).toBe(DEFAULT_RECIPIENT_LOCALE);
       expect(resolver.resolveFor("trigger-user")).toBe("en");
       expect(resolver.resolveFor("host-user")).toBe(DEFAULT_RECIPIENT_LOCALE);
       expect(resolver.resolveFor(null)).toBe(DEFAULT_RECIPIENT_LOCALE);
@@ -59,7 +57,7 @@ describe("buildEmailLocaleResolver", () => {
   });
 
   describe("given a Host triggers from /fr (locale 'fr')", () => {
-    it("falls all recipients on FR (trigger + others)", async () => {
+    it("falls back all recipients to FR (trigger + others)", async () => {
       getLocaleMock.mockResolvedValue("fr");
 
       const resolver = await buildEmailLocaleResolver("host-user");

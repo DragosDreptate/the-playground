@@ -319,7 +319,6 @@ export async function removeCircleMemberAction(
       }
     );
 
-    // Déclencheur = Host, destinataire = membre retiré → membre ≠ déclencheur → FR par défaut
     const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
@@ -442,7 +441,6 @@ export async function approveCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Déclencheur = Host, destinataire = membre approuvé → ≠ déclencheur → FR par défaut
     const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
@@ -492,7 +490,6 @@ export async function rejectCircleMembershipAction(
       { circleRepository: prismaCircleRepository }
     );
 
-    // Déclencheur = Host, destinataire = membre rejeté → ≠ déclencheur → FR par défaut
     const resolver = await buildEmailLocaleResolver(hostUserId);
     after(async () => {
       try {
@@ -532,13 +529,9 @@ async function notifyHostCircleJoin(
   userId: string,
   pendingApproval: boolean,
   resolver: EmailLocaleResolver,
-  circleSlug?: string,
-  circleName?: string,
 ): Promise<void> {
   const [circle, user] = await Promise.all([
-    circleSlug && circleName
-      ? Promise.resolve({ id: circleId, slug: circleSlug, name: circleName })
-      : prismaCircleRepository.findById(circleId),
+    prismaCircleRepository.findById(circleId),
     prismaUserRepository.findById(userId),
   ]);
   if (!circle || !user) return;
@@ -608,10 +601,8 @@ export async function promoteToCoHostAction(
   const hostUserId = session.user.id;
 
   return toActionResult(async () => {
-    // Déclencheur = Host, destinataire = co-host promu → ≠ déclencheur → FR par défaut
     const resolver = await buildEmailLocaleResolver(hostUserId);
-    const targetLocale = resolver.resolveFor(targetUserId);
-    const t = await getTranslations({ locale: targetLocale, namespace: "Email.coHostPromoted" });
+    const t = await resolver.translationsFor(targetUserId);
     await promoteToCoHost(
       { circleId, hostUserId, targetUserId },
       {
@@ -620,19 +611,19 @@ export async function promoteToCoHostAction(
         emailService,
         emailStrings: {
           promotedBy: async ({ inviterName, circleName }) => ({
-            subject: t("subject", { circleName }),
-            heading: t("heading", { circleName }),
-            intro: t("intro", { inviterName }),
-            rightsTitle: t("rightsTitle"),
-            rightCreateEvents: t("rightCreateEvents"),
-            rightManageRegistrations: t("rightManageRegistrations"),
-            rightUpdateCircle: t("rightUpdateCircle"),
-            rightBroadcast: t("rightBroadcast"),
-            rightReceiveNotifications: t("rightReceiveNotifications"),
-            limitsNote: t("limitsNote"),
-            ctaLabel: t("ctaLabel"),
-            footer: t("footer"),
-            leaveLink: t("leaveLink"),
+            subject: t("coHostPromoted.subject", { circleName }),
+            heading: t("coHostPromoted.heading", { circleName }),
+            intro: t("coHostPromoted.intro", { inviterName }),
+            rightsTitle: t("coHostPromoted.rightsTitle"),
+            rightCreateEvents: t("coHostPromoted.rightCreateEvents"),
+            rightManageRegistrations: t("coHostPromoted.rightManageRegistrations"),
+            rightUpdateCircle: t("coHostPromoted.rightUpdateCircle"),
+            rightBroadcast: t("coHostPromoted.rightBroadcast"),
+            rightReceiveNotifications: t("coHostPromoted.rightReceiveNotifications"),
+            limitsNote: t("coHostPromoted.limitsNote"),
+            ctaLabel: t("coHostPromoted.ctaLabel"),
+            footer: t("coHostPromoted.footer"),
+            leaveLink: t("coHostPromoted.leaveLink"),
           }),
         },
       }
@@ -655,10 +646,8 @@ export async function demoteFromCoHostAction(
   const hostUserId = session.user.id;
 
   return toActionResult(async () => {
-    // Déclencheur = Host, destinataire = co-host dégradé → ≠ déclencheur → FR par défaut
     const resolver = await buildEmailLocaleResolver(hostUserId);
-    const targetLocale = resolver.resolveFor(targetUserId);
-    const t = await getTranslations({ locale: targetLocale, namespace: "Email.coHostDemoted" });
+    const t = await resolver.translationsFor(targetUserId);
     await demoteFromCoHost(
       { circleId, hostUserId, targetUserId },
       {
@@ -667,14 +656,14 @@ export async function demoteFromCoHostAction(
         emailService,
         emailStrings: {
           demoted: async ({ circleName }) => ({
-            subject: t("subject", { circleName }),
-            heading: t("heading", { circleName }),
-            intro: t("intro", { circleName }),
-            newRoleLabel: t("newRoleLabel"),
-            registrationsNote: t("registrationsNote"),
-            ctaLabel: t("ctaLabel"),
-            footer: t("footer"),
-            preferencesLink: t("preferencesLink"),
+            subject: t("coHostDemoted.subject", { circleName }),
+            heading: t("coHostDemoted.heading", { circleName }),
+            intro: t("coHostDemoted.intro", { circleName }),
+            newRoleLabel: t("coHostDemoted.newRoleLabel"),
+            registrationsNote: t("coHostDemoted.registrationsNote"),
+            ctaLabel: t("coHostDemoted.ctaLabel"),
+            footer: t("coHostDemoted.footer"),
+            preferencesLink: t("coHostDemoted.preferencesLink"),
           }),
         },
       }
