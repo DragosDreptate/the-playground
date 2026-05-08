@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
+import { collapseWhitespace } from "@/lib/text";
 import { getDisplayName } from "@/lib/display-name";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -85,12 +86,13 @@ export async function generateMetadata({
       getTranslations({ locale, namespace: "Explorer.circleCard" }),
     ]);
     const memberLabel = t("members", { count: memberCount });
+    const title = collapseWhitespace(circle.name);
     const description = circle.description
-      ? `${circle.description} · ${memberLabel}`
+      ? `${collapseWhitespace(circle.description)} · ${memberLabel}`
       : memberLabel;
 
     return {
-      title: circle.name,
+      title,
       description,
       alternates: {
         canonical: `${appUrl}/circles/${slug}`,
@@ -102,12 +104,12 @@ export async function generateMetadata({
       ...(isPrivate && { robots: { index: false, follow: false } }),
       ...(!isPrivate && {
         openGraph: {
-          title: circle.name,
+          title,
           description,
           type: "website",
         },
         twitter: {
-          title: circle.name,
+          title,
           description,
         },
       }),

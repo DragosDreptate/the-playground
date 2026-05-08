@@ -5,6 +5,7 @@ import { isValidSlug } from "@/lib/slug";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
+import { collapseWhitespace } from "@/lib/text";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
 // Les inscriptions en temps réel passent par les Server Actions (revalidatePath),
@@ -60,12 +61,15 @@ export async function generateMetadata({
       ? t("form.locationOnline")
       : moment.locationName ?? moment.locationAddress ?? "";
   const connector = locale === "fr" ? " à " : " at ";
-  const description = `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`;
+  const title = collapseWhitespace(moment.title);
+  const description = collapseWhitespace(
+    `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`,
+  );
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   return {
-    title: moment.title,
+    title,
     description,
     alternates: {
       canonical: `${appUrl}/m/${slug}`,
@@ -75,12 +79,12 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: moment.title,
+      title,
       description,
       type: "website",
     },
     twitter: {
-      title: moment.title,
+      title,
       description,
     },
   };
