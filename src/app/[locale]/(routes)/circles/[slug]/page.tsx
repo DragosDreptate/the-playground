@@ -87,8 +87,12 @@ export async function generateMetadata({
     ]);
     const memberLabel = t("members", { count: memberCount });
     const title = collapseWhitespace(circle.name);
+    // Compteur de membres en tête de la description : les clients (WhatsApp,
+    // iMessage…) tronquent la preview à ~80–120 chars — placer le social proof
+    // avant la description du Circle garantit qu'il reste visible quel que soit
+    // le contenu derrière.
     const description = circle.description
-      ? `${collapseWhitespace(circle.description)} · ${memberLabel}`
+      ? `${memberLabel} · ${collapseWhitespace(circle.description)}`
       : memberLabel;
 
     return {
