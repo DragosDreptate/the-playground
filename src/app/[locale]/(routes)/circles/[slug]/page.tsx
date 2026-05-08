@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
+import { collapseWhitespace } from "@/lib/text";
 import { getDisplayName } from "@/lib/display-name";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -85,8 +86,10 @@ export async function generateMetadata({
       getTranslations({ locale, namespace: "Explorer.circleCard" }),
     ]);
     const memberLabel = t("members", { count: memberCount });
+    // Newlines dans circle.description (saisie multi-paragraphe via Textarea) cassent
+    // le scraping og:description — collapser tout whitespace en simple espace.
     const description = circle.description
-      ? `${circle.description} · ${memberLabel}`
+      ? `${collapseWhitespace(circle.description)} · ${memberLabel}`
       : memberLabel;
 
     return {
