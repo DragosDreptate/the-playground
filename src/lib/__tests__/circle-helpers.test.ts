@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { computeMembersMeta } from "@/lib/circle-helpers";
-import { MEMBER_AVATARS_MAX } from "@/lib/circle-constants";
+import { AVATAR_STACK_MAX } from "@/lib/avatar-stack-meta";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
 function makeMember(overrides: {
   id: string;
   firstName?: string | null;
-  joinedAtMs?: number;
+  joinedAt?: Date;
 }): CircleMemberWithUser {
   return {
     id: overrides.id,
@@ -14,7 +14,7 @@ function makeMember(overrides: {
     circleId: "circle-1",
     role: "PLAYER",
     status: "ACTIVE",
-    joinedAt: new Date(overrides.joinedAtMs ?? 1_700_000_000_000),
+    joinedAt: overrides.joinedAt ?? new Date("2024-01-01"),
     user: {
       id: overrides.id,
       firstName: overrides.firstName ?? overrides.id,
@@ -26,8 +26,6 @@ function makeMember(overrides: {
   };
 }
 
-// Translator factice qui rend l'ICU plural manuellement pour tester l'usage de
-// `count` côté caller. Le rendu réel est testé par next-intl.
 const translate: Parameters<typeof computeMembersMeta>[3] = (key, values) => {
   if (key === "detail.andOthers") {
     const count = (values?.count as number) ?? 0;
@@ -52,7 +50,7 @@ describe("computeMembersMeta", () => {
       expect(result.metaMobileText).toBe("");
     });
 
-    it("renders only the names when total equals NAMES_TO_SHOW", () => {
+    it("renders only the names when total equals the names-to-show count", () => {
       const members = [
         makeMember({ id: "alice", firstName: "Alice" }),
         makeMember({ id: "bob", firstName: "Bob" }),
@@ -65,38 +63,38 @@ describe("computeMembersMeta", () => {
     });
   });
 
-  describe("given total exactly equals MEMBER_AVATARS_MAX", () => {
+  describe("given total exactly equals AVATAR_STACK_MAX", () => {
     it("shows all avatars and no mobile suffix", () => {
-      const members = Array.from({ length: MEMBER_AVATARS_MAX }, (_, i) =>
+      const members = Array.from({ length: AVATAR_STACK_MAX }, (_, i) =>
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
       const result = computeMembersMeta([], members, members.length, translate);
 
-      expect(result.visibleAvatars).toHaveLength(MEMBER_AVATARS_MAX);
+      expect(result.visibleAvatars).toHaveLength(AVATAR_STACK_MAX);
       expect(result.metaMobileText).toBe("");
     });
   });
 
-  describe("given total exceeds MEMBER_AVATARS_MAX by one (the bug case)", () => {
+  describe("given total exceeds AVATAR_STACK_MAX by one (the bug case)", () => {
     it("references avatars in mobile text, not desktop names", () => {
-      const totalCount = MEMBER_AVATARS_MAX + 1;
+      const totalCount = AVATAR_STACK_MAX + 1;
       const members = Array.from({ length: totalCount }, (_, i) =>
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
       const result = computeMembersMeta([], members, totalCount, translate);
 
-      expect(result.visibleAvatars).toHaveLength(MEMBER_AVATARS_MAX);
+      expect(result.visibleAvatars).toHaveLength(AVATAR_STACK_MAX);
       expect(result.metaText).toBe(`M0, M1 et ${totalCount - 2} autres`);
       expect(result.metaMobileText).toBe("et 1 autre");
     });
   });
 
-  describe("given total far exceeds MEMBER_AVATARS_MAX", () => {
+  describe("given total far exceeds AVATAR_STACK_MAX", () => {
     it("computes mobile suffix from avatar count, not name count", () => {
-      const totalCount = MEMBER_AVATARS_MAX + 7;
-      const members = Array.from({ length: MEMBER_AVATARS_MAX + 2 }, (_, i) =>
+      const totalCount = AVATAR_STACK_MAX + 7;
+      const members = Array.from({ length: AVATAR_STACK_MAX + 2 }, (_, i) =>
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
@@ -112,17 +110,17 @@ describe("computeMembersMeta", () => {
       const earlyHost = makeMember({
         id: "early-host",
         firstName: "Early",
-        joinedAtMs: 1_000,
+        joinedAt: new Date("2024-01-01"),
       });
       const lateHost = makeMember({
         id: "late-host",
         firstName: "Late",
-        joinedAtMs: 9_000,
+        joinedAt: new Date("2024-03-01"),
       });
       const midPlayer = makeMember({
         id: "mid-player",
         firstName: "Mid",
-        joinedAtMs: 5_000,
+        joinedAt: new Date("2024-02-01"),
       });
 
       const result = computeMembersMeta(
