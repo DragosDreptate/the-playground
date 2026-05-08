@@ -8,11 +8,34 @@ import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { getMomentGradient } from "@/lib/gradient";
 import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
+import { formatOgDateBadge } from "@/lib/format-date";
+import { truncate } from "@/lib/text";
+import {
+  OG_COLORS,
+  OgBrandingPill,
+  OgCoverBackground,
+  OgScrim,
+} from "@/lib/og/components";
+import type { LocationType } from "@/domain/models/moment";
 
 export const runtime = "nodejs";
 export const alt = "Event — The Playground";
 export const size = { width: 1200, height: 1200 };
 export const contentType = "image/png";
+
+const TITLE_MAX = 70;
+const META_MAX = 56;
+
+function formatLocationLabel(
+  locationType: LocationType,
+  locationName: string | null,
+  locationAddress: string | null,
+  locale: string,
+): string {
+  if (locationType === "ONLINE") return locale === "fr" ? "En ligne" : "Online";
+  if (locationType === "HYBRID") return locale === "fr" ? "Hybride" : "Hybrid";
+  return locationName ?? locationAddress ?? "";
+}
 
 export default async function OgImage({
   params,
@@ -38,45 +61,21 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const circle = await prismaCircleRepository.findById(moment.circleId);
+  const [circle, coverDataUrl] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    moment.coverImage
+      ? loadOgCoverAsDataUrl(moment.coverImage)
+      : Promise.resolve(null),
+  ]);
 
-  const dateLocale = locale === "fr" ? "fr-FR" : "en-US";
-  const month = moment.startsAt
-    .toLocaleDateString(dateLocale, { month: "short" })
-    .replace(/\.$/, "")
-    .toUpperCase();
-  const day = moment.startsAt.toLocaleDateString(dateLocale, { day: "numeric" });
-  const weekday = moment.startsAt
-    .toLocaleDateString(dateLocale, { weekday: "short" })
-    .replace(/\.$/, "")
-    .toUpperCase();
-  const time = moment.startsAt.toLocaleTimeString(dateLocale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const onlineLabel = locale === "fr" ? "En ligne" : "Online";
-  const hybridLabel = locale === "fr" ? "Hybride" : "Hybrid";
-  const location =
-    moment.locationType === "ONLINE"
-      ? onlineLabel
-      : moment.locationType === "HYBRID"
-        ? hybridLabel
-        : moment.locationName ?? moment.locationAddress ?? "";
-
-  const metaText = location
-    ? `${weekday} ${time} · ${location}`
-    : `${weekday} ${time}`;
-  const truncatedMeta =
-    metaText.length > 56 ? metaText.slice(0, 53) + "…" : metaText;
-
-  const truncatedTitle =
-    moment.title.length > 70 ? moment.title.slice(0, 67) + "…" : moment.title;
-
-  const gradient = getMomentGradient(moment.id);
-  const coverDataUrl = moment.coverImage
-    ? await loadOgCoverAsDataUrl(moment.coverImage)
-    : null;
+  const { month, day, weekday, time } = formatOgDateBadge(moment.startsAt, locale);
+  const location = formatLocationLabel(
+    moment.locationType,
+    moment.locationName,
+    moment.locationAddress,
+    locale,
+  );
+  const metaText = location ? `${weekday} ${time} · ${location}` : `${weekday} ${time}`;
 
   return new ImageResponse(
     (
@@ -86,104 +85,16 @@ export default async function OgImage({
           height: "100%",
           display: "flex",
           position: "relative",
-          background: "#0c0a14",
+          background: OG_COLORS.bgDark,
         }}
       >
-        {coverDataUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={coverDataUrl}
-            alt=""
-            width={size.width}
-            height={size.height}
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: gradient,
-              display: "flex",
-            }}
-          />
-        )}
-
-        {/* Bottom scrim — gradient noir → transparent pour lisibilité du bloc info */}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: "55%",
-            background:
-              "linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0) 100%)",
-            display: "flex",
-          }}
+        <OgCoverBackground
+          coverDataUrl={coverDataUrl}
+          gradient={getMomentGradient(moment.id)}
         />
+        <OgScrim />
+        <OgBrandingPill />
 
-        {/* Branding pill — haut-droite */}
-        <div
-          style={{
-            position: "absolute",
-            top: 36,
-            right: 36,
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            background: "rgba(8, 6, 16, 0.55)",
-            padding: "12px 20px",
-            borderRadius: 999,
-            border: "1px solid rgba(255, 255, 255, 0.1)",
-          }}
-        >
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 9,
-              background: "linear-gradient(135deg, #ec4899, #a855f7)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <svg width="14" height="16" viewBox="0 0 13 15" fill="none">
-              <polygon points="0,0 0,15 13,7.5" fill="white" />
-            </svg>
-          </div>
-          <div style={{ display: "flex", alignItems: "baseline" }}>
-            <span
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: "rgba(255, 255, 255, 0.5)",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              {"the "}
-            </span>
-            <span
-              style={{
-                fontSize: 22,
-                fontWeight: 700,
-                color: "#ff6097",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              playground
-            </span>
-          </div>
-        </div>
-
-        {/* Bottom content : date pill + Circle name + title + meta */}
         <div
           style={{
             position: "absolute",
@@ -212,7 +123,7 @@ export default async function OgImage({
               style={{
                 fontSize: 18,
                 fontWeight: 700,
-                color: "#ec4899",
+                color: OG_COLORS.pink,
                 textTransform: "uppercase",
                 letterSpacing: "2.4px",
                 lineHeight: 1,
@@ -225,7 +136,7 @@ export default async function OgImage({
               style={{
                 fontSize: 56,
                 fontWeight: 800,
-                color: "#18181b",
+                color: OG_COLORS.zinc950,
                 letterSpacing: "-1.5px",
                 lineHeight: 1,
               }}
@@ -247,7 +158,7 @@ export default async function OgImage({
                 style={{
                   fontSize: 26,
                   fontWeight: 600,
-                  color: "#ff8eb6",
+                  color: OG_COLORS.pinkSoft,
                   letterSpacing: "0.2px",
                   marginBottom: 10,
                   display: "flex",
@@ -266,7 +177,7 @@ export default async function OgImage({
                 display: "flex",
               }}
             >
-              {truncatedTitle}
+              {truncate(moment.title, TITLE_MAX)}
             </div>
             <div
               style={{
@@ -277,7 +188,7 @@ export default async function OgImage({
                 display: "flex",
               }}
             >
-              {truncatedMeta}
+              {truncate(metaText, META_MAX)}
             </div>
           </div>
         </div>
