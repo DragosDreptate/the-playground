@@ -215,7 +215,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
     : null;
   const primaryHosts = creator ? [creator] : hosts.filter((h) => h.role === "HOST");
   const isHostView = props.variant === "host";
-  const publicProps = isHostView ? null : (props as PublicViewProps);
+  const publicProps = props.variant === "public" ? props : null;
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
   const isAuthenticated = isHostView || publicProps!.isAuthenticated;
 
@@ -372,7 +372,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     momentId={moment.id}
                     senderEmail={publicProps.currentUserEmail}
                     signInUrl={publicProps.isAuthenticated ? null : publicProps.signInUrl}
-                    variant="event"
                   />
                 )}
               </div>

@@ -1,7 +1,16 @@
 import { DomainError } from "./domain-error";
 
+export const CONTACT_ERROR_CODES = {
+  NoHostsToContact: "NO_HOSTS_TO_CONTACT",
+  MomentNotInCircle: "MOMENT_NOT_IN_CIRCLE",
+  ContactMessageTooShort: "CONTACT_MESSAGE_TOO_SHORT",
+  ContactMessageTooLong: "CONTACT_MESSAGE_TOO_LONG",
+  ContactHostsRateLimited: "CONTACT_HOSTS_RATE_LIMITED",
+  SenderEmailMissing: "SENDER_EMAIL_MISSING",
+} as const;
+
 export class NoHostsToContactError extends DomainError {
-  readonly code = "NO_HOSTS_TO_CONTACT";
+  readonly code = CONTACT_ERROR_CODES.NoHostsToContact;
 
   constructor(circleId: string) {
     super(`Circle ${circleId} has no organizers to contact`);
@@ -9,7 +18,7 @@ export class NoHostsToContactError extends DomainError {
 }
 
 export class MomentNotInCircleError extends DomainError {
-  readonly code = "MOMENT_NOT_IN_CIRCLE";
+  readonly code = CONTACT_ERROR_CODES.MomentNotInCircle;
 
   constructor(momentId: string, circleId: string) {
     super(`Moment ${momentId} does not belong to circle ${circleId}`);
@@ -17,7 +26,7 @@ export class MomentNotInCircleError extends DomainError {
 }
 
 export class ContactMessageTooShortError extends DomainError {
-  readonly code = "CONTACT_MESSAGE_TOO_SHORT";
+  readonly code = CONTACT_ERROR_CODES.ContactMessageTooShort;
 
   constructor(min: number) {
     super(`Contact message must be at least ${min} characters long`);
@@ -25,7 +34,7 @@ export class ContactMessageTooShortError extends DomainError {
 }
 
 export class ContactMessageTooLongError extends DomainError {
-  readonly code = "CONTACT_MESSAGE_TOO_LONG";
+  readonly code = CONTACT_ERROR_CODES.ContactMessageTooLong;
 
   constructor(max: number) {
     super(`Contact message must be at most ${max} characters long`);
@@ -33,7 +42,7 @@ export class ContactMessageTooLongError extends DomainError {
 }
 
 export class ContactHostsRateLimitedError extends DomainError {
-  readonly code = "CONTACT_HOSTS_RATE_LIMITED";
+  readonly code = CONTACT_ERROR_CODES.ContactHostsRateLimited;
 
   constructor() {
     super("Too many contact messages sent in the last hour");
@@ -41,7 +50,7 @@ export class ContactHostsRateLimitedError extends DomainError {
 }
 
 export class SenderEmailMissingError extends DomainError {
-  readonly code = "SENDER_EMAIL_MISSING";
+  readonly code = CONTACT_ERROR_CODES.SenderEmailMissing;
 
   constructor(userId: string) {
     super(`User ${userId} has no email and cannot contact organizers`);

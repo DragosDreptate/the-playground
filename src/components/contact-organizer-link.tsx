@@ -21,75 +21,69 @@ import {
   CONTACT_MESSAGE_MAX_LENGTH,
   CONTACT_MESSAGE_MIN_LENGTH,
 } from "@/domain/usecases/contact-circle-hosts";
+import { CONTACT_ERROR_CODES } from "@/domain/errors";
 
 type Props = {
   circleId: string;
-  /** Si fourni, restreint le contexte à un événement précis. */
+  /** Si fourni, l'intro de la modale parle de l'événement plutôt que de la Communauté. */
   momentId?: string;
-  /** Email du Participant — affiché dans la note "reply-to". Null si non auth. */
   senderEmail: string | null;
-  /** Non-null = utilisateur non authentifié, le trigger devient un lien vers signin. */
+  /** Non-null = visiteur non auth → le trigger devient un lien vers signin. */
   signInUrl: string | null;
-  /** Adapte le texte d'intro de la modale au contexte d'origine. */
-  variant: "event" | "circle";
 };
 
 const triggerClassName =
   "group inline-flex items-center gap-1.5 py-1 text-xs font-normal text-muted-foreground hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors";
+
+function TriggerInner() {
+  const t = useTranslations("ContactOrganizer");
+  return (
+    <>
+      <Mail className="size-3" aria-hidden />
+      {t("triggerLabel")}
+    </>
+  );
+}
 
 export function ContactOrganizerLink({
   circleId,
   momentId,
   senderEmail,
   signInUrl,
-  variant,
 }: Props) {
   const t = useTranslations("ContactOrganizer");
   const [open, setOpen] = React.useState(false);
   const [message, setMessage] = React.useState("");
-  const [isPending, setIsPending] = React.useState(false);
+  const [isPending, startTransition] = React.useTransition();
 
   if (signInUrl) {
     return (
       <a href={signInUrl} className={triggerClassName} aria-label={t("signInToContact")}>
-        <Mail className="size-3" aria-hidden />
-        {t("triggerLabel")}
+        <TriggerInner />
       </a>
     );
   }
 
-  async function handleSend() {
-    setIsPending(true);
-    try {
-      const result = await contactCircleHostsAction({
-        circleId,
-        momentId,
-        message,
-      });
+  function handleSend() {
+    startTransition(async () => {
+      const result = await contactCircleHostsAction({ circleId, momentId, message });
       if (result.success) {
         toast.success(t("successTitle"), { description: t("successDescription") });
         setOpen(false);
         setMessage("");
         return;
       }
-      const errorMessage = errorMessageFor(result.code, t);
-      toast.error(errorMessage);
-    } finally {
-      setIsPending(false);
-    }
+      toast.error(errorMessageFor(result.code, t));
+    });
   }
 
-  const trimmedLength = message.trim().length;
-  const isMessageValid =
-    trimmedLength >= CONTACT_MESSAGE_MIN_LENGTH &&
-    trimmedLength <= CONTACT_MESSAGE_MAX_LENGTH;
+  const isMessageValid = message.trim().length >= CONTACT_MESSAGE_MIN_LENGTH;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button type="button" className={triggerClassName}>
-          <Mail className="size-3" aria-hidden />
-          {t("triggerLabel")}
+          <TriggerInner />
         </button>
       </DialogTrigger>
 
@@ -100,7 +94,7 @@ export function ContactOrganizerLink({
           </div>
           <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            {variant === "event" ? t("descriptionEvent") : t("descriptionCircle")}
+            {momentId ? t("descriptionEvent") : t("descriptionCircle")}
           </DialogDescription>
         </DialogHeader>
 
@@ -126,11 +120,7 @@ export function ContactOrganizerLink({
         </div>
 
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setOpen(false)}
-            disabled={isPending}
-          >
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
             {t("cancel")}
           </Button>
           <Button onClick={handleSend} disabled={isPending || !isMessageValid}>
@@ -147,13 +137,13 @@ function errorMessageFor(
   t: ReturnType<typeof useTranslations<"ContactOrganizer">>
 ): string {
   switch (code) {
-    case "CONTACT_HOSTS_RATE_LIMITED":
+    case CONTACT_ERROR_CODES.ContactHostsRateLimited:
       return t("errorRateLimited");
-    case "CONTACT_MESSAGE_TOO_SHORT":
+    case CONTACT_ERROR_CODES.ContactMessageTooShort:
       return t("errorTooShort", { min: CONTACT_MESSAGE_MIN_LENGTH });
-    case "CONTACT_MESSAGE_TOO_LONG":
+    case CONTACT_ERROR_CODES.ContactMessageTooLong:
       return t("errorTooLong", { max: CONTACT_MESSAGE_MAX_LENGTH });
-    case "NO_HOSTS_TO_CONTACT":
+    case CONTACT_ERROR_CODES.NoHostsToContact:
       return t("errorNoHosts");
     default:
       return t("errorGeneric");

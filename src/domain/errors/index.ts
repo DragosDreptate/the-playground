@@ -59,6 +59,7 @@ export {
   CommentPhotoTypeNotAllowedError,
 } from "./comment-attachment-errors";
 export {
+  CONTACT_ERROR_CODES,
   NoHostsToContactError,
   MomentNotInCircleError,
   ContactMessageTooShortError,

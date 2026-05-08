@@ -4,6 +4,7 @@ import type { UserRepository } from "@/domain/ports/repositories/user-repository
 import type { EmailService } from "@/domain/ports/services/email-service";
 import type { RateLimiter } from "@/domain/ports/services/rate-limiter";
 import { isOrganizerRole } from "@/domain/models/circle";
+import { getDisplayName } from "@/lib/display-name";
 import {
   CircleNotFoundError,
   ContactHostsRateLimitedError,
@@ -74,60 +75,47 @@ export async function contactCircleHosts(
     throw new ContactMessageTooLongError(CONTACT_MESSAGE_MAX_LENGTH);
   }
 
-  const sender = await userRepository.findById(input.senderId);
-  if (!sender) {
-    throw new UserNotFoundError(input.senderId);
-  }
-  if (!sender.email) {
-    throw new SenderEmailMissingError(input.senderId);
-  }
+  const [sender, circle, moment, organizers, rateLimit] = await Promise.all([
+    userRepository.findById(input.senderId),
+    circleRepository.findById(input.circleId),
+    input.momentId
+      ? momentRepository.findById(input.momentId)
+      : Promise.resolve(null),
+    circleRepository.findOrganizers(input.circleId),
+    rateLimiter.checkLimit(
+      `contact-hosts:${input.senderId}`,
+      CONTACT_HOSTS_MAX_PER_HOUR,
+      CONTACT_HOSTS_WINDOW_MS
+    ),
+  ]);
 
-  const circle = await circleRepository.findById(input.circleId);
-  if (!circle) {
-    throw new CircleNotFoundError(input.circleId);
+  if (!sender) throw new UserNotFoundError(input.senderId);
+  if (!sender.email) throw new SenderEmailMissingError(input.senderId);
+  if (!circle) throw new CircleNotFoundError(input.circleId);
+  if (input.momentId && !moment) throw new MomentNotFoundError(input.momentId);
+  if (moment && moment.circleId !== input.circleId) {
+    throw new MomentNotInCircleError(input.momentId!, input.circleId);
   }
+  if (!rateLimit.allowed) throw new ContactHostsRateLimitedError();
 
-  let momentTitle: string | null = null;
-  let momentSlug: string | null = null;
-  if (input.momentId) {
-    const moment = await momentRepository.findById(input.momentId);
-    if (!moment) {
-      throw new MomentNotFoundError(input.momentId);
-    }
-    if (moment.circleId !== input.circleId) {
-      throw new MomentNotInCircleError(input.momentId, input.circleId);
-    }
-    momentTitle = moment.title;
-    momentSlug = moment.slug;
-  }
-
-  const { allowed } = await rateLimiter.checkLimit(
-    `contact-hosts:${input.senderId}`,
-    CONTACT_HOSTS_MAX_PER_HOUR,
-    CONTACT_HOSTS_WINDOW_MS
-  );
-  if (!allowed) {
-    throw new ContactHostsRateLimitedError();
-  }
-
-  const organizers = (await circleRepository.findOrganizers(input.circleId)).filter(
+  const activeHosts = organizers.filter(
     (m) => isOrganizerRole(m.role) && m.status === "ACTIVE" && m.user.email
   );
-  if (organizers.length === 0) {
+  if (activeHosts.length === 0) {
     throw new NoHostsToContactError(input.circleId);
   }
 
-  const senderName = formatSenderName(sender.firstName, sender.lastName, sender.email);
-  const contextUrl = momentSlug
-    ? `${appUrl}/m/${momentSlug}`
+  const senderName = getDisplayName(sender.firstName, sender.lastName, sender.email);
+  const contextUrl = moment
+    ? `${appUrl}/m/${moment.slug}`
     : `${appUrl}/circles/${circle.slug}`;
 
-  await Promise.all(
-    organizers.map((organizer) =>
+  const results = await Promise.allSettled(
+    activeHosts.map((organizer) =>
       emailService.sendHostContactMessage({
         to: organizer.user.email,
         replyTo: sender.email!,
-        recipientName: formatSenderName(
+        recipientName: getDisplayName(
           organizer.user.firstName,
           organizer.user.lastName,
           organizer.user.email
@@ -136,22 +124,15 @@ export async function contactCircleHosts(
         senderEmail: sender.email!,
         message: trimmed,
         circleName: circle.name,
-        momentTitle,
+        momentTitle: moment ? moment.title : null,
         contextUrl,
         strings: emailStrings,
       })
     )
   );
 
-  return { recipientsCount: organizers.length };
-}
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  if (sent === 0) throw new NoHostsToContactError(input.circleId);
 
-function formatSenderName(
-  firstName: string | null,
-  lastName: string | null,
-  email: string
-): string {
-  const parts = [firstName, lastName].filter((p): p is string => Boolean(p && p.trim()));
-  if (parts.length > 0) return parts.join(" ");
-  return email.split("@")[0] ?? email;
+  return { recipientsCount: sent };
 }

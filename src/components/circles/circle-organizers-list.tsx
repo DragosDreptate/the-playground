@@ -7,7 +7,6 @@ import type { CircleMemberWithUser } from "@/domain/models/circle";
 type ContactOrganizerConfig = {
   circleId: string;
   senderEmail: string | null;
-  /** Non-null = visiteur non auth → le lien redirige vers signin. */
   signInUrl: string | null;
 };
 
@@ -75,7 +74,6 @@ export function CircleOrganizersList({ organizers, linkable, label, contactOrgan
             circleId={contactOrganizer.circleId}
             senderEmail={contactOrganizer.senderEmail}
             signInUrl={contactOrganizer.signInUrl}
-            variant="circle"
           />
         )}
       </div>

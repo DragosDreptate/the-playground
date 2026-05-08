@@ -11,6 +11,7 @@ import { createResendEmailService } from "@/infrastructure/services";
 import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 import { contactCircleHosts } from "@/domain/usecases/contact-circle-hosts";
 import { captureServerEvent } from "@/lib/posthog-server";
+import { getAppUrl } from "@/lib/app-url";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 
@@ -27,37 +28,18 @@ export async function contactCircleHostsAction(input: {
   }
   const senderId = session.user.id;
 
-  if (
-    typeof input.circleId !== "string" ||
-    input.circleId.length === 0 ||
-    typeof input.message !== "string" ||
-    (input.momentId !== undefined && typeof input.momentId !== "string")
-  ) {
-    return {
-      success: false,
-      error: "Invalid input",
-      code: "VALIDATION_ERROR",
-    };
-  }
-
   const t = await getTranslations("Email.hostContactMessage");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   return toActionResult(async () => {
     const result = await contactCircleHosts(
-      {
-        senderId,
-        circleId: input.circleId,
-        momentId: input.momentId,
-        message: input.message,
-      },
+      { senderId, ...input },
       {
         userRepository: prismaUserRepository,
         circleRepository: prismaCircleRepository,
         momentRepository: prismaMomentRepository,
         emailService,
         rateLimiter: prismaRateLimiter,
-        appUrl,
+        appUrl: getAppUrl(),
         emailStrings: {
           subject: t("subject"),
           heading: t("heading"),
