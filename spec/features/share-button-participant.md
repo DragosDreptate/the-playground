@@ -9,34 +9,35 @@
 
 ## Périmètre
 
-Composant générique `(url, ariaLabel, onShared?)` (voir décision 10 pour le détail), intégré sur les **deux pages publiques** :
+Composant générique `(url, ariaLabel, onShared?)` (voir décision 10 pour le détail), intégré sur **toutes les pages mobile qui affichent une cover d'événement ou de Communauté**. Quatre surfaces concrètes :
 
-- **Page événement** `/m/[slug]` — cas d'usage primaire, l'événement est l'unité virale du modèle.
-- **Page Communauté** `/circles/[slug]` — couche de rétention. Permet à un membre d'amener un proche entre deux événements, ou de partager spontanément la communauté.
+| Surface | Route | Audience |
+|---|---|---|
+| Page événement publique | `/m/[slug]` | Anonyme, Participant, Organisateur |
+| Page événement dashboard | `/dashboard/circles/[slug]/moments/[momentSlug]` | Participant non-Host (`variant="public"`) ET Host (`variant="host"`) |
+| Page Communauté publique | `/circles/[slug]` | Anonyme, Participant, Organisateur |
+| Page Communauté dashboard | `/dashboard/circles/[slug]` | Participant membre ET Organisateur |
 
-**Audience du bouton :** visible pour **tous les utilisateurs** présents sur ces pages, sans condition de rôle :
+### Pourquoi le bouton est visible partout, peu importe le rôle ou la route
 
-- Visiteur anonyme
-- Participant inscrit ou non
-- Organisateur connecté (voir ci-dessous)
+- **Cohérence par cover.** Le bouton est attaché à la cover. Tant qu'il y a une cover sur une page mobile, le bouton est là. Pas de matrice route × rôle à mémoriser pour l'utilisateur.
+- **Le bouton mobile-only ne fait pas doublon avec les cards de partage desktop.** L'Organisateur consulte régulièrement les pages depuis son téléphone. Sur mobile, sa card de dashboard ne lui sert pas, alors que le sheet natif (WhatsApp, Messages, AirDrop...) est exactement l'outil dont il a besoin.
+- **Cacher conditionnellement selon le rôle ajoute de la logique sans bénéfice clair.**
 
-### Pourquoi pas de page dédiée dans le dashboard Participant
+### Erreur structurelle de la première version de cette spec
 
-Il n'existe pas de "page événement individuel" ni de "page Communauté individuelle" dans le dashboard côté Participant. Le dashboard `/dashboard` est une timeline unifiée. Quand le Participant clique sur un événement ou une Communauté, il atterrit directement sur les slugs publics `/m/[slug]` et `/circles/[slug]`. Ces deux surfaces couvrent donc 100 % du parcours Participant — aucune duplication à prévoir.
+La première version affirmait : "il n'existe pas de page Communauté individuelle dans le dashboard côté Participant, le dashboard est une timeline unifiée".
 
-### Pourquoi le bouton reste visible pour l'Organisateur
+**C'était faux.** Pour les membres confirmés (Hosts comme Participants), `dashboard-circle-card.tsx:33` route vers `/dashboard/circles/[slug]` (et non vers `/circles/[slug]`), et cette page est accessible à tous les membres, pas que les Hosts. Idem pour `/dashboard/circles/[slug]/moments/[momentSlug]` qui est servi à tous les membres avec `variant="public"` quand non-Host. Ces routes dashboard sont donc bien des pages individuelles côté Participant.
 
-Le bouton mobile-only ne fait pas doublon avec sa card de partage desktop :
+L'extension du périmètre aux quatre surfaces ci-dessus corrige cette erreur.
 
-- L'Organisateur consulte régulièrement la page publique pour vérifier ce que voient ses participants. Sur mobile, sa card de dashboard ne lui sert pas, alors que le sheet natif (WhatsApp, Messages, AirDrop...) est exactement l'outil dont il a besoin.
-- Cacher conditionnellement le bouton selon le rôle ajoute de la logique sans bénéfice clair.
-
-**Hors périmètre :** les vues Organisateur (dashboard) disposent déjà de leurs propres dispositifs de partage / invitation :
+**Hors périmètre :** les cards de partage existantes côté dashboard restent inchangées :
 
 - Sur l'événement : card "Partager mon événement" (lien copiable + invitations email batch)
 - Sur la Communauté : card `circle-share-invite-card.tsx` (lien copiable + invitations email batch)
 
-Ces cards restent inchangées. Le nouveau bouton mobile s'ajoute aux pages publiques sans toucher au dashboard.
+Le bouton mobile s'ajoute en complément, il ne remplace rien.
 
 ---
 
@@ -281,7 +282,8 @@ Aucune. La spec est complète, prête pour implémentation.
 |---|---|
 | `src/components/share-button.tsx` | À créer — composant générique, hors `moments/` puisque utilisé aussi pour Communauté |
 | `src/components/__tests__/share-button.test.tsx` | À créer — tests Vitest |
-| `src/components/moments/moment-detail-view.tsx` | À modifier — intégration overlay top-right de la cover, branchement `posthog.capture("moment_shared", ...)` dans le `onShared` |
-| `src/app/[locale]/(routes)/circles/[slug]/page.tsx` | À modifier — intégration overlay top-right de la cover, branchement `posthog.capture("circle_shared", ...)` dans le `onShared` |
+| `src/components/moments/moment-detail-view.tsx` | À modifier — intégration overlay top-right de la cover (couvre `/m/[slug]` ET `/dashboard/circles/[slug]/moments/[momentSlug]`, les deux variants) |
+| `src/app/[locale]/(routes)/circles/[slug]/page.tsx` | À modifier — intégration overlay top-right de la cover (page publique Communauté) |
+| `src/app/[locale]/(routes)/dashboard/(app)/(main)/circles/[slug]/page.tsx` | À modifier — intégration overlay top-right de la cover (page dashboard Communauté) |
 | `messages/fr.json` | À modifier — ajouter `Common.share.eventLabel` et `Common.share.communityLabel` |
 | `messages/en.json` | À modifier — ajouter `Common.share.eventLabel` et `Common.share.communityLabel` |
