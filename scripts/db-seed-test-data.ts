@@ -532,10 +532,11 @@ async function main() {
   // ── Large members Circle (test pagination modale, PAGE_SIZE = 20) ──────────
   // 1 HOST + 21 PLAYERS = 22 memberships → le 21e PLAYER tombe sur la page 2
   console.log("\n⭕ Circle: Test Large Members (pagination)");
+  const LARGE_MEMBERS_SLUG = "test-large-members";
   const largeCircle = await prisma.circle.upsert({
-    where: { slug: "test-large-members" },
+    where: { slug: LARGE_MEMBERS_SLUG },
     create: {
-      slug: "test-large-members",
+      slug: LARGE_MEMBERS_SLUG,
       name: "Test Large Members",
       description:
         "Communauté de test avec 22 membres pour valider la pagination de la modale (PAGE_SIZE = 20).",

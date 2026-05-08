@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { SLUGS, AUTH } from "./fixtures";
+import { openCircleMembersDialog } from "./helpers/circle-members";
 
 /**
  * Tests E2E — Feature co-organisateurs
@@ -20,16 +21,6 @@ import { SLUGS, AUTH } from "./fixtures";
  * Les tests E2E se concentrent sur la surface UI.
  */
 
-/** Ouvre la modale Membres via le bloc stats "X Membres" et retourne le dialog. */
-async function openMembersDialog(page: Parameters<Parameters<typeof test>[2]>[0]["page"]) {
-  const trigger = page.getByRole("button", { name: /\d+ membres?/i }).first();
-  await expect(trigger).toBeVisible();
-  await trigger.click();
-  const dialog = page.getByRole("dialog");
-  await expect(dialog).toBeVisible();
-  return dialog;
-}
-
 test.describe("Co-organisateurs — UI HOST", () => {
   test.use({ storageState: AUTH.HOST });
 
@@ -37,14 +28,14 @@ test.describe("Co-organisateurs — UI HOST", () => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
     // La modale membres est accessible via le bloc stats
-    const dialog = await openMembersDialog(page);
+    const dialog = await openCircleMembersDialog(page);
     await expect(dialog).toContainText(/Membres/i);
   });
 
   test("should show the contextual menu trigger for PLAYER members", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    const dialog = await openMembersDialog(page);
+    const dialog = await openCircleMembersDialog(page);
     // Au moins un bouton d'actions doit être présent pour les PLAYERs de la Communauté seed
     // On exclut les boutons disabled (HOST principal qui ne peut pas s'auto-promouvoir)
     const actionButtons = dialog.locator('button[aria-label="Actions"]:not([disabled])');
@@ -54,7 +45,7 @@ test.describe("Co-organisateurs — UI HOST", () => {
   test("should expose the Promote to co-organizer action in the menu", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    const dialog = await openMembersDialog(page);
+    const dialog = await openCircleMembersDialog(page);
     // On exclut les boutons disabled (HOST principal)
     const firstActionButton = dialog
       .locator('button[aria-label="Actions"]:not([disabled])')
@@ -68,7 +59,7 @@ test.describe("Co-organisateurs — UI HOST", () => {
   test("should show the single Organisateur badge on the Circle HOST", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}`);
 
-    const dialog = await openMembersDialog(page);
+    const dialog = await openCircleMembersDialog(page);
     // Badge unique "Organisateur" pour HOST et CO_HOST, partout (D8 simplifié)
     await expect(dialog).toContainText(/Organisateur/);
   });
@@ -82,7 +73,7 @@ test.describe("Co-organisateurs — UI public", () => {
 
     // Badge unique "Organisateur" côté public comme dashboard — HOST et CO_HOST confondus.
     // Depuis la refonte, le badge est dans la modale Membres (la section inline a été retirée).
-    const dialog = await openMembersDialog(page);
+    const dialog = await openCircleMembersDialog(page);
     await expect(dialog).toContainText(/Organisateur/);
   });
 });

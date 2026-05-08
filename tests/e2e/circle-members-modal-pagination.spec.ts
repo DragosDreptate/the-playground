@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { SLUGS, AUTH } from "./fixtures";
+import { openCircleMembersDialog } from "./helpers/circle-members";
 
 /**
  * Tests E2E — Pagination de la modale CircleMembersDialog
@@ -21,29 +22,24 @@ test.describe("Modale membres — pagination infinite scroll", () => {
   test("should load all members of a Circle with > PAGE_SIZE members via infinite scroll", async ({ page }) => {
     await page.goto(`/fr/circles/${SLUGS.LARGE_MEMBERS_CIRCLE}`);
 
-    // Ouvre la modale via le bloc stats "22 Membres"
-    const trigger = page.getByRole("button", { name: /\d+ membres?/i }).first();
-    await expect(trigger).toBeVisible();
-    await trigger.click();
-
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
+    const dialog = await openCircleMembersDialog(page);
     await expect(dialog).toContainText("22 membres");
 
-    // À l'ouverture, seule la page 1 est chargée (20 membres)
-    // → LargeMember21 (en page 2) ne doit pas être présent dans le DOM
-    await expect(dialog.getByText("LargeMember21", { exact: false })).toHaveCount(0);
+    // À l'ouverture, seule la page 1 est chargée (20 membres) → LargeMember21
+    // (en page 2) ne doit pas être présent dans le DOM. Match exact pour
+    // éviter qu'un futur LargeMember210 ne fasse passer l'assertion par erreur.
+    const lastMember = dialog.getByText("LargeMember21 Test", { exact: true });
+    await expect(lastMember).toHaveCount(0);
 
     // Scroll le conteneur de la modale jusqu'en bas pour déclencher l'observer
     const scrollContainer = dialog.getByTestId("circle-members-scroll-container");
-    await expect(scrollContainer).toBeVisible();
     await scrollContainer.evaluate((el) => {
       el.scrollTop = el.scrollHeight;
     });
 
-    // LargeMember21 (21e PLAYER, donc 22e dans la liste avec le HOST) doit
-    // maintenant apparaître. Si l'infinite scroll est cassé, ce test timeout.
-    await expect(dialog.getByText("LargeMember21", { exact: false })).toBeVisible();
+    // LargeMember21 doit maintenant apparaître. Si l'infinite scroll est
+    // cassé, ce test timeout.
+    await expect(lastMember).toBeVisible();
 
     // Et le sentinel disparaît (hasMore = false) une fois tous les membres chargés
     await expect(dialog.getByTestId("circle-members-sentinel")).toHaveCount(0);
