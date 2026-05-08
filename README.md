@@ -81,10 +81,10 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 
 | | |
 | --- | --- |
-| **1 400+** | commits |
-| **300+** | pull requests |
-| **65** | cas d'usage (domain usecases) |
-| **880+** | tests (unit + integration + E2E) |
+| **2 000+** | commits |
+| **400+** | pull requests |
+| **80+** | cas d'usage (domain usecases) |
+| **1 000+** | tests (unit + integration + E2E) |
 
 ## Architecture
 
@@ -102,24 +102,65 @@ Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépend
 
 ## Développement
 
+### Prérequis
+
+- **Node.js** ≥ 24 LTS (aligné avec le runtime Vercel de production)
+- **pnpm** ≥ 10 (le projet déclare `pnpm@10.30.0` via `packageManager`) — `npm install -g pnpm`
+- **PostgreSQL** : un compte gratuit [Neon](https://neon.tech) ou un Postgres local
+- **Compte Resend** (gratuit, 100 emails/jour) : [resend.com](https://resend.com) — pour le magic link et les autres emails
+
+### Setup local (5 minutes)
+
 ```bash
+# 1. Cloner et installer
+git clone https://github.com/DragosDreptate/the-playground.git
+cd the-playground
 pnpm install
-pnpm dev              # Démarre le serveur de développement
-pnpm test             # Lance les tests (unit + integration)
-pnpm test:e2e         # Tests E2E Playwright
-pnpm typecheck        # Vérifie les types TypeScript
-pnpm db:push          # Applique le schema sur la DB dev
+
+# 2. Configurer les variables d'environnement
+cp .env.example .env.local
+# Édite .env.local : voir le fichier pour la liste détaillée. Au minimum :
+#   - DATABASE_URL  (ta branche Neon)
+#   - AUTH_SECRET   (génère avec : npx auth secret)
+#   - un provider d'auth (Resend recommandé, sinon Google/GitHub OAuth)
+
+# 3. Initialiser la DB
+pnpm db:push          # applique le schema Prisma sur ta DB
+
+# 4. (Optionnel) Seed des données de test
+pnpm db:seed-test-data
+
+# 5. Lancer
+pnpm dev              # http://localhost:3000
 ```
 
-Variables d'environnement requises : voir `.env.example`.
+### Authentification en local
 
-## Versions récentes
+Trois options, **au moins une** doit être configurée dans `.env.local` :
 
-Les 3 dernières versions majeures (voir le [changelog complet](https://the-playground.fr/changelog)) :
+| Option | Effort | Avantages |
+|---|---|---|
+| **Resend (magic link)** | 2 min | recommandée — c'est le flow par défaut de l'app. Crée un compte resend.com, mets ta clé dans `AUTH_RESEND_KEY` et ton email dans `STAGING_EMAIL_ALLOWLIST`. |
+| **Google OAuth** | 5 min | Crée un OAuth client sur console.cloud.google.com avec callback `http://localhost:3000/api/auth/callback/google` |
+| **GitHub OAuth** | 5 min | Idem sur github.com/settings/developers, callback `http://localhost:3000/api/auth/callback/github` |
 
-- **v2.6.0** — Réseaux de communautés, profils enrichis, site web des communautés
-- **v2.5.0** — Blog et landing page enrichis
-- **v2.0.0** — Événements payants et billetterie intégrée (Stripe Connect)
+> **Garde-fou email** : `safe-resend.ts` bloque tous les envois vers de vraies adresses dès que `VERCEL_ENV !== "production"`. En local, seuls les emails listés dans `STAGING_EMAIL_ALLOWLIST` (ou se terminant par `@test.playground` / `@demo.playground`) sont effectivement envoyés. Voir `spec/email-testing.md`.
+
+### Commandes courantes
+
+```bash
+pnpm dev              # serveur de développement
+pnpm test             # tests unitaires + intégration (Vitest)
+pnpm test:e2e         # tests E2E (Playwright)
+pnpm typecheck        # vérification TypeScript
+pnpm db:push          # applique le schema sur la DB dev
+pnpm db:studio        # UI de visualisation Prisma
+pnpm db:seed-test-data    # injecte les données de test
+```
+
+## Changelog
+
+L'historique complet des versions est publié sur [the-playground.fr/changelog](https://the-playground.fr/changelog).
 
 ## Auteur
 
