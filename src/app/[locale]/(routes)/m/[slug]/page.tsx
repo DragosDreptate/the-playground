@@ -4,6 +4,7 @@ import { measureTime } from "@/lib/perf-logger";
 import { isValidSlug } from "@/lib/slug";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
 // Les inscriptions en temps réel passent par les Server Actions (revalidatePath),
@@ -52,16 +53,8 @@ export async function generateMetadata({
 
   const circle = await getCircle(moment.circleId);
   const t = await getTranslations({ locale, namespace: "Moment" });
-  const dateLocale = locale === "fr" ? "fr-FR" : "en-US";
-  const date = moment.startsAt.toLocaleDateString(dateLocale, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const time = moment.startsAt.toLocaleTimeString(dateLocale, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const date = formatLongDate(moment.startsAt, locale);
+  const time = formatLocalizedTime(moment.startsAt, locale);
   const location =
     moment.locationType === "ONLINE"
       ? t("form.locationOnline")

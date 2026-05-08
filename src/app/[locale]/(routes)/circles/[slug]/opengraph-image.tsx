@@ -10,7 +10,6 @@ import {
   OG_COLORS,
   OgBrandingPill,
   OgCoverBackground,
-  OgScrim,
 } from "@/lib/og/components";
 
 export const runtime = "nodejs";
@@ -44,19 +43,14 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const [memberCount, coverDataUrl, t] = await Promise.all([
-    prismaCircleRepository.countMembers(circle.id),
-    circle.coverImage
-      ? loadOgCoverAsDataUrl(circle.coverImage)
-      : Promise.resolve(null),
-    getTranslations({ locale, namespace: "Explorer.circleCard" }),
-  ]);
+  const coverDataUrl = circle.coverImage
+    ? await loadOgCoverAsDataUrl(circle.coverImage)
+    : null;
 
-  const memberLabel = t("members", { count: memberCount });
-  const metaText = circle.city ? `${memberLabel} · ${circle.city}` : memberLabel;
-
-  return (
-    new ImageResponse(
+  // Cover présente → cover pure + branding seulement. Le nom et la meta sont
+  // déjà repris par og:title + og:description sous l'image — éviter la redondance.
+  if (coverDataUrl) {
+    return new ImageResponse(
       (
         <div
           style={{
@@ -67,52 +61,77 @@ export default async function OgImage({
             background: OG_COLORS.bgDark,
           }}
         >
-          <OgCoverBackground
-            coverDataUrl={coverDataUrl}
-            gradient={getMomentGradient(circle.id)}
-          />
-          {coverDataUrl && <OgScrim />}
+          <OgCoverBackground coverDataUrl={coverDataUrl} />
           <OgBrandingPill />
-
-          <div
-            style={{
-              position: "absolute",
-              left: 56,
-              right: 56,
-              bottom: 56,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: coverDataUrl ? "flex-start" : "center",
-              textAlign: coverDataUrl ? "left" : "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 64,
-                fontWeight: 700,
-                color: "white",
-                lineHeight: 1.06,
-                letterSpacing: "-1.7px",
-                display: "flex",
-              }}
-            >
-              {truncate(circle.name, NAME_MAX)}
-            </div>
-            <div
-              style={{
-                fontSize: 26,
-                fontWeight: 500,
-                color: "rgba(255, 255, 255, 0.78)",
-                marginTop: 18,
-                display: "flex",
-              }}
-            >
-              {truncate(metaText, META_MAX)}
-            </div>
-          </div>
         </div>
       ),
       { ...size },
-    )
+    );
+  }
+
+  // Pas de cover → fallback content-rich : titre et meta dans l'image.
+  const [memberCount, t] = await Promise.all([
+    prismaCircleRepository.countMembers(circle.id),
+    getTranslations({ locale, namespace: "Explorer.circleCard" }),
+  ]);
+  const memberLabel = t("members", { count: memberCount });
+  const metaText = circle.city ? `${memberLabel} · ${circle.city}` : memberLabel;
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          position: "relative",
+          background: OG_COLORS.bgDark,
+        }}
+      >
+        <OgCoverBackground
+          coverDataUrl={null}
+          gradient={getMomentGradient(circle.id)}
+        />
+        <OgBrandingPill />
+
+        <div
+          style={{
+            position: "absolute",
+            left: 56,
+            right: 56,
+            bottom: 56,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 64,
+              fontWeight: 700,
+              color: "white",
+              lineHeight: 1.06,
+              letterSpacing: "-1.7px",
+              display: "flex",
+            }}
+          >
+            {truncate(circle.name, NAME_MAX)}
+          </div>
+          <div
+            style={{
+              fontSize: 26,
+              fontWeight: 500,
+              color: "rgba(255, 255, 255, 0.78)",
+              marginTop: 18,
+              display: "flex",
+            }}
+          >
+            {truncate(metaText, META_MAX)}
+          </div>
+        </div>
+      </div>
+    ),
+    { ...size },
   );
 }

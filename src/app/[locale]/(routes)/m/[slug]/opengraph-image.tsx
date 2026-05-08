@@ -14,7 +14,6 @@ import {
   OG_COLORS,
   OgBrandingPill,
   OgCoverBackground,
-  OgScrim,
 } from "@/lib/og/components";
 import type { LocationType } from "@/domain/models/moment";
 
@@ -68,6 +67,30 @@ export default async function OgImage({
       : Promise.resolve(null),
   ]);
 
+  // Cover présente → cover pure + branding seulement. Le titre et la date sont
+  // déjà repris par le client (og:title + og:description) sous l'image dans
+  // WhatsApp / iMessage / Slack — on évite la triple redondance.
+  if (coverDataUrl) {
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            position: "relative",
+            background: OG_COLORS.bgDark,
+          }}
+        >
+          <OgCoverBackground coverDataUrl={coverDataUrl} />
+          <OgBrandingPill />
+        </div>
+      ),
+      { ...size },
+    );
+  }
+
+  // Pas de cover → fallback content-rich : tout dans l'image puisque rien d'autre n'y figure.
   const { month, day, weekday, time } = formatOgDateBadge(moment.startsAt, locale);
   const location = formatLocationLabel(
     moment.locationType,
@@ -89,10 +112,9 @@ export default async function OgImage({
         }}
       >
         <OgCoverBackground
-          coverDataUrl={coverDataUrl}
+          coverDataUrl={null}
           gradient={getMomentGradient(moment.id)}
         />
-        <OgScrim />
         <OgBrandingPill />
 
         <div

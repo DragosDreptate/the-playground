@@ -21,8 +21,6 @@ export const OG_COLORS = {
   bgDark: BRAND_BG_DARK,
   zinc950: "#18181b",
   logoGradient: `linear-gradient(135deg, ${BRAND_PINK}, ${BRAND_PURPLE})`,
-  scrim:
-    "linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0) 100%)",
 } as const;
 
 export function OgCoverBackground({
@@ -30,7 +28,7 @@ export function OgCoverBackground({
   gradient,
 }: {
   coverDataUrl: string | null;
-  gradient: string;
+  gradient?: string;
 }) {
   if (coverDataUrl) {
     return (
@@ -56,22 +54,6 @@ export function OgCoverBackground({
         position: "absolute",
         inset: 0,
         background: gradient,
-        display: "flex",
-      }}
-    />
-  );
-}
-
-export function OgScrim() {
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: "55%",
-        background: OG_COLORS.scrim,
         display: "flex",
       }}
     />
