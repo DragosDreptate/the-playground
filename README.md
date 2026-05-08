@@ -81,10 +81,10 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 
 | | |
 | --- | --- |
-| **1 400+** | commits |
-| **300+** | pull requests |
-| **65** | cas d'usage (domain usecases) |
-| **880+** | tests (unit + integration + E2E) |
+| **2 000+** | commits |
+| **400+** | pull requests |
+| **80+** | cas d'usage (domain usecases) |
+| **1 000+** | tests (unit + integration + E2E) |
 
 ## Architecture
 
@@ -104,10 +104,10 @@ Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépend
 
 ### Prérequis
 
-- **Node.js** ≥ 24 (LTS recommandée)
-- **pnpm** ≥ 9 (`npm install -g pnpm`)
+- **Node.js** ≥ 24 LTS (aligné avec le runtime Vercel de production)
+- **pnpm** ≥ 10 (le projet déclare `pnpm@10.30.0` via `packageManager`) — `npm install -g pnpm`
 - **PostgreSQL** : un compte gratuit [Neon](https://neon.tech) ou un Postgres local
-- **Compte Resend** (gratuit, 100 emails/jour) : [resend.com](https://resend.com) — pour le magic link
+- **Compte Resend** (gratuit, 100 emails/jour) : [resend.com](https://resend.com) — pour le magic link et les autres emails
 
 ### Setup local (5 minutes)
 
@@ -158,13 +158,9 @@ pnpm db:studio        # UI de visualisation Prisma
 pnpm db:seed-test-data    # injecte les données de test
 ```
 
-## Versions récentes
+## Changelog
 
-Les 3 dernières versions majeures (voir le [changelog complet](https://the-playground.fr/changelog)) :
-
-- **v2.6.0** — Réseaux de communautés, profils enrichis, site web des communautés
-- **v2.5.0** — Blog et landing page enrichis
-- **v2.0.0** — Événements payants et billetterie intégrée (Stripe Connect)
+L'historique complet des versions est publié sur [the-playground.fr/changelog](https://the-playground.fr/changelog).
 
 ## Auteur
 
