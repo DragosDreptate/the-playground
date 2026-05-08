@@ -20,41 +20,27 @@ describe("truncate", () => {
 });
 
 describe("collapseWhitespace", () => {
-  it("returns the string unchanged when no whitespace mess", () => {
-    expect(collapseWhitespace("Une description simple")).toBe(
-      "Une description simple",
-    );
+  it.each([
+    ["plain", "Une description simple", "Une description simple"],
+    [
+      "CRLF",
+      "Une communauté\r\n\r\npour OSER\r\n\r\n… à la scène !",
+      "Une communauté pour OSER … à la scène !",
+    ],
+    ["mixed (tabs + LF + multi-spaces)", "foo\t\tbar\n\nbaz   qux", "foo bar baz qux"],
+  ])("%s → single-spaced", (_label, input, expected) => {
+    expect(collapseWhitespace(input)).toBe(expected);
   });
 
-  describe("given a description with newlines (CRLF)", () => {
-    it("replaces them with a single space", () => {
-      expect(
-        collapseWhitespace("Une communauté\r\n\r\npour OSER\r\n\r\n… à la scène !"),
-      ).toBe("Une communauté pour OSER … à la scène !");
-    });
+  it("trims leading and trailing whitespace", () => {
+    expect(collapseWhitespace("  \n\n  hello world  \n  ")).toBe("hello world");
   });
 
-  describe("given a description with mixed whitespace", () => {
-    it("collapses tabs, newlines and multiple spaces into one", () => {
-      expect(collapseWhitespace("foo\t\tbar\n\nbaz   qux")).toBe("foo bar baz qux");
-    });
+  it("returns empty for an empty string", () => {
+    expect(collapseWhitespace("")).toBe("");
   });
 
-  describe("given leading/trailing whitespace", () => {
-    it("trims the result", () => {
-      expect(collapseWhitespace("  \n\n  hello world  \n  ")).toBe("hello world");
-    });
-  });
-
-  describe("given an empty string", () => {
-    it("returns empty", () => {
-      expect(collapseWhitespace("")).toBe("");
-    });
-  });
-
-  describe("given only whitespace", () => {
-    it("returns empty", () => {
-      expect(collapseWhitespace("   \n\t\r\n  ")).toBe("");
-    });
+  it("returns empty for whitespace-only input", () => {
+    expect(collapseWhitespace("   \n\t\r\n  ")).toBe("");
   });
 });

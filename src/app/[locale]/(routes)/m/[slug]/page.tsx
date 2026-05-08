@@ -61,8 +61,7 @@ export async function generateMetadata({
       ? t("form.locationOnline")
       : moment.locationName ?? moment.locationAddress ?? "";
   const connector = locale === "fr" ? " à " : " at ";
-  // collapseWhitespace : locationName/Address peuvent contenir des newlines
-  // (saisie multi-ligne) qui cassent les meta tags scrapés par WhatsApp/Slack.
+  const title = collapseWhitespace(moment.title);
   const description = collapseWhitespace(
     `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`,
   );
@@ -70,7 +69,7 @@ export async function generateMetadata({
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
   return {
-    title: moment.title,
+    title,
     description,
     alternates: {
       canonical: `${appUrl}/m/${slug}`,
@@ -80,12 +79,12 @@ export async function generateMetadata({
       },
     },
     openGraph: {
-      title: moment.title,
+      title,
       description,
       type: "website",
     },
     twitter: {
-      title: moment.title,
+      title,
       description,
     },
   };

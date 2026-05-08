@@ -86,14 +86,13 @@ export async function generateMetadata({
       getTranslations({ locale, namespace: "Explorer.circleCard" }),
     ]);
     const memberLabel = t("members", { count: memberCount });
-    // Newlines dans circle.description (saisie multi-paragraphe via Textarea) cassent
-    // le scraping og:description — collapser tout whitespace en simple espace.
+    const title = collapseWhitespace(circle.name);
     const description = circle.description
       ? `${collapseWhitespace(circle.description)} · ${memberLabel}`
       : memberLabel;
 
     return {
-      title: circle.name,
+      title,
       description,
       alternates: {
         canonical: `${appUrl}/circles/${slug}`,
@@ -105,12 +104,12 @@ export async function generateMetadata({
       ...(isPrivate && { robots: { index: false, follow: false } }),
       ...(!isPrivate && {
         openGraph: {
-          title: circle.name,
+          title,
           description,
           type: "website",
         },
         twitter: {
-          title: circle.name,
+          title,
           description,
         },
       }),
