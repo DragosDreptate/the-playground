@@ -529,6 +529,53 @@ async function main() {
     }
   }
 
+  // ── Large members Circle (test pagination modale, PAGE_SIZE = 20) ──────────
+  // 1 HOST + 21 PLAYERS = 22 memberships → le 21e PLAYER tombe sur la page 2
+  console.log("\n⭕ Circle: Test Large Members (pagination)");
+  const largeCircle = await prisma.circle.upsert({
+    where: { slug: "test-large-members" },
+    create: {
+      slug: "test-large-members",
+      name: "Test Large Members",
+      description:
+        "Communauté de test avec 22 membres pour valider la pagination de la modale (PAGE_SIZE = 20).",
+      visibility: "PUBLIC",
+      requiresApproval: false,
+    },
+    update: {},
+  });
+
+  await prisma.circleMembership.upsert({
+    where: { userId_circleId: { userId: userMap["host"], circleId: largeCircle.id } },
+    create: { userId: userMap["host"], circleId: largeCircle.id, role: "HOST" },
+    update: { role: "HOST" },
+  });
+
+  for (let i = 1; i <= 21; i++) {
+    const idx = String(i).padStart(2, "0");
+    const email = `large-member-${idx}@test.playground`;
+    const firstName = `LargeMember${idx}`;
+    const lastName = "Test";
+    const user = await prisma.user.upsert({
+      where: { email },
+      create: {
+        email,
+        name: `${firstName} ${lastName}`,
+        firstName,
+        lastName,
+        onboardingCompleted: true,
+        emailVerified: new Date(),
+      },
+      update: {},
+    });
+    await prisma.circleMembership.upsert({
+      where: { userId_circleId: { userId: user.id, circleId: largeCircle.id } },
+      create: { userId: user.id, circleId: largeCircle.id, role: "PLAYER" },
+      update: {},
+    });
+  }
+  console.log(`  ✓ 1 HOST + 21 PLAYERS = 22 memberships`);
+
   // Récapitulatif
   console.log("\n✅ Données test injectées avec succès.\n");
   console.log("Impersonation (dev uniquement) :");

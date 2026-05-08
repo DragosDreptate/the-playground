@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -79,7 +79,11 @@ export function CircleMembersDialog({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, startLoad] = useTransition();
   const [isExporting, startExport] = useTransition();
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  // Callback refs (useState) plutôt que useRef : Radix monte le DialogContent dans
+  // un Portal de manière différée, et un useRef ne déclenche pas de re-run d'effect
+  // quand le node est attaché. Avec useState, l'effect re-tourne dès que le node est prêt.
+  const [sentinelEl, setSentinelEl] = useState<HTMLDivElement | null>(null);
+  const [scrollContainerEl, setScrollContainerEl] = useState<HTMLDivElement | null>(null);
   const canExport = callerRole === "HOST" || callerRole === "CO_HOST";
 
   function handleExportCsv() {
@@ -155,17 +159,20 @@ export function CircleMembersDialog({
   }, []);
 
   useEffect(() => {
-    if (!open || !hasMore || !sentinelRef.current) return;
-    const sentinel = sentinelRef.current;
+    if (!open || !hasMore || !sentinelEl || !scrollContainerEl) return;
+    // `root: scrollContainerEl` est essentiel : sans ça, l'observer regarde le
+    // viewport global au lieu du conteneur scrollable de la modale → le sentinel
+    // n'intersecte jamais quand on scrolle DANS la modale, et loadMore n'est
+    // jamais appelé.
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) loadMore();
       },
-      { rootMargin: "120px" },
+      { root: scrollContainerEl, rootMargin: "120px" },
     );
-    observer.observe(sentinel);
+    observer.observe(sentinelEl);
     return () => observer.disconnect();
-  }, [open, hasMore, loadMore]);
+  }, [open, hasMore, loadMore, sentinelEl, scrollContainerEl]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -209,7 +216,11 @@ export function CircleMembersDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">
+        <div
+          ref={setScrollContainerEl}
+          data-testid="circle-members-scroll-container"
+          className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6"
+        >
           <ul className="divide-border divide-y">
             {members.map((member) => (
               <MemberRow
@@ -224,7 +235,11 @@ export function CircleMembersDialog({
             ))}
           </ul>
           {hasMore && (
-            <div ref={sentinelRef} className="text-muted-foreground py-4 text-center text-xs">
+            <div
+              ref={setSentinelEl}
+              data-testid="circle-members-sentinel"
+              className="text-muted-foreground py-4 text-center text-xs"
+            >
               {isLoading ? "…" : ""}
             </div>
           )}
