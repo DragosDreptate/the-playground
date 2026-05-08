@@ -30,6 +30,7 @@ import { CircleMomentTabs } from "@/components/circles/circle-moment-tabs";
 import { PaginatedMomentList } from "@/components/circles/paginated-moment-list";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { CoverBlock } from "@/components/circles/cover-block";
+import { CircleShareButton } from "@/components/circles/circle-share-button";
 import { isValidSlug } from "@/lib/slug";
 import {
   Globe,
@@ -112,12 +113,13 @@ export default async function PublicCirclePage({
   const { slug, locale } = await params;
   if (!isValidSlug(slug)) notFound();
 
-  const [t, tExplorer, tCategory, tNetwork, session] =
+  const [t, tExplorer, tCategory, tNetwork, tCommon, session] =
     await Promise.all([
       getTranslations("Circle"),
       getTranslations("Explorer"),
       getTranslations("CircleCategory"),
       getTranslations("Network"),
+      getTranslations("Common"),
       // Session optionnelle — les pages publiques sont accessibles sans auth
       measureTime("circle-page:auth", () => auth()),
     ]);
@@ -245,6 +247,13 @@ export default async function PublicCirclePage({
               altText={circle.name}
             >
               {circle.isDemo && <DemoBadge label={tExplorer("circleCard.demo")} size="lg" />}
+              <CircleShareButton
+                url={`${appUrl}/circles/${circle.slug}`}
+                ariaLabel={tCommon("share.communityLabel")}
+                circleId={circle.id}
+                circleSlug={circle.slug}
+                circleName={circle.name}
+              />
             </CoverBlock>
           </div>
 

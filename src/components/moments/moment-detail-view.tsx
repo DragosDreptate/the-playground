@@ -10,6 +10,7 @@ import { PendingRegistrationsList } from "@/components/circles/pending-requests-
 import { MomentRegistrationsDialog } from "@/components/moments/moment-registrations-dialog";
 import { ParticipantAvatarStack } from "@/components/moments/participant-avatar-stack";
 import { CopyLinkButton } from "@/components/moments/copy-link-button";
+import { MomentShareButton } from "@/components/moments/moment-share-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName } from "@/lib/display-name";
@@ -100,6 +101,7 @@ type MomentCoverBlockProps = {
   gradient: string;
   sizes: string;
   demoLabel: string;
+  children?: React.ReactNode;
 };
 
 const breadcrumbStatusStyle: Record<string, string> = {
@@ -111,7 +113,7 @@ const breadcrumbStatusStyle: Record<string, string> = {
 
 function MomentCoverBlock({
   coverImage, coverImageAttribution, title, status, isDemo, gradient,
-  sizes, demoLabel,
+  sizes, demoLabel, children,
 }: MomentCoverBlockProps) {
   return (
     <div className="relative">
@@ -141,6 +143,8 @@ function MomentCoverBlock({
             </span>
           </div>
         )}
+
+        {children}
 
         {coverImageAttribution && (
           <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/60 to-transparent px-3 pt-8 pb-2">
@@ -290,7 +294,19 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               gradient={gradient}
               sizes="(max-width: 1024px) 100vw, 340px"
               demoLabel={tCommon("demo")}
-            />
+            >
+              {(moment.status === "PUBLISHED" || moment.status === "PAST") && props.appUrl && (
+                <MomentShareButton
+                  url={`${props.appUrl}/m/${moment.slug}`}
+                  ariaLabel={tCommon("share.eventLabel")}
+                  momentId={moment.id}
+                  momentSlug={moment.slug}
+                  circleId={circle.id}
+                  circleName={circle.name}
+                  momentStatus={moment.status}
+                />
+              )}
+            </MomentCoverBlock>
           </div>
 
           {/* Groupe 2 — Circle info "Proposé par" (mobile: order-16, vers le bas après Documents) */}

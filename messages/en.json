@@ -125,7 +125,11 @@
     "copyLink": "Copy link",
     "copied": "Copied!",
     "close": "Close",
-    "openInNewTab": "Open in new tab"
+    "openInNewTab": "Open in new tab",
+    "share": {
+      "eventLabel": "Share this event",
+      "communityLabel": "Share this community"
+    }
   },
   "Auth": {
     "signIn": {
