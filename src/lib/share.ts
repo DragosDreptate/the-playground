@@ -1,12 +1,16 @@
 export type ShareOutcome = "shared" | "cancelled" | "unsupported" | "error";
 
-export function isShareSupported(nav: Navigator | undefined = typeof navigator !== "undefined" ? navigator : undefined): boolean {
+function defaultNavigator(): Navigator | undefined {
+  return typeof navigator !== "undefined" ? navigator : undefined;
+}
+
+export function isShareSupported(nav: Navigator | undefined = defaultNavigator()): boolean {
   return typeof nav?.share === "function";
 }
 
 export async function tryShare(
   url: string,
-  nav: Navigator | undefined = typeof navigator !== "undefined" ? navigator : undefined,
+  nav: Navigator | undefined = defaultNavigator(),
 ): Promise<ShareOutcome> {
   if (!isShareSupported(nav)) return "unsupported";
 
