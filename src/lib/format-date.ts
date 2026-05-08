@@ -137,6 +137,38 @@ export function formatDateRange(
 }
 
 /**
+ * Composantes typographiques utilisées par les og:image (date pill + meta) :
+ * mois & jour pour la pill blanche, weekday + heure pour la ligne meta.
+ * Tout en uppercase, sans le point final que `Intl` ajoute parfois en FR.
+ */
+export function formatOgDateBadge(
+  date: Date,
+  locale: string,
+): { month: string; day: string; weekday: string; time: string } {
+  const intlLocale = toIntlLocale(locale);
+  const stripDot = (s: string) => s.replace(/\.$/, "").toUpperCase();
+  return {
+    month: stripDot(
+      new Intl.DateTimeFormat(intlLocale, {
+        timeZone: TIMEZONE,
+        month: "short",
+      }).format(date),
+    ),
+    day: new Intl.DateTimeFormat(intlLocale, {
+      timeZone: TIMEZONE,
+      day: "numeric",
+    }).format(date),
+    weekday: stripDot(
+      new Intl.DateTimeFormat(intlLocale, {
+        timeZone: TIMEZONE,
+        weekday: "short",
+      }).format(date),
+    ),
+    time: formatLocalizedTime(date, locale),
+  };
+}
+
+/**
  * Affichage meta "Quand" sur la page événement — toujours 2 lignes.
  *
  * - Pas de `endsAt`       → `{ line1: "mardi 22 avril", line2: "15:00", isMultiDay: false }`
