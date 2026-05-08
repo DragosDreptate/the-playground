@@ -112,11 +112,22 @@ export async function contactCircleHosts(
   }
 
   const senderName = getDisplayName(sender.firstName, sender.lastName, sender.email);
-  const context = moment
+  const aboutLine = moment
     ? emailStrings.aboutEvent
         .replace("{momentTitle}", moment.title)
         .replace("{circleName}", circle.name)
     : emailStrings.aboutCircle.replace("{circleName}", circle.name);
+
+  // next-intl ne court-circuite pas les placeholders quand on appelle `t(key)` sans
+  // variables côté action — on les résout ici pour garder le template purement
+  // déclaratif (zéro logique de templating dans le rendu).
+  const resolvedStrings = {
+    ...emailStrings,
+    intro: emailStrings.intro.replace("{senderName}", senderName),
+    replyHint: emailStrings.replyHint
+      .replace("{senderName}", senderName)
+      .replace("{senderEmail}", sender.email),
+  };
 
   const results = await Promise.allSettled(
     activeHosts.map((organizer) =>
@@ -128,12 +139,10 @@ export async function contactCircleHosts(
           organizer.user.lastName,
           organizer.user.email
         ),
-        senderName,
-        senderEmail: sender.email!,
         message: trimmed,
-        context,
-        baseUrl: appUrl,
-        strings: emailStrings,
+        aboutLine,
+        appUrl,
+        strings: resolvedStrings,
       })
     )
   );

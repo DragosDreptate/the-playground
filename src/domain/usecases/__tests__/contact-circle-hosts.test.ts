@@ -281,14 +281,14 @@ describe("contactCircleHosts", () => {
       for (const [data] of calls) {
         expect(data.replyTo).toBe("player@example.com");
         expect(data.message).toBe("Hello there organisers!");
-        expect(data.context).toBe("About community My Circle");
-        expect(data.baseUrl).toBe("https://app.example.com");
+        expect(data.aboutLine).toBe("About community My Circle");
+        expect(data.appUrl).toBe("https://app.example.com");
       }
     });
   });
 
   describe("given a momentId that belongs to the circle", () => {
-    it("should pass the event context string to the template", async () => {
+    it("should pass the event aboutLine to the template", async () => {
       const organizers = [makeOrganizer({ userId: "host-1" })];
       const deps = makeDeps({
         organizers,
@@ -311,7 +311,7 @@ describe("contactCircleHosts", () => {
       );
 
       const [[data]] = (deps.emailService.sendHostContactMessage as ReturnType<typeof vi.fn>).mock.calls;
-      expect(data.context).toBe("About event Soirée React in My Circle");
+      expect(data.aboutLine).toBe("About event Soirée React in My Circle");
     });
   });
 

@@ -235,9 +235,7 @@ export default async function CircleDetailPage({
 
           {/* Bouton Quitter — Participant uniquement */}
           {!isOrganizer && (
-            <div className="px-1">
-              <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
-            </div>
+            <LeaveCircleDialog circleId={circle.id} circleName={circle.name} />
           )}
           </div>
           {/* /Groupe 2 */}

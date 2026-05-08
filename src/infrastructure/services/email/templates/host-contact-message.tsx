@@ -1,6 +1,7 @@
-import { Img, Section, Text } from "@react-email/components";
+import { Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
+import { CenteredLogo } from "./components/centered-logo";
 import type { HostContactMessageEmailData } from "@/domain/ports/services/email-service";
 import {
   headingLg as heading,
@@ -12,59 +13,29 @@ import {
 type Props = HostContactMessageEmailData;
 
 export function HostContactMessageEmail({
-  senderName,
-  senderEmail,
   message,
-  context,
-  baseUrl,
+  aboutLine,
+  appUrl,
   strings,
 }: Props) {
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
       <Section style={logoSection}>
-        {/* Centrage robuste pour Outlook Word renderer : table align="center". */}
-        <table
-          align="center"
-          role="presentation"
-          cellPadding="0"
-          cellSpacing="0"
-          border={0}
-          style={{ margin: "0 auto", borderCollapse: "collapse" }}
-        >
-          <tbody>
-            <tr>
-              <td>
-                <Img
-                  src={`${baseUrl}/brand/logo-light.png`}
-                  width="180"
-                  height="32"
-                  alt="The Playground"
-                  style={logoImg}
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <CenteredLogo src={`${appUrl}/brand/logo-light.png`} />
       </Section>
 
       <Text style={heading}>{strings.heading}</Text>
 
-      <Text style={contextLabel}>{context}</Text>
+      <Text style={contextLabel}>{aboutLine}</Text>
 
-      <Text style={intro}>
-        {strings.intro.replace("{senderName}", senderName)}
-      </Text>
+      <Text style={intro}>{strings.intro}</Text>
 
       <Section style={commentSection}>
         <Text style={commentLabel}>{strings.messageLabel}</Text>
         <Text style={commentText}>{message}</Text>
       </Section>
 
-      <Text style={replyHint}>
-        {strings.replyHint
-          .replace("{senderName}", senderName)
-          .replace("{senderEmail}", senderEmail)}
-      </Text>
+      <Text style={replyHint}>{strings.replyHint}</Text>
     </EmailLayout>
   );
 }
@@ -72,13 +43,6 @@ export function HostContactMessageEmail({
 const logoSection: React.CSSProperties = {
   textAlign: "center" as const,
   marginBottom: "24px",
-};
-
-const logoImg: React.CSSProperties = {
-  display: "block",
-  border: 0,
-  outline: "none",
-  textDecoration: "none",
 };
 
 const contextLabel: React.CSSProperties = {

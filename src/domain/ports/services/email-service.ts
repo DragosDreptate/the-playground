@@ -399,13 +399,15 @@ export type HostContactMessageEmailData = {
   to: string;
   replyTo: string;
   recipientName: string;
-  senderName: string;
-  senderEmail: string;
+  /**
+   * Source du contact, déjà formée et localisée :
+   * « À propos de l'événement « X » · Communauté Y » ou « À propos de la Communauté « X » ».
+   */
+  aboutLine: string;
   message: string;
-  /** Pré-formé côté app : "À propos de l'événement « X » · Communauté Y" ou variante. */
-  context: string;
   /** URL de base de l'app, utilisée pour charger le logo dans l'email. */
-  baseUrl: string;
+  appUrl: string;
+  /** Strings i18n entièrement résolus côté usecase (pas de placeholders restants). */
   strings: {
     subject: string;
     heading: string;
