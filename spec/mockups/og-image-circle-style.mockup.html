@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OG Image Communauté — 3 variantes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0a0710;
+        --bg-soft: #14101e;
+        --pink: #ec4899;
+        --violet: #a855f7;
+        --text: #f1f1f3;
+        --muted: #8b8b9a;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 32px 96px;
+      }
+      h1 {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0 0 12px;
+      }
+      h1 span {
+        background: linear-gradient(135deg, var(--pink), var(--violet));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      h2 {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        margin: 64px 0 6px;
+      }
+      .lead {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+        max-width: 720px;
+      }
+      .lead strong {
+        color: var(--text);
+      }
+      .pre-h2 {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--pink);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+        margin-top: 24px;
+      }
+      .card {
+        background: var(--bg-soft);
+        border: 1px solid #25223a;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .card .label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card .label .badge {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #f1f1f3;
+        background: rgba(168, 85, 247, 0.18);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+      .card .label .name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .card .desc {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .card .pros-cons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .card .pros-cons div {
+        padding: 8px 10px;
+        border-radius: 8px;
+        line-height: 1.4;
+      }
+      .card .pros {
+        background: rgba(74, 222, 128, 0.1);
+        border-left: 2px solid #4ade80;
+        color: #b1f5c2;
+      }
+      .card .cons {
+        background: rgba(251, 113, 133, 0.1);
+        border-left: 2px solid #fb7185;
+        color: #fcc;
+      }
+
+      .og {
+        width: 480px;
+        height: 480px;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        background: #050308;
+        margin: 0 auto;
+      }
+      .og .cover {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+      }
+      /* Cover démo Communauté = workspace / équipe collaboration */
+      .og .cover.real {
+        background-image:
+          url("https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=1200&fit=crop&q=80");
+      }
+      .og .cover.gradient {
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(168, 85, 247, 0.6), transparent 60%),
+          radial-gradient(120% 80% at 100% 100%, rgba(236, 72, 153, 0.55), transparent 60%),
+          linear-gradient(135deg, #1a1028, #2d1b3d);
+      }
+      .og .scrim-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 50%;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0));
+      }
+      .og .topbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--pink), var(--violet), var(--pink));
+      }
+      .og .brand-corner {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(8, 6, 16, 0.55);
+        backdrop-filter: blur(10px);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: -0.2px;
+      }
+      .og .brand-corner .logo {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, var(--pink), var(--violet));
+        display: grid;
+        place-items: center;
+      }
+      .og .brand-corner .logo svg {
+        width: 8px;
+        height: 9px;
+      }
+      .og .brand-corner .word .light {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .og .brand-corner .word .dark {
+        color: #ff6097;
+      }
+
+      /* Member pill (option C) */
+      .og .members-pill {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        color: #18181b;
+        border-radius: 10px;
+        padding: 8px 12px;
+        line-height: 1;
+        gap: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        flex-shrink: 0;
+      }
+      .og .members-pill .label {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--violet);
+      }
+      .og .members-pill .count {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+      }
+
+      /* Title + eyebrow */
+      .og .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2.5px;
+        color: var(--pink);
+        margin-bottom: 6px;
+      }
+      .og .title {
+        color: white;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+      }
+      .og .meta {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 6px;
+      }
+
+      /* ────────── A — épuré (titre seul plein largeur) ────────── */
+      .va .scrim-bottom {
+      }
+      .va .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+      }
+      .va .title {
+        font-size: 26px;
+      }
+      .va .meta {
+        font-size: 12px;
+      }
+
+      /* ────────── B — eyebrow + meta ────────── */
+      .vb .scrim-bottom {
+      }
+      .vb .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+      }
+      .vb .title {
+        font-size: 26px;
+      }
+
+      /* ────────── C — members pill + texte ────────── */
+      .vc .scrim-bottom {
+      }
+      .vc .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+      }
+      .vc .content .text .title {
+        font-size: 22px;
+      }
+
+      /* ────────── Fallback ────────── */
+      .fa-content,
+      .fb-content,
+      .fc-content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 32px;
+        text-align: center;
+        gap: 16px;
+      }
+      .fall .title {
+        font-size: 30px;
+      }
+      .fall .meta {
+        font-size: 13px;
+      }
+      .fall .eyebrow {
+        font-size: 12px;
+        letter-spacing: 3px;
+      }
+      .fall .members-pill {
+        margin-top: 10px;
+      }
+
+      .compare-note {
+        background: rgba(168, 85, 247, 0.08);
+        border-left: 3px solid var(--violet);
+        padding: 14px 16px;
+        margin-top: 24px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #cfcfd6;
+      }
+      .compare-note strong {
+        color: white;
+      }
+
+      /* Recap table */
+      .recap {
+        margin-top: 40px;
+        background: var(--bg-soft);
+        border: 1px solid #25223a;
+        border-radius: 12px;
+        padding: 0;
+        overflow: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      table th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--muted);
+        padding: 14px 16px;
+        border-bottom: 1px solid #25223a;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+      }
+      table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #1d1a2c;
+        line-height: 1.4;
+      }
+      table tr:last-child td {
+        border-bottom: none;
+      }
+      table td:first-child {
+        font-weight: 600;
+        color: var(--violet);
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="pre-h2">Mockup · OG Image Communauté</div>
+      <h1>3 variantes pour <span>Communauté</span></h1>
+      <p class="lead">
+        Adaptation de la V7 (cover dominante + branding haut-droite) au cas Circle —
+        sans la date pill qui n'a pas d'équivalent. Données démo :
+        <em>Paris Creative Tech</em>, 124 membres à Paris.
+      </p>
+
+      <h2>Avec cover</h2>
+      <div class="grid">
+        <!-- Option A — épuré -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">A</span>
+            <span class="name">Épuré · titre seul</span>
+          </div>
+          <div class="og va">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="title">Paris Creative Tech</div>
+              <div class="meta">124 membres · Paris</div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Layout minimaliste, focus sur le nom de la Communauté. Pas d'eyebrow ni
+            de pill — juste le titre et la meta-ligne.
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Maximum de respect de la cover. Lisible sur petit écran.</div>
+            <div class="cons">⚠️ Aucun signal "Communauté" → confusion possible avec un event.</div>
+          </div>
+        </div>
+
+        <!-- Option B — eyebrow -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">B</span>
+            <span class="name">Eyebrow `COMMUNAUTÉ` · meta</span>
+          </div>
+          <div class="og vb">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="eyebrow">Communauté</div>
+              <div class="title">Paris Creative Tech</div>
+              <div class="meta">124 membres · Paris</div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Eyebrow rose `COMMUNAUTÉ` au-dessus du titre, meta en dessous. Cohérent
+            avec l'OG actuel des Circles + signe clairement le type de page.
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Distingue clairement event ≠ Communauté. Ligne meta utile.</div>
+            <div class="cons">⚠️ Pas de pill décorative → contraste plus faible avec V7 event.</div>
+          </div>
+        </div>
+
+        <!-- Option C — members pill -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">C</span>
+            <span class="name">Pill membres + nom + meta</span>
+          </div>
+          <div class="og vc">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="members-pill">
+                <div class="label">Membres</div>
+                <div class="count">124</div>
+              </div>
+              <div class="text">
+                <div class="eyebrow">Communauté</div>
+                <div class="title">Paris Creative Tech</div>
+                <div class="meta">Paris · talks &amp; networking</div>
+              </div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Symétrique avec V7 event : pill blanche à gauche (compteur de membres
+            au lieu de date), texte à droite. Social proof immédiat.
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Symétrie visuelle event/Communauté. Compteur membres = social proof fort.</div>
+            <div class="cons">⚠️ Communauté à 3 membres → pill ridicule. Bloc dense pour les noms longs.</div>
+          </div>
+        </div>
+
+        <!-- Option C-bis — variante : cacher pill si peu de membres -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">C+</span>
+            <span class="name">Option C avec seuil (≥ 10 membres)</span>
+          </div>
+          <div class="og vc">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="text">
+                <div class="eyebrow">Communauté</div>
+                <div class="title">Paris Creative Tech</div>
+                <div class="meta">7 membres · Paris</div>
+              </div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Variante C avec seuil : si < 10 membres, on cache la pill et on retombe
+            sur l'option B. Évite l'effet "communauté vide" sur les Circles
+            naissants.
+          </div>
+          <div class="pros-cons">
+            <div class="pros">✅ Robuste au cold start. Visuel cohérent quand peu de membres.</div>
+            <div class="cons">⚠️ Logique conditionnelle à coder + tester (mineur).</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Sans cover (fallback gradient)</h2>
+      <p class="lead">
+        Mêmes options déclinées sur le fallback gradient. Le branding haut-droite est
+        conservé pour rester cohérent avec V7-event/F2-event.
+      </p>
+
+      <div class="grid">
+        <!-- Fallback A -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">A</span>
+            <span class="name">Fallback · titre centré</span>
+          </div>
+          <div class="og fall">
+            <div class="cover gradient"></div>
+            <div class="fa-content">
+              <div class="title">Paris Creative Tech</div>
+              <div class="meta">124 membres · Paris</div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback B -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">B</span>
+            <span class="name">Fallback · eyebrow + meta</span>
+          </div>
+          <div class="og fall">
+            <div class="cover gradient"></div>
+            <div class="fb-content">
+              <div class="eyebrow">Communauté</div>
+              <div class="title">Paris Creative Tech</div>
+              <div class="meta">124 membres · Paris</div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fallback C -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">C</span>
+            <span class="name">Fallback · pill membres</span>
+          </div>
+          <div class="og fall">
+            <div class="cover gradient"></div>
+            <div class="fc-content">
+              <div class="eyebrow">Communauté</div>
+              <div class="title">Paris Creative Tech</div>
+              <div class="members-pill">
+                <div class="label">Membres</div>
+                <div class="count">124</div>
+              </div>
+              <div class="meta">Paris</div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover blank -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">—</span>
+            <span class="name">Référence : V7-event correspondant</span>
+          </div>
+          <div class="og">
+            <div
+              class="cover"
+              style="
+                background-image:
+                  url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&h=1200&fit=crop&q=80');
+                background-size: cover;
+              "
+            ></div>
+            <div class="scrim-bottom"></div>
+            <div
+              style="
+                position: absolute;
+                bottom: 22px;
+                left: 22px;
+                right: 22px;
+                display: flex;
+                gap: 14px;
+                align-items: flex-end;
+              "
+            >
+              <div
+                style="
+                  background: white;
+                  color: #18181b;
+                  border-radius: 10px;
+                  padding: 8px 12px;
+                  line-height: 1;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 4px;
+                  align-items: center;
+                "
+              >
+                <div
+                  style="
+                    font-size: 9px;
+                    font-weight: 700;
+                    color: var(--pink);
+                    text-transform: uppercase;
+                    letter-spacing: 1.2px;
+                  "
+                >
+                  Mars
+                </div>
+                <div style="font-size: 22px; font-weight: 800">21</div>
+              </div>
+              <div>
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #ff8eb6;
+                    margin-bottom: 4px;
+                  "
+                >
+                  Paris Creative Tech
+                </div>
+                <div style="font-size: 22px; font-weight: 700; color: white">
+                  Soirée JS &amp; Pizza
+                </div>
+                <div
+                  style="
+                    font-size: 11px;
+                    color: rgba(255, 255, 255, 0.7);
+                    margin-top: 6px;
+                  "
+                >
+                  VEN 19:00 · Le Cargo
+                </div>
+              </div>
+            </div>
+            <div class="brand-corner">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Pour comparer la symétrie visuelle event/Communauté côte à côte. Option C
+            est celle qui matche le mieux ce design event.
+          </div>
+        </div>
+      </div>
+
+      <h2>Tableau récapitulatif</h2>
+      <div class="recap">
+        <table>
+          <thead>
+            <tr>
+              <th>Option</th>
+              <th>Bloc bas</th>
+              <th>Cohérence event</th>
+              <th>Cas Circle naissant</th>
+              <th>Quand l'utiliser</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>titre + meta seuls</td>
+              <td>faible</td>
+              <td>OK</td>
+              <td>Si tu privilégies un look magazine ultra épuré</td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>eyebrow + titre + meta</td>
+              <td>moyenne</td>
+              <td>OK</td>
+              <td>Choix safe par défaut. Lisible et signé.</td>
+            </tr>
+            <tr>
+              <td>C</td>
+              <td>pill membres + texte</td>
+              <td>forte (symétrie V7)</td>
+              <td>Risqué (pill = "5 membres" peu engageant)</td>
+              <td>Si tu vises la cohérence visuelle event/Circle maximale</td>
+            </tr>
+            <tr>
+              <td>C+</td>
+              <td>pill si ≥ 10, sinon = B</td>
+              <td>forte (≥ 10) / moyenne</td>
+              <td>Robuste</td>
+              <td>Compromis : symétrie quand utile, fallback B sinon</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="compare-note">
+        <strong>Mon vote.</strong> Si symétrie event/Circle compte (et a priori oui pour
+        marquer "même plateforme"), <strong>option C+</strong> est le bon compromis :
+        pill membres quand significatif (≥ 10 ou un autre seuil que tu choisis), repli sur
+        B sinon. À défaut, <strong>option B</strong> est le safe choice qui marche
+        toujours.
+      </div>
+    </div>
+  </body>
+</html>

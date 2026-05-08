@@ -1,0 +1,1197 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OG Image cover-style — exploration visuelle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      :root {
+        --bg: #0a0710;
+        --bg-soft: #14101e;
+        --pink: #ec4899;
+        --violet: #a855f7;
+        --text: #f1f1f3;
+        --muted: #8b8b9a;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 48px 32px 96px;
+      }
+      h1 {
+        font-size: 36px;
+        font-weight: 800;
+        letter-spacing: -1px;
+        margin: 0 0 12px;
+      }
+      h1 span {
+        background: linear-gradient(135deg, var(--pink), var(--violet));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      h2 {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        margin: 64px 0 6px;
+      }
+      .lead {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+        max-width: 720px;
+      }
+      .lead strong {
+        color: var(--text);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+        margin-top: 24px;
+      }
+      .card {
+        background: var(--bg-soft);
+        border: 1px solid #25223a;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .card .label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card .label .badge {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: #f1f1f3;
+        background: rgba(236, 72, 153, 0.18);
+        border: 1px solid rgba(236, 72, 153, 0.4);
+        padding: 4px 8px;
+        border-radius: 999px;
+      }
+      .card .label .name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .card .desc {
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .og {
+        width: 480px;
+        height: 480px;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        background: #050308;
+        margin: 0 auto;
+      }
+      .og .cover {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+      }
+      /* Cover avec une vraie image via Unsplash (gens en meetup) */
+      .og .cover.real {
+        background-image:
+          url("https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1200&h=1200&fit=crop&q=80");
+      }
+      .og .cover.gradient {
+        background:
+          radial-gradient(120% 80% at 0% 0%, rgba(236, 72, 153, 0.55), transparent 60%),
+          radial-gradient(120% 80% at 100% 100%, rgba(168, 85, 247, 0.55), transparent 60%),
+          linear-gradient(135deg, #1a1028, #2d1b3d);
+      }
+      .og .scrim-bottom {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.55) 50%, rgba(0, 0, 0, 0));
+      }
+      .og .scrim-fullbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(8, 6, 16, 0.92);
+        backdrop-filter: blur(8px);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .og .topbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--pink), var(--violet), var(--pink));
+      }
+      .og .brand {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: -0.2px;
+      }
+      .og .brand .logo {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        background: linear-gradient(135deg, var(--pink), var(--violet));
+        display: grid;
+        place-items: center;
+      }
+      .og .brand .logo svg {
+        width: 8px;
+        height: 9px;
+      }
+      .og .brand .word .light {
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .og .brand .word .dark {
+        color: #ff6097;
+      }
+      .og .date-pill {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        color: #18181b;
+        border-radius: 10px;
+        padding: 8px 12px;
+        line-height: 1;
+        gap: 4px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      }
+      .og .date-pill .month {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        color: var(--pink);
+      }
+      .og .date-pill .day {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.6px;
+      }
+      .og .title {
+        color: white;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+      }
+      .og .meta {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      /* ─────────────── Variantes ─────────────── */
+
+      /* V1 — pure cover (Luma strict) */
+      .v1 .cover {
+      }
+
+      /* V2 — cover + branding bas-droit */
+      .v2 .brand-corner {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        background: rgba(8, 6, 16, 0.55);
+        backdrop-filter: blur(10px);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* V3 — cover + date pill bas-gauche */
+      .v3 .date-pill {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+      }
+
+      /* V4 — cover + branding + date pill */
+      .v4 .brand-corner {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        background: rgba(8, 6, 16, 0.55);
+        backdrop-filter: blur(10px);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .v4 .date-pill {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+      }
+
+      /* V5 — cover + titre seul (gradient bas) */
+      .v5 .scrim-bottom {
+        height: 45%;
+      }
+      .v5 .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+      }
+      .v5 .title {
+        font-size: 26px;
+      }
+
+      /* V6 — cover + titre + date pill (gradient bas) */
+      .v6 .scrim-bottom {
+        height: 45%;
+      }
+      .v6 .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+      }
+      .v6 .content .date-pill {
+        flex-shrink: 0;
+      }
+      .v6 .content .text .circle {
+        font-size: 11px;
+        font-weight: 600;
+        color: #ff8eb6;
+        margin-bottom: 4px;
+        letter-spacing: 0.2px;
+      }
+      .v6 .content .text .title {
+        font-size: 22px;
+      }
+      .v6 .content .text .meta {
+        margin-top: 6px;
+      }
+
+      /* V7 — cover + titre + date + logo coin */
+      .v7 .scrim-bottom {
+        height: 45%;
+      }
+      .v7 .content {
+        position: absolute;
+        bottom: 22px;
+        left: 22px;
+        right: 22px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-end;
+      }
+      .v7 .content .date-pill {
+        flex-shrink: 0;
+      }
+      .v7 .content .text .circle {
+        font-size: 11px;
+        font-weight: 600;
+        color: #ff8eb6;
+        margin-bottom: 4px;
+      }
+      .v7 .content .text .title {
+        font-size: 22px;
+      }
+      .v7 .content .text .meta {
+        margin-top: 6px;
+      }
+      .v7 .brand-corner {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(8, 6, 16, 0.55);
+        backdrop-filter: blur(10px);
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* V8 — cover + bandeau bas plein avec titre, date, logo */
+      .v8 .scrim-fullbar {
+        padding: 18px 22px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .v8 .scrim-fullbar .date-pill {
+        flex-shrink: 0;
+        box-shadow: none;
+      }
+      .v8 .scrim-fullbar .text {
+        flex: 1;
+        min-width: 0;
+      }
+      .v8 .scrim-fullbar .text .title {
+        font-size: 17px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .v8 .scrim-fullbar .text .meta {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+      .v8 .scrim-fullbar .brand {
+        flex-shrink: 0;
+        opacity: 0.55;
+      }
+
+      /* Fallback (pas de cover) */
+      .vfa .content,
+      .vfb .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 0 32px;
+        text-align: center;
+        gap: 20px;
+      }
+      .vfa .title,
+      .vfb .title {
+        font-size: 32px;
+      }
+      .vfa .circle,
+      .vfb .circle {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--pink);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      .vfb .brand-corner {
+        position: absolute;
+        bottom: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0.55;
+      }
+      .vfb .date-pill {
+        position: relative;
+      }
+
+      /* ─────────────── Aperçu en contexte messagerie ─────────────── */
+      .messaging {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+        margin-top: 32px;
+      }
+      .phone {
+        background: var(--bg-soft);
+        border-radius: 24px;
+        padding: 16px;
+        border: 1px solid #25223a;
+      }
+      .phone .phone-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 12px;
+        text-align: center;
+      }
+      .phone .screen {
+        border-radius: 20px;
+        overflow: hidden;
+        padding: 16px;
+      }
+      .phone.whatsapp .screen {
+        background: #0b141a;
+      }
+      .phone.imessage .screen {
+        background: #000;
+      }
+      .phone.slack .screen {
+        background: #1a1d21;
+      }
+      .phone.linkedin .screen {
+        background: #1d2226;
+      }
+      .bubble {
+        max-width: 280px;
+        padding: 8px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+      .phone.whatsapp .bubble {
+        background: #005c4b;
+        color: white;
+        margin-left: auto;
+      }
+      .phone.imessage .bubble {
+        background: #2c2c2e;
+        color: white;
+      }
+      .phone.imessage .bubble.sent {
+        background: #0084ff;
+        margin-left: auto;
+      }
+      .phone.slack .bubble,
+      .phone.linkedin .bubble {
+        background: transparent;
+        max-width: 100%;
+        padding: 0;
+        color: #d1d2d3;
+      }
+      .preview {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 6px;
+      }
+      .phone.whatsapp .preview {
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .phone.imessage .preview {
+        background: #1c1c1e;
+      }
+      .phone.slack .preview {
+        background: transparent;
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+        border-left: 4px solid #4a154b;
+        padding: 8px 12px;
+      }
+      .phone.linkedin .preview {
+        background: #1d2226;
+        border: 1px solid #2f3439;
+      }
+      .preview .img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        background: #050308;
+        position: relative;
+        overflow: hidden;
+      }
+      .phone.slack .preview .img {
+        width: 80px;
+        flex-shrink: 0;
+        border-radius: 6px;
+      }
+      .preview .meta-block {
+        padding: 10px 12px;
+      }
+      .phone.slack .preview .meta-block {
+        padding: 0;
+        flex: 1;
+      }
+      .preview .meta-block .title-line {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1a1a1a;
+        line-height: 1.3;
+      }
+      .preview .meta-block .desc-line {
+        font-size: 11px;
+        color: #6b6b6b;
+        line-height: 1.35;
+        margin-top: 2px;
+      }
+      .preview .meta-block .url-line {
+        font-size: 10px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+      }
+      .phone.imessage .preview .meta-block .title-line,
+      .phone.linkedin .preview .meta-block .title-line {
+        color: #f1f1f3;
+      }
+      .phone.imessage .preview .meta-block .desc-line,
+      .phone.linkedin .preview .meta-block .desc-line {
+        color: #98989d;
+      }
+      .phone.slack .preview .title-line {
+        color: #d1d2d3;
+        font-size: 14px;
+      }
+      .phone.slack .preview .desc-line {
+        color: #aab1b8;
+      }
+
+      /* version mini de la card (pour aperçus) */
+      .preview .img.v1 {
+        background-image:
+          url("https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=600&fit=crop&q=80");
+        background-size: cover;
+      }
+      .preview .img.v6 .cover {
+        background-image:
+          url("https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=600&fit=crop&q=80");
+        background-size: cover;
+      }
+      .preview .img.v6 .scrim {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.92), transparent);
+      }
+      .preview .img.v6 .text-mini {
+        position: absolute;
+        left: 8%;
+        bottom: 8%;
+        right: 8%;
+        color: white;
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+      }
+      .preview .img.v6 .text-mini .pill-mini {
+        background: white;
+        color: #18181b;
+        border-radius: 6px;
+        padding: 5px 7px;
+        text-align: center;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+      .preview .img.v6 .text-mini .pill-mini .m {
+        font-size: 7px;
+        font-weight: 700;
+        color: var(--pink);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .preview .img.v6 .text-mini .pill-mini .d {
+        font-size: 14px;
+        font-weight: 800;
+      }
+      .preview .img.v6 .text-mini .ttext .ttitle {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.15;
+      }
+      .preview .img.v6 .text-mini .ttext .tloc {
+        font-size: 9px;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 3px;
+      }
+
+      /* utilities */
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .pre-h2 {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--pink);
+      }
+
+      .compare-note {
+        background: rgba(168, 85, 247, 0.08);
+        border-left: 3px solid var(--violet);
+        padding: 14px 16px;
+        margin-top: 24px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #cfcfd6;
+      }
+      .compare-note strong {
+        color: white;
+      }
+
+      .legend-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .legend-row span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--pink);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="pre-h2">Mockup · OG Image cover-style</div>
+      <h1>Si on faisait <span>cover-only à la Luma</span> ?</h1>
+      <p class="lead">
+        Comparaison des variantes en format <strong>1200×1200</strong> pour optimiser les
+        partages sur WhatsApp / iMessage / Slack. Chaque variante combine cover photo + 0
+        à 4 éléments d'overlay (titre, date pill, branding, gradient). Données démo :
+        <em>Soirée JS &amp; Pizza · Networking dev</em> chez <em>Paris Creative Tech</em>,
+        vendredi 21 mars, Le Cargo.
+      </p>
+
+      <h2>Avec cover (8 variantes)</h2>
+      <div class="legend-row">
+        <span><span class="dot"></span>cover photo Unsplash (placeholder)</span>
+        <span>1 carré 1200×1200, ratio idéal mobile</span>
+      </div>
+
+      <div class="grid">
+        <!-- V1 — pure cover -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v1</span>
+            <span class="name">Pure cover (Luma strict)</span>
+          </div>
+          <div class="og v1">
+            <div class="cover real"></div>
+          </div>
+          <div class="desc">
+            Aucun overlay. Maximum d'impact visuel mobile, mais aucun branding ni
+            indication de contexte (event/Communauté, date, lieu).
+          </div>
+        </div>
+
+        <!-- V2 — cover + branding -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v2</span>
+            <span class="name">Cover + branding</span>
+          </div>
+          <div class="og v2">
+            <div class="cover real"></div>
+            <div class="brand-corner brand">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Cover dominante, signature plateforme en bas-droite. Préserve la marque sans
+            charger l'image.
+          </div>
+        </div>
+
+        <!-- V3 — cover + date pill -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v3</span>
+            <span class="name">Cover + date pill</span>
+          </div>
+          <div class="og v3">
+            <div class="cover real"></div>
+            <div class="date-pill">
+              <div class="month">Mars</div>
+              <div class="day">21</div>
+            </div>
+          </div>
+          <div class="desc">
+            La date saute aux yeux (pattern produit le plus reconnaissable). Variante
+            event-only ; pour Communauté on remplacerait par un eyebrow "COMMUNAUTÉ".
+          </div>
+        </div>
+
+        <!-- V4 — cover + branding + date -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v4</span>
+            <span class="name">Cover + branding + date pill</span>
+          </div>
+          <div class="og v4">
+            <div class="cover real"></div>
+            <div class="date-pill">
+              <div class="month">Mars</div>
+              <div class="day">21</div>
+            </div>
+            <div class="brand-corner brand">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Combinaison v2 + v3. Branding discret + date saillante. Pas de titre — le
+            crawler le lira via og:title (affiché sous l'image dans WhatsApp/iMessage).
+          </div>
+        </div>
+
+        <!-- V5 — cover + titre seul -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v5</span>
+            <span class="name">Cover + titre overlay</span>
+          </div>
+          <div class="og v5">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="title">Soirée JS &amp; Pizza · Networking dev</div>
+            </div>
+          </div>
+          <div class="desc">
+            Titre rasterisé sur gradient noir → transparent. Lisible même quand
+            l'image est sombre, mais redondant avec og:title.
+          </div>
+        </div>
+
+        <!-- V6 — cover + titre + date -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v6</span>
+            <span class="name">Cover + titre + date pill</span>
+          </div>
+          <div class="og v6">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="date-pill">
+                <div class="month">Mars</div>
+                <div class="day">21</div>
+              </div>
+              <div class="text">
+                <div class="circle">Paris Creative Tech</div>
+                <div class="title">Soirée JS &amp; Pizza</div>
+                <div class="meta">VEN 19:00 · Le Cargo</div>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Format "fiche" complète. Tout est visible dans l'image, indépendant de
+            og:title. Risque d'overload sur petites previews.
+          </div>
+        </div>
+
+        <!-- V7 — cover + titre + date + branding coin -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v7</span>
+            <span class="name">v6 + branding (haut-droite)</span>
+          </div>
+          <div class="og v7">
+            <div class="cover real"></div>
+            <div class="scrim-bottom"></div>
+            <div class="content">
+              <div class="date-pill">
+                <div class="month">Mars</div>
+                <div class="day">21</div>
+              </div>
+              <div class="text">
+                <div class="circle">Paris Creative Tech</div>
+                <div class="title">Soirée JS &amp; Pizza</div>
+                <div class="meta">VEN 19:00 · Le Cargo</div>
+              </div>
+            </div>
+            <div class="brand-corner brand">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Maximum d'info. Branding en haut pour ne pas concurrencer le bloc bas.
+          </div>
+        </div>
+
+        <!-- V8 — cover + bandeau bas plein -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">v8</span>
+            <span class="name">Cover + bandeau bas plein</span>
+          </div>
+          <div class="og v8">
+            <div class="cover real"></div>
+            <div class="scrim-fullbar">
+              <div class="date-pill">
+                <div class="month">Mars</div>
+                <div class="day">21</div>
+              </div>
+              <div class="text">
+                <div class="title">Soirée JS &amp; Pizza · Networking dev</div>
+                <div class="meta">VEN 19:00 · Le Cargo · Paris Creative Tech</div>
+              </div>
+              <div class="brand">
+                <div class="logo">
+                  <svg viewBox="0 0 13 15" fill="none">
+                    <polygon points="0,0 0,15 13,7.5" fill="white" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Bandeau opaque qui mange ~20% de l'image mais garantit lisibilité quel que
+            soit l'angle/luminosité de la cover.
+          </div>
+        </div>
+      </div>
+
+      <h2>Sans cover (fallback gradient)</h2>
+      <p class="lead">
+        Si l'organisateur n'a pas uploadé de cover, on tombe sur un design dérivé
+        déterministiquement de l'ID de l'event/Communauté.
+      </p>
+
+      <div class="grid">
+        <!-- VFa — fallback titre seul -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">f1</span>
+            <span class="name">Fallback gradient + titre</span>
+          </div>
+          <div class="og vfa">
+            <div class="cover gradient"></div>
+            <div class="content">
+              <div class="circle">Paris Creative Tech</div>
+              <div class="title">Soirée JS &amp; Pizza · Networking dev</div>
+              <div class="date-pill">
+                <div class="month">Mars</div>
+                <div class="day">21</div>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Gradient unique par ID, titre + Circle + date pill. Adapté quand pas de
+            cover.
+          </div>
+        </div>
+
+        <!-- VFb — fallback minimal -->
+        <div class="card">
+          <div class="label">
+            <span class="badge">f2</span>
+            <span class="name">Fallback gradient + branding</span>
+          </div>
+          <div class="og vfb">
+            <div class="cover gradient"></div>
+            <div class="content">
+              <div class="circle">Paris Creative Tech</div>
+              <div class="date-pill">
+                <div class="month">Mars</div>
+                <div class="day">21</div>
+              </div>
+              <div class="title">Soirée JS &amp; Pizza · Networking dev</div>
+            </div>
+            <div class="brand-corner brand">
+              <div class="logo">
+                <svg viewBox="0 0 13 15" fill="none">
+                  <polygon points="0,0 0,15 13,7.5" fill="white" />
+                </svg>
+              </div>
+              <div class="word">
+                <span class="light">the</span> <span class="dark">playground</span>
+              </div>
+            </div>
+          </div>
+          <div class="desc">
+            Variante avec branding visible (utile pour les events sans cover qui sont
+            partagés en cold).
+          </div>
+        </div>
+      </div>
+
+      <h2>Aperçu en contexte messagerie</h2>
+      <p class="lead">
+        Comparaison <strong>V1 (pure cover)</strong> vs <strong>V6 (titre + date overlay)</strong>
+        rendus dans une preview WhatsApp / iMessage / Slack / LinkedIn. Les apps affichent
+        toutes l'image + un bloc texte (og:title + og:description) sous l'image.
+      </p>
+
+      <div class="messaging">
+        <!-- WhatsApp V1 -->
+        <div class="phone whatsapp">
+          <div class="phone-title">WhatsApp · V1 pure cover</div>
+          <div class="screen">
+            <div class="bubble">
+              <div class="preview">
+                <div class="img v1"></div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris · Paris Creative Tech
+                  </div>
+                  <div class="url-line">the-playground.fr</div>
+                </div>
+              </div>
+              <div style="font-size: 11px; margin-top: 4px; opacity: 0.7">
+                the-playground.fr/m/soiree-js
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp V6 -->
+        <div class="phone whatsapp">
+          <div class="phone-title">WhatsApp · V6 cover + overlay</div>
+          <div class="screen">
+            <div class="bubble">
+              <div class="preview">
+                <div class="img v6">
+                  <div class="cover"></div>
+                  <div class="scrim"></div>
+                  <div class="text-mini">
+                    <div class="pill-mini">
+                      <div class="m">Mar</div>
+                      <div class="d">21</div>
+                    </div>
+                    <div class="ttext">
+                      <div class="ttitle">Soirée JS &amp; Pizza</div>
+                      <div class="tloc">VEN 19:00 · Le Cargo</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris · Paris Creative Tech
+                  </div>
+                  <div class="url-line">the-playground.fr</div>
+                </div>
+              </div>
+              <div style="font-size: 11px; margin-top: 4px; opacity: 0.7">
+                the-playground.fr/m/soiree-js
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- iMessage V1 -->
+        <div class="phone imessage">
+          <div class="phone-title">iMessage · V1 pure cover</div>
+          <div class="screen">
+            <div class="bubble sent">
+              <div class="preview">
+                <div class="img v1"></div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris
+                  </div>
+                  <div class="url-line">the-playground.fr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- iMessage V6 -->
+        <div class="phone imessage">
+          <div class="phone-title">iMessage · V6 cover + overlay</div>
+          <div class="screen">
+            <div class="bubble sent">
+              <div class="preview">
+                <div class="img v6">
+                  <div class="cover"></div>
+                  <div class="scrim"></div>
+                  <div class="text-mini">
+                    <div class="pill-mini">
+                      <div class="m">Mar</div>
+                      <div class="d">21</div>
+                    </div>
+                    <div class="ttext">
+                      <div class="ttitle">Soirée JS &amp; Pizza</div>
+                      <div class="tloc">VEN 19:00 · Le Cargo</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris
+                  </div>
+                  <div class="url-line">the-playground.fr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slack V1 -->
+        <div class="phone slack">
+          <div class="phone-title">Slack · V1 pure cover</div>
+          <div class="screen">
+            <div class="bubble">
+              <div>
+                <span style="color: #1d9bd1">the-playground.fr/m/soiree-js</span>
+              </div>
+              <div class="preview">
+                <div class="img v1"></div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris · Paris Creative Tech
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slack V6 -->
+        <div class="phone slack">
+          <div class="phone-title">Slack · V6 cover + overlay</div>
+          <div class="screen">
+            <div class="bubble">
+              <div>
+                <span style="color: #1d9bd1">the-playground.fr/m/soiree-js</span>
+              </div>
+              <div class="preview">
+                <div class="img v6">
+                  <div class="cover"></div>
+                  <div class="scrim"></div>
+                  <div class="text-mini">
+                    <div class="pill-mini">
+                      <div class="m">Mar</div>
+                      <div class="d">21</div>
+                    </div>
+                    <div class="ttext">
+                      <div class="ttitle">Soirée JS &amp; Pizza</div>
+                      <div class="tloc">VEN · Cargo</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">
+                    Vendredi 21 mars 19:00 · Le Cargo, Paris · Paris Creative Tech
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn V1 -->
+        <div class="phone linkedin">
+          <div class="phone-title">LinkedIn · V1 pure cover</div>
+          <div class="screen">
+            <div class="bubble">
+              <div class="preview">
+                <div class="img v1"></div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">the-playground.fr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LinkedIn V6 -->
+        <div class="phone linkedin">
+          <div class="phone-title">LinkedIn · V6 cover + overlay</div>
+          <div class="screen">
+            <div class="bubble">
+              <div class="preview">
+                <div class="img v6">
+                  <div class="cover"></div>
+                  <div class="scrim"></div>
+                  <div class="text-mini">
+                    <div class="pill-mini">
+                      <div class="m">Mar</div>
+                      <div class="d">21</div>
+                    </div>
+                    <div class="ttext">
+                      <div class="ttitle">Soirée JS &amp; Pizza</div>
+                      <div class="tloc">VEN 19:00 · Le Cargo</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="meta-block">
+                  <div class="title-line">Soirée JS &amp; Pizza · Networking dev</div>
+                  <div class="desc-line">the-playground.fr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-note">
+        <strong>Lecture rapide.</strong> V1 (pure cover) maximise l'impact visuel mais
+        repose à 100% sur la cover et l'og:title pour transmettre l'info — si la cover est
+        peu marquante, le résultat est anonyme. V6 (cover + titre + date) garantit le
+        contexte même quand la cover est ambiguë, au prix d'un peu d'overload sur les
+        previews très réduites (Slack icon).
+      </div>
+
+      <h2>Mon analyse rapide</h2>
+      <ul class="lead" style="padding-left: 20px">
+        <li>
+          <strong>V4 (cover + branding + date pill)</strong> est l'équilibre le plus sain
+          pour démarrer : cover dominante, branding discret, info-clé (la date) saillante.
+          Préserve l'esprit Luma + signe la plateforme.
+        </li>
+        <li>
+          <strong>V6 (cover + titre + date overlay bas)</strong> est plus dense mais
+          fonctionne dans tous les contextes — utile quand un Host partage une URL sans
+          message accompagnant.
+        </li>
+        <li>
+          <strong>V1 (pure Luma)</strong> est tentant mais risqué : le branding disparaît
+          complètement et un Circle ressemble visuellement à un event si on ne distingue
+          pas via l'overlay.
+        </li>
+        <li>
+          <strong>V8 (bandeau bas plein)</strong> est le plus lisible mais consomme 20% de
+          la cover — moins beau mais robuste si certains organisateurs ont des covers
+          difficiles (texte trop sombre, etc.).
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>
