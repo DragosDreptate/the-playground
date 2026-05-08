@@ -402,17 +402,16 @@ export type HostContactMessageEmailData = {
   senderName: string;
   senderEmail: string;
   message: string;
-  circleName: string;
-  /** Null si le contact se fait depuis la page Communauté (pas un événement précis). */
-  momentTitle: string | null;
-  contextUrl: string;
+  /** Pré-formé côté app : "À propos de l'événement « X » · Communauté Y" ou variante. */
+  context: string;
+  /** URL de base de l'app, utilisée pour charger le logo dans l'email. */
+  baseUrl: string;
   strings: {
     subject: string;
     heading: string;
     intro: string;
     messageLabel: string;
     replyHint: string;
-    viewContextCta: string;
     footer: string;
   };
 };

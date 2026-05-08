@@ -1,9 +1,8 @@
-import { Button, Section, Text } from "@react-email/components";
+import { Img, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import type { HostContactMessageEmailData } from "@/domain/ports/services/email-service";
 import {
-  ctaButton,
   headingLg as heading,
   commentSection,
   commentLabel,
@@ -16,12 +15,41 @@ export function HostContactMessageEmail({
   senderName,
   senderEmail,
   message,
-  contextUrl,
+  context,
+  baseUrl,
   strings,
 }: Props) {
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
+      <Section style={logoSection}>
+        {/* Centrage robuste pour Outlook Word renderer : table align="center". */}
+        <table
+          align="center"
+          role="presentation"
+          cellPadding="0"
+          cellSpacing="0"
+          border={0}
+          style={{ margin: "0 auto", borderCollapse: "collapse" }}
+        >
+          <tbody>
+            <tr>
+              <td>
+                <Img
+                  src={`${baseUrl}/brand/logo-light.png`}
+                  width="180"
+                  height="32"
+                  alt="The Playground"
+                  style={logoImg}
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </Section>
+
       <Text style={heading}>{strings.heading}</Text>
+
+      <Text style={contextLabel}>{context}</Text>
 
       <Text style={intro}>
         {strings.intro.replace("{senderName}", senderName)}
@@ -37,15 +65,28 @@ export function HostContactMessageEmail({
           .replace("{senderName}", senderName)
           .replace("{senderEmail}", senderEmail)}
       </Text>
-
-      <Section style={ctaSection}>
-        <Button style={ctaButton} href={contextUrl}>
-          {strings.viewContextCta}
-        </Button>
-      </Section>
     </EmailLayout>
   );
 }
+
+const logoSection: React.CSSProperties = {
+  textAlign: "center" as const,
+  marginBottom: "24px",
+};
+
+const logoImg: React.CSSProperties = {
+  display: "block",
+  border: 0,
+  outline: "none",
+  textDecoration: "none",
+};
+
+const contextLabel: React.CSSProperties = {
+  fontSize: "13px",
+  color: "#71717a",
+  margin: "0 0 16px 0",
+  lineHeight: "20px",
+};
 
 const intro: React.CSSProperties = {
   fontSize: "14px",
@@ -57,11 +98,6 @@ const intro: React.CSSProperties = {
 const replyHint: React.CSSProperties = {
   fontSize: "13px",
   color: "#71717a",
-  margin: "20px 0",
+  margin: "20px 0 0 0",
   lineHeight: "20px",
-};
-
-const ctaSection: React.CSSProperties = {
-  textAlign: "center" as const,
-  marginTop: "8px",
 };

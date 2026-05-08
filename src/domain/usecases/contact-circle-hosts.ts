@@ -36,16 +36,22 @@ export type ContactCircleHostsDeps = {
   momentRepository: MomentRepository;
   emailService: EmailService;
   rateLimiter: RateLimiter;
-  /** Strings i18n résolus côté app (le domaine reste pur). */
+  /**
+   * Strings i18n résolus côté app (le domaine reste pur).
+   * `aboutEvent` et `aboutCircle` sont des templates avec placeholders
+   * `{momentTitle}` et `{circleName}` interpolés ici.
+   */
   emailStrings: {
     subject: string;
     heading: string;
     intro: string;
     messageLabel: string;
     replyHint: string;
-    viewContextCta: string;
+    aboutEvent: string;
+    aboutCircle: string;
     footer: string;
   };
+  /** URL de base utilisée par le template pour charger le logo. */
   appUrl: string;
 };
 
@@ -106,9 +112,11 @@ export async function contactCircleHosts(
   }
 
   const senderName = getDisplayName(sender.firstName, sender.lastName, sender.email);
-  const contextUrl = moment
-    ? `${appUrl}/m/${moment.slug}`
-    : `${appUrl}/circles/${circle.slug}`;
+  const context = moment
+    ? emailStrings.aboutEvent
+        .replace("{momentTitle}", moment.title)
+        .replace("{circleName}", circle.name)
+    : emailStrings.aboutCircle.replace("{circleName}", circle.name);
 
   const results = await Promise.allSettled(
     activeHosts.map((organizer) =>
@@ -123,9 +131,8 @@ export async function contactCircleHosts(
         senderName,
         senderEmail: sender.email!,
         message: trimmed,
-        circleName: circle.name,
-        momentTitle: moment ? moment.title : null,
-        contextUrl,
+        context,
+        baseUrl: appUrl,
         strings: emailStrings,
       })
     )

@@ -46,7 +46,8 @@ export async function contactCircleHostsAction(input: {
           intro: t("intro"),
           messageLabel: t("messageLabel"),
           replyHint: t("replyHint"),
-          viewContextCta: t("viewContextCta"),
+          aboutEvent: t("aboutEvent"),
+          aboutCircle: t("aboutCircle"),
           footer: t("footer"),
         },
       }

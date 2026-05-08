@@ -202,9 +202,8 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
         senderEmail: "alice@example.com",
         message:
           "Bonjour Bob,\n\nUne question rapide sur l'événement : est-ce que les places sont en accès libre une fois sur place, ou y a-t-il un check-in à l'entrée ? Je risque d'arriver un peu en retard.\n\nMerci pour l'organisation, je suis vraiment ravie de pouvoir y assister !\n\nAlice",
-        circleName: "Paris Creative Tech",
-        momentTitle: "Soirée JS & Pizza",
-        contextUrl: `${BASE_URL}/m/soiree-js-pizza`,
+        context: "À propos de l'événement « Soirée JS & Pizza » · Paris Creative Tech",
+        baseUrl: BASE_URL,
         strings: {
           subject: "Un membre vous contacte sur The Playground",
           heading: "Vous avez un nouveau message",
@@ -212,7 +211,6 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
           messageLabel: "Message",
           replyHint:
             "Pour répondre à {senderName}, répondez simplement à cet email — ou écrivez à {senderEmail}.",
-          viewContextCta: "Voir la page concernée",
           footer: FOOTER,
         },
       }),

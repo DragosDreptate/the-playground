@@ -1159,7 +1159,8 @@
       "intro": "{senderName} vous a envoyé un message via The Playground.",
       "messageLabel": "Message",
       "replyHint": "Pour répondre à {senderName}, répondez simplement à cet email — ou écrivez à {senderEmail}.",
-      "viewContextCta": "Voir la page concernée",
+      "aboutEvent": "À propos de l'événement « {momentTitle} » · {circleName}",
+      "aboutCircle": "À propos de la Communauté « {circleName} »",
       "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     },
     "magicLink": {
