@@ -2,17 +2,25 @@ import { Button, Hr, Img, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 
+export type MagicLinkEmailStrings = {
+  preview: string;
+  heading: string;
+  bodyText: string;
+  ctaLabel: string;
+  expiryText: string;
+  securityText: string;
+  footer: string;
+};
+
 type Props = {
   url: string;
   baseUrl: string;
+  strings: MagicLinkEmailStrings;
 };
 
-export function MagicLinkEmail({ url, baseUrl }: Props) {
+export function MagicLinkEmail({ url, baseUrl, strings }: Props) {
   return (
-    <EmailLayout
-      preview="Votre lien de connexion à The Playground"
-      footer="The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
-    >
+    <EmailLayout preview={strings.preview} footer={strings.footer}>
       <Section style={iconSection}>
         {/* Logo The Playground — PNG hébergé sur public/brand/icon.png.
             URL absolue obligatoire pour les clients email. */}
@@ -26,26 +34,20 @@ export function MagicLinkEmail({ url, baseUrl }: Props) {
         <Text style={brandName}>The Playground</Text>
       </Section>
 
-      <Text style={heading}>Votre lien de connexion</Text>
-      <Text style={bodyText}>
-        Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable{" "}
-        <strong>15 minutes</strong> et ne peut être utilisé qu'une seule fois.
-      </Text>
+      <Text style={heading}>{strings.heading}</Text>
+      <Text style={bodyText}>{strings.bodyText}</Text>
 
       <Section style={ctaSection}>
         <Button style={ctaButton} href={url}>
-          Se connecter →
+          {strings.ctaLabel}
         </Button>
       </Section>
 
-      <Text style={expiryText}>Expire dans 15 minutes · Usage unique</Text>
+      <Text style={expiryText}>{strings.expiryText}</Text>
 
       <Hr style={separator} />
 
-      <Text style={securityText}>
-        Vous n'avez pas demandé ce lien ? Votre compte reste sécurisé — ignorez
-        simplement cet email.
-      </Text>
+      <Text style={securityText}>{strings.securityText}</Text>
     </EmailLayout>
   );
 }

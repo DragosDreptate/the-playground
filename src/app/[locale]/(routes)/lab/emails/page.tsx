@@ -363,6 +363,18 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
         baseUrl: BASE_URL,
+        strings: {
+          preview: "Votre lien de connexion à The Playground",
+          heading: "Votre lien de connexion",
+          bodyText:
+            "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable 15 minutes et ne peut être utilisé qu'une seule fois.",
+          ctaLabel: "Se connecter →",
+          expiryText: "Expire dans 15 minutes · Usage unique",
+          securityText:
+            "Vous n'avez pas demandé ce lien ? Votre compte reste sécurisé, ignorez simplement cet email.",
+          footer:
+            "The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité.",
+        },
       }),
     },
     {

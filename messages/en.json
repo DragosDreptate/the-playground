@@ -1151,6 +1151,16 @@
       "notRefunded": "No refund issued (non-refundable event).",
       "manageCta": "Manage registrations"
     },
+    "magicLink": {
+      "subject": "Your sign-in link — The Playground",
+      "preview": "Your sign-in link to The Playground",
+      "heading": "Your sign-in link",
+      "bodyText": "Click the button below to sign in. This link is valid for 15 minutes and can only be used once.",
+      "ctaLabel": "Sign in →",
+      "expiryText": "Expires in 15 minutes · Single use",
+      "securityText": "Didn't request this link? Your account is still secure, just ignore this email.",
+      "footer": "The Playground · If you didn't request this link, you can safely ignore it."
+    },
     "common": {
       "dateLabel": "Date",
       "locationLabel": "Location",
