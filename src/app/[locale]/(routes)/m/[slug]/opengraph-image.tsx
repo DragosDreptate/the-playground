@@ -14,7 +14,7 @@ import {
   OG_COLORS,
   OgBrandingPill,
   OgCoverBackground,
-  OgScrim,
+  OgPureCoverLayout,
 } from "@/lib/og/components";
 import type { LocationType } from "@/domain/models/moment";
 
@@ -61,13 +61,18 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const [circle, coverDataUrl] = await Promise.all([
-    prismaCircleRepository.findById(moment.circleId),
-    moment.coverImage
-      ? loadOgCoverAsDataUrl(moment.coverImage)
-      : Promise.resolve(null),
-  ]);
+  const coverDataUrl = moment.coverImage
+    ? await loadOgCoverAsDataUrl(moment.coverImage)
+    : null;
 
+  if (coverDataUrl) {
+    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
+      ...size,
+    });
+  }
+
+  // Pas de cover → fallback content-rich : tout dans l'image puisque rien d'autre n'y figure.
+  const circle = await prismaCircleRepository.findById(moment.circleId);
   const { month, day, weekday, time } = formatOgDateBadge(moment.startsAt, locale);
   const location = formatLocationLabel(
     moment.locationType,
@@ -89,10 +94,9 @@ export default async function OgImage({
         }}
       >
         <OgCoverBackground
-          coverDataUrl={coverDataUrl}
+          coverDataUrl={null}
           gradient={getMomentGradient(moment.id)}
         />
-        <OgScrim />
         <OgBrandingPill />
 
         <div

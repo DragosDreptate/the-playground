@@ -21,8 +21,6 @@ export const OG_COLORS = {
   bgDark: BRAND_BG_DARK,
   zinc950: "#18181b",
   logoGradient: `linear-gradient(135deg, ${BRAND_PINK}, ${BRAND_PURPLE})`,
-  scrim:
-    "linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0) 100%)",
 } as const;
 
 export function OgCoverBackground({
@@ -30,7 +28,7 @@ export function OgCoverBackground({
   gradient,
 }: {
   coverDataUrl: string | null;
-  gradient: string;
+  gradient?: string;
 }) {
   if (coverDataUrl) {
     return (
@@ -62,19 +60,27 @@ export function OgCoverBackground({
   );
 }
 
-export function OgScrim() {
+/**
+ * Layout og:image en mode "cover pure" : juste la cover plein cadre + la pill
+ * de branding. Utilisé quand une cover est disponible — le titre, la date et
+ * la description ne sont pas rasterisés dans l'image puisque les clients
+ * (WhatsApp, iMessage, Slack…) les affichent déjà sous l'image via og:title
+ * et og:description. Évite la triple redondance.
+ */
+export function OgPureCoverLayout({ coverDataUrl }: { coverDataUrl: string }) {
   return (
     <div
       style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: "55%",
-        background: OG_COLORS.scrim,
+        width: "100%",
+        height: "100%",
         display: "flex",
+        position: "relative",
+        background: OG_COLORS.bgDark,
       }}
-    />
+    >
+      <OgCoverBackground coverDataUrl={coverDataUrl} />
+      <OgBrandingPill />
+    </div>
   );
 }
 

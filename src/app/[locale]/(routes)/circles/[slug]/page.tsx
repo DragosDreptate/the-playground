@@ -60,6 +60,10 @@ const getCachedCircle = cache(async (slug: string) => {
   }
 });
 
+const getCachedMemberCount = cache((circleId: string) =>
+  prismaCircleRepository.countMembers(circleId),
+);
+
 // ── Helpers ───────────────────────────────────────────────────
 
 // ── Metadata ──────────────────────────────────────────────────
@@ -69,15 +73,25 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   try {
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
     const isPrivate = circle.visibility !== "PUBLIC";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+    const [memberCount, t] = await Promise.all([
+      getCachedMemberCount(circle.id),
+      getTranslations({ locale, namespace: "Explorer.circleCard" }),
+    ]);
+    const memberLabel = t("members", { count: memberCount });
+    const description = circle.description
+      ? `${circle.description} · ${memberLabel}`
+      : memberLabel;
+
     return {
       title: circle.name,
-      description: circle.description,
+      description,
       alternates: {
         canonical: `${appUrl}/circles/${slug}`,
         languages: {
@@ -89,12 +103,12 @@ export async function generateMetadata({
       ...(!isPrivate && {
         openGraph: {
           title: circle.name,
-          description: circle.description ?? undefined,
+          description,
           type: "website",
         },
         twitter: {
           title: circle.name,
-          description: circle.description ?? undefined,
+          description,
         },
       }),
     };
@@ -144,7 +158,7 @@ export default async function PublicCirclePage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    prismaCircleRepository.countMembers(circle.id),
+    getCachedMemberCount(circle.id),
     session?.user?.id
       ? prismaCircleRepository.findMembership(circle.id, session.user.id).then((m) => m?.status ?? null)
       : Promise.resolve(null),
