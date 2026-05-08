@@ -48,6 +48,7 @@ import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
+import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 
 export const revalidate = 60;
 
@@ -279,6 +280,20 @@ export default async function PublicCirclePage({
             organizers={circleOrganizers}
             linkable={isConnected}
             label={t("detail.hostedBy")}
+            footer={
+              isOrganizer ? null : (
+                <ContactOrganizerLink
+                  circleId={circle.id}
+                  senderEmail={session?.user?.email ?? null}
+                  signInUrl={
+                    isConnected
+                      ? null
+                      : `/${locale}/auth/sign-in?callbackUrl=/${locale}/circles/${slug}`
+                  }
+                  variant="circle"
+                />
+              )
+            }
           />
 
           {/* Stats */}

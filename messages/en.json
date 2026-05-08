@@ -1155,6 +1155,15 @@
       "notRefunded": "No refund issued (non-refundable event).",
       "manageCta": "Manage registrations"
     },
+    "hostContactMessage": {
+      "subject": "A member sent you a message on The Playground",
+      "heading": "You have a new message",
+      "intro": "{senderName} sent you a message via The Playground.",
+      "messageLabel": "Message",
+      "replyHint": "To reply to {senderName}, simply reply to this email — or write to {senderEmail}.",
+      "viewContextCta": "View related page",
+      "footer": "Powered by The Playground — Launch your community for free."
+    },
     "magicLink": {
       "subject": "Your sign-in link — The Playground",
       "preview": "Your sign-in link to The Playground",
@@ -1902,6 +1911,26 @@
     "errorInvalidEmail": "Invalid email address",
     "errorSendFailed": "Failed to send message",
     "errorRateLimited": "Too many messages sent. Please try again in a few minutes."
+  },
+  "ContactOrganizer": {
+    "triggerLabel": "Contact the organizer",
+    "title": "Contact the organizer",
+    "descriptionEvent": "Have a question about this event? Send a message to the organizer — they'll get back to you by email.",
+    "descriptionCircle": "Have a question about this Community? Send a message to the organizer — they'll get back to you by email.",
+    "messageLabel": "Your message",
+    "messagePlaceholder": "What would you like to ask the organizer?",
+    "replyToNote": "The organizer will receive your message and can reply directly to {email}.",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "successTitle": "Message sent",
+    "successDescription": "The organizer will receive your message in a few moments.",
+    "errorRateLimited": "You've already sent several messages recently. Please try again in an hour.",
+    "errorTooShort": "Message must be at least {min} characters.",
+    "errorTooLong": "Message cannot exceed {max} characters.",
+    "errorNoHosts": "This Community has no reachable organizer at the moment.",
+    "errorGeneric": "Could not send the message right now. Please try again later.",
+    "signInToContact": "Sign in to contact the organizer"
   },
   "About": {
     "pageTitle": "About",

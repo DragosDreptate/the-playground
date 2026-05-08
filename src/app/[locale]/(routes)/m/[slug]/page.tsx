@@ -275,6 +275,7 @@ export default async function PublicMomentPage({
         comments={comments}
         attachments={attachments}
         currentUserId={session?.user?.id ?? null}
+        currentUserEmail={session?.user?.email ?? null}
         isAuthenticated={isAuthenticated}
         isOrganizer={isOrganizer}
         existingRegistration={existingRegistration}

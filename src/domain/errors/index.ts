@@ -58,3 +58,11 @@ export {
   CommentPhotoTooLargeError,
   CommentPhotoTypeNotAllowedError,
 } from "./comment-attachment-errors";
+export {
+  NoHostsToContactError,
+  MomentNotInCircleError,
+  ContactMessageTooShortError,
+  ContactMessageTooLongError,
+  ContactHostsRateLimitedError,
+  SenderEmailMissingError,
+} from "./contact-errors";

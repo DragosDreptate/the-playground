@@ -27,6 +27,7 @@ import type { UpcomingCircleMoment } from "@/domain/ports/repositories/moment-re
 import { formatDateRange, formatMomentDateTime } from "@/lib/format-date";
 import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
+import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 import { UserAvatar } from "@/components/user-avatar";
 import Image from "next/image";
 import {
@@ -86,6 +87,8 @@ type PublicViewProps = CommonProps & {
   appUrl: string;
   waitlistPosition: number;
   upcomingCircleMoments: UpcomingCircleMoment[];
+  /** Email du Participant connecté — pour la note "reply-to" du formulaire de contact. */
+  currentUserEmail: string | null;
 };
 
 export type MomentDetailViewProps = HostViewProps | PublicViewProps;
@@ -212,8 +215,9 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
     : null;
   const primaryHosts = creator ? [creator] : hosts.filter((h) => h.role === "HOST");
   const isHostView = props.variant === "host";
+  const publicProps = isHostView ? null : (props as PublicViewProps);
   // Le host est toujours connecté — l'accès au dashboard nécessite une session
-  const isAuthenticated = isHostView || (props as PublicViewProps).isAuthenticated;
+  const isAuthenticated = isHostView || publicProps!.isAuthenticated;
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
@@ -362,6 +366,15 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     );
                   })}
                 </ul>
+                {publicProps && !publicProps.isOrganizer && (
+                  <ContactOrganizerLink
+                    circleId={circle.id}
+                    momentId={moment.id}
+                    senderEmail={publicProps.currentUserEmail}
+                    signInUrl={publicProps.isAuthenticated ? null : publicProps.signInUrl}
+                    variant="event"
+                  />
+                )}
               </div>
             </>
           )}

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { UserAvatar } from "@/components/user-avatar";
 import { getDisplayName } from "@/lib/display-name";
@@ -9,13 +10,15 @@ type Props = {
   linkable: boolean;
   /** Label de section, déjà traduit. */
   label: string;
+  /** Contenu optionnel rendu sous la liste, dans le même bloc (avant le séparateur). */
+  footer?: ReactNode;
 };
 
 /**
  * Bloc "Organisé par" de la colonne gauche des pages Circle (publique + dashboard).
  * Liste les organisateurs triés (HOST puis CO_HOST) avec avatar + nom.
  */
-export function CircleOrganizersList({ organizers, linkable, label }: Props) {
+export function CircleOrganizersList({ organizers, linkable, label, footer }: Props) {
   if (organizers.length === 0) return null;
 
   return (
@@ -57,6 +60,7 @@ export function CircleOrganizersList({ organizers, linkable, label }: Props) {
             );
           })}
         </ul>
+        {footer}
       </div>
       <div className="border-border border-t" />
     </>

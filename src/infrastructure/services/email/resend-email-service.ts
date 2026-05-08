@@ -26,6 +26,7 @@ import type {
   OnboardingWelcomeEmailData,
   CoHostPromotedEmailData,
   CoHostDemotedEmailData,
+  HostContactMessageEmailData,
 } from "@/domain/ports/services/email-service";
 import { RegistrationConfirmationEmail } from "./templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "./templates/waitlist-promotion";
@@ -48,6 +49,7 @@ import { HostPaidCancellationEmail } from "./templates/host-paid-cancellation";
 import { OnboardingWelcomeEmail } from "./templates/onboarding-welcome";
 import { CoHostPromotedEmail } from "./templates/co-host-promoted";
 import { CoHostDemotedEmail } from "./templates/co-host-demoted";
+import { HostContactMessageEmail } from "./templates/host-contact-message";
 
 function getBaseUrl(): string {
   return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
@@ -435,6 +437,16 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: CoHostDemotedEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendHostContactMessage(data: HostContactMessageEmailData): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        replyTo: data.replyTo,
+        subject: data.strings.subject,
+        react: HostContactMessageEmail(data),
       });
     },
   };

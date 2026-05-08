@@ -393,6 +393,30 @@ export type OnboardingWelcomeEmailData = {
   firstName: string | null;
 };
 
+// --- Contact organizers (issue #425) ---
+
+export type HostContactMessageEmailData = {
+  to: string;
+  replyTo: string;
+  recipientName: string;
+  senderName: string;
+  senderEmail: string;
+  message: string;
+  circleName: string;
+  /** Null si le contact se fait depuis la page Communauté (pas un événement précis). */
+  momentTitle: string | null;
+  contextUrl: string;
+  strings: {
+    subject: string;
+    heading: string;
+    intro: string;
+    messageLabel: string;
+    replyHint: string;
+    viewContextCta: string;
+    footer: string;
+  };
+};
+
 // --- Co-host role changes (D19) ---
 
 export type CoHostPromotedEmailData = {
@@ -467,4 +491,5 @@ export interface EmailService {
   sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
   sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void>;
   sendCoHostDemoted(data: CoHostDemotedEmailData): Promise<void>;
+  sendHostContactMessage(data: HostContactMessageEmailData): Promise<void>;
 }
