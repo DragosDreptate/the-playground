@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Check, Clock, Crown } from "lucide-react";
+import { MapPin, Globe, Clock, Users } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -114,23 +114,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName;
 
-  const roleBadge = !isPast && !isDraft ? (
-    isOrganizerView || isOrganizer ? (
-      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-        <Crown className="size-3" />
-        <span className="hidden sm:inline">{t("role.host")}</span>
-      </Badge>
-    ) : isRegistered ? (
-      <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-        <Check className="size-3" />
-        <span className="hidden sm:inline">{t("registrationStatus.registered")}</span>
-      </Badge>
-    ) : isWaitlisted ? (
-      <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-        <Clock className="size-3" />
-        <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
-      </Badge>
-    ) : null
+  const waitlistedBadge = !isPast && !isDraft && isWaitlisted ? (
+    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
+      <Clock className="size-3" />
+      <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
+    </Badge>
   ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
@@ -159,6 +147,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
             </p>
           </>
         )}
+        <p
+          className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+          suppressHydrationWarning
+        >
+          {timeStr}
+        </p>
       </div>
 
       {/* Dot + vertical line */}
@@ -176,80 +170,75 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-start gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors sm:items-center ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors ${cardBorderClass}`}
           >
-            {/* Content — LEFT */}
             <div className="min-w-0 flex-1 space-y-1.5">
-              {/* Time + community pill */}
-              <div className="flex items-center gap-2">
-                <p
-                  className={`shrink-0 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-                  suppressHydrationWarning
-                >
-                  {timeStr}
-                </p>
-                {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                <span
-                  className={`truncate rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
-                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
-                  }`}
-                >
-                  {momentData.circleName}
+              <div
+                className={`hidden items-center gap-3 text-xs sm:flex ${
+                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                }`}
+              >
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <Clock className="size-3.5 shrink-0" />
+                  <span suppressHydrationWarning>{timeStr}</span>
                 </span>
+                {locationLabel && (
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
+                  </span>
+                )}
               </div>
 
-              {/* Title */}
               <p
-                className={`truncate font-semibold leading-snug ${
+                className={`line-clamp-2 font-semibold leading-snug ${
                   isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
                 }`}
               >
                 {momentData.title}
               </p>
 
-              {/* Location */}
-              {locationLabel && (
-                <div
-                  className={`flex items-center gap-1.5 text-xs ${
-                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+              {momentData.registrationCount > 0 && (
+                <div className={isPast ? "opacity-60" : ""}>
+                  <AttendeeAvatarStack
+                    attendees={momentData.topAttendees}
+                    totalCount={momentData.registrationCount}
+                    label={
+                      momentData.topAttendees.length < momentData.registrationCount
+                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+                        : tMoment("registrations.registered", { count: momentData.registrationCount })
+                    }
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <span
+                  className={`flex min-w-0 items-center gap-1.5 rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
+                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
                   }`}
                 >
-                  <LocationIcon className="size-3 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
+                  <Users className="size-3 shrink-0" />
+                  <span className="truncate">{momentData.circleName}</span>
+                </span>
+                <div className="hidden items-center gap-2 sm:flex">
+                  {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                  {waitlistedBadge}
                 </div>
-              )}
-
-              {/* Inscrits + badge rôle */}
-              {(momentData.registrationCount > 0 || roleBadge) && (
-                <div className={`flex items-center gap-2 ${isPast ? "opacity-60" : ""}`}>
-                  {momentData.registrationCount > 0 && (
-                    <AttendeeAvatarStack
-                      attendees={momentData.topAttendees}
-                      totalCount={momentData.registrationCount}
-                      label={
-                        momentData.topAttendees.length < momentData.registrationCount
-                          ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
-                          : tMoment("registrations.registered", { count: momentData.registrationCount })
-                      }
-                    />
-                  )}
-                  {roleBadge}
-                </div>
-              )}
+              </div>
             </div>
 
-            {/* Cover — RIGHT, alignée avec le titre */}
             {momentData.coverImage ? (
               <Image
                 src={momentData.coverImage}
                 alt={momentData.title}
                 width={100}
                 height={100}
-                className={`size-16 shrink-0 rounded-xl object-cover sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-[100px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
-                className={`size-16 shrink-0 rounded-xl sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-[100px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
                 style={{ background: gradient }}
               />
             )}

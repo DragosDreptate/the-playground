@@ -3,7 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Users, Check, Clock, XCircle, Crown } from "lucide-react";
+import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -16,12 +16,11 @@ type Props = {
   circleSlug: string;
   registrationCount: number;
   userRegistrationStatus: RegistrationStatus | null;
-  isOrganizer: boolean;
   isLast: boolean;
   /** "dashboard" (défaut) → lien vers le dashboard Host.
    *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
   variant?: "dashboard" | "public";
-  /** Premiers inscrits pour l'avatar stack (variant public). */
+  /** Premiers inscrits pour l'avatar stack. */
   topAttendees?: Attendee[];
 };
 
@@ -30,7 +29,6 @@ export async function MomentTimelineItem({
   circleSlug,
   registrationCount,
   userRegistrationStatus,
-  isOrganizer,
   isLast,
   variant = "dashboard",
   topAttendees = [],
@@ -82,6 +80,27 @@ export async function MomentTimelineItem({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
+  const statusBadge =
+    isCancelled || variant !== "dashboard"
+      ? null
+      : isDraft
+        ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
+        : isRegistered
+          ? (
+              <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
+                <Check className="size-3" />
+                {tDashboard("registrationStatus.registered")}
+              </Badge>
+            )
+          : isWaitlisted
+            ? (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Clock className="size-3" />
+                  {tDashboard("registrationStatus.waitlisted")}
+                </Badge>
+              )
+            : null;
+
   return (
     <div className="flex gap-0">
       {/* Date column */}
@@ -96,6 +115,9 @@ export async function MomentTimelineItem({
             <p className="text-sm font-medium leading-snug">{dateStr}</p>
           </>
         )}
+        <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+          {timeStr}
+        </p>
       </div>
 
       {/* Dot + vertical line */}
@@ -126,53 +148,38 @@ export async function MomentTimelineItem({
             {/* Corps de la carte */}
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
-              <div className="min-w-0 flex-1 space-y-1.5">
-                {/* Time + badge rôle — sur la même ligne */}
-                <div className="flex items-center gap-2">
-                  <p className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>{timeStr}</p>
-                  {!isCancelled && variant === "dashboard" && (
-                    <>
-                      {isDraft ? (
-                        <DraftBadge label={t("status.draft")} />
-                      ) : isOrganizer ? (
-                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                          <Crown className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("role.host")}</span>
-                        </Badge>
-                      ) : isRegistered ? (
-                        <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-                          <Check className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("registrationStatus.registered")}</span>
-                        </Badge>
-                      ) : isWaitlisted ? (
-                        <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-                          <Clock className="size-3" />
-                          <span className="hidden sm:inline">{tDashboard("registrationStatus.waitlisted")}</span>
-                        </Badge>
-                      ) : null}
-                    </>
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div
+                  className={`flex items-center gap-3 text-xs ${
+                    isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                  }`}
+                >
+                  <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
+                    <Clock className="size-3.5 shrink-0" />
+                    {timeStr}
+                  </span>
+                  {locationLabel && (
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <LocationIcon className="size-3.5 shrink-0" />
+                      <span className="truncate">{locationLabel}</span>
+                    </span>
                   )}
                 </div>
 
-                {/* Title */}
-                {!isCancelled && variant === "dashboard" ? (
-                  <p className={`truncate font-semibold leading-snug ${isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
-                    {moment.title}
-                  </p>
-                ) : (
-                  <p className={`truncate font-semibold leading-snug ${isCancelled ? "text-muted-foreground line-through" : isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"}`}>
-                    {moment.title}
-                  </p>
-                )}
 
-                {/* Inscrits */}
-                {!isCancelled && registrationCount > 0 && variant === "dashboard" && (
-                  <div className={`flex items-center gap-1 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                    <Users className="size-3 shrink-0" />
-                    <span>{t("registrations.registered", { count: registrationCount })}</span>
-                  </div>
-                )}
-                {!isCancelled && registrationCount > 0 && variant === "public" && (
+                <p
+                  className={`line-clamp-2 font-semibold leading-snug ${
+                    isCancelled
+                      ? "text-muted-foreground line-through"
+                      : isPast
+                        ? "text-muted-foreground"
+                        : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                  }`}
+                >
+                  {moment.title}
+                </p>
+
+                {!isCancelled && registrationCount > 0 && (
                   <div className={isPast ? "opacity-60" : ""}>
                     <AttendeeAvatarStack
                       attendees={topAttendees}
@@ -186,13 +193,7 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
-                {/* Location */}
-                {locationLabel && (
-                  <div className={`flex items-center gap-1.5 text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-                    <LocationIcon className="size-3.5 shrink-0" />
-                    <span className="truncate">{locationLabel}</span>
-                  </div>
-                )}
+                {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
               </div>
 
               {/* Thumbnail */}

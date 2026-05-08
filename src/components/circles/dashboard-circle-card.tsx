@@ -3,12 +3,11 @@ import { Link } from "@/i18n/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
-import { Users, CalendarIcon, MapPin, Crown, Clock } from "lucide-react";
+import { CalendarIcon, MapPin, Clock } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { DashboardCircle } from "@/domain/models/circle";
-import { isOrganizerRole } from "@/domain/models/circle";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
@@ -27,7 +26,6 @@ export async function DashboardCircleCard({ circle }: Props) {
   const nextMomentStart = circle.nextMoment?.startsAt ?? null;
   const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
   const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
-  const hasNextMoment = !!(circle.nextMoment && nextMomentDate);
 
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
 
@@ -36,52 +34,37 @@ export async function DashboardCircleCard({ circle }: Props) {
       <div className="bg-card overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
         <div className="flex items-center gap-4 sm:gap-5">
 
-          {/* Thumbnail */}
           <div
-            className="size-[100px] sm:size-[120px] shrink-0 overflow-hidden rounded-xl"
+            className="size-[100px] shrink-0 overflow-hidden rounded-xl"
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
               <Image
                 src={circle.coverImage}
                 alt={circle.name}
-                width={120}
-                height={120}
+                width={100}
+                height={100}
                 className="size-full object-cover"
-                sizes="120px"
+                sizes="100px"
               />
             )}
           </div>
 
-          {/* Body */}
-          <div className="min-w-0 flex-1 space-y-1">
-            {/* Badges — catégorie */}
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             {categoryLabel && (
               <div className="flex items-center gap-2">
                 <CategoryBadge label={categoryLabel} />
               </div>
             )}
-            {/* Titre — pleine largeur */}
             <h3 className="truncate text-sm font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
               {circle.name}
             </h3>
-            <p className="text-muted-foreground line-clamp-1 text-xs">
-              {circle.description}
-            </p>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
-              {circle.city && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="size-3.5 shrink-0" />
-                  <span>{circle.city}</span>
-                </div>
-              )}
-              {circle.upcomingMomentCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="size-3.5 shrink-0" />
-                  <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-                </div>
-              )}
-            </div>
+            {circle.city && (
+              <div className="text-muted-foreground flex items-center gap-1 text-xs">
+                <MapPin className="size-3.5 shrink-0" />
+                <span>{circle.city}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               {circle.memberCount > 0 && (
                 <AttendeeAvatarStack
@@ -94,25 +77,26 @@ export async function DashboardCircleCard({ circle }: Props) {
                   }
                 />
               )}
-              <Badge variant="outline" className={`shrink-0 gap-1 text-xs ${circle.membershipStatus === "PENDING" ? "border-amber-500/40 text-amber-500" : "border-primary/40 text-primary"}`}>
-                {circle.membershipStatus === "PENDING"
-                  ? <><Clock className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span></>
-                  : isOrganizerRole(circle.memberRole)
-                    ? <><Crown className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span></>
-                    : <><Users className="size-3" /><span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span></>}
-              </Badge>
+              {circle.membershipStatus === "PENDING" && (
+                <Badge variant="outline" className="shrink-0 gap-1 border-amber-500/40 text-xs text-amber-500">
+                  <Clock className="size-3" />
+                  <span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span>
+                </Badge>
+              )}
             </div>
           </div>
 
-          {/* Colonne droite — desktop uniquement */}
           <div className="hidden sm:flex shrink-0 items-center ml-4">
-            {hasNextMoment ? (
-              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground max-w-[200px]">
-                <p className="truncate font-medium text-foreground">{circle.nextMoment!.title}</p>
+            {circle.nextMoment ? (
+              <div className="flex w-[180px] min-w-0 flex-col gap-1 overflow-hidden rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                <p className="text-muted-foreground/70 text-[0.6rem] font-medium uppercase tracking-wider">
+                  {t("circleCard.nextMoment")}
+                </p>
                 <div className="flex items-center gap-1.5">
-                  <CalendarIcon className="size-3 shrink-0 text-primary" />
+                  <CalendarIcon className="size-3 shrink-0 text-foreground" />
                   <span className="whitespace-nowrap">{nextMomentDate} · {nextMomentTime}</span>
                 </div>
+                <p className="line-clamp-2 min-w-0 break-words font-medium leading-snug text-foreground">{circle.nextMoment!.title}</p>
               </div>
             ) : (
               <div className="rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">

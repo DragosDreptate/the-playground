@@ -779,7 +779,7 @@
       "moments": "No upcoming Events for this category."
     },
     "circleCard": {
-      "members": "{count} members",
+      "members": "{count, plural, one {# member} other {# members}}",
       "moreMembers": "+{count} more",
       "upcomingMoments": "{count} upcoming Event(s)",
       "noUpcomingMoments": "No upcoming Events",
@@ -1060,7 +1060,7 @@
       "subject": "{playerName} joined {circleName}",
       "heading": "New member",
       "message": "{playerName} joined your community {circleName}.",
-      "memberCountInfo": "{count} member(s)",
+      "memberCountInfo": "{count, plural, one {# member} other {# members}}",
       "manageMembersCta": "View members"
     },
     "hostNotification": {

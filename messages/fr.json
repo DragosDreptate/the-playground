@@ -649,8 +649,8 @@
     },
     "registrations": {
       "title": "Participants",
-      "registered": "{count} inscrit(s)",
-      "moreRegistered": "+{count} inscrit(s)",
+      "registered": "{count, plural, one {# inscrit} other {# inscrits}}",
+      "moreRegistered": "+{count, plural, one {# inscrit} other {# inscrits}}",
       "waitlisted": "{count} en liste d'attente",
       "capacity": "{count} places",
       "empty": "Aucune inscription pour le moment.",
@@ -779,8 +779,8 @@
       "moments": "Aucun événement à venir pour cette thématique."
     },
     "circleCard": {
-      "members": "{count} membres",
-      "moreMembers": "+{count} membres",
+      "members": "{count, plural, one {# membre} other {# membres}}",
+      "moreMembers": "+{count, plural, one {# membre} other {# membres}}",
       "upcomingMoments": "{count} événement(s) à venir",
       "noUpcomingMoments": "Aucun événement à venir",
       "nextMoment": "Prochain événement",
@@ -794,8 +794,8 @@
     "momentCard": {
       "free": "Gratuit",
       "spotsRemaining": "{count} places restantes",
-      "registeredCount": "{count} inscrit(s)",
-      "moreRegistered": "+{count} inscrit(s)",
+      "registeredCount": "{count, plural, one {# inscrit} other {# inscrits}}",
+      "moreRegistered": "+{count, plural, one {# inscrit} other {# inscrits}}",
       "online": "En ligne",
       "roleBadge": {
         "host": "Organisateur",
@@ -1060,7 +1060,7 @@
       "subject": "{playerName} a rejoint {circleName}",
       "heading": "Nouveau membre",
       "message": "{playerName} a rejoint votre communauté {circleName}.",
-      "memberCountInfo": "{count} membre(s)",
+      "memberCountInfo": "{count, plural, one {# membre} other {# membres}}",
       "manageMembersCta": "Voir les membres"
     },
     "hostNotification": {
