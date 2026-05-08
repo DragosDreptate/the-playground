@@ -4,12 +4,16 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import ResendProvider from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/infrastructure/db/prisma";
 import { createSafeResend } from "@/lib/email/safe-resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
-import { buildMagicLinkConfirmUrl } from "@/lib/auth/magic-link-url";
+import {
+  buildMagicLinkConfirmUrl,
+  detectLocaleFromRequest,
+} from "@/lib/auth/magic-link-url";
 import { classifyAuthError } from "@/lib/auth/error-kinds";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -44,11 +48,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // POST sur le callback, déclenchable uniquement par un humain.
         const confirmUrl = buildMagicLinkConfirmUrl(url, request);
 
+        // Le déclencheur EST le destinataire (l'utilisateur qui demande le
+        // lien) → on lit la locale de la requête de sign-in pour lui répondre
+        // dans la même langue que l'UI où il a cliqué.
+        const locale = detectLocaleFromRequest(request);
+        const t = await getTranslations({ locale, namespace: "Email.magicLink" });
+
         const { error } = await resend.emails.send({
           from,
           to: identifier,
-          subject: "Votre lien de connexion — The Playground",
-          react: MagicLinkEmail({ url: confirmUrl, baseUrl }),
+          subject: t("subject"),
+          react: MagicLinkEmail({
+            url: confirmUrl,
+            baseUrl,
+            strings: {
+              preview: t("preview"),
+              heading: t("heading"),
+              bodyText: t("bodyText"),
+              ctaLabel: t("ctaLabel"),
+              expiryText: t("expiryText"),
+              securityText: t("securityText"),
+              footer: t("footer"),
+            },
+          }),
         });
 
         if (error) {

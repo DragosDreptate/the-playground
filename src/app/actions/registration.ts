@@ -1,12 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { formatInTimeZone } from "date-fns-tz";
-import { fr } from "date-fns/locale/fr";
-import { enUS } from "date-fns/locale/en-US";
-
-const PLATFORM_TIMEZONE = "Europe/Paris";
-import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import {
@@ -27,31 +21,16 @@ import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { getDisplayName } from "@/lib/display-name";
 import { formatPrice } from "@/lib/format-price";
 import { notifySlackNewRegistration } from "@/infrastructure/services/slack/slack-notification-service";
+import {
+  buildEmailLocaleResolver,
+  type EmailLocaleResolver,
+} from "@/lib/email/email-locale";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import type { Registration } from "@/domain/models/registration";
 import type { ActionResult } from "./types";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
-
-function getDateFnsLocale(locale: string) {
-  return locale === "fr" ? fr : enUS;
-}
-
-function formatLocationText(
-  locationType: string,
-  locationName: string | null,
-  locationAddress: string | null,
-  videoLink: string | null,
-  locale: string
-): string {
-  if (locationType === "ONLINE") {
-    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
-  }
-  return (
-    [locationName, locationAddress].filter(Boolean).join(", ") ||
-    (locale === "fr" ? "À définir" : "TBD")
-  );
-}
 
 export async function joinMomentAction(
   momentId: string
@@ -72,27 +51,14 @@ export async function joinMomentAction(
       }
     );
 
-    if (!result.pendingApproval) {
-      const locale = await getLocale();
-      const t = await getTranslations("Email");
-
-      if (!isAdminUser(session)) sendRegistrationEmails(
-        momentId,
-        userId,
-        result.registration,
-        t,
-        locale
-      ).catch((err) => {
+    if (!isAdminUser(session)) {
+      // Pas de after() : Vercel serverless peut couper la lambda avant que l'after se déclenche.
+      const resolver = await buildEmailLocaleResolver(userId);
+      const fireAndForget = result.pendingApproval
+        ? notifyHostsPendingApproval(momentId, userId, resolver)
+        : sendRegistrationEmails(momentId, userId, result.registration, resolver);
+      fireAndForget.catch((err) => {
         console.error(err);
-        Sentry.captureException(err);
-      });
-    } else {
-      // Pending approval flow — fire-and-forget (pas de after() — peut être coupé par Vercel serverless)
-      const t = await getTranslations("Email");
-      if (!isAdminUser(session)) notifyHostsPendingApproval(
-        momentId, userId, t
-      ).catch((err) => {
-        console.error("[approval-notification] Error:", err);
         Sentry.captureException(err);
       });
     }
@@ -122,10 +88,10 @@ export async function cancelRegistrationAction(
       }
     );
 
+    const resolver = await buildEmailLocaleResolver(userId);
+
     if (result.promotedRegistration) {
-      const locale = await getLocale();
-      const t = await getTranslations("Email");
-      sendPromotionEmail(result.promotedRegistration, t, locale).catch((err) => {
+      sendPromotionEmail(result.promotedRegistration, resolver).catch((err) => {
         console.error(err);
         Sentry.captureException(err);
       });
@@ -133,7 +99,7 @@ export async function cancelRegistrationAction(
 
     const cancelledReg = result.registration;
     if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
-      sendHostPaidCancellationEmail(registrationId, userId).catch((err) =>
+      sendHostPaidCancellationEmail(registrationId, userId, resolver).catch((err) =>
         Sentry.captureException(err)
       );
     }
@@ -149,7 +115,8 @@ export async function cancelRegistrationAction(
 
 async function sendHostPaidCancellationEmail(
   registrationId: string,
-  cancellingUserId: string
+  cancellingUserId: string,
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const registration = await prismaRegistrationRepository.findById(registrationId);
   if (!registration) return;
@@ -166,45 +133,44 @@ async function sendHostPaidCancellationEmail(
   const hosts = await prismaCircleRepository.findOrganizers(circle.id);
   if (hosts.length === 0) return;
 
-  const locale = await getLocale();
-  const t = await getTranslations("Email");
   const playerName = getDisplayName(player.firstName, player.lastName, player.email);
-
   const isRefundable = moment.refundable;
-  const amountFormatted = formatPrice(moment.price, moment.currency, locale);
 
-  for (const host of hosts) {
-    const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
-    await emailService.sendHostPaidCancellation({
-      to: host.user.email,
-      hostName,
-      playerName,
-      momentTitle: moment.title,
-      momentSlug: moment.slug,
-      circleSlug: circle.slug,
-      amountRefunded: isRefundable ? amountFormatted : null,
-      strings: {
-        subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
-        heading: t("paidCancellation.heading"),
-        message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
-        refundMessage: isRefundable
-          ? t("paidCancellation.refunded", { amount: amountFormatted })
-          : t("paidCancellation.notRefunded"),
-        manageRegistrationsCta: t("paidCancellation.manageCta"),
-        footer: t("common.footer"),
-      },
-    });
-  }
+  await Promise.all(
+    hosts.map(async (host) => {
+      const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+      const t = await resolver.translationsFor(host.userId);
+      const hostLocale = resolver.resolveFor(host.userId);
+      const amountFormatted = formatPrice(moment.price, moment.currency, hostLocale);
+
+      return emailService.sendHostPaidCancellation({
+        to: host.user.email,
+        hostName,
+        playerName,
+        momentTitle: moment.title,
+        momentSlug: moment.slug,
+        circleSlug: circle.slug,
+        amountRefunded: isRefundable ? amountFormatted : null,
+        strings: {
+          subject: t("paidCancellation.subject", { playerName, momentTitle: moment.title }),
+          heading: t("paidCancellation.heading"),
+          message: t("paidCancellation.message", { playerName, momentTitle: moment.title }),
+          refundMessage: isRefundable
+            ? t("paidCancellation.refunded", { amount: amountFormatted })
+            : t("paidCancellation.notRefunded"),
+          manageRegistrationsCta: t("paidCancellation.manageCta"),
+          footer: t("common.footer"),
+        },
+      });
+    })
+  );
 }
-
-type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
 
 export async function sendRegistrationEmails(
   momentId: string,
   userId: string,
   registration: Registration,
-  t: TranslationFunction,
-  locale: string
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [user, moment] = await Promise.all([
     prismaUserRepository.findById(userId),
@@ -216,28 +182,17 @@ export async function sendRegistrationEmails(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
   const isWaitlisted = registration.status === "WAITLISTED";
   const stringPrefix = isWaitlisted ? "waitlist" : "registration";
 
-  // Generate .ics calendar attachment (REGISTERED only — not for waitlist)
+  // Le Player peut être le déclencheur (self-join) ou non (Host qui approuve) — resolveFor() arbitre.
+  const playerT = await resolver.translationsFor(userId);
+  const playerLocale = resolver.resolveFor(userId);
+  const playerCtx = buildMomentEmailContext(moment, playerLocale);
+
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const icsContent = !isWaitlisted
     ? generateIcs({
@@ -246,7 +201,7 @@ export async function sendRegistrationEmails(
         description: moment.description,
         startsAt: moment.startsAt,
         endsAt: moment.endsAt,
-        location: locationText,
+        location: playerCtx.locationText,
         videoLink: moment.videoLink,
         url: `${baseUrl}/m/${moment.slug}`,
         organizerName: circle.name,
@@ -255,69 +210,70 @@ export async function sendRegistrationEmails(
       })
     : undefined;
 
-  // Send confirmation to player
   await emailService.sendRegistrationConfirmation({
     to: user.email,
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: playerCtx.momentDate,
+    momentDateMonth: playerCtx.momentDateMonth,
+    momentDateDay: playerCtx.momentDateDay,
+    locationText: playerCtx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     status: registration.status,
     icsContent,
     ...(registration.paymentStatus === "PAID" && moment.price > 0 && {
-      amountPaid: formatPrice(moment.price, moment.currency, locale),
+      amountPaid: formatPrice(moment.price, moment.currency, playerLocale),
     }),
     ...(registration.stripeReceiptUrl && { receiptUrl: registration.stripeReceiptUrl }),
     strings: {
-      subject: t(`${stringPrefix}.subject`, { momentTitle: moment.title }),
-      heading: t(`${stringPrefix}.heading`),
-      statusMessage: t(`${stringPrefix}.statusMessage`, {
+      subject: playerT(`${stringPrefix}.subject`, { momentTitle: moment.title }),
+      heading: playerT(`${stringPrefix}.heading`),
+      statusMessage: playerT(`${stringPrefix}.statusMessage`, {
         momentTitle: moment.title,
       }),
-      dateLabel: t("common.dateLabel"),
-      locationLabel: t("common.locationLabel"),
-      viewMomentCta: t("common.viewMomentCta"),
-      cancelLink: t("common.cancelLink"),
-      dashboardLink: t("common.dashboardLink"),
-      paymentConfirmed: t("common.paymentConfirmed"),
-      viewReceipt: t("common.viewReceipt"),
-      footer: t("common.footer"),
+      dateLabel: playerT("common.dateLabel"),
+      locationLabel: playerT("common.locationLabel"),
+      viewMomentCta: playerT("common.viewMomentCta"),
+      cancelLink: playerT("common.cancelLink"),
+      dashboardLink: playerT("common.dashboardLink"),
+      paymentConfirmed: playerT("common.paymentConfirmed"),
+      viewReceipt: playerT("common.viewReceipt"),
+      footer: playerT("common.footer"),
     },
   });
 
-  // Send notification to each Host of the Circle (skip if host = player)
-  const [hosts, registeredCount] = await Promise.all([
+  const [hosts, registeredCount, defaultT] = await Promise.all([
     prismaCircleRepository.findOrganizers(moment.circleId),
     prismaRegistrationRepository.countByMomentIdAndStatus(momentId, "REGISTERED"),
+    resolver.defaultTranslations(),
   ]);
 
-  const registrationInfo = moment.capacity
-    ? t("hostNotification.registrationInfo", {
-        count: registeredCount,
-        capacity: moment.capacity,
-      })
-    : t("hostNotification.registrationInfoUnlimited", {
-        count: registeredCount,
-      });
-
-  // Récupère les préférences de tous les Hosts en une seule requête pour éviter le N+1
   const filteredHosts = hosts.filter((host) => host.userId !== userId);
   const hostUserIds = filteredHosts.map((h) => h.userId);
   const prefsMap = await prismaUserRepository.findNotificationPreferencesByIds(hostUserIds);
 
-  await Promise.all(
-    filteredHosts.map(async (host) => {
+  // registrationInfo dans la locale par défaut, réutilisé pour Slack et pour les
+  // destinataires non-déclencheur (cas typique : tous les Hosts).
+  const formatRegistrationInfo = (t: typeof defaultT) =>
+    moment.capacity
+      ? t("hostNotification.registrationInfo", { count: registeredCount, capacity: moment.capacity })
+      : t("hostNotification.registrationInfoUnlimited", { count: registeredCount });
+  const defaultRegistrationInfo = formatRegistrationInfo(defaultT);
+
+  await Promise.all([
+    ...filteredHosts.map(async (host) => {
       const prefs = prefsMap.get(host.userId);
       if (!prefs?.notifyNewRegistration) return;
 
+      const hostT = await resolver.translationsFor(host.userId);
       const hostName =
         [host.user.firstName, host.user.lastName].filter(Boolean).join(" ") ||
         host.user.email;
+
+      const registrationInfo =
+        hostT === defaultT ? defaultRegistrationInfo : formatRegistrationInfo(hostT);
 
       return emailService.sendHostNewRegistration({
         to: host.user.email,
@@ -328,35 +284,27 @@ export async function sendRegistrationEmails(
         circleSlug: circle.slug,
         registrationInfo,
         strings: {
-          subject: t("hostNotification.subject", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          heading: t("hostNotification.heading"),
-          message: t("hostNotification.message", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          manageRegistrationsCta: t("hostNotification.manageRegistrationsCta"),
-          footer: t("common.footer"),
+          subject: hostT("hostNotification.subject", { playerName, momentTitle: moment.title }),
+          heading: hostT("hostNotification.heading"),
+          message: hostT("hostNotification.message", { playerName, momentTitle: moment.title }),
+          manageRegistrationsCta: hostT("hostNotification.manageRegistrationsCta"),
+          footer: hostT("common.footer"),
         },
       });
-    })
-  );
-
-  await notifySlackNewRegistration({
-    playerName,
-    momentTitle: moment.title,
-    circleName: circle.name,
-    registrationInfo,
-    momentUrl: `${baseUrl}/m/${moment.slug}`,
-  });
+    }),
+    notifySlackNewRegistration({
+      playerName,
+      momentTitle: moment.title,
+      circleName: circle.name,
+      registrationInfo: defaultRegistrationInfo,
+      momentUrl: `${baseUrl}/m/${moment.slug}`,
+    }),
+  ]);
 }
 
 async function sendPromotionEmail(
   promotedRegistration: Registration,
-  t: TranslationFunction,
-  locale: string
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [user, moment] = await Promise.all([
     prismaUserRepository.findById(promotedRegistration.userId),
@@ -367,21 +315,9 @@ async function sendPromotionEmail(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const t = await resolver.translationsFor(promotedRegistration.userId);
+  const locale = resolver.resolveFor(promotedRegistration.userId);
+  const ctx = buildMomentEmailContext(moment, locale);
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
@@ -394,7 +330,7 @@ async function sendPromotionEmail(
     description: moment.description,
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
-    location: locationText,
+    location: ctx.locationText,
     videoLink: moment.videoLink,
     url: `${promotionBaseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
@@ -407,10 +343,10 @@ async function sendPromotionEmail(
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     icsContent,
@@ -449,17 +385,16 @@ export async function removeRegistrationByHostAction(
       }
     );
 
-    const locale = await getLocale();
-    const t = await getTranslations("Email");
+    const resolver = await buildEmailLocaleResolver(hostUserId);
     const { momentId, userId } = result.cancelledRegistration;
 
-    sendRemovedByHostEmail(momentId, userId, t, locale).catch((err) => {
+    sendRemovedByHostEmail(momentId, userId, resolver).catch((err) => {
       console.error(err);
       Sentry.captureException(err);
     });
 
     if (result.promotedRegistration) {
-      sendPromotionEmail(result.promotedRegistration, t, locale).catch((err) => {
+      sendPromotionEmail(result.promotedRegistration, resolver).catch((err) => {
         console.error(err);
         Sentry.captureException(err);
       });
@@ -475,8 +410,7 @@ export async function removeRegistrationByHostAction(
 async function sendRemovedByHostEmail(
   momentId: string,
   userId: string,
-  t: TranslationFunction,
-  locale: string
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [user, moment] = await Promise.all([
     prismaUserRepository.findById(userId),
@@ -487,21 +421,8 @@ async function sendRemovedByHostEmail(
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  const t = await resolver.translationsFor(userId);
+  const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
   const playerName = getDisplayName(user.firstName, user.lastName, user.email);
 
   await emailService.sendRegistrationRemovedByHost({
@@ -509,10 +430,10 @@ async function sendRemovedByHostEmail(
     playerName,
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     strings: {
@@ -546,9 +467,8 @@ export async function approveMomentRegistrationAction(
     );
 
     const reg = result.registration;
-    const locale = await getLocale();
-    const t = await getTranslations("Email");
-    sendRegistrationEmails(reg.momentId, reg.userId, reg, t, locale).catch((err) => {
+    const resolver = await buildEmailLocaleResolver(hostUserId);
+    sendRegistrationEmails(reg.momentId, reg.userId, reg, resolver).catch((err) => {
       console.error(err);
       Sentry.captureException(err);
     });
@@ -578,8 +498,8 @@ export async function rejectMomentRegistrationAction(
       }
     );
 
-    const t = await getTranslations("Email");
-    notifyPlayerRejection(result.userId, result.momentId, t).catch((err) => {
+    const resolver = await buildEmailLocaleResolver(hostUserId);
+    notifyPlayerRejection(result.userId, result.momentId, resolver).catch((err) => {
       console.error("[rejection-notification] Error:", err);
       Sentry.captureException(err);
     });
@@ -594,7 +514,7 @@ export async function rejectMomentRegistrationAction(
 async function notifyHostsPendingApproval(
   momentId: string,
   userId: string,
-  t: Awaited<ReturnType<typeof getTranslations<"Email">>>
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [user, moment] = await Promise.all([
     prismaUserRepository.findById(userId),
@@ -616,6 +536,7 @@ async function notifyHostsPendingApproval(
     hosts.map(async (host) => {
       const prefs = prefsMap.get(host.userId);
       if (!prefs?.notifyNewRegistration) return;
+      const t = await resolver.translationsFor(host.userId);
       const hostName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
       return emailService.sendApprovalNotification({
         to: host.user.email,
@@ -637,13 +558,14 @@ async function notifyHostsPendingApproval(
 async function notifyPlayerRejection(
   userId: string,
   momentId: string,
-  t: Awaited<ReturnType<typeof getTranslations<"Email">>>
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [user, moment] = await Promise.all([
     prismaUserRepository.findById(userId),
     prismaMomentRepository.findById(momentId),
   ]);
   if (!user || !moment) return;
+  const t = await resolver.translationsFor(userId);
   const playerName = getDisplayName(user.firstName, user.lastName, user.email);
   await emailService.sendApprovalNotification({
     to: user.email,

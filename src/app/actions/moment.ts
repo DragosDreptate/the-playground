@@ -1,12 +1,6 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
-import { formatInTimeZone } from "date-fns-tz";
-import { fr } from "date-fns/locale/fr";
-import { enUS } from "date-fns/locale/en-US";
-
-const PLATFORM_TIMEZONE = "Europe/Paris";
-import { getLocale, getTranslations } from "next-intl/server";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
@@ -39,29 +33,15 @@ import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
+import {
+  buildEmailLocaleResolver,
+  DEFAULT_RECIPIENT_LOCALE,
+  type EmailLocaleResolver,
+} from "@/lib/email/email-locale";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
-
-function getDateFnsLocale(locale: string) {
-  return locale === "fr" ? fr : enUS;
-}
-
-function formatLocationText(
-  locationType: string,
-  locationName: string | null,
-  locationAddress: string | null,
-  videoLink: string | null,
-  locale: string
-): string {
-  if (locationType === "ONLINE") {
-    return videoLink ?? (locale === "fr" ? "En ligne" : "Online");
-  }
-  return (
-    [locationName, locationAddress].filter(Boolean).join(", ") ||
-    (locale === "fr" ? "À définir" : "TBD")
-  );
-}
 
 export async function createMomentAction(
   circleId: string,
@@ -175,7 +155,8 @@ export async function createMomentAction(
         { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
       );
 
-      sendMomentPublishedNotifications(publishResult.moment, userId);
+      const resolver = await buildEmailLocaleResolver(userId);
+      sendMomentPublishedNotifications(publishResult.moment, userId, resolver);
 
       revalidatePath(`/dashboard/circles/${publishResult.moment.circleId}`);
       revalidatePath(`/m/${publishResult.moment.slug}`);
@@ -301,14 +282,12 @@ export async function updateMomentAction(
         (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
 
       if ((dateChanged || locationChanged) && !isAdminUser(session)) {
-        const locale = await getLocale();
-        const t = await getTranslations("Email");
+        const resolver = await buildEmailLocaleResolver(userId);
         sendMomentUpdateEmails(
           result.moment,
           Boolean(dateChanged),
           Boolean(locationChanged),
-          t,
-          locale
+          resolver
         ).catch((err) => Sentry.captureException(err));
       }
     }
@@ -327,7 +306,8 @@ export async function updateMomentAction(
           { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
         );
 
-        sendMomentPublishedNotifications(publishResult.moment, userId);
+        const resolver = await buildEmailLocaleResolver(userId);
+        sendMomentPublishedNotifications(publishResult.moment, userId, resolver);
 
         revalidatePath(`/dashboard/circles/${publishResult.moment.circleId}`);
         revalidatePath(`/m/${publishResult.moment.slug}`);
@@ -348,14 +328,11 @@ export async function updateMomentAction(
   });
 }
 
-type TranslationFunction = Awaited<ReturnType<typeof getTranslations<"Email">>>;
-
 async function sendMomentUpdateEmails(
   moment: Moment,
   dateChanged: boolean,
   locationChanged: boolean,
-  t: TranslationFunction,
-  locale: string
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const [circle, registrations, hosts] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
@@ -370,21 +347,10 @@ async function sendMomentUpdateEmails(
   const { participants: participantRecipients, hosts: hostRecipients } =
     partitionMomentUpdateRecipients(confirmed, hosts);
 
-  const dateFnsLocale = getDateFnsLocale(locale);
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", {
-    locale: dateFnsLocale,
-  });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", {
-    locale: dateFnsLocale,
-  });
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  // Tous les destinataires d'un batch update sont des "tiers" (≠ déclencheur Host)
+  // → locale par défaut FR pour rester cohérent et formaté en français.
+  const t = await resolver.defaultTranslations();
+  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const icsContent = generateIcs({
@@ -393,7 +359,7 @@ async function sendMomentUpdateEmails(
     description: moment.description,
     startsAt: moment.startsAt,
     endsAt: moment.endsAt,
-    location: locationText,
+    location: ctx.locationText,
     videoLink: moment.videoLink,
     url: `${baseUrl}/m/${moment.slug}`,
     organizerName: circle.name,
@@ -413,10 +379,10 @@ async function sendMomentUpdateEmails(
   const commonFields = {
     momentTitle: moment.title,
     momentSlug: moment.slug,
-    momentDate,
-    momentDateMonth,
-    momentDateDay,
-    locationText,
+    momentDate: ctx.momentDate,
+    momentDateMonth: ctx.momentDateMonth,
+    momentDateDay: ctx.momentDateDay,
+    locationText: ctx.locationText,
     circleName: circle.name,
     circleSlug: circle.slug,
     dateChanged,
@@ -489,7 +455,8 @@ export async function deleteMomentAction(
       : false;
     const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isOrganizerOfEvent);
     if (shouldNotify) {
-      sendMomentCancelledEmails(momentToDelete, registrationsToNotify).catch(
+      const resolver = await buildEmailLocaleResolver(userId);
+      sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
         (err) => Sentry.captureException(err)
       );
     }
@@ -505,25 +472,15 @@ export async function deleteMomentAction(
 
 async function sendMomentCancelledEmails(
   moment: Moment,
-  registrations: RegistrationWithUser[]
+  registrations: RegistrationWithUser[],
+  resolver: EmailLocaleResolver
 ): Promise<void> {
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
 
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: "Email" });
-  const dateFnsLocale = getDateFnsLocale(locale);
-
-  const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-  const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-  const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-  const locationText = formatLocationText(
-    moment.locationType,
-    moment.locationName,
-    moment.locationAddress,
-    moment.videoLink,
-    locale
-  );
+  // Tous les destinataires sont des participants ≠ déclencheur Host → FR par défaut.
+  const t = await resolver.defaultTranslations();
+  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
 
   const strings = {
     subject: t("momentCancelled.subject", { momentTitle: moment.title }),
@@ -533,7 +490,6 @@ async function sendMomentCancelledEmails(
     footer: t("common.footer"),
   };
 
-  // Notifier REGISTERED et WAITLISTED (tous les participants actifs) en batch
   const recipients = registrations
     .filter((r) => r.user?.email)
     .map((r) => ({
@@ -545,10 +501,10 @@ async function sendMomentCancelledEmails(
     await emailService.sendMomentCancelledBatch({
       recipients,
       momentTitle: moment.title,
-      momentDate,
-      momentDateMonth,
-      momentDateDay,
-      locationText,
+      momentDate: ctx.momentDate,
+      momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+      momentDateDay: ctx.momentDateDay,
+      locationText: ctx.locationText,
       circleName: circle.name,
       circleSlug: circle.slug,
       strings,
@@ -573,7 +529,8 @@ export async function publishMomentAction(
       { momentRepository: prismaMomentRepository, circleRepository: circleRepo }
     );
 
-    sendMomentPublishedNotifications(result.moment, userId);
+    const resolver = await buildEmailLocaleResolver(userId);
+    sendMomentPublishedNotifications(result.moment, userId, resolver);
 
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
     revalidatePath(`/m/${result.moment.slug}`);
@@ -594,7 +551,11 @@ export async function publishMomentAction(
  * and `createMomentAction` with `intent=publish` (create + publish in one
  * operation).
  */
-function sendMomentPublishedNotifications(moment: Moment, userId: string): void {
+function sendMomentPublishedNotifications(
+  moment: Moment,
+  userId: string,
+  resolver: EmailLocaleResolver,
+): void {
   prismaCircleRepository
     .findById(moment.circleId)
     .then(async (circle) => {
@@ -605,23 +566,12 @@ function sendMomentPublishedNotifications(moment: Moment, userId: string): void 
         Sentry.captureException(err);
       });
 
-      const [host, locale] = await Promise.all([
-        prismaUserRepository.findById(userId),
-        getLocale(),
-      ]);
+      const host = await prismaUserRepository.findById(userId);
       if (!host?.email) return;
 
-      const dateFnsLocale = getDateFnsLocale(locale);
-      const momentDate = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "EEEE d MMMM yyyy, HH:mm", { locale: dateFnsLocale });
-      const momentDateMonth = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "MMM", { locale: dateFnsLocale }).toUpperCase();
-      const momentDateDay = formatInTimeZone(moment.startsAt, PLATFORM_TIMEZONE, "d");
-      const locationText = formatLocationText(
-        moment.locationType,
-        moment.locationName,
-        moment.locationAddress,
-        moment.videoLink,
-        locale
-      );
+      // Le Host est le déclencheur : il garde la locale de la requête.
+      const t = await resolver.translationsFor(userId);
+      const ctx = buildMomentEmailContext(moment, resolver.resolveFor(userId));
       const hostName = [host.firstName, host.lastName].filter(Boolean).join(" ") || host.email;
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
@@ -631,7 +581,7 @@ function sendMomentPublishedNotifications(moment: Moment, userId: string): void 
         description: moment.description,
         startsAt: moment.startsAt,
         endsAt: moment.endsAt,
-        location: locationText,
+        location: ctx.locationText,
         videoLink: moment.videoLink,
         url: `${appUrl}/m/${moment.slug}`,
         organizerName: circle.name,
@@ -639,17 +589,16 @@ function sendMomentPublishedNotifications(moment: Moment, userId: string): void 
         attendeeEmail: host.email,
       });
 
-      const t = await getTranslations({ locale, namespace: "Email" });
       await emailService.sendHostMomentCreated({
         to: host.email,
         hostName,
         momentTitle: moment.title,
         momentSlug: moment.slug,
         circleSlug: circle.slug,
-        momentDate,
-        momentDateMonth,
-        momentDateDay,
-        locationText,
+        momentDate: ctx.momentDate,
+        momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+        momentDateDay: ctx.momentDateDay,
+        locationText: ctx.locationText,
         circleName: circle.name,
         icsContent,
         strings: {

@@ -13,14 +13,19 @@ const NEXT_LOCALE_COOKIE = /(?:^|;\s*)NEXT_LOCALE=([^;]+)/;
  */
 export function buildMagicLinkConfirmUrl(authJsUrl: string, request: Request): string {
   const original = new URL(authJsUrl);
-  const locale = detectLocale(request);
+  const locale = detectLocaleFromRequest(request);
   const prefix = locale === routing.defaultLocale ? "" : `/${locale}`;
   const confirm = new URL(`${prefix}/auth/confirm`, original.origin);
   confirm.search = original.search;
   return confirm.toString();
 }
 
-function detectLocale(request: Request): Locale {
+/**
+ * Détecte la locale d'une requête HTTP en dehors du contexte i18n Next.js
+ * (ex: callbacks Auth.js). Lit le cookie NEXT_LOCALE puis le header
+ * Accept-Language. Repli sur la locale par défaut.
+ */
+export function detectLocaleFromRequest(request: Request): Locale {
   const cookie = request.headers.get("cookie") ?? "";
   const match = cookie.match(NEXT_LOCALE_COOKIE);
   if (match && isSupportedLocale(match[1])) return match[1];
