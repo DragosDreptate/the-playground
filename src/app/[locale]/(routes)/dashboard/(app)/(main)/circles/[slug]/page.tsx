@@ -24,6 +24,7 @@ import { CircleMembersDialog } from "@/components/circles/circle-members-dialog"
 import { CircleShareInviteCard } from "@/components/circles/circle-share-invite-card";
 import { PendingMembershipsList } from "@/components/circles/pending-requests-list";
 import { CoverBlock } from "@/components/circles/cover-block";
+import { CircleShareButton } from "@/components/circles/circle-share-button";
 import { getMomentGradient } from "@/lib/gradient";
 import { getDisplayName } from "@/lib/display-name";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -161,7 +162,15 @@ export default async function CircleDetailPage({
               coverImageAttribution={circle.coverImageAttribution}
               gradient={gradient}
               altText={circle.name}
-            />
+            >
+              <CircleShareButton
+                url={publicUrl}
+                ariaLabel={tCommon("share.communityLabel")}
+                circleId={circle.id}
+                circleSlug={circle.slug}
+                circleName={circle.name}
+              />
+            </CoverBlock>
           </div>
 
           {/* Groupe 2 — Organisateurs + Stats + CTA (mobile: order-4) */}

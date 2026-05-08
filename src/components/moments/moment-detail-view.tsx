@@ -295,18 +295,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               sizes="(max-width: 1024px) 100vw, 340px"
               demoLabel={tCommon("demo")}
             >
-              {props.variant === "public" &&
-                (moment.status === "PUBLISHED" || moment.status === "PAST") && (
-                  <MomentShareButton
-                    url={`${props.appUrl}/m/${moment.slug}`}
-                    ariaLabel={tCommon("share.eventLabel")}
-                    momentId={moment.id}
-                    momentSlug={moment.slug}
-                    circleId={circle.id}
-                    circleName={circle.name}
-                    momentStatus={moment.status}
-                  />
-                )}
+              {(moment.status === "PUBLISHED" || moment.status === "PAST") && props.appUrl && (
+                <MomentShareButton
+                  url={`${props.appUrl}/m/${moment.slug}`}
+                  ariaLabel={tCommon("share.eventLabel")}
+                  momentId={moment.id}
+                  momentSlug={moment.slug}
+                  circleId={circle.id}
+                  circleName={circle.name}
+                  momentStatus={moment.status}
+                />
+              )}
             </MomentCoverBlock>
           </div>
 
