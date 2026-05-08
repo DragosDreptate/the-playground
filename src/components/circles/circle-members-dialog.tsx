@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Link } from "@/i18n/navigation";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -79,7 +80,6 @@ export function CircleMembersDialog({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, startLoad] = useTransition();
   const [isExporting, startExport] = useTransition();
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const canExport = callerRole === "HOST" || callerRole === "CO_HOST";
 
   function handleExportCsv() {
@@ -154,18 +154,11 @@ export function CircleMembersDialog({
     setMembers((prev) => prev.map((m) => (m.user.id === userId ? { ...m, role } : m)));
   }, []);
 
-  useEffect(() => {
-    if (!open || !hasMore || !sentinelRef.current) return;
-    const sentinel = sentinelRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) loadMore();
-      },
-      { rootMargin: "120px" },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [open, hasMore, loadMore]);
+  const { scrollContainerRef, sentinelRef } = useInfiniteScroll({
+    enabled: open,
+    hasMore,
+    onLoadMore: loadMore,
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -209,7 +202,11 @@ export function CircleMembersDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">
+        <div
+          ref={scrollContainerRef}
+          data-testid="circle-members-scroll-container"
+          className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6"
+        >
           <ul className="divide-border divide-y">
             {members.map((member) => (
               <MemberRow
@@ -224,7 +221,11 @@ export function CircleMembersDialog({
             ))}
           </ul>
           {hasMore && (
-            <div ref={sentinelRef} className="text-muted-foreground py-4 text-center text-xs">
+            <div
+              ref={sentinelRef}
+              data-testid="circle-members-sentinel"
+              className="text-muted-foreground py-4 text-center text-xs"
+            >
               {isLoading ? "…" : ""}
             </div>
           )}

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import {
   Dialog,
   DialogContent,
@@ -82,7 +83,6 @@ export function MomentRegistrationsDialog({
     name: string;
     isPaid: boolean;
   } | null>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
 
   function handleExportCsv() {
     const eventDate = momentStartsAt.toISOString().slice(0, 10);
@@ -136,18 +136,11 @@ export function MomentRegistrationsDialog({
     });
   }, [momentId, participants.length, hasMore, isLoading]);
 
-  useEffect(() => {
-    if (!open || !hasMore || !sentinelRef.current) return;
-    const sentinel = sentinelRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) loadMore();
-      },
-      { rootMargin: "120px" },
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [open, hasMore, loadMore]);
+  const { scrollContainerRef, sentinelRef } = useInfiniteScroll({
+    enabled: open,
+    hasMore,
+    onLoadMore: loadMore,
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -194,7 +187,10 @@ export function MomentRegistrationsDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6">
+        <div
+          ref={scrollContainerRef}
+          className="min-h-0 flex-1 overflow-y-auto px-6 pt-2 pb-6"
+        >
           <ul className="divide-border divide-y">
             {participants.map((r) => (
               <ParticipantRow

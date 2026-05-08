@@ -36,6 +36,8 @@ export const SLUGS = {
   MOMENT_BOTH_APPROVAL: "test-moment-both-approval",
   /** Circle Network (réseau de test contenant paris-creative-tech) */
   NETWORK: "test-network",
+  /** Circle avec 22 membres (1 HOST + 21 PLAYERS) — test pagination modale (PAGE_SIZE=20) */
+  LARGE_MEMBERS_CIRCLE: "test-large-members",
 } as const;
 
 // ── Chemins auth (générés par globalSetup) ────────────────────────────────────
