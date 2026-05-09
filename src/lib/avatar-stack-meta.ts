@@ -15,28 +15,16 @@ type Translator = (key: string, values?: Record<string, number | string>) => str
 type Options = {
   avatarsMax?: number;
   namesToShow?: number;
-  /**
-   * Étiquette à afficher pour un Player sans nom (typiquement
-   * `t("Common.anonymousFallback")` côté caller). Évite d'exposer l'email.
-   */
+  /** Étiquette pour un user sans nom (typiquement `t("Common.anonymousFallback")`). */
   anonymousFallback: string;
 };
 
-/**
- * Aperçu "stack d'avatars + et X autres" partagé entre la page Communauté
- * et la page événement.
- *
- * Le compteur "et X autres" est calculé par rapport à ce qui est *visible*
- * dans chaque contexte d'affichage, pour éviter une lecture fausse :
- * - desktop affiche les noms → compteur = total − noms affichés
- * - mobile n'affiche que les avatars → compteur = total − avatars visibles
- *
- * Sans cette distinction, un mobile à 5 avatars affichait "et 4 autres" pour
- * 6 inscrits (calcul desktop appliqué au mobile), donnant l'illusion de 9.
- *
- * Les `items` doivent être déjà triés par le caller dans l'ordre voulu —
- * la fonction se contente de slicer.
- */
+// Le compteur "et X autres" diffère selon le contexte d'affichage :
+//   desktop affiche les noms → compteur = total − noms
+//   mobile n'affiche que les avatars → compteur = total − avatars visibles
+// Avant cette distinction, un mobile à 5 avatars affichait "et 4 autres" pour
+// 6 inscrits (calcul desktop appliqué au mobile), donnant l'illusion de 9.
+// `items` doit être pré-trié par le caller — la fonction se contente de slicer.
 export function computeAvatarStackMeta<T extends WithDisplayUser>(
   items: T[],
   totalCount: number,

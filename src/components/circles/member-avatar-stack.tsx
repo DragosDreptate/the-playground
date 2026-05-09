@@ -2,13 +2,6 @@ import type { CircleMemberWithUser } from "@/domain/models/circle";
 import { getPublicDisplayName, getPublicUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 
-/**
- * Rangée d'avatars de membres superposés avec tooltip au survol.
- * Utilisée sur les pages Circle (publique + dashboard) dans la section Meta.
- *
- * `anonymousFallback` (typiquement `t("Common.anonymousFallback")`) sert d'étiquette
- * pour les membres sans nom — l'email n'est jamais exposé côté public (RGPD).
- */
 export function MemberAvatarStack({
   members,
   anonymousFallback,

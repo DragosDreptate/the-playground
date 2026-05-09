@@ -4,10 +4,9 @@ import { cn } from "@/lib/utils";
 type UserAvatarProps = {
   name?: string | null;
   /**
-   * Optionnel : email du user. Sert UNIQUEMENT à dériver l'initiale en
-   * contextes privés (Host dashboard, admin) quand `name` est absent.
-   * À NE PAS passer en contexte public — l'initiale d'email reste un fragment
-   * d'email exposé. Sans `name` ni `email`, l'initiale tombe sur "?".
+   * Privé uniquement (Host dashboard, admin) — `email[0]` sert d'initiale
+   * fallback. À ne PAS passer en contexte public ; sans `name` ni `email`
+   * l'initiale tombe sur "?".
    */
   email?: string | null;
   image?: string | null;

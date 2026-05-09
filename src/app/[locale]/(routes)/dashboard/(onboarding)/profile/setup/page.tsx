@@ -31,11 +31,7 @@ export default async function ProfileSetupPage({
     redirect("/auth/sign-in");
   }
 
-  // callbackUrl peut venir :
-  //  - de la query (cas guard onboarding sur server action publique : Player connecté
-  //    mais non onboardé qui clique S'inscrire / Rejoindre / poste un commentaire)
-  //  - du cookie auth-callback-url (cas magic link / OAuth posant le cookie pendant sign-in)
-  // La query est prioritaire car elle correspond à l'intention immédiate du clic.
+  // Query (intention immédiate du clic) prioritaire sur cookie (posé pendant sign-in).
   const { callbackUrl: queryCallbackUrl } = await searchParams;
   const cookieStore = await cookies();
   const cookieCallbackUrl = cookieStore.get("auth-callback-url")?.value;

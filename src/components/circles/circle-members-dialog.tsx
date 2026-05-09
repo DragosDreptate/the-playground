@@ -74,6 +74,8 @@ export function CircleMembersDialog({
   children,
 }: Props) {
   const t = useTranslations("Circle");
+  const tCommon = useTranslations("Common");
+  const anonymousFallback = tCommon("anonymousFallback");
   const [open, setOpen] = useState(false);
   const [members, setMembers] = useState<CircleMemberWithUser[]>(initialMembers);
   const [total, setTotal] = useState(initialTotal);
@@ -215,6 +217,7 @@ export function CircleMembersDialog({
                 callerRole={callerRole}
                 showEmail={showEmails}
                 circleId={circleId}
+                anonymousFallback={anonymousFallback}
                 onRemoved={handleMemberRemoved}
                 onRoleChanged={handleMemberRoleChanged}
               />
@@ -240,6 +243,7 @@ type MemberRowProps = {
   callerRole: CircleMemberRole | undefined;
   showEmail: boolean;
   circleId: string;
+  anonymousFallback: string;
   onRemoved: (userId: string) => void;
   onRoleChanged: (userId: string, role: CircleMemberRole) => void;
 };
@@ -249,18 +253,14 @@ function MemberRow({
   callerRole,
   showEmail,
   circleId,
+  anonymousFallback,
   onRemoved,
   onRoleChanged,
 }: MemberRowProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
-  const tCommon = useTranslations("Common");
   const { user } = member;
-  const displayName = getPublicDisplayName(
-    user.firstName,
-    user.lastName,
-    tCommon("anonymousFallback"),
-  );
+  const displayName = getPublicDisplayName(user.firstName, user.lastName, anonymousFallback);
   const router = useRouter();
 
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);

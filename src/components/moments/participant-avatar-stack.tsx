@@ -2,15 +2,8 @@ import type { RegistrationWithUser } from "@/domain/models/registration";
 import { getPublicDisplayName, getPublicUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 
-/**
- * Rangée d'avatars d'inscrits superposés avec tooltip au survol.
- * Utilisée sur la page Moment (publique + dashboard) dans la section Participants.
- * Pendant très similaire à MemberAvatarStack côté Circle — les domaines restent séparés
- * car le type d'entrée diffère (Registration vs CircleMembership).
- *
- * `anonymousFallback` (typiquement `t("Common.anonymousFallback")`) sert d'étiquette
- * pour les Participants sans nom — l'email n'est jamais exposé côté public (RGPD).
- */
+// Pendant de MemberAvatarStack côté Circle — domaines séparés car les types
+// d'entrée diffèrent (Registration vs CircleMembership).
 export function ParticipantAvatarStack({
   participants,
   anonymousFallback,

@@ -4,15 +4,9 @@ import { computeAvatarStackMeta } from "@/lib/avatar-stack-meta";
 
 type Translator = (key: string, values?: Record<string, number | string>) => string;
 
-/**
- * Trie les organisateurs d'un Circle : HOST en premier, puis CO_HOST, chaque groupe
- * trié alphabétiquement par nom affiché (sensibilité accents ignorée).
- *
- * `getDisplayName` est utilisé ici comme clé de tri uniquement — la valeur
- * n'est jamais rendue dans le HTML, donc même si elle retombe sur l'email
- * elle ne sort pas de la mémoire de la fonction. Et un Host a normalement
- * complété son onboarding (firstName/lastName non vides).
- */
+// HOST puis CO_HOST, alphabétique sur le nom (insensible aux accents).
+// `getDisplayName` sert de clé de tri uniquement (jamais rendue) : le
+// fallback email reste interne à la fonction.
 export function sortCircleOrganizers(
   organizers: CircleMemberWithUser[],
 ): CircleMemberWithUser[] {
@@ -27,15 +21,8 @@ export function sortCircleOrganizers(
   ];
 }
 
-/**
- * Aperçu "Membres" pour la colonne meta des pages Communauté : merge
- * hosts + players, trie par `joinedAt` ascendant, puis délègue le rendu
- * de la stack à `computeAvatarStackMeta`.
- *
- * `anonymousFallback` (typiquement `t("Common.anonymousFallback")`) est passé
- * au helper de stack pour ne jamais rendre l'email d'un Player sans nom dans
- * un contexte public.
- */
+// Bloc "Membres" des pages Communauté : merge hosts+players, trie par
+// `joinedAt` ascendant, délègue le rendu de la stack.
 export function computeMembersMeta(
   hosts: CircleMemberWithUser[],
   players: CircleMemberWithUser[],

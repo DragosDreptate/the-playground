@@ -6,7 +6,7 @@ import posthog from "posthog-js";
 import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
-import { buildOnboardingSetupUrl } from "@/lib/onboarding";
+import { handleOnboardingRequired } from "@/lib/onboarding";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -29,9 +29,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
         router.refresh();
         return;
       }
-      if (result.code === "ONBOARDING_REQUIRED") {
-        router.push(buildOnboardingSetupUrl());
-      }
+      handleOnboardingRequired(result, router);
     });
   }
 

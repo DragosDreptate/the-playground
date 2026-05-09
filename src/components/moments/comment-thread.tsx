@@ -21,7 +21,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import { compressCommentPhoto } from "@/lib/image-compress";
-import { buildOnboardingSetupUrl } from "@/lib/onboarding";
+import { handleOnboardingRequired } from "@/lib/onboarding";
 import { isCoarsePointer } from "@/lib/coarse-pointer";
 import { getPublicDisplayName } from "@/lib/display-name";
 import { linkifyText } from "@/lib/linkify";
@@ -184,6 +184,7 @@ export function CommentThread({
 }: CommentThreadProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
+  const anonymousFallback = tCommon("anonymousFallback");
   const router = useRouter();
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -284,10 +285,7 @@ export function CommentThread({
         router.refresh();
         return;
       }
-      if (result.code === "ONBOARDING_REQUIRED") {
-        router.push(buildOnboardingSetupUrl());
-        return;
-      }
+      if (handleOnboardingRequired(result, router)) return;
       setError(result.error);
     });
   }
@@ -313,7 +311,7 @@ export function CommentThread({
               const authorName = getPublicDisplayName(
                 comment.user.firstName,
                 comment.user.lastName,
-                tCommon("anonymousFallback")
+                anonymousFallback,
               );
               return (
                 <div key={comment.id} className="flex gap-3">

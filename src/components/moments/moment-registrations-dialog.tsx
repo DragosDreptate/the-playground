@@ -74,6 +74,8 @@ export function MomentRegistrationsDialog({
 }: Props) {
   const hostUserIdSet = new Set(hostUserIds);
   const t = useTranslations("Moment");
+  const tCommon = useTranslations("Common");
+  const anonymousFallback = tCommon("anonymousFallback");
   const [open, setOpen] = useState(false);
   const [participants, setParticipants] = useState<RegistrationWithUser[]>(initialParticipants);
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -199,6 +201,7 @@ export function MomentRegistrationsDialog({
                 showEmail={isHostView}
                 isHost={hostUserIdSet.has(r.user.id)}
                 isHostView={isHostView}
+                anonymousFallback={anonymousFallback}
                 onRequestRemove={setRemoveTarget}
               />
             ))}
@@ -223,6 +226,7 @@ export function MomentRegistrationsDialog({
                     showEmail={isHostView}
                     isHost={hostUserIdSet.has(r.user.id)}
                     isHostView={isHostView}
+                    anonymousFallback={anonymousFallback}
                     onRequestRemove={setRemoveTarget}
                   />
                 ))}
@@ -255,6 +259,7 @@ type ParticipantRowProps = {
   showEmail: boolean;
   isHost: boolean;
   isHostView: boolean;
+  anonymousFallback: string;
   onRequestRemove: (target: { id: string; name: string; isPaid: boolean }) => void;
 };
 
@@ -263,17 +268,13 @@ function ParticipantRow({
   showEmail,
   isHost,
   isHostView,
+  anonymousFallback,
   onRequestRemove,
 }: ParticipantRowProps) {
   const t = useTranslations("Dashboard");
   const tMoment = useTranslations("Moment");
-  const tCommon = useTranslations("Common");
   const { user } = registration;
-  const displayName = getPublicDisplayName(
-    user.firstName,
-    user.lastName,
-    tCommon("anonymousFallback"),
-  );
+  const displayName = getPublicDisplayName(user.firstName, user.lastName, anonymousFallback);
   const avatar = <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />;
   const hostBadge = isHost && (
     <span className="group/role relative shrink-0">

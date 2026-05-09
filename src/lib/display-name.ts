@@ -1,15 +1,7 @@
 /**
- * Retourne le nom d'affichage d'un utilisateur, avec l'**email en fallback**.
- *
- * À RÉSERVER aux contextes privés (dashboard Host, emails serveur, admin) où
- * l'exposition de l'email est légitime — par ex. un Host doit pouvoir
- * identifier un Player via son email s'il n'a pas saisi de nom.
- *
- * Pour les contextes publics (page événement publique, page Communauté, listes
- * de membres/inscrits, fil de commentaires), utiliser `getPublicDisplayName` :
- * exposer l'email à un visiteur anonyme constitue une fuite RGPD.
- *
- * Priorité : prénom + nom > prénom seul > email
+ * Contextes privés uniquement (Host dashboard, emails serveur, admin) :
+ * fallback sur l'email autorisé. Pour les pages publiques, utiliser
+ * `getPublicDisplayName` — exposer l'email serait une fuite RGPD.
  */
 export function getDisplayName(
   firstName: string | null | undefined,
@@ -21,15 +13,7 @@ export function getDisplayName(
   return email;
 }
 
-/**
- * Retourne le nom d'affichage d'un utilisateur **sans jamais exposer l'email**.
- *
- * À utiliser pour tout rendu côté pages publiques (visibles par des visiteurs
- * anonymes ou par des Players autres que celui affiché). Le fallback est une
- * étiquette générique localisée passée par le caller (par ex. "Membre" / "Member").
- *
- * Priorité : prénom + nom > prénom seul > fallback générique
- */
+/** Pages publiques : fallback générique localisé fourni par le caller. */
 export function getPublicDisplayName(
   firstName: string | null | undefined,
   lastName: string | null | undefined,
@@ -40,12 +24,7 @@ export function getPublicDisplayName(
   return fallback;
 }
 
-/**
- * Retourne les initiales d'un membre de Circle pour l'avatar (contexte privé,
- * email autorisé en fallback).
- *
- * Priorité : initiales prénom+nom > initiale prénom > initiale email
- */
+/** Initiales avatar — contextes privés (email[0] autorisé en fallback). */
 export function getCircleUserInitials(user: {
   firstName?: string | null;
   lastName?: string | null;
@@ -57,11 +36,7 @@ export function getCircleUserInitials(user: {
   return user.email[0].toUpperCase();
 }
 
-/**
- * Initiales pour l'avatar dans les contextes publics (jamais d'initiale email).
- *
- * Priorité : initiales prénom+nom > initiale prénom > "?" (placeholder neutre)
- */
+/** Initiales avatar — pages publiques, fallback "?" (jamais email[0]). */
 export function getPublicUserInitials(user: {
   firstName?: string | null;
   lastName?: string | null;
