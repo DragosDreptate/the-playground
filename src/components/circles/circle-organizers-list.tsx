@@ -49,9 +49,10 @@ export function CircleOrganizersList({ organizers, linkable, label, anonymousFal
                 size="sm"
               />
             );
+            const showLink = linkable && host.user.publicId;
             return (
               <li key={host.id}>
-                {linkable ? (
+                {showLink ? (
                   <Link
                     href={`/u/${host.user.publicId}`}
                     className="group/organizer flex items-center gap-3"
