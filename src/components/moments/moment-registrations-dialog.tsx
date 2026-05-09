@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Users as UsersIcon, Crown, Clock, Download, Trash2, MoreVertical, Globe, Linkedin, Github } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import { generateSlug } from "@/lib/slug";
 import { getMomentParticipantsPageAction } from "@/app/actions/moment";
 import { RemoveRegistrationDialog } from "@/components/moments/remove-registration-dialog";
@@ -267,8 +267,13 @@ function ParticipantRow({
 }: ParticipantRowProps) {
   const t = useTranslations("Dashboard");
   const tMoment = useTranslations("Moment");
+  const tCommon = useTranslations("Common");
   const { user } = registration;
-  const displayName = getDisplayName(user.firstName, user.lastName, user.email);
+  const displayName = getPublicDisplayName(
+    user.firstName,
+    user.lastName,
+    tCommon("anonymousFallback"),
+  );
   const avatar = <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />;
   const hostBadge = isHost && (
     <span className="group/role relative shrink-0">
