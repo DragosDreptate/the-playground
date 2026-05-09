@@ -1,7 +1,7 @@
 import { Link } from "@/i18n/navigation";
 import { UserAvatar } from "@/components/user-avatar";
 import { ContactOrganizerLink } from "@/components/contact-organizer-link";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
 
 type ContactOrganizerConfig = {
@@ -16,6 +16,8 @@ type Props = {
   linkable: boolean;
   /** Label de section, déjà traduit. */
   label: string;
+  /** Étiquette pour un organisateur sans nom (`t("Common.anonymousFallback")`). */
+  anonymousFallback: string;
   /**
    * Si fourni, affiche un lien discret "Contacter l'organisateur" sous la liste.
    * À ne PAS passer si le visiteur est lui-même organisateur du Circle.
@@ -27,7 +29,7 @@ type Props = {
  * Bloc "Organisé par" de la colonne gauche des pages Circle (publique + dashboard).
  * Liste les organisateurs triés (HOST puis CO_HOST) avec avatar + nom.
  */
-export function CircleOrganizersList({ organizers, linkable, label, contactOrganizer }: Props) {
+export function CircleOrganizersList({ organizers, linkable, label, anonymousFallback, contactOrganizer }: Props) {
   if (organizers.length === 0) return null;
 
   return (
@@ -38,7 +40,7 @@ export function CircleOrganizersList({ organizers, linkable, label, contactOrgan
         </p>
         <ul className="space-y-2">
           {organizers.map((host) => {
-            const hostDisplayName = getDisplayName(host.user.firstName, host.user.lastName, host.user.email);
+            const hostDisplayName = getPublicDisplayName(host.user.firstName, host.user.lastName, anonymousFallback);
             const avatar = (
               <UserAvatar
                 name={hostDisplayName}

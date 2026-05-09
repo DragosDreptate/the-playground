@@ -1,16 +1,25 @@
 import type { CircleMemberWithUser } from "@/domain/models/circle";
-import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
+import { getPublicDisplayName, getPublicUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 
 /**
  * Rangée d'avatars de membres superposés avec tooltip au survol.
  * Utilisée sur les pages Circle (publique + dashboard) dans la section Meta.
+ *
+ * `anonymousFallback` (typiquement `t("Common.anonymousFallback")`) sert d'étiquette
+ * pour les membres sans nom — l'email n'est jamais exposé côté public (RGPD).
  */
-export function MemberAvatarStack({ members }: { members: CircleMemberWithUser[] }) {
+export function MemberAvatarStack({
+  members,
+  anonymousFallback,
+}: {
+  members: CircleMemberWithUser[];
+  anonymousFallback: string;
+}) {
   return (
     <span className="flex -space-x-1.5">
       {members.map((m) => {
-        const displayName = getDisplayName(m.user.firstName, m.user.lastName, m.user.email);
+        const displayName = getPublicDisplayName(m.user.firstName, m.user.lastName, anonymousFallback);
         return (
           <span key={m.id} className="group/avatar relative">
             <span
@@ -26,7 +35,7 @@ export function MemberAvatarStack({ members }: { members: CircleMemberWithUser[]
                   className="absolute inset-0 size-full object-cover"
                 />
               ) : (
-                getCircleUserInitials(m.user)
+                getPublicUserInitials(m.user)
               )}
             </span>
             <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">

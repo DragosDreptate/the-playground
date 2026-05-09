@@ -183,8 +183,9 @@ export default async function PublicCirclePage({
   const primaryHosts = hosts.filter((h) => h.role === "HOST");
   const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+  const anonymousFallback = tCommon("anonymousFallback");
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
-    computeMembersMeta(hosts, players, memberCount, t);
+    computeMembersMeta(hosts, players, memberCount, t, anonymousFallback);
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -285,6 +286,7 @@ export default async function PublicCirclePage({
             organizers={circleOrganizers}
             linkable={isConnected}
             label={t("detail.hostedBy")}
+            anonymousFallback={anonymousFallback}
             contactOrganizer={
               isOrganizer
                 ? undefined
@@ -431,7 +433,10 @@ export default async function PublicCirclePage({
                       initialHasMore={membersFirstPage.hasMore}
                       triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                     >
-                      <MemberAvatarStack members={visibleMemberAvatars} />
+                      <MemberAvatarStack
+                        members={visibleMemberAvatars}
+                        anonymousFallback={anonymousFallback}
+                      />
                       <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         <span className="lg:hidden">{membersMetaMobileText}</span>
                         <span className="hidden lg:inline">{membersMetaText}</span>
@@ -439,7 +444,10 @@ export default async function PublicCirclePage({
                     </CircleMembersDialog>
                   ) : (
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <MemberAvatarStack members={visibleMemberAvatars} />
+                      <MemberAvatarStack
+                        members={visibleMemberAvatars}
+                        anonymousFallback={anonymousFallback}
+                      />
                       <span className="text-sm font-medium">
                         <span className="lg:hidden">{membersMetaMobileText}</span>
                         <span className="hidden lg:inline">{membersMetaText}</span>

@@ -1,4 +1,4 @@
-import { getCircleUserInitials } from "@/lib/display-name";
+import { getPublicUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 import type { UserAvatarInfo } from "@/domain/models/user";
 
@@ -25,7 +25,7 @@ export function AttendeeAvatarStack({
     <div className="flex items-center">
       <div className="flex -space-x-1.5">
         {visible.map((a, i) => {
-          const initials = getCircleUserInitials(a.user);
+          const initials = getPublicUserInitials(a.user);
           const gradient = getMomentGradient(a.user.email);
           return (
             <div

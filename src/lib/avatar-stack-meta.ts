@@ -1,4 +1,4 @@
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 
 export const AVATAR_STACK_MAX = 5;
 export const AVATAR_STACK_NAMES_TO_SHOW = 2;
@@ -7,7 +7,6 @@ type WithDisplayUser = {
   user: {
     firstName: string | null;
     lastName: string | null;
-    email: string;
   };
 };
 
@@ -16,6 +15,11 @@ type Translator = (key: string, values?: Record<string, number | string>) => str
 type Options = {
   avatarsMax?: number;
   namesToShow?: number;
+  /**
+   * Étiquette à afficher pour un Player sans nom (typiquement
+   * `t("Common.anonymousFallback")` côté caller). Évite d'exposer l'email.
+   */
+  anonymousFallback: string;
 };
 
 /**
@@ -37,7 +41,7 @@ export function computeAvatarStackMeta<T extends WithDisplayUser>(
   items: T[],
   totalCount: number,
   t: Translator,
-  options: Options = {},
+  options: Options,
 ): {
   visibleAvatars: T[];
   metaText: string;
@@ -49,7 +53,13 @@ export function computeAvatarStackMeta<T extends WithDisplayUser>(
   const visibleAvatars = items.slice(0, avatarsMax);
   const names = items
     .slice(0, namesToShow)
-    .map((item) => getDisplayName(item.user.firstName, item.user.lastName, item.user.email));
+    .map((item) =>
+      getPublicDisplayName(
+        item.user.firstName,
+        item.user.lastName,
+        options.anonymousFallback,
+      ),
+    );
 
   const desktopOthersCount = Math.max(0, totalCount - names.length);
   const desktopOthersText = desktopOthersCount > 0

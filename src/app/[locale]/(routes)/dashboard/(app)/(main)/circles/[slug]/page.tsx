@@ -111,8 +111,9 @@ export default async function CircleDetailPage({
   const totalMembers = hosts.length + players.length;
   const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+  const anonymousFallback = tCommon("anonymousFallback");
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
-    computeMembersMeta(hosts, players, totalMembers, t);
+    computeMembersMeta(hosts, players, totalMembers, t, anonymousFallback);
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
   const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
 
@@ -180,6 +181,7 @@ export default async function CircleDetailPage({
             organizers={circleOrganizers}
             linkable
             label={t("detail.hostedBy")}
+            anonymousFallback={anonymousFallback}
             contactOrganizer={
               isOrganizer
                 ? undefined
@@ -305,7 +307,10 @@ export default async function CircleDetailPage({
                     circleSlug={circle.slug}
                     triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                   >
-                    <MemberAvatarStack members={visibleMemberAvatars} />
+                    <MemberAvatarStack
+                      members={visibleMemberAvatars}
+                      anonymousFallback={anonymousFallback}
+                    />
                     <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                       <span className="lg:hidden">{membersMetaMobileText}</span>
                       <span className="hidden lg:inline">{membersMetaText}</span>

@@ -1,12 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
+import {
+  getDisplayName,
+  getCircleUserInitials,
+  getPublicDisplayName,
+  getPublicUserInitials,
+} from "@/lib/display-name";
 
 /**
  * Tests — display-name.ts
  *
  * Règles métier :
- * - getDisplayName : prénom + nom > prénom seul > email (fallback)
- * - getCircleUserInitials : initiales prénom+nom > initiale prénom > initiale email (fallback)
+ * - getDisplayName : prénom + nom > prénom seul > email (fallback) — contextes privés
+ * - getCircleUserInitials : initiales prénom+nom > initiale prénom > initiale email — contextes privés
+ * - getPublicDisplayName : prénom + nom > prénom seul > fallback générique (jamais d'email)
+ * - getPublicUserInitials : initiales prénom+nom > initiale prénom > "?" (jamais d'email)
  */
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -264,6 +271,89 @@ describe("getCircleUserInitials", () => {
         email: "alice@example.com",
       });
       expect(result).toHaveLength(1);
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getPublicDisplayName — jamais d'email exposé
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getPublicDisplayName", () => {
+  describe("given a user with first name and last name", () => {
+    it("should return 'firstName lastName'", () => {
+      expect(getPublicDisplayName("Alice", "Dupont", "Membre")).toBe("Alice Dupont");
+    });
+  });
+
+  describe("given a user with first name only", () => {
+    it("should return the first name when lastName is null", () => {
+      expect(getPublicDisplayName("Alice", null, "Membre")).toBe("Alice");
+    });
+
+    it("should return the first name when lastName is empty (falsy)", () => {
+      expect(getPublicDisplayName("Alice", "", "Membre")).toBe("Alice");
+    });
+  });
+
+  describe("given a user with no first name (RGPD-sensitive case)", () => {
+    it("should return the fallback when firstName is null — never exposing email", () => {
+      expect(getPublicDisplayName(null, null, "Membre")).toBe("Membre");
+    });
+
+    it("should return the fallback when firstName is undefined", () => {
+      expect(getPublicDisplayName(undefined, undefined, "Member")).toBe("Member");
+    });
+
+    it("should return the fallback when firstName is empty even with lastName", () => {
+      expect(getPublicDisplayName("", "Dupont", "Membre")).toBe("Membre");
+    });
+
+    it("should localize via the caller-provided fallback (FR vs EN)", () => {
+      expect(getPublicDisplayName(null, null, "Membre")).toBe("Membre");
+      expect(getPublicDisplayName(null, null, "Member")).toBe("Member");
+    });
+  });
+
+  describe("priority order — firstName + lastName > firstName > fallback", () => {
+    it.each([
+      { firstName: "Alice", lastName: "Dupont", expected: "Alice Dupont", label: "prénom + nom" },
+      { firstName: "Alice", lastName: null, expected: "Alice", label: "prénom seul" },
+      { firstName: null, lastName: null, expected: "Membre", label: "fallback générique" },
+    ])("should return '$expected' given $label", ({ firstName, lastName, expected }) => {
+      expect(getPublicDisplayName(firstName, lastName, "Membre")).toBe(expected);
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// getPublicUserInitials — jamais d'initiale d'email
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe("getPublicUserInitials", () => {
+  describe("given a user with first name and last name", () => {
+    it("should return uppercased initials", () => {
+      expect(getPublicUserInitials({ firstName: "Alice", lastName: "Dupont" })).toBe("AD");
+    });
+  });
+
+  describe("given a user with first name only", () => {
+    it("should return the first initial", () => {
+      expect(getPublicUserInitials({ firstName: "Alice", lastName: null })).toBe("A");
+    });
+  });
+
+  describe("given a user with no first name (RGPD-sensitive case)", () => {
+    it("should return '?' instead of an email-derived initial", () => {
+      expect(getPublicUserInitials({ firstName: null, lastName: null })).toBe("?");
+    });
+
+    it("should return '?' when only lastName is provided (no first = no initials)", () => {
+      expect(getPublicUserInitials({ firstName: null, lastName: "Dupont" })).toBe("?");
+    });
+
+    it("should return '?' for undefined fields", () => {
+      expect(getPublicUserInitials({})).toBe("?");
     });
   });
 });

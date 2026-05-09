@@ -34,6 +34,8 @@ const translate: Parameters<typeof computeMembersMeta>[3] = (key, values) => {
   return key;
 };
 
+const FALLBACK = "Membre";
+
 describe("computeMembersMeta", () => {
   describe("given fewer members than the avatars cap", () => {
     it("renders all avatars and no mobile 'others' suffix", () => {
@@ -43,7 +45,7 @@ describe("computeMembersMeta", () => {
         makeMember({ id: "carol", firstName: "Carol" }),
       ];
 
-      const result = computeMembersMeta([], members, members.length, translate);
+      const result = computeMembersMeta([], members, members.length, translate, FALLBACK);
 
       expect(result.visibleAvatars).toHaveLength(3);
       expect(result.metaText).toBe("Alice, Bob et 1 autre");
@@ -56,7 +58,7 @@ describe("computeMembersMeta", () => {
         makeMember({ id: "bob", firstName: "Bob" }),
       ];
 
-      const result = computeMembersMeta([], members, members.length, translate);
+      const result = computeMembersMeta([], members, members.length, translate, FALLBACK);
 
       expect(result.metaText).toBe("Alice, Bob");
       expect(result.metaMobileText).toBe("");
@@ -69,7 +71,7 @@ describe("computeMembersMeta", () => {
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
-      const result = computeMembersMeta([], members, members.length, translate);
+      const result = computeMembersMeta([], members, members.length, translate, FALLBACK);
 
       expect(result.visibleAvatars).toHaveLength(AVATAR_STACK_MAX);
       expect(result.metaMobileText).toBe("");
@@ -83,7 +85,7 @@ describe("computeMembersMeta", () => {
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
-      const result = computeMembersMeta([], members, totalCount, translate);
+      const result = computeMembersMeta([], members, totalCount, translate, FALLBACK);
 
       expect(result.visibleAvatars).toHaveLength(AVATAR_STACK_MAX);
       expect(result.metaText).toBe(`M0, M1 et ${totalCount - 2} autres`);
@@ -98,7 +100,7 @@ describe("computeMembersMeta", () => {
         makeMember({ id: `m${i}`, firstName: `M${i}` }),
       );
 
-      const result = computeMembersMeta([], members, totalCount, translate);
+      const result = computeMembersMeta([], members, totalCount, translate, FALLBACK);
 
       expect(result.metaText).toBe(`M0, M1 et ${totalCount - 2} autres`);
       expect(result.metaMobileText).toBe("et 7 autres");
@@ -128,6 +130,7 @@ describe("computeMembersMeta", () => {
         [midPlayer],
         3,
         translate,
+        FALLBACK,
       );
 
       expect(result.visibleAvatars.map((m) => m.id)).toEqual([

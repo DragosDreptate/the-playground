@@ -3,12 +3,18 @@ import { cn } from "@/lib/utils";
 
 type UserAvatarProps = {
   name?: string | null;
-  email: string;
+  /**
+   * Optionnel : email du user. Sert UNIQUEMENT à dériver l'initiale en
+   * contextes privés (Host dashboard, admin) quand `name` est absent.
+   * À NE PAS passer en contexte public — l'initiale d'email reste un fragment
+   * d'email exposé. Sans `name` ni `email`, l'initiale tombe sur "?".
+   */
+  email?: string | null;
   image?: string | null;
   size?: "sm" | "default" | "md" | "lg" | "xl";
 };
 
-function getInitials(name?: string | null, email?: string): string {
+function getInitials(name?: string | null, email?: string | null): string {
   if (name) {
     const parts = name.trim().split(/\s+/);
     if (parts.length >= 2) {
@@ -32,7 +38,7 @@ export function UserAvatar({ name, email, image, size = "default" }: UserAvatarP
         size === "xl" && "size-24 text-3xl",
       )}
     >
-      {image && <AvatarImage src={image} alt={name ?? email} referrerPolicy="no-referrer" />}
+      {image && <AvatarImage src={image} alt={name ?? ""} referrerPolicy="no-referrer" />}
       <AvatarFallback className="bg-primary/10 text-primary font-medium">
         {initials}
       </AvatarFallback>

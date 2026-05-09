@@ -27,7 +27,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { RemoveMemberDialog } from "@/components/circles/remove-member-dialog";
 import { Users as UsersIcon, Crown, MoreVertical, Star, ChevronDown, Trash2, Globe, Linkedin, Github, Download } from "lucide-react";
 import { XIcon } from "@/components/icons/x-icon";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import { generateSlug } from "@/lib/slug";
 import {
   getCircleMembersPageAction,
@@ -254,8 +254,13 @@ function MemberRow({
 }: MemberRowProps) {
   const t = useTranslations("Dashboard");
   const tCircle = useTranslations("Circle");
+  const tCommon = useTranslations("Common");
   const { user } = member;
-  const displayName = getDisplayName(user.firstName, user.lastName, user.email);
+  const displayName = getPublicDisplayName(
+    user.firstName,
+    user.lastName,
+    tCommon("anonymousFallback"),
+  );
   const router = useRouter();
 
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
