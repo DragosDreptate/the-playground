@@ -21,6 +21,7 @@ import {
   cancelRegistrationAction,
 } from "@/app/actions/registration";
 import { createCheckoutAction } from "@/app/actions/checkout";
+import { buildOnboardingSetupUrl } from "@/lib/onboarding";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { CalendarEventData } from "@/lib/calendar";
@@ -244,9 +245,13 @@ export function RegistrationButton({
                 registration_status: result.data.status,
               });
               router.refresh();
-            } else {
-              setError(result.error);
+              return;
             }
+            if (result.code === "ONBOARDING_REQUIRED") {
+              router.push(buildOnboardingSetupUrl());
+              return;
+            }
+            setError(result.error);
           });
         }}
       >

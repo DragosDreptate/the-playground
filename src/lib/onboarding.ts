@@ -30,3 +30,16 @@ export function shouldRedirectToSetup(user: OnboardingUser): boolean {
 export function shouldRedirectFromSetup(user: OnboardingUser): boolean {
   return !!user && user.onboardingCompleted;
 }
+
+/**
+ * Construit l'URL `/dashboard/profile/setup` avec un `callbackUrl` pointant
+ * vers la page courante (chemin + query). Appelée côté client quand une
+ * server action publique renvoie `code: "ONBOARDING_REQUIRED"` — le user a
+ * une session mais n'a pas finalisé son profil.
+ *
+ * Le routeur i18n (`@/i18n/navigation`) ajoutera le préfixe de locale.
+ */
+export function buildOnboardingSetupUrl(): string {
+  const callbackUrl = `${window.location.pathname}${window.location.search}`;
+  return `/dashboard/profile/setup?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+}

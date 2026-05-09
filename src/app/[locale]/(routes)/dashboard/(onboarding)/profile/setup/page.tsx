@@ -20,16 +20,27 @@ function parseName(name: string | null): { firstName: string; lastName: string }
   };
 }
 
-export default async function ProfileSetupPage() {
+export default async function ProfileSetupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
   const session = await getCachedSession();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");
   }
 
+  // callbackUrl peut venir :
+  //  - de la query (cas guard onboarding sur server action publique : Player connecté
+  //    mais non onboardé qui clique S'inscrire / Rejoindre / poste un commentaire)
+  //  - du cookie auth-callback-url (cas magic link / OAuth posant le cookie pendant sign-in)
+  // La query est prioritaire car elle correspond à l'intention immédiate du clic.
+  const { callbackUrl: queryCallbackUrl } = await searchParams;
   const cookieStore = await cookies();
-  const rawCallbackUrl = cookieStore.get("auth-callback-url")?.value;
-  const callbackUrl = safeCallbackUrl(rawCallbackUrl);
+  const cookieCallbackUrl = cookieStore.get("auth-callback-url")?.value;
+  const callbackUrl =
+    safeCallbackUrl(queryCallbackUrl) ?? safeCallbackUrl(cookieCallbackUrl);
 
   if (shouldRedirectFromSetup(session.user)) {
     redirect(callbackUrl ?? "/dashboard");
