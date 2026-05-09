@@ -89,10 +89,12 @@ export function ContactOrganizerLink({
 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="bg-muted border-border mb-2 flex size-12 items-center justify-center rounded-2xl border">
-            <Mail className="size-5" aria-hidden />
+          <div className="flex items-center gap-3">
+            <div className="bg-muted border-border flex size-12 shrink-0 items-center justify-center rounded-2xl border">
+              <Mail className="size-5" aria-hidden />
+            </div>
+            <DialogTitle>{t("title")}</DialogTitle>
           </div>
-          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
             {momentId ? t("descriptionEvent") : t("descriptionCircle")}
           </DialogDescription>
