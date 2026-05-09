@@ -26,7 +26,6 @@ import { PendingMembershipsList } from "@/components/circles/pending-requests-li
 import { CoverBlock } from "@/components/circles/cover-block";
 import { CircleShareButton } from "@/components/circles/circle-share-button";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName } from "@/lib/display-name";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";

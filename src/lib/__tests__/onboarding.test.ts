@@ -1,5 +1,10 @@
-import { describe, it, expect } from "vitest";
-import { shouldRedirectToSetup, shouldRedirectFromSetup } from "@/lib/onboarding";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  shouldRedirectToSetup,
+  shouldRedirectFromSetup,
+  buildOnboardingSetupUrl,
+  handleOnboardingRequired,
+} from "@/lib/onboarding";
 
 describe("Onboarding routing guards", () => {
   // ─── shouldRedirectToSetup (protected pages) ────────────────
@@ -121,6 +126,74 @@ describe("Onboarding routing guards", () => {
       expect(
         shouldRedirectToSetup(onboarded) && shouldRedirectFromSetup(onboarded)
       ).toBe(false);
+    });
+  });
+
+  // ─── buildOnboardingSetupUrl ────────────────────────────────
+
+  describe("buildOnboardingSetupUrl", () => {
+    function stubLocation(pathname: string, search = "") {
+      vi.stubGlobal("window", { location: { pathname, search } });
+    }
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("encode le chemin courant en callbackUrl", () => {
+      stubLocation("/fr/m/some-event");
+      expect(buildOnboardingSetupUrl()).toBe(
+        "/dashboard/profile/setup?callbackUrl=%2Ffr%2Fm%2Fsome-event",
+      );
+    });
+
+    it("préserve la query string courante dans le callbackUrl", () => {
+      stubLocation("/fr/circles/spark", "?tab=members");
+      expect(buildOnboardingSetupUrl()).toBe(
+        "/dashboard/profile/setup?callbackUrl=%2Ffr%2Fcircles%2Fspark%3Ftab%3Dmembers",
+      );
+    });
+  });
+
+  // ─── handleOnboardingRequired ───────────────────────────────
+
+  describe("handleOnboardingRequired", () => {
+    let push: ReturnType<typeof vi.fn<(url: string) => void>>;
+
+    beforeEach(() => {
+      push = vi.fn<(url: string) => void>();
+      vi.stubGlobal("window", { location: { pathname: "/fr/m/x", search: "" } });
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("retourne false et n'appelle pas push sur succès", () => {
+      const handled = handleOnboardingRequired({ success: true }, { push });
+      expect(handled).toBe(false);
+      expect(push).not.toHaveBeenCalled();
+    });
+
+    it("retourne false et n'appelle pas push pour un autre code d'erreur", () => {
+      const handled = handleOnboardingRequired(
+        { success: false, code: "UNAUTHORIZED" },
+        { push },
+      );
+      expect(handled).toBe(false);
+      expect(push).not.toHaveBeenCalled();
+    });
+
+    it("redirige vers setup et retourne true sur ONBOARDING_REQUIRED", () => {
+      const handled = handleOnboardingRequired(
+        { success: false, code: "ONBOARDING_REQUIRED" },
+        { push },
+      );
+      expect(handled).toBe(true);
+      expect(push).toHaveBeenCalledTimes(1);
+      expect(push).toHaveBeenCalledWith(
+        "/dashboard/profile/setup?callbackUrl=%2Ffr%2Fm%2Fx",
+      );
     });
   });
 });
