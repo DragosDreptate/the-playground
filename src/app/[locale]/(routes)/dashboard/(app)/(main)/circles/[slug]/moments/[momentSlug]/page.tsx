@@ -107,6 +107,7 @@ export default async function MomentDetailPage({
         comments={comments}
         attachments={attachments}
         currentUserId={session.user.id}
+        currentUserEmail={session.user.email ?? null}
         isAuthenticated={true}
         isOrganizer={false}
         existingRegistration={existingRegistration}

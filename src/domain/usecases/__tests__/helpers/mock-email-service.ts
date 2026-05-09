@@ -30,6 +30,7 @@ export function createMockEmailService(
     sendOnboardingWelcome: vi.fn().mockResolvedValue(undefined),
     sendCoHostPromoted: vi.fn().mockResolvedValue(undefined),
     sendCoHostDemoted: vi.fn().mockResolvedValue(undefined),
+    sendHostContactMessage: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

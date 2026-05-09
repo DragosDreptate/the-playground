@@ -4,7 +4,6 @@ import {
   Head,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -13,6 +12,7 @@ import {
 import * as React from "react";
 
 import { onboardingWelcomeContent as content } from "@/content/emails/onboarding-welcome.content";
+import { CenteredLogo } from "./components/centered-logo";
 
 type Props = {
   firstName: string | null;
@@ -137,38 +137,6 @@ export function OnboardingWelcomeEmail({
   );
 }
 
-/**
- * Centrage robuste d'une image pour Outlook Word renderer : wrapper
- * `<table align="center">`. `display: block` + `margin: auto` ne fonctionne
- * pas dans Outlook Desktop (2016+).
- */
-function CenteredLogo({ src }: { src: string }) {
-  return (
-    <table
-      align="center"
-      role="presentation"
-      cellPadding="0"
-      cellSpacing="0"
-      border={0}
-      style={{ margin: "0 auto", borderCollapse: "collapse" }}
-    >
-      <tbody>
-        <tr>
-          <td>
-            <Img
-              src={src}
-              width="180"
-              height="32"
-              alt="The Playground"
-              style={logoImg}
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-}
-
 // ─── Styles ───
 
 const fontFamily =
@@ -190,13 +158,6 @@ const container: React.CSSProperties = {
 
 const headerSection: React.CSSProperties = {
   paddingBottom: "24px",
-};
-
-const logoImg: React.CSSProperties = {
-  display: "block",
-  border: 0,
-  outline: "none",
-  textDecoration: "none",
 };
 
 const card: React.CSSProperties = {

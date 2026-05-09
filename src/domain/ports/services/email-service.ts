@@ -393,6 +393,31 @@ export type OnboardingWelcomeEmailData = {
   firstName: string | null;
 };
 
+// --- Contact organizers (issue #425) ---
+
+export type HostContactMessageEmailData = {
+  to: string;
+  replyTo: string;
+  recipientName: string;
+  /**
+   * Source du contact, déjà formée et localisée :
+   * « À propos de l'événement « X » · Communauté Y » ou « À propos de la Communauté « X » ».
+   */
+  aboutLine: string;
+  message: string;
+  /** URL de base de l'app, utilisée pour charger le logo dans l'email. */
+  appUrl: string;
+  /** Strings i18n entièrement résolus côté usecase (pas de placeholders restants). */
+  strings: {
+    subject: string;
+    heading: string;
+    intro: string;
+    messageLabel: string;
+    replyHint: string;
+    footer: string;
+  };
+};
+
 // --- Co-host role changes (D19) ---
 
 export type CoHostPromotedEmailData = {
@@ -467,4 +492,5 @@ export interface EmailService {
   sendOnboardingWelcome(data: OnboardingWelcomeEmailData): Promise<void>;
   sendCoHostPromoted(data: CoHostPromotedEmailData): Promise<void>;
   sendCoHostDemoted(data: CoHostDemotedEmailData): Promise<void>;
+  sendHostContactMessage(data: HostContactMessageEmailData): Promise<void>;
 }

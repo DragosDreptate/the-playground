@@ -6,6 +6,7 @@ import { HostNewCircleMemberEmail } from "@/infrastructure/services/email/templa
 import { HostMomentCreatedEmail } from "@/infrastructure/services/email/templates/host-moment-created";
 import { NewCommentEmail } from "@/infrastructure/services/email/templates/new-comment";
 import { HostNewCommentEmail } from "@/infrastructure/services/email/templates/host-new-comment";
+import { HostContactMessageEmail } from "@/infrastructure/services/email/templates/host-contact-message";
 import { MomentUpdateEmail } from "@/infrastructure/services/email/templates/moment-update";
 import { MomentCancelledEmail } from "@/infrastructure/services/email/templates/moment-cancelled";
 import { NewMomentNotificationEmail } from "@/infrastructure/services/email/templates/new-moment-notification";
@@ -188,6 +189,28 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
           footer: FOOTER,
         },
         baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "host-contact-message",
+      label: "Host — Message d'un Participant (Contacter l'organisateur)",
+      element: HostContactMessageEmail({
+        to: "bob@example.com",
+        replyTo: "alice@example.com",
+        recipientName: "Bob Dupont",
+        message:
+          "Bonjour Bob,\n\nUne question rapide sur l'événement : est-ce que les places sont en accès libre une fois sur place, ou y a-t-il un check-in à l'entrée ? Je risque d'arriver un peu en retard.\n\nMerci pour l'organisation, je suis vraiment ravie de pouvoir y assister !\n\nAlice",
+        aboutLine: "À propos de l'événement « Soirée JS & Pizza » · Paris Creative Tech",
+        appUrl: BASE_URL,
+        strings: {
+          subject: "Un membre vous contacte sur The Playground",
+          heading: "Vous avez un nouveau message",
+          intro: "Alice Martin vous a envoyé un message via The Playground.",
+          messageLabel: "Message",
+          replyHint:
+            "Pour répondre à Alice Martin, répondez simplement à cet email — ou écrivez à alice@example.com.",
+          footer: FOOTER,
+        },
       }),
     },
     {

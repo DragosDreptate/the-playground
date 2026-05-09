@@ -355,7 +355,6 @@
       "joinRequiresApproval": "Rejoindre (soumis à validation)",
       "joined": "Membre",
       "pendingApproval": "Demande en cours de validation",
-      "isMember": "Vous êtes membre",
       "isOrganizer": "Vous êtes organisateur",
       "manageCircle": "Gérer cette communauté",
       "shareableLink": "Lien partageable",
@@ -615,7 +614,6 @@
       "waitlistedBannerTitle": "Vous êtes sur liste d'attente",
       "joinWaitlist": "S'inscrire sur la liste d'attente",
       "cancelRegistration": "Annuler mon inscription",
-      "youAreRegistered": "Vous êtes inscrit",
       "youAreWaitlisted": "Vous êtes en liste d'attente",
       "youAreWaitlistedWithPosition": "Vous êtes en liste d'attente · #{position}",
       "cancelConfirmTitle": "Annuler l'inscription",
@@ -1154,6 +1152,16 @@
       "refunded": "Un remboursement de {amount} a été effectué automatiquement.",
       "notRefunded": "Aucun remboursement effectué (événement non remboursable).",
       "manageCta": "Gérer les inscriptions"
+    },
+    "hostContactMessage": {
+      "subject": "Un membre vous contacte sur The Playground",
+      "heading": "Vous avez un nouveau message",
+      "intro": "{senderName} vous a envoyé un message via The Playground.",
+      "messageLabel": "Message",
+      "replyHint": "Pour répondre à {senderName}, répondez simplement à cet email — ou écrivez à {senderEmail}.",
+      "aboutEvent": "À propos de l'événement « {momentTitle} » · {circleName}",
+      "aboutCircle": "À propos de la Communauté « {circleName} »",
+      "footer": "Powered by The Playground — Lancez votre communauté, gratuitement."
     },
     "magicLink": {
       "subject": "Votre lien de connexion — The Playground",
@@ -1902,6 +1910,26 @@
     "errorInvalidEmail": "Email invalide",
     "errorSendFailed": "Erreur d'envoi",
     "errorRateLimited": "Trop de messages envoyés. Veuillez réessayer dans quelques minutes."
+  },
+  "ContactOrganizer": {
+    "triggerLabel": "Contacter l'organisateur",
+    "title": "Contacter l'organisateur",
+    "descriptionEvent": "Une question sur cet événement ? Envoyez votre message à l'organisateur, vous serez recontacté par email.",
+    "descriptionCircle": "Une question sur cette Communauté ? Envoyez votre message à l'organisateur, vous serez recontacté par email.",
+    "messageLabel": "Votre message",
+    "messagePlaceholder": "Quelle est votre question pour l'organisateur ?",
+    "replyToNote": "L'organisateur recevra votre message et pourra répondre directement à {email}.",
+    "submit": "Envoyer le message",
+    "sending": "Envoi en cours…",
+    "cancel": "Annuler",
+    "successTitle": "Message envoyé",
+    "successDescription": "L'organisateur recevra votre message dans quelques instants.",
+    "errorRateLimited": "Vous avez déjà envoyé plusieurs messages récemment. Réessayez dans une heure.",
+    "errorTooShort": "Le message doit faire au moins {min} caractères.",
+    "errorTooLong": "Le message ne peut pas dépasser {max} caractères.",
+    "errorNoHosts": "Cette Communauté n'a pas d'organisateur joignable pour le moment.",
+    "errorGeneric": "Impossible d'envoyer le message pour le moment. Réessayez plus tard.",
+    "signInToContact": "Connectez-vous pour contacter l'organisateur"
   },
   "About": {
     "pageTitle": "À propos",

@@ -1,7 +1,14 @@
 import { Link } from "@/i18n/navigation";
 import { UserAvatar } from "@/components/user-avatar";
+import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 import { getDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
+
+type ContactOrganizerConfig = {
+  circleId: string;
+  senderEmail: string | null;
+  signInUrl: string | null;
+};
 
 type Props = {
   organizers: CircleMemberWithUser[];
@@ -9,13 +16,18 @@ type Props = {
   linkable: boolean;
   /** Label de section, déjà traduit. */
   label: string;
+  /**
+   * Si fourni, affiche un lien discret "Contacter l'organisateur" sous la liste.
+   * À ne PAS passer si le visiteur est lui-même organisateur du Circle.
+   */
+  contactOrganizer?: ContactOrganizerConfig;
 };
 
 /**
  * Bloc "Organisé par" de la colonne gauche des pages Circle (publique + dashboard).
  * Liste les organisateurs triés (HOST puis CO_HOST) avec avatar + nom.
  */
-export function CircleOrganizersList({ organizers, linkable, label }: Props) {
+export function CircleOrganizersList({ organizers, linkable, label, contactOrganizer }: Props) {
   if (organizers.length === 0) return null;
 
   return (
@@ -57,6 +69,13 @@ export function CircleOrganizersList({ organizers, linkable, label }: Props) {
             );
           })}
         </ul>
+        {contactOrganizer && (
+          <ContactOrganizerLink
+            circleId={contactOrganizer.circleId}
+            senderEmail={contactOrganizer.senderEmail}
+            signInUrl={contactOrganizer.signInUrl}
+          />
+        )}
       </div>
       <div className="border-border border-t" />
     </>

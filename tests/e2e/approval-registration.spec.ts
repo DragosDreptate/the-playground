@@ -157,7 +157,9 @@ test.describe.serial("Circle membership approval — direct join", () => {
     const playerCtx = await browser.newContext({ storageState: AUTH.PLAYER3 });
     const playerPage = await playerCtx.newPage();
     await navigateToCircle(playerPage, SLUGS.APPROVAL_CIRCLE);
-    await expect(playerPage.getByText(/vous êtes membre|you are a member/i)).toBeVisible();
+    await expect(
+      playerPage.getByRole("button", { name: /quitter la communauté|leave community/i })
+    ).toBeVisible();
     await playerCtx.close();
   });
 });
@@ -289,7 +291,9 @@ test.describe.serial("Event registration approval", () => {
     await navigateToMoment(playerPage, SLUGS.MOMENT_WITH_APPROVAL);
 
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
+    await expect(
+      main.getByRole("button", { name: /annuler mon inscription|cancel my registration/i })
+    ).toBeVisible();
     // Le menu calendrier est maintenant un DropdownMenu avec le trigger "Ajouter à mon calendrier"
     await expect(main.getByText(/ajouter à mon calendrier|add to calendar/i).first()).toBeVisible();
     await playerCtx.close();
@@ -318,7 +322,9 @@ test.describe("Cross-flow D2 — event no approval + Circle with approval", () =
     if (await cta.isVisible({ timeout: 3000 }).catch(() => false)) {
       await cta.click();
       // Immediately registered
-      await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible({ timeout: 10000 });
+      await expect(
+        main.getByRole("button", { name: /annuler mon inscription|cancel my registration/i })
+      ).toBeVisible({ timeout: 10000 });
     }
 
     await ctx.close();
@@ -344,7 +350,9 @@ test.describe("Cross-flow D2 — event no approval + Circle with approval", () =
     await navigateToMoment(playerPage, SLUGS.MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE);
 
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
+    await expect(
+      main.getByRole("button", { name: /annuler mon inscription|cancel my registration/i })
+    ).toBeVisible();
 
     // Dashboard access not 404
     await playerPage.goto(`/fr/dashboard/circles/${SLUGS.APPROVAL_CIRCLE}/moments/${SLUGS.MOMENT_NO_APPROVAL_IN_APPROVAL_CIRCLE}`);
@@ -392,7 +400,9 @@ test.describe.serial("Double approval — event + Circle both require approval",
     const playerPage = await playerCtx.newPage();
     await navigateToMoment(playerPage, SLUGS.MOMENT_BOTH_APPROVAL);
     const main = playerPage.locator("main").first();
-    await expect(main.getByText(/vous êtes inscrit|you're registered/i)).toBeVisible();
+    await expect(
+      main.getByRole("button", { name: /annuler mon inscription|cancel my registration/i })
+    ).toBeVisible();
     await playerCtx.close();
   });
 });

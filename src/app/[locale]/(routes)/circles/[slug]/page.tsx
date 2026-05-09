@@ -285,6 +285,17 @@ export default async function PublicCirclePage({
             organizers={circleOrganizers}
             linkable={isConnected}
             label={t("detail.hostedBy")}
+            contactOrganizer={
+              isOrganizer
+                ? undefined
+                : {
+                    circleId: circle.id,
+                    senderEmail: session?.user?.email ?? null,
+                    signInUrl: isConnected
+                      ? null
+                      : `/${locale}/auth/sign-in?callbackUrl=/${locale}/circles/${slug}`,
+                  }
+            }
           />
 
           {/* Stats */}
@@ -326,26 +337,6 @@ export default async function PublicCirclePage({
                 {t("detail.manageCircle")}
               </Link>
             </Button>
-          )}
-
-          {/* Badge Membre — visible pour les membres non-Organisateurs */}
-          {showMemberBadge && (
-            <div className="flex w-full items-center justify-center gap-2 rounded-full border border-primary/40 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              {t("detail.isMember")}
-            </div>
           )}
 
           {/* Bouton Quitter — visible pour les membres non-Organisateurs */}
