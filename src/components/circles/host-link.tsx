@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import { cn } from "@/lib/utils";
 
 type HostUser = {
@@ -7,19 +7,20 @@ type HostUser = {
   publicId?: string | null;
   firstName?: string | null;
   lastName?: string | null;
-  email: string;
 };
 
 type Props = {
   user: HostUser;
+  /** Étiquette pour un Host sans nom (typiquement `t("Common.anonymousFallback")`). */
+  anonymousFallback: string;
   /** Classes CSS appliquées au lien et au fallback <span> */
   className?: string;
   /** Désactive le lien (ex: visiteur non connecté sur page publique) */
   linkDisabled?: boolean;
 };
 
-export function HostLink({ user, className, linkDisabled }: Props) {
-  const name = getDisplayName(user.firstName, user.lastName, user.email);
+export function HostLink({ user, anonymousFallback, className, linkDisabled }: Props) {
+  const name = getPublicDisplayName(user.firstName, user.lastName, anonymousFallback);
   if (!linkDisabled && user.publicId) {
     return (
       <Link

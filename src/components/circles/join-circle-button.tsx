@@ -6,6 +6,7 @@ import posthog from "posthog-js";
 import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
+import { handleOnboardingRequired } from "@/lib/onboarding";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -26,7 +27,9 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
         posthog.capture("circle_joined_directly", { circle_id: circleId });
         setState(result.data.pendingApproval ? "pending" : "joined");
         router.refresh();
+        return;
       }
+      handleOnboardingRequired(result, router);
     });
   }
 

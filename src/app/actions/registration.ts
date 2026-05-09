@@ -39,6 +39,9 @@ export async function joinMomentAction(
   if (!session?.user?.id) {
     return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
   }
+  if (!session.user.onboardingCompleted) {
+    return { success: false, error: "Onboarding required", code: "ONBOARDING_REQUIRED" };
+  }
 
   const userId = session.user.id;
   return toActionResult(async () => {

@@ -1,22 +1,20 @@
 import type { RegistrationWithUser } from "@/domain/models/registration";
-import { getDisplayName, getCircleUserInitials } from "@/lib/display-name";
+import { getPublicDisplayName, getPublicUserInitials } from "@/lib/display-name";
 import { getMomentGradient } from "@/lib/gradient";
 
-/**
- * Rangée d'avatars d'inscrits superposés avec tooltip au survol.
- * Utilisée sur la page Moment (publique + dashboard) dans la section Participants.
- * Pendant très similaire à MemberAvatarStack côté Circle — les domaines restent séparés
- * car le type d'entrée diffère (Registration vs CircleMembership).
- */
+// Pendant de MemberAvatarStack côté Circle — domaines séparés car les types
+// d'entrée diffèrent (Registration vs CircleMembership).
 export function ParticipantAvatarStack({
   participants,
+  anonymousFallback,
 }: {
   participants: RegistrationWithUser[];
+  anonymousFallback: string;
 }) {
   return (
     <span className="flex -space-x-1.5">
       {participants.map((r) => {
-        const displayName = getDisplayName(r.user.firstName, r.user.lastName, r.user.email);
+        const displayName = getPublicDisplayName(r.user.firstName, r.user.lastName, anonymousFallback);
         return (
           <span key={r.id} className="group/avatar relative">
             <span
@@ -32,7 +30,7 @@ export function ParticipantAvatarStack({
                   className="absolute inset-0 size-full object-cover"
                 />
               ) : (
-                getCircleUserInitials(r.user)
+                getPublicUserInitials(r.user)
               )}
             </span>
             <span className="bg-foreground text-background pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 -translate-x-1/2 rounded-md px-2 py-1 text-xs font-medium whitespace-nowrap opacity-0 transition-opacity group-hover/avatar:opacity-100">

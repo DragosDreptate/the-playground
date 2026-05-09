@@ -4,10 +4,9 @@ import { computeAvatarStackMeta } from "@/lib/avatar-stack-meta";
 
 type Translator = (key: string, values?: Record<string, number | string>) => string;
 
-/**
- * Trie les organisateurs d'un Circle : HOST en premier, puis CO_HOST, chaque groupe
- * trié alphabétiquement par nom affiché (sensibilité accents ignorée).
- */
+// HOST puis CO_HOST, alphabétique sur le nom (insensible aux accents).
+// `getDisplayName` sert de clé de tri uniquement (jamais rendue) : le
+// fallback email reste interne à la fonction.
 export function sortCircleOrganizers(
   organizers: CircleMemberWithUser[],
 ): CircleMemberWithUser[] {
@@ -22,16 +21,14 @@ export function sortCircleOrganizers(
   ];
 }
 
-/**
- * Aperçu "Membres" pour la colonne meta des pages Communauté : merge
- * hosts + players, trie par `joinedAt` ascendant, puis délègue le rendu
- * de la stack à `computeAvatarStackMeta`.
- */
+// Bloc "Membres" des pages Communauté : merge hosts+players, trie par
+// `joinedAt` ascendant, délègue le rendu de la stack.
 export function computeMembersMeta(
   hosts: CircleMemberWithUser[],
   players: CircleMemberWithUser[],
   totalCount: number,
   t: Translator,
+  anonymousFallback: string,
 ): {
   visibleAvatars: CircleMemberWithUser[];
   metaText: string;
@@ -40,5 +37,5 @@ export function computeMembersMeta(
   const allMembers = [...hosts, ...players].sort(
     (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime(),
   );
-  return computeAvatarStackMeta(allMembers, totalCount, t);
+  return computeAvatarStackMeta(allMembers, totalCount, t, { anonymousFallback });
 }

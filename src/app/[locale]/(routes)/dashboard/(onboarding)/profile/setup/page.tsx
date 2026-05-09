@@ -20,16 +20,23 @@ function parseName(name: string | null): { firstName: string; lastName: string }
   };
 }
 
-export default async function ProfileSetupPage() {
+export default async function ProfileSetupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>;
+}) {
   const session = await getCachedSession();
 
   if (!session?.user?.id) {
     redirect("/auth/sign-in");
   }
 
+  // Query (intention immédiate du clic) prioritaire sur cookie (posé pendant sign-in).
+  const { callbackUrl: queryCallbackUrl } = await searchParams;
   const cookieStore = await cookies();
-  const rawCallbackUrl = cookieStore.get("auth-callback-url")?.value;
-  const callbackUrl = safeCallbackUrl(rawCallbackUrl);
+  const cookieCallbackUrl = cookieStore.get("auth-callback-url")?.value;
+  const callbackUrl =
+    safeCallbackUrl(queryCallbackUrl) ?? safeCallbackUrl(cookieCallbackUrl);
 
   if (shouldRedirectFromSetup(session.user)) {
     redirect(callbackUrl ?? "/dashboard");

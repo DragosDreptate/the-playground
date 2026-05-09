@@ -110,6 +110,7 @@
   "Common": {
     "loading": "Loading...",
     "error": "An error occurred",
+    "anonymousFallback": "Member",
     "back": "Back",
     "save": "Save",
     "cancel": "Cancel",

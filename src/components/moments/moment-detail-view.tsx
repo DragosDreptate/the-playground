@@ -13,7 +13,7 @@ import { CopyLinkButton } from "@/components/moments/copy-link-button";
 import { MomentShareButton } from "@/components/moments/moment-share-button";
 import { CommentThread } from "@/components/moments/comment-thread";
 import { getMomentGradient } from "@/lib/gradient";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import { computeAvatarStackMeta } from "@/lib/avatar-stack-meta";
 import type { Moment } from "@/domain/models/moment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
@@ -242,12 +242,13 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
       ? `https://maps.google.com/?q=${encodeURIComponent(moment.locationAddress)}`
       : null;
 
+  const anonymousFallback = tCommon("anonymousFallback");
   const registeredParticipants = registrations.filter((r) => r.status === "REGISTERED");
   const {
     visibleAvatars: visibleParticipantAvatars,
     metaText: participantsMetaText,
     metaMobileText: participantsMetaMobileText,
-  } = computeAvatarStackMeta(registeredParticipants, registeredCount, tCircle);
+  } = computeAvatarStackMeta(registeredParticipants, registeredCount, tCircle, { anonymousFallback });
 
   const circleHref = isHostView
     ? `/dashboard/circles/${props.circleSlug}`
@@ -334,7 +335,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </p>
                 <ul className="space-y-2">
                   {primaryHosts.map((h) => {
-                    const hostDisplayName = getDisplayName(h.user.firstName, h.user.lastName, h.user.email);
+                    const hostDisplayName = getPublicDisplayName(h.user.firstName, h.user.lastName, anonymousFallback);
                     const avatar = (
                       <UserAvatar
                         name={hostDisplayName}
@@ -559,7 +560,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       momentStartsAt={moment.startsAt}
                       triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
                     >
-                      <ParticipantAvatarStack participants={visibleParticipantAvatars} />
+                      <ParticipantAvatarStack
+                        participants={visibleParticipantAvatars}
+                        anonymousFallback={anonymousFallback}
+                      />
                       <span className="text-sm font-medium group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
                         <span className="lg:hidden">{participantsMetaMobileText}</span>
                         <span className="hidden lg:inline">{participantsMetaText}</span>
@@ -567,7 +571,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     </MomentRegistrationsDialog>
                   ) : (
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                      <ParticipantAvatarStack participants={visibleParticipantAvatars} />
+                      <ParticipantAvatarStack
+                        participants={visibleParticipantAvatars}
+                        anonymousFallback={anonymousFallback}
+                      />
                       <span className="text-sm font-medium">
                         <span className="lg:hidden">{participantsMetaMobileText}</span>
                         <span className="hidden lg:inline">{participantsMetaText}</span>

@@ -21,8 +21,9 @@ import { UserAvatar } from "@/components/user-avatar";
 import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
 import { compressCommentPhoto } from "@/lib/image-compress";
+import { handleOnboardingRequired } from "@/lib/onboarding";
 import { isCoarsePointer } from "@/lib/coarse-pointer";
-import { getDisplayName } from "@/lib/display-name";
+import { getPublicDisplayName } from "@/lib/display-name";
 import { linkifyText } from "@/lib/linkify";
 import {
   MAX_COMMENT_PHOTOS,
@@ -183,6 +184,7 @@ export function CommentThread({
 }: CommentThreadProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
+  const anonymousFallback = tCommon("anonymousFallback");
   const router = useRouter();
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -281,9 +283,10 @@ export function CommentThread({
         for (const p of stagedPhotos) URL.revokeObjectURL(p.previewUrl);
         setStagedPhotos([]);
         router.refresh();
-      } else {
-        setError(result.error);
+        return;
       }
+      if (handleOnboardingRequired(result, router)) return;
+      setError(result.error);
     });
   }
 
@@ -305,15 +308,16 @@ export function CommentThread({
             {comments.map((comment) => {
               const canDelete =
                 currentUserId === comment.user.id || isOrganizer;
+              const authorName = getPublicDisplayName(
+                comment.user.firstName,
+                comment.user.lastName,
+                anonymousFallback,
+              );
               return (
                 <div key={comment.id} className="flex gap-3">
                   {/* Avatar */}
                   <UserAvatar
-                    name={getDisplayName(
-                      comment.user.firstName,
-                      comment.user.lastName,
-                      comment.user.email
-                    )}
+                    name={authorName}
                     email={comment.user.email}
                     image={comment.user.image}
                     size="sm"
@@ -322,13 +326,7 @@ export function CommentThread({
                   {/* Content */}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline gap-2">
-                      <span className="text-sm font-medium">
-                        {getDisplayName(
-                          comment.user.firstName,
-                          comment.user.lastName,
-                          comment.user.email
-                        )}
-                      </span>
+                      <span className="text-sm font-medium">{authorName}</span>
                       <span className="text-muted-foreground text-xs" suppressHydrationWarning>
                         {formatRelativeTime(comment.createdAt)}
                       </span>

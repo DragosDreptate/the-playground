@@ -110,6 +110,7 @@
   "Common": {
     "loading": "Chargement...",
     "error": "Une erreur est survenue",
+    "anonymousFallback": "Membre",
     "back": "Retour",
     "save": "Enregistrer",
     "cancel": "Annuler",
