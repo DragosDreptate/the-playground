@@ -31,6 +31,7 @@ import { revalidatePath } from "next/cache";
 import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
+import { notifyAdminMomentUpdated } from "./notify-admin-moment-updated";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import {
@@ -124,6 +125,7 @@ export async function createMomentAction(
       if (!circle) return;
 
       const creator = await prismaUserRepository.findById(userId);
+      const ctx = buildMomentEmailContext(result.moment, DEFAULT_RECIPIENT_LOCALE);
       notifyAdminEntityCreated({
         entityType: "moment",
         entityName: result.moment.title,
@@ -133,6 +135,8 @@ export async function createMomentAction(
         creatorEmail: creator?.email ?? session.user.email ?? "",
         circleName: circle.name,
         circleSlug: circle.slug,
+        momentDate: ctx.momentDate,
+        locationText: ctx.locationText,
       }).catch(console.error);
     }).catch((err) => {
       console.error(err);
@@ -289,6 +293,29 @@ export async function updateMomentAction(
           Boolean(locationChanged),
           resolver
         ).catch((err) => Sentry.captureException(err));
+      }
+
+      // Les passages DRAFT → PUBLISHED sont couverts par la notif de création.
+      // Le filtre par email côté recipients exclut l'auteur s'il est admin.
+      if (existingMoment.status === "PUBLISHED") {
+        const titleChanged = title !== null && title.trim() !== existingMoment.title;
+        const capacityChanged = capacity !== undefined && capacity !== existingMoment.capacity;
+        const priceChanged = price !== undefined && price !== existingMoment.price;
+
+        const changedFields: string[] = [];
+        if (titleChanged) changedFields.push("Titre");
+        if (dateChanged) changedFields.push("Date");
+        if (locationChanged) changedFields.push("Lieu");
+        if (capacityChanged) changedFields.push("Capacité");
+        if (priceChanged) changedFields.push("Prix");
+
+        if (changedFields.length > 0) {
+          sendAdminMomentUpdatedNotification(
+            result.moment,
+            userId,
+            changedFields,
+          ).catch((err) => Sentry.captureException(err));
+        }
       }
     }
 
@@ -616,6 +643,36 @@ function sendMomentPublishedNotifications(
       console.error(err);
       Sentry.captureException(err);
     });
+}
+
+async function sendAdminMomentUpdatedNotification(
+  moment: Moment,
+  hostId: string,
+  changedFields: string[],
+): Promise<void> {
+  const [circle, host] = await Promise.all([
+    prismaCircleRepository.findById(moment.circleId),
+    prismaUserRepository.findById(hostId),
+  ]);
+  if (!circle) return;
+
+  const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
+  const hostEmail = host?.email ?? "";
+  const hostName = host
+    ? getDisplayName(host.firstName, host.lastName, hostEmail)
+    : "Organisateur";
+
+  await notifyAdminMomentUpdated({
+    momentTitle: moment.title,
+    momentSlug: moment.slug,
+    circleName: circle.name,
+    circleSlug: circle.slug,
+    hostName,
+    hostEmail,
+    momentDate: ctx.momentDate,
+    locationText: ctx.locationText,
+    changedFields,
+  });
 }
 
 export async function getMomentParticipantsPageAction(

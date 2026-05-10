@@ -21,8 +21,11 @@ export function AdminEntityCreatedEmail({
   creatorEmail,
   circleName,
   entityUrl,
+  momentDate,
+  locationText,
   strings,
 }: Props) {
+  const isMoment = entityType === "moment";
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
       <Text style={heading}>{strings.heading}</Text>
@@ -31,13 +34,25 @@ export function AdminEntityCreatedEmail({
 
       <Section style={infoCard}>
         <Text style={infoLabel}>
-          {entityType === "circle" ? "Communauté" : "Événement"}
+          {isMoment ? "Événement" : "Communauté"}
         </Text>
         <Text style={infoValue}>{entityName}</Text>
         {circleName && (
           <>
             <Text style={infoLabel}>Communauté</Text>
             <Text style={infoValue}>{circleName}</Text>
+          </>
+        )}
+        {isMoment && momentDate && (
+          <>
+            <Text style={infoLabel}>{strings.dateLabel}</Text>
+            <Text style={infoValue}>{momentDate}</Text>
+          </>
+        )}
+        {isMoment && locationText && (
+          <>
+            <Text style={infoLabel}>{strings.locationLabel}</Text>
+            <Text style={infoValue}>{locationText}</Text>
           </>
         )}
         <Text style={infoLabel}>Créé par</Text>

@@ -272,10 +272,38 @@ export type AdminEntityCreatedEmailData = {
   creatorEmail: string;
   circleName?: string; // Pour les moments : nom de la Communauté
   entityUrl: string;
+  // Pour les moments uniquement : date pré-formatée + lieu lisible
+  momentDate?: string;
+  locationText?: string;
   strings: {
     subject: string;
     heading: string;
     message: string;
+    ctaLabel: string;
+    footer: string;
+    dateLabel?: string;
+    locationLabel?: string;
+  };
+};
+
+export type AdminMomentUpdatedEmailData = {
+  to: string;
+  momentTitle: string;
+  circleName: string;
+  hostName: string;
+  hostEmail: string;
+  momentUrl: string;
+  momentDate: string;
+  locationText: string;
+  // Liste lisible des champs modifiés (ex: ["Date", "Lieu", "Capacité"])
+  changedFields: string[];
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    changesLabel: string;
+    dateLabel: string;
+    locationLabel: string;
     ctaLabel: string;
     footer: string;
   };
@@ -480,6 +508,7 @@ export interface EmailService {
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
   sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
+  sendAdminMomentUpdated(data: AdminMomentUpdatedEmailData): Promise<void>;
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
   sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;

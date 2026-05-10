@@ -45,6 +45,8 @@ export async function notifySlackNewEntity(params: {
   creatorEmail: string;
   circleName?: string;
   entityUrl: string;
+  momentDate?: string;
+  locationText?: string;
 }): Promise<void> {
   const isCircle = params.entityType === "circle";
   const icon = isCircle ? "🟣" : "📅";
@@ -52,6 +54,8 @@ export async function notifySlackNewEntity(params: {
 
   const bodyParts = [`*${params.entityName}*`, `Par ${params.creatorName} (${params.creatorEmail})`];
   if (params.circleName) bodyParts.push(`Communaute : ${params.circleName}`);
+  if (params.momentDate) bodyParts.push(`Date : ${params.momentDate}`);
+  if (params.locationText) bodyParts.push(`Lieu : ${params.locationText}`);
 
   await sendSlack({
     text: `${icon} ${label} — ${params.entityName}`,
@@ -59,6 +63,35 @@ export async function notifySlackNewEntity(params: {
       { type: "header", text: { type: "plain_text", text: `${icon} ${label}`, emoji: true } },
       { type: "section", text: { type: "mrkdwn", text: bodyParts.join("\n") } },
       { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans le dashboard" }, url: params.entityUrl }] },
+    ],
+  });
+}
+
+export async function notifySlackMomentUpdated(params: {
+  momentTitle: string;
+  circleName: string;
+  hostName: string;
+  hostEmail: string;
+  momentUrl: string;
+  momentDate: string;
+  locationText: string;
+  changedFields: string[];
+}): Promise<void> {
+  const bodyParts = [
+    `*${params.momentTitle}*`,
+    `Par ${params.hostName} (${params.hostEmail})`,
+    `Communaute : ${params.circleName}`,
+    `Date : ${params.momentDate}`,
+    `Lieu : ${params.locationText}`,
+  ];
+
+  await sendSlack({
+    text: `✏️ Evenement modifie — ${params.momentTitle}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "✏️ Evenement modifie", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: bodyParts.join("\n") } },
+      { type: "section", text: { type: "mrkdwn", text: `*Champs modifies*\n${params.changedFields.map((f) => `• ${f}`).join("\n")}` } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans le dashboard" }, url: params.momentUrl }] },
     ],
   });
 }

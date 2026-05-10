@@ -15,6 +15,9 @@ export type AdminEntityCreatedParams = {
   creatorEmail: string;
   circleName?: string; // Pour les moments
   circleSlug?: string; // Pour les moments
+  // Pour les moments uniquement
+  momentDate?: string;
+  locationText?: string;
 };
 
 export async function notifyAdminEntityCreated(
@@ -43,6 +46,8 @@ export async function notifyAdminEntityCreated(
     message: `${params.creatorName} vient de créer ${isCircle ? "une nouvelle Communauté" : "un nouvel événement"}.`,
     ctaLabel: `Voir ${isCircle ? "la Communauté" : "l'événement"} dans l'admin`,
     footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
+    dateLabel: "Date",
+    locationLabel: "Lieu",
   };
 
   if (isAdminEmailEnabled()) {
@@ -56,6 +61,8 @@ export async function notifyAdminEntityCreated(
           creatorEmail: params.creatorEmail,
           circleName: params.circleName,
           entityUrl,
+          momentDate: params.momentDate,
+          locationText: params.locationText,
           strings,
         })
       )
@@ -78,5 +85,7 @@ export async function notifyAdminEntityCreated(
     creatorEmail: params.creatorEmail,
     circleName: params.circleName,
     entityUrl,
+    momentDate: params.momentDate,
+    locationText: params.locationText,
   });
 }
