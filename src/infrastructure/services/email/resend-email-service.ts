@@ -15,6 +15,7 @@ import type {
   HostMomentCreatedEmailData,
   BroadcastMomentsBatchEmailData,
   AdminEntityCreatedEmailData,
+  AdminMomentUpdatedEmailData,
   CircleInvitationEmailData,
   CircleInvitationsBatchEmailData,
   AdminNewUserEmailData,
@@ -38,6 +39,7 @@ import { MomentCancelledEmail } from "./templates/moment-cancelled";
 import { HostMomentCreatedEmail } from "./templates/host-moment-created";
 import { BroadcastMomentEmail } from "./templates/broadcast-moment";
 import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
+import { AdminMomentUpdatedEmail } from "./templates/admin-moment-updated";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
 import { AdminNewUserEmail } from "./templates/admin-new-user";
 import { HostNewCircleMemberEmail } from "./templates/host-new-circle-member";
@@ -296,6 +298,15 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: AdminEntityCreatedEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendAdminMomentUpdated(data: AdminMomentUpdatedEmailData): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: AdminMomentUpdatedEmail({ ...data, baseUrl }),
       });
     },
 

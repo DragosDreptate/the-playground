@@ -13,6 +13,7 @@ import { NewMomentNotificationEmail } from "@/infrastructure/services/email/temp
 import { BroadcastMomentEmail } from "@/infrastructure/services/email/templates/broadcast-moment";
 import { CircleInvitationEmail } from "@/infrastructure/services/email/templates/circle-invitation";
 import { AdminEntityCreatedEmail } from "@/infrastructure/services/email/templates/admin-entity-created";
+import { AdminMomentUpdatedEmail } from "@/infrastructure/services/email/templates/admin-moment-updated";
 import { AdminNewUserEmail } from "@/infrastructure/services/email/templates/admin-new-user";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { RegistrationReminderEmail } from "@/infrastructure/services/email/templates/registration-reminder";
@@ -343,7 +344,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     },
     {
       id: "admin-entity-created",
-      label: "Admin — Nouvelle entité",
+      label: "Admin — Nouvelle entité (Communauté)",
       element: AdminEntityCreatedEmail({
         to: "admin@the-playground.fr",
         entityType: "circle",
@@ -355,6 +356,57 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
           subject: "Nouvelle Communauté créée : Paris Creative Tech",
           heading: "Nouvelle Communauté",
           message: "Bob Dupont vient de créer la Communauté Paris Creative Tech.",
+          ctaLabel: "Voir dans l'admin",
+          footer: FOOTER,
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "admin-entity-created-moment",
+      label: "Admin — Nouvel événement",
+      element: AdminEntityCreatedEmail({
+        to: "admin@the-playground.fr",
+        entityType: "moment",
+        entityName: "Soirée JS & Pizza",
+        creatorName: "Bob Dupont",
+        creatorEmail: "bob@example.com",
+        circleName: "Paris Creative Tech",
+        momentDate: "vendredi 21 mars 2026, 19:00",
+        locationText: "Le Cargo, 18 rue de la Paix, Paris",
+        entityUrl: `${BASE_URL}/dashboard/circles/paris-creative-tech/moments/soiree-js-pizza`,
+        strings: {
+          subject: "Nouvel événement créé : Soirée JS & Pizza",
+          heading: "Nouvel événement",
+          message: "Bob Dupont vient de créer un nouvel événement.",
+          ctaLabel: "Voir dans l'admin",
+          footer: FOOTER,
+          dateLabel: "Date",
+          locationLabel: "Lieu",
+        },
+        baseUrl: BASE_URL,
+      }),
+    },
+    {
+      id: "admin-moment-updated",
+      label: "Admin — Événement modifié",
+      element: AdminMomentUpdatedEmail({
+        to: "admin@the-playground.fr",
+        momentTitle: "Soirée JS & Pizza",
+        circleName: "Paris Creative Tech",
+        hostName: "Bob Dupont",
+        hostEmail: "bob@example.com",
+        momentUrl: `${BASE_URL}/dashboard/circles/paris-creative-tech/moments/soiree-js-pizza`,
+        momentDate: "vendredi 21 mars 2026, 19:00",
+        locationText: "Le Cargo, 18 rue de la Paix, Paris",
+        changedFields: ["Date", "Lieu", "Capacité"],
+        strings: {
+          subject: "[Admin] Événement modifié — Soirée JS & Pizza",
+          heading: "Événement modifié",
+          message: "Bob Dupont vient de modifier un événement publié.",
+          changesLabel: "Champs modifiés",
+          dateLabel: "Date",
+          locationLabel: "Lieu",
           ctaLabel: "Voir dans l'admin",
           footer: FOOTER,
         },
