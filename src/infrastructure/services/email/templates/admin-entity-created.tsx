@@ -45,13 +45,13 @@ export function AdminEntityCreatedEmail({
         )}
         {isMoment && momentDate && (
           <>
-            <Text style={infoLabel}>{strings.dateLabel ?? "Date"}</Text>
+            <Text style={infoLabel}>{strings.dateLabel}</Text>
             <Text style={infoValue}>{momentDate}</Text>
           </>
         )}
         {isMoment && locationText && (
           <>
-            <Text style={infoLabel}>{strings.locationLabel ?? "Lieu"}</Text>
+            <Text style={infoLabel}>{strings.locationLabel}</Text>
             <Text style={infoValue}>{locationText}</Text>
           </>
         )}

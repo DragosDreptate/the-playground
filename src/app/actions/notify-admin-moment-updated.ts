@@ -6,6 +6,7 @@ import {
   notifySlackMomentUpdated,
   isAdminEmailEnabled,
 } from "@/infrastructure/services/slack/slack-notification-service";
+import { getAppUrl } from "@/lib/app-url";
 
 const emailService = createResendEmailService();
 
@@ -14,7 +15,6 @@ export type AdminMomentUpdatedParams = {
   momentSlug: string;
   circleName: string;
   circleSlug: string;
-  hostId: string;
   hostName: string;
   hostEmail: string;
   momentDate: string;
@@ -28,13 +28,10 @@ export async function notifyAdminMomentUpdated(
   if (params.changedFields.length === 0) return;
 
   const adminEmails = await prismaUserRepository.findAdminEmails();
-
-  // Exclure l'auteur de la modification s'il est lui-même admin
   const recipients = adminEmails.filter((email) => email !== params.hostEmail);
   if (recipients.length === 0) return;
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const momentUrl = `${appUrl}/dashboard/circles/${params.circleSlug}/moments/${params.momentSlug}`;
+  const momentUrl = `${getAppUrl()}/dashboard/circles/${params.circleSlug}/moments/${params.momentSlug}`;
 
   const strings = {
     subject: `[Admin] Événement modifié — ${params.momentTitle}`,

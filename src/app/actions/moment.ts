@@ -295,11 +295,10 @@ export async function updateMomentAction(
         ).catch((err) => Sentry.captureException(err));
       }
 
-      // Notifier les admins si un événement publié a été modifié sur un champ significatif.
-      // On ne notifie pas pour les passages DRAFT → PUBLISHED (couverts par la notif de création)
-      // ni quand un admin agit lui-même sur l'événement d'un autre.
-      if (existingMoment.status === "PUBLISHED" && !isAdminUser(session)) {
-        const titleChanged = Boolean(title && title.trim() !== existingMoment.title);
+      // Les passages DRAFT → PUBLISHED sont couverts par la notif de création.
+      // Le filtre par email côté recipients exclut l'auteur s'il est admin.
+      if (existingMoment.status === "PUBLISHED") {
+        const titleChanged = title !== null && title.trim() !== existingMoment.title;
         const capacityChanged = capacity !== undefined && capacity !== existingMoment.capacity;
         const priceChanged = price !== undefined && price !== existingMoment.price;
 
@@ -658,19 +657,18 @@ async function sendAdminMomentUpdatedNotification(
   if (!circle) return;
 
   const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
-  const hostName =
-    [host?.firstName, host?.lastName].filter(Boolean).join(" ") ||
-    host?.email ||
-    "Organisateur";
+  const hostEmail = host?.email ?? "";
+  const hostName = host
+    ? getDisplayName(host.firstName, host.lastName, hostEmail)
+    : "Organisateur";
 
   await notifyAdminMomentUpdated({
     momentTitle: moment.title,
     momentSlug: moment.slug,
     circleName: circle.name,
     circleSlug: circle.slug,
-    hostId,
     hostName,
-    hostEmail: host?.email ?? "",
+    hostEmail,
     momentDate: ctx.momentDate,
     locationText: ctx.locationText,
     changedFields,
