@@ -1666,7 +1666,8 @@
         "photosLabel": "Photos dans les commentaires :",
         "photos1": "Vous pouvez <strong>ajouter jusqu'à 3 photos</strong> à chaque commentaire (JPG, PNG, WebP)",
         "photos2": "Les photos volumineuses sont <strong>automatiquement compressées</strong> pour un envoi rapide, même depuis un téléphone",
-        "photos3": "Cliquez sur une photo pour l'agrandir"
+        "photos3": "Cliquez sur une photo pour l'agrandir",
+        "contactNote": "Pour une question privée, utilisez le lien « Contacter l'organisateur » disponible sous la section organisateurs sur la page de l'événement ou de la communauté. Votre message est envoyé directement à l'organisateur par email, et il peut vous répondre en retour."
       },
       "mySpace": {
         "title": "Mon espace",
@@ -1761,7 +1762,8 @@
       },
       "contact": {
         "title": "Contacter vos participants",
-        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures."
+        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures.",
+        "inboundNote": "Les participants peuvent également vous envoyer un message privé via le lien « Contacter l'organisateur » affiché sur la page de l'événement ou de la communauté. Vous recevez ce message par email et pouvez répondre directement."
       },
       "editCancel": {
         "title": "Modifier ou annuler un événement",

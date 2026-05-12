@@ -322,6 +322,9 @@ export default async function HelpPage() {
                 <li>{t.rich("participant.comments.photos2", rich)}</li>
                 <li>{t("participant.comments.photos3")}</li>
               </ul>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("participant.comments.contactNote")}
+              </p>
             </div>
 
             <hr className="border-border" />
@@ -511,6 +514,9 @@ export default async function HelpPage() {
               <SectionH3 id="contactParticipants">{t("organizer.contact.title")}</SectionH3>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("organizer.contact.intro", rich)}
+              </p>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t("organizer.contact.inboundNote")}
               </p>
             </div>
 

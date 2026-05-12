@@ -1666,7 +1666,8 @@
         "photosLabel": "Photos in comments:",
         "photos1": "You can <strong>add up to 3 photos</strong> to each comment (JPG, PNG, WebP)",
         "photos2": "Large photos are <strong>automatically compressed</strong> for fast upload, even from a phone",
-        "photos3": "Click a photo to enlarge it"
+        "photos3": "Click a photo to enlarge it",
+        "contactNote": "For a private question, use the \"Contact the organizer\" link available under the organizers section on the event or community page. Your message is sent directly to the organizer by email, and they can reply to you in return."
       },
       "mySpace": {
         "title": "My Dashboard",
@@ -1761,7 +1762,8 @@
       },
       "contact": {
         "title": "Contact your members",
-        "intro": "From the event dashboard, the <strong>Invite my community</strong> button lets you send an email to all community members to invite them to the event. You can personalize the message. The same broadcast can only be resent after 24 hours."
+        "intro": "From the event dashboard, the <strong>Invite my community</strong> button lets you send an email to all community members to invite them to the event. You can personalize the message. The same broadcast can only be resent after 24 hours.",
+        "inboundNote": "Members can also send you a private message via the \"Contact the organizer\" link shown on the event or community page. You receive this message by email and can reply directly."
       },
       "editCancel": {
         "title": "Edit or cancel an event",
