@@ -1503,7 +1503,7 @@
       "emailHint": "Your email is used to sign in and cannot be changed.",
       "firstName": "First name",
       "firstNamePlaceholder": "Alice",
-      "lastName": "Last name",
+      "lastName": "Last name (optional)",
       "lastNamePlaceholder": "Dupont",
       "bio": "Bio",
       "bioPlaceholder": "Describe yourself in a few words...",
