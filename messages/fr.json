@@ -1489,6 +1489,11 @@
       "title": "Complétez votre profil",
       "description": "Dites-nous en un peu plus sur vous pour commencer."
     },
+    "inlineOnboarding": {
+      "title": "Juste votre prénom",
+      "description": "Il nous permet d'afficher votre inscription et vos commentaires sans interrompre votre parcours.",
+      "submit": "Continuer"
+    },
     "edit": {
       "title": "Mon profil",
       "description": "Gérez vos informations personnelles",

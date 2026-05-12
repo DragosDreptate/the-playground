@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import posthog from "posthog-js";
 import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InlineOnboardingDialog } from "@/components/profile/inline-onboarding-dialog";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
 import { handleOnboardingRequired } from "@/lib/onboarding";
 import { useTranslations } from "next-intl";
@@ -19,6 +20,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
   const router = useRouter();
   const [state, setState] = useState<"idle" | "joined" | "pending">("idle");
   const [isPending, startTransition] = useTransition();
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   function handleJoin() {
     startTransition(async () => {
@@ -29,7 +31,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
         router.refresh();
         return;
       }
-      handleOnboardingRequired(result, router);
+      handleOnboardingRequired(result, router, { onRequired: () => setShowOnboarding(true) });
     });
   }
 
@@ -52,15 +54,22 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
   }
 
   return (
-    <Button
-      variant="default"
-      size="sm"
-      onClick={handleJoin}
-      disabled={isPending}
-      className="w-full gap-2"
-    >
-      <Users className="size-4" />
-      {requiresApproval ? t("joinRequiresApproval") : t("join")}
-    </Button>
+    <>
+      <InlineOnboardingDialog
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onCompleted={handleJoin}
+      />
+      <Button
+        variant="default"
+        size="sm"
+        onClick={handleJoin}
+        disabled={isPending}
+        className="w-full gap-2"
+      >
+        <Users className="size-4" />
+        {requiresApproval ? t("joinRequiresApproval") : t("join")}
+      </Button>
+    </>
   );
 }

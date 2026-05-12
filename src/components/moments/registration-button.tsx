@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
+import { InlineOnboardingDialog } from "@/components/profile/inline-onboarding-dialog";
 import { Clock, LogOut } from "lucide-react";
 import {
   AlertDialog,
@@ -76,6 +77,28 @@ export function RegistrationButton({
     existingRegistration?.id ?? null
   );
   const [error, setError] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  function handleJoin() {
+    startTransition(async () => {
+      setError(null);
+      const result = await joinMomentAction(momentId);
+      if (result.success) {
+        setLocalStatus(result.data.status);
+        setLocalRegistrationId(result.data.id);
+        posthog.capture("moment_joined", {
+          moment_id: momentId,
+          circle_id: circleId,
+          circle_name: circleName,
+          registration_status: result.data.status,
+        });
+        router.refresh();
+        return;
+      }
+      if (handleOnboardingRequired(result, router, { onRequired: () => setShowOnboarding(true) })) return;
+      setError(result.error);
+    });
+  }
 
   // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
@@ -227,30 +250,16 @@ export function RegistrationButton({
   // Default: register or join waitlist
   return (
     <div className="space-y-2">
+      <InlineOnboardingDialog
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onCompleted={handleJoin}
+      />
       <Button
         className="w-full"
         size="sm"
         disabled={isPending}
-        onClick={() => {
-          startTransition(async () => {
-            setError(null);
-            const result = await joinMomentAction(momentId);
-            if (result.success) {
-              setLocalStatus(result.data.status);
-              setLocalRegistrationId(result.data.id);
-              posthog.capture("moment_joined", {
-                moment_id: momentId,
-                circle_id: circleId,
-                circle_name: circleName,
-                registration_status: result.data.status,
-              });
-              router.refresh();
-              return;
-            }
-            if (handleOnboardingRequired(result, router)) return;
-            setError(result.error);
-          });
-        }}
+        onClick={handleJoin}
       >
         {isPending
           ? tCommon("loading")

@@ -1489,6 +1489,11 @@
       "title": "Complete your profile",
       "description": "Tell us a bit about yourself to get started."
     },
+    "inlineOnboarding": {
+      "title": "Just your first name",
+      "description": "It lets us display your registration and comments without interrupting your flow.",
+      "submit": "Continue"
+    },
     "edit": {
       "title": "My profile",
       "description": "Manage your personal information",
