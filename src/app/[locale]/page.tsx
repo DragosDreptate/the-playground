@@ -122,7 +122,6 @@ export default async function HomePage() {
 
             {/* RIGHT — iPhone mockup illustration (desktop only) */}
             <div className="hidden shrink-0 justify-center lg:flex lg:w-[700px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/hero-phone.png"
                 alt="The Playground sur mobile"

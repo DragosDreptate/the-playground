@@ -1,6 +1,7 @@
 "use client";
 
 import * as Sentry from "@sentry/nextjs";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -25,12 +26,12 @@ export default function GlobalError({
             </p>
           </div>
           <div className="flex flex-col items-center gap-3">
-            <a
+            <Link
               href="/"
               className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               Retour à l&apos;accueil
-            </a>
+            </Link>
             <button
               onClick={reset}
               className="text-muted-foreground text-sm hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"

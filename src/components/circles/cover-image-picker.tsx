@@ -75,7 +75,6 @@ function PhotoGrid({
               isSelected ? "ring-2 ring-primary" : "hover:ring-2 hover:ring-primary/50"
             }`}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={photo.thumbUrl}
               alt={t("photoAlt", { name: photo.author.name })}
@@ -357,7 +356,6 @@ export function CoverImagePicker({
         aria-label={t("ariaModify")}
       >
         {showPreviewImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={previewImage}
             alt="Image de couverture"
@@ -506,7 +504,6 @@ export function CoverImagePicker({
 
               {uploadPreview ? (
                 <div className="relative overflow-hidden rounded-xl">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadPreview}
                     alt={t("previewAlt")}

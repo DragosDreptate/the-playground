@@ -22,7 +22,6 @@ export function ParticipantAvatarStack({
               style={{ background: getMomentGradient(r.user.email) }}
             >
               {r.user.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={r.user.image}
                   alt={displayName}

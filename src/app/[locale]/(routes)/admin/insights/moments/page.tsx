@@ -18,6 +18,7 @@ import {
 
 const PAGE_SIZE = 20;
 const BASE = "/admin/insights/moments";
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function statusVariant(status: string) {
   switch (status) {
@@ -39,6 +40,10 @@ function statusLabel(status: string) {
   }
 }
 
+function getSinceDate(days: number) {
+  return new Date(Date.now() - days * MS_PER_DAY);
+}
+
 type Props = {
   searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
 };
@@ -56,7 +61,7 @@ export default async function AdminInsightMomentsPage({ searchParams }: Props) {
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const since = getSinceDate(days);
 
   const [timeSeries, moments, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),
