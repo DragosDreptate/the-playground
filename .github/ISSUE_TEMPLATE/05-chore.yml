@@ -1,0 +1,39 @@
+name: Maintenance / documentation / infra
+description: Suivre une tâche de maintenance, documentation, CI, infra ou dette technique.
+title: ""
+labels:
+  - type:chore
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Problème
+      description: Décris la dette, le manque, le risque ou la tâche à traiter.
+      placeholder: Dette, manque, risque ou tâche à traiter.
+    validations:
+      required: true
+  - type: textarea
+    id: piste
+    attributes:
+      label: Piste
+      description: Indique l'approche envisagée, les fichiers concernés ou la commande à ajouter.
+      placeholder: Approche envisagée, fichiers concernés ou commande à ajouter.
+    validations:
+      required: false
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Ajoute une spec existante ou mets `—` si rien à ajouter.
+      placeholder: "—"
+    validations:
+      required: false
+  - type: textarea
+    id: validation
+    attributes:
+      label: Tests / Validation
+      description: Liste les vérifications attendues.
+      value: |
+        - [ ]
+    validations:
+      required: false

@@ -1,0 +1,64 @@
+name: Nouvelle fonctionnalité
+description: Proposer une nouvelle fonctionnalité produit ou plateforme.
+title: ""
+labels:
+  - type:feature
+body:
+  - type: textarea
+    id: contexte
+    attributes:
+      label: Contexte
+      description: Explique la situation actuelle, les utilisateurs concernés, et les limites observées.
+      placeholder: Situation actuelle, utilisateurs concernés, limites observées.
+    validations:
+      required: true
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Problème
+      description: Formule le besoin ou le problème utilisateur à résoudre.
+      placeholder: Besoin utilisateur ou problème à résoudre.
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: Idée
+      description: Décris le comportement cible et les grands choix de conception.
+      placeholder: Comportement cible et grands choix de conception.
+    validations:
+      required: true
+  - type: textarea
+    id: perimetre
+    attributes:
+      label: Périmètre V1
+      description: Liste les éléments inclus dans une première version livrable.
+      value: |
+        - [ ]
+    validations:
+      required: false
+  - type: textarea
+    id: hors_scope
+    attributes:
+      label: Hors scope
+      description: Note explicitement ce qui ne doit pas être traité dans cette issue.
+      placeholder: Ce qui ne doit pas être traité dans cette issue.
+    validations:
+      required: false
+  - type: textarea
+    id: risques
+    attributes:
+      label: Risques / Points d'attention
+      description: Ajoute les risques techniques, produit, données, sécurité ou UX.
+      placeholder: Risques techniques, produit, données, sécurité ou UX.
+    validations:
+      required: false
+  - type: textarea
+    id: validation
+    attributes:
+      label: Tests / Validation
+      description: Liste les scénarios à tester pour valider la fonctionnalité.
+      value: |
+        - [ ]
+    validations:
+      required: false
