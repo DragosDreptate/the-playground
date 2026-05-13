@@ -1,8 +1,6 @@
 name: Idée à qualifier
 description: Capturer une idée, une opportunité ou un spike avant cadrage.
-title: ""
-labels:
-  - type:idea
+labels: ["type:idea"]
 body:
   - type: textarea
     id: probleme

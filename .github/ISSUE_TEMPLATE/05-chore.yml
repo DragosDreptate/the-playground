@@ -1,8 +1,6 @@
 name: Maintenance / documentation / infra
 description: Suivre une tâche de maintenance, documentation, CI, infra ou dette technique.
-title: ""
-labels:
-  - type:chore
+labels: ["type:chore"]
 body:
   - type: textarea
     id: probleme

@@ -1,8 +1,6 @@
 name: Correction de bug
 description: Signaler un bug ou un comportement incorrect.
-title: ""
-labels:
-  - type:fix
+labels: ["type:fix"]
 body:
   - type: textarea
     id: probleme

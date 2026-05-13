@@ -1,8 +1,6 @@
 name: Évolution
 description: Faire évoluer une fonctionnalité existante.
-title: ""
-labels:
-  - type:evol
+labels: ["type:evol"]
 body:
   - type: textarea
     id: contexte
