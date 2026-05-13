@@ -1,0 +1,39 @@
+name: Idée à qualifier
+description: Capturer une idée, une opportunité ou un spike avant cadrage.
+title: ""
+labels:
+  - type:idea
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Problème ou opportunité
+      description: Décris l'idée, le signal observé, ou l'opportunité à explorer.
+      placeholder: Idée, signal observé, ou opportunité à explorer.
+    validations:
+      required: true
+  - type: textarea
+    id: piste
+    attributes:
+      label: Piste
+      description: Ajoute les hypothèses, benchmarks, options ou recherches à mener.
+      placeholder: Hypothèses, benchmarks, options ou recherches à mener.
+    validations:
+      required: false
+  - type: textarea
+    id: questions
+    attributes:
+      label: Questions ouvertes
+      description: Liste les décisions ou inconnues à clarifier avant implémentation.
+      value: |
+        1.
+    validations:
+      required: false
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Ajoute une spec existante, `à créer`, ou `—`.
+      placeholder: "—"
+    validations:
+      required: false

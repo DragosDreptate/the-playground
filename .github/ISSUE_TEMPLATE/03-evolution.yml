@@ -1,0 +1,64 @@
+name: Évolution
+description: Faire évoluer une fonctionnalité existante.
+title: ""
+labels:
+  - type:evol
+body:
+  - type: textarea
+    id: contexte
+    attributes:
+      label: Contexte
+      description: Décris le comportement actuel et les surfaces concernées.
+      placeholder: Comportement actuel et surfaces concernées.
+    validations:
+      required: true
+  - type: textarea
+    id: objectif
+    attributes:
+      label: Objectif
+      description: Décris le résultat attendu pour l'utilisateur ou l'équipe.
+      placeholder: Résultat attendu pour l'utilisateur ou l'équipe.
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: Idée
+      description: Décris l'évolution envisagée et les principaux choix d'UX ou d'implémentation.
+      placeholder: Évolution envisagée et principaux choix d'UX ou d'implémentation.
+    validations:
+      required: false
+  - type: textarea
+    id: a_cadrer
+    attributes:
+      label: À cadrer
+      description: Liste les décisions ou inconnues à clarifier avant implémentation.
+      placeholder: Décisions à prendre, arbitrages ou inconnues à clarifier.
+    validations:
+      required: false
+  - type: textarea
+    id: benefice
+    attributes:
+      label: Bénéfice attendu
+      description: Explique pourquoi cette évolution vaut l'effort.
+      placeholder: Impact attendu pour les utilisateurs, l'équipe ou la plateforme.
+    validations:
+      required: false
+  - type: textarea
+    id: perimetre
+    attributes:
+      label: Périmètre
+      description: Liste les écrans, workflows, composants ou comportements concernés.
+      value: |
+        - [ ]
+    validations:
+      required: false
+  - type: textarea
+    id: validation
+    attributes:
+      label: Tests / Validation
+      description: Liste les vérifications attendues.
+      value: |
+        - [ ]
+    validations:
+      required: false

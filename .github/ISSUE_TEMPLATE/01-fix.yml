@@ -1,0 +1,47 @@
+name: Correction de bug
+description: Signaler un bug ou un comportement incorrect.
+title: ""
+labels:
+  - type:fix
+body:
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Problème
+      description: Décris le bug, son impact utilisateur ou technique, et les surfaces concernées.
+      placeholder: Le comportement observé, l'impact et les surfaces concernées.
+    validations:
+      required: true
+  - type: textarea
+    id: observations
+    attributes:
+      label: Reproduction / observations
+      description: Ajoute les étapes, captures, liens, logs ou contexte utile pour reproduire ou diagnostiquer.
+      placeholder: Étapes, captures, liens, logs ou contexte utile.
+    validations:
+      required: false
+  - type: textarea
+    id: piste
+    attributes:
+      label: Piste
+      description: Indique la cause probable, les fichiers à auditer, ou l'approche de correction envisagée.
+      placeholder: Cause probable, fichiers à auditer, ou approche envisagée.
+    validations:
+      required: false
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec
+      description: Ajoute une spec existante ou note les décisions attendues. Mets `—` si rien à ajouter.
+      placeholder: "—"
+    validations:
+      required: false
+  - type: textarea
+    id: validation
+    attributes:
+      label: Tests / Validation
+      description: Liste les vérifications attendues pour considérer le bug corrigé.
+      value: |
+        - [ ]
+    validations:
+      required: false
