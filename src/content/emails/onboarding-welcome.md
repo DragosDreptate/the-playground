@@ -9,11 +9,11 @@ signature: — Dragos
 signatureSubline: Fondateur de The Playground
 footer: Tu reçois cet email car tu as créé un compte sur The Playground.
 ---
-Merci d'avoir rejoint The Playground. J'aimerais te dire ce qu'il y a derrière ce projet, parce que maintenant tu en fais partie.
+Il y a quelque chose que j'aimerais partager avec toi.
 
-Tu as sûrement déjà fait partie de communautés qui comptaient pour toi. Derrière chacune, il y a une personne ou une équipe qui l'anime. Et qui se bat souvent avec des outils qui jouent contre elle. Meetup leur facture l'accès à leur propre communauté, et garde leur audience en otage s'ils veulent partir. Luma fait de belles pages, mais oublie tout d'un événement à l'autre.
+J'ai construit The Playground parce que j'en avais marre de voir des organisateurs se faire plumer. Meetup qui facture des abonnements pour accéder à sa propre communauté. Luma, élégant mais sans mémoire, chaque événement repart de zéro, aucun lien qui dure.
 
-Les gens qui animent des communautés font quelque chose d'utile. Ils méritent un outil à la hauteur : gratuit, français, au code ouvert, où les communautés qu'ils animent restent les leurs.
+Les gens qui animent des communautés font quelque chose d'utile. Ils méritent un outil à la hauteur: gratuit, français, au code ouvert, où les communautés qu'ils animent restent les leurs.
 
 C'est ça, The Playground. Rien de plus, rien de moins.
 
