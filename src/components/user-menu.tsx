@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   Compass,
@@ -13,14 +13,14 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { signOut } from "next-auth/react";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
 import { cn } from "@/lib/utils";
+import { useLocaleSwitcher } from "@/lib/use-locale-switcher";
 
 type UserMenuProps = {
   user: {
@@ -85,10 +86,10 @@ export function UserMenu({ user }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
         )}
-        <div className="md:hidden">
-          <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="md:hidden" />
+        <DropdownMenuGroup className="md:hidden">
           <PreferencesBlock />
-        </div>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
@@ -109,10 +110,10 @@ function PreferencesBlock() {
   return (
     <>
       <PreferenceRow icon={Globe} label={t("language")}>
-        <LocaleSegmented />
+        <LocaleSegmented ariaLabel={t("language")} />
       </PreferenceRow>
       <PreferenceRow icon={Sun} label={t("theme")}>
-        <ThemeSegmented lightLabel={t("light")} darkLabel={t("dark")} />
+        <ThemeSegmented ariaLabel={t("theme")} />
       </PreferenceRow>
     </>
   );
@@ -138,25 +139,16 @@ function PreferenceRow({
   );
 }
 
-function LocaleSegmented() {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
-
+function LocaleSegmented({ ariaLabel }: { ariaLabel: string }) {
+  const { locale, locales, switchLocale, isPending } = useLocaleSwitcher();
   return (
-    <SegmentedGroup ariaLabel="Locale">
-      {routing.locales.map((l) => (
+    <SegmentedGroup ariaLabel={ariaLabel}>
+      {locales.map((l) => (
         <SegmentedButton
           key={l}
           active={l === locale}
           disabled={isPending}
-          onClick={() => {
-            if (l === locale) return;
-            startTransition(() => {
-              router.replace(pathname, { locale: l });
-            });
-          }}
+          onClick={() => switchLocale(l)}
         >
           {l.toUpperCase()}
         </SegmentedButton>
@@ -165,7 +157,8 @@ function LocaleSegmented() {
   );
 }
 
-function ThemeSegmented({ lightLabel, darkLabel }: { lightLabel: string; darkLabel: string }) {
+function ThemeSegmented({ ariaLabel }: { ariaLabel: string }) {
+  const t = useTranslations("UserMenu.preferences");
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -176,17 +169,17 @@ function ThemeSegmented({ lightLabel, darkLabel }: { lightLabel: string; darkLab
   const current = mounted ? theme : undefined;
 
   return (
-    <SegmentedGroup ariaLabel="Theme">
+    <SegmentedGroup ariaLabel={ariaLabel}>
       <SegmentedButton
         active={current === "light"}
-        ariaLabel={lightLabel}
+        ariaLabel={t("light")}
         onClick={() => setTheme("light")}
       >
         <Sun className="size-3.5" />
       </SegmentedButton>
       <SegmentedButton
         active={current === "dark"}
-        ariaLabel={darkLabel}
+        ariaLabel={t("dark")}
         onClick={() => setTheme("dark")}
       >
         <Moon className="size-3.5" />
