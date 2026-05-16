@@ -1,8 +1,6 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,8 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Globe } from "lucide-react";
-import { useTransition } from "react";
+import { useLocaleSwitcher } from "@/lib/use-locale-switcher";
 
 const localeLabels: Record<string, { short: string; full: string }> = {
   fr: { short: "FR", full: "Français" },
@@ -19,16 +16,7 @@ const localeLabels: Record<string, { short: string; full: string }> = {
 };
 
 export function LocaleToggle() {
-  const locale = useLocale();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isPending, startTransition] = useTransition();
-
-  function switchLocale(nextLocale: string) {
-    startTransition(() => {
-      router.replace(pathname, { locale: nextLocale });
-    });
-  }
+  const { locale, locales, switchLocale, isPending } = useLocaleSwitcher();
 
   return (
     <DropdownMenu>
@@ -39,7 +27,7 @@ export function LocaleToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {routing.locales.map((l) => (
+        {locales.map((l) => (
           <DropdownMenuItem
             key={l}
             onClick={() => switchLocale(l)}

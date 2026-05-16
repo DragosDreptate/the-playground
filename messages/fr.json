@@ -291,7 +291,7 @@
     "hostTools": "Outils organisateur",
     "greeting": "Bonjour, {name}",
     "greetingAnonymous": "Bonjour",
-    "greetingSubtitle": "Voici ce qui se passe dans vos communautés.",
+    "greetingSubtitle": "Vos événements et vos communautés, en un coup d'œil.",
     "memberCount": "{count} membres",
     "filterAll": "Tous",
     "filterHostOnly": "Organisateur"
@@ -1010,7 +1010,13 @@
   "UserMenu": {
     "dashboard": "Mon espace",
     "profile": "Profil",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "preferences": {
+      "language": "Langue",
+      "theme": "Thème",
+      "light": "Mode clair",
+      "dark": "Mode sombre"
+    }
   },
   "Email": {
     "coHostPromoted": {

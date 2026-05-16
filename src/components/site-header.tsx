@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { LocaleToggle } from "@/components/locale-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { MobileNav } from "@/components/mobile-nav";
-import { Compass, LayoutDashboard } from "lucide-react";
+import { Compass, LayoutDashboard, LogIn } from "lucide-react";
 
 export function SiteHeader() {
   const { data: session } = useSession();
@@ -31,6 +31,8 @@ export function SiteHeader() {
     );
   }, []);
 
+  const signInHref = `/auth/sign-in?callbackUrl=${encodeURIComponent(fullPathname)}`;
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
@@ -41,10 +43,10 @@ export function SiteHeader() {
               <polygon points="0,0 0,12 10,6" fill="white" />
             </svg>
           </div>
-          <span className="text-[15px] font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
+          <span className="hidden text-[15px] font-extrabold tracking-[-0.4px] md:inline">the&thinsp;<span className="text-primary">playground</span></span>
         </Link>
 
-        {/* Nav — center (desktop only) */}
+        {/* Nav — center (desktop) */}
         <nav className="hidden flex-1 items-center justify-center gap-6 md:flex">
           <Link
             href="/explorer"
@@ -64,8 +66,8 @@ export function SiteHeader() {
           )}
         </nav>
 
-        {/* Spacer for mobile (pushes actions to the right) */}
-        <div className="flex-1 md:hidden" />
+        {/* Nav — center (mobile) */}
+        <MobileNav isAuthenticated={!!user} dashboardHref={dashboardHref} />
 
         {/* Actions — right */}
         <div className="flex shrink-0 items-center gap-2">
@@ -76,11 +78,17 @@ export function SiteHeader() {
           {user ? (
             <UserMenu user={user} />
           ) : (
-            <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
-              <Link href={`/auth/sign-in?callbackUrl=${encodeURIComponent(fullPathname)}`}>{t("signIn.title")}</Link>
-            </Button>
+            <>
+              <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
+                <Link href={signInHref}>{t("signIn.title")}</Link>
+              </Button>
+              <Button variant="ghost" size="icon" asChild className="md:hidden">
+                <Link href={signInHref} aria-label={t("signIn.title")}>
+                  <LogIn className="size-5" />
+                </Link>
+              </Button>
+            </>
           )}
-          <MobileNav isAuthenticated={!!user} dashboardHref={dashboardHref} />
         </div>
       </div>
     </header>

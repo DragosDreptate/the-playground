@@ -2,18 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { usePathname as useFullPathname } from "next/navigation";
-import { Menu, Compass, LayoutDashboard, LogIn } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { LocaleToggle } from "@/components/locale-toggle";
+import { Compass, LayoutDashboard, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type MobileNavProps = {
   isAuthenticated: boolean;
@@ -23,48 +13,58 @@ type MobileNavProps = {
 export function MobileNav({ isAuthenticated, dashboardHref = "/dashboard" }: MobileNavProps) {
   const tExplorer = useTranslations("Explorer");
   const tDashboard = useTranslations("Dashboard");
-  const tAuth = useTranslations("Auth");
   const pathname = usePathname();
-  const fullPathname = useFullPathname();
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="md:hidden">
-          <Menu className="size-5" />
-          <span className="sr-only">Menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        {isAuthenticated ? (
-          <>
-            <DropdownMenuItem asChild>
-              <Link href="/explorer" className={`cursor-pointer ${pathname.startsWith("/explorer") ? "text-foreground font-medium" : ""}`}>
-                <Compass className="mr-2 size-4" />
-                {tExplorer("navLink")}
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={dashboardHref} className={`cursor-pointer ${pathname.startsWith("/dashboard") ? "text-foreground font-medium" : ""}`}>
-                <LayoutDashboard className="mr-2 size-4" />
-                {tDashboard("title")}
-              </Link>
-            </DropdownMenuItem>
-          </>
-        ) : (
-          <DropdownMenuItem asChild>
-            <Link href={`/auth/sign-in?callbackUrl=${encodeURIComponent(fullPathname)}`} className="cursor-pointer">
-              <LogIn className="mr-2 size-4" />
-              {tAuth("signIn.title")}
-            </Link>
-          </DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
-        <div className="flex items-center justify-between px-2 py-1.5">
-          <LocaleToggle />
-          <ThemeToggle />
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <nav className="flex flex-1 items-center justify-center gap-1 md:hidden">
+      <MobileNavItem
+        href="/explorer"
+        icon={Compass}
+        label={tExplorer("navLink")}
+        active={pathname.startsWith("/explorer")}
+      />
+      {isAuthenticated && (
+        <MobileNavItem
+          href={dashboardHref}
+          icon={LayoutDashboard}
+          label={tDashboard("title")}
+          active={pathname.startsWith("/dashboard")}
+        />
+      )}
+    </nav>
+  );
+}
+
+function MobileNavItem({
+  href,
+  icon: Icon,
+  label,
+  active,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "relative flex size-11 items-center justify-center rounded-md transition-colors",
+        active
+          ? "text-foreground"
+          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+      )}
+    >
+      <Icon className="size-5" />
+      {active && (
+        <span
+          aria-hidden
+          className="bg-primary absolute bottom-1.5 size-1 rounded-full"
+        />
+      )}
+    </Link>
   );
 }
