@@ -32,6 +32,7 @@ export type Moment = {
   id: string;
   slug: string;
   circleId: string;
+  circleVenueId: string | null;
   createdById: string | null;
   title: string;
   description: string;

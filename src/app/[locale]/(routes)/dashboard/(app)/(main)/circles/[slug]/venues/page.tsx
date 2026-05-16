@@ -1,17 +1,19 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaCircleRepository,
   prismaCircleVenueRepository,
 } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
+import { listCircleVenues } from "@/domain/usecases/list-circle-venues";
 import { CircleNotFoundError } from "@/domain/errors";
-import { MomentForm } from "@/components/moments/moment-form";
-import { createMomentAction } from "@/app/actions/moment";
+import { CircleVenueManager } from "@/components/circles/circle-venue-manager";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 
-export default async function NewMomentPage({
+export default async function CircleVenuesPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -30,11 +32,22 @@ export default async function NewMomentPage({
     throw error;
   }
 
-  const boundAction = createMomentAction.bind(null, circle.id);
-  const venues = await prismaCircleVenueRepository.findByCircleId(circle.id);
+  const session = await auth();
+  if (!session?.user?.id) {
+    notFound();
+  }
+
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+  const venues = await listCircleVenues(
+    { circleId: circle.id, userId: session.user.id },
+    {
+      circleRepository: circleRepo,
+      circleVenueRepository: prismaCircleVenueRepository,
+    }
+  );
 
   const tDashboard = await getTranslations("Dashboard");
-  const tMoment = await getTranslations("Moment");
+  const tVenues = await getTranslations("Circle.venues");
 
   return (
     <div className="space-y-6">
@@ -51,10 +64,15 @@ export default async function NewMomentPage({
         </Link>
         <ChevronRight className="size-3.5" />
         <span className="text-foreground truncate font-medium">
-          {tMoment("create.title")}
+          {tVenues("title")}
         </span>
       </div>
-      <MomentForm circleSlug={slug} circleName={circle.name} circleDescription={circle.description ?? undefined} circleCoverImage={circle.coverImage} stripeConnectActive={!!circle.stripeConnectAccountId} venues={venues} action={boundAction} />
+
+      <CircleVenueManager
+        circleId={circle.id}
+        circleSlug={circle.slug}
+        venues={venues}
+      />
     </div>
   );
 }

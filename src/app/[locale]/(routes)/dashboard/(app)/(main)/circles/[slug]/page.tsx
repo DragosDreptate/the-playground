@@ -220,16 +220,21 @@ export default async function CircleDetailPage({
           {/* Séparateur — desktop uniquement */}
           <div className="border-border border-t max-lg:hidden" />
 
-          {/* Actions Organisateur — Modifier + Supprimer (Supprimer réservé au HOST) */}
+          {/* Actions Organisateur — Lieux + Modifier + Supprimer (Supprimer réservé au HOST) */}
           {isOrganizer && (
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild size="sm" variant="outline" className="flex-1">
+                <Link href={`/dashboard/circles/${circle.slug}/venues`}>
+                  {t("venues.nav")}
+                </Link>
+              </Button>
               <Button asChild size="sm" className="flex-1">
                 <Link href={`/dashboard/circles/${circle.slug}/edit`}>
                   {tCommon("edit")}
                 </Link>
               </Button>
               {membership.role === "HOST" && (
-                <DeleteCircleDialog circleId={circle.id} triggerClassName="flex-1" />
+                <DeleteCircleDialog circleId={circle.id} triggerClassName="col-span-2" />
               )}
             </div>
           )}

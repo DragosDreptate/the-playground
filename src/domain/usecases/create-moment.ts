@@ -2,8 +2,10 @@ import type { Moment, LocationType, CoverImageAttribution } from "@/domain/model
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { CircleVenueRepository } from "@/domain/ports/repositories/circle-venue-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import {
+  CircleVenueNotFoundError,
   MomentSlugAlreadyExistsError,
   MomentPastDateError,
   UnauthorizedMomentActionError,
@@ -22,6 +24,7 @@ type CreateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt: Date;
   endsAt: Date | null;
+  circleVenueId?: string | null;
   locationType: LocationType;
   locationName: string | null;
   locationAddress: string | null;
@@ -36,6 +39,7 @@ type CreateMomentInput = {
 type CreateMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
+  circleVenueRepository?: CircleVenueRepository;
   registrationRepository: RegistrationRepository;
 };
 
@@ -80,6 +84,13 @@ export async function createMoment(
     throw new MomentPastDateError();
   }
 
+  if (input.locationType !== "ONLINE" && input.circleVenueId) {
+    const venue = await deps.circleVenueRepository?.findById(input.circleVenueId);
+    if (!venue || venue.circleId !== input.circleId) {
+      throw new CircleVenueNotFoundError(input.circleVenueId);
+    }
+  }
+
   let slug = generateSlug(input.title);
 
   if (await momentRepository.slugExists(slug)) {
@@ -101,9 +112,10 @@ export async function createMoment(
     coverImageAttribution: input.coverImageAttribution,
     startsAt: input.startsAt,
     endsAt: input.endsAt,
+    circleVenueId: input.locationType === "ONLINE" ? null : input.circleVenueId ?? null,
     locationType: input.locationType,
-    locationName: input.locationName,
-    locationAddress: input.locationAddress,
+    locationName: input.locationType === "ONLINE" ? null : input.locationName,
+    locationAddress: input.locationType === "ONLINE" ? null : input.locationAddress,
     videoLink: input.videoLink,
     capacity: input.capacity,
     price: input.price,

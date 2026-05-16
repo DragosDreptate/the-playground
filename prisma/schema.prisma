@@ -193,6 +193,7 @@ model Circle {
 
   memberships   CircleMembership[]
   moments       Moment[]
+  venues        CircleVenue[]
   networks      CircleNetworkMembership[]
 
   // Index composite (visibility, category) : utilisé dans getPublicCircles (explorer)
@@ -227,10 +228,26 @@ model CircleMembership {
   @@map("circle_memberships")
 }
 
+model CircleVenue {
+  id        String   @id @default(cuid())
+  circleId  String
+  name      String
+  address   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  circle  Circle   @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  moments Moment[]
+
+  @@index([circleId])
+  @@map("circle_venues")
+}
+
 model Moment {
   id                    String       @id @default(cuid())
   slug                  String       @unique
   circleId              String
+  circleVenueId         String?
   createdById           String?
   title                 String
   description           String       @db.Text
@@ -258,6 +275,7 @@ model Moment {
   updatedAt DateTime @updatedAt
 
   circle    Circle @relation(fields: [circleId], references: [id], onDelete: Cascade)
+  circleVenue CircleVenue? @relation(fields: [circleVenueId], references: [id], onDelete: SetNull)
   createdBy User?  @relation("CreatedMoments", fields: [createdById], references: [id], onDelete: SetNull)
 
   registrations Registration[]
@@ -266,6 +284,7 @@ model Moment {
 
   // Index sur circleId : utilisé dans findByCircleId, getCircleMoments
   @@index([circleId])
+  @@index([circleVenueId])
   // Index composite (status, startsAt) : utilisé dans findPublicUpcoming, transitionPastMoments, explorer
   @@index([status, startsAt])
   // Index sur (circleId, status) : utilisé dans findPublic (circles avec moments à venir)
@@ -417,4 +436,3 @@ model SiteSettings {
 
   @@map("site_settings")
 }
-

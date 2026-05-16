@@ -1,6 +1,7 @@
 export { DomainError } from "./domain-error";
 export {
   CircleNotFoundError,
+  CircleVenueNotFoundError,
   SlugAlreadyExistsError,
   UnauthorizedCircleActionError,
   CannotLeaveAsHostError,

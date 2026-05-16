@@ -6,6 +6,7 @@ import type { PublicMomentRegistration, UserAvatarInfo } from "@/domain/models/u
 export type CreateMomentInput = {
   slug: string;
   circleId: string;
+  circleVenueId?: string | null;
   createdById: string;
   title: string;
   description: string;
@@ -32,6 +33,7 @@ export type UpdateMomentInput = {
   coverImageAttribution?: CoverImageAttribution | null;
   startsAt?: Date;
   endsAt?: Date | null;
+  circleVenueId?: string | null;
   locationType?: LocationType;
   locationName?: string | null;
   locationAddress?: string | null;

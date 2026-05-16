@@ -8,6 +8,7 @@ import {
   prismaRegistrationRepository,
   prismaUserRepository,
   prismaMomentAttachmentRepository,
+  prismaCircleVenueRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
@@ -58,6 +59,7 @@ export async function createMomentAction(
   const startsAtRaw = formData.get("startsAt") as string;
   const endsAtRaw = formData.get("endsAt") as string | null;
   const locationType = (formData.get("locationType") as LocationType) ?? "IN_PERSON";
+  const circleVenueId = (formData.get("circleVenueId") as string) || null;
   const locationName = (formData.get("locationName") as string) || null;
   const locationAddress = (formData.get("locationAddress") as string) || null;
   const videoLink = (formData.get("videoLink") as string) || null;
@@ -103,6 +105,7 @@ export async function createMomentAction(
         ...coverData,
         startsAt,
         endsAt,
+        circleVenueId,
         locationType,
         locationName,
         locationAddress,
@@ -116,6 +119,7 @@ export async function createMomentAction(
       {
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
+        circleVenueRepository: prismaCircleVenueRepository,
         registrationRepository: prismaRegistrationRepository,
       }
     );
@@ -194,6 +198,7 @@ export async function updateMomentAction(
   const startsAtRaw = formData.get("startsAt") as string;
   const endsAtRaw = formData.get("endsAt") as string | null;
   const locationType = formData.get("locationType") as LocationType | null;
+  const circleVenueId = formData.get("circleVenueId") as string | null;
   const locationName = formData.get("locationName") as string | null;
   const locationAddress = formData.get("locationAddress") as string | null;
   const videoLink = formData.get("videoLink") as string | null;
@@ -244,6 +249,7 @@ export async function updateMomentAction(
         ...coverData,
         ...(!isPastMoment && startsAtRaw && { startsAt: new Date(startsAtRaw) }),
         ...(!isPastMoment && endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
+        ...(circleVenueId !== undefined && { circleVenueId: circleVenueId || null }),
         ...(locationType && { locationType }),
         ...(locationName !== undefined && { locationName: locationName || null }),
         ...(locationAddress !== undefined && { locationAddress: locationAddress || null }),
@@ -258,6 +264,7 @@ export async function updateMomentAction(
       {
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
+        circleVenueRepository: prismaCircleVenueRepository,
         registrationRepository: prismaRegistrationRepository,
       }
     );
