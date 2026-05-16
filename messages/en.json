@@ -1010,7 +1010,13 @@
   "UserMenu": {
     "dashboard": "Dashboard",
     "profile": "Profile",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "preferences": {
+      "language": "Language",
+      "theme": "Theme",
+      "light": "Light mode",
+      "dark": "Dark mode"
+    }
   },
   "Email": {
     "coHostPromoted": {

@@ -1,9 +1,23 @@
 "use client";
 
-import { LayoutDashboard, LogOut, User, Shield } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { useEffect, useState, useTransition } from "react";
+import {
+  ChevronDown,
+  Compass,
+  Globe,
+  LayoutDashboard,
+  LogOut,
+  Moon,
+  Shield,
+  Sun,
+  User,
+  type LucideIcon,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 import { signOut } from "next-auth/react";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserAvatar } from "@/components/user-avatar";
-import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type UserMenuProps = {
   user: {
@@ -26,6 +40,7 @@ type UserMenuProps = {
 
 export function UserMenu({ user }: UserMenuProps) {
   const t = useTranslations("UserMenu");
+  const tExplorer = useTranslations("Explorer");
   const email = user.email ?? "";
 
   return (
@@ -34,7 +49,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <UserAvatar name={user.name} email={email} image={user.image} size="sm" />
         <ChevronDown className="text-muted-foreground h-3.5 w-3.5" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col gap-1">
             {user.name && (
@@ -44,6 +59,12 @@ export function UserMenu({ user }: UserMenuProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild className="md:hidden">
+          <Link href="/explorer" className="cursor-pointer">
+            <Compass className="mr-2 h-4 w-4" />
+            {tExplorer("navLink")}
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="cursor-pointer">
             <LayoutDashboard className="mr-2 h-4 w-4" />
@@ -64,6 +85,10 @@ export function UserMenu({ user }: UserMenuProps) {
             </Link>
           </DropdownMenuItem>
         )}
+        <div className="md:hidden">
+          <DropdownMenuSeparator />
+          <PreferencesBlock />
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
@@ -76,5 +101,147 @@ export function UserMenu({ user }: UserMenuProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+function PreferencesBlock() {
+  const t = useTranslations("UserMenu.preferences");
+  return (
+    <>
+      <PreferenceRow icon={Globe} label={t("language")}>
+        <LocaleSegmented />
+      </PreferenceRow>
+      <PreferenceRow icon={Sun} label={t("theme")}>
+        <ThemeSegmented lightLabel={t("light")} darkLabel={t("dark")} />
+      </PreferenceRow>
+    </>
+  );
+}
+
+function PreferenceRow({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: LucideIcon;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2 px-2 py-1.5">
+      <span className="flex items-center gap-2 text-sm">
+        <Icon className="text-muted-foreground size-4" />
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function LocaleSegmented() {
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  return (
+    <SegmentedGroup ariaLabel="Locale">
+      {routing.locales.map((l) => (
+        <SegmentedButton
+          key={l}
+          active={l === locale}
+          disabled={isPending}
+          onClick={() => {
+            if (l === locale) return;
+            startTransition(() => {
+              router.replace(pathname, { locale: l });
+            });
+          }}
+        >
+          {l.toUpperCase()}
+        </SegmentedButton>
+      ))}
+    </SegmentedGroup>
+  );
+}
+
+function ThemeSegmented({ lightLabel, darkLabel }: { lightLabel: string; darkLabel: string }) {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const current = mounted ? theme : undefined;
+
+  return (
+    <SegmentedGroup ariaLabel="Theme">
+      <SegmentedButton
+        active={current === "light"}
+        ariaLabel={lightLabel}
+        onClick={() => setTheme("light")}
+      >
+        <Sun className="size-3.5" />
+      </SegmentedButton>
+      <SegmentedButton
+        active={current === "dark"}
+        ariaLabel={darkLabel}
+        onClick={() => setTheme("dark")}
+      >
+        <Moon className="size-3.5" />
+      </SegmentedButton>
+    </SegmentedGroup>
+  );
+}
+
+function SegmentedGroup({
+  ariaLabel,
+  children,
+}: {
+  ariaLabel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      className="border-border bg-muted inline-flex items-center rounded-md border p-0.5"
+    >
+      {children}
+    </div>
+  );
+}
+
+function SegmentedButton({
+  active,
+  disabled,
+  ariaLabel,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  disabled?: boolean;
+  ariaLabel?: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      aria-pressed={active}
+      disabled={disabled}
+      onClick={onClick}
+      className={cn(
+        "inline-flex h-6 min-w-7 items-center justify-center rounded-sm px-2 text-xs font-medium transition-colors",
+        active
+          ? "bg-card text-foreground shadow-sm"
+          : "text-muted-foreground hover:text-foreground",
+        disabled && "opacity-50"
+      )}
+    >
+      {children}
+    </button>
   );
 }

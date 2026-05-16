@@ -1010,7 +1010,13 @@
   "UserMenu": {
     "dashboard": "Mon espace",
     "profile": "Profil",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "preferences": {
+      "language": "Langue",
+      "theme": "Thème",
+      "light": "Mode clair",
+      "dark": "Mode sombre"
+    }
   },
   "Email": {
     "coHostPromoted": {
