@@ -1,5 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { SLUGS } from "./fixtures";
+import { SLUGS, AUTH } from "./fixtures";
+
+// PLAYER3 isn't seeded as a member of yoga-montmartre — used to cover the
+// "authenticated but not in the circle" path.
+const YOGA_MOMENT = "test-atelier-meditation-mars";
 
 /**
  * Tests E2E — Authentification
@@ -57,6 +61,44 @@ test.describe("Authentification — accès non authentifié", () => {
     // Soit la page charge (200) soit 404 — mais jamais redirection vers auth
     expect(response?.status()).not.toBe(302);
     await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+  });
+
+  test("should redirect unauthenticated user from a dashboard event URL to its public page", async ({
+    page,
+  }) => {
+    await page.goto(
+      `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${SLUGS.PUBLISHED_MOMENT}`
+    );
+    await expect(page).toHaveURL(new RegExp(`/m/${SLUGS.PUBLISHED_MOMENT}$`), {
+      timeout: 10_000,
+    });
+    await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+  });
+});
+
+test.describe("Authentification — accès dashboard event hors-Communauté", () => {
+  test.use({ storageState: AUTH.PLAYER3 });
+
+  test("should redirect a logged-in non-member from dashboard event detail to the public page", async ({
+    page,
+  }) => {
+    await page.goto(
+      `/fr/dashboard/circles/${SLUGS.PUBLIC_CIRCLE}/moments/${YOGA_MOMENT}`
+    );
+    await expect(page).toHaveURL(new RegExp(`/m/${YOGA_MOMENT}$`), {
+      timeout: 10_000,
+    });
+  });
+
+  test("should redirect a logged-in non-Host from dashboard event /edit to the public page", async ({
+    page,
+  }) => {
+    await page.goto(
+      `/fr/dashboard/circles/${SLUGS.PUBLIC_CIRCLE}/moments/${YOGA_MOMENT}/edit`
+    );
+    await expect(page).toHaveURL(new RegExp(`/m/${YOGA_MOMENT}$`), {
+      timeout: 10_000,
+    });
   });
 });
 

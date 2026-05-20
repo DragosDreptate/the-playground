@@ -14,6 +14,7 @@ import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
+import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 export default async function MomentDetailPage({
@@ -39,7 +40,7 @@ export default async function MomentDetailPage({
     throw error;
   }
 
-  if (moment.circleId !== circle.id) notFound();
+  if (moment.circleId !== circle.id) redirectToPublicMoment(moment.slug);
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
@@ -50,10 +51,11 @@ export default async function MomentDetailPage({
     prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 
-  // Accès autorisé si : membre ACTIVE du Circle OU inscrit à l'événement
+  // Access granted to active Circle members or anyone with a live registration;
+  // others go to the public event page instead of a dead-end 404.
   const hasActiveMembership = membership?.status === "ACTIVE";
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
-  if (!hasActiveMembership && !hasActiveRegistration) notFound();
+  if (!hasActiveMembership && !hasActiveRegistration) redirectToPublicMoment(moment.slug);
 
   const isOrganizer = isActiveOrganizer(membership);
 
