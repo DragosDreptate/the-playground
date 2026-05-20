@@ -60,16 +60,13 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Bounce unauthenticated visitors from a shared dashboard event link
-  // to the public event page, so they stay in the funnel instead of hitting
-  // sign-in and dropping off.
-  if (!hasSessionCookie(request)) {
-    const publicPath = dashboardEventPublicPath(request.nextUrl.pathname);
-    if (publicPath) {
-      const url = request.nextUrl.clone();
-      url.pathname = publicPath;
-      return NextResponse.redirect(url);
-    }
+  // 4. Bounce shared dashboard event links to the public page for visitors
+  // without a session, so they stay in the funnel instead of hitting sign-in.
+  const dashboardEventPath = dashboardEventPublicPath(request.nextUrl.pathname);
+  if (dashboardEventPath && !hasSessionCookie(request)) {
+    const url = request.nextUrl.clone();
+    url.pathname = dashboardEventPath;
+    return NextResponse.redirect(url);
   }
 
   // 5. Delegate to next-intl middleware

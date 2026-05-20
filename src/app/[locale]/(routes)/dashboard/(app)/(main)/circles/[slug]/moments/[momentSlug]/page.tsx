@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -14,6 +14,7 @@ import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
+import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 export default async function MomentDetailPage({
@@ -39,9 +40,7 @@ export default async function MomentDetailPage({
     throw error;
   }
 
-  // Mismatch between Circle in URL and the event's actual Circle — treat as a
-  // malformed share link and send the visitor to the public event page.
-  if (moment.circleId !== circle.id) redirect(`/m/${moment.slug}`);
+  if (moment.circleId !== circle.id) redirectToPublicMoment(moment.slug);
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
@@ -52,13 +51,11 @@ export default async function MomentDetailPage({
     prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 
-  // Accès autorisé si : membre ACTIVE du Circle OU inscrit à l'événement.
-  // Sinon, on bascule le visiteur sur la page publique pour qu'il garde une
-  // vue de l'événement au lieu de prendre un 404 (cas typique : lien dashboard
-  // partagé à quelqu'un qui n'est pas dans la Communauté).
+  // Access granted to active Circle members or anyone with a live registration;
+  // others go to the public event page instead of a dead-end 404.
   const hasActiveMembership = membership?.status === "ACTIVE";
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
-  if (!hasActiveMembership && !hasActiveRegistration) redirect(`/m/${moment.slug}`);
+  if (!hasActiveMembership && !hasActiveRegistration) redirectToPublicMoment(moment.slug);
 
   const isOrganizer = isActiveOrganizer(membership);
 

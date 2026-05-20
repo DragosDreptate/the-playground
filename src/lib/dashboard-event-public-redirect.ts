@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { isValidSlug } from "./slug";
 
@@ -6,18 +7,20 @@ const dashboardEventRe = new RegExp(
   `^(?:/(${localeAlt}))?/dashboard/circles/[^/]+/moments/([^/]+)(?:/.*)?$`
 );
 
-// Reserved segments under /dashboard/circles/[slug]/moments/ that are not
-// event slugs (e.g. /moments/new is the creation page).
+// `/moments/new` is the creation route, not an event slug.
 const RESERVED_MOMENT_SEGMENTS = new Set(["new"]);
 
-/**
- * If `pathname` targets a dashboard event view, returns the matching public
- * `/m/[slug]` pathname (locale preserved). Returns `null` otherwise.
- *
- * Used by the middleware to bounce unauthenticated visitors from a shared
- * dashboard link to the public event page, so they stay in the funnel
- * instead of hitting the sign-in screen.
- */
+/** Pathname of the public event page for a given moment slug. */
+export function publicMomentPath(slug: string): string {
+  return `/m/${slug}`;
+}
+
+/** Server-side redirect to the public event page (throws NEXT_REDIRECT). */
+export function redirectToPublicMoment(slug: string): never {
+  redirect(publicMomentPath(slug));
+}
+
+/** Maps a dashboard event pathname to its public `/m/[slug]` equivalent. */
 export function dashboardEventPublicPath(pathname: string): string | null {
   const match = pathname.match(dashboardEventRe);
   if (!match) return null;
@@ -27,5 +30,5 @@ export function dashboardEventPublicPath(pathname: string): string | null {
   if (RESERVED_MOMENT_SEGMENTS.has(momentSlug)) return null;
   if (!isValidSlug(momentSlug)) return null;
 
-  return `${locale ? `/${locale}` : ""}/m/${momentSlug}`;
+  return `${locale ? `/${locale}` : ""}${publicMomentPath(momentSlug)}`;
 }

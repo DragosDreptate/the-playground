@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
@@ -9,6 +9,7 @@ import {
 import { getCachedSession } from "@/lib/auth-cache";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
+import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
@@ -48,33 +49,26 @@ export default async function EditMomentPage({
     throw error;
   }
 
-  if (moment.circleId !== circle.id) {
-    redirect(`/m/${moment.slug}`);
-  }
+  if (moment.circleId !== circle.id) redirectToPublicMoment(moment.slug);
 
-  // Only an active Organizer of the Circle may edit. Anyone else (member,
-  // attendee, or unrelated user) is bounced to the public event page —
-  // same UX as the detail view, no dead-end 404 on a shared dashboard link.
   const session = await getCachedSession();
-  if (!session?.user?.id) {
-    redirect(`/m/${moment.slug}`);
-  }
+  if (!session?.user?.id) redirectToPublicMoment(moment.slug);
+
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-  const membership = await circleRepo.findMembership(circle.id, session.user.id);
-  if (!isActiveOrganizer(membership)) {
-    redirect(`/m/${moment.slug}`);
-  }
+
+  // Price lock excludes the host auto-registration (which doesn't count as paid).
+  const [membership, paymentSummary, initialAttachments] = await Promise.all([
+    circleRepo.findMembership(circle.id, session.user.id),
+    moment.price > 0
+      ? prismaRegistrationRepository.getPaymentSummary(moment.id)
+      : Promise.resolve(null),
+    prismaMomentAttachmentRepository.findByMoment(moment.id),
+  ]);
+
+  if (!isActiveOrganizer(membership)) redirectToPublicMoment(moment.slug);
 
   const boundAction = updateMomentAction.bind(null, moment.id);
-
-  // Check if price is locked (paid event with paid registrations — excludes host auto-registration)
-  let priceLocked = false;
-  if (moment.price > 0) {
-    const { paidCount } = await prismaRegistrationRepository.getPaymentSummary(moment.id);
-    priceLocked = paidCount > 0;
-  }
-
-  const initialAttachments = await prismaMomentAttachmentRepository.findByMoment(moment.id);
+  const priceLocked = (paymentSummary?.paidCount ?? 0) > 0;
 
   const tDashboard = await getTranslations("Dashboard");
   const tCommon = await getTranslations("Common");
