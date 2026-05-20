@@ -68,7 +68,6 @@ export default function middleware(request: NextRequest) {
     if (publicPath) {
       const url = request.nextUrl.clone();
       url.pathname = publicPath;
-      url.search = "";
       return NextResponse.redirect(url);
     }
   }

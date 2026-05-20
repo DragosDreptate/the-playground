@@ -6,6 +6,10 @@ const dashboardEventRe = new RegExp(
   `^(?:/(${localeAlt}))?/dashboard/circles/[^/]+/moments/([^/]+)(?:/.*)?$`
 );
 
+// Reserved segments under /dashboard/circles/[slug]/moments/ that are not
+// event slugs (e.g. /moments/new is the creation page).
+const RESERVED_MOMENT_SEGMENTS = new Set(["new"]);
+
 /**
  * If `pathname` targets a dashboard event view, returns the matching public
  * `/m/[slug]` pathname (locale preserved). Returns `null` otherwise.
@@ -20,6 +24,7 @@ export function dashboardEventPublicPath(pathname: string): string | null {
 
   const locale = match[1];
   const momentSlug = decodeURIComponent(match[2]);
+  if (RESERVED_MOMENT_SEGMENTS.has(momentSlug)) return null;
   if (!isValidSlug(momentSlug)) return null;
 
   return `${locale ? `/${locale}` : ""}/m/${momentSlug}`;

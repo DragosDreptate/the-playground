@@ -49,6 +49,18 @@ describe("dashboardEventPublicPath", () => {
     });
   });
 
+  describe("reserved moment segments", () => {
+    // /dashboard/circles/[slug]/moments/new is the event creation page,
+    // not an event slug — must keep its normal auth redirect.
+    it.each([
+      "/dashboard/circles/the-spark/moments/new",
+      "/fr/dashboard/circles/the-spark/moments/new",
+      "/en/dashboard/circles/the-spark/moments/new",
+    ])("should return null for %s (reserved segment)", (input) => {
+      expect(dashboardEventPublicPath(input)).toBe(null);
+    });
+  });
+
   describe("invalid moment slug", () => {
     it.each([
       "/dashboard/circles/the-spark/moments/UPPERCASE",
