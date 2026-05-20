@@ -58,6 +58,21 @@ test.describe("Authentification — accès non authentifié", () => {
     expect(response?.status()).not.toBe(302);
     await expect(page).not.toHaveURL(/\/auth\/sign-in/);
   });
+
+  test("should redirect unauthenticated user from a dashboard event URL to its public page", async ({
+    page,
+  }) => {
+    // Un Organisateur qui partage par erreur l'URL dashboard d'un événement
+    // ne doit pas envoyer le destinataire dans le funnel auth — on le bascule
+    // sur la page publique correspondante.
+    await page.goto(
+      `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${SLUGS.PUBLISHED_MOMENT}`
+    );
+    await expect(page).toHaveURL(new RegExp(`/m/${SLUGS.PUBLISHED_MOMENT}$`), {
+      timeout: 10_000,
+    });
+    await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+  });
 });
 
 test.describe("Magic link — protection contre les scanners email", () => {

@@ -4,6 +4,19 @@ import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { isValidSlug } from "./lib/slug";
 import { BLOCKED_BOTS } from "./lib/blocked-bots";
+import { dashboardEventPublicPath } from "./lib/dashboard-event-public-redirect";
+
+// Auth.js v5 stores the session under `authjs.session-token` (HTTP) or
+// `__Secure-authjs.session-token` (HTTPS). Presence-only check — middleware
+// stays edge-friendly and the dashboard layout still validates the session.
+const SESSION_COOKIE_NAMES = [
+  "authjs.session-token",
+  "__Secure-authjs.session-token",
+];
+
+function hasSessionCookie(request: NextRequest): boolean {
+  return SESSION_COOKIE_NAMES.some((name) => request.cookies.has(name));
+}
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -47,7 +60,20 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Delegate to next-intl middleware
+  // 4. Bounce unauthenticated visitors from a shared dashboard event link
+  // to the public event page, so they stay in the funnel instead of hitting
+  // sign-in and dropping off.
+  if (!hasSessionCookie(request)) {
+    const publicPath = dashboardEventPublicPath(request.nextUrl.pathname);
+    if (publicPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = publicPath;
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+  }
+
+  // 5. Delegate to next-intl middleware
   return intlMiddleware(request);
 }
 
