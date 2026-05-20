@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
-import { SLUGS } from "./fixtures";
+import { SLUGS, AUTH } from "./fixtures";
+
+// PLAYER3 isn't a member of `yoga-montmartre` (seed: only host + player2/4 are
+// registered to its moments), so they're a good fit to exercise the
+// "authenticated but not in the circle" path.
+const YOGA_CIRCLE = "yoga-montmartre";
+const YOGA_MOMENT = "test-atelier-meditation-mars";
 
 /**
  * Tests E2E — Authentification
@@ -72,6 +78,35 @@ test.describe("Authentification — accès non authentifié", () => {
       timeout: 10_000,
     });
     await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+  });
+});
+
+test.describe("Authentification — accès dashboard event hors-Communauté", () => {
+  test.use({ storageState: AUTH.PLAYER3 });
+
+  test("should redirect a logged-in non-member from dashboard event detail to the public page", async ({
+    page,
+  }) => {
+    // PLAYER3 est connecté mais n'est ni membre de yoga-montmartre ni inscrit
+    // à l'événement — la vue dashboard renverrait 404, on bascule sur public.
+    await page.goto(`/fr/dashboard/circles/${YOGA_CIRCLE}/moments/${YOGA_MOMENT}`);
+    await expect(page).toHaveURL(new RegExp(`/m/${YOGA_MOMENT}$`), {
+      timeout: 10_000,
+    });
+  });
+
+  test("should redirect a logged-in non-Host from dashboard event /edit to the public page", async ({
+    page,
+  }) => {
+    // Même logique pour la page d'édition : seul un Organisateur actif peut
+    // éditer, sinon on renvoie vers la page publique au lieu de laisser
+    // apparaître le formulaire ou un 404.
+    await page.goto(
+      `/fr/dashboard/circles/${YOGA_CIRCLE}/moments/${YOGA_MOMENT}/edit`
+    );
+    await expect(page).toHaveURL(new RegExp(`/m/${YOGA_MOMENT}$`), {
+      timeout: 10_000,
+    });
   });
 });
 

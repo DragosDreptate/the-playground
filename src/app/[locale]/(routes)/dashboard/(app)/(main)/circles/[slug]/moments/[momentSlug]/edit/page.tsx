@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
@@ -6,6 +6,9 @@ import {
   prismaRegistrationRepository,
   prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
+import { getCachedSession } from "@/lib/auth-cache";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
@@ -46,7 +49,20 @@ export default async function EditMomentPage({
   }
 
   if (moment.circleId !== circle.id) {
-    notFound();
+    redirect(`/m/${moment.slug}`);
+  }
+
+  // Only an active Organizer of the Circle may edit. Anyone else (member,
+  // attendee, or unrelated user) is bounced to the public event page —
+  // same UX as the detail view, no dead-end 404 on a shared dashboard link.
+  const session = await getCachedSession();
+  if (!session?.user?.id) {
+    redirect(`/m/${moment.slug}`);
+  }
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+  const membership = await circleRepo.findMembership(circle.id, session.user.id);
+  if (!isActiveOrganizer(membership)) {
+    redirect(`/m/${moment.slug}`);
   }
 
   const boundAction = updateMomentAction.bind(null, moment.id);

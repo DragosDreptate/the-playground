@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -39,7 +39,9 @@ export default async function MomentDetailPage({
     throw error;
   }
 
-  if (moment.circleId !== circle.id) notFound();
+  // Mismatch between Circle in URL and the event's actual Circle — treat as a
+  // malformed share link and send the visitor to the public event page.
+  if (moment.circleId !== circle.id) redirect(`/m/${moment.slug}`);
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
@@ -50,10 +52,13 @@ export default async function MomentDetailPage({
     prismaRegistrationRepository.findByMomentAndUser(moment.id, session.user.id),
   ]);
 
-  // Accès autorisé si : membre ACTIVE du Circle OU inscrit à l'événement
+  // Accès autorisé si : membre ACTIVE du Circle OU inscrit à l'événement.
+  // Sinon, on bascule le visiteur sur la page publique pour qu'il garde une
+  // vue de l'événement au lieu de prendre un 404 (cas typique : lien dashboard
+  // partagé à quelqu'un qui n'est pas dans la Communauté).
   const hasActiveMembership = membership?.status === "ACTIVE";
   const hasActiveRegistration = userRegistration && userRegistration.status !== "CANCELLED" && userRegistration.status !== "REJECTED";
-  if (!hasActiveMembership && !hasActiveRegistration) notFound();
+  if (!hasActiveMembership && !hasActiveRegistration) redirect(`/m/${moment.slug}`);
 
   const isOrganizer = isActiveOrganizer(membership);
 
