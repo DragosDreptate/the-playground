@@ -86,13 +86,13 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
           />
         </div>
 
-        <Tabs defaultValue="preview" className="w-full">
+        <Tabs defaultValue="preview" className="min-w-0">
           <TabsList>
             <TabsTrigger value="preview">{t("dashboardPreviewTitle")}</TabsTrigger>
             <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="preview" className="mt-3">
+          <TabsContent value="preview" className="mt-3 min-w-0">
             <div className="bg-muted/30 flex items-center justify-center overflow-auto rounded-lg border p-4">
               <iframe
                 key={embedUrl}
@@ -106,9 +106,9 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             </div>
           </TabsContent>
 
-          <TabsContent value="code" className="mt-3">
-            <div className="bg-muted relative rounded-lg p-3">
-              <div className="absolute right-2 top-2">
+          <TabsContent value="code" className="mt-3 min-w-0">
+            <div className="bg-muted relative min-w-0 rounded-lg p-3">
+              <div className="absolute right-2 top-2 z-10">
                 <CopyButton
                   value={snippet}
                   label={t("dashboardCta")}
@@ -117,7 +117,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
                   size="sm"
                 />
               </div>
-              <pre className="overflow-auto pr-24 text-xs leading-relaxed">
+              <pre className="max-w-full overflow-x-auto pr-24 text-xs leading-relaxed">
                 <code>{snippet}</code>
               </pre>
             </div>
