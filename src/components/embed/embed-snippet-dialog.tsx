@@ -103,7 +103,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
 
           <TabsContent value="preview" className="mt-3 min-w-0">
             <div
-              className="bg-muted/30 flex items-center justify-center overflow-hidden rounded-lg border p-4"
+              className="bg-muted flex items-center justify-center overflow-hidden rounded-lg p-4"
               style={{ height: 320 }}
             >
               <iframe
