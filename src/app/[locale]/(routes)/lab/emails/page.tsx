@@ -433,7 +433,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
     {
       id: "admin-new-user",
       label: "Admin — Nouvel utilisateur",
-      subject: "Nouvel utilisateur : Alice Martin",
+      subject: "[Admin] Nouvel utilisateur — Alice Martin",
       element: AdminNewUserEmail({
         to: "admin@the-playground.fr",
         userName: "Alice Martin",
@@ -441,11 +441,11 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         registeredAt: "samedi 15 mars 2026",
         adminUsersUrl: `${BASE_URL}/admin/users`,
         strings: {
-          subject: "Nouvel utilisateur : Alice Martin",
-          heading: "Nouvel utilisateur",
-          message: "Alice Martin vient de compléter son profil sur The Playground.",
-          ctaLabel: "Voir les utilisateurs",
-          footer: FOOTER,
+          subject: "[Admin] Nouvel utilisateur — Alice Martin",
+          heading: "Nouvel utilisateur sur The Playground",
+          message: "Alice Martin vient de compléter son inscription.",
+          ctaLabel: "Voir les utilisateurs dans l'admin",
+          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
         },
         baseUrl: BASE_URL,
       }),
