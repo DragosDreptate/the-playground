@@ -102,7 +102,10 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
           </TabsList>
 
           <TabsContent value="preview" className="mt-3 min-w-0">
-            <div className="bg-muted/30 flex h-[320px] items-center justify-center overflow-auto rounded-lg border p-4">
+            <div
+              className="bg-muted/30 flex items-center justify-center overflow-hidden rounded-lg border p-4"
+              style={{ height: 320 }}
+            >
               <iframe
                 key={embedUrl}
                 src={embedUrl}
@@ -110,13 +113,17 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
                 height={EMBED_HEIGHT}
                 frameBorder={0}
                 title={t("titleAlt", { title: momentTitle })}
-                className="block"
+                className="block max-w-full"
+                style={{ maxHeight: "100%" }}
               />
             </div>
           </TabsContent>
 
           <TabsContent value="code" className="mt-3 min-w-0">
-            <pre className="bg-muted h-[320px] max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed">
+            <pre
+              className="bg-muted max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed"
+              style={{ height: 320 }}
+            >
               <code>{snippet}</code>
             </pre>
           </TabsContent>
