@@ -675,7 +675,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               </div>
 
               {moment.status !== "DRAFT" && props.appUrl && (
-                <>
+                <div className="hidden md:block">
                   <div className="border-border ml-11 border-t" />
                   <div className="flex items-center gap-3 py-3">
                     <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
@@ -695,7 +695,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       appUrl={props.appUrl}
                     />
                   </div>
-                </>
+                </div>
               )}
 
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
