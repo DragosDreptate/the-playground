@@ -96,7 +96,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
         </div>
 
         <Tabs defaultValue="preview" className="min-w-0">
-          <TabsList>
+          <TabsList className="w-full">
             <TabsTrigger value="preview">{t("dashboardPreviewTitle")}</TabsTrigger>
             <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
           </TabsList>
