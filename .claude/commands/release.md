@@ -35,13 +35,26 @@ Si `conclusion != "success"` → **STOP**. Le CI sur main doit être vert avant 
 
 ### Étape 2 — Vérifier les pages statiques (OBLIGATOIRE)
 
-Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Trois vérifications :
+Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Deux vérifications :
 
-#### 2a — Cohérence features (page Aide + README)
+#### 2a — Audit exhaustif README + page Aide
 
 Lancer l'agent `docs-coherence-guardian` :
 
-> Vérifie que la page Aide (clé "Help" dans messages/fr.json et messages/en.json + page help/page.tsx) ET la section "Fonctionnalités" du README.md à la racine sont à jour avec toutes les fonctionnalités implémentées depuis la dernière release. Si des features manquent, ajoute-les aux deux endroits, en gardant la formulation courte et orientée bénéfice utilisateur côté README.
+> Audit exhaustif du README.md à la racine et de la page Aide (clé "Help" dans messages/fr.json + messages/en.json + page help/page.tsx) contre l'état réel du codebase. Vérifie ET corrige les écarts dans les sections suivantes du README :
+>
+> 1. **Fonctionnalités** : doit refléter toutes les features livrées depuis la dernière release. Synchroniser avec la page Aide (même périmètre, formulation plus courte et orientée bénéfice côté README).
+> 2. **Stack** : versions et outils mentionnés (Next.js, Auth.js, Tailwind, Prisma, Resend, Anthropic SDK, Stripe, etc.) doivent correspondre à `package.json`. Mettre à jour les versions majeures si elles ont évolué.
+> 3. **Prérequis** : versions Node et pnpm doivent correspondre à `engines` et `packageManager` dans `package.json`.
+> 4. **Architecture** : l'arbre `src/` documenté doit refléter la vraie structure (`ls src/`). Mettre à jour si des dossiers ont été ajoutés/renommés.
+> 5. **Commandes courantes** : les scripts listés doivent exister dans `package.json`. Retirer les scripts supprimés, ajouter les nouveaux scripts marquants si pertinents pour un nouvel arrivant.
+> 6. **Authentification en local** : la liste des providers OAuth doit correspondre à ce qui est configuré dans `src/infrastructure/auth/`.
+> 7. **Tableau comparatif Meetup/Luma** : laisser tel quel sauf si un nouveau concurrent pertinent doit être ajouté.
+> 8. **Liens internes** (changelog, about, explorer, etc.) : vérifier qu'ils pointent vers des routes qui existent toujours.
+>
+> Pour la page Aide : même périmètre fonctionnel que la section "Fonctionnalités" du README. Garder fr.json et en.json strictement synchronisés.
+>
+> Pour chaque écart trouvé : applique la correction directement dans le bon fichier. Si une formulation est ambiguë, signale-le mais corrige avec l'option la plus probable.
 
 #### 2b — Stats (page À propos + README)
 
