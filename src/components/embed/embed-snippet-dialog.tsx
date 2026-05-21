@@ -147,13 +147,8 @@ function LocaleDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs font-medium"
-          aria-label={ariaLabel}
-        >
-          <Globe className="size-3.5" />
+        <Button variant="ghost" size="sm" aria-label={ariaLabel}>
+          <Globe className="size-4" />
           {value.toUpperCase()}
         </Button>
       </DropdownMenuTrigger>
@@ -187,13 +182,8 @@ function ThemeDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-xs font-medium"
-          aria-label={ariaLabel}
-        >
-          <Icon className="size-3.5" />
+        <Button variant="ghost" size="sm" aria-label={ariaLabel}>
+          <Icon className="size-4" />
           {labels[value]}
         </Button>
       </DropdownMenuTrigger>
