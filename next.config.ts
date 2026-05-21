@@ -16,11 +16,9 @@ const withPWA = withPWAInit({
   disable: process.env.NODE_ENV === "development",
 });
 
-const securityHeaders = [
+const baseSecurityHeaders = [
   // Empêche le navigateur de détecter (sniffer) le Content-Type
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Empêche l'intégration dans des iframes (clickjacking)
-  { key: "X-Frame-Options", value: "DENY" },
   // Politique de référent : transmet l'origine uniquement en cross-origin HTTPS
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // Désactive les fonctionnalités navigateur non utilisées (privacy + sécurité)
@@ -33,30 +31,51 @@ const securityHeaders = [
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Content Security Policy — restreint les sources de scripts, styles et images
+];
+
+const baseCspDirectives = [
+  "default-src 'self'",
+  // Next.js requiert 'unsafe-inline' pour les styles injectés et 'unsafe-eval' pour le HMR dev
+  // Stripe.js doit être chargé depuis js.stripe.com (exigence PCI-DSS)
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' js.stripe.com",
+  "style-src 'self' 'unsafe-inline'",
+  // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
+  "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
+  // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API + PostHog (tunnel via /ingest)
+  "connect-src 'self' *.sentry.io api.stripe.com api-adresse.data.gouv.fr",
+  // Service Worker PWA
+  "worker-src 'self'",
+  "font-src 'self'",
+  // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
+  // + Vercel Blob (PDF preview dans la modale des pièces jointes Moment)
+  // + 'self' pour l'aperçu live du widget /embed/m/* dans la modale dashboard
+  "frame-src 'self' js.stripe.com www.google.com *.public.blob.vercel-storage.com",
+  // Formulaires : uniquement vers le domaine propre
+  "form-action 'self'",
+];
+
+const securityHeaders = [
+  ...baseSecurityHeaders,
+  // Empêche l'intégration dans des iframes (clickjacking)
+  { key: "X-Frame-Options", value: "DENY" },
   {
     key: "Content-Security-Policy",
     value: [
-      "default-src 'self'",
-      // Next.js requiert 'unsafe-inline' pour les styles injectés et 'unsafe-eval' pour le HMR dev
-      // Stripe.js doit être chargé depuis js.stripe.com (exigence PCI-DSS)
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' js.stripe.com",
-      "style-src 'self' 'unsafe-inline'",
-      // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
-      "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
-      // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API + PostHog (tunnel via /ingest)
-      "connect-src 'self' *.sentry.io api.stripe.com api-adresse.data.gouv.fr",
-      // Service Worker PWA
-      "worker-src 'self'",
-      "font-src 'self'",
-      // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
-      // + Vercel Blob (PDF preview dans la modale des pièces jointes Moment)
-      "frame-src js.stripe.com www.google.com *.public.blob.vercel-storage.com",
+      ...baseCspDirectives,
       // Interdire l'intégration de NOTRE page dans des iframes tierces (anti-clickjacking)
       "frame-ancestors 'none'",
-      // Formulaires : uniquement vers le domaine propre
-      "form-action 'self'",
     ].join("; "),
+  },
+];
+
+// Headers pour la route /embed/* : on autorise volontairement l'embedding
+// par des sites externes (c'est l'objectif du widget). X-Frame-Options retiré
+// et CSP frame-ancestors * pour permettre l'intégration n'importe où.
+const embedHeaders = [
+  ...baseSecurityHeaders,
+  {
+    key: "Content-Security-Policy",
+    value: [...baseCspDirectives, "frame-ancestors *"].join("; "),
   },
 ];
 
@@ -91,8 +110,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Applique les headers de sécurité sur toutes les routes
-        source: "/(.*)",
+        // Widget embeddable : autorise l'intégration sur tout domaine externe.
+        source: "/embed/:path*",
+        headers: embedHeaders,
+      },
+      {
+        // Applique les headers de sécurité stricts sur toutes les autres routes.
+        source: "/((?!embed).*)",
         headers: securityHeaders,
       },
     ];

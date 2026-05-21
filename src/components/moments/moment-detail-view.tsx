@@ -43,7 +43,9 @@ import {
   ArrowRight,
   ArrowUpRight,
   ShieldCheck,
+  Code,
 } from "lucide-react";
+import { EmbedSnippetDialog } from "@/components/embed/embed-snippet-dialog";
 
 // ── Types ────────────────────────────────────────────────────
 
@@ -221,6 +223,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
 
   const t = await getTranslations("Moment");
   const tCommon = await getTranslations("Common");
+  const tEmbed = await getTranslations("EmbedWidget");
   const tCircle = await getTranslations("Circle");
   const tDashboard = await getTranslations("Dashboard");
   const locale = await getLocale();
@@ -670,6 +673,30 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                   </div>
                 </div>
               </div>
+
+              {moment.status !== "DRAFT" && props.appUrl && (
+                <div className="hidden md:block">
+                  <div className="border-border ml-11 border-t" />
+                  <div className="flex items-center gap-3 py-3">
+                    <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-lg">
+                      <Code className="size-[15px]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-medium">
+                        {tEmbed("dashboardCardLabel")}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {tEmbed("dashboardCardDescription")}
+                      </p>
+                    </div>
+                    <EmbedSnippetDialog
+                      momentSlug={moment.slug}
+                      momentTitle={moment.title}
+                      appUrl={props.appUrl}
+                    />
+                  </div>
+                </div>
+              )}
 
               {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
                 <>
