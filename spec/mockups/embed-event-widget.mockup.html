@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Widget embed événement (4 variants)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E91E63',
+            'primary-hover': '#D81557',
+          },
+          fontFamily: {
+            sans: ['Geist', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Geist', system-ui, sans-serif; }
+    .iframe-frame {
+      border: 1px dashed #cbd5e1;
+      border-radius: 12px;
+      padding: 24px;
+      background: repeating-linear-gradient(
+        45deg,
+        #f8fafc,
+        #f8fafc 8px,
+        #f1f5f9 8px,
+        #f1f5f9 16px
+      );
+    }
+    .iframe-label {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .footer-mention {
+      font-size: 9px;
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <header class="max-w-6xl mx-auto px-6 pt-12 pb-8">
+    <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-3">Spec embed-event-widget · 4 variants</p>
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Widget embed événement</h1>
+    <p class="text-slate-600 max-w-2xl">
+      Mockup des 4 variants. Carte 480px desktop, cover 1:1 à gauche, contenu à droite avec CTA aligné en bas de la cover, footer centré sous les deux colonnes.
+      Variant 320px mobile en bas, cover 1:1 pleine largeur.
+    </p>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+    <!-- VARIANT 1 : active-light -->
+    <section>
+      <p class="iframe-label">Variant 1 · Active · Light · 480px</p>
+      <div class="iframe-frame">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4" style="width: 480px;">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0">
+              <img src="https://picsum.photos/seed/event1/240/240" alt="" class="w-48 h-48 rounded-xl object-cover" />
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <h2 class="text-base font-semibold text-slate-900 leading-snug line-clamp-2">Meetup IA & Créativité</h2>
+              <div class="mt-4 space-y-2 text-xs text-slate-600">
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Mardi 27 mai · 19h30
+                </p>
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  Station F, Paris
+                </p>
+              </div>
+              <div class="mt-4 flex items-center gap-2">
+                <div class="flex -space-x-1.5">
+                  <img src="https://i.pravatar.cc/40?img=12" class="w-5 h-5 rounded-full ring-2 ring-white" />
+                  <img src="https://i.pravatar.cc/40?img=23" class="w-5 h-5 rounded-full ring-2 ring-white" />
+                  <img src="https://i.pravatar.cc/40?img=34" class="w-5 h-5 rounded-full ring-2 ring-white" />
+                  <img src="https://i.pravatar.cc/40?img=45" class="w-5 h-5 rounded-full ring-2 ring-white" />
+                </div>
+                <span class="text-xs text-slate-500">+12 inscrits</span>
+              </div>
+              <button class="mt-auto w-full bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5">
+                <span>S'inscrire</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </button>
+            </div>
+          </div>
+          <p class="footer-mention mt-3 text-center text-slate-300">
+            Powered by <a href="#" class="text-slate-400 hover:text-slate-500 transition-colors">The Playground</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VARIANT 2 : active-dark -->
+    <section>
+      <p class="iframe-label">Variant 2 · Active · Dark · 480px</p>
+      <div class="iframe-frame">
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-4" style="width: 480px;">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0">
+              <img src="https://picsum.photos/seed/event1/240/240" alt="" class="w-48 h-48 rounded-xl object-cover" />
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <h2 class="text-base font-semibold text-slate-50 leading-snug line-clamp-2">Meetup IA & Créativité</h2>
+              <div class="mt-4 space-y-2 text-xs text-slate-400">
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Mardi 27 mai · 19h30
+                </p>
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  Station F, Paris
+                </p>
+              </div>
+              <div class="mt-4 flex items-center gap-2">
+                <div class="flex -space-x-1.5">
+                  <img src="https://i.pravatar.cc/40?img=12" class="w-5 h-5 rounded-full ring-2 ring-slate-900" />
+                  <img src="https://i.pravatar.cc/40?img=23" class="w-5 h-5 rounded-full ring-2 ring-slate-900" />
+                  <img src="https://i.pravatar.cc/40?img=34" class="w-5 h-5 rounded-full ring-2 ring-slate-900" />
+                  <img src="https://i.pravatar.cc/40?img=45" class="w-5 h-5 rounded-full ring-2 ring-slate-900" />
+                </div>
+                <span class="text-xs text-slate-400">+12 inscrits</span>
+              </div>
+              <button class="mt-auto w-full bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5">
+                <span>S'inscrire</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+              </button>
+            </div>
+          </div>
+          <p class="footer-mention mt-3 text-center text-slate-600">
+            Powered by <a href="#" class="text-slate-500 hover:text-slate-400 transition-colors">The Playground</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VARIANT 3 : passive-light (passé) -->
+    <section>
+      <p class="iframe-label">Variant 3 · Passive (passé) · Light · 480px</p>
+      <div class="iframe-frame">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4" style="width: 480px;">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 relative">
+              <img src="https://picsum.photos/seed/event2/240/240" alt="" class="w-48 h-48 rounded-xl object-cover grayscale opacity-60" />
+              <span class="absolute top-2 left-2 bg-slate-700 text-white text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded">Passé</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <h2 class="text-base font-semibold text-slate-500 leading-snug line-clamp-2">Soirée JS & Pizza</h2>
+              <div class="mt-4 space-y-2 text-xs text-slate-400">
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Jeudi 12 mai · 19h00
+                </p>
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  WeWork La Fayette, Paris
+                </p>
+              </div>
+              <div class="mt-4 flex items-center gap-2">
+                <div class="flex -space-x-1.5 opacity-60">
+                  <img src="https://i.pravatar.cc/40?img=15" class="w-5 h-5 rounded-full ring-2 ring-white grayscale" />
+                  <img src="https://i.pravatar.cc/40?img=27" class="w-5 h-5 rounded-full ring-2 ring-white grayscale" />
+                  <img src="https://i.pravatar.cc/40?img=38" class="w-5 h-5 rounded-full ring-2 ring-white grayscale" />
+                </div>
+                <span class="text-xs text-slate-400">28 ont participé</span>
+              </div>
+              <a href="#" class="mt-auto block w-full border border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white text-slate-700 text-sm font-semibold py-2.5 rounded-lg text-center transition-colors">
+                <span class="inline-flex items-center justify-center gap-1.5">
+                  <span>Voir les prochains</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+          <p class="footer-mention mt-3 text-center text-slate-300">
+            Powered by <a href="#" class="text-slate-400 hover:text-slate-500 transition-colors">The Playground</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- VARIANT 4 : passive-dark (annulé) -->
+    <section>
+      <p class="iframe-label">Variant 4 · Passive (annulé) · Dark · 480px</p>
+      <div class="iframe-frame">
+        <div class="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-4" style="width: 480px;">
+          <div class="flex gap-4">
+            <div class="flex-shrink-0 relative">
+              <img src="https://picsum.photos/seed/event3/240/240" alt="" class="w-48 h-48 rounded-xl object-cover grayscale opacity-50" />
+              <span class="absolute top-2 left-2 bg-red-900/80 text-red-100 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded">Annulé</span>
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col">
+              <h2 class="text-base font-semibold text-slate-400 leading-snug line-clamp-2 line-through decoration-slate-600 decoration-1">Workshop Bun vs Node</h2>
+              <div class="mt-4 space-y-2 text-xs text-slate-500">
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  Samedi 30 mai · 14h00
+                </p>
+                <p class="flex items-center gap-2">
+                  <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                  En ligne
+                </p>
+              </div>
+              <p class="mt-4 text-xs text-red-300/80 italic">
+                Cet événement a été annulé.
+              </p>
+              <a href="#" class="mt-auto block w-full border border-slate-700 hover:border-slate-100 hover:bg-slate-100 hover:text-slate-900 text-slate-300 text-sm font-semibold py-2.5 rounded-lg text-center transition-colors">
+                <span class="inline-flex items-center justify-center gap-1.5">
+                  <span>Voir les prochains</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+          <p class="footer-mention mt-3 text-center text-slate-600">
+            Powered by <a href="#" class="text-slate-500 hover:text-slate-400 transition-colors">The Playground</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <section class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="border-t border-slate-200 pt-12">
+      <p class="iframe-label">Bonus · Active · Light · 320px (mobile, layout vertical, cover 1:1)</p>
+      <div class="iframe-frame inline-block">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4" style="width: 296px;">
+          <img src="https://picsum.photos/seed/event1/400/400" alt="" class="w-full aspect-square rounded-xl object-cover" />
+          <h2 class="mt-4 text-base font-semibold text-slate-900 leading-snug line-clamp-2">Meetup IA & Créativité</h2>
+          <div class="mt-4 space-y-2 text-xs text-slate-600">
+            <p class="flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Mardi 27 mai · 19h30
+            </p>
+            <p class="flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              Station F, Paris
+            </p>
+          </div>
+          <div class="mt-4 flex items-center gap-2">
+            <div class="flex -space-x-1.5">
+              <img src="https://i.pravatar.cc/40?img=12" class="w-5 h-5 rounded-full ring-2 ring-white" />
+              <img src="https://i.pravatar.cc/40?img=23" class="w-5 h-5 rounded-full ring-2 ring-white" />
+              <img src="https://i.pravatar.cc/40?img=34" class="w-5 h-5 rounded-full ring-2 ring-white" />
+              <img src="https://i.pravatar.cc/40?img=45" class="w-5 h-5 rounded-full ring-2 ring-white" />
+            </div>
+            <span class="text-xs text-slate-500">+12 inscrits</span>
+          </div>
+          <button class="mt-5 w-full bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5">
+            <span>S'inscrire</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+          </button>
+          <p class="footer-mention mt-3 text-center text-slate-300">
+            Powered by <a href="#" class="text-slate-400 hover:text-slate-500 transition-colors">The Playground</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="max-w-6xl mx-auto px-6 pb-16">
+    <div class="bg-slate-100 border border-slate-200 rounded-lg p-5 text-sm text-slate-700">
+      <p class="font-semibold mb-2">Notes de design</p>
+      <ul class="list-disc list-inside space-y-1 text-slate-600">
+        <li><strong>Footer sous les deux colonnes</strong> : sorti de la colonne droite, centré sous l'ensemble cover + contenu. <code>mt-3 text-center</code> sur le <code>&lt;p&gt;</code>.</li>
+        <li><strong>CTA aligné bas de cover</strong> : la colonne droite est <code>flex flex-col</code>, le CTA a <code>mt-auto</code> qui le pousse en bas. Comme la colonne droite prend la hauteur de la cover (192px via items-stretch default), le bas du CTA est exactement au niveau du bas de la cover.</li>
+        <li><strong>Cover w-48 h-48</strong> (192×192) avec <code>rounded-xl</code>.</li>
+        <li><strong>Espacement vertical aéré</strong> : <code>mt-4</code> entre titre/dates/social proof. Vide naturel entre social proof et CTA absorbé par <code>mt-auto</code>.</li>
+        <li><strong>Espace interne dates</strong> : <code>space-y-2</code> entre date et lieu.</li>
+        <li><strong>Variant passé/annulé</strong> : grayscale + opacity, badge, CTA outline qui se remplit au hover.</li>
+        <li><strong>Footer ultra-discret</strong> : 9px, slate-300 en light, hover sans couleur primary.</li>
+        <li><strong>Mobile (320px)</strong> : layout vertical, footer reste sous le tout (déjà sous le CTA naturellement).</li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>
