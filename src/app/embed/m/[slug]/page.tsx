@@ -100,8 +100,12 @@ export default async function EmbedMomentPage({
     status: moment.status,
   });
 
+  // Wrap with a background that matches the widget theme so the iframe's
+  // default browser background never bleeds around the card.
+  const themeBg = theme === "dark" ? "dark bg-slate-900" : "bg-white";
+
   return (
-    <main className="p-4">
+    <div className={`${themeBg} min-h-screen`}>
       <EmbedEventCard
         moment={moment}
         circle={circle}
@@ -110,6 +114,6 @@ export default async function EmbedMomentPage({
         locale={locale}
         theme={theme}
       />
-    </main>
+    </div>
   );
 }
