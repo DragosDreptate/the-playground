@@ -10,7 +10,7 @@ Gère la montée de version de The Playground de bout en bout, en suivant la pro
 ## Ce que fait ce skill
 
 1. Vérifie que le CI sur main est vert (pré-requis)
-2. Vérifie que la page Aide est à jour avec les features de la release
+2. Vérifie que la page Aide, la page À propos et le README sont à jour avec les features de la release
 3. Trouve la PR Release Please en attente
 4. Attend que "Humanize Changelog" ait fini (s'il tourne)
 5. Déclenche le CI via commit vide (branch protection l'exige — `workflow_dispatch` ne satisfait pas les PR checks)
@@ -35,17 +35,17 @@ Si `conclusion != "success"` → **STOP**. Le CI sur main doit être vert avant 
 
 ### Étape 2 — Vérifier les pages statiques (OBLIGATOIRE)
 
-Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Deux vérifications :
+Avant chaque release, vérifier et mettre à jour les pages statiques sur **une seule branche** `chore/pre-release-updates`. Trois vérifications :
 
-#### 2a — Page Aide
+#### 2a — Cohérence features (page Aide + README)
 
 Lancer l'agent `docs-coherence-guardian` :
 
-> Vérifie que la page Aide (clé "Help" dans messages/fr.json et messages/en.json + page help/page.tsx) est à jour avec toutes les fonctionnalités implémentées depuis la dernière release. Si des features manquent, ajoute-les.
+> Vérifie que la page Aide (clé "Help" dans messages/fr.json et messages/en.json + page help/page.tsx) ET la section "Fonctionnalités" du README.md à la racine sont à jour avec toutes les fonctionnalités implémentées depuis la dernière release. Si des features manquent, ajoute-les aux deux endroits, en gardant la formulation courte et orientée bénéfice utilisateur côté README.
 
-#### 2b — Stats page À propos
+#### 2b — Stats (page À propos + README)
 
-Mettre à jour les 4 chiffres hardcodés dans `src/app/[locale]/(routes)/(static)/about/page.tsx` (section "En chiffres") :
+Calculer les chiffres une seule fois :
 
 ```bash
 COMMITS=$(git rev-list --count HEAD)
@@ -54,15 +54,21 @@ USECASES=$(find src/domain/usecases -name '*.ts' ! -name 'index.ts' ! -path '*__
 TESTS=$(pnpm test 2>&1 | grep 'Tests' | grep -o '[0-9]\+ passed' | grep -o '[0-9]\+')
 ```
 
-Arrondir pour l'affichage :
+**Page À propos** — `src/app/[locale]/(routes)/(static)/about/page.tsx` (section "En chiffres") :
 - Commits : centaine inférieure + "+" (ex: 1694 → `"1 600+"`)
 - PRs : dizaine inférieure + "+" (ex: 353 → `"350+"`)
 - Usecases : valeur exacte
 - Tests : dizaine inférieure + "+" (ex: 888 → `"880+"`)
 
+**README.md** (section "En chiffres") — arrondis plus larges pour rester stable entre releases :
+- Commits : millier inférieur + "+" (ex: 2 153 → `"2 000+"`)
+- PRs : centaine inférieure + "+" (ex: 485 → `"400+"`)
+- Usecases : dizaine inférieure + "+" (ex: 87 → `"80+"`)
+- Tests : millier inférieur + "+" (ex: 1 133 → `"1 000+"`)
+
 #### Résultat
 
-Si au moins une modification (page Aide ou stats) :
+Si au moins une modification (page Aide, page À propos, README) :
 1. Créer la branche `chore/pre-release-updates`
 2. Committer toutes les modifications ensemble
 3. PR + merge sur main
