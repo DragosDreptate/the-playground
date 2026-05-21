@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getCachedSession } from "@/lib/auth-cache";
 import { getAppUrl } from "@/lib/app-url";
+import { buildAlternates } from "@/lib/seo";
 import { prisma } from "@/infrastructure/db/prisma";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -30,25 +31,19 @@ const FAQ_COUNT = 7;
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("HomePage");
-  const appUrl = getAppUrl();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("HomePage")]);
   const title = `The Playground — ${t("metaTitle")}`;
   const description = t("metaDescription");
+  const alternates = buildAlternates(locale as "fr" | "en", "");
   return {
     title,
     description,
-    alternates: {
-      canonical: appUrl,
-      languages: {
-        fr: appUrl,
-        en: `${appUrl}/en`,
-      },
-    },
+    alternates,
     openGraph: {
       title,
       description,
       siteName: "The Playground",
-      url: appUrl,
+      url: alternates.canonical,
     },
     twitter: {
       title,

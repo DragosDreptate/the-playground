@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
+import { buildAlternates } from "@/lib/seo";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -78,7 +79,6 @@ export async function generateMetadata({
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
     const isPrivate = circle.visibility !== "PUBLIC";
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
     const [memberCount, t] = await Promise.all([
       getCachedMemberCount(circle.id),
@@ -97,13 +97,7 @@ export async function generateMetadata({
     return {
       title,
       description,
-      alternates: {
-        canonical: `${appUrl}/circles/${slug}`,
-        languages: {
-          fr: `${appUrl}/circles/${slug}`,
-          en: `${appUrl}/en/circles/${slug}`,
-        },
-      },
+      alternates: buildAlternates(locale as "fr" | "en", `/circles/${slug}`),
       ...(isPrivate && { robots: { index: false, follow: false } }),
       ...(!isPrivate && {
         openGraph: {

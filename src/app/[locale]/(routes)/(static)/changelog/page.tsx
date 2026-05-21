@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
+import { getLocale } from "next-intl/server";
 import { getChangelog } from "@/lib/parse-changelog";
+import { buildAlternates } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const locale = await getLocale();
   return {
     title: "Changelog · The Playground",
     description: "Les évolutions du Playground, jour après jour.",
-    alternates: {
-      canonical: `${appUrl}/changelog`,
-      languages: {
-        fr: `${appUrl}/changelog`,
-        en: `${appUrl}/en/changelog`,
-      },
-    },
+    alternates: buildAlternates(locale as "fr" | "en", "/changelog"),
   };
 }
 

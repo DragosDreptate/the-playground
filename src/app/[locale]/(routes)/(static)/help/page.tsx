@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { getAppUrl } from "@/lib/app-url";
+import { getLocale, getTranslations } from "next-intl/server";
 import { HelpSidebar } from "@/components/help/help-sidebar";
 import { HelpFaqAccordion } from "@/components/help/help-faq-accordion";
+import { buildAlternates } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Help");
-  const appUrl = getAppUrl();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Help")]);
   return {
     title: t("meta.title"),
     description: t("meta.description"),
-    alternates: {
-      canonical: `${appUrl}/help`,
-      languages: {
-        fr: `${appUrl}/help`,
-        en: `${appUrl}/en/help`,
-      },
-    },
+    alternates: buildAlternates(locale as "fr" | "en", "/help"),
     openGraph: {
       title: t("meta.title"),
       description: t("meta.description"),

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { getAppUrl } from "@/lib/app-url";
+import { buildAlternates } from "@/lib/seo";
 import {
   CheckIcon,
   Github,
@@ -16,18 +16,11 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("About");
-  const appUrl = getAppUrl();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("About")]);
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),
-    alternates: {
-      canonical: `${appUrl}/about`,
-      languages: {
-        fr: `${appUrl}/about`,
-        en: `${appUrl}/en/about`,
-      },
-    },
+    alternates: buildAlternates(locale as "fr" | "en", "/about"),
     openGraph: {
       title: t("pageTitle"),
       description: t("pageDescription"),

@@ -20,6 +20,7 @@ function withAlternates(
       languages: {
         fr: frUrl,
         en: enUrl,
+        "x-default": frUrl,
       },
     },
   };
