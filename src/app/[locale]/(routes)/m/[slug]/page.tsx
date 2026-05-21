@@ -6,6 +6,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
+import { buildAlternates } from "@/lib/seo";
+import { getAppUrl } from "@/lib/app-url";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
 // Les inscriptions en temps réel passent par les Server Actions (revalidatePath),
@@ -66,18 +68,10 @@ export async function generateMetadata({
     `${date}${connector}${time} · ${location}${circle ? ` — ${circle.name}` : ""}`,
   );
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
   return {
     title,
     description,
-    alternates: {
-      canonical: `${appUrl}/m/${slug}`,
-      languages: {
-        fr: `${appUrl}/m/${slug}`,
-        en: `${appUrl}/en/m/${slug}`,
-      },
-    },
+    alternates: buildAlternates(locale, `/m/${slug}`),
     openGraph: {
       title,
       description,
@@ -165,7 +159,7 @@ export default async function PublicMomentPage({
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
   ).length;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getAppUrl();
   const calendarData = {
     title: moment.title,
     startsAt: moment.startsAt,

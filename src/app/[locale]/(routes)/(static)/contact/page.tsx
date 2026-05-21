@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { getAppUrl } from "@/lib/app-url";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ContactForm } from "@/components/contact/contact-form";
+import { buildAlternates } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Contact");
-  const appUrl = getAppUrl();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Contact")]);
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),
-    alternates: {
-      canonical: `${appUrl}/contact`,
-      languages: {
-        fr: `${appUrl}/contact`,
-        en: `${appUrl}/en/contact`,
-      },
-    },
+    alternates: buildAlternates(locale, "/contact"),
     openGraph: {
       title: t("pageTitle"),
       description: t("pageDescription"),

@@ -1,45 +1,38 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/infrastructure/db/prisma";
-import { getAppUrl } from "@/lib/app-url";
 import { getAllPosts } from "@/lib/blog";
+import { buildLocalizedUrls } from "@/lib/seo";
 
 function withAlternates(
-  baseUrl: string,
   path: string,
   opts: { lastModified: Date; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number },
 ): MetadataRoute.Sitemap[number] {
-  const frUrl = path ? `${baseUrl}/${path}` : baseUrl;
-  const enUrl = path ? `${baseUrl}/en/${path}` : `${baseUrl}/en`;
-
+  const urls = buildLocalizedUrls(path);
   return {
-    url: frUrl,
+    url: urls.fr,
     lastModified: opts.lastModified,
     changeFrequency: opts.changeFrequency,
     priority: opts.priority,
     alternates: {
-      languages: {
-        fr: frUrl,
-        en: enUrl,
-      },
+      languages: { ...urls, "x-default": urls.fr },
     },
   };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = getAppUrl();
   const now = new Date();
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    withAlternates(baseUrl, "", { lastModified: now, changeFrequency: "weekly", priority: 1 }),
-    withAlternates(baseUrl, "explorer", { lastModified: now, changeFrequency: "daily", priority: 0.9 }),
-    withAlternates(baseUrl, "about", { lastModified: now, changeFrequency: "monthly", priority: 0.6 }),
-    withAlternates(baseUrl, "help", { lastModified: now, changeFrequency: "monthly", priority: 0.5 }),
-    withAlternates(baseUrl, "contact", { lastModified: now, changeFrequency: "monthly", priority: 0.5 }),
-    withAlternates(baseUrl, "changelog", { lastModified: now, changeFrequency: "weekly", priority: 0.4 }),
-    withAlternates(baseUrl, "legal/mentions-legales", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
-    withAlternates(baseUrl, "legal/confidentialite", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
-    withAlternates(baseUrl, "legal/cgu", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
+    withAlternates("", { lastModified: now, changeFrequency: "weekly", priority: 1 }),
+    withAlternates("/explorer", { lastModified: now, changeFrequency: "daily", priority: 0.9 }),
+    withAlternates("/about", { lastModified: now, changeFrequency: "monthly", priority: 0.6 }),
+    withAlternates("/help", { lastModified: now, changeFrequency: "monthly", priority: 0.5 }),
+    withAlternates("/contact", { lastModified: now, changeFrequency: "monthly", priority: 0.5 }),
+    withAlternates("/changelog", { lastModified: now, changeFrequency: "weekly", priority: 0.4 }),
+    withAlternates("/legal/mentions-legales", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
+    withAlternates("/legal/confidentialite", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
+    withAlternates("/legal/cgu", { lastModified: now, changeFrequency: "yearly", priority: 0.2 }),
   ];
 
   // Exclude circles owned by test/demo users
@@ -76,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const circlePages: MetadataRoute.Sitemap = circles.map((circle) =>
-    withAlternates(baseUrl, `circles/${circle.slug}`, {
+    withAlternates(`/circles/${circle.slug}`, {
       lastModified: circle.updatedAt,
       changeFrequency: "weekly",
       priority: 0.8,
@@ -84,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   );
 
   const momentPages: MetadataRoute.Sitemap = moments.map((moment) =>
-    withAlternates(baseUrl, `m/${moment.slug}`, {
+    withAlternates(`/m/${moment.slug}`, {
       lastModified: moment.updatedAt,
       changeFrequency: "weekly",
       priority: 0.7,
@@ -94,9 +87,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Blog posts
   const blogPosts = getAllPosts("fr");
   const blogPages: MetadataRoute.Sitemap = [
-    withAlternates(baseUrl, "blog", { lastModified: now, changeFrequency: "weekly", priority: 0.5 }),
+    withAlternates("/blog", { lastModified: now, changeFrequency: "weekly", priority: 0.5 }),
     ...blogPosts.map((post) =>
-      withAlternates(baseUrl, `blog/${post.slug}`, {
+      withAlternates(`/blog/${post.slug}`, {
         lastModified: new Date(post.date),
         changeFrequency: "monthly" as const,
         priority: 0.6,

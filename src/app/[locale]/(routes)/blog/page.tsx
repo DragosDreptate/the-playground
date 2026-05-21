@@ -2,22 +2,15 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
-import { getAppUrl } from "@/lib/app-url";
 import { getAllPosts, formatBlogDate } from "@/lib/blog";
+import { buildAlternates } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Blog");
-  const appUrl = getAppUrl();
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Blog")]);
   return {
     title: t("pageTitle"),
     description: t("pageDescription"),
-    alternates: {
-      canonical: `${appUrl}/blog`,
-      languages: {
-        fr: `${appUrl}/blog`,
-        en: `${appUrl}/en/blog`,
-      },
-    },
+    alternates: buildAlternates(locale, "/blog"),
     openGraph: {
       title: t("pageTitle"),
       description: t("pageDescription"),

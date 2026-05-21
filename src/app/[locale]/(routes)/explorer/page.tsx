@@ -1,10 +1,11 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
   prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { measureTime } from "@/lib/perf-logger";
+import { buildAlternates } from "@/lib/seo";
 
 // Revalide toutes les 5 minutes — la page Découvrir ne nécessite pas un temps réel strict.
 // Les filtres par catégorie + onglets sont gérés côté SSR via searchParams.
@@ -27,18 +28,11 @@ const PAGE_SIZE = 10;
 const FETCH_SIZE = PAGE_SIZE + 1;
 
 export async function generateMetadata() {
-  const t = await getTranslations("Explorer");
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const [locale, t] = await Promise.all([getLocale(), getTranslations("Explorer")]);
   return {
     title: t("title"),
     description: t("description"),
-    alternates: {
-      canonical: `${appUrl}/explorer`,
-      languages: {
-        fr: `${appUrl}/explorer`,
-        en: `${appUrl}/en/explorer`,
-      },
-    },
+    alternates: buildAlternates(locale, "/explorer"),
     openGraph: {
       title: t("title"),
       description: t("description"),
