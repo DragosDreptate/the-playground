@@ -115,7 +115,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
                 height={EMBED_HEIGHT}
                 frameBorder={0}
                 title={t("titleAlt", { title: momentTitle })}
-                className="block max-w-full"
+                className="block max-w-full rounded-2xl"
                 style={{ maxHeight: "100%" }}
               />
             </div>
