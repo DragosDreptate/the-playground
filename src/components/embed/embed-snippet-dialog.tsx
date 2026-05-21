@@ -36,7 +36,7 @@ type Props = {
 };
 
 const EMBED_WIDTH = 480;
-const EMBED_HEIGHT = 280;
+const EMBED_HEIGHT = 250;
 
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   const t = useTranslations("EmbedWidget");

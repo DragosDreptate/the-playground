@@ -100,14 +100,11 @@ export default async function EmbedMomentPage({
     status: moment.status,
   });
 
-  // In dark mode we need to override the page background so the iframe's
-  // default white doesn't bleed around the dark card. Light mode already
-  // matches the default --background, so we keep the simple padded layout.
-  const wrapperClass =
-    theme === "dark" ? "dark min-h-screen bg-slate-900" : "p-4";
-
+  // No wrapper: the card renders at its natural height (~250px) and the
+  // iframe is sized to match in the snippet. The `dark` class is applied
+  // only as a context for the card's internal dark: variants.
   return (
-    <main className={wrapperClass}>
+    <div className={theme === "dark" ? "dark" : undefined}>
       <EmbedEventCard
         moment={moment}
         circle={circle}
@@ -116,6 +113,6 @@ export default async function EmbedMomentPage({
         locale={locale}
         theme={theme}
       />
-    </main>
+    </div>
   );
 }
