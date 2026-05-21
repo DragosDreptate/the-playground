@@ -65,24 +65,33 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
           <DialogDescription>{t("dashboardNote")}</DialogDescription>
         </DialogHeader>
 
-        <div className="flex items-center gap-1">
-          <LocaleDropdown
-            value={locale}
-            onChange={setLocale}
-            ariaLabel={t("dashboardLabelLocale")}
-            labels={{
-              fr: t("dashboardLocaleFr"),
-              en: t("dashboardLocaleEn"),
-            }}
-          />
-          <ThemeDropdown
-            value={theme}
-            onChange={setTheme}
-            ariaLabel={t("dashboardLabelTheme")}
-            labels={{
-              light: t("dashboardThemeLight"),
-              dark: t("dashboardThemeDark"),
-            }}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1">
+            <LocaleDropdown
+              value={locale}
+              onChange={setLocale}
+              ariaLabel={t("dashboardLabelLocale")}
+              labels={{
+                fr: t("dashboardLocaleFr"),
+                en: t("dashboardLocaleEn"),
+              }}
+            />
+            <ThemeDropdown
+              value={theme}
+              onChange={setTheme}
+              ariaLabel={t("dashboardLabelTheme")}
+              labels={{
+                light: t("dashboardThemeLight"),
+                dark: t("dashboardThemeDark"),
+              }}
+            />
+          </div>
+          <CopyButton
+            value={snippet}
+            label={t("dashboardCta")}
+            copiedLabel={t("dashboardCopied")}
+            variant="ghost"
+            size="sm"
           />
         </div>
 
@@ -92,8 +101,8 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="preview" className="mt-3 h-[320px] min-w-0">
-            <div className="bg-muted/30 flex h-full items-center justify-center overflow-auto rounded-lg border p-4">
+          <TabsContent value="preview" className="mt-3 min-w-0">
+            <div className="bg-muted/30 flex h-[320px] items-center justify-center overflow-auto rounded-lg border p-4">
               <iframe
                 key={embedUrl}
                 src={embedUrl}
@@ -106,17 +115,8 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             </div>
           </TabsContent>
 
-          <TabsContent value="code" className="mt-3 flex h-[320px] min-w-0 flex-col">
-            <div className="mb-2 flex shrink-0 justify-end">
-              <CopyButton
-                value={snippet}
-                label={t("dashboardCta")}
-                copiedLabel={t("dashboardCopied")}
-                variant="ghost"
-                size="sm"
-              />
-            </div>
-            <pre className="bg-muted min-w-0 flex-1 max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed">
+          <TabsContent value="code" className="mt-3 min-w-0">
+            <pre className="bg-muted h-[320px] max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed">
               <code>{snippet}</code>
             </pre>
           </TabsContent>

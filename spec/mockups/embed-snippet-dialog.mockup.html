@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Modale "Intégrer sur mon site"</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#E91E63',
+            'primary-hover': '#D81557',
+            border: 'rgba(255,255,255,0.08)',
+            background: '#0b0e14',
+            card: '#0f1320',
+            muted: '#1a2030',
+            'muted-foreground': '#94a3b8',
+            foreground: '#f1f5f9',
+            accent: '#1a2030',
+          },
+          fontFamily: {
+            sans: ['Geist', 'system-ui', 'sans-serif'],
+            mono: ['Geist Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body { font-family: 'Geist', system-ui, sans-serif; }
+    .label-section {
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-foreground min-h-screen p-6">
+
+  <header class="max-w-7xl mx-auto mb-8">
+    <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-2">Spec embed-snippet-dialog · 2 états</p>
+    <h1 class="text-2xl font-bold mb-1">Modale « Intégrer sur mon site »</h1>
+    <p class="text-slate-400 text-sm max-w-3xl">
+      Hauteur stable entre tabs (320px sur le content). Bouton Copier sorti des tabs : dans la barre top à côté des sélecteurs. Sélecteurs alignés sur LocaleToggle / ThemeToggle du site (DropdownMenu ghost). Preview iframe à la taille réelle 480×280.
+    </p>
+  </header>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- ÉTAT 1 : Tab Aperçu actif -->
+    <section>
+      <p class="label-section">État 1 · Tab « Aperçu » actif</p>
+      <!-- Faux dialog -->
+      <div class="bg-card border-border rounded-xl border shadow-2xl" style="width: 100%;">
+        <div class="p-6">
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h2 class="text-lg font-semibold leading-tight">Intégrer sur mon site</h2>
+            <button class="text-slate-400 hover:text-slate-200 transition-colors -mt-1 -mr-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <p class="text-sm text-slate-400 mb-5 leading-relaxed">
+            Le widget se met à jour automatiquement (date, places, état). Pensez à retirer le code de votre site quand l'événement sera passé.
+          </p>
+
+          <!-- Toolbar : sélecteurs + bouton Copier -->
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-1">
+              <!-- Locale dropdown style ghost -->
+              <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                FR
+              </button>
+              <!-- Theme dropdown style ghost -->
+              <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                Clair
+              </button>
+            </div>
+            <!-- Copy button ghost -->
+            <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copier le code
+            </button>
+          </div>
+
+          <!-- Tabs -->
+          <div class="bg-slate-800/60 inline-flex w-full rounded-lg p-0.5 mb-3" role="tablist">
+            <button class="flex-1 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-slate-100 shadow-sm" aria-selected="true">
+              Aperçu
+            </button>
+            <button class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-slate-200">
+              Code HTML
+            </button>
+          </div>
+
+          <!-- Tab content : Aperçu (h-[320px] fixe) -->
+          <div class="bg-slate-800/30 flex items-center justify-center overflow-auto rounded-lg border border-slate-800 p-4" style="height: 320px;">
+            <!-- Faux widget preview : carte 480x280 alignée sur le mockup embed-event-widget -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4" style="width: 480px;">
+              <div class="flex gap-4">
+                <div class="flex-shrink-0">
+                  <img src="https://picsum.photos/seed/preview/200/200" alt="" class="w-44 h-44 rounded-xl object-cover" />
+                </div>
+                <div class="flex-1 min-w-0 flex flex-col">
+                  <h3 class="text-base font-semibold text-slate-900 leading-snug line-clamp-2">Meetup IA & Créativité</h3>
+                  <div class="mt-3 space-y-1.5 text-xs text-slate-600">
+                    <p class="flex items-center gap-2">
+                      <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      Mardi 27 mai · 19h30
+                    </p>
+                    <p class="flex items-center gap-2">
+                      <svg class="w-3.5 h-3.5 flex-shrink-0 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                      Station F, Paris
+                    </p>
+                  </div>
+                  <div class="mt-3 flex items-center gap-2">
+                    <div class="flex -space-x-1.5">
+                      <div class="w-5 h-5 rounded-full ring-2 ring-white bg-gradient-to-br from-violet-500 to-indigo-500"></div>
+                      <div class="w-5 h-5 rounded-full ring-2 ring-white bg-gradient-to-br from-rose-500 to-fuchsia-600"></div>
+                      <div class="w-5 h-5 rounded-full ring-2 ring-white bg-gradient-to-br from-emerald-500 to-cyan-500"></div>
+                      <div class="w-5 h-5 rounded-full ring-2 ring-white bg-gradient-to-br from-amber-500 to-rose-500"></div>
+                    </div>
+                    <span class="text-xs text-slate-500">+12 inscrits</span>
+                  </div>
+                  <button class="mt-auto w-full bg-primary text-white text-sm font-semibold py-2.5 rounded-lg inline-flex items-center justify-center gap-1.5">
+                    <span>S'inscrire</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                  </button>
+                </div>
+              </div>
+              <p class="mt-3 text-center text-[9px] tracking-wide text-slate-300">
+                Powered by <span class="text-slate-400 font-semibold">The Playground</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ÉTAT 2 : Tab Code HTML actif -->
+    <section>
+      <p class="label-section">État 2 · Tab « Code HTML » actif</p>
+      <!-- Faux dialog (même structure exacte que l'État 1) -->
+      <div class="bg-card border-border rounded-xl border shadow-2xl" style="width: 100%;">
+        <div class="p-6">
+          <!-- Header (identique) -->
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h2 class="text-lg font-semibold leading-tight">Intégrer sur mon site</h2>
+            <button class="text-slate-400 hover:text-slate-200 transition-colors -mt-1 -mr-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <p class="text-sm text-slate-400 mb-5 leading-relaxed">
+            Le widget se met à jour automatiquement (date, places, état). Pensez à retirer le code de votre site quand l'événement sera passé.
+          </p>
+
+          <!-- Toolbar (identique) -->
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-1">
+              <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                FR
+              </button>
+              <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                Clair
+              </button>
+            </div>
+            <button class="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-800/60 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              Copier le code
+            </button>
+          </div>
+
+          <!-- Tabs (Code HTML actif) -->
+          <div class="bg-slate-800/60 inline-flex w-full rounded-lg p-0.5 mb-3" role="tablist">
+            <button class="flex-1 rounded-md px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-slate-200">
+              Aperçu
+            </button>
+            <button class="flex-1 rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-slate-100 shadow-sm" aria-selected="true">
+              Code HTML
+            </button>
+          </div>
+
+          <!-- Tab content : Code HTML (h-[320px] fixe) -->
+          <pre class="bg-slate-800/60 rounded-lg p-4 text-xs font-mono leading-relaxed overflow-auto text-slate-200" style="height: 320px;">&lt;iframe
+  src=&quot;https://the-playground.fr/embed/m/meetup-ia-creativite?locale=fr&amp;theme=light&quot;
+  width=&quot;480&quot;
+  height=&quot;280&quot;
+  frameborder=&quot;0&quot;
+  title=&quot;Événement : Meetup IA &amp; Créativité&quot;
+  loading=&quot;lazy&quot;
+&gt;&lt;/iframe&gt;</pre>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="max-w-7xl mx-auto mt-8 bg-slate-900/50 border border-slate-800 rounded-lg p-5 text-sm text-slate-400">
+    <p class="font-semibold mb-3 text-slate-200">Décisions de design (à valider)</p>
+    <ul class="list-disc list-inside space-y-1.5">
+      <li><strong>Hauteur identique entre tabs</strong> : <code class="bg-slate-800 px-1.5 py-0.5 rounded text-slate-200">style="height: 320px"</code> directement sur le contenu interne (pas sur TabsContent) pour ne pas dépendre du parent flex Radix.</li>
+      <li><strong>Bouton Copier sorti des tabs</strong> : dans la toolbar du haut, à droite des sélecteurs. Toujours accessible, jamais en superposition.</li>
+      <li><strong>Sélecteurs alignés sur le site</strong> : style ghost button avec icône + label court (Globe + FR, Sun + Clair). Cliquer ouvre un DropdownMenu (non rendu dans ce mockup statique).</li>
+      <li><strong>Tabs full-width</strong> : variant pill comme dans le projet, hauteur compacte.</li>
+      <li><strong>Preview iframe taille réelle</strong> : 480×280 centrée dans une zone 320px de haut avec background muted pour signifier "zone d'intégration".</li>
+      <li><strong>Pre code</strong> : font-mono, leading-relaxed, overflow-auto, fond muted pour distinction visuelle.</li>
+      <li><strong>Modale max-w-2xl (≈672px)</strong> : largeur suffisante pour les 2 tabs + iframe 480px + paddings.</li>
+    </ul>
+  </footer>
+
+</body>
+</html>
