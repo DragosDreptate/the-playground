@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { Code, Globe, Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
 import {
@@ -40,8 +41,18 @@ const EMBED_HEIGHT = 250;
 
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   const t = useTranslations("EmbedWidget");
+  const { resolvedTheme } = useTheme();
   const [locale, setLocale] = useState<Locale>("fr");
   const [theme, setTheme] = useState<Theme>("light");
+
+  // Initialise le theme du widget sur celui du site à chaque ouverture, pour
+  // que l'Organisateur démarre par défaut sur le rendu qui matche son dashboard.
+  function handleOpenChange(open: boolean) {
+    if (!open) return;
+    if (resolvedTheme === "dark" || resolvedTheme === "light") {
+      setTheme(resolvedTheme);
+    }
+  }
 
   const embedUrl = `${appUrl}/embed/m/${momentSlug}?locale=${locale}&theme=${theme}`;
 
@@ -52,7 +63,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   );
 
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Code className="size-4" />
