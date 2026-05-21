@@ -37,6 +37,15 @@ export interface RegistrationRepository {
   findActiveWithUserByMomentId(
     momentId: string
   ): Promise<RegistrationWithUser[]>;
+  /**
+   * Lightweight read for the embed widget social proof: only the first N
+   * REGISTERED users (avatar fields only) + the total REGISTERED count.
+   * Avoids loading all attendees of popular events.
+   */
+  findRegisteredPreviewAndCount(
+    momentId: string,
+    previewSize: number
+  ): Promise<{ preview: RegistrationWithUser[]; total: number }>;
   countByMomentIdAndStatus(
     momentId: string,
     status: RegistrationStatus

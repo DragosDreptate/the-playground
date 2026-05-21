@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import {
@@ -11,17 +12,15 @@ import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { EmbedEventCard } from "@/components/embed/embed-event-card";
+import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 export const revalidate = 300;
 
-type SupportedLocale = "fr" | "en";
-type Theme = "light" | "dark";
-
-function parseLocale(raw: string | undefined): SupportedLocale {
+function parseLocale(raw: string | undefined): EmbedLocale {
   return raw === "en" ? "en" : "fr";
 }
 
-function parseTheme(raw: string | undefined): Theme {
+function parseTheme(raw: string | undefined): EmbedTheme {
   return raw === "dark" ? "dark" : "light";
 }
 
@@ -81,38 +80,33 @@ export default async function EmbedMomentPage({
 
   if (moment.status === "DRAFT") notFound();
 
-  const [circle, attendees] = await Promise.all([
+  const [circle, registered] = await Promise.all([
     prismaCircleRepository.findById(moment.circleId),
-    prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
+    prismaRegistrationRepository.findRegisteredPreviewAndCount(moment.id, 4),
   ]);
 
   if (!circle) notFound();
 
-  const registered = attendees.filter((r) => r.status === "REGISTERED");
+  // distinctId stable pour compter les vues, pas créer un user PostHog par event.
+  // `after()` détache l'envoi du request lifecycle (sinon Vercel tronque).
+  after(() =>
+    captureServerEvent("embed_widget", "embed_widget_view", {
+      momentId: moment.id,
+      momentSlug: moment.slug,
+      circleSlug: circle.slug,
+      locale,
+      theme,
+      status: moment.status,
+    })
+  );
 
-  // Vue widget (server-side, sans cookie ni tracking visiteur).
-  // Émis seulement sur cache miss (revalidate=300), donc volumétrie modérée.
-  // distinctId stable ("embed_widget") pour ne pas créer un user PostHog par
-  // événement : on veut un compteur d'événements, pas une dimension user.
-  void captureServerEvent("embed_widget", "embed_widget_view", {
-    momentId: moment.id,
-    momentSlug: moment.slug,
-    circleSlug: circle.slug,
-    locale,
-    theme,
-    status: moment.status,
-  });
-
-  // No wrapper: the card renders at its natural height (~250px) and the
-  // iframe is sized to match in the snippet. The `dark` class is applied
-  // only as a context for the card's internal dark: variants.
   return (
-    <div className={theme === "dark" ? "dark" : undefined}>
+    <div className={theme === "dark" ? "dark" : ""}>
       <EmbedEventCard
         moment={moment}
         circle={circle}
-        registeredCount={registered.length}
-        registeredPreview={registered}
+        registeredCount={registered.total}
+        registeredPreview={registered.preview}
         locale={locale}
         theme={theme}
       />

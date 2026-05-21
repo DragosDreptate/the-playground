@@ -1,3 +1,4 @@
+import { escapeHtml } from "@/lib/html";
 import type {
   PosthogDashboard,
   PosthogInsight,
@@ -54,15 +55,6 @@ const ENGAGEMENT_ORDER = [
 ];
 
 const BREAKDOWN_OTHER_LABEL = "$$_posthog_breakdown_other_$$";
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 function findInsightByPrefix(
   dashboard: PosthogDashboard,

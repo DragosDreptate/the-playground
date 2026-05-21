@@ -26,9 +26,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
-
-type Locale = "fr" | "en";
-type Theme = "light" | "dark";
+import { escapeHtml } from "@/lib/html";
+import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 type Props = {
   momentSlug: string;
@@ -42,11 +41,10 @@ const EMBED_HEIGHT = 250;
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   const t = useTranslations("EmbedWidget");
   const { resolvedTheme } = useTheme();
-  const [locale, setLocale] = useState<Locale>("fr");
-  const [theme, setTheme] = useState<Theme>("light");
+  const [locale, setLocale] = useState<EmbedLocale>("fr");
+  const [theme, setTheme] = useState<EmbedTheme>("light");
 
-  // Initialise le theme du widget sur celui du site à chaque ouverture, pour
-  // que l'Organisateur démarre par défaut sur le rendu qui matche son dashboard.
+  // Sync à l'ouverture: respecte un choix manuel ultérieur pendant l'usage.
   function handleOpenChange(open: boolean) {
     if (!open) return;
     if (resolvedTheme === "dark" || resolvedTheme === "light") {
@@ -58,7 +56,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
 
   const snippet = useMemo(
     () =>
-      `<iframe\n  src="${embedUrl}"\n  width="${EMBED_WIDTH}"\n  height="${EMBED_HEIGHT}"\n  frameborder="0"\n  title="${escapeHtmlAttr(t("titleAlt", { title: momentTitle }))}"\n  loading="lazy"\n></iframe>`,
+      `<iframe\n  src="${embedUrl}"\n  width="${EMBED_WIDTH}"\n  height="${EMBED_HEIGHT}"\n  frameborder="0"\n  title="${escapeHtml(t("titleAlt", { title: momentTitle }))}"\n  loading="lazy"\n></iframe>`,
     [embedUrl, momentTitle, t]
   );
 
@@ -152,10 +150,10 @@ function LocaleDropdown({
   ariaLabel,
   labels,
 }: {
-  value: Locale;
-  onChange: (next: Locale) => void;
+  value: EmbedLocale;
+  onChange: (next: EmbedLocale) => void;
   ariaLabel: string;
-  labels: Record<Locale, string>;
+  labels: Record<EmbedLocale, string>;
 }) {
   return (
     <DropdownMenu>
@@ -166,7 +164,7 @@ function LocaleDropdown({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        {(Object.keys(labels) as Locale[]).map((l) => (
+        {(Object.keys(labels) as EmbedLocale[]).map((l) => (
           <DropdownMenuItem
             key={l}
             onClick={() => onChange(l)}
@@ -186,10 +184,10 @@ function ThemeToggleButton({
   ariaLabel,
   labels,
 }: {
-  value: Theme;
-  onChange: (next: Theme) => void;
+  value: EmbedTheme;
+  onChange: (next: EmbedTheme) => void;
   ariaLabel: string;
-  labels: Record<Theme, string>;
+  labels: Record<EmbedTheme, string>;
 }) {
   const Icon = value === "dark" ? Moon : Sun;
   return (
@@ -205,6 +203,3 @@ function ThemeToggleButton({
   );
 }
 
-function escapeHtmlAttr(value: string): string {
-  return value.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}

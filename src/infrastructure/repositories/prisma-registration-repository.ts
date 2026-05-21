@@ -140,6 +140,35 @@ export const prismaRegistrationRepository: RegistrationRepository = {
     return records.map(toDomainRegistrationWithUser);
   },
 
+  async findRegisteredPreviewAndCount(
+    momentId: string,
+    previewSize: number
+  ): Promise<{ preview: RegistrationWithUser[]; total: number }> {
+    const [previewRecords, total] = await Promise.all([
+      prisma.registration.findMany({
+        where: { momentId, status: "REGISTERED" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              image: true,
+              publicId: true,
+            },
+          },
+        },
+        orderBy: { registeredAt: "asc" },
+        take: previewSize,
+      }),
+      prisma.registration.count({
+        where: { momentId, status: "REGISTERED" },
+      }),
+    ]);
+    return { preview: previewRecords.map(toDomainRegistrationWithUser), total };
+  },
+
   async countByMomentIdAndStatus(
     momentId: string,
     status: RegistrationStatus
