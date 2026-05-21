@@ -22,6 +22,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import { buildAlternates } from "@/lib/seo";
+import { getAppUrl } from "@/lib/app-url";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
@@ -97,7 +98,7 @@ export async function generateMetadata({
     return {
       title,
       description,
-      alternates: buildAlternates(locale as "fr" | "en", `/circles/${slug}`),
+      alternates: buildAlternates(locale, `/circles/${slug}`),
       ...(isPrivate && { robots: { index: false, follow: false } }),
       ...(!isPrivate && {
         openGraph: {
@@ -206,7 +207,7 @@ export default async function PublicCirclePage({
 
   const gradient = getMomentGradient(circle.name);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getAppUrl();
   const jsonLd =
     circle.visibility === "PUBLIC"
       ? {

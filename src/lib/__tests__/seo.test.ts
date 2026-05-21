@@ -70,4 +70,11 @@ describe("buildAlternates", () => {
       expect(result.languages.en).toBe(`${APP_URL}/en/legal/mentions-legales`);
     });
   });
+
+  describe("given an unknown locale string", () => {
+    it("falls back to FR as the canonical (defensive default)", () => {
+      const result = buildAlternates("de", "/about");
+      expect(result.canonical).toBe(`${APP_URL}/about`);
+    });
+  });
 });

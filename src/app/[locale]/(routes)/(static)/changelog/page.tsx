@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Changelog · The Playground",
     description: "Les évolutions du Playground, jour après jour.",
-    alternates: buildAlternates(locale as "fr" | "en", "/changelog"),
+    alternates: buildAlternates(locale, "/changelog"),
   };
 }
 

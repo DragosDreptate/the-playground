@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("HomePage")]);
   const title = `The Playground — ${t("metaTitle")}`;
   const description = t("metaDescription");
-  const alternates = buildAlternates(locale as "fr" | "en", "");
+  const alternates = buildAlternates(locale, "");
   return {
     title,
     description,

@@ -7,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("terms.title"),
     description: t("terms.metaDescription"),
-    alternates: buildAlternates(locale as "fr" | "en", "/legal/cgu"),
+    alternates: buildAlternates(locale, "/legal/cgu"),
   };
 }
 
