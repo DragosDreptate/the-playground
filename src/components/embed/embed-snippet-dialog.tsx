@@ -92,8 +92,8 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="preview" className="mt-3 min-w-0">
-            <div className="bg-muted/30 flex items-center justify-center overflow-auto rounded-lg border p-4">
+          <TabsContent value="preview" className="mt-3 h-[320px] min-w-0">
+            <div className="bg-muted/30 flex h-full items-center justify-center overflow-auto rounded-lg border p-4">
               <iframe
                 key={embedUrl}
                 src={embedUrl}
@@ -106,21 +106,19 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             </div>
           </TabsContent>
 
-          <TabsContent value="code" className="mt-3 min-w-0">
-            <div className="bg-muted relative min-w-0 rounded-lg p-3">
-              <div className="absolute right-2 top-2 z-10">
-                <CopyButton
-                  value={snippet}
-                  label={t("dashboardCta")}
-                  copiedLabel={t("dashboardCopied")}
-                  variant="ghost"
-                  size="sm"
-                />
-              </div>
-              <pre className="max-w-full overflow-x-auto pr-24 text-xs leading-relaxed">
-                <code>{snippet}</code>
-              </pre>
+          <TabsContent value="code" className="mt-3 flex h-[320px] min-w-0 flex-col">
+            <div className="mb-2 flex shrink-0 justify-end">
+              <CopyButton
+                value={snippet}
+                label={t("dashboardCta")}
+                copiedLabel={t("dashboardCopied")}
+                variant="ghost"
+                size="sm"
+              />
             </div>
+            <pre className="bg-muted min-w-0 flex-1 max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed">
+              <code>{snippet}</code>
+            </pre>
           </TabsContent>
         </Tabs>
       </DialogContent>
