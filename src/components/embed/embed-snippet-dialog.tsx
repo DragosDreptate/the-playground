@@ -121,8 +121,8 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
 
           <TabsContent value="code" className="mt-3 min-w-0">
             <pre
-              className="bg-muted max-w-full overflow-auto whitespace-pre-wrap break-all rounded-lg p-3 text-xs leading-relaxed"
-              style={{ height: 320 }}
+              className="bg-muted max-w-full overflow-scroll rounded-lg p-3 text-xs leading-relaxed [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-slate-600/60 [&::-webkit-scrollbar-track]:bg-transparent"
+              style={{ height: 320, scrollbarWidth: "thin" }}
             >
               <code>{snippet}</code>
             </pre>
