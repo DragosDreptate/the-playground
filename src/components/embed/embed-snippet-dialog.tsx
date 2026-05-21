@@ -76,7 +76,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
                 en: t("dashboardLocaleEn"),
               }}
             />
-            <ThemeDropdown
+            <ThemeToggleButton
               value={theme}
               onChange={setTheme}
               ariaLabel={t("dashboardLabelTheme")}
@@ -167,7 +167,7 @@ function LocaleDropdown({
   );
 }
 
-function ThemeDropdown({
+function ThemeToggleButton({
   value,
   onChange,
   ariaLabel,
@@ -180,25 +180,15 @@ function ThemeDropdown({
 }) {
   const Icon = value === "dark" ? Moon : Sun;
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label={ariaLabel}>
-          <Icon className="size-4" />
-          {labels[value]}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start">
-        {(Object.keys(labels) as Theme[]).map((t) => (
-          <DropdownMenuItem
-            key={t}
-            onClick={() => onChange(t)}
-            className={t === value ? "font-semibold" : ""}
-          >
-            {labels[t]}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-label={ariaLabel}
+      onClick={() => onChange(value === "dark" ? "light" : "dark")}
+    >
+      <Icon className="size-4" />
+      {labels[value]}
+    </Button>
   );
 }
 
