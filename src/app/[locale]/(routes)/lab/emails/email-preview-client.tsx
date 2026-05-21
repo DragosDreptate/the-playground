@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Template = { id: string; label: string; html: string };
+type Template = { id: string; label: string; subject: string; html: string };
 
 export function EmailPreviewClient({ templates }: { templates: Template[] }) {
   const [selected, setSelected] = useState(templates[0]?.id ?? "");
@@ -60,15 +60,27 @@ export function EmailPreviewClient({ templates }: { templates: Template[] }) {
           background: "#ffffff",
           borderBottom: "1px solid #e4e4e7",
           display: "flex",
-          alignItems: "center",
-          gap: "12px",
+          flexDirection: "column",
+          gap: "4px",
         }}>
-          <span style={{ fontSize: "14px", fontWeight: 600, color: "#18181b" }}>
-            {current?.label}
-          </span>
-          <span style={{ fontSize: "12px", color: "#71717a" }}>
-            {current?.id}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "#18181b" }}>
+              {current?.label}
+            </span>
+            <span style={{ fontSize: "12px", color: "#71717a" }}>
+              {current?.id}
+            </span>
+          </div>
+          {current && (
+            <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+              <span style={{ fontSize: "11px", fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                Sujet
+              </span>
+              <span style={{ fontSize: "13px", color: "#27272a" }}>
+                {current.subject}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Iframe */}

@@ -36,15 +36,26 @@ export async function notifyAdminEntityCreated(
       ? `${appUrl}/dashboard/circles/${params.entitySlug}`
       : `${appUrl}/dashboard/circles/${params.circleSlug}/moments/${params.entitySlug}`;
 
-  const isCircle = params.entityType === "circle";
-  const entityLabel = isCircle ? "Communauté" : "événement";
-  const entityLabelCap = isCircle ? "Communauté" : "Événement";
+  const copy = {
+    circle: {
+      subjectPrefix: "Nouvelle Communauté créée",
+      heading: "Nouvelle Communauté sur The Playground",
+      messageEntity: "une nouvelle Communauté",
+      ctaTarget: "la Communauté",
+    },
+    moment: {
+      subjectPrefix: "Nouvel événement créé",
+      heading: "Nouvel événement sur The Playground",
+      messageEntity: "un nouvel événement",
+      ctaTarget: "l'événement",
+    },
+  }[params.entityType];
 
   const strings = {
-    subject: `[Admin] Nouvelle ${entityLabel} créé${isCircle ? "e" : ""} — ${params.entityName}`,
-    heading: `Nouvelle ${entityLabel} sur The Playground`,
-    message: `${params.creatorName} vient de créer ${isCircle ? "une nouvelle Communauté" : "un nouvel événement"}.`,
-    ctaLabel: `Voir ${isCircle ? "la Communauté" : "l'événement"} dans l'admin`,
+    subject: `[Admin] ${copy.subjectPrefix} — ${params.entityName}`,
+    heading: copy.heading,
+    message: `${params.creatorName} vient de créer ${copy.messageEntity}.`,
+    ctaLabel: `Voir ${copy.ctaTarget} dans l'admin`,
     footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
     dateLabel: "Date",
     locationLabel: "Lieu",
