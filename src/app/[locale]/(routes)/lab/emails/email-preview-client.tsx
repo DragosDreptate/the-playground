@@ -71,7 +71,7 @@ export function EmailPreviewClient({ templates }: { templates: Template[] }) {
               {current?.id}
             </span>
           </div>
-          {current?.subject && (
+          {current && (
             <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
               <span style={{ fontSize: "11px", fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.06em" }}>
                 Sujet
