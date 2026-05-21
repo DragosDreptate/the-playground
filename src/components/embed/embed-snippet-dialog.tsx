@@ -60,7 +60,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
+        <DialogHeader className="gap-3">
           <DialogTitle>{t("dashboardTitle")}</DialogTitle>
           <DialogDescription className="whitespace-pre-line">
             {t("dashboardNote")}
