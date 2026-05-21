@@ -81,13 +81,16 @@ test.describe("Embed widget — dashboard Organisateur", () => {
     await expect(page.getByRole("button", { name: /obtenir le code/i })).toBeVisible();
   });
 
-  test("should open the embed snippet dialog when clicked", async ({ page }) => {
+  test("should open the embed snippet dialog with preview and code tabs", async ({ page }) => {
     await page.goto(
       `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${SLUGS.PUBLISHED_MOMENT}`
     );
     await page.getByRole("button", { name: /obtenir le code/i }).click();
     await expect(page.getByRole("dialog")).toBeVisible();
+    // Tab Aperçu actif par défaut → iframe visible
     await expect(page.locator("iframe[src*='/embed/m/']")).toBeVisible();
+    // Switch sur le tab Code HTML → snippet visible
+    await page.getByRole("tab", { name: /code html/i }).click();
     await expect(page.locator("pre code")).toContainText("<iframe");
   });
 });

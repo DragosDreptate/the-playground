@@ -2016,7 +2016,7 @@
     "dashboardLocaleFr": "Français",
     "dashboardLocaleEn": "English",
     "dashboardPreviewTitle": "Preview",
-    "dashboardSnippetTitle": "Paste this snippet into your site",
+    "dashboardSnippetTitle": "HTML code",
     "dashboardNote": "The widget updates automatically (date, capacity, status). Remember to remove the snippet from your site after the event."
   }
 }

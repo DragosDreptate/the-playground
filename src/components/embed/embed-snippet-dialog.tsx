@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Code } from "lucide-react";
+import { Code, Globe, Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/ui/copy-button";
@@ -13,6 +13,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 type Locale = "fr" | "en";
 type Theme = "light" | "dark";
@@ -23,6 +35,7 @@ type Props = {
   appUrl: string;
 };
 
+const EMBED_WIDTH = 480;
 const EMBED_HEIGHT = 280;
 
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
@@ -34,7 +47,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
 
   const snippet = useMemo(
     () =>
-      `<iframe\n  src="${embedUrl}"\n  width="100%"\n  height="${EMBED_HEIGHT}"\n  frameborder="0"\n  title="${escapeHtmlAttr(t("titleAlt", { title: momentTitle }))}"\n  loading="lazy"\n></iframe>`,
+      `<iframe\n  src="${embedUrl}"\n  width="${EMBED_WIDTH}"\n  height="${EMBED_HEIGHT}"\n  frameborder="0"\n  title="${escapeHtmlAttr(t("titleAlt", { title: momentTitle }))}"\n  loading="lazy"\n></iframe>`,
     [embedUrl, momentTitle, t]
   );
 
@@ -52,105 +65,145 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
           <DialogDescription>{t("dashboardNote")}</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-5">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-muted-foreground mb-1.5 block text-xs font-medium uppercase tracking-wider">
-                {t("dashboardLabelLocale")}
-              </label>
-              <SegmentedControl
-                value={locale}
-                onChange={setLocale}
-                options={[
-                  { value: "fr", label: t("dashboardLocaleFr") },
-                  { value: "en", label: t("dashboardLocaleEn") },
-                ]}
-              />
-            </div>
-            <div>
-              <label className="text-muted-foreground mb-1.5 block text-xs font-medium uppercase tracking-wider">
-                {t("dashboardLabelTheme")}
-              </label>
-              <SegmentedControl
-                value={theme}
-                onChange={setTheme}
-                options={[
-                  { value: "light", label: t("dashboardThemeLight") },
-                  { value: "dark", label: t("dashboardThemeDark") },
-                ]}
-              />
-            </div>
-          </div>
+        <div className="flex items-center gap-1">
+          <LocaleDropdown
+            value={locale}
+            onChange={setLocale}
+            ariaLabel={t("dashboardLabelLocale")}
+            labels={{
+              fr: t("dashboardLocaleFr"),
+              en: t("dashboardLocaleEn"),
+            }}
+          />
+          <ThemeDropdown
+            value={theme}
+            onChange={setTheme}
+            ariaLabel={t("dashboardLabelTheme")}
+            labels={{
+              light: t("dashboardThemeLight"),
+              dark: t("dashboardThemeDark"),
+            }}
+          />
+        </div>
 
-          <div>
-            <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wider">
-              {t("dashboardPreviewTitle")}
-            </p>
-            <div className="bg-muted/30 overflow-hidden rounded-xl border p-4">
+        <Tabs defaultValue="preview" className="w-full">
+          <TabsList>
+            <TabsTrigger value="preview">{t("dashboardPreviewTitle")}</TabsTrigger>
+            <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="preview" className="mt-3">
+            <div className="bg-muted/30 flex items-center justify-center overflow-auto rounded-lg border p-4">
               <iframe
                 key={embedUrl}
                 src={embedUrl}
-                width="100%"
+                width={EMBED_WIDTH}
                 height={EMBED_HEIGHT}
                 frameBorder={0}
                 title={t("titleAlt", { title: momentTitle })}
                 className="block"
               />
             </div>
-          </div>
+          </TabsContent>
 
-          <div>
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
-                {t("dashboardSnippetTitle")}
-              </p>
-              <CopyButton
-                value={snippet}
-                label={t("dashboardCta")}
-                copiedLabel={t("dashboardCopied")}
-                variant="default"
-                size="sm"
-              />
+          <TabsContent value="code" className="mt-3">
+            <div className="bg-muted relative rounded-lg p-3">
+              <div className="absolute right-2 top-2">
+                <CopyButton
+                  value={snippet}
+                  label={t("dashboardCta")}
+                  copiedLabel={t("dashboardCopied")}
+                  variant="ghost"
+                  size="sm"
+                />
+              </div>
+              <pre className="overflow-auto pr-24 text-xs leading-relaxed">
+                <code>{snippet}</code>
+              </pre>
             </div>
-            <pre className="bg-muted overflow-x-auto rounded-lg p-3 text-xs leading-relaxed">
-              <code>{snippet}</code>
-            </pre>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
 }
 
-function SegmentedControl<T extends string>({
+function LocaleDropdown({
   value,
   onChange,
-  options,
+  ariaLabel,
+  labels,
 }: {
-  value: T;
-  onChange: (next: T) => void;
-  options: { value: T; label: string }[];
+  value: Locale;
+  onChange: (next: Locale) => void;
+  ariaLabel: string;
+  labels: Record<Locale, string>;
 }) {
   return (
-    <div className="bg-muted inline-flex w-full rounded-lg p-0.5">
-      {options.map((opt) => {
-        const active = opt.value === value;
-        return (
-          <button
-            key={opt.value}
-            type="button"
-            onClick={() => onChange(opt.value)}
-            className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              active
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs font-medium"
+          aria-label={ariaLabel}
+        >
+          <Globe className="size-3.5" />
+          {value.toUpperCase()}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {(Object.keys(labels) as Locale[]).map((l) => (
+          <DropdownMenuItem
+            key={l}
+            onClick={() => onChange(l)}
+            className={l === value ? "font-semibold" : ""}
           >
-            {opt.label}
-          </button>
-        );
-      })}
-    </div>
+            {labels[l]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function ThemeDropdown({
+  value,
+  onChange,
+  ariaLabel,
+  labels,
+}: {
+  value: Theme;
+  onChange: (next: Theme) => void;
+  ariaLabel: string;
+  labels: Record<Theme, string>;
+}) {
+  const Icon = value === "dark" ? Moon : Sun;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs font-medium"
+          aria-label={ariaLabel}
+        >
+          <Icon className="size-3.5" />
+          {labels[value]}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        {(Object.keys(labels) as Theme[]).map((t) => (
+          <DropdownMenuItem
+            key={t}
+            onClick={() => onChange(t)}
+            className={t === value ? "font-semibold" : ""}
+          >
+            {labels[t]}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
