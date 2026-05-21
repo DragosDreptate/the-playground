@@ -74,5 +74,7 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|monitoring|ingest|icon|embed|.*\\..*).*)"],
+  // `embed(?:/|$)` (vs simple `embed`) évite de matcher des paths futurs
+  // comme /embedded-foo qui ne sont pas l'app widget embed.
+  matcher: ["/((?!api|_next|_vercel|monitoring|ingest|icon|embed(?:/|$)|.*\\..*).*)"],
 };

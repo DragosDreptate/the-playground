@@ -24,9 +24,9 @@ test.describe("Embed widget — rendu public", () => {
   test("should not render the site header or footer", async ({ page }) => {
     await page.goto(`/embed/m/${SLUGS.PUBLISHED_MOMENT}`);
     await expect(page.locator("header.site-header")).toHaveCount(0);
-    await expect(page.locator("footer").filter({ hasText: /the playground/i }).first()).toBeVisible();
-    // Le footer présent est uniquement la mention "Powered by The Playground"
-    // dans la carte, pas le SiteFooter du reste de l'app.
+    // La mention "Powered by The Playground" est rendue dans un <p>, pas dans
+    // un <footer> HTML : on vérifie juste sa présence.
+    await expect(page.getByText(/powered by the playground/i)).toBeVisible();
   });
 
   test("should serve frame-ancestors * in CSP (allow embedding anywhere)", async ({ request }) => {

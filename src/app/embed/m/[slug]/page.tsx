@@ -92,7 +92,10 @@ export default async function EmbedMomentPage({
 
   // Vue widget (server-side, sans cookie ni tracking visiteur).
   // Émis seulement sur cache miss (revalidate=300), donc volumétrie modérée.
-  void captureServerEvent(moment.id, "embed_widget_view", {
+  // distinctId stable ("embed_widget") pour ne pas créer un user PostHog par
+  // événement : on veut un compteur d'événements, pas une dimension user.
+  void captureServerEvent("embed_widget", "embed_widget_view", {
+    momentId: moment.id,
     momentSlug: moment.slug,
     circleSlug: circle.slug,
     locale,

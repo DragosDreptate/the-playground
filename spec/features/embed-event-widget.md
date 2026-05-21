@@ -31,7 +31,7 @@ Un Organisateur a un site externe (blog, page d'association, landing page Notion
 | D13 | Pas de tracking PostHog dans l'iframe (RGPD : on est dans le contexte d'un site tiers). |
 | D14 | Pas de personnalisation de design côté Organisateur (couleurs, logo). Look uniforme = brand awareness. |
 | D15 | Tracking server-side via PostHog (event `embed_widget_view` avec props `momentSlug`, `locale`, `theme`, `circleSlug`). Aucun cookie, aucun identifiant visiteur — RGPD-safe. Vues exploitables en interne pour dashboards futurs. |
-| D16 | Hauteur du snippet : ~260px desktop (cover 192px + paddings + footer), ~530px mobile (cover pleine largeur 1:1 + contenu vertical). À arbitrer en début d'impl : hauteur unique conservative (530px, du vide en bas sur desktop) ou auto-resize via `postMessage` (hors scope V1, à reconsidérer). |
+| D16 | Hauteur du snippet : **250px desktop** (= cover w-48 + p-4 + footer mention), à utiliser tel quel dans le `<iframe height="250">` généré. Mobile : si l'iframe est plus étroite que ~480px, la carte bascule en layout vertical et l'utilisateur doit ajuster `height` manuellement (auto-resize via `postMessage` hors scope V1). |
 
 ---
 
@@ -167,8 +167,8 @@ Contient :
    ```html
    <iframe
      src="https://the-playground.fr/embed/m/[slug]?locale=fr&theme=light"
-     width="100%"
-     height="450"
+     width="480"
+     height="250"
      frameborder="0"
      title="Événement : [titre]"
      loading="lazy"

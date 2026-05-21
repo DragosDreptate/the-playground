@@ -49,7 +49,7 @@
     <p class="text-xs uppercase tracking-widest text-primary font-semibold mb-2">Spec embed-snippet-dialog · 2 états</p>
     <h1 class="text-2xl font-bold mb-1">Modale « Intégrer sur mon site »</h1>
     <p class="text-slate-400 text-sm max-w-3xl">
-      Hauteur stable entre tabs (320px sur le content). Bouton Copier sorti des tabs : dans la barre top à côté des sélecteurs. Sélecteurs alignés sur LocaleToggle / ThemeToggle du site (DropdownMenu ghost). Preview iframe à la taille réelle 480×280.
+      Hauteur stable entre tabs (320px sur le content). Bouton Copier sorti des tabs : dans la barre top à côté des sélecteurs. Sélecteurs alignés sur LocaleToggle / ThemeToggle du site (DropdownMenu ghost). Preview iframe à la taille réelle 480×250.
     </p>
   </header>
 
@@ -105,7 +105,7 @@
 
           <!-- Tab content : Aperçu (h-[320px] fixe) -->
           <div class="bg-slate-800/30 flex items-center justify-center overflow-auto rounded-lg border border-slate-800 p-4" style="height: 320px;">
-            <!-- Faux widget preview : carte 480x280 alignée sur le mockup embed-event-widget -->
+            <!-- Faux widget preview : carte 480x250 alignée sur le mockup embed-event-widget -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4" style="width: 480px;">
               <div class="flex gap-4">
                 <div class="flex-shrink-0">
@@ -196,7 +196,7 @@
           <pre class="bg-slate-800/60 rounded-lg p-4 text-xs font-mono leading-relaxed overflow-auto text-slate-200" style="height: 320px;">&lt;iframe
   src=&quot;https://the-playground.fr/embed/m/meetup-ia-creativite?locale=fr&amp;theme=light&quot;
   width=&quot;480&quot;
-  height=&quot;280&quot;
+  height=&quot;250&quot;
   frameborder=&quot;0&quot;
   title=&quot;Événement : Meetup IA &amp; Créativité&quot;
   loading=&quot;lazy&quot;
@@ -214,7 +214,7 @@
       <li><strong>Bouton Copier sorti des tabs</strong> : dans la toolbar du haut, à droite des sélecteurs. Toujours accessible, jamais en superposition.</li>
       <li><strong>Sélecteurs alignés sur le site</strong> : style ghost button avec icône + label court (Globe + FR, Sun + Clair). Cliquer ouvre un DropdownMenu (non rendu dans ce mockup statique).</li>
       <li><strong>Tabs full-width</strong> : variant pill comme dans le projet, hauteur compacte.</li>
-      <li><strong>Preview iframe taille réelle</strong> : 480×280 centrée dans une zone 320px de haut avec background muted pour signifier "zone d'intégration".</li>
+      <li><strong>Preview iframe taille réelle</strong> : 480×250 centrée dans une zone 320px de haut avec background muted pour signifier "zone d'intégration".</li>
       <li><strong>Pre code</strong> : font-mono, leading-relaxed, overflow-auto, fond muted pour distinction visuelle.</li>
       <li><strong>Modale max-w-2xl (≈672px)</strong> : largeur suffisante pour les 2 tabs + iframe 480px + paddings.</li>
     </ul>
