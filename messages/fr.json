@@ -1381,14 +1381,62 @@
           "hosting": "Hébergement des données",
           "safeguards": "Garanties"
         },
-        "vercel": { "purpose": "Hébergement de l'application", "data": "Adresse IP, cookies de session, requêtes HTTP (transit)", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Vercel, données hébergées en UE" },
-        "neon": { "purpose": "Hébergement de la base de données", "data": "Toutes les données du compte : email, nom, photo de profil, inscriptions, commentaires", "hq": "États-Unis", "hosting": "Union européenne (Frankfurt)", "safeguards": "DPA Neon, données hébergées en UE" },
-        "posthog": { "purpose": "Analyse d'utilisation du service", "data": "Identifiant utilisateur, email, nom, pages visitées", "hq": "États-Unis", "hosting": "Union européenne (eu.posthog.com)", "safeguards": "DPA PostHog, données hébergées en UE" },
-        "sentry": { "purpose": "Surveillance des erreurs techniques", "data": "Traces d'erreur techniques (aucune donnée personnelle explicitement transmise)", "hq": "États-Unis", "hosting": "Union européenne (Allemagne, de.sentry.io)", "safeguards": "DPA Sentry, données hébergées en UE" },
-        "resend": { "purpose": "Envoi d'emails transactionnels et de notifications", "data": "Adresse email du destinataire, nom (dans certains emails)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Resend, clauses contractuelles types UE" },
-        "stripe": { "purpose": "Traitement des paiements (événements payants)", "data": "Adresse email, identifiant utilisateur", "hq": "États-Unis", "hosting": "États-Unis / Union européenne (infrastructure globale)", "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE" },
-        "anthropic": { "purpose": "Fonctionnalités d'intelligence artificielle (génération de descriptions)", "data": "Contenu saisi par l'utilisateur (titres et descriptions d'événements) — aucune donnée personnelle", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Anthropic, clauses contractuelles types UE" },
-        "slack": { "purpose": "Notifications internes d'administration (nouveaux utilisateurs, nouvelles communautés)", "data": "Nom et email de l'utilisateur (notifications administrateur uniquement)", "hq": "États-Unis", "hosting": "États-Unis", "safeguards": "DPA Slack/Salesforce, clauses contractuelles types UE" },
+        "vercel": {
+          "purpose": "Hébergement de l'application",
+          "data": "Adresse IP, cookies de session, requêtes HTTP (transit)",
+          "hq": "États-Unis",
+          "hosting": "Union européenne (Frankfurt)",
+          "safeguards": "DPA Vercel, données hébergées en UE"
+        },
+        "neon": {
+          "purpose": "Hébergement de la base de données",
+          "data": "Toutes les données du compte : email, nom, photo de profil, inscriptions, commentaires",
+          "hq": "États-Unis",
+          "hosting": "Union européenne (Frankfurt)",
+          "safeguards": "DPA Neon, données hébergées en UE"
+        },
+        "posthog": {
+          "purpose": "Analyse d'utilisation du service",
+          "data": "Identifiant utilisateur, email, nom, pages visitées",
+          "hq": "États-Unis",
+          "hosting": "Union européenne (eu.posthog.com)",
+          "safeguards": "DPA PostHog, données hébergées en UE"
+        },
+        "sentry": {
+          "purpose": "Surveillance des erreurs techniques",
+          "data": "Traces d'erreur techniques (aucune donnée personnelle explicitement transmise)",
+          "hq": "États-Unis",
+          "hosting": "Union européenne (Allemagne, de.sentry.io)",
+          "safeguards": "DPA Sentry, données hébergées en UE"
+        },
+        "resend": {
+          "purpose": "Envoi d'emails transactionnels et de notifications",
+          "data": "Adresse email du destinataire, nom (dans certains emails)",
+          "hq": "États-Unis",
+          "hosting": "États-Unis",
+          "safeguards": "DPA Resend, clauses contractuelles types UE"
+        },
+        "stripe": {
+          "purpose": "Traitement des paiements (événements payants)",
+          "data": "Adresse email, identifiant utilisateur",
+          "hq": "États-Unis",
+          "hosting": "États-Unis / Union européenne (infrastructure globale)",
+          "safeguards": "Certifié PCI-DSS, DPA Stripe, clauses contractuelles types UE"
+        },
+        "anthropic": {
+          "purpose": "Fonctionnalités d'intelligence artificielle (génération de descriptions)",
+          "data": "Contenu saisi par l'utilisateur (titres et descriptions d'événements) — aucune donnée personnelle",
+          "hq": "États-Unis",
+          "hosting": "États-Unis",
+          "safeguards": "DPA Anthropic, clauses contractuelles types UE"
+        },
+        "slack": {
+          "purpose": "Notifications internes d'administration (nouveaux utilisateurs, nouvelles communautés)",
+          "data": "Nom et email de l'utilisateur (notifications administrateur uniquement)",
+          "hq": "États-Unis",
+          "hosting": "États-Unis",
+          "safeguards": "DPA Slack/Salesforce, clauses contractuelles types UE"
+        },
         "noSale": "Vos données ne sont jamais vendues ni partagées avec des tiers à des fins commerciales ou publicitaires."
       },
       "transfers": {
@@ -1943,5 +1991,32 @@
   "About": {
     "pageTitle": "À propos",
     "pageDescription": "The Playground est la plateforme communautaire gratuite pour organiser des événements — alternative à Meetup et Luma, sans commission ni abonnement."
+  },
+  "EmbedWidget": {
+    "register": "S'inscrire",
+    "viewUpcoming": "Voir les prochains",
+    "attendingCount": "+{count} inscrits",
+    "attendedCount": "{count} ont participé",
+    "badgePast": "Passé",
+    "badgeCancelled": "Annulé",
+    "cancelledExplanation": "Cet événement a été annulé.",
+    "online": "En ligne",
+    "poweredBy": "Powered by",
+    "titleAlt": "Événement : {title}",
+    "dashboardTitle": "Intégrer sur mon site",
+    "dashboardCardLabel": "Widget événement",
+    "dashboardCardDescription": "Affichez cet événement sur votre site, blog ou newsletter.",
+    "dashboardOpen": "Obtenir le code",
+    "dashboardCta": "Copier le code",
+    "dashboardCopied": "Copié",
+    "dashboardLabelLocale": "Langue",
+    "dashboardLabelTheme": "Thème",
+    "dashboardThemeLight": "Clair",
+    "dashboardThemeDark": "Sombre",
+    "dashboardLocaleFr": "Français",
+    "dashboardLocaleEn": "English",
+    "dashboardPreviewTitle": "Aperçu",
+    "dashboardSnippetTitle": "Code à coller dans votre site",
+    "dashboardNote": "Le widget se met à jour automatiquement (date, places, état). Pensez à retirer le code de votre site quand l'événement sera passé."
   }
 }
