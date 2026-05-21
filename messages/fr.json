@@ -2017,6 +2017,6 @@
     "dashboardLocaleEn": "English",
     "dashboardPreviewTitle": "Aperçu",
     "dashboardSnippetTitle": "Code HTML",
-    "dashboardNote": "Le widget se met à jour automatiquement (date, places, état). Pensez à retirer le code de votre site quand l'événement sera passé."
+    "dashboardNote": "Le widget se met à jour automatiquement (date, places, état).\nPensez à retirer le code de votre site quand l'événement sera passé."
   }
 }

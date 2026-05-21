@@ -2017,6 +2017,6 @@
     "dashboardLocaleEn": "English",
     "dashboardPreviewTitle": "Preview",
     "dashboardSnippetTitle": "HTML code",
-    "dashboardNote": "The widget updates automatically (date, capacity, status). Remember to remove the snippet from your site after the event."
+    "dashboardNote": "The widget updates automatically (date, capacity, status).\nRemember to remove the snippet from your site after the event."
   }
 }
