@@ -48,7 +48,8 @@ const baseCspDirectives = [
   "font-src 'self'",
   // Stripe Elements + Google Maps Embed API (www.google.com/maps/embed/v1/...)
   // + Vercel Blob (PDF preview dans la modale des pièces jointes Moment)
-  "frame-src js.stripe.com www.google.com *.public.blob.vercel-storage.com",
+  // + 'self' pour l'aperçu live du widget /embed/m/* dans la modale dashboard
+  "frame-src 'self' js.stripe.com www.google.com *.public.blob.vercel-storage.com",
   // Formulaires : uniquement vers le domaine propre
   "form-action 'self'",
 ];
