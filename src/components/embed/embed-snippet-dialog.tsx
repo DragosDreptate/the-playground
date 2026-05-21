@@ -103,10 +103,10 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             <TabsTrigger value="code">{t("dashboardSnippetTitle")}</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="preview" className="mt-3 min-w-0">
+          <TabsContent value="preview" className="mt-2 min-w-0">
             <div
               className="flex items-center justify-center"
-              style={{ height: 320 }}
+              style={{ height: 260 }}
             >
               <iframe
                 key={embedUrl}
@@ -121,10 +121,10 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
             </div>
           </TabsContent>
 
-          <TabsContent value="code" className="mt-3 min-w-0">
+          <TabsContent value="code" className="mt-2 min-w-0">
             <pre
               className="bg-muted max-w-full overflow-scroll rounded-lg p-3 text-xs leading-relaxed [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:appearance-none [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500/70 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-700/30"
-              style={{ height: 320, scrollbarWidth: "thin", scrollbarColor: "rgba(100,116,139,0.7) rgba(51,65,85,0.3)" }}
+              style={{ height: 260, scrollbarWidth: "thin", scrollbarColor: "rgba(100,116,139,0.7) rgba(51,65,85,0.3)" }}
             >
               <code>{snippet}</code>
             </pre>
