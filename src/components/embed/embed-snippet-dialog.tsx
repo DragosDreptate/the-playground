@@ -121,7 +121,7 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
 
           <TabsContent value="code" className="mt-3 min-w-0">
             <pre
-              className="bg-muted max-w-full overflow-auto rounded-lg p-3 text-xs leading-relaxed"
+              className="bg-muted max-w-full overflow-auto whitespace-pre-wrap break-all rounded-lg p-3 text-xs leading-relaxed"
               style={{ height: 320 }}
             >
               <code>{snippet}</code>
