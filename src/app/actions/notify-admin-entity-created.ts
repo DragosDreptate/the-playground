@@ -37,12 +37,12 @@ export async function notifyAdminEntityCreated(
       : `${appUrl}/dashboard/circles/${params.circleSlug}/moments/${params.entitySlug}`;
 
   const isCircle = params.entityType === "circle";
-  const entityLabel = isCircle ? "Communauté" : "événement";
-  const entityLabelCap = isCircle ? "Communauté" : "Événement";
 
   const strings = {
-    subject: `[Admin] Nouvelle ${entityLabel} créé${isCircle ? "e" : ""} — ${params.entityName}`,
-    heading: `Nouvelle ${entityLabel} sur The Playground`,
+    subject: isCircle
+      ? `[Admin] Nouvelle Communauté créée — ${params.entityName}`
+      : `[Admin] Nouvel événement créé — ${params.entityName}`,
+    heading: isCircle ? "Nouvelle Communauté sur The Playground" : "Nouvel événement sur The Playground",
     message: `${params.creatorName} vient de créer ${isCircle ? "une nouvelle Communauté" : "un nouvel événement"}.`,
     ctaLabel: `Voir ${isCircle ? "la Communauté" : "l'événement"} dans l'admin`,
     footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",

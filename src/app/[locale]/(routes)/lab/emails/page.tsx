@@ -20,16 +20,18 @@ import { RegistrationReminderEmail } from "@/infrastructure/services/email/templ
 import { RegistrationRemovedByHostEmail } from "@/infrastructure/services/email/templates/registration-removed-by-host";
 import { MemberRemovedFromCircleEmail } from "@/infrastructure/services/email/templates/member-removed-from-circle";
 import { OnboardingWelcomeEmail } from "@/infrastructure/services/email/templates/onboarding-welcome";
+import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 import { EmailPreviewClient } from "./email-preview-client";
 
 const BASE_URL = "https://the-playground.fr";
 const FOOTER = "Powered by The Playground — Lancez votre communauté, gratuitement.";
 
-async function buildTemplates(): Promise<{ id: string; label: string; html: string }[]> {
+async function buildTemplates(): Promise<{ id: string; label: string; subject: string; html: string }[]> {
   const templates = [
     {
       id: "registration-confirmation",
       label: "Confirmation d'inscription",
+      subject: "Inscription confirmée : Soirée JS & Pizza",
       element: RegistrationConfirmationEmail({
         to: "alice@example.com",
         playerName: "Alice Martin",
@@ -59,6 +61,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "waitlist",
       label: "Liste d'attente",
+      subject: "Votre place est confirmée : Soirée JS & Pizza",
       element: WaitlistPromotionEmail({
         to: "alice@example.com",
         playerName: "Alice Martin",
@@ -85,6 +88,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "host-new-registration",
       label: "Host — Nouvelle inscription",
+      subject: "Alice Martin s'est inscrit(e) à Soirée JS & Pizza",
       element: HostNewRegistrationEmail({
         to: "bob@example.com",
         hostName: "Bob Dupont",
@@ -106,6 +110,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "host-new-circle-member",
       label: "Host — Nouveau membre Communauté",
+      subject: "Alice Martin a rejoint Paris Creative Tech",
       element: HostNewCircleMemberEmail({
         to: "bob@example.com",
         hostName: "Bob Dupont",
@@ -127,6 +132,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "host-moment-created",
       label: "Host — Événement publié",
+      subject: "Votre événement est en ligne : Soirée JS & Pizza",
       element: HostMomentCreatedEmail({
         to: "bob@example.com",
         hostName: "Bob Dupont",
@@ -153,6 +159,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "new-comment",
       label: "Participant — Nouveau commentaire",
+      subject: "Charlie Leroy a commenté Soirée JS & Pizza",
       element: NewCommentEmail({
         to: "alice@example.com",
         recipientName: "Alice Martin",
@@ -174,6 +181,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "host-new-comment",
       label: "Host — Nouveau commentaire",
+      subject: "Alice Martin a commenté Soirée JS & Pizza",
       element: HostNewCommentEmail({
         to: "bob@example.com",
         recipientName: "Bob Dupont",
@@ -195,6 +203,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "host-contact-message",
       label: "Host — Message d'un Participant (Contacter l'organisateur)",
+      subject: "Un membre vous contacte sur The Playground",
       element: HostContactMessageEmail({
         to: "bob@example.com",
         replyTo: "alice@example.com",
@@ -217,6 +226,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "moment-update",
       label: "Mise à jour d'événement",
+      subject: "Mise à jour : Soirée JS & Pizza",
       element: MomentUpdateEmail({
         to: "alice@example.com",
         playerName: "Alice Martin",
@@ -247,6 +257,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "moment-cancelled",
       label: "Événement annulé",
+      subject: "Annulé : Soirée JS & Pizza",
       element: MomentCancelledEmail({
         to: "alice@example.com",
         recipientName: "Alice Martin",
@@ -270,6 +281,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "new-moment-notification",
       label: "Nouvel événement (membres)",
+      subject: "🎉 Nouvel événement — Paris Creative Tech",
       element: NewMomentNotificationEmail({
         to: "alice@example.com",
         recipientName: "Alice",
@@ -298,6 +310,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "broadcast-moment",
       label: "Diffusion événement (broadcast)",
+      subject: "Nouveau : Soirée JS & Pizza",
       element: BroadcastMomentEmail({
         to: "alice@example.com",
         momentTitle: "Soirée JS & Pizza",
@@ -325,6 +338,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "circle-invitation",
       label: "Invitation Communauté",
+      subject: "Bob Dupont vous invite à rejoindre Paris Creative Tech",
       element: CircleInvitationEmail({
         to: "alice@example.com",
         inviterName: "Bob Dupont",
@@ -345,6 +359,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "admin-entity-created",
       label: "Admin — Nouvelle entité (Communauté)",
+      subject: "[Admin] Nouvelle Communauté créée — Paris Creative Tech",
       element: AdminEntityCreatedEmail({
         to: "admin@the-playground.fr",
         entityType: "circle",
@@ -353,11 +368,11 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
         creatorEmail: "bob@example.com",
         entityUrl: `${BASE_URL}/admin/circles/paris-creative-tech`,
         strings: {
-          subject: "Nouvelle Communauté créée : Paris Creative Tech",
-          heading: "Nouvelle Communauté",
-          message: "Bob Dupont vient de créer la Communauté Paris Creative Tech.",
-          ctaLabel: "Voir dans l'admin",
-          footer: FOOTER,
+          subject: "[Admin] Nouvelle Communauté créée — Paris Creative Tech",
+          heading: "Nouvelle Communauté sur The Playground",
+          message: "Bob Dupont vient de créer une nouvelle Communauté.",
+          ctaLabel: "Voir la Communauté dans l'admin",
+          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
         },
         baseUrl: BASE_URL,
       }),
@@ -365,6 +380,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "admin-entity-created-moment",
       label: "Admin — Nouvel événement",
+      subject: "[Admin] Nouvel événement créé — Soirée JS & Pizza",
       element: AdminEntityCreatedEmail({
         to: "admin@the-playground.fr",
         entityType: "moment",
@@ -376,11 +392,11 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
         locationText: "Le Cargo, 18 rue de la Paix, Paris",
         entityUrl: `${BASE_URL}/dashboard/circles/paris-creative-tech/moments/soiree-js-pizza`,
         strings: {
-          subject: "Nouvel événement créé : Soirée JS & Pizza",
-          heading: "Nouvel événement",
+          subject: "[Admin] Nouvel événement créé — Soirée JS & Pizza",
+          heading: "Nouvel événement sur The Playground",
           message: "Bob Dupont vient de créer un nouvel événement.",
-          ctaLabel: "Voir dans l'admin",
-          footer: FOOTER,
+          ctaLabel: "Voir l'événement dans l'admin",
+          footer: "Vous recevez cet email car vous êtes administrateur de The Playground.",
           dateLabel: "Date",
           locationLabel: "Lieu",
         },
@@ -390,6 +406,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "admin-moment-updated",
       label: "Admin — Événement modifié",
+      subject: "[Admin] Événement modifié — Soirée JS & Pizza",
       element: AdminMomentUpdatedEmail({
         to: "admin@the-playground.fr",
         momentTitle: "Soirée JS & Pizza",
@@ -416,6 +433,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "admin-new-user",
       label: "Admin — Nouvel utilisateur",
+      subject: "Nouvel utilisateur : Alice Martin",
       element: AdminNewUserEmail({
         to: "admin@the-playground.fr",
         userName: "Alice Martin",
@@ -435,6 +453,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "magic-link",
       label: "Magic Link (connexion)",
+      subject: "Votre lien de connexion — The Playground",
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
         baseUrl: BASE_URL,
@@ -455,6 +474,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "registration-removed-by-host",
       label: "Inscription invalidée par l'Organisateur",
+      subject: "Inscription invalidée : Soirée JS & Pizza",
       element: RegistrationRemovedByHostEmail({
         to: "alice@example.com",
         playerName: "Alice Martin",
@@ -479,6 +499,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "member-removed-from-circle",
       label: "Membre retiré de la Communauté",
+      subject: "Votre inscription à Paris Creative Tech a été invalidée",
       element: MemberRemovedFromCircleEmail({
         to: "alice@example.com",
         memberName: "Alice Martin",
@@ -498,6 +519,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "onboarding-welcome",
       label: "Onboarding — Lettre du fondateur",
+      subject: onboardingWelcomeContent.subject,
       element: OnboardingWelcomeEmail({
         firstName: "Alice",
         // Utilise l'URL de l'app pour que la preview charge le logo local en dev
@@ -507,6 +529,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
     {
       id: "registration-reminder",
       label: "Rappel 24h avant événement",
+      subject: "Rappel : Soirée JS & Pizza — demain",
       element: RegistrationReminderEmail({
         to: "alice@example.com",
         playerName: "Alice Martin",
@@ -532,9 +555,10 @@ async function buildTemplates(): Promise<{ id: string; label: string; html: stri
   ];
 
   const rendered = await Promise.all(
-    templates.map(async ({ id, label, element }) => ({
+    templates.map(async ({ id, label, subject, element }) => ({
       id,
       label,
+      subject,
       html: await render(element),
     }))
   );
