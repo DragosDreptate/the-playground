@@ -53,6 +53,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 
 **Plateforme**
 - [Explorer](https://the-playground.fr/explorer) — répertoire public de communautés avec tri, filtres et section À la une
+- **Widget intégrable** — encart événement embarquable sur n'importe quel site externe (thème clair/sombre, copie du snippet HTML en un clic)
 - **Réseaux** — regrouper plusieurs communautés sous une vitrine commune (fédérations, collectifs, marques)
 - **Blog** — articles de fond sur la philosophie et les choix du produit
 - Bilingue FR / EN avec URLs propres
