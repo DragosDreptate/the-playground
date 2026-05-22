@@ -7,6 +7,7 @@ import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
 import { getPublicUserInitials } from "@/lib/display-name";
 import { getAppUrl } from "@/lib/app-url";
+import { EMBED_MAX_WIDTH } from "@/components/embed/constants";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 type Props = {
@@ -84,7 +85,8 @@ export async function EmbedEventCard({
 
   return (
     <div
-      className={`@container mx-auto w-full max-w-[480px] rounded-2xl border ${palette.card} p-4 shadow-sm`}
+      className={`@container mx-auto w-full rounded-2xl border ${palette.card} p-4 shadow-sm`}
+      style={{ maxWidth: EMBED_MAX_WIDTH }}
     >
       <div className="flex flex-col @[400px]:flex-row @[400px]:gap-4">
         <div className="relative flex-shrink-0">

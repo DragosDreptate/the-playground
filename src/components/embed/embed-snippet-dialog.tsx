@@ -27,7 +27,11 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { escapeHtml } from "@/lib/html";
-import { EMBED_HEIGHT_MESSAGE_TYPE } from "@/components/embed/constants";
+import {
+  EMBED_HEIGHT_MESSAGE_TYPE,
+  EMBED_INITIAL_HEIGHT,
+  EMBED_MAX_WIDTH,
+} from "@/components/embed/constants";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 type Props = {
@@ -35,9 +39,6 @@ type Props = {
   momentTitle: string;
   appUrl: string;
 };
-
-const EMBED_MAX_WIDTH = 480;
-const EMBED_INITIAL_HEIGHT = 230;
 
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   const t = useTranslations("EmbedWidget");
@@ -152,18 +153,14 @@ function buildSnippet({
 }): string {
   const elementId = `playground-embed-${momentSlug}`;
   const safeTitle = escapeHtml(titleAlt);
-  // L'iframe est responsive (width=100%, max-width=480px). Le script ajuste la hauteur
-  // au contenu réel via postMessage : layout horizontal (~230px) sur desktop, vertical
-  // (~640px) sur mobile contraint.
   return [
     `<iframe`,
     `  id="${elementId}"`,
     `  src="${embedUrl}"`,
-    `  width="100%"`,
     `  height="${EMBED_INITIAL_HEIGHT}"`,
     `  title="${safeTitle}"`,
     `  loading="lazy"`,
-    `  style="border:0;max-width:${EMBED_MAX_WIDTH}px;width:100%"`,
+    `  style="border:0;width:100%;max-width:${EMBED_MAX_WIDTH}px"`,
     `></iframe>`,
     `<script>`,
     `(function(){`,
@@ -174,7 +171,7 @@ function buildSnippet({
     `    if(e.origin!=="${appOrigin}") return;`,
     `    if(!e.data||e.data.type!=="${EMBED_HEIGHT_MESSAGE_TYPE}") return;`,
     `    var h=Number(e.data.height);`,
-    `    if(h>0) f.style.height=h+"px";`,
+    `    if(h>0&&h!==f.offsetHeight) f.style.height=h+"px";`,
     `  });`,
     `})();`,
     `</script>`,
@@ -192,10 +189,6 @@ function PreviewIframe({
 }) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [height, setHeight] = useState(EMBED_INITIAL_HEIGHT);
-
-  useEffect(() => {
-    setHeight(EMBED_INITIAL_HEIGHT);
-  }, [embedUrl]);
 
   useEffect(() => {
     function onMessage(e: MessageEvent) {
