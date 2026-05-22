@@ -1,13 +1,5 @@
 {
   "ignoreCommand": "bash scripts/vercel-ignore.sh",
-  "redirects": [
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "msl.the-playground.fr" }],
-      "destination": "https://the-playground.fr/circles/le-club-de-mont-saint-leger",
-      "permanent": true
-    }
-  ],
   "crons": [
     {
       "path": "/api/cron/recalculate-scores",
