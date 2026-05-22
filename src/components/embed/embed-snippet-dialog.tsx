@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Code, Globe, Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
@@ -27,6 +27,11 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { escapeHtml } from "@/lib/html";
+import {
+  EMBED_HEIGHT_MESSAGE_TYPE,
+  EMBED_INITIAL_HEIGHT,
+  EMBED_MAX_WIDTH,
+} from "@/components/embed/constants";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 type Props = {
@@ -34,9 +39,6 @@ type Props = {
   momentTitle: string;
   appUrl: string;
 };
-
-const EMBED_WIDTH = 480;
-const EMBED_HEIGHT = 250;
 
 export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   const t = useTranslations("EmbedWidget");
@@ -53,11 +55,17 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
   }
 
   const embedUrl = `${appUrl}/embed/m/${momentSlug}?locale=${locale}&theme=${theme}`;
+  const titleAlt = t("titleAlt", { title: momentTitle });
 
   const snippet = useMemo(
     () =>
-      `<iframe\n  src="${embedUrl}"\n  width="${EMBED_WIDTH}"\n  height="${EMBED_HEIGHT}"\n  frameborder="0"\n  title="${escapeHtml(t("titleAlt", { title: momentTitle }))}"\n  loading="lazy"\n></iframe>`,
-    [embedUrl, momentTitle, t]
+      buildSnippet({
+        embedUrl,
+        appOrigin: appUrl,
+        momentSlug,
+        titleAlt,
+      }),
+    [embedUrl, appUrl, momentSlug, titleAlt]
   );
 
   return (
@@ -111,27 +119,17 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
           </TabsList>
 
           <TabsContent value="preview" className="mt-2 min-w-0">
-            <div
-              className="flex items-center justify-center"
-              style={{ height: 260 }}
-            >
-              <iframe
-                key={embedUrl}
-                src={embedUrl}
-                width={EMBED_WIDTH}
-                height={EMBED_HEIGHT}
-                frameBorder={0}
-                title={t("titleAlt", { title: momentTitle })}
-                className="block max-w-full rounded-2xl"
-                style={{ maxHeight: "100%" }}
-              />
-            </div>
+            <PreviewIframe
+              embedUrl={embedUrl}
+              appOrigin={appUrl}
+              title={titleAlt}
+            />
           </TabsContent>
 
           <TabsContent value="code" className="mt-2 min-w-0">
             <pre
               className="bg-muted max-w-full overflow-scroll rounded-lg p-3 text-xs leading-relaxed [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:appearance-none [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-500/70 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-700/30"
-              style={{ height: 260, scrollbarWidth: "thin", scrollbarColor: "rgba(100,116,139,0.7) rgba(51,65,85,0.3)" }}
+              style={{ height: 320, scrollbarWidth: "thin", scrollbarColor: "rgba(100,116,139,0.7) rgba(51,65,85,0.3)" }}
             >
               <code>{snippet}</code>
             </pre>
@@ -139,6 +137,86 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
         </Tabs>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function buildSnippet({
+  embedUrl,
+  appOrigin,
+  momentSlug,
+  titleAlt,
+}: {
+  embedUrl: string;
+  appOrigin: string;
+  momentSlug: string;
+  titleAlt: string;
+}): string {
+  const elementId = `playground-embed-${momentSlug}`;
+  const safeTitle = escapeHtml(titleAlt);
+  return [
+    `<iframe`,
+    `  id="${elementId}"`,
+    `  src="${embedUrl}"`,
+    `  height="${EMBED_INITIAL_HEIGHT}"`,
+    `  title="${safeTitle}"`,
+    `  loading="lazy"`,
+    `  style="border:0;width:100%;max-width:${EMBED_MAX_WIDTH}px"`,
+    `></iframe>`,
+    `<script>`,
+    `(function(){`,
+    `  var f=document.getElementById("${elementId}");`,
+    `  if(!f) return;`,
+    `  window.addEventListener("message",function(e){`,
+    `    if(e.source!==f.contentWindow) return;`,
+    `    if(e.origin!=="${appOrigin}") return;`,
+    `    if(!e.data||e.data.type!=="${EMBED_HEIGHT_MESSAGE_TYPE}") return;`,
+    `    var h=Number(e.data.height);`,
+    `    if(h>0&&h!==f.offsetHeight) f.style.height=h+"px";`,
+    `  });`,
+    `})();`,
+    `</script>`,
+  ].join("\n");
+}
+
+function PreviewIframe({
+  embedUrl,
+  appOrigin,
+  title,
+}: {
+  embedUrl: string;
+  appOrigin: string;
+  title: string;
+}) {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [height, setHeight] = useState(EMBED_INITIAL_HEIGHT);
+
+  useEffect(() => {
+    function onMessage(e: MessageEvent) {
+      const iframe = iframeRef.current;
+      if (!iframe || e.source !== iframe.contentWindow) return;
+      if (e.origin !== appOrigin) return;
+      const data = e.data as { type?: string; height?: number } | undefined;
+      if (!data || data.type !== EMBED_HEIGHT_MESSAGE_TYPE) return;
+      const h = Number(data.height);
+      if (Number.isFinite(h) && h > 0) setHeight(h);
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [appOrigin]);
+
+  return (
+    <div className="flex justify-center" style={{ minHeight: EMBED_INITIAL_HEIGHT }}>
+      <iframe
+        ref={iframeRef}
+        key={embedUrl}
+        src={embedUrl}
+        width={EMBED_MAX_WIDTH}
+        height={height}
+        title={title}
+        className="block max-w-full rounded-2xl"
+        style={{ border: 0 }}
+      />
+    </div>
   );
 }
 
@@ -200,4 +278,3 @@ function ThemeToggleButton({
     </Button>
   );
 }
-

@@ -7,6 +7,7 @@ import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
 import { getPublicUserInitials } from "@/lib/display-name";
 import { getAppUrl } from "@/lib/app-url";
+import { EMBED_MAX_WIDTH } from "@/components/embed/constants";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 type Props = {
@@ -80,13 +81,14 @@ export async function EmbedEventCard({
     : isCancelled
       ? "opacity-50 grayscale"
       : "";
-  const coverClass = `h-48 w-48 rounded-xl object-cover ${coverOpacity}`;
+  const coverClass = `aspect-square w-full rounded-xl object-cover @[400px]:aspect-auto @[400px]:h-48 @[400px]:w-48 ${coverOpacity}`;
 
   return (
     <div
-      className={`mx-auto w-full max-w-[480px] rounded-2xl border ${palette.card} p-4 shadow-sm`}
+      className={`@container mx-auto w-full rounded-2xl border ${palette.card} p-4 shadow-sm`}
+      style={{ maxWidth: EMBED_MAX_WIDTH }}
     >
-      <div className="flex gap-4">
+      <div className="flex flex-col @[400px]:flex-row @[400px]:gap-4">
         <div className="relative flex-shrink-0">
           {moment.coverImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -108,24 +110,24 @@ export async function EmbedEventCard({
             </span>
           )}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="mt-4 flex min-w-0 flex-1 flex-col @[400px]:mt-0">
           <h2
-            className={`line-clamp-2 text-base font-semibold leading-snug ${titleColor} ${titleStrike}`}
+            className={`line-clamp-2 text-lg font-semibold leading-snug @[400px]:text-base ${titleColor} ${titleStrike}`}
           >
             {moment.title}
           </h2>
-          <div className={`mt-4 space-y-2 text-xs ${palette.date}`}>
+          <div className={`mt-3 space-y-2 text-sm @[400px]:mt-4 @[400px]:text-xs ${palette.date}`}>
             <p className="flex items-center gap-2">
-              <Calendar className={`size-3.5 shrink-0 ${palette.icon}`} aria-hidden="true" />
+              <Calendar className={`size-4 shrink-0 @[400px]:size-3.5 ${palette.icon}`} aria-hidden="true" />
               <span>{dateLine}</span>
             </p>
             <p className="flex items-center gap-2">
-              <MapPin className={`size-3.5 shrink-0 ${palette.icon}`} aria-hidden="true" />
+              <MapPin className={`size-4 shrink-0 @[400px]:size-3.5 ${palette.icon}`} aria-hidden="true" />
               <span className="truncate">{locationLine}</span>
             </p>
           </div>
           {isCancelled ? (
-            <p className="mt-4 text-xs italic text-red-300/80">
+            <p className="mt-4 text-sm italic text-red-300/80 @[400px]:text-xs">
               {t("cancelledExplanation")}
             </p>
           ) : (
@@ -149,12 +151,12 @@ export async function EmbedEventCard({
             className={ctaClassName(isPassive, isDark)}
           >
             <span>{ctaLabel}</span>
-            <ArrowRight className="size-3.5" aria-hidden="true" />
+            <ArrowRight className="size-4 @[400px]:size-3.5" aria-hidden="true" />
           </a>
         </div>
       </div>
       <p
-        className={`mt-3 text-center text-[9px] tracking-wide ${palette.footer}`}
+        className={`mt-4 text-center text-[10px] tracking-wide @[400px]:mt-3 @[400px]:text-[9px] ${palette.footer}`}
       >
         {t("poweredBy")}{" "}
         <a
@@ -172,7 +174,7 @@ export async function EmbedEventCard({
 
 function ctaClassName(passive: boolean, dark: boolean): string {
   const base =
-    "mt-auto inline-flex w-full items-center justify-center gap-1.5 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors";
+    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-lg py-3 text-base font-semibold transition-colors @[400px]:mt-auto @[400px]:py-2.5 @[400px]:text-sm";
   if (!passive) {
     return `${base} bg-primary text-white hover:bg-primary/90`;
   }
@@ -211,7 +213,7 @@ function SocialProof({
           return (
             <div
               key={i}
-              className={`relative flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full text-[8px] font-semibold text-white ring-2 ${ringClass} ${avatarFilter}`}
+              className={`relative flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[10px] font-semibold text-white ring-2 @[400px]:h-5 @[400px]:w-5 @[400px]:text-[8px] ${ringClass} ${avatarFilter}`}
               style={{ background: gradient }}
             >
               {a.user.image ? (
@@ -228,8 +230,7 @@ function SocialProof({
           );
         })}
       </div>
-      <span className={`text-xs ${labelColor}`}>{label}</span>
+      <span className={`text-sm @[400px]:text-xs ${labelColor}`}>{label}</span>
     </div>
   );
 }
-

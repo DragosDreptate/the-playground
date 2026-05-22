@@ -12,6 +12,7 @@ import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { EmbedEventCard } from "@/components/embed/embed-event-card";
+import { EmbedHeightReporter } from "@/components/embed/embed-height-reporter";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
 export const revalidate = 300;
@@ -110,6 +111,7 @@ export default async function EmbedMomentPage({
         locale={locale}
         theme={theme}
       />
+      <EmbedHeightReporter />
     </div>
   );
 }
