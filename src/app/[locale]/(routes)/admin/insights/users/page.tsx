@@ -17,6 +17,11 @@ import {
 
 const PAGE_SIZE = 20;
 const BASE = "/admin/insights/users";
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+function getSinceDate(days: number) {
+  return new Date(Date.now() - days * MS_PER_DAY);
+}
 
 type Props = {
   searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
@@ -35,7 +40,7 @@ export default async function AdminInsightUsersPage({ searchParams }: Props) {
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const since = getSinceDate(days);
 
   const [timeSeries, users, total] = await Promise.all([
     prismaAdminRepository.getTimeSeries(days),

@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Generated and local tooling output
+coverage/
+.turbo/
+.vercel/
+playwright-report/
+playwright-report-mobile/
+test-results/
+tests/mobile/.auth/
+tests/e2e/.auth/
+
+# Environment and local exports
+.env
+.env.local
+.env.*.local
+exports/
+
+# Generated PWA assets
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+
+# Out of scope for the initial Prettier rollout
+src/
+tests/
+scripts/
+spec/
+*.md
+CHANGELOG.md
+pnpm-lock.yaml

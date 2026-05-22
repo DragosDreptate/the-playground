@@ -34,7 +34,6 @@ export function AttendeeAvatarStack({
               style={{ background: gradient }}
             >
               {a.user.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={a.user.image}
                   alt=""

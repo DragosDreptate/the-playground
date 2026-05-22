@@ -214,7 +214,6 @@ export default async function OgImage() {
             paddingRight: "64px",
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={phoneBase64}
             alt=""
