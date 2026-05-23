@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function EmbedLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html suppressHydrationWarning>
+    <html translate="no" suppressHydrationWarning>
       <body className={`${inter.variable} bg-transparent font-sans antialiased`}>
         {children}
       </body>
