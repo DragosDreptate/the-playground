@@ -87,8 +87,13 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} translate="no" suppressHydrationWarning>
       <head>
+        {/* L'app est nativement bilingue FR/EN via next-intl. Google
+            Translate auto manipule le DOM hors-React et casse la
+            réconciliation (cf. NotFoundError insertBefore/removeChild
+            sur la page sign-in). On désactive donc l'auto-traduction. */}
+        <meta name="google" content="notranslate" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
