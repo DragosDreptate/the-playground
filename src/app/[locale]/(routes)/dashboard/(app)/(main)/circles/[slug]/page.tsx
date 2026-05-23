@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { stripProtocol } from "@/lib/url";
+import { degradedQuery } from "@/lib/degraded-query";
 import { formatLongDate } from "@/lib/format-date";
+import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
+import type { CircleNetwork } from "@/domain/models/circle-network";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -98,13 +101,27 @@ export default async function CircleDetailPage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    isOrganizer ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
-    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
-    prismaCircleRepository.findMembersPaginated(circle.id, {
-      offset: 0,
-      limit: 20,
-      priorityUserId: session.user.id,
-    }),
+    isOrganizer
+      ? degradedQuery(
+          prismaCircleRepository.findPendingMemberships(circle.id),
+          [],
+          "dashboard_circle_page:pending_memberships",
+        )
+      : Promise.resolve([]),
+    degradedQuery(
+      prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+      [] as CircleNetwork[],
+      "dashboard_circle_page:circle_networks",
+    ),
+    degradedQuery(
+      prismaCircleRepository.findMembersPaginated(circle.id, {
+        offset: 0,
+        limit: 20,
+        priorityUserId: session.user.id,
+      }),
+      { members: [], total: 0, hasMore: false },
+      "dashboard_circle_page:members_first_page",
+    ),
   ]);
 
   const totalMembers = hosts.length + players.length;
@@ -119,9 +136,21 @@ export default async function CircleDetailPage({
   // Récupère compteurs + inscriptions utilisateur + top inscrits (avatars) pour TOUS les moments
   const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, userRegistrationsByMomentId, topAttendeesByMomentId] = await Promise.all([
-    prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
-    prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
-    prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+    degradedQuery(
+      prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+      new Map<string, number>(),
+      "dashboard_circle_page:registration_counts",
+    ),
+    degradedQuery(
+      prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
+      new Map<string, Registration | null>(),
+      "dashboard_circle_page:user_registrations",
+    ),
+    degradedQuery(
+      prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+      new Map<string, RegistrationWithUser[]>(),
+      "dashboard_circle_page:top_registrants",
+    ),
   ]);
   const userStatusByMomentId = new Map(
     [...userRegistrationsByMomentId.entries()].map(([id, reg]) => [id, reg?.status ?? null])
