@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Prisma } from "@prisma/client";
-import { isTransientError } from "../retry-policy";
+import { describeDbError, isTransientError } from "../retry-policy";
 
 describe("isTransientError", () => {
   describe("given a Neon control plane error", () => {
@@ -38,6 +38,22 @@ describe("isTransientError", () => {
     );
   });
 
+  describe("given a Neon WebSocket ErrorEvent (driver-level)", () => {
+    it("should treat a DOM-style ErrorEvent (type=error, empty message) as transient", () => {
+      const errorEvent = { type: "error", message: "" };
+      expect(isTransientError(errorEvent)).toBe(true);
+    });
+
+    it("should treat a wrapped ErrorEvent (under .error) as transient", () => {
+      const wrapped = { error: { type: "error", message: "" } };
+      expect(isTransientError(wrapped)).toBe(true);
+    });
+
+    it("should treat an Error whose message mentions WebSocket as transient", () => {
+      expect(isTransientError(new Error("WebSocket closed"))).toBe(true);
+    });
+  });
+
   describe("given a non-transient error", () => {
     it("should not retry a unique constraint violation (P2002)", () => {
       const error = new Prisma.PrismaClientKnownRequestError(
@@ -56,5 +72,33 @@ describe("isTransientError", () => {
       expect(isTransientError(null)).toBe(false);
       expect(isTransientError(undefined)).toBe(false);
     });
+  });
+});
+
+describe("describeDbError", () => {
+  it("extracts the message from a standard Error", () => {
+    expect(describeDbError(new Error("boom"))).toBe("boom");
+  });
+
+  it("extracts a non-empty message field from a plain object", () => {
+    expect(describeDbError({ message: "pool closed" })).toBe("pool closed");
+  });
+
+  it("returns a sentinel for a DOM ErrorEvent (type=error, empty message)", () => {
+    expect(describeDbError({ type: "error", message: "" })).toBe(
+      "websocket_error_event",
+    );
+  });
+
+  it("unwraps nested errors via the .error field", () => {
+    expect(
+      describeDbError({ message: "", error: new Error("inner cause") }),
+    ).toBe("inner cause");
+  });
+
+  it("stringifies unknown shapes as a last resort", () => {
+    expect(describeDbError("oops")).toBe("oops");
+    expect(describeDbError(null)).toBe("null");
+    expect(describeDbError(42)).toBe("42");
   });
 });

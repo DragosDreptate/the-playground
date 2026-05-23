@@ -2,8 +2,11 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
+import { degradedQuery } from "@/lib/degraded-query";
 import { stripProtocol } from "@/lib/url";
 import type { Metadata } from "next";
+import type { RegistrationWithUser } from "@/domain/models/registration";
+import type { CircleNetwork } from "@/domain/models/circle-network";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -193,15 +196,31 @@ export default async function PublicCirclePage({
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
-    prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
-    prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
-    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+    degradedQuery(
+      prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+      new Map<string, number>(),
+      "circle_page:registration_counts",
+    ),
+    degradedQuery(
+      prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+      new Map<string, RegistrationWithUser[]>(),
+      "circle_page:top_registrants",
+    ),
+    degradedQuery(
+      prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+      [] as CircleNetwork[],
+      "circle_page:circle_networks",
+    ),
     canSeeMembers
-      ? prismaCircleRepository.findMembersPaginated(circle.id, {
-          offset: 0,
-          limit: 20,
-          priorityUserId: session?.user?.id ?? null,
-        })
+      ? degradedQuery(
+          prismaCircleRepository.findMembersPaginated(circle.id, {
+            offset: 0,
+            limit: 20,
+            priorityUserId: session?.user?.id ?? null,
+          }),
+          { members: [], total: 0, hasMore: false },
+          "circle_page:members_first_page",
+        )
       : Promise.resolve({ members: [], total: 0, hasMore: false }),
   ]);
 

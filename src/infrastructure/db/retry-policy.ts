@@ -18,6 +18,11 @@ const TRANSIENT_PATTERNS = [
   // Neon control plane hiccup (cold start, rolling deploy, transient saturation).
   // Substring matches "Control plane request failed" and any future variant.
   "Control plane",
+  // @neondatabase/serverless balance des ErrorEvent DOM quand son WebSocket
+  // tombe — `.message` est vide, d'où la chaîne sentinelle produite par
+  // describeDbError pour les rendre détectables.
+  "websocket_error_event",
+  "WebSocket",
 ];
 
 const TRANSIENT_PRISMA_CODES = new Set([
@@ -39,11 +44,30 @@ export const READ_OPERATIONS = new Set([
   "groupBy",
 ]);
 
+export function describeDbError(error: unknown): string {
+  if (error && typeof error === "object") {
+    const obj = error as { message?: unknown; error?: unknown; type?: unknown };
+    if (typeof obj.message === "string" && obj.message.length > 0) {
+      return obj.message;
+    }
+    if (obj.error !== undefined && obj.error !== null) {
+      return describeDbError(obj.error);
+    }
+    // ErrorEvent DOM émis par @neondatabase/serverless quand le WebSocket
+    // tombe : `.message` vide, mais `.type === "error"`. On produit une
+    // chaîne sentinelle pour la rendre matchable par TRANSIENT_PATTERNS.
+    if (obj.type === "error") {
+      return "websocket_error_event";
+    }
+  }
+  return error instanceof Error ? error.message : String(error);
+}
+
 export function isTransientError(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return TRANSIENT_PRISMA_CODES.has(error.code);
   }
-  const message = error instanceof Error ? error.message : String(error);
+  const message = describeDbError(error);
   return TRANSIENT_PATTERNS.some((p) => message.includes(p));
 }
 
