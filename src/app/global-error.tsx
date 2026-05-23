@@ -15,7 +15,12 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
+    // lang="fr" + translate="no" : le contenu de cette page d'erreur est
+    // en français en dur. Sans translate="no", Google Translate auto
+    // wrappe les noeuds texte hors-React et déclenche exactement le bug
+    // NotFoundError insertBefore/removeChild qu'on évite ailleurs — sur
+    // la page la moins capable de l'absorber (déjà en état d'erreur).
+    <html lang="fr" translate="no">
       <body>
         <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-8 text-center">
           <div className="space-y-2">
