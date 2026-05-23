@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { stripProtocol } from "@/lib/url";
 import { degradedQuery } from "@/lib/degraded-query";
 import { formatLongDate } from "@/lib/format-date";
-import type { Registration, RegistrationWithUser } from "@/domain/models/registration";
+import type { RegistrationWithUser } from "@/domain/models/registration";
 import type { CircleNetwork } from "@/domain/models/circle-network";
 import {
   prismaCircleRepository,
@@ -101,13 +101,10 @@ export default async function CircleDetailPage({
       { momentRepository: prismaMomentRepository, circleRepository: prismaCircleRepository },
       { skipCircleCheck: true }
     ),
-    isOrganizer
-      ? degradedQuery(
-          prismaCircleRepository.findPendingMemberships(circle.id),
-          [],
-          "dashboard_circle_page:pending_memberships",
-        )
-      : Promise.resolve([]),
+    // pendingMemberships volontairement NON dégradé : l'état "aucune
+    // demande" est indistinguable d'une dégradation et un Organisateur qui
+    // croit la queue vide peut laisser des demandes non approuvées.
+    isOrganizer ? prismaCircleRepository.findPendingMemberships(circle.id) : Promise.resolve([]),
     degradedQuery(
       prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
       [] as CircleNetwork[],
@@ -141,11 +138,11 @@ export default async function CircleDetailPage({
       new Map<string, number>(),
       "dashboard_circle_page:registration_counts",
     ),
-    degradedQuery(
-      prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
-      new Map<string, Registration | null>(),
-      "dashboard_circle_page:user_registrations",
-    ),
+    // userRegistrations volontairement NON dégradé : si vide, chaque
+    // Moment s'affiche "non inscrit" alors que l'utilisateur l'est, ce
+    // qui le pousse à re-cliquer "S'inscrire" et déclencher une erreur
+    // de contrainte unique. Mieux vaut une vraie erreur de page.
+    prismaRegistrationRepository.findByMomentIdsAndUser(allMomentIds, session.user.id!),
     degradedQuery(
       prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
       new Map<string, RegistrationWithUser[]>(),
