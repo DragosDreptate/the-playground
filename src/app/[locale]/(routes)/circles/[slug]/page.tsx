@@ -1,9 +1,12 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import * as Sentry from "@sentry/nextjs";
 import { measureTime } from "@/lib/perf-logger";
 import { stripProtocol } from "@/lib/url";
 import type { Metadata } from "next";
+import type { RegistrationWithUser } from "@/domain/models/registration";
+import type { CircleNetwork } from "@/domain/models/circle-network";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -52,6 +55,24 @@ import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
 export const revalidate = 60;
+
+// Décor de la page Communauté : si Neon hoquette sur ces queries, on rend
+// la page en mode dégradé (compteurs/avatars vides) plutôt que de tout
+// perdre. Le signal reste capturé par Sentry pour le monitoring.
+async function degradedQuery<T>(
+  promise: Promise<T>,
+  fallback: T,
+  tag: string,
+): Promise<T> {
+  try {
+    return await promise;
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { context: "circle_page_degraded", query: tag },
+    });
+    return fallback;
+  }
+}
 
 // Deduplicate DB call between generateMetadata and the page (identique au pattern /m/[slug])
 const getCachedCircle = cache(async (slug: string) => {
@@ -193,15 +214,31 @@ export default async function PublicCirclePage({
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
-    prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
-    prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
-    prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+    degradedQuery(
+      prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+      new Map<string, number>(),
+      "registration_counts",
+    ),
+    degradedQuery(
+      prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+      new Map<string, RegistrationWithUser[]>(),
+      "top_registrants",
+    ),
+    degradedQuery(
+      prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+      [] as CircleNetwork[],
+      "circle_networks",
+    ),
     canSeeMembers
-      ? prismaCircleRepository.findMembersPaginated(circle.id, {
-          offset: 0,
-          limit: 20,
-          priorityUserId: session?.user?.id ?? null,
-        })
+      ? degradedQuery(
+          prismaCircleRepository.findMembersPaginated(circle.id, {
+            offset: 0,
+            limit: 20,
+            priorityUserId: session?.user?.id ?? null,
+          }),
+          { members: [], total: 0, hasMore: false },
+          "members_first_page",
+        )
       : Promise.resolve({ members: [], total: 0, hasMore: false }),
   ]);
 

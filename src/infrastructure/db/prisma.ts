@@ -4,6 +4,7 @@ import {
   BASE_DELAY_MS,
   MAX_RETRIES,
   READ_OPERATIONS,
+  describeDbError,
   isTransientError,
   sleep,
 } from "./retry-policy";
@@ -18,7 +19,7 @@ function createClient(): PrismaClient {
   const adapter = new PrismaNeon(
     {
       connectionString: process.env.DATABASE_URL!,
-      max: 5,
+      max: 10,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 15_000,
     },
@@ -28,7 +29,7 @@ function createClient(): PrismaClient {
           JSON.stringify({
             level: "error",
             type: "pool_error",
-            message: err.message,
+            message: describeDbError(err),
           })
         );
       },
@@ -84,7 +85,7 @@ export const prisma = _baseClient.$extends({
                   operation,
                   attempt: attempt + 1,
                   delay,
-                  error: error instanceof Error ? error.message : String(error),
+                  error: describeDbError(error),
                 })
               );
               await sleep(delay);
@@ -102,7 +103,7 @@ export const prisma = _baseClient.$extends({
                   operation,
                   duration,
                   ...(attempt > 0 && { retries: attempt }),
-                  error: error instanceof Error ? error.message : String(error),
+                  error: describeDbError(error),
                 })
               );
             }
