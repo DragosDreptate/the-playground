@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { isValidSlug } from "./lib/slug";
-import { BLOCKED_BOTS } from "./lib/blocked-bots";
+import { AGGRESSIVE_CRAWLERS, AI_TRAINING_BOTS } from "./lib/blocked-bots";
 import { dashboardEventPublicPath } from "./lib/dashboard-event-public-redirect";
 
 // Auth.js v5 stores the session under `authjs.session-token` (HTTP) or
@@ -26,20 +26,36 @@ const slugRouteRe = new RegExp(
   `^(?:\\/(?:${localeAlt}))?\\/(?:m|circles)\\/([^/]+)(?:\\/|$)`
 );
 
+// Matches UGC routes (Moments and Circles) with optional locale prefix.
+// Used to gate AI training bots, which are allowed on generic pages but
+// must not crawl user-generated content.
+const ugcRouteRe = new RegExp(
+  `^(?:\\/(?:${localeAlt}))?\\/(?:m|circles)\\/`
+);
+
 // Next.js metadata file routes (opengraph-image, twitter-image) — optional hash suffix
 // e.g. /fr/circles/[slug]/opengraph-image-gwtces
 const metadataFileRe = /\/(opengraph-image|twitter-image)(-[^/]+)?$/;
 
-function isBlockedBot(ua: string): boolean {
+function matchesAny(ua: string, bots: readonly string[]): boolean {
   const lower = ua.toLowerCase();
-  return BLOCKED_BOTS.some((bot) => lower.includes(bot));
+  return bots.some((bot) => lower.includes(bot));
 }
 
 export default function middleware(request: NextRequest) {
-  // 1. Block known aggressive bots early (Edge, zero serverless cost)
+  // 1. Block known aggressive bots early (Edge, zero serverless cost).
+  // AI training bots are blocked only on user-generated content paths.
   const ua = request.headers.get("user-agent") ?? "";
-  if (ua && isBlockedBot(ua)) {
-    return new NextResponse("Forbidden", { status: 403 });
+  if (ua) {
+    if (matchesAny(ua, AGGRESSIVE_CRAWLERS)) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
+    if (
+      matchesAny(ua, AI_TRAINING_BOTS) &&
+      ugcRouteRe.test(request.nextUrl.pathname)
+    ) {
+      return new NextResponse("Forbidden", { status: 403 });
+    }
   }
 
   // 2. Bypass next-intl for Next.js metadata file routes. The i18n middleware

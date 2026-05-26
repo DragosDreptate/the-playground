@@ -1,5 +1,17 @@
 import type { MetadataRoute } from "next";
-import { BLOCKED_BOTS } from "@/lib/blocked-bots";
+import { AGGRESSIVE_CRAWLERS, AI_TRAINING_BOTS } from "@/lib/blocked-bots";
+
+const PRIVATE_PATHS = ["/dashboard/", "/admin/", "/api/", "/auth/"];
+
+// User-generated content: Moments (/m/) and Circles (/circles/) in both
+// locales, plus the embed widget. These belong to Hosts, not to the platform.
+const UGC_PATHS = [
+  "/m/",
+  "/circles/",
+  "/en/m/",
+  "/en/circles/",
+  "/embed/m/",
+];
 
 export default function robots(): MetadataRoute.Robots {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -9,10 +21,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/", "/m/", "/circles/"],
-        disallow: ["/dashboard/", "/admin/", "/api/", "/auth/"],
+        disallow: PRIVATE_PATHS,
       },
       {
-        userAgent: BLOCKED_BOTS,
+        userAgent: AI_TRAINING_BOTS,
+        disallow: [...PRIVATE_PATHS, ...UGC_PATHS],
+      },
+      {
+        userAgent: AGGRESSIVE_CRAWLERS,
         disallow: "/",
       },
     ],
