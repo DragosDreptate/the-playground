@@ -42,9 +42,9 @@ export default async function AuthConfirmPage({
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6 text-center">
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground text-sm">{t("description")}</p>
+          <p className="text-muted-foreground text-sm">{t("reason")}</p>
         </div>
 
         <form action={action} method="POST">
@@ -52,8 +52,6 @@ export default async function AuthConfirmPage({
             {t("submit")}
           </Button>
         </form>
-
-        <p className="text-muted-foreground text-xs">{t("hint")}</p>
       </div>
     </div>
   );
