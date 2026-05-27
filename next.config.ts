@@ -130,6 +130,16 @@ const nextConfig: NextConfig = {
         source: "/((?!embed).*)",
         headers: securityHeaders,
       },
+      {
+        // Routes techniques jamais destinées à apparaître dans un index moteur.
+        // Doublé du `disallow` dans robots.ts car robots.txt n'empêche pas
+        // l'indexation d'URLs découvertes via lien externe — seul X-Robots-Tag
+        // bloque l'indexation côté Google/Bing.
+        source: "/:path(api|ingest|monitoring)/:rest*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
     ];
   },
 };
