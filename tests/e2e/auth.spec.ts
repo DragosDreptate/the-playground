@@ -137,7 +137,7 @@ test.describe("Magic link — protection contre les scanners email", () => {
     page,
   }) => {
     await page.goto("/fr/auth/error?error=Verification");
-    await expect(page.getByText(/anti-phishing/i)).toBeVisible();
+    await expect(page.getByText(/anti-spam/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
   });
 });

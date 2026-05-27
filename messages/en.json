@@ -152,10 +152,9 @@
       "description": "A sign-in link has been sent to your email address. Click it to sign in."
     },
     "confirm": {
-      "title": "Confirm your sign-in",
-      "description": "Click the button below to finish signing in to The Playground.",
-      "submit": "Confirm sign-in",
-      "hint": "This step keeps your link safe from anti-phishing scanners that automatically follow email links.",
+      "title": "One last click to sign in",
+      "reason": "Security check: one last click to make sure it's really you, and not an anti-spam bot.",
+      "submit": "Sign me in",
       "invalid": {
         "title": "Invalid link",
         "description": "This sign-in link is incomplete. Request a new one to continue.",
@@ -166,7 +165,7 @@
       "title": "Authentication error",
       "backToSignIn": "Back to sign in",
       "requestNewLink": "Send me a new link",
-      "verificationExplanation": "If you use a corporate inbox (Outlook, Gmail Workspace), your anti-phishing may have visited the link automatically and invalidated it.",
+      "verificationExplanation": "If you use a corporate inbox (Outlook, Gmail Workspace), an anti-spam bot may have visited the link automatically and invalidated it.",
       "verificationAction": "Request a new link and click it quickly, or sign in with Google/GitHub.",
       "webviewExplanation": "Google and GitHub block sign-in from in-app browsers (LinkedIn, Instagram, Facebook...).",
       "webviewAction": "Use the email sign-in, or open the site in your browser.",
