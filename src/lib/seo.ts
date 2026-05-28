@@ -1,12 +1,7 @@
-import { routing } from "@/i18n/routing";
+import { routing, isSupportedLocale, type Locale } from "@/i18n/routing";
 import { getAppUrl } from "./app-url";
 
-type Locale = (typeof routing.locales)[number];
 type LocaleUrls = Record<Locale, string>;
-
-function isSupportedLocale(value: string): value is Locale {
-  return (routing.locales as readonly string[]).includes(value);
-}
 
 // Per-locale absolute URLs for a path. `path` is the URL after the locale
 // segment, with a leading slash for sub-paths (e.g. "/m/abc"). Use "" for the

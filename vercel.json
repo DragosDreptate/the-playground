@@ -24,6 +24,10 @@
     {
       "path": "/api/cron/transition-past-moments",
       "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/cleanup-verification-tokens",
+      "schedule": "30 3 * * *"
     }
   ]
 }

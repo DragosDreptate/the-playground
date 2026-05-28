@@ -10,18 +10,39 @@ import { createSafeResend } from "@/lib/email/safe-resend";
 import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-link";
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
-import {
-  buildMagicLinkConfirmUrl,
-  detectLocaleFromRequest,
-} from "@/lib/auth/magic-link-url";
+import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
 import { classifyAuthError } from "@/lib/auth/error-kinds";
+import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
+
+// Validité du magic link. On le rend volontairement court (vs 24h par défaut
+// Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
+// pour absorber le prefetch des scanners email corporate (Defender, Mimecast…)
+// sans bloquer l'utilisateur humain qui cliquera ensuite. Cf. spec
+// /spec/magic-link-reusable-token.md.
+const MAGIC_LINK_MAX_AGE_SECONDS = 60 * 15;
+
+// Fenêtre pendant laquelle un User est considéré "nouveau" dans le session
+// callback. Dérivée de MAGIC_LINK_MAX_AGE_SECONDS : si un scanner email crée
+// le User à T+0 et que l'humain clique près de l'expiration, il faut que
+// isNewUser reste vrai jusqu'à la fin de la fenêtre de validité du token.
+const NEW_USER_WINDOW_MS = MAGIC_LINK_MAX_AGE_SECONDS * 1000;
+
+// Adapter custom : on garde toutes les méthodes standard du PrismaAdapter
+// (createUser, getUserByEmail, etc.) et on override uniquement
+// useVerificationToken pour rendre le magic link réutilisable pendant sa
+// fenêtre de validité (cf. createReusableVerificationToken).
+const basePrismaAdapter = PrismaAdapter(prisma);
+const adapter: typeof basePrismaAdapter = {
+  ...basePrismaAdapter,
+  useVerificationToken: createReusableVerificationToken(prisma),
+};
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
   // Nécessaire sur Vercel (preview + prod) : fait confiance au header X-Forwarded-Host
   // du proxy Vercel, ce qui évite l'erreur "UntrustedHost" sur les URLs preview dynamiques.
   trustHost: true,
-  adapter: PrismaAdapter(prisma),
+  adapter,
   providers: [
     // allowDangerousEmailAccountLinking : si un User existe déjà avec le même email
     // (créé via magic link ou autre provider), Auth.js linke automatiquement le
@@ -36,22 +57,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ResendProvider({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
+      maxAge: MAGIC_LINK_MAX_AGE_SECONDS,
       async sendVerificationRequest({ identifier, url, request }) {
         const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-        // On envoie l'utilisateur sur une page applicative inerte plutôt que
-        // directement sur le callback Auth.js. Les scanners email (Microsoft
-        // Defender Safe Links, Mimecast, Proofpoint…) prefetchent ce lien et
-        // consumeraient le token. La page de confirmation expose un bouton qui
-        // POST sur le callback, déclenchable uniquement par un humain.
-        const confirmUrl = buildMagicLinkConfirmUrl(url, request);
-
-        // Le déclencheur EST le destinataire (l'utilisateur qui demande le
-        // lien) → on lit la locale de la requête de sign-in pour lui répondre
-        // dans la même langue que l'UI où il a cliqué.
-        const locale = detectLocaleFromRequest(request);
+        // La locale du mail est lue depuis le `callbackUrl` de l'URL Auth.js
+        // en priorité (parcours produit), avec repli cookie/header. C'est plus
+        // fiable que le seul cookie NEXT_LOCALE qui n'est pas toujours set par
+        // next-intl quand on est sur la locale par défaut.
+        const locale = detectLocaleForMagicLink(url, request);
         const t = await getTranslations({ locale, namespace: "Email.magicLink" });
 
         const { error } = await resend.emails.send({
@@ -59,7 +75,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           to: identifier,
           subject: t("subject"),
           react: MagicLinkEmail({
-            url: confirmUrl,
+            url,
             baseUrl,
             strings: {
               preview: t("preview"),
@@ -186,9 +202,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.onboardingCompleted = dbUser.onboardingCompleted;
       session.user.role = dbUser.role;
       session.user.dashboardMode = dbUser.dashboardMode ?? null;
-      // Nouveau user = compte créé il y a moins de 2 minutes
       const ageMs = Date.now() - new Date(dbUser.createdAt).getTime();
-      session.user.isNewUser = ageMs < 120_000;
+      session.user.isNewUser = ageMs < NEW_USER_WINDOW_MS;
       return session;
     },
   },

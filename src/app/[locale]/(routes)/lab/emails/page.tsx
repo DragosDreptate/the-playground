@@ -1,4 +1,5 @@
 import { render } from "@react-email/components";
+import { getTranslations } from "next-intl/server";
 import { RegistrationConfirmationEmail } from "@/infrastructure/services/email/templates/registration-confirmation";
 import { WaitlistPromotionEmail } from "@/infrastructure/services/email/templates/waitlist-promotion";
 import { HostNewRegistrationEmail } from "@/infrastructure/services/email/templates/host-new-registration";
@@ -27,6 +28,11 @@ const BASE_URL = "https://the-playground.fr";
 const FOOTER = "Powered by The Playground — Lancez votre communauté, gratuitement.";
 
 async function buildTemplates(): Promise<{ id: string; label: string; subject: string; html: string }[]> {
+  // Pour les templates dont le wording risque de dériver de messages/fr.json
+  // (ex: magic link, dont la copie suit la spec magic-link-reusable-token),
+  // on lit directement les clés i18n plutôt que de hardcoder ici.
+  const magicLinkT = await getTranslations({ locale: "fr", namespace: "Email.magicLink" });
+
   const templates = [
     {
       id: "registration-confirmation",
@@ -453,21 +459,18 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
     {
       id: "magic-link",
       label: "Magic Link (connexion)",
-      subject: "Votre lien de connexion — The Playground",
+      subject: magicLinkT("subject"),
       element: MagicLinkEmail({
         url: `${BASE_URL}/auth/verify?token=abc123`,
         baseUrl: BASE_URL,
         strings: {
-          preview: "Votre lien de connexion à The Playground",
-          heading: "Votre lien de connexion",
-          bodyText:
-            "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable 15 minutes et ne peut être utilisé qu'une seule fois.",
-          ctaLabel: "Se connecter →",
-          expiryText: "Expire dans 15 minutes · Usage unique",
-          securityText:
-            "Vous n'avez pas demandé ce lien ? Votre compte reste sécurisé, ignorez simplement cet email.",
-          footer:
-            "The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité.",
+          preview: magicLinkT("preview"),
+          heading: magicLinkT("heading"),
+          bodyText: magicLinkT("bodyText"),
+          ctaLabel: magicLinkT("ctaLabel"),
+          expiryText: magicLinkT("expiryText"),
+          securityText: magicLinkT("securityText"),
+          footer: magicLinkT("footer"),
         },
       }),
     },

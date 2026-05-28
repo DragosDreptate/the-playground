@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { unstable_rethrow } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
 import { isValidEmail } from "@/lib/email";
 import { safeCallbackUrl } from "@/lib/url";
@@ -14,18 +15,29 @@ async function setCallbackCookie(callbackUrl: string) {
   });
 }
 
+// Le prefix locale dans le `redirectTo` est ce qui permet à
+// `detectLocaleForMagicLink` (côté sendVerificationRequest) de servir le mail
+// dans la bonne langue, indépendamment du cookie NEXT_LOCALE ou du header
+// Accept-Language du navigateur. Cf. spec/magic-link-reusable-token.md (sujet
+// 5). Pour les flows OAuth c'est cosmétique (le middleware next-intl
+// canonicalisera l'URL).
+async function postSignInRedirectTo() {
+  const locale = await getLocale();
+  return `/${locale}/dashboard/profile/setup`;
+}
+
 export async function signInWithGitHub(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   // Toujours passer par le setup : la page setup redirige vers callbackUrl
   // si le profil est déjà complété, sinon affiche le formulaire.
-  await signIn("github", { redirectTo: "/dashboard/profile/setup" });
+  await signIn("github", { redirectTo: await postSignInRedirectTo() });
 }
 
 export async function signInWithGoogle(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn("google", { redirectTo: "/dashboard/profile/setup" });
+  await signIn("google", { redirectTo: await postSignInRedirectTo() });
 }
 
 export type SignInWithEmailState =
@@ -43,7 +55,7 @@ export async function signInWithEmail(
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   try {
-    await signIn("resend", { email, redirectTo: "/dashboard/profile/setup" });
+    await signIn("resend", { email, redirectTo: await postSignInRedirectTo() });
   } catch (error) {
     // Relance les erreurs spéciales Next.js (redirect, notFound) pour préserver le flow nominal.
     unstable_rethrow(error);

@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildMagicLinkConfirmUrl } from "@/lib/auth/magic-link-url";
-
-const AUTH_URL =
-  "https://app.example.com/api/auth/callback/resend?token=abc&email=user%40example.com&callbackUrl=%2Fdashboard";
+import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
 
 function makeRequest(headers: Record<string, string> = {}): Request {
   return new Request("https://app.example.com/api/auth/signin/resend", {
@@ -10,53 +7,72 @@ function makeRequest(headers: Record<string, string> = {}): Request {
   });
 }
 
-describe("buildMagicLinkConfirmUrl", () => {
-  describe("given a default-locale visitor", () => {
-    it("should point to /auth/confirm without locale prefix", () => {
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, makeRequest());
-      const url = new URL(result);
-      expect(url.pathname).toBe("/auth/confirm");
+function authUrl(callbackPath: string | null): string {
+  const params = new URLSearchParams({ token: "abc", email: "user@example.com" });
+  if (callbackPath !== null) params.set("callbackUrl", callbackPath);
+  return `https://app.example.com/api/auth/callback/resend?${params}`;
+}
+
+describe("detectLocaleForMagicLink", () => {
+  describe("given a callbackUrl with a locale prefix", () => {
+    it.each([
+      ["/fr/m/foo", "fr"],
+      ["/en/m/foo", "en"],
+      ["/fr/dashboard/circles/x", "fr"],
+      ["/en/", "en"],
+    ])("should return %s for callbackUrl=%s", (callback, expected) => {
+      const result = detectLocaleForMagicLink(authUrl(callback), makeRequest());
+      expect(result).toBe(expected);
     });
 
-    it("should preserve token, email and callbackUrl query params", () => {
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, makeRequest());
-      const url = new URL(result);
-      expect(url.searchParams.get("token")).toBe("abc");
-      expect(url.searchParams.get("email")).toBe("user@example.com");
-      expect(url.searchParams.get("callbackUrl")).toBe("/dashboard");
+    it("should accept an absolute callbackUrl", () => {
+      const url = authUrl("https://the-playground.fr/fr/m/foo");
+      expect(detectLocaleForMagicLink(url, makeRequest())).toBe("fr");
     });
 
-    it("should keep the original origin", () => {
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, makeRequest());
-      const url = new URL(result);
-      expect(url.origin).toBe("https://app.example.com");
+    it("should beat the cookie when the prefix says otherwise", () => {
+      const request = makeRequest({ cookie: "NEXT_LOCALE=en" });
+      expect(detectLocaleForMagicLink(authUrl("/fr/m/foo"), request)).toBe("fr");
     });
-  });
 
-  describe("given a visitor with NEXT_LOCALE=en cookie", () => {
-    it("should prefix the path with /en", () => {
-      const request = makeRequest({ cookie: "NEXT_LOCALE=en; foo=bar" });
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, request);
-      const url = new URL(result);
-      expect(url.pathname).toBe("/en/auth/confirm");
-    });
-  });
-
-  describe("given a visitor with Accept-Language en when no cookie", () => {
-    it("should fall back to /en", () => {
+    it("should beat the accept-language header", () => {
       const request = makeRequest({ "accept-language": "en-US,en;q=0.9" });
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, request);
-      const url = new URL(result);
-      expect(url.pathname).toBe("/en/auth/confirm");
+      expect(detectLocaleForMagicLink(authUrl("/fr/m/foo"), request)).toBe("fr");
     });
   });
 
-  describe("given an unknown locale in the cookie", () => {
-    it("should fall back to default locale", () => {
+  describe("given no usable locale prefix in callbackUrl", () => {
+    it("should fall back to NEXT_LOCALE cookie", () => {
+      const request = makeRequest({ cookie: "NEXT_LOCALE=en; foo=bar" });
+      expect(detectLocaleForMagicLink(authUrl("/dashboard"), request)).toBe("en");
+    });
+
+    it("should fall back to accept-language when no cookie", () => {
+      const request = makeRequest({ "accept-language": "en-US,en;q=0.9" });
+      expect(detectLocaleForMagicLink(authUrl("/dashboard"), request)).toBe("en");
+    });
+
+    it("should fall back to defaultLocale (fr) when nothing else", () => {
+      expect(detectLocaleForMagicLink(authUrl("/dashboard"), makeRequest())).toBe("fr");
+    });
+
+    it("should ignore an unknown locale in the cookie", () => {
       const request = makeRequest({ cookie: "NEXT_LOCALE=xx" });
-      const result = buildMagicLinkConfirmUrl(AUTH_URL, request);
-      const url = new URL(result);
-      expect(url.pathname).toBe("/auth/confirm");
+      expect(detectLocaleForMagicLink(authUrl("/dashboard"), request)).toBe("fr");
+    });
+  });
+
+  describe("given a missing or malformed callbackUrl", () => {
+    it("should fall back to defaultLocale when callbackUrl is absent", () => {
+      expect(detectLocaleForMagicLink(authUrl(null), makeRequest())).toBe("fr");
+    });
+
+    it("should fall back to defaultLocale when callbackUrl is empty", () => {
+      expect(detectLocaleForMagicLink(authUrl(""), makeRequest())).toBe("fr");
+    });
+
+    it("should fall back to defaultLocale when the auth URL itself is malformed", () => {
+      expect(detectLocaleForMagicLink("not-a-url", makeRequest())).toBe("fr");
     });
   });
 });
