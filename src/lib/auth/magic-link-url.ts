@@ -1,6 +1,4 @@
-import { routing } from "@/i18n/routing";
-
-type Locale = (typeof routing.locales)[number];
+import { routing, isSupportedLocale, type Locale } from "@/i18n/routing";
 
 const NEXT_LOCALE_COOKIE = /(?:^|;\s*)NEXT_LOCALE=([^;]+)/;
 
@@ -49,6 +47,3 @@ function detectLocaleFromRequest(request: Request): Locale {
   return fromHeader ?? routing.defaultLocale;
 }
 
-function isSupportedLocale(value: string): value is Locale {
-  return (routing.locales as readonly string[]).includes(value);
-}

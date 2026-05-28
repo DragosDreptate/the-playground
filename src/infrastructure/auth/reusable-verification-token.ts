@@ -55,6 +55,11 @@ export function createReusableVerificationToken(prisma: VerificationTokenStore) 
     const where = { identifier_token: { identifier, token } };
     const vt = await prisma.verificationToken.findUnique({ where });
     if (!vt) return null;
+    // Le check d'expiration ici est un cleanup opportuniste, pas une garantie
+    // de sécurité : Auth.js core ré-vérifie `invite.expires` après notre
+    // return (cf. @auth/core/lib/actions/callback/index.js:147). Sans ce
+    // delete-on-read, les tokens expirés s'accumuleraient en attendant le
+    // cron quotidien — on garbage-collecte ici à chaque tentative.
     if (vt.expires < new Date()) {
       try {
         await prisma.verificationToken.delete({ where });
