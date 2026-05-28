@@ -118,7 +118,9 @@ test.describe("Magic link — protection contre les scanners email", () => {
     page,
   }) => {
     await page.goto("/fr/auth/error?error=Verification");
-    await expect(page.getByText(/expir/i)).toBeVisible();
+    // Cible la mention « 15 minutes » qui est unique au verificationExplanation
+    // (le message d'erreur générique mentionne aussi « expiré »).
+    await expect(page.getByText(/15\s*minutes/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
   });
 });

@@ -164,7 +164,7 @@
     "errors": {
       "Configuration": "Erreur de configuration du serveur.",
       "AccessDenied": "Accès refusé.",
-      "Verification": "Le lien de vérification a expiré ou a déjà été utilisé.",
+      "Verification": "Le lien de connexion a expiré.",
       "OAuthAccountNotLinked": "Cet email est déjà associé à une autre méthode de connexion. Utilisez celle-ci pour continuer.",
       "OAuthCallbackError": "La connexion via le fournisseur a échoué. Réessayez.",
       "OAuthSignInError": "La connexion via le fournisseur n'a pas pu démarrer. Réessayez.",

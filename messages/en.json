@@ -164,7 +164,7 @@
     "errors": {
       "Configuration": "Server configuration error.",
       "AccessDenied": "Access denied.",
-      "Verification": "The verification link has expired or has already been used.",
+      "Verification": "The sign-in link has expired.",
       "OAuthAccountNotLinked": "This email is already linked to another sign-in method. Use that one to continue.",
       "OAuthCallbackError": "Sign-in via the provider failed. Please try again.",
       "OAuthSignInError": "Sign-in via the provider couldn't start. Please try again.",
