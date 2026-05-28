@@ -22,9 +22,10 @@ import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-
 const MAGIC_LINK_MAX_AGE_SECONDS = 60 * 15;
 
 // Fenêtre pendant laquelle un User est considéré "nouveau" dans le session
-// callback. Élargie à 10 min (vs 2 min) pour rester correct quand un scanner
-// email crée le User en avance de quelques minutes sur l'humain.
-const NEW_USER_WINDOW_MS = 10 * 60 * 1000;
+// callback. Dérivée de MAGIC_LINK_MAX_AGE_SECONDS : si un scanner email crée
+// le User à T+0 et que l'humain clique près de l'expiration, il faut que
+// isNewUser reste vrai jusqu'à la fin de la fenêtre de validité du token.
+const NEW_USER_WINDOW_MS = MAGIC_LINK_MAX_AGE_SECONDS * 1000;
 
 // Adapter custom : on garde toutes les méthodes standard du PrismaAdapter
 // (createUser, getUserByEmail, etc.) et on override uniquement

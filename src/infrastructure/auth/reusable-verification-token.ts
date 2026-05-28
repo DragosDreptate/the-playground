@@ -18,6 +18,22 @@ type VerificationTokenStore = {
   };
 };
 
+// Code d'erreur Prisma "Record not found" — émis si un autre processus a déjà
+// supprimé le token entre notre findUnique et notre delete. On l'absorbe
+// silencieusement, mais on laisse remonter toutes les autres erreurs (panne
+// DB, timeout, permissions) pour préserver l'observabilité Sentry.
+// Cf. https://www.prisma.io/docs/reference/api-reference/error-reference#p2025
+const PRISMA_RECORD_NOT_FOUND = "P2025";
+
+function isPrismaRecordNotFound(err: unknown): boolean {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    "code" in err &&
+    (err as { code: unknown }).code === PRISMA_RECORD_NOT_FOUND
+  );
+}
+
 /**
  * Adapter `useVerificationToken` qui rend le magic link RÉUTILISABLE pendant
  * sa fenêtre de validité, au lieu d'être consommé au premier appel comme le
@@ -36,14 +52,15 @@ type VerificationTokenStore = {
  */
 export function createReusableVerificationToken(prisma: VerificationTokenStore) {
   return async function useVerificationToken({ identifier, token }: VerificationTokenArgs) {
-    const vt = await prisma.verificationToken.findUnique({
-      where: { identifier_token: { identifier, token } },
-    });
+    const where = { identifier_token: { identifier, token } };
+    const vt = await prisma.verificationToken.findUnique({ where });
     if (!vt) return null;
     if (vt.expires < new Date()) {
-      await prisma.verificationToken
-        .delete({ where: { identifier_token: { identifier, token } } })
-        .catch(() => null);
+      try {
+        await prisma.verificationToken.delete({ where });
+      } catch (err) {
+        if (!isPrismaRecordNotFound(err)) throw err;
+      }
       return null;
     }
     return vt;

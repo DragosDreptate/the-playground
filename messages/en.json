@@ -1166,7 +1166,7 @@
       "bodyText": "Click the button below to sign in. This link is valid for 15 minutes.",
       "ctaLabel": "Sign in →",
       "expiryText": "Expires in 15 minutes",
-      "securityText": "Didn't request this link? Your account is still secure, just ignore this email.",
+      "securityText": "Didn't request this link? Ignore this email, it will become inactive in 15 minutes. Don't forward it to anyone: it grants access to your account.",
       "footer": "The Playground · If you didn't request this link, you can safely ignore it."
     },
     "common": {

@@ -59,17 +59,34 @@ describe("createReusableVerificationToken", () => {
       });
     });
 
-    it("should still return null when the delete itself fails (concurrent cleanup)", async () => {
+    it("should still return null when delete races with another cleanup (Prisma P2025)", async () => {
       prisma.verificationToken.findUnique.mockResolvedValue({
         identifier: ARGS.identifier,
         token: ARGS.token,
         expires: new Date(Date.now() - 1),
       });
-      prisma.verificationToken.delete.mockRejectedValue(new Error("P2025"));
+      // Reproduit la shape réelle d'une PrismaClientKnownRequestError P2025 :
+      // l'objet a un `.code === "P2025"` que `isPrismaRecordNotFound` détecte.
+      const p2025 = Object.assign(new Error("Record not found"), { code: "P2025" });
+      prisma.verificationToken.delete.mockRejectedValue(p2025);
 
       const result = await useVerificationToken(ARGS);
 
       expect(result).toBeNull();
+    });
+
+    it("should rethrow non-P2025 errors so observability is preserved", async () => {
+      prisma.verificationToken.findUnique.mockResolvedValue({
+        identifier: ARGS.identifier,
+        token: ARGS.token,
+        expires: new Date(Date.now() - 1),
+      });
+      const dbOutage = Object.assign(new Error("Connection terminated"), {
+        code: "P1017",
+      });
+      prisma.verificationToken.delete.mockRejectedValue(dbOutage);
+
+      await expect(useVerificationToken(ARGS)).rejects.toBe(dbOutage);
     });
   });
 

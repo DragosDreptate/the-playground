@@ -1166,7 +1166,7 @@
       "bodyText": "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable 15 minutes.",
       "ctaLabel": "Se connecter →",
       "expiryText": "Expire dans 15 minutes",
-      "securityText": "Vous n'avez pas demandé ce lien ? Votre compte reste sécurisé, ignorez simplement cet email.",
+      "securityText": "Vous n'avez pas demandé ce lien ? Ignorez cet email, il deviendra inactif dans 15 minutes. Ne le transférez à personne : il permet la connexion à votre compte.",
       "footer": "The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     },
     "common": {
