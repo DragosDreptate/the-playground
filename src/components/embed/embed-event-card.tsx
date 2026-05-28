@@ -146,7 +146,7 @@ export async function EmbedEventCard({
           )}
           <a
             href={ctaHref}
-            target="_blank"
+            target="_top"
             rel="noopener noreferrer"
             className={ctaClassName(isPassive, isDark)}
           >
@@ -161,7 +161,7 @@ export async function EmbedEventCard({
         {t("poweredBy")}{" "}
         <a
           href={platformUrl}
-          target="_blank"
+          target="_top"
           rel="noopener noreferrer"
           className={`transition-colors ${palette.footerLink}`}
         >

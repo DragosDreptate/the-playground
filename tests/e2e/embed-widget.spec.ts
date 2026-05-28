@@ -46,10 +46,10 @@ test.describe("Embed widget — rendu public", () => {
     await expect(page.getByRole("link", { name: /s'inscrire/i })).toBeVisible();
   });
 
-  test("should open the public moment page in a new tab (target=_blank)", async ({ page }) => {
+  test("should navigate the top frame to the public moment page (target=_top)", async ({ page }) => {
     await page.goto(`/embed/m/${SLUGS.PUBLISHED_MOMENT}`);
     const cta = page.getByRole("link", { name: /s'inscrire/i });
-    await expect(cta).toHaveAttribute("target", "_blank");
+    await expect(cta).toHaveAttribute("target", "_top");
     await expect(cta).toHaveAttribute("rel", /noopener/);
   });
 });
