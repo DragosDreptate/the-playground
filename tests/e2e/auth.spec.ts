@@ -114,30 +114,11 @@ test.describe("Magic link — protection contre les scanners email", () => {
     expect(response.status()).toBe(200);
   });
 
-  test("page /auth/confirm should render a POST form when token + email are present", async ({
-    page,
-  }) => {
-    await page.goto(
-      "/fr/auth/confirm?token=fake-token&email=user%40example.com&callbackUrl=%2Fdashboard"
-    );
-    const form = page.locator("form[method='POST'][action*='/api/auth/callback/resend']");
-    await expect(form).toBeVisible();
-    await expect(form).toHaveAttribute("action", /token=fake-token/);
-    await expect(form).toHaveAttribute("action", /email=user%40example.com/);
-    await expect(form.locator("button[type='submit']")).toBeVisible();
-  });
-
-  test("page /auth/confirm should reject a request without token", async ({ page }) => {
-    await page.goto("/fr/auth/confirm");
-    await expect(page.locator("form")).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
-  });
-
-  test("page /auth/error?error=Verification should explain the corporate inbox case", async ({
+  test("page /auth/error?error=Verification should explain that the link expired", async ({
     page,
   }) => {
     await page.goto("/fr/auth/error?error=Verification");
-    await expect(page.getByText(/anti-spam/i)).toBeVisible();
+    await expect(page.getByText(/expir/i)).toBeVisible();
     await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
   });
 });

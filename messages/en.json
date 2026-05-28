@@ -151,22 +151,12 @@
       "title": "Check your email",
       "description": "A sign-in link has been sent to your email address. Click it to sign in."
     },
-    "confirm": {
-      "title": "One last click to sign in",
-      "reason": "Security check: one last click to make sure it's really you, and not an anti-spam bot.",
-      "submit": "Sign me in",
-      "invalid": {
-        "title": "Invalid link",
-        "description": "This sign-in link is incomplete. Request a new one to continue.",
-        "cta": "Send me a new link"
-      }
-    },
     "error": {
       "title": "Authentication error",
       "backToSignIn": "Back to sign in",
       "requestNewLink": "Send me a new link",
-      "verificationExplanation": "If you use a corporate inbox (Outlook, Gmail Workspace), an anti-spam bot may have visited the link automatically and invalidated it.",
-      "verificationAction": "Request a new link and click it quickly, or sign in with Google/GitHub.",
+      "verificationExplanation": "This sign-in link has expired. Links are valid for 15 minutes for security reasons.",
+      "verificationAction": "Request a new link to sign in.",
       "webviewExplanation": "Google and GitHub block sign-in from in-app browsers (LinkedIn, Instagram, Facebook...).",
       "webviewAction": "Use the email sign-in, or open the site in your browser.",
       "openInBrowser": "Open in browser"
@@ -1173,9 +1163,9 @@
       "subject": "Your sign-in link — The Playground",
       "preview": "Your sign-in link to The Playground",
       "heading": "Your sign-in link",
-      "bodyText": "Click the button below to sign in. This link is valid for 15 minutes and can only be used once.",
+      "bodyText": "Click the button below to sign in. This link is valid for 15 minutes.",
       "ctaLabel": "Sign in →",
-      "expiryText": "Expires in 15 minutes · Single use",
+      "expiryText": "Expires in 15 minutes",
       "securityText": "Didn't request this link? Your account is still secure, just ignore this email.",
       "footer": "The Playground · If you didn't request this link, you can safely ignore it."
     },

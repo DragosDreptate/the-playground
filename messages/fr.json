@@ -151,22 +151,12 @@
       "title": "Vérifiez votre email",
       "description": "Un lien de connexion a été envoyé à votre adresse email. Cliquez dessus pour vous connecter."
     },
-    "confirm": {
-      "title": "Un dernier clic pour vous connecter",
-      "reason": "Sécurité oblige : un dernier clic pour s'assurer que c'est bien vous, et pas un robot anti-spam.",
-      "submit": "Me connecter",
-      "invalid": {
-        "title": "Lien invalide",
-        "description": "Ce lien de connexion est incomplet. Demandez-en un nouveau pour continuer.",
-        "cta": "Recevoir un nouveau lien"
-      }
-    },
     "error": {
       "title": "Erreur d'authentification",
       "backToSignIn": "Retour à la connexion",
       "requestNewLink": "Recevoir un nouveau lien",
-      "verificationExplanation": "Si vous utilisez une boîte mail professionnelle (Outlook, Gmail Workspace), il est possible qu'un robot anti-spam ait visité le lien automatiquement et l'ait invalidé.",
-      "verificationAction": "Demandez un nouveau lien et cliquez-le rapidement, ou utilisez la connexion Google/GitHub.",
+      "verificationExplanation": "Ce lien de connexion a expiré. Les liens sont valables 15 minutes pour des raisons de sécurité.",
+      "verificationAction": "Demandez un nouveau lien pour vous connecter.",
       "webviewExplanation": "Google et GitHub bloquent la connexion depuis les navigateurs intégrés (LinkedIn, Instagram, Facebook...).",
       "webviewAction": "Utilisez la connexion par email, ou ouvrez le site dans votre navigateur.",
       "openInBrowser": "Ouvrir dans le navigateur"
@@ -1173,9 +1163,9 @@
       "subject": "Votre lien de connexion — The Playground",
       "preview": "Votre lien de connexion à The Playground",
       "heading": "Votre lien de connexion",
-      "bodyText": "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable 15 minutes et ne peut être utilisé qu'une seule fois.",
+      "bodyText": "Cliquez sur le bouton ci-dessous pour vous connecter. Ce lien est valable 15 minutes.",
       "ctaLabel": "Se connecter →",
-      "expiryText": "Expire dans 15 minutes · Usage unique",
+      "expiryText": "Expire dans 15 minutes",
       "securityText": "Vous n'avez pas demandé ce lien ? Votre compte reste sécurisé, ignorez simplement cet email.",
       "footer": "The Playground · Si vous n'avez pas demandé ce lien, ignorez cet email en toute sécurité."
     },
