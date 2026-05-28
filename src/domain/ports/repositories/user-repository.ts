@@ -2,7 +2,7 @@ import type { User, NotificationPreferences, DashboardMode, PublicUser } from "@
 
 export type UpdateProfileInput = {
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   name?: string | null;
   image?: string | null;
   bio?: string | null;

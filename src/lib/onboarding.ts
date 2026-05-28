@@ -31,8 +31,13 @@ export function buildOnboardingSetupUrl(): string {
 export function handleOnboardingRequired(
   result: { success: true } | { success: false; code: string },
   router: { push: (url: string) => void },
+  options?: { onRequired?: () => void },
 ): boolean {
   if (result.success || result.code !== "ONBOARDING_REQUIRED") return false;
+  if (options?.onRequired) {
+    options.onRequired();
+    return true;
+  }
   router.push(buildOnboardingSetupUrl());
   return true;
 }

@@ -1532,6 +1532,11 @@
       "title": "Complétez votre profil",
       "description": "Dites-nous en un peu plus sur vous pour commencer."
     },
+    "inlineOnboarding": {
+      "title": "Juste votre prénom",
+      "description": "Il nous permet d'afficher votre inscription et vos commentaires sans interrompre votre parcours.",
+      "submit": "Continuer"
+    },
     "edit": {
       "title": "Mon profil",
       "description": "Gérez vos informations personnelles",
@@ -1546,7 +1551,7 @@
       "emailHint": "Votre email est utilisé pour vous connecter et ne peut pas être modifié.",
       "firstName": "Prénom",
       "firstNamePlaceholder": "Alice",
-      "lastName": "Nom",
+      "lastName": "Nom (optionnel)",
       "lastNamePlaceholder": "Dupont",
       "bio": "Bio",
       "bioPlaceholder": "Décrivez-vous en quelques mots...",

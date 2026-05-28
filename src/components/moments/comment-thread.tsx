@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { InlineOnboardingDialog } from "@/components/profile/inline-onboarding-dialog";
 import { UserAvatar } from "@/components/user-avatar";
 import { CommentPhotoLightbox } from "@/components/moments/comment-photo-lightbox";
 import { addCommentAction, deleteCommentAction } from "@/app/actions/comment";
@@ -189,6 +190,7 @@ export function CommentThread({
   const [content, setContent] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const formatRelativeTime = useRelativeTime(t);
@@ -285,13 +287,18 @@ export function CommentThread({
         router.refresh();
         return;
       }
-      if (handleOnboardingRequired(result, router)) return;
+      if (handleOnboardingRequired(result, router, { onRequired: () => setShowOnboarding(true) })) return;
       setError(result.error);
     });
   }
 
   return (
     <div className="border-border bg-card rounded-2xl border p-6">
+      <InlineOnboardingDialog
+        open={showOnboarding}
+        onOpenChange={setShowOnboarding}
+        onCompleted={handleSubmit}
+      />
       <div className="space-y-4">
         {/* Header */}
         <h2 className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">

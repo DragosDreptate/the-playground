@@ -37,6 +37,32 @@ describe("UpdateProfile", () => {
       expect(result.onboardingCompleted).toBe(true);
     });
 
+    it("should accept a missing lastName", async () => {
+      const existing = makeUser({ id: "user-1" });
+      const updated = makeUser({
+        id: "user-1",
+        firstName: "Alice",
+        lastName: null,
+        onboardingCompleted: true,
+      });
+      const repo = createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        updateProfile: vi.fn().mockResolvedValue(updated),
+      });
+
+      const result = await updateProfile(
+        { userId: "user-1", firstName: "Alice", lastName: null },
+        { userRepository: repo },
+      );
+
+      expect(repo.updateProfile).toHaveBeenCalledWith("user-1", {
+        firstName: "Alice",
+        lastName: null,
+      });
+      expect(result.lastName).toBeNull();
+      expect(result.onboardingCompleted).toBe(true);
+    });
+
     it("should pass optional name if provided", async () => {
       const existing = makeUser({ id: "user-1" });
       const repo = createMockUserRepository({

@@ -8,7 +8,7 @@ import { UserNotFoundError } from "@/domain/errors";
 type UpdateProfileUseCaseInput = {
   userId: string;
   firstName: string;
-  lastName: string;
+  lastName: string | null;
   name?: string | null;
   image?: string | null;
   bio?: string | null;

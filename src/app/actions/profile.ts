@@ -32,15 +32,11 @@ export async function updateProfileAction(
   }
 
   const firstName = formData.get("firstName") as string;
-  const lastName = formData.get("lastName") as string;
+  const lastName = formData.get("lastName") as string | null;
 
   if (!firstName?.trim()) {
     return { success: false, error: "First name is required", code: "VALIDATION" };
   }
-  if (!lastName?.trim()) {
-    return { success: false, error: "Last name is required", code: "VALIDATION" };
-  }
-
   const bio = formData.get("bio") as string | null;
   const city = formData.get("city") as string | null;
   const website = formData.get("website") as string | null;
@@ -51,13 +47,13 @@ export async function updateProfileAction(
   const userId = session.user.id;
   return toActionResult(async () => {
     const trimmedFirst = firstName.trim();
-    const trimmedLast = lastName.trim();
+    const trimmedLast = lastName?.trim() || null;
     return updateProfile(
       {
         userId,
         firstName: trimmedFirst,
         lastName: trimmedLast,
-        name: `${trimmedFirst} ${trimmedLast}`,
+        name: [trimmedFirst, trimmedLast].filter(Boolean).join(" "),
         bio: bio?.trim() || null,
         city: city?.trim() || null,
         website: website?.trim() || null,

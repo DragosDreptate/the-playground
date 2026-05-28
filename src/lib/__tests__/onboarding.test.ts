@@ -195,5 +195,18 @@ describe("Onboarding routing guards", () => {
         "/dashboard/profile/setup?callbackUrl=%2Ffr%2Fm%2Fx",
       );
     });
+
+    it("appelle le callback au lieu de rediriger quand onRequired est fourni", () => {
+      const onRequired = vi.fn();
+      const handled = handleOnboardingRequired(
+        { success: false, code: "ONBOARDING_REQUIRED" },
+        { push },
+        { onRequired },
+      );
+
+      expect(handled).toBe(true);
+      expect(onRequired).toHaveBeenCalledTimes(1);
+      expect(push).not.toHaveBeenCalled();
+    });
   });
 });

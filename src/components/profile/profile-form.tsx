@@ -98,7 +98,6 @@ export function ProfileForm({ user, mode, action, callbackUrl }: ProfileFormProp
             name="lastName"
             placeholder={t("form.lastNamePlaceholder")}
             defaultValue={user.lastName ?? ""}
-            required
             maxLength={50}
             className={INPUT_BG}
           />
