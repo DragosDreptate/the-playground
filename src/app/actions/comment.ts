@@ -1,6 +1,7 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
+import { after } from "next/server";
 import { fileTypeFromBuffer } from "file-type";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
@@ -128,15 +129,22 @@ export async function addCommentAction(
       }
     );
 
-    // Resolve i18n in the request context (before fire-and-forget)
+    // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
+    // doit s'exécuter dans le request context, avant `after()`.
     const resolver = await buildEmailLocaleResolver(userId);
 
-    sendCommentNotifications(momentId, userId, content, resolver).catch(
-      (err) => {
+    // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
+    // de la Server Action. La callback DOIT être async et await la promise —
+    // une callback synchrone qui n'attend pas la Promise reproduirait le bug
+    // d'origine (5/39 emails partis, incident 2026-05-31).
+    after(async () => {
+      try {
+        await sendCommentNotifications(momentId, userId, content, resolver);
+      } catch (err) {
         console.error(err);
         Sentry.captureException(err);
       }
-    );
+    });
 
     return result.comment;
   });
@@ -228,37 +236,41 @@ async function sendCommentNotifications(
   const prefsMap =
     await prismaUserRepository.findNotificationPreferencesByIds(recipientIds);
 
-  await Promise.all(
-    [...recipientMap.values()].map(async (recipient) => {
-      const prefs = prefsMap.get(recipient.userId);
-      if (!prefs?.notifyNewComment) return;
+  // Filtre opt-in AVANT le batch — n'envoie qu'aux destinataires qui ont
+  // activé `notifyNewComment`.
+  const recipients = [...recipientMap.values()]
+    .filter((r) => prefsMap.get(r.userId)?.notifyNewComment)
+    .map((r) => ({ to: r.email, recipientName: r.name }));
 
-      const t = await resolver.translationsFor(recipient.userId);
+  if (recipients.length > 0) {
+    // Le commenter (=trigger) est exclu du recipientMap (cf. delete ci-dessus),
+    // donc tous les destinataires sont ≠ trigger → buildEmailLocaleResolver
+    // retourne toujours DEFAULT_RECIPIENT_LOCALE pour eux. Les strings sont
+    // donc identiques pour tous → précalcul une seule fois.
+    const t = await resolver.defaultTranslations();
 
-      return emailService.sendNewComment({
-        to: recipient.email,
-        recipientName: recipient.name,
-        playerName,
-        momentTitle: moment.title,
-        momentSlug: moment.slug,
-        commentPreview,
-        strings: {
-          subject: t("commentNotification.subject", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          heading: t("commentNotification.heading"),
-          message: t("commentNotification.message", {
-            playerName,
-            momentTitle: moment.title,
-          }),
-          commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
-          viewCommentCta: t("commentNotification.viewCommentCta"),
-          footer: t("common.footer"),
-        },
-      });
-    })
-  );
+    await emailService.sendNewCommentBatch({
+      recipients,
+      playerName,
+      momentTitle: moment.title,
+      momentSlug: moment.slug,
+      commentPreview,
+      strings: {
+        subject: t("commentNotification.subject", {
+          playerName,
+          momentTitle: moment.title,
+        }),
+        heading: t("commentNotification.heading"),
+        message: t("commentNotification.message", {
+          playerName,
+          momentTitle: moment.title,
+        }),
+        commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
+        viewCommentCta: t("commentNotification.viewCommentCta"),
+        footer: t("common.footer"),
+      },
+    });
+  }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   await notifySlackNewComment({

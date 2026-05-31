@@ -5,7 +5,7 @@ import type {
   RegistrationReminderEmailData,
   WaitlistPromotionEmailData,
   HostNewRegistrationEmailData,
-  NewCommentEmailData,
+  NewCommentBatchEmailData,
   NewMomentMemberEmailData,
   NewMomentMembersEmailData,
   MomentUpdateEmailData,
@@ -172,13 +172,23 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendNewComment(data: NewCommentEmailData): Promise<void> {
-      await send({
-        from,
-        to: data.to,
-        subject: data.strings.subject,
-        react: NewCommentEmail({ ...data, baseUrl }),
-      });
+    async sendNewCommentBatch(
+      data: NewCommentBatchEmailData
+    ): Promise<void> {
+      const { recipients, ...common } = data;
+      await sendBatch(
+        recipients.map(({ to, recipientName }) => ({
+          from,
+          to,
+          subject: common.strings.subject,
+          react: NewCommentEmail({
+            ...common,
+            to,
+            recipientName,
+            baseUrl,
+          }),
+        }))
+      );
     },
 
     async sendNewMomentToMember(
