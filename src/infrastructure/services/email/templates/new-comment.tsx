@@ -20,7 +20,7 @@ export function NewCommentEmail({
   baseUrl,
   strings,
 }: Props) {
-  const viewUrl = `${baseUrl}/m/${momentSlug}`;
+  const viewUrl = `${baseUrl}/m/${momentSlug}#comments`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>

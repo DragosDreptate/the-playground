@@ -264,6 +264,10 @@ export type MomentCancelledBatchEmailData = Omit<MomentCancelledEmailData, "to" 
   recipients: Array<{ to: string; recipientName: string }>;
 };
 
+export type NewCommentBatchEmailData = Omit<NewCommentEmailData, "to" | "recipientName"> & {
+  recipients: Array<{ to: string; recipientName: string }>;
+};
+
 export type AdminEntityCreatedEmailData = {
   to: string;
   entityType: "circle" | "moment";
@@ -498,7 +502,7 @@ export interface EmailService {
   ): Promise<void>;
   sendWaitlistPromotion(data: WaitlistPromotionEmailData): Promise<void>;
   sendHostNewRegistration(data: HostNewRegistrationEmailData): Promise<void>;
-  sendNewComment(data: NewCommentEmailData): Promise<void>;
+  sendNewCommentBatch(data: NewCommentBatchEmailData): Promise<void>;
   sendNewMomentToMember(data: NewMomentMemberEmailData): Promise<void>;
   sendNewMomentToMembers(data: NewMomentMembersEmailData): Promise<void>;
   sendMomentUpdate(data: MomentUpdateEmailData): Promise<void>;

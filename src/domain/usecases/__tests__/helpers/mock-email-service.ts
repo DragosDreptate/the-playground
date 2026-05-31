@@ -8,7 +8,7 @@ export function createMockEmailService(
     sendRegistrationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendWaitlistPromotion: vi.fn().mockResolvedValue(undefined),
     sendHostNewRegistration: vi.fn().mockResolvedValue(undefined),
-    sendNewComment: vi.fn().mockResolvedValue(undefined),
+    sendNewCommentBatch: vi.fn().mockResolvedValue(undefined),
     sendNewMomentToMember: vi.fn().mockResolvedValue(undefined),
     sendNewMomentToMembers: vi.fn().mockResolvedValue(undefined),
     sendMomentUpdate: vi.fn().mockResolvedValue(undefined),
