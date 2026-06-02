@@ -50,10 +50,10 @@ export async function notifySlackNewEntity(params: {
 }): Promise<void> {
   const isCircle = params.entityType === "circle";
   const icon = isCircle ? "🟣" : "📅";
-  const label = isCircle ? "Nouvelle Communaute" : "Nouvel evenement";
+  const label = isCircle ? "Nouvelle Communauté" : "Nouvel événement";
 
   const bodyParts = [`*${params.entityName}*`, `Par ${params.creatorName} (${params.creatorEmail})`];
-  if (params.circleName) bodyParts.push(`Communaute : ${params.circleName}`);
+  if (params.circleName) bodyParts.push(`Communauté : ${params.circleName}`);
   if (params.momentDate) bodyParts.push(`Date : ${params.momentDate}`);
   if (params.locationText) bodyParts.push(`Lieu : ${params.locationText}`);
 
@@ -80,17 +80,17 @@ export async function notifySlackMomentUpdated(params: {
   const bodyParts = [
     `*${params.momentTitle}*`,
     `Par ${params.hostName} (${params.hostEmail})`,
-    `Communaute : ${params.circleName}`,
+    `Communauté : ${params.circleName}`,
     `Date : ${params.momentDate}`,
     `Lieu : ${params.locationText}`,
   ];
 
   await sendSlack({
-    text: `✏️ Evenement modifie — ${params.momentTitle}`,
+    text: `✏️ Événement modifié — ${params.momentTitle}`,
     blocks: [
-      { type: "header", text: { type: "plain_text", text: "✏️ Evenement modifie", emoji: true } },
+      { type: "header", text: { type: "plain_text", text: "✏️ Événement modifié", emoji: true } },
       { type: "section", text: { type: "mrkdwn", text: bodyParts.join("\n") } },
-      { type: "section", text: { type: "mrkdwn", text: `*Champs modifies*\n${params.changedFields.map((f) => `• ${f}`).join("\n")}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Champs modifiés*\n${params.changedFields.map((f) => `• ${f}`).join("\n")}` } },
       { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans le dashboard" }, url: params.momentUrl }] },
     ],
   });
@@ -145,12 +145,12 @@ export async function notifySlackNewRegistration(params: {
     text: `🎟️ Nouvelle inscription — ${params.playerName} → ${params.momentTitle}`,
     blocks: [
       { type: "header", text: { type: "plain_text", text: "🎟️ Nouvelle inscription", emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* s'est inscrit a *${params.momentTitle}*` } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* s'est inscrit à *${params.momentTitle}*` } },
       { type: "section", fields: [
-        { type: "mrkdwn", text: `*Communaute*\n${params.circleName}` },
+        { type: "mrkdwn", text: `*Communauté*\n${params.circleName}` },
         { type: "mrkdwn", text: `*Inscriptions*\n${params.registrationInfo}` },
       ]},
-      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'evenement" }, url: params.momentUrl }] },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'événement" }, url: params.momentUrl }] },
     ],
   });
 }
@@ -165,9 +165,23 @@ export async function notifySlackNewComment(params: {
     text: `💬 Nouveau commentaire — ${params.playerName} sur ${params.momentTitle}`,
     blocks: [
       { type: "header", text: { type: "plain_text", text: "💬 Nouveau commentaire", emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* a commente sur *${params.momentTitle}*` } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* a commenté sur *${params.momentTitle}*` } },
       { type: "section", text: { type: "mrkdwn", text: `> ${params.commentPreview}` } },
-      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'evenement" }, url: params.momentUrl }] },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir l'événement" }, url: params.momentUrl }] },
+    ],
+  });
+}
+
+export async function notifySlackQuotaWarning(
+  used: number,
+  tier: number,
+): Promise<void> {
+  await sendSlack({
+    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} franchi)`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "⚠️ Quota emails Resend", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* franchi.` } },
+      { type: "context", elements: [{ type: "mrkdwn", text: "Au-delà de 100/jour, les envois sont bloqués jusqu'au lendemain. Pense à passer sur un plan payant." }] },
     ],
   });
 }
