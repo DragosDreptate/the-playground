@@ -506,6 +506,7 @@ export const prismaAdminRepository: AdminRepository = {
         name: m.circle.name,
         slug: m.circle.slug,
         role: m.role,
+        status: m.status,
       })),
       moments: record.registrations.map((r) => ({
         id: r.moment.id,

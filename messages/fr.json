@@ -843,6 +843,7 @@
       "memberSince": "Membre depuis",
       "circles": "Communautés",
       "noCircles": "Aucune communauté.",
+      "pendingMembership": "En attente",
       "moments": "Événements",
       "noMoments": "Aucun événement.",
       "auth": {

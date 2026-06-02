@@ -60,8 +60,8 @@ describe("GetAdminUser", () => {
     it("should return all circle memberships in the detail", async () => {
       const userDetail = makeAdminUserDetail({
         circles: [
-          { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST" },
-          { id: "circle-2", name: "Design Lyon", slug: "design-lyon", role: "PLAYER" },
+          { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST", status: "ACTIVE" },
+          { id: "circle-2", name: "Design Lyon", slug: "design-lyon", role: "PLAYER", status: "ACTIVE" },
         ],
       });
       const adminRepository = createMockAdminRepository({

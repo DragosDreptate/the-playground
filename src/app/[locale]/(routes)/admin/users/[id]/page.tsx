@@ -169,7 +169,9 @@ export default async function AdminUserDetailPage({ params }: Props) {
                     {circle.name}
                   </Link>
                   <Badge variant="outline" className="text-xs">
-                    {tRole(circle.role.toLowerCase() as "host" | "player")}
+                    {circle.status === "PENDING"
+                      ? t("userDetail.pendingMembership")
+                      : tRole(circle.role.toLowerCase() as "host" | "player")}
                   </Badge>
                 </div>
               ))}
