@@ -1,5 +1,10 @@
 import type { UserRole } from "@/domain/models/user";
-import type { CircleVisibility, CircleCategory, MembershipStatus } from "@/domain/models/circle";
+import type {
+  CircleVisibility,
+  CircleCategory,
+  CircleMemberRole,
+  MembershipStatus,
+} from "@/domain/models/circle";
 import type { MomentStatus } from "@/domain/models/moment";
 
 // ─────────────────────────────────────────────
@@ -55,7 +60,7 @@ export type AdminUserDetail = AdminUserRow & {
     id: string;
     name: string;
     slug: string;
-    role: string;
+    role: CircleMemberRole;
     status: MembershipStatus;
   }>;
   moments: Array<{

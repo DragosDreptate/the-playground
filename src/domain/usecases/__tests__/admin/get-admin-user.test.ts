@@ -75,4 +75,22 @@ describe("GetAdminUser", () => {
       expect(result?.circles[1].role).toBe("PLAYER");
     });
   });
+
+  describe("given a user with a PENDING membership", () => {
+    it("should expose the PENDING status on the membership entry", async () => {
+      const userDetail = makeAdminUserDetail({
+        circles: [
+          { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "PLAYER", status: "PENDING" },
+        ],
+      });
+      const adminRepository = createMockAdminRepository({
+        findUserById: vi.fn().mockResolvedValue(userDetail),
+      });
+
+      const result = await getAdminUser("ADMIN", "user-1", { adminRepository });
+
+      expect(result?.circles[0].status).toBe("PENDING");
+      expect(result?.circles[0].role).toBe("PLAYER");
+    });
+  });
 });

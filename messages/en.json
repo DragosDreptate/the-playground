@@ -261,7 +261,8 @@
     "role": {
       "host": "Organizer",
       "coHost": "Co-organizer",
-      "player": "Member"
+      "player": "Member",
+      "pending": "Pending"
     },
     "pendingRequests": {
       "membershipsTitle": "Pending membership requests",
@@ -843,7 +844,6 @@
       "memberSince": "Member since",
       "circles": "Communities",
       "noCircles": "No communities.",
-      "pendingMembership": "Pending",
       "moments": "Events",
       "noMoments": "No Events.",
       "auth": {

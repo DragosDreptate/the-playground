@@ -261,7 +261,8 @@
     "role": {
       "host": "Organisateur",
       "coHost": "Co-organisateur",
-      "player": "Participant"
+      "player": "Participant",
+      "pending": "En attente"
     },
     "pendingRequests": {
       "membershipsTitle": "Demandes d'adhésion en attente",
@@ -843,7 +844,6 @@
       "memberSince": "Membre depuis",
       "circles": "Communautés",
       "noCircles": "Aucune communauté.",
-      "pendingMembership": "En attente",
       "moments": "Événements",
       "noMoments": "Aucun événement.",
       "auth": {
