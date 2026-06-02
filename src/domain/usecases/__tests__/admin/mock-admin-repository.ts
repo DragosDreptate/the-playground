@@ -123,7 +123,7 @@ export function makeAdminUserDetail(
       welcomeEmailSentAt: new Date("2026-01-01"),
     },
     circles: [
-      { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST" },
+      { id: "circle-1", name: "Tech Paris", slug: "tech-paris", role: "HOST", status: "ACTIVE" },
     ],
     moments: [
       { id: "moment-1", title: "Meetup JS", slug: "meetup-js", startsAt: new Date("2099-06-01T18:00:00Z"), status: "PUBLISHED", circleName: "Tech Paris" },

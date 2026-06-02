@@ -261,7 +261,8 @@
     "role": {
       "host": "Organizer",
       "coHost": "Co-organizer",
-      "player": "Member"
+      "player": "Member",
+      "pending": "Pending"
     },
     "pendingRequests": {
       "membershipsTitle": "Pending membership requests",

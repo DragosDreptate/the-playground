@@ -10,7 +10,14 @@ import { CopyButton } from "@/components/ui/copy-button";
 import { formatLongDate } from "@/lib/format-date";
 import { buildSentryIssuesSearchUrl } from "@/lib/sentry-url";
 import { buildPostHogPersonUrl } from "@/lib/posthog-url";
+import type { CircleMemberRole } from "@/domain/models/circle";
 import { AdminUserDeleteButton } from "./delete-button";
+
+const ROLE_I18N_KEY: Record<CircleMemberRole, "host" | "coHost" | "player"> = {
+  HOST: "host",
+  CO_HOST: "coHost",
+  PLAYER: "player",
+};
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -169,7 +176,7 @@ export default async function AdminUserDetailPage({ params }: Props) {
                     {circle.name}
                   </Link>
                   <Badge variant="outline" className="text-xs">
-                    {tRole(circle.role.toLowerCase() as "host" | "player")}
+                    {tRole(circle.status === "PENDING" ? "pending" : ROLE_I18N_KEY[circle.role])}
                   </Badge>
                 </div>
               ))}
