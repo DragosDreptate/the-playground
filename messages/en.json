@@ -187,7 +187,7 @@
       "cta": "Explore"
     },
     "modeChoice": {
-      "greetingPrefix": "Welcome,",
+      "greetingPrefix": "Welcome",
       "greetingSuffix": "What do you want to do?",
       "greetingAnonymous": "Welcome — what do you want to do?",
       "subtitle": "Where would you like to start?",
@@ -279,7 +279,7 @@
     "online": "Online",
     "hybrid": "Hybrid",
     "hostTools": "Host tools",
-    "greeting": "Hello, {name}",
+    "greeting": "Hello {name}",
     "greetingAnonymous": "Hello",
     "greetingSubtitle": "Your events and communities, at a glance.",
     "memberCount": "{count} members",

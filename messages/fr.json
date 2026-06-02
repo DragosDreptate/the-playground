@@ -187,7 +187,7 @@
       "cta": "Explorer"
     },
     "modeChoice": {
-      "greetingPrefix": "Bienvenue,",
+      "greetingPrefix": "Bienvenue",
       "greetingSuffix": "Que voulez-vous faire ?",
       "greetingAnonymous": "Bienvenue — que voulez-vous faire ?",
       "subtitle": "Par où voulez-vous commencer ?",
@@ -279,7 +279,7 @@
     "online": "En ligne",
     "hybrid": "Hybride",
     "hostTools": "Outils organisateur",
-    "greeting": "Bonjour, {name}",
+    "greeting": "Bonjour {name}",
     "greetingAnonymous": "Bonjour",
     "greetingSubtitle": "Vos événements et vos communautés, en un coup d'œil.",
     "memberCount": "{count} membres",
