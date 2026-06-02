@@ -100,6 +100,7 @@ export default async function HelpPage() {
         { id: "editCancel", label: t("sidebar.editCancel") },
         { id: "radar", label: t("sidebar.radar") },
         { id: "share", label: t("sidebar.share") },
+        { id: "embed", label: t("sidebar.embed") },
         { id: "members", label: t("sidebar.members") },
         { id: "coHosts", label: t("sidebar.coHosts") },
         { id: "inviteMembers", label: t("sidebar.inviteMembers") },
@@ -561,6 +562,30 @@ export default async function HelpPage() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {t.rich("organizer.share.intro", rich)}
               </p>
+            </div>
+
+            <hr className="border-border" />
+
+            {/* Intégrer (widget) */}
+            <div className="space-y-4">
+              <SectionH3 id="embed">{t("organizer.embed.title")}</SectionH3>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {t.rich("organizer.embed.intro", rich)}
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                {t("organizer.embed.stepsLabel")}
+              </p>
+              <ol className="space-y-3">
+                {(["step1", "step2", "step3"] as const).map((step, i) => (
+                  <li key={step} className="flex items-start gap-3">
+                    <StepNumber n={i + 1} />
+                    <span className="text-sm leading-relaxed text-muted-foreground">
+                      {t.rich(`organizer.embed.${step}`, rich)}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <Callout>{t("organizer.embed.callout")}</Callout>
             </div>
 
             <hr className="border-border" />

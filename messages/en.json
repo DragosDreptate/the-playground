@@ -1642,6 +1642,7 @@
       "editCancel": "Edit or cancel",
       "radar": "The Radar",
       "share": "Share your event",
+      "embed": "Embed on your site",
       "members": "Manage members",
       "coHosts": "Co-organizers",
       "inviteMembers": "Invite members",
@@ -1826,6 +1827,15 @@
       "share": {
         "title": "Share your event",
         "intro": "Every event has a <strong>unique URL</strong> (format <code>the-playground.fr/m/your-event</code>). Copy this link from the event dashboard and share it directly — via WhatsApp, Instagram, email, or newsletter. No installation or prior account is required for attendees."
+      },
+      "embed": {
+        "title": "Embed an event on your site",
+        "intro": "You can display any event directly on your website, blog or newsletter using an embeddable <strong>widget</strong>. It shows the essentials of the event page (title, date, location, attendees) with a registration button, and always stays up to date automatically.",
+        "stepsLabel": "To get the embed code:",
+        "step1": "From your event dashboard, find the <strong>Event widget</strong> block and click <strong>Get the code</strong>",
+        "step2": "Choose the <strong>language</strong> (French or English) and the <strong>theme</strong> (light or dark). A live preview is shown",
+        "step3": "Click <strong>Copy code</strong>, then paste the HTML snippet into your site, blog post or newsletter editor",
+        "callout": "The widget updates automatically (date, remaining capacity, event status) and adapts to the width of its container. No maintenance on your end: if you edit the event, the widget reflects the change instantly."
       },
       "members": {
         "title": "Manage community members",
