@@ -9,8 +9,8 @@ export default function ExplorerLoading() {
         <Skeleton className="h-5 w-80" />
       </div>
 
-      {/* À la une */}
-      <div className="rounded-[20px] border p-5 sm:p-6 space-y-5">
+      {/* À la une — masquée en mobile, comme le composant réel */}
+      <div className="hidden rounded-[20px] border p-5 sm:block sm:p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <Skeleton className="h-3 w-16" />
