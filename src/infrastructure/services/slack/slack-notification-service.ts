@@ -172,6 +172,20 @@ export async function notifySlackNewComment(params: {
   });
 }
 
+export async function notifySlackQuotaWarning(
+  used: number,
+  tier: number,
+): Promise<void> {
+  await sendSlack({
+    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} franchi)`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "⚠️ Quota emails Resend", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyes aujourd'hui (plan gratuit).\nSeuil de *${tier}* franchi.` } },
+      { type: "context", elements: [{ type: "mrkdwn", text: "Au-dela de 100/jour, les envois sont bloques jusqu'au lendemain. Pense a passer sur un plan payant." }] },
+    ],
+  });
+}
+
 export async function notifySlackSentryIssue(params: {
   issue: { issueShortId: string; issueTitle: string };
   analysis: AnalysisResult;
