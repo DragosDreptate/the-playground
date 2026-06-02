@@ -21,7 +21,7 @@ export function ExplorerFeatured({ circles }: Props) {
   if (circles.length === 0) return null;
 
   return (
-    <div className="relative mb-8 overflow-hidden rounded-[20px] border border-border">
+    <div className="relative mb-8 hidden overflow-hidden rounded-[20px] border border-border sm:block">
       {/* Backdrop cinématique — dark mode uniquement */}
       <div
         className="absolute inset-0 hidden scale-105 opacity-40 dark:block"
