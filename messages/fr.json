@@ -1642,6 +1642,7 @@
       "editCancel": "Modifier ou annuler",
       "radar": "Le Radar",
       "share": "Partager l'événement",
+      "embed": "Intégrer sur votre site",
       "members": "Gérer les membres",
       "coHosts": "Co-organisateurs",
       "inviteMembers": "Inviter des membres",
@@ -1826,6 +1827,15 @@
       "share": {
         "title": "Partager votre événement",
         "intro": "Chaque événement dispose d'une <strong>URL unique</strong> (format <code>the-playground.fr/m/votre-evenement</code>). Copiez ce lien depuis le tableau de bord de l'événement et partagez-le directement — via WhatsApp, Instagram, email, ou newsletter. Aucune installation ni compte préalable n'est requis pour les participants."
+      },
+      "embed": {
+        "title": "Intégrer un événement sur votre site",
+        "intro": "Vous pouvez afficher n'importe quel événement directement sur votre site, votre blog ou votre newsletter grâce à un <strong>widget</strong> à intégrer. Le widget reprend l'essentiel de la page de l'événement (titre, date, lieu, inscrits) avec un bouton d'inscription, et reste toujours à jour automatiquement.",
+        "stepsLabel": "Pour obtenir le code d'intégration :",
+        "step1": "Depuis le tableau de bord de votre événement, repérez le bloc <strong>Widget événement</strong> et cliquez sur <strong>Obtenir le code</strong>",
+        "step2": "Choisissez la <strong>langue</strong> (français ou anglais) et le <strong>thème</strong> (clair ou sombre). Un aperçu en direct s'affiche",
+        "step3": "Cliquez sur <strong>Copier le code</strong>, puis collez l'extrait HTML dans votre site, votre article de blog ou votre éditeur de newsletter",
+        "callout": "Le widget se met à jour automatiquement (date, places restantes, statut de l'événement) et s'adapte à la largeur de son emplacement. Aucune maintenance de votre côté : si vous modifiez l'événement, le widget reflète le changement instantanément."
       },
       "members": {
         "title": "Gérer les membres de votre communauté",
