@@ -177,10 +177,10 @@ export async function notifySlackQuotaWarning(
   tier: number,
 ): Promise<void> {
   await sendSlack({
-    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} franchi)`,
+    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} dépassé)`,
     blocks: [
       { type: "header", text: { type: "plain_text", text: "⚠️ Quota emails Resend", emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* franchi.` } },
+      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* dépassé.` } },
       { type: "context", elements: [{ type: "mrkdwn", text: "Au-delà de 100/jour, les envois sont bloqués jusqu'au lendemain. Pense à passer sur un plan payant." }] },
     ],
   });

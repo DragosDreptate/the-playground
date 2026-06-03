@@ -1,5 +1,4 @@
 import { createSafeResend } from "@/lib/email/safe-resend";
-import { checkResendQuota } from "./resend-quota-monitor";
 import type {
   EmailService,
   RegistrationConfirmationEmailData,
@@ -100,8 +99,7 @@ export function createResendEmailService(): EmailService {
   ): Promise<void> {
     const to = Array.isArray(params.to) ? params.to : [params.to];
     if (to.every(isDemoEmail)) return;
-    const res = await resend.emails.send(params);
-    await checkResendQuota(res.headers);
+    await resend.emails.send(params);
   }
 
   // Envoie un batch en respectant la limite de 100 emails par appel Resend.
@@ -118,8 +116,7 @@ export function createResendEmailService(): EmailService {
     const CHUNK_SIZE = 100;
     for (let i = 0; i < real.length; i += CHUNK_SIZE) {
       if (i > 0) await new Promise((r) => setTimeout(r, 500));
-      const res = await resend.batch.send(real.slice(i, i + CHUNK_SIZE));
-      await checkResendQuota(res.headers);
+      await resend.batch.send(real.slice(i, i + CHUNK_SIZE));
     }
   }
 
