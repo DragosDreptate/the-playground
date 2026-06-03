@@ -1,0 +1,180 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1760" viewBox="0 0 1280 1760" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <style>
+      .band   { font-size:17px; font-weight:700; fill:#ffffff; }
+      .h2     { font-size:15px; font-weight:700; }
+      .body   { font-size:13.5px; fill:#1f2937; }
+      .muted  { font-size:12.5px; fill:#6b7280; }
+      .pill   { font-size:12.5px; font-weight:600; fill:#0f172a; }
+      .trig   { font-size:13px; font-weight:600; fill:#334155; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="1760" fill="#f7f7f8"/>
+
+  <!-- Title -->
+  <text x="40" y="50" font-size="27" font-weight="800" fill="#0f172a">Pipeline CI/CD · The Playground</text>
+  <text x="40" y="78" font-size="14.5" fill="#6b7280">Du commit au déploiement : triggers, build, déploiement, runtime</text>
+
+  <!-- ============ PHASE 1 · LOCAL ============ -->
+  <g>
+    <rect x="40" y="100" width="1200" height="158" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <path d="M40,112 a12,12 0 0 1 12,-12 h1176 a12,12 0 0 1 12,12 v22 h-1200 Z" fill="#2563eb"/>
+    <text x="64" y="124" class="band">1 · LOCAL — ton poste</text>
+
+    <text x="64" y="162" class="body">Tu écris le code et tu vérifies en local :</text>
+    <!-- pills -->
+    <rect x="64"  y="178" width="96"  height="30" rx="15" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="112" y="198" class="pill" text-anchor="middle">next dev</text>
+    <rect x="176" y="178" width="142" height="30" rx="15" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="247" y="198" class="pill" text-anchor="middle">pnpm typecheck</text>
+    <rect x="334" y="178" width="140" height="30" rx="15" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="404" y="198" class="pill" text-anchor="middle">pnpm test:unit</text>
+    <rect x="490" y="178" width="140" height="30" rx="15" fill="#dbeafe" stroke="#93c5fd"/>
+    <text x="560" y="198" class="pill" text-anchor="middle">pnpm test:e2e</text>
+
+    <text x="64" y="240" class="body" font-weight="600">puis  git commit  →  git push origin feat/xxx</text>
+  </g>
+
+  <!-- trigger 1 -->
+  <line x1="640" y1="258" x2="640" y2="298" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="470" y="266" width="340" height="24" rx="12" fill="#e2e8f0"/>
+  <text x="640" y="283" class="trig" text-anchor="middle">push de la branche + ouverture de la PR</text>
+
+  <!-- ============ PHASE 2 · PULL REQUEST ============ -->
+  <g>
+    <rect x="40" y="300" width="1200" height="472" rx="12" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+    <path d="M40,312 a12,12 0 0 1 12,-12 h1176 a12,12 0 0 1 12,12 v22 h-1200 Z" fill="#7c3aed"/>
+    <text x="64" y="324" class="band">2 · PULL REQUEST vers main</text>
+
+    <text x="64" y="358" class="h2" fill="#5b21b6">GitHub Actions · ci.yml</text>
+    <text x="270" y="358" class="muted">paths-ignore: spec/** , *.md , ISSUE_TEMPLATE  ·  concurrency: cancel-in-progress</text>
+    <text x="64" y="380" class="muted">3 jobs en parallèle — runners Ubuntu, Node 22, pnpm</text>
+
+    <!-- job: typecheck -->
+    <rect x="64" y="396" width="350" height="106" rx="10" fill="#ffffff" stroke="#ddd6fe"/>
+    <text x="80" y="420" class="h2" fill="#6d28d9">typecheck</text>
+    <text x="80" y="446" class="body">pnpm install --frozen-lockfile</text>
+    <text x="80" y="470" class="body">pnpm typecheck</text>
+    <text x="80" y="490" class="muted">(tsc --noEmit)</text>
+
+    <!-- job: test-unit -->
+    <rect x="440" y="396" width="350" height="106" rx="10" fill="#ffffff" stroke="#ddd6fe"/>
+    <text x="456" y="420" class="h2" fill="#6d28d9">test-unit</text>
+    <text x="456" y="446" class="body">pnpm install --frozen-lockfile</text>
+    <text x="456" y="470" class="body">pnpm test:unit</text>
+    <text x="456" y="490" class="muted">(vitest)</text>
+
+    <!-- job: test-e2e -->
+    <rect x="816" y="396" width="360" height="300" rx="10" fill="#ffffff" stroke="#ddd6fe"/>
+    <text x="832" y="420" class="h2" fill="#6d28d9">test-e2e</text>
+    <text x="832" y="446" class="body">pnpm install  ·  cache Playwright</text>
+    <text x="832" y="476" class="body">① crée une branche Neon isolée</text>
+    <text x="848" y="496" class="muted">e2e-&lt;run_id&gt;, parent = dev</text>
+    <!-- build #1 highlight -->
+    <rect x="832" y="510" width="328" height="44" rx="8" fill="#fce7f3" stroke="#db2777"/>
+    <text x="848" y="530" class="body" font-weight="700" fill="#9d174d">② pnpm build   ◄  BUILD #1</text>
+    <text x="848" y="548" class="muted" fill="#9d174d">next build de prod (banc d'essai)</text>
+    <text x="832" y="578" class="body">③ pnpm test:e2e  (playwright)</text>
+    <text x="832" y="606" class="body">④ supprime la branche Neon</text>
+    <text x="848" y="626" class="muted">always() — même si les tests échouent</text>
+    <text x="832" y="656" class="body">⑤ upload report  (si échec)</text>
+
+    <!-- required checks -->
+    <rect x="64" y="520" width="726" height="40" rx="8" fill="#ede9fe" stroke="#c4b5fd"/>
+    <text x="80" y="545" class="body" font-weight="700" fill="#5b21b6">✓ required checks (branch protection) : typecheck + test-unit + test-e2e verts</text>
+
+    <!-- docs-ci note -->
+    <rect x="64" y="576" width="726" height="52" rx="8" fill="#ffffff" stroke="#e5e7eb"/>
+    <text x="80" y="598" class="body" font-weight="700">docs-ci.yml</text>
+    <text x="80" y="618" class="muted">Si la PR ne touche QUE des docs : checks « factices » qui passent, aucun build.</text>
+
+    <!-- vercel preview off -->
+    <rect x="64" y="644" width="726" height="52" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="80" y="666" class="body" font-weight="700" fill="#b91c1c">Vercel Preview DÉSACTIVÉ sur les PR</text>
+    <text x="80" y="686" class="muted" fill="#b91c1c">vercel-ignore.sh → exit 0 pour toute branche ≠ main / staging</text>
+  </g>
+
+  <!-- trigger 2 (manuel) -->
+  <line x1="640" y1="772" x2="640" y2="822" stroke="#d97706" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect x="446" y="784" width="388" height="26" rx="13" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="640" y="802" class="trig" fill="#92400e" text-anchor="middle">⚠ gh pr merge --merge   ·   étape manuelle</text>
+
+  <!-- ============ PHASE 3 · MERGE ============ -->
+  <g>
+    <rect x="40" y="826" width="1200" height="628" rx="12" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+    <path d="M40,838 a12,12 0 0 1 12,-12 h1176 a12,12 0 0 1 12,12 v22 h-1200 Z" fill="#d97706"/>
+    <text x="64" y="850" class="band">3 · MERGE sur main — deux pistes parallèles</text>
+
+    <!-- Lane A -->
+    <text x="64" y="890" class="h2" fill="#92400e">PISTE A — Validation (GitHub Actions)</text>
+    <rect x="64" y="906" width="560" height="84" rx="10" fill="#ffffff" stroke="#fde68a"/>
+    <text x="80" y="936" class="body" font-weight="700">ci.yml re-tourne (push main)</text>
+    <text x="80" y="962" class="muted">typecheck · test-unit · test-e2e + BUILD #1</text>
+
+    <rect x="64" y="1006" width="560" height="84" rx="10" fill="#ffffff" stroke="#fde68a"/>
+    <text x="80" y="1036" class="body" font-weight="700">release-please.yml</text>
+    <text x="80" y="1062" class="muted">accumule les commits → crée / met à jour la « Release PR »</text>
+
+    <rect x="64" y="1106" width="560" height="84" rx="10" fill="#ffffff" stroke="#fde68a"/>
+    <text x="80" y="1136" class="body" font-weight="700">sync-version.yml</text>
+    <text x="80" y="1162" class="muted">si CHANGELOG.md change : bump version + commit [skip ci]</text>
+
+    <!-- Lane B -->
+    <text x="656" y="890" class="h2" fill="#92400e">PISTE B — Build &amp; Deploy (Vercel)</text>
+    <rect x="656" y="906" width="560" height="110" rx="10" fill="#ffffff" stroke="#fde68a"/>
+    <text x="672" y="934" class="body" font-weight="700">Webhook git  →  ignoreCommand (vercel-ignore.sh)</text>
+    <text x="672" y="958" class="muted">décide build ou skip :</text>
+    <text x="672" y="980" class="muted">main + src/content/** → build  ·  docs/scripts → skip</text>
+    <text x="672" y="1000" class="muted">main + code → build</text>
+
+    <line x1="936" y1="1016" x2="936" y2="1036" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- BUILD #2 highlight -->
+    <rect x="656" y="1036" width="560" height="200" rx="10" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+    <text x="672" y="1064" class="h2" fill="#9d174d">BUILD #2 — déployé en production</text>
+    <text x="672" y="1092" class="body" fill="#831843" font-weight="600">next build</text>
+    <text x="672" y="1118" class="body" fill="#831843">withSentryConfig  →  upload des source maps</text>
+    <text x="672" y="1142" class="body" fill="#831843">withPWA (service worker)  ·  withNextIntl (i18n)</text>
+    <text x="672" y="1166" class="body" fill="#831843">postinstall : prisma generate</text>
+    <text x="672" y="1190" class="body" fill="#831843">transpile TS · bundle · prerender ISR · Tailwind</text>
+    <text x="672" y="1216" class="body" fill="#9d174d" font-weight="700">→ artefact .next/</text>
+
+    <line x1="936" y1="1236" x2="936" y2="1256" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- DEPLOY -->
+    <rect x="656" y="1256" width="560" height="84" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text x="672" y="1286" class="body" font-weight="700" fill="#065f46">DEPLOY + promotion automatique</text>
+    <text x="672" y="1312" class="muted" fill="#047857">→ the-playground.fr (prod)   ·   staging → environnement staging</text>
+  </g>
+
+  <!-- trigger 3 -->
+  <line x1="640" y1="1454" x2="640" y2="1504" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="516" y="1466" width="248" height="24" rx="12" fill="#e2e8f0"/>
+  <text x="640" y="1483" class="trig" text-anchor="middle">application en ligne</text>
+
+  <!-- ============ PHASE 4 · RUNTIME ============ -->
+  <g>
+    <rect x="40" y="1506" width="1200" height="172" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <path d="M40,1518 a12,12 0 0 1 12,-12 h1176 a12,12 0 0 1 12,12 v22 h-1200 Z" fill="#059669"/>
+    <text x="64" y="1530" class="band">4 · RUNTIME — prod en ligne</text>
+
+    <text x="64" y="1566" class="body"><tspan font-weight="700">Vercel Cron</tspan> — 7 jobs → /api/cron/* : reminders (1h), transition-past-moments (30min), scores (3h), reports, cleanup</text>
+    <text x="64" y="1596" class="body"><tspan font-weight="700">Sentry</tspan> — capture des erreurs runtime (de.sentry.io)</text>
+    <text x="64" y="1626" class="body"><tspan font-weight="700">PostHog</tspan> — analytics produit (eu.posthog.com)</text>
+    <text x="64" y="1656" class="body"><tspan font-weight="700">Neon</tspan> — base PostgreSQL (eu-central-1) sert les requêtes</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(0,1706)">
+    <rect x="64"  y="0" width="16" height="16" rx="3" fill="#2563eb"/><text x="88"  y="13" class="muted">Local</text>
+    <rect x="150" y="0" width="16" height="16" rx="3" fill="#7c3aed"/><text x="174" y="13" class="muted">Pull Request</text>
+    <rect x="290" y="0" width="16" height="16" rx="3" fill="#d97706"/><text x="314" y="13" class="muted">Merge</text>
+    <rect x="390" y="0" width="16" height="16" rx="3" fill="#db2777"/><text x="414" y="13" class="muted">Build déployé</text>
+    <rect x="530" y="0" width="16" height="16" rx="3" fill="#059669"/><text x="554" y="13" class="muted">Runtime</text>
+    <text x="660" y="13" class="muted">→ trigger automatique   ·   ⚠ étape manuelle   ·   Hors flux : DAST OWASP ZAP (hebdo dimanche 4h + manuel)</text>
+  </g>
+</svg>
