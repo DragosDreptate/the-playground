@@ -32,6 +32,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
+import { redirectToPublicCircle } from "@/lib/dashboard-circle-public-redirect";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import {
   Globe,
@@ -86,8 +87,12 @@ export default async function CircleDetailPage({
 
   const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
+  // Bounce visitors without a membership to the public circle page instead of a
+  // 404 — typically someone who was handed the `/dashboard/circles/[slug]`
+  // management link rather than the public `/circles/[slug]` one. PENDING members
+  // keep their current access (the membership is non-null), so they are unaffected.
   const membership = await circleRepo.findMembership(circle.id, session.user.id);
-  if (!membership) notFound();
+  if (!membership) redirectToPublicCircle(slug);
 
   const isOrganizer = isActiveOrganizer(membership);
   const callerRole = membership.role;
