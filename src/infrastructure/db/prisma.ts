@@ -20,8 +20,15 @@ function createClient(): PrismaClient {
     {
       connectionString: process.env.DATABASE_URL!,
       max: 10,
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 15_000,
+      // Atténuation des "stale connections" Neon (cf spec/infra/neon-websocket-timeouts.md).
+      // En serverless, une connexion WebSocket inactive meurt côté réseau sans que le
+      // pool le sache ; la requête suivante tape une connexion fantôme et timeout (30-185s
+      // observées). On recycle donc les connexions idle plus tôt (8s) pour qu'elles soient
+      // jetées AVANT de devenir fantômes, et on échoue vite (5s) pour qu'un retry reparte
+      // sur une connexion fraîche au lieu de poireauter.
+      // Anciennes valeurs (réversibles tel quel si régression) : idle 30_000 / connTimeout 15_000.
+      idleTimeoutMillis: 8_000,
+      connectionTimeoutMillis: 5_000,
     },
     {
       onPoolError: (err) => {
