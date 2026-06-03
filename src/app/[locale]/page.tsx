@@ -81,7 +81,16 @@ export default async function HomePage() {
         <section className="flex min-h-[calc(100vh-3.5rem)] items-center px-4 pb-16 md:pb-0">
           <div className="mx-auto flex max-w-5xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:gap-4">
             {/* LEFT — text */}
-            <div className="flex-1 text-center lg:-translate-y-12 lg:text-left">
+            <div className="flex-1 text-center max-md:-translate-y-5 lg:-translate-y-12 lg:text-left">
+              {/* Brand lockup — mobile uniquement (le header n'affiche le wordmark qu'à partir de md) */}
+              <div className="mb-[72px] flex items-center justify-center gap-2.5 md:hidden">
+                <div className="flex size-[34px] items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 to-violet-500 shadow-lg shadow-pink-500/20">
+                  <svg width="13" height="15" viewBox="0 0 10 12" fill="none" className="ml-0.5">
+                    <polygon points="0,0 0,12 10,6" fill="white" />
+                  </svg>
+                </div>
+                <span className="text-xl font-extrabold tracking-[-0.4px]">the&thinsp;<span className="text-primary">playground</span></span>
+              </div>
               <h1 className="text-3xl leading-[1.3] font-medium tracking-tighter md:text-4xl lg:text-[2.75rem]">
                 <span className="block md:whitespace-nowrap">
                   <span className="block bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 bg-clip-text font-bold text-transparent md:inline">
