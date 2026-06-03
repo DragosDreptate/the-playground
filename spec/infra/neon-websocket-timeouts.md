@@ -141,7 +141,7 @@ Mode = **WebSocket Pool**. `@neondatabase/serverless` v1.0.2, `@prisma/adapter-n
 | # | Cause | Niveau | Statut |
 |---|---|---|---|
 | R1 | **Stale connection** : WS du pool mortes pendant l'inactivité lambda, non détectées | **Mécanisme dominant** | Confirmé (timeline 1J) |
-| R2 | Cold start du compute Neon (`scale-to-zero`) → control plane lent | Mécanisme secondaire | Hypothèse — `scale-to-zero` à confirmer en console |
+| R2 | Cold start du compute Neon (`scale-to-zero`) → control plane lent | Mécanisme secondaire | **Confirmé** — `scale-to-zero` actif sur `production`, délai **5 min** (`suspend_timeout_seconds=300`, endpoint `ep-cool-bread-alja3wbs`), relevé API 2026-06-03 |
 | R3 | Retry re-tente sur le pool fantôme sans l'invalider ; timeouts trop longs | Mitigation insuffisante | Confirmé (54 s / 185 s) |
 | R4 | Rayon de blast non confiné (page événement, inscription, crons) | Résilience | Confirmé |
 
@@ -152,20 +152,23 @@ Mode = **WebSocket Pool**. `@neondatabase/serverless` v1.0.2, `@prisma/adapter-n
 > Principe : **commencer par ce qui ne coûte rien et ne risque rien** (config pure), puis monter en complexité **seulement si la récidive le justifie**.
 
 ### Tier 0 — Confirmer (préalable, ~30 min, sans déploiement)
-- [ ] Console Neon → branche `production` → **autosuspend (scale-to-zero)** actif ? Quel délai ? (pèse sur R2)
-- [ ] Corréler les timestamps Sentry ci-dessus avec les cold starts compute Neon.
+- [x] **`scale-to-zero` actif sur `production` : OUI, délai 5 min** (`suspend_timeout_seconds=300` sur l'endpoint `ep-cool-bread-alja3wbs`). Idem staging (300 s) et dev (0 = défaut 5 min). Relevé via API Neon le 2026-06-03 (voir [annexe C](#annexe-c--inspecter--régler-le-scale-to-zero-neon-api)). → **R2 confirmé.**
+- [ ] Corréler finement les timestamps Sentry avec les cold starts compute Neon (optionnel).
 - [ ] Mesurer le **temps d'une reconnexion WS fraîche** Vercel EU → Neon EU (calibre le Tier 1).
 
 ### Tier 1 — Quick win « piste hybride » (config pure, 15 min, ZÉRO risque) ⭐ RECOMMANDÉ EN PREMIER
 Attaque directement R1/R3 sans toucher à la logique :
-- [ ] `idleTimeoutMillis: 30_000 → 8_000` : recycle les connexions inactives **avant** qu'elles ne deviennent fantômes.
-- [ ] `connectionTimeoutMillis: 15_000 → 5_000` : échoue vite quand une connexion ne répond pas (4 × 5 s = 20 s max au lieu de 54 s, et le retry a plus de chances d'obtenir une connexion fraîche).
-- [ ] Observer Sentry 1 à 2 semaines. Si la famille d'erreurs disparaît, **on s'arrête là**.
+- [x] `idleTimeoutMillis: 30_000 → 8_000` : recycle les connexions inactives **avant** qu'elles ne deviennent fantômes.
+- [x] `connectionTimeoutMillis: 15_000 → 5_000` : échoue vite quand une connexion ne répond pas (4 × 5 s = 20 s max au lieu de 54 s, et le retry a plus de chances d'obtenir une connexion fraîche).
+- [ ] Observer Sentry 1 à 2 semaines après merge. Si la famille d'erreurs disparaît, **on s'arrête là**.
+
+> **Statut : livré, en attente de merge — [PR #509](https://github.com/DragosDreptate/the-playground/pull/509)** (`fix/neon-stale-connection-timeouts`, commit `50dc380`). Réversible en remettant `30_000` / `15_000`. `/code-review` sauté (diff = 2 constantes, zéro logique).
 
 **Coût/risque** : `idle` plus court = quelques cold starts de connexion en plus (latence +qq centaines de ms après une pause). Aucune régression fonctionnelle.
 
-### Tier 2 — Réduire les cold starts à la source (si R2 confirmé en Tier 0)
-- [ ] **Option A** : désactiver/allonger l'autosuspend sur `production`. Coût : compute minimal always-on (~qq $/mois).
+### Tier 2 — Réduire les cold starts à la source (R2 confirmé : scale-to-zero actif 5 min)
+À n'activer **que si** le Tier 1 ne suffit pas (le scale-to-zero n'est que le mécanisme secondaire ; inutile de payer de l'always-on avant d'avoir mesuré l'effet du Tier 1).
+- [ ] **Option A** : désactiver l'autosuspend sur `production` → `suspend_timeout_seconds: -1` via API ([annexe C](#annexe-c--inspecter--régler-le-scale-to-zero-neon-api)) ou console. Coût : compute always-on (~qq $/mois). ⚠️ **Piège console** : la modale « Change **default** compute settings » ne modifie que les **futurs** computes (« Modifying these defaults does not alter the settings of any existing computes »). Pour agir sur la prod existante, éditer **le compute de la branche production lui-même**, pas les défauts.
 - [ ] **Option B (gratuite)** : cron keep-alive léger (`SELECT 1`) toutes les ~4 min. On a déjà l'infra cron. Ne couvre pas les rolling deploys Neon.
 
 ### Tier 3 — Levier C : auto-réparation du pool (ANALYSÉ, ABANDONNÉ — voir §8)
@@ -237,7 +240,7 @@ Le mode TCP (`@prisma/adapter-pg` via pooler) a été essayé (commits `66b7b8e`
 | `5bcfa2f` | `Control plane` reconnu transitoire ; extraction `retry-policy.ts` | Retenté mais sans invalider le pool |
 | `2f60005` | `describeDbError` gère les `ErrorEvent` vides ; pattern WS ; pool 5→10 ; `degradedQuery` sur page Communauté | Page événement **toujours exposée** |
 
-**Bilan** : on a bien progressé sur la *détection* et un *confinement partiel* (page Communauté). Mais R1 (stale connection) n'est traité ni par le quick win config (pas encore appliqué) ni par l'invalidation du pool (levier C abandonné). Le commit `4adcab0` a même **aggravé** le temps perdu en passant le timeout à 15 s.
+**Bilan** : on a bien progressé sur la *détection* et un *confinement partiel* (page Communauté). R1 (stale connection) est désormais attaqué par le quick win config ([PR #509](https://github.com/DragosDreptate/the-playground/pull/509), en attente de merge) qui **annule l'effet pervers du commit `4adcab0`** (timeout ramené de 15 s à 5 s). L'invalidation du pool (levier C) reste non faite (abandonnée). Le commit `4adcab0` avait **aggravé** le temps perdu en passant le timeout à 15 s ; le quick win le corrige.
 
 ---
 
@@ -257,8 +260,8 @@ Les sous-agents associés (dossiers `…--claude-worktrees-fix-neon-control-plan
 ## 12. Questions ouvertes (mises à jour)
 
 1. ~~Pourquoi le TCP a-t-il été abandonné ?~~ **Résolu** : performance (§9).
-2. **`scale-to-zero` est-il actif** sur `production` ? (Tier 0) — pèse sur R2.
-3. **Temps d'une reconnexion WS fraîche** Vercel EU → Neon EU ? Si ~50 ms, le Tier 1 (`idle` court) est gratuit ; si 2-3 s, le calibrer prudemment.
+2. ~~`scale-to-zero` est-il actif sur `production` ?~~ **Résolu** : oui, 5 min (§6 R2, [annexe C](#annexe-c--inspecter--régler-le-scale-to-zero-neon-api)).
+3. **Temps d'une reconnexion WS fraîche** Vercel EU → Neon EU ? Si ~50 ms, le Tier 1 (`idle` court) est gratuit ; si 2-3 s, le calibrer prudemment. À mesurer en observant l'effet de la PR #509.
 4. Faut-il un **`statement_timeout` Postgres** pour borner les requêtes pendantes plutôt que les laisser traîner 185 s ?
 
 ---
@@ -304,3 +307,25 @@ Breadcrumbs maison (`src/infrastructure/db/prisma.ts`) : `slow_query`, `slow_que
 | `src/lib/degraded-query.ts` | Confinement des blocs décoratifs (mode dégradé) |
 | `src/sentry.server.config.ts` | Config Sentry serveur (pas de `beforeSend` actuellement) |
 | `spec/infra/incident-runbook.md` | Runbook d'urgence (section 3 : DB inaccessible) |
+
+## Annexe C — Inspecter / régler le scale-to-zero (Neon API)
+
+> Clé `NEON_API_KEY` + `NEON_PROJECT_ID` dans `.env.local`. `suspend_timeout_seconds` : `0` = défaut (5 min) · `> 0` = N secondes · `-1` = **désactivé (always-on)**.
+
+```bash
+set -a; source .env.local; set +a
+
+# Lister branches + endpoints avec leur suspend_timeout (lecture seule)
+curl -s -H "Authorization: Bearer $NEON_API_KEY" \
+  "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/endpoints" \
+  | python3 -c "import sys,json;[print(e['id'],e['branch_id'],'suspend=',e.get('suspend_timeout_seconds')) for e in json.load(sys.stdin)['endpoints']]"
+
+# Désactiver le scale-to-zero sur PROD (Tier 2 option A) — modif production, valider d'abord
+curl -s -X PATCH -H "Authorization: Bearer $NEON_API_KEY" -H "Content-Type: application/json" \
+  "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/endpoints/ep-cool-bread-alja3wbs" \
+  -d '{"endpoint":{"suspend_timeout_seconds":-1}}'
+```
+
+État au 2026-06-03 : prod `ep-cool-bread-alja3wbs` = 300 s · staging `ep-noisy-waterfall` = 300 s · dev `ep-quiet-salad` = 0 (défaut 5 min). Branche prod = `br-dawn-waterfall-aldvtglk`.
+
+⚠️ La modale console « Change **default** compute settings » ne touche **pas** les computes existants — éditer le compute de la branche production directement.
