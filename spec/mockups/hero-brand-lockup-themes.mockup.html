@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lockup de marque — dark vs light (tokens réels)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif;
+    display: flex; min-height: 100vh;
+  }
+  .pane { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 48px 16px; }
+  /* tokens réels globals.css */
+  .dark  { background: oklch(0.1649 0.0352 281.8285); --fg: oklch(0.9513 0.0074 260.7315); }
+  .light { background: oklch(0.9816 0.0017 247.839);  --fg: oklch(0.1649 0.0352 281.8285); }
+  .primary { color: oklch(0.6726 0.2904 341.4084); }
+
+  .tag { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.5; color: var(--fg); }
+
+  .lockup { display: flex; align-items: center; gap: 10px; }
+  .icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, oklch(0.6726 0.2904 341.4084), oklch(0.55 0.22 290));
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 16px -4px rgba(236, 72, 153, 0.2);
+  }
+  .icon svg { margin-left: 2px; }
+  .word { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; color: var(--fg); }
+
+  /* mini hero pour contexte */
+  h1 { color: var(--fg); font-size: 24px; line-height: 1.3; font-weight: 500; letter-spacing: -0.03em; text-align: center; }
+  h1 .grad { display: block; font-weight: 700; background: linear-gradient(90deg, #ec4899, #d946ef, #8b5cf6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
+</head>
+<body>
+  <div class="pane dark">
+    <span class="tag">Dark</span>
+    <div class="lockup">
+      <div class="icon"><svg width="13" height="15" viewBox="0 0 10 12"><polygon points="0,0 0,12 10,6" fill="white"/></svg></div>
+      <span class="word">the&thinsp;<span class="primary">playground</span></span>
+    </div>
+    <h1><span class="grad">Lancez</span>votre communauté.</h1>
+  </div>
+  <div class="pane light">
+    <span class="tag">Light</span>
+    <div class="lockup">
+      <div class="icon"><svg width="13" height="15" viewBox="0 0 10 12"><polygon points="0,0 0,12 10,6" fill="white"/></svg></div>
+      <span class="word">the&thinsp;<span class="primary">playground</span></span>
+    </div>
+    <h1><span class="grad">Lancez</span>votre communauté.</h1>
+  </div>
+</body>
+</html>

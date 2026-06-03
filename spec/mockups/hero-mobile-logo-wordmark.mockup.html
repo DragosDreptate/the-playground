@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero mobile — Option A (logo + wordmark)</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --fg: #ffffff;
+    --muted: #8b8b96;
+    --border: rgba(255, 255, 255, 0.08);
+    --pink: #ec4899;
+    --fuchsia: #d946ef;
+    --violet: #8b5cf6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #1a1a1f;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    gap: 16px;
+  }
+  .caption {
+    color: #aaa;
+    font-size: 13px;
+    text-align: center;
+    max-width: 380px;
+    line-height: 1.5;
+  }
+  .caption b { color: #fff; }
+
+  /* ---- Phone frame ---- */
+  .phone {
+    width: 390px;
+    height: 800px;
+    background: var(--bg);
+    border-radius: 44px;
+    border: 10px solid #000;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .notch {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 130px; height: 26px;
+    background: #000;
+    border-radius: 0 0 16px 16px;
+    z-index: 30;
+  }
+
+  /* ---- Header (réplique site-header) ---- */
+  .header {
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,15,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 20;
+  }
+  .logo-icon {
+    width: 24px; height: 24px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-icon svg { margin-left: 1px; }
+  .header-nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    color: var(--muted);
+  }
+  .header-nav svg { display: block; }
+  .header-right {
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+  }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6b5b95, #3a3a4a);
+    border: 1px solid var(--border);
+  }
+  .chevron { color: var(--muted); }
+
+  /* ---- Hero ---- */
+  .hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 16px 24px;
+    gap: 0;
+    transform: translateY(-22px); /* logo garde sa hauteur, le reste descend */
+  }
+
+  /* Brand lockup (NOUVEAU — option A) */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 72px; /* descend le H1 et tout ce qui suit */
+  }
+  .brand-icon {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--pink), var(--violet));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.35);
+  }
+  .brand-icon svg { margin-left: 2px; }
+  .brand-word {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: var(--fg);
+  }
+  .brand-word .accent { color: var(--pink); }
+
+  h1 {
+    font-size: 30px;
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  h1 .grad {
+    display: block;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--pink), var(--fuchsia), var(--violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  h1 .rest { display: block; color: var(--fg); }
+
+  .subtitle {
+    margin-top: 24px;
+    max-width: 300px;
+    color: var(--muted);
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+  .cta {
+    margin-top: 36px;
+    width: 100%;
+    max-width: 320px;
+    padding: 18px 24px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(90deg, var(--pink), var(--fuchsia), var(--violet));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+  <div class="caption">
+    <b>Option A — Logo + wordmark au-dessus du H1</b><br />
+    Le wordmark « the&nbsp;playground » apporte de l'info que le header mobile (icône seule) n'affiche pas. Contenu recentré verticalement.
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo-icon">
+        <svg width="10" height="12" viewBox="0 0 10 12"><polygon points="0,0 0,12 10,6" fill="white"/></svg>
+      </div>
+      <div class="header-nav">
+        <!-- Compass -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        <!-- Dashboard grid -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <div class="header-right">
+        <div class="avatar"></div>
+        <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <!-- NOUVEAU : brand lockup -->
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="13" height="15" viewBox="0 0 10 12"><polygon points="0,0 0,12 10,6" fill="white"/></svg>
+        </div>
+        <span class="brand-word">the&thinsp;<span class="accent">playground</span></span>
+      </div>
+
+      <h1>
+        <span class="grad">Lancez</span><span class="rest">votre communauté.</span>
+        <span class="grad">Organisez</span><span class="rest">vos événements.</span>
+        <span class="grad">Animez</span><span class="rest">votre réseau.</span>
+      </h1>
+
+      <p class="subtitle">La plateforme gratuite pour créer votre communauté et organiser des événements mémorables.</p>
+
+      <button class="cta">Découvrir les communautés</button>
+    </div>
+  </div>
+</body>
+</html>
