@@ -1,6 +1,9 @@
 import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "../sentry/analysis-meta";
 
-const WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
+const ADMIN_WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
+// Canal dédié aux erreurs Sentry (#sentry). Si non configuré, les notifs Sentry
+// retombent sur le webhook admin (#admin) — fallback pour ne rien perdre.
+const SENTRY_WEBHOOK_URL = process.env.SLACK_SENTRY_WEBHOOK_URL;
 
 export function isAdminEmailEnabled(): boolean {
   return process.env.ADMIN_NOTIFICATIONS_EMAIL !== "false";
@@ -14,8 +17,11 @@ type SlackBlock =
   | { type: "context"; elements: { type: "mrkdwn"; text: string }[] }
   | { type: "actions"; elements: { type: "button"; text: { type: "plain_text"; text: string }; url: string; style?: "primary" | "danger" }[] };
 
-async function sendSlack(payload: { text: string; blocks?: SlackBlock[] }): Promise<void> {
-  if (!WEBHOOK_URL) return;
+async function sendSlack(
+  payload: { text: string; blocks?: SlackBlock[] },
+  webhookUrl: string | undefined = ADMIN_WEBHOOK_URL,
+): Promise<void> {
+  if (!webhookUrl) return;
 
   // Guard symétrique avec safe-resend : seul VERCEL_ENV=production laisse
   // passer. Tout le reste (preview, staging, local, CI) bloque — fail-closed.
@@ -25,7 +31,7 @@ async function sendSlack(payload: { text: string; blocks?: SlackBlock[] }): Prom
   }
 
   try {
-    await fetch(WEBHOOK_URL, {
+    await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -194,18 +200,24 @@ export async function notifySlackSentryIssue(params: {
   const { issue, analysis, sentryUrl } = params;
   const urgencyLabel = URGENCY_META[analysis.urgency].label;
   const impactMeta = USER_IMPACT_META[analysis.userImpact.level];
-  await sendSlack({
-    text: `🚨 [Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle}`,
-    blocks: [
-      { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${urgencyLabel}`, emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${issue.issueShortId}*\n${issue.issueTitle}` } },
-      { type: "divider" },
-      { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${analysis.trigger}` } },
-      { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${analysis.functionalConsequence}` } },
-      { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${analysis.userImpact.description}` } },
-      { type: "divider" },
-      { type: "context", elements: [{ type: "mrkdwn", text: `_Détails techniques_\n\`\`\`${analysis.technical}\`\`\`` }] },
-      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: sentryUrl, style: "danger" }] },
-    ],
-  });
+  // Les erreurs Sentry vont dans #sentry. Fallback sur #admin si le webhook
+  // dédié n'est pas configuré (|| et non ?? : une variable d'env vide "" doit
+  // aussi retomber sur le webhook admin).
+  await sendSlack(
+    {
+      text: `🚨 [Sentry ${urgencyLabel}] ${issue.issueShortId} — ${issue.issueTitle}`,
+      blocks: [
+        { type: "header", text: { type: "plain_text", text: `🚨 Sentry — Urgence ${urgencyLabel}`, emoji: true } },
+        { type: "section", text: { type: "mrkdwn", text: `*${issue.issueShortId}*\n${issue.issueTitle}` } },
+        { type: "divider" },
+        { type: "section", text: { type: "mrkdwn", text: `*Déclencheur*\n${analysis.trigger}` } },
+        { type: "section", text: { type: "mrkdwn", text: `*Conséquence fonctionnelle*\n${analysis.functionalConsequence}` } },
+        { type: "section", text: { type: "mrkdwn", text: `${impactMeta.emoji} *${impactMeta.label}*\n${analysis.userImpact.description}` } },
+        { type: "divider" },
+        { type: "context", elements: [{ type: "mrkdwn", text: `_Détails techniques_\n\`\`\`${analysis.technical}\`\`\`` }] },
+        { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir dans Sentry" }, url: sentryUrl, style: "danger" }] },
+      ],
+    },
+    SENTRY_WEBHOOK_URL || ADMIN_WEBHOOK_URL,
+  );
 }
