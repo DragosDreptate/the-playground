@@ -1,5 +1,6 @@
 "use server";
 
+import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
@@ -55,14 +56,21 @@ export async function joinMomentAction(
     );
 
     if (!isAdminUser(session)) {
-      // Pas de after() : Vercel serverless peut couper la lambda avant que l'after se déclenche.
+      // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
+      // doit s'exécuter dans le request context, avant `after()`.
       const resolver = await buildEmailLocaleResolver(userId);
-      const fireAndForget = result.pendingApproval
-        ? notifyHostsPendingApproval(momentId, userId, resolver)
-        : sendRegistrationEmails(momentId, userId, result.registration, resolver);
-      fireAndForget.catch((err) => {
-        console.error(err);
-        Sentry.captureException(err);
+      // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
+      // de la Server Action. Une promesse fire-and-forget nue serait larguée au
+      // gel de l'instance (emails + Slack perdus par intermittence).
+      after(async () => {
+        try {
+          await (result.pendingApproval
+            ? notifyHostsPendingApproval(momentId, userId, resolver)
+            : sendRegistrationEmails(momentId, userId, result.registration, resolver));
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
       });
     }
 
@@ -91,20 +99,31 @@ export async function cancelRegistrationAction(
       }
     );
 
+    // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(userId);
 
     if (result.promotedRegistration) {
-      sendPromotionEmail(result.promotedRegistration, resolver).catch((err) => {
-        console.error(err);
-        Sentry.captureException(err);
+      const promoted = result.promotedRegistration;
+      after(async () => {
+        try {
+          await sendPromotionEmail(promoted, resolver);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
       });
     }
 
     const cancelledReg = result.registration;
     if (cancelledReg.paymentStatus === "PAID" || cancelledReg.paymentStatus === "REFUNDED") {
-      sendHostPaidCancellationEmail(registrationId, userId, resolver).catch((err) =>
-        Sentry.captureException(err)
-      );
+      after(async () => {
+        try {
+          await sendHostPaidCancellationEmail(registrationId, userId, resolver);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      });
     }
 
     invalidateDashboardCache(userId);
@@ -114,7 +133,7 @@ export async function cancelRegistrationAction(
   });
 }
 
-// --- Fire-and-forget email helpers ---
+// --- Email helpers (dispatchés via after() par les actions) ---
 
 async function sendHostPaidCancellationEmail(
   registrationId: string,
@@ -388,18 +407,28 @@ export async function removeRegistrationByHostAction(
       }
     );
 
+    // Resolver construit en request context (getLocale), avant les `after()`.
     const resolver = await buildEmailLocaleResolver(hostUserId);
     const { momentId, userId } = result.cancelledRegistration;
 
-    sendRemovedByHostEmail(momentId, userId, resolver).catch((err) => {
-      console.error(err);
-      Sentry.captureException(err);
+    after(async () => {
+      try {
+        await sendRemovedByHostEmail(momentId, userId, resolver);
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
     });
 
     if (result.promotedRegistration) {
-      sendPromotionEmail(result.promotedRegistration, resolver).catch((err) => {
-        console.error(err);
-        Sentry.captureException(err);
+      const promoted = result.promotedRegistration;
+      after(async () => {
+        try {
+          await sendPromotionEmail(promoted, resolver);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
       });
     }
 
@@ -470,10 +499,15 @@ export async function approveMomentRegistrationAction(
     );
 
     const reg = result.registration;
+    // Resolver construit en request context (getLocale), avant `after()`.
     const resolver = await buildEmailLocaleResolver(hostUserId);
-    sendRegistrationEmails(reg.momentId, reg.userId, reg, resolver).catch((err) => {
-      console.error(err);
-      Sentry.captureException(err);
+    after(async () => {
+      try {
+        await sendRegistrationEmails(reg.momentId, reg.userId, reg, resolver);
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
     });
 
     invalidateDashboardCache(reg.userId);
@@ -501,10 +535,15 @@ export async function rejectMomentRegistrationAction(
       }
     );
 
+    // Resolver construit en request context (getLocale), avant `after()`.
     const resolver = await buildEmailLocaleResolver(hostUserId);
-    notifyPlayerRejection(result.userId, result.momentId, resolver).catch((err) => {
-      console.error("[rejection-notification] Error:", err);
-      Sentry.captureException(err);
+    after(async () => {
+      try {
+        await notifyPlayerRejection(result.userId, result.momentId, resolver);
+      } catch (err) {
+        console.error("[rejection-notification] Error:", err);
+        Sentry.captureException(err);
+      }
     });
 
     invalidateDashboardCache(result.userId);
@@ -512,7 +551,7 @@ export async function rejectMomentRegistrationAction(
   });
 }
 
-// ── Notification helpers (fire-and-forget, pas de after()) ────
+// ── Notification helpers (dispatchés via after() par les actions) ────
 
 async function notifyHostsPendingApproval(
   momentId: string,
