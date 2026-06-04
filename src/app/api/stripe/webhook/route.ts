@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import {
   prismaCircleRepository,
@@ -36,20 +36,30 @@ export async function POST(request: Request) {
     );
 
     if (result.handled) {
+      const { registration } = result;
       // Webhook : pas de contexte i18n côté requête → resolver retombe sur la
       // locale par défaut FR pour tous les destinataires (comportement
       // historique préservé).
-      const resolver = await buildEmailLocaleResolver(result.registration.userId);
-      sendRegistrationEmails(
-        result.registration.momentId,
-        result.registration.userId,
-        result.registration,
-        resolver
-      ).catch((error) => Sentry.captureException(error));
+      const resolver = await buildEmailLocaleResolver(registration.userId);
+      // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
+      // du route handler. Une promesse fire-and-forget nue serait larguée au gel
+      // de l'instance (emails + Slack perdus par intermittence).
+      after(async () => {
+        try {
+          await sendRegistrationEmails(
+            registration.momentId,
+            registration.userId,
+            registration,
+            resolver
+          );
+        } catch (error) {
+          Sentry.captureException(error);
+        }
+      });
 
       return NextResponse.json({
         received: true,
-        registrationId: result.registration.id,
+        registrationId: registration.id,
       });
     }
 
