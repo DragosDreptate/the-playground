@@ -1,4 +1,4 @@
-import { Button, Section, Text } from "@react-email/components";
+import { Button, Hr, Link, Section, Text } from "@react-email/components";
 import * as React from "react";
 import { EmailLayout } from "./components/email-layout";
 import type { NewCommentEmailData } from "@/domain/ports/services/email-service";
@@ -8,6 +8,8 @@ import {
   commentSection,
   commentLabel,
   commentText,
+  unsubscribeRow,
+  unsubscribeLink,
 } from "./components/email-styles";
 
 type Props = NewCommentEmailData & {
@@ -21,6 +23,7 @@ export function HostNewCommentEmail({
   strings,
 }: Props) {
   const viewUrl = `${baseUrl}/m/${momentSlug}`;
+  const preferencesUrl = `${baseUrl}/dashboard/profile?tab=notifications`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
@@ -38,6 +41,13 @@ export function HostNewCommentEmail({
           {strings.viewCommentCta}
         </Button>
       </Section>
+
+      <Hr style={divider} />
+      <Text style={unsubscribeRow}>
+        <Link href={preferencesUrl} style={unsubscribeLink}>
+          {strings.manageNotifications}
+        </Link>
+      </Text>
     </EmailLayout>
   );
 }
@@ -51,5 +61,11 @@ const message: React.CSSProperties = {
 
 const ctaSection: React.CSSProperties = {
   textAlign: "center" as const,
+  marginBottom: "16px",
+};
+
+const divider: React.CSSProperties = {
+  borderTop: "1px solid #e4e4e7",
+  margin: "24px 0 16px 0",
 };
 

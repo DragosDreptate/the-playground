@@ -267,6 +267,7 @@ async function sendCommentNotifications(
         }),
         commentPreviewLabel: t("commentNotification.commentPreviewLabel"),
         viewCommentCta: t("commentNotification.viewCommentCta"),
+        manageNotifications: t("commentNotification.manageNotifications"),
         footer: t("common.footer"),
       },
     });

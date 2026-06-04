@@ -1075,7 +1075,8 @@
       "heading": "Nouveau commentaire",
       "message": "{playerName} a commenté l'événement {momentTitle}",
       "commentPreviewLabel": "Commentaire",
-      "viewCommentCta": "Voir le commentaire"
+      "viewCommentCta": "Voir le commentaire",
+      "manageNotifications": "Gérer mes préférences de notification"
     },
     "momentUpdate": {
       "subject": "Mise à jour : {momentTitle}",
