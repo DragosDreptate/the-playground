@@ -55,7 +55,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - [Explorer](https://the-playground.fr/explorer) — répertoire public de communautés avec tri, filtres et section À la une
 - **Widget intégrable** — encart événement embarquable sur n'importe quel site externe (thème clair/sombre, copie du snippet HTML en un clic)
 - **Réseaux** — regrouper plusieurs communautés sous une vitrine commune (fédérations, collectifs, marques)
-- **Blog** — articles de fond sur la philosophie et les choix du produit
+- **Blog** — articles de fond et guides pratiques (philosophie produit, migration depuis Meetup, etc.)
 - Bilingue FR / EN avec URLs propres
 - 100% gratuit — seuls les frais Stripe (~2,9% + 0,30€) sur les événements payants
 
@@ -97,6 +97,11 @@ src/
   infrastructure/  → Adapters (Prisma, Resend, Stripe, Claude)
   app/             → Next.js App Router (routes, server actions)
   components/      → Composants React réutilisables
+  lib/             → Utilitaires partagés (helpers purs)
+  hooks/           → React hooks personnalisés
+  i18n/            → Configuration next-intl (routing, request)
+  content/         → Contenu statique (articles de blog en Markdown)
+  assets/          → Assets statiques (images, SVG)
 ```
 
 Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépendance.

@@ -348,7 +348,7 @@ export default async function HelpPage() {
                 {t.rich("participant.notifications.intro", rich)}
               </p>
               <ul className="space-y-2">
-                {(["item1", "item2", "item3", "item4"] as const).map((item) => (
+                {(["item1", "item2", "item3", "item4", "item5"] as const).map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
                     {t(`participant.notifications.${item}`)}
