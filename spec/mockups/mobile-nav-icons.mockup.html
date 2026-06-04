@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mockup — Mobile nav icônes (issue #454)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #e8457a;
+    --primary-foreground: #ffffff;
+    --background: #1a1b2e;
+    --foreground: #f0f0f5;
+    --card: #252638;
+    --card-foreground: #f0f0f5;
+    --muted: #222336;
+    --muted-foreground: #8385a0;
+    --border: #383a55;
+    --accent: #6ee7d0;
+    --accent-foreground: #1a1b2e;
+    --popover: #252638;
+    --radius: 0.5rem;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--background);
+    color: var(--foreground);
+    padding: 48px 24px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page-title {
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+  }
+  .page-subtitle {
+    text-align: center;
+    color: var(--muted-foreground);
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .mode-badge {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .mode-badge span {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .states {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 56px;
+  }
+  .state-section {
+    width: 100%;
+    max-width: 420px;
+  }
+  .state-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .state-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: -0.2px;
+  }
+  .state-description {
+    font-size: 13px;
+    color: var(--muted-foreground);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .device {
+    width: 375px;
+    margin: 0 auto;
+    border-radius: 36px;
+    background: var(--background);
+    border: 8px solid #0c0d1a;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6), 0 12px 24px -8px rgba(0, 0, 0, 0.4);
+    position: relative;
+  }
+  .device-notch {
+    height: 28px;
+    background: #0c0d1a;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 4px;
+  }
+  .device-notch::after {
+    content: '';
+    width: 96px;
+    height: 22px;
+    background: #000;
+    border-radius: 0 0 14px 14px;
+  }
+  .device-content {
+    background: var(--background);
+    min-height: 280px;
+    position: relative;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid rgba(56, 58, 85, 0.4);
+    background: rgba(26, 27, 46, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .header-inner {
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  /* Logo (gauche) */
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  .logo-square {
+    width: 24px;
+    height: 24px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .logo-triangle {
+    width: 10px;
+    height: 12px;
+    margin-left: 1px;
+  }
+
+  /* Nav icônes (centre) */
+  .nav {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--muted-foreground);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 150ms, background 150ms;
+    position: relative;
+  }
+  .nav-btn:hover { color: var(--foreground); background: var(--muted); }
+  .nav-btn.active { color: var(--foreground); }
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+  .nav-btn svg { width: 20px; height: 20px; }
+
+  /* Actions (droite) */
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Avatar trigger */
+  .avatar-trigger {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px;
+    border-radius: 9999px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: opacity 150ms;
+  }
+  .avatar-trigger:hover { opacity: 0.8; }
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8457a 0%, #9333ea 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .chevron {
+    width: 14px;
+    height: 14px;
+    color: var(--muted-foreground);
+  }
+
+  /* Bouton "Se connecter" icône (cas non authentifié) */
+  .signin-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--muted-foreground);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: color 150ms, background 150ms;
+  }
+  .signin-btn:hover { color: var(--foreground); background: var(--muted); }
+  .signin-btn svg { width: 20px; height: 20px; }
+
+  /* Dropdown */
+  .dropdown-wrapper { position: relative; }
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 12px;
+    width: 240px;
+    background: var(--popover);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.6), 0 4px 10px -4px rgba(0, 0, 0, 0.4);
+    padding: 4px;
+    z-index: 100;
+    animation: dropdownIn 200ms ease-out;
+  }
+  @keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .dropdown-label {
+    padding: 8px 8px 6px;
+  }
+  .dropdown-label .name {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .dropdown-label .email {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dropdown-separator {
+    height: 1px;
+    background: var(--border);
+    margin: 4px -4px;
+  }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--foreground);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 150ms;
+  }
+  .dropdown-item:hover { background: var(--accent); }
+  .dropdown-item svg { width: 16px; height: 16px; color: var(--muted-foreground); flex-shrink: 0; }
+  .dropdown-item.destructive { color: var(--primary); }
+  .dropdown-item.destructive svg { color: var(--primary); }
+
+  /* Locale + Theme inline dans le dropdown */
+  .dropdown-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px;
+  }
+  .dropdown-control-label {
+    font-size: 11px;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    padding: 0 8px;
+  }
+  .locale-wrapper {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .locale-icon {
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+    display: inline-flex;
+  }
+  .locale-icon svg { width: 16px; height: 16px; }
+  .locale-segmented {
+    flex: 1;
+    display: inline-flex;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 2px;
+    background: var(--muted);
+  }
+  .locale-segmented button {
+    flex: 1;
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 150ms;
+  }
+  .locale-segmented button.active {
+    background: var(--card);
+    color: var(--foreground);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+  .theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 28px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--foreground);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 150ms;
+  }
+  .theme-toggle:hover { background: var(--muted); }
+  .theme-toggle svg { width: 14px; height: 14px; }
+
+  /* En dark mode, l'icône thème = lune (action = repasser en light) */
+
+  /* Faux contenu de page dessous (juste pour le contexte visuel) */
+  .fake-content {
+    padding: 24px 16px;
+    color: var(--muted-foreground);
+    font-size: 13px;
+  }
+  .fake-content .placeholder-block {
+    background: var(--muted);
+    border-radius: 12px;
+    height: 80px;
+    margin-bottom: 12px;
+  }
+  .fake-content .placeholder-line {
+    height: 12px;
+    background: var(--muted);
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  .fake-content .placeholder-line.w-3-4 { width: 75%; }
+  .fake-content .placeholder-line.w-1-2 { width: 50%; }
+
+  .notes {
+    max-width: 640px;
+    margin: 64px auto 0;
+    padding: 20px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--foreground);
+  }
+  .notes h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { margin-bottom: 6px; }
+  @media (max-width: 720px) {
+    body > section[style*="grid-template-columns: repeat(2, 1fr)"] > div > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  }
+  .notes code {
+    background: var(--muted);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Mobile nav — icônes inline</h1>
+<p class="page-subtitle">Issue #454 — remplacement du hamburger par une nav 3 zones</p>
+<div class="mode-badge"><span>Dark mode</span></div>
+
+<div class="states">
+
+  <!-- ÉTAT 1 — Authentifié, défaut -->
+  <section class="state-section">
+    <div class="state-label">État 1</div>
+    <div class="state-title">Authentifié — défaut</div>
+    <div class="state-description">Logo à gauche, icônes Découvrir + Mon espace au milieu, avatar à droite.</div>
+    <div class="device">
+      <div class="device-notch"></div>
+      <div class="device-content">
+        <header class="header">
+          <div class="header-inner">
+            <a class="logo" href="#" aria-label="The Playground">
+              <div class="logo-square">
+                <svg class="logo-triangle" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+            </a>
+            <nav class="nav">
+              <a href="#" class="nav-btn" aria-label="Découvrir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </a>
+              <a href="#" class="nav-btn" aria-label="Mon espace">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              </a>
+            </nav>
+            <div class="actions">
+              <button class="avatar-trigger" aria-label="Menu utilisateur">
+                <div class="avatar">DD</div>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="fake-content">
+          <div class="placeholder-block"></div>
+          <div class="placeholder-line"></div>
+          <div class="placeholder-line w-3-4"></div>
+          <div class="placeholder-line w-1-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉTAT 2 — Authentifié, Découvrir actif -->
+  <section class="state-section">
+    <div class="state-label">État 2</div>
+    <div class="state-title">Authentifié — sur la page Découvrir</div>
+    <div class="state-description">Icône active (Découvrir) en <code>text-foreground</code> + point rose primary. Icône inactive en <code>text-muted-foreground</code>.</div>
+    <div class="device">
+      <div class="device-notch"></div>
+      <div class="device-content">
+        <header class="header">
+          <div class="header-inner">
+            <a class="logo" href="#" aria-label="The Playground">
+              <div class="logo-square">
+                <svg class="logo-triangle" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+            </a>
+            <nav class="nav">
+              <a href="#" class="nav-btn active" aria-label="Découvrir" aria-current="page">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </a>
+              <a href="#" class="nav-btn" aria-label="Mon espace">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              </a>
+            </nav>
+            <div class="actions">
+              <button class="avatar-trigger" aria-label="Menu utilisateur">
+                <div class="avatar">DD</div>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+          </div>
+        </header>
+        <div class="fake-content">
+          <div class="placeholder-block"></div>
+          <div class="placeholder-line"></div>
+          <div class="placeholder-line w-3-4"></div>
+          <div class="placeholder-line w-1-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉTAT 3 — Dropdown ouvert avec langue + thème -->
+  <section class="state-section">
+    <div class="state-label">État 3</div>
+    <div class="state-title">Dropdown avatar ouvert</div>
+    <div class="state-description">Menu utilisateur classique + bloc "Préférences" inline : langue FR/EN (segmented) et thème (icône soleil/lune).</div>
+    <div class="device">
+      <div class="device-notch"></div>
+      <div class="device-content">
+        <header class="header">
+          <div class="header-inner">
+            <a class="logo" href="#" aria-label="The Playground">
+              <div class="logo-square">
+                <svg class="logo-triangle" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+            </a>
+            <nav class="nav">
+              <a href="#" class="nav-btn" aria-label="Découvrir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </a>
+              <a href="#" class="nav-btn" aria-label="Mon espace">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+              </a>
+            </nav>
+            <div class="actions dropdown-wrapper">
+              <button class="avatar-trigger" aria-label="Menu utilisateur" aria-expanded="true">
+                <div class="avatar">DD</div>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="dropdown" role="menu">
+                <div class="dropdown-label">
+                  <div class="name">Dragos Dreptate</div>
+                  <div class="email">ddreptate@gmail.com</div>
+                </div>
+                <div class="dropdown-separator"></div>
+                <a href="#" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                  Découvrir
+                </a>
+                <a href="#" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                  Mon espace
+                </a>
+                <a href="#" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  Profil
+                </a>
+                <div class="dropdown-separator"></div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px;">
+                  <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                    Langue
+                  </span>
+                  <div style="display: inline-flex; border: 1px solid var(--border); border-radius: 6px; padding: 2px; background: var(--muted);" role="group" aria-label="Langue">
+                    <button type="button" style="border: none; background: var(--card); color: var(--foreground); font-family: inherit; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">FR</button>
+                    <button type="button" style="border: none; background: transparent; color: var(--muted-foreground); font-family: inherit; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; cursor: pointer;">EN</button>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px;">
+                  <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    Thème
+                  </span>
+                  <div style="display: inline-flex; border: 1px solid var(--border); border-radius: 6px; padding: 2px; background: var(--muted);" role="group" aria-label="Thème">
+                    <button type="button" style="border: none; background: transparent; color: var(--muted-foreground); font-family: inherit; padding: 3px 6px; border-radius: 4px; cursor: pointer; display: inline-flex;" aria-label="Clair">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    </button>
+                    <button type="button" style="border: none; background: var(--card); color: var(--foreground); font-family: inherit; padding: 3px 6px; border-radius: 4px; cursor: pointer; display: inline-flex; box-shadow: 0 1px 2px rgba(0,0,0,0.06);" aria-label="Sombre">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="dropdown-separator"></div>
+                <a href="#" class="dropdown-item destructive">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                  Se déconnecter
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
+        <div class="fake-content" style="opacity: 0.4;">
+          <div class="placeholder-block"></div>
+          <div class="placeholder-line"></div>
+          <div class="placeholder-line w-3-4"></div>
+          <div class="placeholder-line w-1-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉTAT 4 — Non authentifié -->
+  <section class="state-section">
+    <div class="state-label">État 4</div>
+    <div class="state-title">Non authentifié</div>
+    <div class="state-description">Pas de Mon espace ni d'avatar. À droite, une icône <code>LogIn</code> qui pointe vers <code>/auth/sign-in</code>.</div>
+    <div class="device">
+      <div class="device-notch"></div>
+      <div class="device-content">
+        <header class="header">
+          <div class="header-inner">
+            <a class="logo" href="#" aria-label="The Playground">
+              <div class="logo-square">
+                <svg class="logo-triangle" viewBox="0 0 10 12" fill="none">
+                  <polygon points="0,0 0,12 10,6" fill="white" />
+                </svg>
+              </div>
+            </a>
+            <nav class="nav">
+              <a href="#" class="nav-btn" aria-label="Découvrir">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              </a>
+            </nav>
+            <div class="actions">
+              <a href="#" class="signin-btn" aria-label="Se connecter">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+              </a>
+            </div>
+          </div>
+        </header>
+        <div class="fake-content">
+          <div class="placeholder-block"></div>
+          <div class="placeholder-line"></div>
+          <div class="placeholder-line w-3-4"></div>
+          <div class="placeholder-line w-1-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- VARIANTES — bloc Préférences -->
+<section style="max-width: 1080px; margin: 96px auto 0;">
+  <h2 style="text-align: center; font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 8px;">Alternatives — bloc Préférences</h2>
+  <p style="text-align: center; color: var(--muted-foreground); font-size: 14px; margin-bottom: 40px;">Comparaison de 4 traitements pour la zone langue + thème dans le dropdown avatar.</p>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px;">
+
+    <!-- Variante A — Items cyclables -->
+    <div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground);">A</span>
+      </div>
+      <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 4px;">Items cyclables</h3>
+      <p style="font-size: 12px; color: var(--muted-foreground); margin: 0 0 16px; line-height: 1.5;">Deux entrées identiques aux autres items du menu. Click cycle FR↔EN ou clair↔sombre. Lecture immédiate de la valeur courante. Pas de label "Préférences" — le menu reste plat.</p>
+      <div style="width: 240px; background: var(--popover); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.6); padding: 4px;">
+        <div class="dropdown-separator" style="background: var(--border); height: 1px; margin: 4px -4px 4px;"></div>
+        <a href="#" class="dropdown-item" style="justify-content: space-between;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Langue
+          </span>
+          <span style="font-size: 12px; color: var(--muted-foreground); font-weight: 500;">Français</span>
+        </a>
+        <a href="#" class="dropdown-item" style="justify-content: space-between;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            Thème
+          </span>
+          <span style="font-size: 12px; color: var(--muted-foreground); font-weight: 500;">Sombre</span>
+        </a>
+      </div>
+      <p style="font-size: 11px; color: var(--muted-foreground); margin: 12px 0 0; line-height: 1.5;"><strong style="color: var(--foreground);">+</strong> Cohérent avec le reste du dropdown · lisible · scalable (si on ajoute "Notifications", "Confidentialité", ça suit le même pattern). <br/><strong style="color: var(--foreground);">−</strong> 1 tap pour cycler ; sur 2 langues OK, sur 3+ il faudrait un sous-menu.</p>
+    </div>
+
+    <!-- Variante B — Ligne label + segmented (recommandée) -->
+    <div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary);">B — recommandée</span>
+      </div>
+      <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 4px;">Label gauche + contrôle droite</h3>
+      <p style="font-size: 12px; color: var(--muted-foreground); margin: 0 0 16px; line-height: 1.5;">Deux lignes structurées. Icône + label à gauche, segmented compact à droite. Donne plus de présence aux options.</p>
+      <div style="width: 240px; background: var(--popover); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.6); padding: 4px;">
+        <div style="height: 1px; background: var(--border); margin: 4px -4px;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Langue
+          </span>
+          <div style="display: inline-flex; border: 1px solid var(--border); border-radius: 6px; padding: 2px; background: var(--muted);">
+            <button type="button" style="border: none; background: var(--card); color: var(--foreground); font-family: inherit; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.06);">FR</button>
+            <button type="button" style="border: none; background: transparent; color: var(--muted-foreground); font-family: inherit; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; cursor: pointer;">EN</button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 6px 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            Thème
+          </span>
+          <div style="display: inline-flex; border: 1px solid var(--border); border-radius: 6px; padding: 2px; background: var(--muted);">
+            <button type="button" style="border: none; background: transparent; color: var(--muted-foreground); font-family: inherit; padding: 3px 6px; border-radius: 4px; cursor: pointer; display: inline-flex;" aria-label="Clair">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+            </button>
+            <button type="button" style="border: none; background: var(--card); color: var(--foreground); font-family: inherit; padding: 3px 6px; border-radius: 4px; cursor: pointer; display: inline-flex; box-shadow: 0 1px 2px rgba(0,0,0,0.06);" aria-label="Sombre">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <p style="font-size: 11px; color: var(--muted-foreground); margin: 12px 0 0; line-height: 1.5;"><strong style="color: var(--foreground);">+</strong> Choix direct sans cycle · les 2 options visibles. <br/><strong style="color: var(--foreground);">−</strong> Mélange paradigmes (items vs segmented) dans le même menu · 4 contrôles sur 2 lignes denses.</p>
+    </div>
+
+    <!-- Variante C — Sous-menus -->
+    <div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground);">C</span>
+      </div>
+      <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 4px;">Sous-menus</h3>
+      <p style="font-size: 12px; color: var(--muted-foreground); margin: 0 0 16px; line-height: 1.5;">Chaque préférence ouvre un sous-menu Radix. Valeur courante affichée à droite, chevron pour indiquer l'ouverture.</p>
+      <div style="width: 240px; background: var(--popover); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.6); padding: 4px;">
+        <div style="height: 1px; background: var(--border); margin: 4px -4px;"></div>
+        <a href="#" class="dropdown-item" style="justify-content: space-between;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            Langue
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted-foreground); font-weight: 500;">
+            Français
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </a>
+        <a href="#" class="dropdown-item" style="justify-content: space-between;">
+          <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            Thème
+          </span>
+          <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted-foreground); font-weight: 500;">
+            Sombre
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 12px; height: 12px;"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </a>
+      </div>
+      <p style="font-size: 11px; color: var(--muted-foreground); margin: 12px 0 0; line-height: 1.5;"><strong style="color: var(--foreground);">+</strong> Scalable (3+ langues, thème système) · pattern macOS / iOS reconnu. <br/><strong style="color: var(--foreground);">−</strong> 2 taps minimum · sous-menus délicats à animer sur mobile.</p>
+    </div>
+
+    <!-- Variante D — Toggles inline droite -->
+    <div>
+      <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px;">
+        <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted-foreground);">D</span>
+      </div>
+      <h3 style="font-size: 15px; font-weight: 600; margin: 0 0 4px;">Toggles iOS-style</h3>
+      <p style="font-size: 12px; color: var(--muted-foreground); margin: 0 0 16px; line-height: 1.5;">Switch binaire pour chaque préférence. Très visuel mais binaire — ne marche que parce qu'on a exactement 2 valeurs.</p>
+      <div style="width: 240px; background: var(--popover); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 10px 30px -8px rgba(0,0,0,0.6); padding: 4px;">
+        <div style="height: 1px; background: var(--border); margin: 4px -4px;"></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            English
+          </span>
+          <button type="button" style="width: 38px; height: 22px; border-radius: 9999px; background: var(--muted); border: 1px solid var(--border); position: relative; cursor: pointer; padding: 0;">
+            <span style="position: absolute; left: 2px; top: 1px; width: 16px; height: 16px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,0.3);"></span>
+          </button>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px;">
+          <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: var(--muted-foreground);"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            Mode sombre
+          </span>
+          <button type="button" style="width: 38px; height: 22px; border-radius: 9999px; background: var(--primary); border: 1px solid var(--primary); position: relative; cursor: pointer; padding: 0;">
+            <span style="position: absolute; right: 2px; top: 1px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.3);"></span>
+          </button>
+        </div>
+      </div>
+      <p style="font-size: 11px; color: var(--muted-foreground); margin: 12px 0 0; line-height: 1.5;"><strong style="color: var(--foreground);">+</strong> Familier (iOS Settings) · 1 tap. <br/><strong style="color: var(--foreground);">−</strong> Sémantique louche : "English ON" ne veut rien dire intrinsèquement · bloque tout ajout d'une 3e langue · le label change selon l'état.</p>
+    </div>
+
+  </div>
+</section>
+
+<aside class="notes">
+  <h3>Décisions du mockup</h3>
+  <ul>
+    <li><strong>Logo seul</strong> à gauche (sans le wordmark "the playground") pour libérer la largeur du centre.</li>
+    <li><strong>Touch target</strong> 44×44px pour chaque icône (cible Apple HIG / WCAG), icône SVG 20×20.</li>
+    <li><strong>État actif</strong> = icône en <code>text-foreground</code> + petit <strong>point rose</strong> sous l'icône. Plus visible qu'un simple changement de teinte, sans alourdir avec un fond plein.</li>
+    <li><strong>Avatar</strong> reste avec son chevron — cohérent avec l'existant desktop.</li>
+    <li>Dans le <strong>dropdown</strong>, un bloc "Préférences" regroupe langue (segmented FR/EN) + thème (toggle icône). Ça remplace la rangée Locale+Theme actuellement perdue dans le hamburger.</li>
+    <li><strong>Non authentifié</strong> : icône <code>LogIn</code> à droite plutôt que le bouton texte "Se connecter" du desktop, pour rester cohérent en mode icônes.</li>
+    <li>Pas de menu Admin affiché ici — il s'insère entre Profil et Préférences pour les utilisateurs <code>role === "ADMIN"</code> (logique identique à <code>user-menu.tsx</code>).</li>
+  </ul>
+</aside>
+
+</body>
+</html>
