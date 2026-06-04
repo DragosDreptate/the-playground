@@ -103,6 +103,7 @@ export type NewCommentEmailData = {
     message: string; // Pre-formatted: "{playerName} commented on {momentTitle}"
     commentPreviewLabel: string;
     viewCommentCta: string;
+    manageNotifications: string;
     footer: string;
   };
 };

@@ -1075,7 +1075,8 @@
       "heading": "New comment",
       "message": "{playerName} commented on {momentTitle}",
       "commentPreviewLabel": "Comment",
-      "viewCommentCta": "View comment"
+      "viewCommentCta": "View comment",
+      "manageNotifications": "Manage notification preferences"
     },
     "momentUpdate": {
       "subject": "Update: {momentTitle}",
