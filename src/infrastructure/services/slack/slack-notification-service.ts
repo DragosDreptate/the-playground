@@ -161,6 +161,32 @@ export async function notifySlackNewRegistration(params: {
   });
 }
 
+export async function notifySlackNewMember(params: {
+  playerName: string;
+  circleName: string;
+  memberInfo: string;
+  circleUrl: string;
+  pendingApproval: boolean;
+}): Promise<void> {
+  const { pendingApproval } = params;
+  const icon = pendingApproval ? "⏳" : "🟢";
+  const label = pendingApproval ? "Demande d'adhésion" : "Nouveau membre";
+  const verb = pendingApproval ? "demande à rejoindre" : "a rejoint";
+
+  await sendSlack({
+    text: `${icon} ${label} — ${params.playerName} → ${params.circleName}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: `${icon} ${label}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* ${verb} *${params.circleName}*` } },
+      { type: "section", fields: [
+        { type: "mrkdwn", text: `*Communauté*\n${params.circleName}` },
+        { type: "mrkdwn", text: `*Membres*\n${params.memberInfo}` },
+      ]},
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir la Communauté" }, url: params.circleUrl }] },
+    ],
+  });
+}
+
 export async function notifySlackNewComment(params: {
   playerName: string;
   momentTitle: string;
