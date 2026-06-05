@@ -152,7 +152,7 @@ function CommentPhotos({
             onClick={() => handleClick(att.url, alt)}
             className={
               isSingle
-                ? "block max-w-xs cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30"
+                ? "block w-full max-w-xs cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30"
                 : "size-24 cursor-pointer overflow-hidden rounded-lg ring-2 ring-transparent transition-all hover:opacity-90 hover:ring-primary/30 sm:size-32"
             }
           >
@@ -161,7 +161,7 @@ function CommentPhotos({
               alt={alt}
               className={
                 isSingle
-                  ? "max-h-60 max-w-xs rounded-lg object-cover"
+                  ? "max-h-60 w-full rounded-lg object-cover"
                   : "size-full object-cover"
               }
             />
