@@ -35,6 +35,7 @@ import { toActionResult } from "./helpers/to-action-result";
 import { processCoverImage } from "./cover-image";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
 import { notifyHostNewCircleMember } from "./notify-host-new-circle-member";
+import { notifySlackNewMember } from "@/infrastructure/services/slack/slack-notification-service";
 import {
   resolveCustomCategoryForCreate,
   resolveCustomCategoryForUpdate,
@@ -269,10 +270,19 @@ export async function joinCircleDirectlyAction(
     );
 
     if (!alreadyMember) {
+      // Resolver construit en request context (getLocale), avant after().
       const resolver = await buildEmailLocaleResolver(userId);
-      notifyHostCircleJoin(circleId, userId, pendingApproval, resolver).catch((err) => {
-        console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
-        Sentry.captureException(err);
+      // after() garantit la complétion sur Vercel Fluid Compute après le retour de
+      // la Server Action (email Host + notif Slack admin). Une promesse fire-and-forget
+      // nue serait larguée au gel de l'instance (même incident qu'en 2026-06-04 sur
+      // registration.ts, ce chemin avait été oublié).
+      after(async () => {
+        try {
+          await notifyHostCircleJoin(circleId, userId, pendingApproval, resolver);
+        } catch (err) {
+          console.error("[joinCircleDirectlyAction] Erreur notification host :", err);
+          Sentry.captureException(err);
+        }
       });
       invalidateDashboardCache(userId);
     }
@@ -542,7 +552,17 @@ async function notifyHostCircleJoin(
   const playerName =
     [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email;
 
+  // Notif Slack admin — câblée pour l'adhésion DIRECTE à une Communauté (le
+  // parcours par événement passe par notifySlackNewRegistration). Best-effort :
+  // sendSlack avale ses propres erreurs, l'envoi ne peut pas faire échouer les
+  // notifications Host qui suivent.
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const circleUrl = `${baseUrl}/dashboard/circles/${circle.slug}`;
+
   if (pendingApproval) {
+    // Pas de compte de membres ici : le demandeur n'est pas encore membre.
+    await notifySlackNewMember({ playerName, circleName: circle.name, circleUrl, pendingApproval: true });
+
     // Demande d'adhésion en attente → notifier les HOSTs
     const hosts = await prismaCircleRepository.findOrganizers(circleId);
     const hostUserIds = hosts.map((h) => h.userId);
@@ -571,7 +591,17 @@ async function notifyHostCircleJoin(
       })
     );
   } else {
-    // Membre accepté directement → notification classique
+    // Membre accepté directement → notification classique.
+    // memberCount calculé une seule fois et partagé entre Slack et emails Host.
+    const memberCount = await prismaCircleRepository.countMembers(circleId);
+    await notifySlackNewMember({
+      playerName,
+      circleName: circle.name,
+      memberInfo: `${memberCount} membre${memberCount > 1 ? "s" : ""}`,
+      circleUrl,
+      pendingApproval: false,
+    });
+
     // Les Hosts ne sont pas le déclencheur ici → tous reçoivent en locale par défaut.
     const t = await resolver.defaultTranslations();
     await notifyHostNewCircleMember(
@@ -580,6 +610,7 @@ async function notifyHostCircleJoin(
       circle.name,
       userId,
       playerName,
+      memberCount,
       (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
       {
         subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),
