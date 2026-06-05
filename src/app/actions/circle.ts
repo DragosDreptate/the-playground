@@ -557,16 +557,12 @@ async function notifyHostCircleJoin(
   // sendSlack avale ses propres erreurs, l'envoi ne peut pas faire échouer les
   // notifications Host qui suivent.
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const memberCount = await prismaCircleRepository.countMembers(circleId);
-  await notifySlackNewMember({
-    playerName,
-    circleName: circle.name,
-    memberInfo: `${memberCount} membre${memberCount > 1 ? "s" : ""}`,
-    circleUrl: `${baseUrl}/dashboard/circles/${circle.slug}`,
-    pendingApproval,
-  });
+  const circleUrl = `${baseUrl}/dashboard/circles/${circle.slug}`;
 
   if (pendingApproval) {
+    // Pas de compte de membres ici : le demandeur n'est pas encore membre.
+    await notifySlackNewMember({ playerName, circleName: circle.name, circleUrl, pendingApproval: true });
+
     // Demande d'adhésion en attente → notifier les HOSTs
     const hosts = await prismaCircleRepository.findOrganizers(circleId);
     const hostUserIds = hosts.map((h) => h.userId);
@@ -595,7 +591,17 @@ async function notifyHostCircleJoin(
       })
     );
   } else {
-    // Membre accepté directement → notification classique
+    // Membre accepté directement → notification classique.
+    // memberCount calculé une seule fois et partagé entre Slack et emails Host.
+    const memberCount = await prismaCircleRepository.countMembers(circleId);
+    await notifySlackNewMember({
+      playerName,
+      circleName: circle.name,
+      memberInfo: `${memberCount} membre${memberCount > 1 ? "s" : ""}`,
+      circleUrl,
+      pendingApproval: false,
+    });
+
     // Les Hosts ne sont pas le déclencheur ici → tous reçoivent en locale par défaut.
     const t = await resolver.defaultTranslations();
     await notifyHostNewCircleMember(
@@ -604,6 +610,7 @@ async function notifyHostCircleJoin(
       circle.name,
       userId,
       playerName,
+      memberCount,
       (count) => t("hostCircleMemberNotification.memberCountInfo", { count }),
       {
         subject: t("hostCircleMemberNotification.subject", { playerName, circleName: circle.name }),

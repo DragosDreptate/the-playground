@@ -164,7 +164,9 @@ export async function notifySlackNewRegistration(params: {
 export async function notifySlackNewMember(params: {
   playerName: string;
   circleName: string;
-  memberInfo: string;
+  // Omis pour une demande en attente : le demandeur n'est pas encore membre,
+  // afficher le compte (ACTIVE only) serait trompeur.
+  memberInfo?: string;
   circleUrl: string;
   pendingApproval: boolean;
 }): Promise<void> {
@@ -173,17 +175,21 @@ export async function notifySlackNewMember(params: {
   const label = pendingApproval ? "Demande d'adhésion" : "Nouveau membre";
   const verb = pendingApproval ? "demande à rejoindre" : "a rejoint";
 
+  const blocks: SlackBlock[] = [
+    { type: "header", text: { type: "plain_text", text: `${icon} ${label}`, emoji: true } },
+    { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* ${verb} *${params.circleName}*` } },
+  ];
+  if (params.memberInfo) {
+    blocks.push({ type: "section", fields: [{ type: "mrkdwn", text: `*Membres*\n${params.memberInfo}` }] });
+  }
+  blocks.push({
+    type: "actions",
+    elements: [{ type: "button", text: { type: "plain_text", text: "Voir la Communauté" }, url: params.circleUrl }],
+  });
+
   await sendSlack({
     text: `${icon} ${label} — ${params.playerName} → ${params.circleName}`,
-    blocks: [
-      { type: "header", text: { type: "plain_text", text: `${icon} ${label}`, emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* ${verb} *${params.circleName}*` } },
-      { type: "section", fields: [
-        { type: "mrkdwn", text: `*Communauté*\n${params.circleName}` },
-        { type: "mrkdwn", text: `*Membres*\n${params.memberInfo}` },
-      ]},
-      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Voir la Communauté" }, url: params.circleUrl }] },
-    ],
+    blocks,
   });
 }
 

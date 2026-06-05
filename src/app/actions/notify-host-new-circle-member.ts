@@ -11,6 +11,7 @@ export async function notifyHostNewCircleMember(
   circleName: string,
   newMemberUserId: string,
   newMemberName: string,
+  memberCount: number,
   formatMemberCount: (count: number) => string,
   strings: {
     subject: string;
@@ -20,10 +21,7 @@ export async function notifyHostNewCircleMember(
     footer: string;
   }
 ): Promise<void> {
-  const [hosts, memberCount] = await Promise.all([
-    prismaCircleRepository.findOrganizers(circleId),
-    prismaCircleRepository.countMembers(circleId),
-  ]);
+  const hosts = await prismaCircleRepository.findOrganizers(circleId);
 
   const filteredHosts = hosts.filter((host) => host.userId !== newMemberUserId);
   const hostUserIds = filteredHosts.map((h) => h.userId);
