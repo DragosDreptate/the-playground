@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { auth } from "@/infrastructure/auth/auth.config";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { createStripePaymentService } from "@/infrastructure/services";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
@@ -8,8 +7,10 @@ import { getStripeConnectStatus } from "@/domain/usecases/onboard-stripe-connect
 import { CircleNotFoundError } from "@/domain/errors";
 import { CircleForm } from "@/components/circles/circle-form";
 import { updateCircleAction } from "@/app/actions/circle";
+import { getCachedSession } from "@/lib/auth-cache";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
-import { isActivePrimaryHost } from "@/domain/models/circle";
+import { isActiveOrganizer, isActivePrimaryHost } from "@/domain/models/circle";
+import { redirectToPublicCircle } from "@/lib/dashboard-circle-public-redirect";
 import { Link } from "@/i18n/navigation";
 import { ChevronRight } from "lucide-react";
 
@@ -32,14 +33,20 @@ export default async function EditCirclePage({
     throw error;
   }
 
+  // Garde d'autorisation : seul un organisateur actif de la Communauté peut
+  // éditer. Un non-membre (ou un membre Participant) est renvoyé vers la page
+  // publique, comme sur les pages de gestion sœurs.
+  const session = await getCachedSession();
+  if (!session?.user?.id) redirectToPublicCircle(slug);
+
+  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+  const membership = await circleRepo.findMembership(circle.id, session.user.id);
+
+  if (!isActiveOrganizer(membership)) redirectToPublicCircle(slug);
+
   const boundAction = updateCircleAction.bind(null, circle.id);
 
   // Load Stripe Connect status for the HOST (supports admin host mode)
-  const session = await auth();
-  const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-  const membership = session?.user?.id
-    ? await circleRepo.findMembership(circle.id, session.user.id)
-    : null;
   const canManageStripe = isActivePrimaryHost(membership);
 
   let stripeConnect;
@@ -49,7 +56,7 @@ export default async function EditCirclePage({
     let status = null as import("@/domain/ports/services/payment-service").ConnectAccountStatus | null;
 
     // If circle already has a Stripe account, fetch its status
-    if (circle.stripeConnectAccountId && session?.user?.id) {
+    if (circle.stripeConnectAccountId) {
       try {
         const stripeStatus = await getStripeConnectStatus(
           { circleId: circle.id, userId: session.user.id },
