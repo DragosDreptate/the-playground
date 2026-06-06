@@ -16,8 +16,16 @@ import { SLUGS, AUTH } from "./fixtures";
  * par ses propres tests d'autorisation. Ici on verrouille la garde de page.
  */
 
-// Page publique de la Communauté seed (sans préfixe /dashboard/).
+// Page publique de la Communauté seed. Le `$` ancre la fin (tolère le préfixe
+// de locale présent ou non, "as-needed"). On vérifie EN PLUS l'absence de
+// `/dashboard/` pour exclure un faux positif si la redirection pointait par
+// erreur vers la page de gestion `/dashboard/circles/[slug]`.
 const PUBLIC_CIRCLE_URL = new RegExp(`/circles/${SLUGS.CIRCLE}/?$`);
+
+async function expectRedirectedToPublicCircle(page: import("@playwright/test").Page) {
+  await expect(page).toHaveURL(PUBLIC_CIRCLE_URL);
+  await expect(page).not.toHaveURL(/\/dashboard\//);
+}
 
 test.describe("Garde organisateur — Participant (non-organisateur)", () => {
   test.use({ storageState: AUTH.PLAYER });
@@ -25,13 +33,13 @@ test.describe("Garde organisateur — Participant (non-organisateur)", () => {
   test("redirige l'édition de Communauté vers la page publique", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/edit`);
 
-    await expect(page).toHaveURL(PUBLIC_CIRCLE_URL);
+    await expectRedirectedToPublicCircle(page);
   });
 
   test("redirige la création d'événement vers la page publique", async ({ page }) => {
     await page.goto(`/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/new`);
 
-    await expect(page).toHaveURL(PUBLIC_CIRCLE_URL);
+    await expectRedirectedToPublicCircle(page);
   });
 });
 
