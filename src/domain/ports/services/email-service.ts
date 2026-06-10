@@ -190,13 +190,12 @@ export type MomentHostMessageEmailData = {
   hostAvatarUrl: string | null;
   /** Objet saisi par l'Organisateur, tel quel. */
   subject: string;
-  /** Corps HTML déjà sanitizé côté action (allowlist stricte). */
+  /**
+   * Corps HTML déjà sanitizé côté action (allowlist stricte). Peut contenir
+   * le placeholder prénom, résolu par destinataire dans l'adapter.
+   */
   bodyHtml: string;
   strings: {
-    /** Template de salutation avec placeholder {firstName}. */
-    greeting: string;
-    /** Salutation quand le prénom est absent. */
-    greetingFallback: string;
     preheader: string;
     dateLabel: string;
     locationLabel: string;

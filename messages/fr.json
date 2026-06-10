@@ -716,6 +716,9 @@
       "subjectPlaceholder": "Ex : Informations pratiques",
       "bodyLabel": "Message",
       "bodyPlaceholder": "Écrivez votre message…",
+      "firstNameTokenLabel": "Prénom",
+      "firstNameToken": "'{'prénom'}'",
+      "firstNameTokenHint": "Insérez {token} dans votre texte : chaque participant le verra remplacé par son prénom (retiré si le prénom est inconnu).",
       "softLimitWarning": "Vous avez déjà envoyé un message il y a moins de 24h. Évitez de solliciter trop souvent vos participants.",
       "sendButton": "Envoyer",
       "cancelButton": "Annuler",
@@ -1116,8 +1119,6 @@
       "ctaLabel": "Voir la communauté"
     },
     "momentHostMessage": {
-      "greeting": "Bonjour {firstName},",
-      "greetingFallback": "Bonjour,",
       "preheader": "Message de {hostName} à propos de {momentTitle}",
       "dateLabel": "Date",
       "locationLabel": "Lieu",

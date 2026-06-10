@@ -229,11 +229,15 @@ export function HostMessageDialog({
             placeholder={t("bodyPlaceholder")}
             initialContent={bodyHtml}
             disabled={isPending}
+            tokens={[{ label: t("firstNameTokenLabel"), value: t("firstNameToken") }]}
             onChange={(html, textLength) => {
               setBodyHtml(html);
               setBodyTextLength(textLength);
             }}
           />
+          <p className="text-muted-foreground text-xs leading-snug">
+            {t("firstNameTokenHint", { token: t("firstNameToken") })}
+          </p>
         </div>
 
         <DialogFooter className="gap-2">

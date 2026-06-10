@@ -716,6 +716,9 @@
       "subjectPlaceholder": "E.g. Practical information",
       "bodyLabel": "Message",
       "bodyPlaceholder": "Write your message…",
+      "firstNameTokenLabel": "First name",
+      "firstNameToken": "'{'firstName'}'",
+      "firstNameTokenHint": "Insert {token} in your text: each attendee will see it replaced with their first name (removed when unknown).",
       "softLimitWarning": "You already sent a message less than 24 hours ago. Avoid messaging your attendees too often.",
       "sendButton": "Send",
       "cancelButton": "Cancel",
@@ -1116,8 +1119,6 @@
       "ctaLabel": "View community"
     },
     "momentHostMessage": {
-      "greeting": "Hi {firstName},",
-      "greetingFallback": "Hi,",
       "preheader": "Message from {hostName} about {momentTitle}",
       "dateLabel": "Date",
       "locationLabel": "Location",

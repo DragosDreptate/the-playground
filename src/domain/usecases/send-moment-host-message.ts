@@ -48,8 +48,6 @@ export type SendMomentHostMessageDeps = {
   emailService: EmailService;
   /** Strings i18n résolus côté app (le domaine reste pur). */
   emailStrings: {
-    greeting: string;
-    greetingFallback: string;
     preheader: string;
     dateLabel: string;
     locationLabel: string;

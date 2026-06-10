@@ -415,8 +415,6 @@ describe("CO_HOST security — message aux participants", () => {
       }),
       emailService: createMockEmailService(),
       emailStrings: {
-        greeting: "Bonjour {firstName},",
-        greetingFallback: "Bonjour,",
         preheader: "p",
         dateLabel: "Date",
         locationLabel: "Lieu",
