@@ -321,7 +321,6 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
       subject: "Changement de salle pour vendredi",
       element: MomentHostMessageEmail({
         to: "alice@example.com",
-        recipientFirstName: "Alice",
         greeting: "Bonjour Alice,",
         replyTo: "bob@example.com",
         hostName: "Bob Dupont",

@@ -16,6 +16,14 @@ export class HostMessageBodyEmptyError extends DomainError {
   }
 }
 
+export class HostMessageBodyTooLongError extends DomainError {
+  readonly code = "HOST_MESSAGE_BODY_TOO_LONG";
+
+  constructor(maxLength: number) {
+    super(`Message body exceeds ${maxLength} characters of text`);
+  }
+}
+
 export class HostMessageNotAllowedOnDraftError extends DomainError {
   readonly code = "HOST_MESSAGE_DRAFT";
 

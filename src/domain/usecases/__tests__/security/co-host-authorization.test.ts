@@ -421,10 +421,12 @@ describe("CO_HOST security — message aux participants", () => {
         ctaLabel: "Voir",
         footer: "f",
       },
-      momentDate: "d",
-      momentDateMonth: "M",
-      momentDateDay: "1",
-      momentLocation: null,
+      buildEmailContext: () => ({
+        momentDate: "d",
+        momentDateMonth: "M",
+        momentDateDay: "1",
+        momentLocation: null,
+      }),
       appUrl: "https://the-playground.fr",
     };
   }
@@ -434,6 +436,7 @@ describe("CO_HOST security — message aux participants", () => {
     segment: "REGISTERED" as const,
     subject: "Objet",
     bodyHtml: "<p>corps</p>",
+    bodyTextLength: 5,
   };
 
   it("should allow a CO_HOST ACTIVE to message the participants", async () => {

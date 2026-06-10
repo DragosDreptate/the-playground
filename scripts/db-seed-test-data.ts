@@ -454,7 +454,7 @@ async function main() {
           capacity: momentData.capacity,
           price: momentPrice,
           refundable: momentRefundable,
-          broadcastSentAt: null,
+          lastHostMessageSentAt: null,
           requiresApproval: momentRequiresApproval,
         },
       });

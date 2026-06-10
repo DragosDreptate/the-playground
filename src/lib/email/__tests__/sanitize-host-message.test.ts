@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   extractHostMessageTextLength,
   sanitizeHostMessageHtml,
-  HOST_MESSAGE_BODY_MAX_TEXT_LENGTH,
 } from "@/lib/email/sanitize-host-message";
+import { HOST_MESSAGE_BODY_MAX_TEXT_LENGTH } from "@/domain/models/registration";
 
 describe("sanitizeHostMessageHtml", () => {
   describe("given allowed rich text markup", () => {
@@ -23,7 +23,7 @@ describe("sanitizeHostMessageHtml", () => {
       const result = sanitizeHostMessageHtml('<p><a href="https://example.com">infos</a></p>');
 
       expect(result).toContain('href="https://example.com"');
-      expect(result).toContain("color: #e8457a");
+      expect(result).toContain("color: #ec4899");
       expect(result).toContain('rel="noopener noreferrer"');
     });
   });

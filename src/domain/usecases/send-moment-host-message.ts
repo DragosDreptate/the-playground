@@ -3,14 +3,18 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
 import type { EmailService } from "@/domain/ports/services/email-service";
-import type {
-  HostMessageSegment,
-  RegistrationWithUser,
+import type { Moment } from "@/domain/models/moment";
+import {
+  HOST_MESSAGE_BODY_MAX_TEXT_LENGTH,
+  HOST_MESSAGE_SUBJECT_MAX_LENGTH,
+  type HostMessageSegment,
+  type RegistrationWithUser,
 } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import { getDisplayName } from "@/lib/display-name";
 import {
   HostMessageBodyEmptyError,
+  HostMessageBodyTooLongError,
   HostMessageNoRecipientsError,
   HostMessageNotAllowedOnDraftError,
   HostMessageSubjectInvalidError,
@@ -19,8 +23,6 @@ import {
   UnauthorizedMomentActionError,
   UserNotFoundError,
 } from "@/domain/errors";
-
-export const HOST_MESSAGE_SUBJECT_MAX_LENGTH = 150;
 
 export type { HostMessageSegment };
 
@@ -32,6 +34,8 @@ export type SendMomentHostMessageInput = {
   subject: string;
   /** Corps HTML déjà sanitizé en couche action (string opaque pour le domaine). */
   bodyHtml: string;
+  /** Longueur du texte seul du corps (balises exclues), calculée par l'action. */
+  bodyTextLength: number;
   /** Admin en host mode : court-circuite la vérification d'organisateur. */
   skipAuthorization?: boolean;
 };
@@ -52,13 +56,17 @@ export type SendMomentHostMessageDeps = {
     ctaLabel: string;
     footer: string;
   };
-  momentDate: string;
-  momentDateMonth: string;
-  momentDateDay: string;
-  momentLocation: string | null;
+  /**
+   * Construit les chaînes de date/lieu de l'email à partir du Moment chargé.
+   * Résolu côté app : i18n et date-fns restent hors du domaine.
+   */
+  buildEmailContext: (moment: Moment) => {
+    momentDate: string;
+    momentDateMonth: string;
+    momentDateDay: string;
+    momentLocation: string | null;
+  };
   appUrl: string;
-  /** Remontée des erreurs d'envoi (fire-and-forget) — ex: Sentry côté app. */
-  onEmailError?: (error: unknown) => void;
 };
 
 export type SendMomentHostMessageResult = {
@@ -71,6 +79,18 @@ function matchesSegment(
 ): boolean {
   if (segment === "ALL") return true;
   return registration.status === segment;
+}
+
+/**
+ * Interpole des placeholders {key} dans un template i18n. La valeur est passée
+ * en fonction pour neutraliser les motifs spéciaux de String.replace ($&, $'…)
+ * présents dans une donnée utilisateur.
+ */
+function fillPlaceholders(template: string, vars: Record<string, string>): string {
+  return Object.entries(vars).reduce(
+    (acc, [key, value]) => acc.replace(`{${key}}`, () => value),
+    template
+  );
 }
 
 export async function sendMomentHostMessage(
@@ -89,8 +109,11 @@ export async function sendMomentHostMessage(
   if (subject.length === 0 || subject.length > HOST_MESSAGE_SUBJECT_MAX_LENGTH) {
     throw new HostMessageSubjectInvalidError(HOST_MESSAGE_SUBJECT_MAX_LENGTH);
   }
-  if (input.bodyHtml.trim().length === 0) {
+  if (input.bodyTextLength <= 0 || input.bodyHtml.trim().length === 0) {
     throw new HostMessageBodyEmptyError();
+  }
+  if (input.bodyTextLength > HOST_MESSAGE_BODY_MAX_TEXT_LENGTH) {
+    throw new HostMessageBodyTooLongError(HOST_MESSAGE_BODY_MAX_TEXT_LENGTH);
   }
 
   const moment = await momentRepository.findById(input.momentId);
@@ -99,26 +122,24 @@ export async function sendMomentHostMessage(
     throw new HostMessageNotAllowedOnDraftError(input.momentId);
   }
 
-  if (!input.skipAuthorization) {
-    const membership = await circleRepository.findMembership(
-      moment.circleId,
-      input.senderId
-    );
-    if (!isActiveOrganizer(membership)) {
-      throw new UnauthorizedMomentActionError();
-    }
+  // Trois lectures indépendantes — parallélisées, validées dans l'ordre métier.
+  const [membership, sender, registrations] = await Promise.all([
+    input.skipAuthorization
+      ? Promise.resolve(null)
+      : circleRepository.findMembership(moment.circleId, input.senderId),
+    userRepository.findById(input.senderId),
+    registrationRepository.findActiveWithUserByMomentId(input.momentId),
+  ]);
+
+  if (!input.skipAuthorization && !isActiveOrganizer(membership)) {
+    throw new UnauthorizedMomentActionError();
   }
 
-  const sender = await userRepository.findById(input.senderId);
   if (!sender) throw new UserNotFoundError(input.senderId);
   if (!sender.email) throw new SenderEmailMissingError(input.senderId);
-
-  const registrations = await registrationRepository.findActiveWithUserByMomentId(
-    input.momentId
-  );
-  const recipients = registrations.filter(
-    (r) => matchesSegment(r, input.segment) && r.userId !== input.senderId
-  );
+  // L'expéditeur inscrit reçoit aussi le message : copie de contrôle pour
+  // vérifier le rendu et confirmer que l'envoi est bien parti.
+  const recipients = registrations.filter((r) => matchesSegment(r, input.segment));
   if (recipients.length === 0) {
     throw new HostMessageNoRecipientsError(input.momentId, input.segment);
   }
@@ -126,28 +147,39 @@ export async function sendMomentHostMessage(
   // Mark avant l'envoi — anti race condition (écrase le timestamp à chaque envoi)
   await momentRepository.markHostMessageSent(input.momentId);
 
-  // Fire-and-forget : l'envoi batch ne bloque pas le retour du usecase.
-  emailService
-    .sendMomentHostMessages({
-      recipients: recipients.map((r) => ({
-        to: r.user.email,
-        firstName: r.user.firstName,
-      })),
-      replyTo: sender.email,
-      hostName: getDisplayName(sender.firstName, sender.lastName, sender.email),
-      hostAvatarUrl: sender.image ?? null,
-      subject,
-      bodyHtml: input.bodyHtml,
-      strings: deps.emailStrings,
+  const emailContext = deps.buildEmailContext(moment);
+  const hostName = getDisplayName(sender.firstName, sender.lastName, sender.email);
+  const resolvedStrings = {
+    ...deps.emailStrings,
+    preheader: fillPlaceholders(deps.emailStrings.preheader, {
+      hostName,
       momentTitle: moment.title,
-      momentDate: deps.momentDate,
-      momentDateMonth: deps.momentDateMonth,
-      momentDateDay: deps.momentDateDay,
-      momentLocation: deps.momentLocation,
-      momentSlug: moment.slug,
-      appUrl: deps.appUrl,
-    })
-    .catch((err) => deps.onEmailError?.(err));
+    }),
+    footer: fillPlaceholders(deps.emailStrings.footer, { momentTitle: moment.title }),
+  };
+
+  // Envoi attendu avant le retour (pattern contact-circle-hosts) : une promesse
+  // flottante serait larguée au gel de l'instance Vercel après la réponse, et le
+  // succès retourné à l'Organisateur ne serait pas garanti.
+  await emailService.sendMomentHostMessages({
+    recipients: recipients.map((r) => ({
+      to: r.user.email,
+      firstName: r.user.firstName,
+    })),
+    replyTo: sender.email,
+    hostName,
+    hostAvatarUrl: sender.image ?? null,
+    subject,
+    bodyHtml: input.bodyHtml,
+    strings: resolvedStrings,
+    momentTitle: moment.title,
+    momentDate: emailContext.momentDate,
+    momentDateMonth: emailContext.momentDateMonth,
+    momentDateDay: emailContext.momentDateDay,
+    momentLocation: emailContext.momentLocation,
+    momentSlug: moment.slug,
+    appUrl: deps.appUrl,
+  });
 
   return { recipientCount: recipients.length };
 }

@@ -14,6 +14,10 @@ export type PaymentStatus = "NONE" | "PENDING" | "PAID" | "REFUNDED";
 /** Audience d'un message Organisateur → Participants d'un Moment. */
 export type HostMessageSegment = "REGISTERED" | "WAITLISTED" | "ALL";
 
+/** Limites du message Organisateur — source unique pour client, action et usecase. */
+export const HOST_MESSAGE_SUBJECT_MAX_LENGTH = 150;
+export const HOST_MESSAGE_BODY_MAX_TEXT_LENGTH = 5000;
+
 export type Registration = {
   id: string;
   momentId: string;

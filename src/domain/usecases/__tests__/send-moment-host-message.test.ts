@@ -1,19 +1,24 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   sendMomentHostMessage,
-  HOST_MESSAGE_SUBJECT_MAX_LENGTH,
   type SendMomentHostMessageDeps,
   type SendMomentHostMessageInput,
 } from "@/domain/usecases/send-moment-host-message";
 import {
   HostMessageBodyEmptyError,
+  HostMessageBodyTooLongError,
   HostMessageNoRecipientsError,
   HostMessageNotAllowedOnDraftError,
   HostMessageSubjectInvalidError,
   MomentNotFoundError,
   UnauthorizedMomentActionError,
 } from "@/domain/errors";
-import type { RegistrationWithUser, RegistrationStatus } from "@/domain/models/registration";
+import {
+  HOST_MESSAGE_BODY_MAX_TEXT_LENGTH,
+  HOST_MESSAGE_SUBJECT_MAX_LENGTH,
+  type RegistrationWithUser,
+  type RegistrationStatus,
+} from "@/domain/models/registration";
 import { createMockMomentRepository, makeMoment } from "./helpers/mock-moment-repository";
 import { createMockCircleRepository, makeMembership } from "./helpers/mock-circle-repository";
 import {
@@ -52,6 +57,7 @@ function makeInput(
     segment: "REGISTERED",
     subject: "Changement de salle",
     bodyHtml: "<p>Nous changeons de salle.</p>",
+    bodyTextLength: 25,
     ...overrides,
   };
 }
@@ -91,10 +97,12 @@ function makeDeps(
       ctaLabel: "Voir l'événement",
       footer: "Vous recevez cet email car vous êtes inscrit.",
     },
-    momentDate: "vendredi 21 mars 2026, 19:00",
-    momentDateMonth: "MAR",
-    momentDateDay: "21",
-    momentLocation: "Cafe Central, Paris",
+    buildEmailContext: () => ({
+      momentDate: "vendredi 21 mars 2026, 19:00",
+      momentDateMonth: "MAR",
+      momentDateDay: "21",
+      momentLocation: "Cafe Central, Paris",
+    }),
     appUrl: "https://the-playground.fr",
     ...overrides,
   };
@@ -158,7 +166,7 @@ describe("SendMomentHostMessage", () => {
       });
     });
 
-    it("should exclude the sender from recipients even when registered", async () => {
+    it("should include the registered sender in recipients (copie de contrôle)", async () => {
       const deps = makeDeps({
         registrationRepository: createMockRegistrationRepository({
           findActiveWithUserByMomentId: vi
@@ -172,9 +180,12 @@ describe("SendMomentHostMessage", () => {
 
       const result = await sendMomentHostMessage(makeInput(), deps);
 
-      expect(result.recipientCount).toBe(1);
+      expect(result.recipientCount).toBe(2);
       const payload = vi.mocked(deps.emailService.sendMomentHostMessages).mock.calls[0][0];
-      expect(payload.recipients.map((r) => r.to)).toEqual(["user-2@example.com"]);
+      expect(payload.recipients.map((r) => r.to)).toEqual([
+        `${HOST_ID}@example.com`,
+        "user-2@example.com",
+      ]);
     });
 
     describe.each([["PUBLISHED" as const], ["PAST" as const], ["CANCELLED" as const]])(
@@ -302,25 +313,33 @@ describe("SendMomentHostMessage", () => {
       const deps = makeDeps();
 
       await expect(
-        sendMomentHostMessage(makeInput({ bodyHtml: "  " }), deps)
+        sendMomentHostMessage(makeInput({ bodyHtml: "<p></p>", bodyTextLength: 0 }), deps)
       ).rejects.toThrow(HostMessageBodyEmptyError);
+    });
+
+    it("should throw HostMessageBodyTooLongError above the max text length", async () => {
+      const deps = makeDeps();
+
+      await expect(
+        sendMomentHostMessage(
+          makeInput({ bodyTextLength: HOST_MESSAGE_BODY_MAX_TEXT_LENGTH + 1 }),
+          deps
+        )
+      ).rejects.toThrow(HostMessageBodyTooLongError);
     });
   });
 
-  describe("given the email batch fails after the action returned", () => {
-    it("should report the error through onEmailError (fire-and-forget)", async () => {
-      const onEmailError = vi.fn();
+  describe("given the email batch fails", () => {
+    it("should propagate the error instead of returning a false success", async () => {
       const deps = makeDeps({
         emailService: createMockEmailService({
           sendMomentHostMessages: vi.fn().mockRejectedValue(new Error("resend down")),
         }),
-        onEmailError,
       });
 
-      const result = await sendMomentHostMessage(makeInput(), deps);
-
-      expect(result.recipientCount).toBe(1);
-      await vi.waitFor(() => expect(onEmailError).toHaveBeenCalled());
+      await expect(sendMomentHostMessage(makeInput(), deps)).rejects.toThrow(
+        "resend down"
+      );
     });
   });
 });

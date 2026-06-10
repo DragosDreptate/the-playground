@@ -77,6 +77,22 @@ export function getOnboardingSender(): string {
   );
 }
 
+/**
+ * Construit un header From valide RFC 5322 à partir d'un display-name
+ * contenant des données utilisateur (nom de l'Organisateur). Le nom est mis
+ * en quoted-string (" et \ échappés) : sans ça, un nom contenant une virgule,
+ * des guillemets ou une adresse email (fallback de getDisplayName) produit un
+ * header malformé que Resend peut rejeter pour tout le batch.
+ */
+export function formatFromWithDisplayName(
+  displayName: string,
+  senderString: string
+): string {
+  const address = senderString.match(/<([^<>]+)>$/)?.[1] ?? senderString;
+  const quoted = `"${displayName.replace(/[\\"]/g, "\\$&")}"`;
+  return `${quoted} <${address}>`;
+}
+
 // Contenu centralisé — re-exporté pour le script de backfill one-shot.
 export { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
 import { onboardingWelcomeContent } from "@/content/emails/onboarding-welcome.content";
@@ -295,8 +311,10 @@ export function createResendEmailService(): EmailService {
     ): Promise<void> {
       const { recipients, ...emailData } = data;
       // From personnalisé : nom de l'Organisateur, adresse plateforme (DKIM).
-      const senderAddress = from.match(/<(.+)>/)?.[1] ?? from;
-      const personalizedFrom = `${emailData.hostName} via The Playground <${senderAddress}>`;
+      const personalizedFrom = formatFromWithDisplayName(
+        `${emailData.hostName} via The Playground`,
+        from
+      );
       await sendBatch(
         recipients.map(({ to, firstName }) => ({
           from: personalizedFrom,
@@ -306,9 +324,9 @@ export function createResendEmailService(): EmailService {
           react: MomentHostMessageEmail({
             ...emailData,
             to,
-            recipientFirstName: firstName,
+            // Forme fonction : neutralise les motifs $ de String.replace dans un prénom.
             greeting: firstName
-              ? emailData.strings.greeting.replace("{firstName}", firstName)
+              ? emailData.strings.greeting.replace("{firstName}", () => firstName)
               : emailData.strings.greetingFallback,
           }),
         }))

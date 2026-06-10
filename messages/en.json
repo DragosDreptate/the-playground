@@ -721,7 +721,14 @@
       "cancelButton": "Cancel",
       "sending": "Sending...",
       "successToast": "{count, plural, one {Message sent to # attendee} other {Message sent to # attendees}}",
-      "noRecipientsError": "No recipients for this audience"
+      "noRecipientsError": "No recipients for this audience",
+      "unauthorizedError": "You don't have permission to send this message.",
+      "draftError": "This event is still a draft.",
+      "subjectInvalidError": "Subject is required (150 characters max).",
+      "bodyEmptyError": "The message is empty.",
+      "bodyTooLongError": "The message exceeds the maximum allowed length.",
+      "notFoundError": "Event not found.",
+      "genericError": "Something went wrong. Please try again."
     },
     "errors": {
       "notFound": "Event not found",

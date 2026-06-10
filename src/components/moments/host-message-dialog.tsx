@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { Mail, TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RichTextEditor } from "@/components/ui/rich-text-editor";
+// Tiptap/ProseMirror (~80 KB gzip) chargé uniquement à l'ouverture de la modale,
+// pas dans le bundle de la page détail événement.
+const RichTextEditor = dynamic(
+  () => import("@/components/ui/rich-text-editor").then((m) => m.RichTextEditor),
+  { ssr: false, loading: () => <Skeleton className="h-40 w-full rounded-md" /> }
+);
 import {
   Select,
   SelectContent,
@@ -25,15 +32,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sendMomentHostMessageAction } from "@/app/actions/send-moment-host-message";
-import type { HostMessageSegment } from "@/domain/models/registration";
+import {
+  HOST_MESSAGE_BODY_MAX_TEXT_LENGTH,
+  HOST_MESSAGE_SUBJECT_MAX_LENGTH,
+  type HostMessageSegment,
+} from "@/domain/models/registration";
 
 const SOFT_LIMIT_MS = 24 * 60 * 60 * 1000;
-const SUBJECT_MAX_LENGTH = 150;
-const BODY_MAX_TEXT_LENGTH = 5000;
+
+/** Codes d'erreur de l'action → clés i18n (jamais de message serveur brut). */
+const ERROR_KEYS: Record<string, string> = {
+  HOST_MESSAGE_NO_RECIPIENTS: "noRecipientsError",
+  MOMENT_UNAUTHORIZED: "unauthorizedError",
+  HOST_MESSAGE_DRAFT: "draftError",
+  HOST_MESSAGE_SUBJECT_INVALID: "subjectInvalidError",
+  HOST_MESSAGE_BODY_EMPTY: "bodyEmptyError",
+  HOST_MESSAGE_BODY_TOO_LONG: "bodyTooLongError",
+  MOMENT_NOT_FOUND: "notFoundError",
+};
 
 type Props = {
   momentId: string;
   momentTitle: string;
+  momentSlug: string;
+  circleSlug: string;
   registeredCount: number;
   waitlistedCount: number;
   /** ISO string du dernier message envoyé. null = jamais envoyé. */
@@ -43,6 +65,8 @@ type Props = {
 export function HostMessageDialog({
   momentId,
   momentTitle,
+  momentSlug,
+  circleSlug,
   registeredCount,
   waitlistedCount,
   lastHostMessageSentAt,
@@ -54,8 +78,6 @@ export function HostMessageDialog({
   const [bodyHtml, setBodyHtml] = React.useState("");
   const [bodyTextLength, setBodyTextLength] = React.useState(0);
   const [isPending, setIsPending] = React.useState(false);
-  // La clé force un remontage de l'éditeur (vide) à la réouverture du dialog
-  const [editorKey, setEditorKey] = React.useState(0);
 
   const hasWaitlist = waitlistedCount > 0;
   const segmentCounts: Record<HostMessageSegment, number> = {
@@ -72,9 +94,9 @@ export function HostMessageDialog({
   const canSend =
     !isPending &&
     subject.trim().length > 0 &&
-    subject.trim().length <= SUBJECT_MAX_LENGTH &&
+    subject.trim().length <= HOST_MESSAGE_SUBJECT_MAX_LENGTH &&
     bodyTextLength > 0 &&
-    bodyTextLength <= BODY_MAX_TEXT_LENGTH &&
+    bodyTextLength <= HOST_MESSAGE_BODY_MAX_TEXT_LENGTH &&
     recipientCount > 0;
 
   function resetForm() {
@@ -82,7 +104,6 @@ export function HostMessageDialog({
     setSubject("");
     setBodyHtml("");
     setBodyTextLength(0);
-    setEditorKey((k) => k + 1);
   }
 
   async function handleSend() {
@@ -90,6 +111,8 @@ export function HostMessageDialog({
     try {
       const result = await sendMomentHostMessageAction({
         momentId,
+        momentSlug,
+        circleSlug,
         segment: hasWaitlist ? segment : "REGISTERED",
         subject: subject.trim(),
         bodyHtml,
@@ -99,12 +122,12 @@ export function HostMessageDialog({
         setOpen(false);
         resetForm();
       } else {
-        toast.error(
-          result.code === "HOST_MESSAGE_NO_RECIPIENTS"
-            ? t("noRecipientsError")
-            : result.error
-        );
+        toast.error(t(ERROR_KEYS[result.code] ?? "genericError"));
       }
+    } catch {
+      // Échec de la requête elle-même (réseau, redéploiement) — toActionResult
+      // ne couvre que les erreurs côté serveur.
+      toast.error(t("genericError"));
     } finally {
       setIsPending(false);
     }
@@ -189,7 +212,7 @@ export function HostMessageDialog({
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             placeholder={t("subjectPlaceholder")}
-            maxLength={SUBJECT_MAX_LENGTH}
+            maxLength={HOST_MESSAGE_SUBJECT_MAX_LENGTH}
             disabled={isPending}
           />
         </div>
@@ -198,11 +221,10 @@ export function HostMessageDialog({
           <div className="flex items-baseline justify-between">
             <Label htmlFor="host-message-body">{t("bodyLabel")}</Label>
             <span className="text-muted-foreground text-xs tabular-nums">
-              {bodyTextLength} / {BODY_MAX_TEXT_LENGTH}
+              {bodyTextLength} / {HOST_MESSAGE_BODY_MAX_TEXT_LENGTH}
             </span>
           </div>
           <RichTextEditor
-            key={editorKey}
             id="host-message-body"
             placeholder={t("bodyPlaceholder")}
             initialContent={bodyHtml}

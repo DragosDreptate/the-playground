@@ -183,7 +183,6 @@ export type MomentCancelledEmailData = {
 
 export type MomentHostMessageEmailData = {
   to: string;
-  recipientFirstName: string | null;
   /** Email de l'Organisateur — les réponses lui arrivent directement. */
   replyTo: string;
   /** Nom affiché de l'Organisateur (from + tête de l'email). */
@@ -257,10 +256,7 @@ export type CircleInvitationsBatchEmailData = Omit<CircleInvitationEmailData, "t
   recipients: string[];
 };
 
-export type MomentHostMessagesBatchEmailData = Omit<
-  MomentHostMessageEmailData,
-  "to" | "recipientFirstName"
-> & {
+export type MomentHostMessagesBatchEmailData = Omit<MomentHostMessageEmailData, "to"> & {
   recipients: Array<{ to: string; firstName: string | null }>;
 };
 

@@ -1,6 +1,5 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/infrastructure/auth/auth.config";
@@ -17,14 +16,10 @@ import {
 } from "@/domain/usecases/send-moment-host-message";
 import { isAdminInHostMode } from "@/lib/admin-host-mode";
 import { DEFAULT_RECIPIENT_LOCALE } from "@/lib/email/email-locale";
-import {
-  buildMomentEmailContext,
-  formatLocationText,
-} from "@/lib/email/format-moment-email";
+import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 import {
   extractHostMessageTextLength,
   sanitizeHostMessageHtml,
-  HOST_MESSAGE_BODY_MAX_TEXT_LENGTH,
 } from "@/lib/email/sanitize-host-message";
 import { getAppUrl } from "@/lib/app-url";
 import { captureServerEvent } from "@/lib/posthog-server";
@@ -40,6 +35,9 @@ export async function sendMomentHostMessageAction(input: {
   segment: HostMessageSegment;
   subject: string;
   bodyHtml: string;
+  /** Slugs connus du composant appelant — servent uniquement à revalidatePath. */
+  circleSlug: string;
+  momentSlug: string;
 }): Promise<ActionResult<{ recipientCount: number }>> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -51,18 +49,9 @@ export async function sendMomentHostMessageAction(input: {
     return { success: false, error: "Segment invalide", code: "INVALID_SEGMENT" };
   }
 
+  // Vide / trop long : vérifiés par le usecase via bodyTextLength.
   const bodyHtml = sanitizeHostMessageHtml(input.bodyHtml);
   const bodyTextLength = extractHostMessageTextLength(bodyHtml);
-  if (bodyTextLength === 0) {
-    return { success: false, error: "Message vide", code: "HOST_MESSAGE_BODY_EMPTY" };
-  }
-  if (bodyTextLength > HOST_MESSAGE_BODY_MAX_TEXT_LENGTH) {
-    return {
-      success: false,
-      error: "Message trop long",
-      code: "HOST_MESSAGE_BODY_TOO_LONG",
-    };
-  }
 
   const skipAuthorization = await isAdminInHostMode(session);
 
@@ -72,23 +61,6 @@ export async function sendMomentHostMessageAction(input: {
   const t = await getTranslations({ locale, namespace: "Email.momentHostMessage" });
 
   return toActionResult(async () => {
-    const moment = await prismaMomentRepository.findById(input.momentId);
-    const emailContext = moment
-      ? buildMomentEmailContext(moment, locale)
-      : { momentDate: "", momentDateMonth: "", momentDateDay: "", locationText: "" };
-    const momentLocation = moment
-      ? formatLocationText(
-          moment.locationType,
-          moment.locationName,
-          moment.locationAddress,
-          null, // pas de lien visio dans l'email — la page événement le porte
-          locale
-        )
-      : null;
-
-    const hostName =
-      session.user.name ?? session.user.email ?? "";
-
     const result = await sendMomentHostMessage(
       {
         momentId: input.momentId,
@@ -96,6 +68,7 @@ export async function sendMomentHostMessageAction(input: {
         segment: input.segment,
         subject: input.subject,
         bodyHtml,
+        bodyTextLength,
         skipAuthorization,
       },
       {
@@ -104,24 +77,29 @@ export async function sendMomentHostMessageAction(input: {
         registrationRepository: prismaRegistrationRepository,
         userRepository: prismaUserRepository,
         emailService,
+        // Templates bruts : {firstName}, {hostName} et {momentTitle} sont résolus
+        // par le usecase, qui détient le sender et le moment (pattern contact-circle-hosts).
         emailStrings: {
           greeting: t("greeting"),
           greetingFallback: t("greetingFallback"),
-          preheader: t("preheader", {
-            hostName,
-            momentTitle: moment?.title ?? "",
-          }),
+          preheader: t("preheader"),
           dateLabel: t("dateLabel"),
           locationLabel: t("locationLabel"),
           ctaLabel: t("ctaLabel"),
-          footer: t("footer", { momentTitle: moment?.title ?? "" }),
+          footer: t("footer"),
         },
-        momentDate: emailContext.momentDate,
-        momentDateMonth: emailContext.momentDateMonth.toUpperCase(),
-        momentDateDay: emailContext.momentDateDay,
-        momentLocation,
+        buildEmailContext: (moment) => {
+          // videoLink omis : le lien visio n'apparaît pas dans l'email, la page
+          // événement le porte.
+          const ctx = buildMomentEmailContext({ ...moment, videoLink: null }, locale);
+          return {
+            momentDate: ctx.momentDate,
+            momentDateMonth: ctx.momentDateMonth.toUpperCase(),
+            momentDateDay: ctx.momentDateDay,
+            momentLocation: ctx.locationText,
+          };
+        },
         appUrl: getAppUrl(),
-        onEmailError: (err) => Sentry.captureException(err),
       }
     );
 
@@ -131,12 +109,9 @@ export async function sendMomentHostMessageAction(input: {
       recipientCount: result.recipientCount,
     });
 
-    if (moment) {
-      const circle = await prismaCircleRepository.findById(moment.circleId);
-      if (circle) {
-        revalidatePath(`/dashboard/circles/${circle.slug}/moments/${moment.slug}`);
-      }
-    }
+    revalidatePath(
+      `/dashboard/circles/${input.circleSlug}/moments/${input.momentSlug}`
+    );
 
     return result;
   });

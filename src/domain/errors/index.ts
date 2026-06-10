@@ -70,6 +70,7 @@ export {
 export {
   HostMessageSubjectInvalidError,
   HostMessageBodyEmptyError,
+  HostMessageBodyTooLongError,
   HostMessageNotAllowedOnDraftError,
   HostMessageNoRecipientsError,
 } from "./host-message-errors";

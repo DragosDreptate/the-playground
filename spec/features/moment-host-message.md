@@ -43,7 +43,7 @@ Mockup : [`spec/mockups/moment-host-message-dialog.mockup.html`](../mockups/mome
 - **Permissions** : Host / Co-Host actif du Circle de l'événement (`isActiveOrganizer`), + admin en host mode (`isAdminInHostMode`) — même pattern que `broadcast-moment.ts` actuel.
 - **Statuts d'événement autorisés** : `PUBLISHED`, `PAST`, `CANCELLED`. Le suivi post-événement et la communication après annulation sont des cas d'usage légitimes. `DRAFT` exclu (aucun inscrit possible de toute façon).
 - **Liste d'attente vide** : « Inscrits » et « Tous » deviennent équivalents → **la ligne « À » est entièrement supprimée**. Le récapitulatif du nombre de destinataires est déplacé dans la description du dialog : « Envoyé par email aux **{count} inscrits** de {événement}. » L'envoi cible implicitement le segment `REGISTERED`.
-- **Exclusion de l'auteur** : l'expéditeur ne se reçoit pas lui-même, même s'il est inscrit à son événement.
+- **Copie de contrôle à l'expéditeur** (décision 2026-06-10, revue de code) : l'expéditeur inscrit reçoit aussi le message, comme tout participant du segment. Il peut ainsi vérifier le rendu reçu et confirmer que l'envoi est bien parti. Le créateur étant auto-inscrit `REGISTERED`, le Host reçoit toujours sa copie ; un Co-Host non inscrit n'en reçoit pas.
 - **0 destinataire** : bouton d'envoi désactivé.
 - **Limite souple** : si `lastHostMessageSentAt` < 24h, afficher un avertissement non bloquant dans le dialog (ex : « Vous avez déjà envoyé un message il y a moins de 24h. Évitez de solliciter trop souvent vos participants. »).
 - **Transactionnel** : aucun filtrage sur les préférences de notification. Le footer de l'email explique pourquoi on le reçoit (« Vous recevez cet email car vous êtes inscrit à {événement} »).
@@ -143,7 +143,7 @@ Nouveau composant **réutilisable** (candidat futur pour la description d'évén
 
 ## Tests
 
-- **Usecase (unitaires, ports mockés)** : autorisation (Host ok, Co-Host actif ok, Player refusé, membership inactif refusé, non-membre refusé), segments (REGISTERED / WAITLISTED / ALL), exclusion de l'auteur, 0 destinataire → erreur typée, DRAFT → erreur, PAST/CANCELLED → autorisés, pas de filtrage sur les préférences de notification, `markHostMessageSent` appelé avant l'envoi.
+- **Usecase (unitaires, ports mockés)** : autorisation (Host ok, Co-Host actif ok, Player refusé, membership inactif refusé, non-membre refusé), segments (REGISTERED / WAITLISTED / ALL), copie de contrôle à l'expéditeur inscrit, 0 destinataire → erreur typée, DRAFT → erreur, PAST/CANCELLED → autorisés, pas de filtrage sur les préférences de notification, `markHostMessageSent` appelé avant l'envoi.
 - **Sanitization (unitaires)** : tags hors allowlist strippés (`script`, `img`, `iframe`, handlers `on*`), protocoles interdits sur les liens (`javascript:`) neutralisés, limite 5000 caractères sur le texte extrait.
 - **Tests d'autorisation sécurité** : ajouter le usecase à la suite `co-host-authorization.test.ts` existante.
 - **E2E** : `tests/e2e/broadcast-moment.spec.ts` casse avec la suppression du bouton → le remplacer par un scénario du nouveau parcours (ouvrir le dialog, choisir un segment, composer, envoyer, toast). ⚠️ Ce test déclenche des envois d'emails : lire **`spec/email-testing.md`** avant de l'écrire ou de le lancer (vérifier `AUTH_RESEND_KEY` commentée, jamais de `--repeat-each`/`--retries` sans cette vérification).

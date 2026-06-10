@@ -721,7 +721,14 @@
       "cancelButton": "Annuler",
       "sending": "Envoi en cours...",
       "successToast": "{count, plural, one {Message envoyé à # participant} other {Message envoyé à # participants}}",
-      "noRecipientsError": "Aucun destinataire pour cette audience"
+      "noRecipientsError": "Aucun destinataire pour cette audience",
+      "unauthorizedError": "Vous n'avez pas la permission d'envoyer ce message.",
+      "draftError": "Cet événement est encore en brouillon.",
+      "subjectInvalidError": "L'objet est requis (150 caractères maximum).",
+      "bodyEmptyError": "Le message est vide.",
+      "bodyTooLongError": "Le message dépasse la longueur maximale autorisée.",
+      "notFoundError": "Événement introuvable.",
+      "genericError": "Une erreur est survenue. Veuillez réessayer."
     },
     "errors": {
       "notFound": "Événement introuvable",

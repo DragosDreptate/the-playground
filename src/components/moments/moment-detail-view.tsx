@@ -712,6 +712,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     <HostMessageDialog
                       momentId={moment.id}
                       momentTitle={moment.title}
+                      momentSlug={moment.slug}
+                      circleSlug={circle.slug}
                       registeredCount={registeredCount}
                       waitlistedCount={waitlistedCount}
                       lastHostMessageSentAt={
