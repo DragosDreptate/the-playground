@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { headers } from "next/headers";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -135,6 +136,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           auth_error_kind: classifyAuthError(code),
         },
       });
+    },
+  },
+  events: {
+    // Trace serveur de chaque sign-in réussi, avec user-agent : permet de
+    // distinguer un clic humain d'une détonation de scanner email (incident
+    // @interieur.gouv.fr — Users fantômes créés 6s après l'envoi du lien).
+    // Chaque clic sur un magic link réutilisable apparaît ici.
+    async signIn({ user, account, isNewUser }) {
+      try {
+        const headersList = await headers();
+        Sentry.captureMessage("auth:sign-in", {
+          level: "info",
+          tags: {
+            context: "auth",
+            provider: account?.provider ?? "unknown",
+            is_new_user: String(isNewUser ?? false),
+          },
+          extra: {
+            user_agent: headersList.get("user-agent") ?? "unknown",
+            referer: headersList.get("referer") ?? "unknown",
+            email_domain: user.email?.split("@")[1] ?? "unknown",
+          },
+        });
+      } catch {
+        // Observabilité uniquement — ne doit jamais bloquer le sign-in
+        // (headers() indisponible hors scope requête, Sentry down, etc.)
+      }
     },
   },
   callbacks: {
