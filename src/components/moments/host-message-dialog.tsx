@@ -200,6 +200,7 @@ export function HostMessageDialog({
             key={editorKey}
             id="host-message-body"
             placeholder={t("bodyPlaceholder")}
+            initialContent={bodyHtml}
             disabled={isPending}
             onChange={(html, textLength) => {
               setBodyHtml(html);

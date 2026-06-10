@@ -18,6 +18,8 @@ type Props = {
   id?: string;
   placeholder?: string;
   disabled?: boolean;
+  /** HTML restauré au montage (ex : réouverture d'une modale fermée par erreur). */
+  initialContent?: string;
   /** HTML + longueur du texte seul, à chaque frappe. */
   onChange: (html: string, textLength: number) => void;
   className?: string;
@@ -28,7 +30,14 @@ type Props = {
  * gras, italique, listes, lien. La sanitization ne se fait PAS ici
  * (client non fiable) — toujours côté serveur avant tout usage du HTML.
  */
-export function RichTextEditor({ id, placeholder, disabled, onChange, className }: Props) {
+export function RichTextEditor({
+  id,
+  placeholder,
+  disabled,
+  initialContent,
+  onChange,
+  className,
+}: Props) {
   const t = useTranslations("RichTextEditor");
   const [linkPopoverOpen, setLinkPopoverOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState("");
@@ -37,6 +46,7 @@ export function RichTextEditor({ id, placeholder, disabled, onChange, className 
 
   const editor = useEditor({
     immediatelyRender: false,
+    content: initialContent ?? "",
     extensions: [
       StarterKit.configure({
         heading: false,
