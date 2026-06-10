@@ -105,7 +105,8 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "border-input rounded-md border shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
+        // Focus neutre (bordure assombrie), sans le ring rose du design system
+        "border-input rounded-md border shadow-xs transition-colors focus-within:border-muted-foreground/40",
         disabled && "pointer-events-none opacity-50",
         className
       )}
