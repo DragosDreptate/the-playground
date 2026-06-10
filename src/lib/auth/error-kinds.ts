@@ -8,6 +8,24 @@ const EXPECTED_AUTH_ERROR_CODES = new Set([
   "AccessDenied",
 ]);
 
+// Codes Auth.js acceptés tels quels dans les tags/messages Sentry. Le param
+// ?error= étant contrôlable par l'utilisateur, tout le reste est rangé sous
+// "Unknown" pour borner la cardinalité (la valeur brute reste en extra).
+const KNOWN_AUTH_ERROR_CODES = new Set([
+  ...EXPECTED_AUTH_ERROR_CODES,
+  "Configuration",
+  "OAuthAccountNotLinked",
+  "OAuthCallbackError",
+  "OAuthSignInError",
+  "Default",
+]);
+
+export function normalizeAuthErrorCode(code: string | null | undefined): string {
+  if (!code) return "Unknown";
+  const normalized = code.split(":")[0]?.trim() ?? "";
+  return KNOWN_AUTH_ERROR_CODES.has(normalized) ? normalized : "Unknown";
+}
+
 /**
  * Range les codes d'erreur Auth.js en deux familles : ceux qu'on attend dans
  * les flows utilisateurs normaux (token expiré, prefetch scanner, refus OAuth)

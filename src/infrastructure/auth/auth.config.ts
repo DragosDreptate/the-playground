@@ -1,5 +1,4 @@
 import * as Sentry from "@sentry/nextjs";
-import { headers } from "next/headers";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
@@ -13,6 +12,8 @@ import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
 import { classifyAuthError } from "@/lib/auth/error-kinds";
+import { getRequestObservability } from "@/lib/auth/request-observability";
+import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
@@ -110,7 +111,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/auth/error",
   },
   logger: {
-    error(error) {
+    async error(error) {
       console.error("[AUTH ERROR]", error);
       const code = error?.name ?? "Unknown";
       const kind = classifyAuthError(code);
@@ -124,9 +125,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           error_code: code,
           auth_error_kind: kind,
         },
+        // Le user-agent distingue un token expiré détonné par un scanner
+        // email d'un vrai clic humain tardif (incident @interieur.gouv.fr).
+        extra: await getRequestObservability(),
       });
     },
-    warn(code) {
+    async warn(code) {
       console.warn("[AUTH WARN]", code);
       Sentry.captureMessage(`auth:${code}`, {
         level: "warning",
@@ -135,6 +139,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           error_code: code,
           auth_error_kind: classifyAuthError(code),
         },
+        extra: await getRequestObservability(),
       });
     },
   },
@@ -142,27 +147,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // Trace serveur de chaque sign-in réussi, avec user-agent : permet de
     // distinguer un clic humain d'une détonation de scanner email (incident
     // @interieur.gouv.fr — Users fantômes créés 6s après l'envoi du lien).
-    // Chaque clic sur un magic link réutilisable apparaît ici.
+    // Chaque clic sur un magic link réutilisable apparaît ici. Canal PostHog
+    // (pas Sentry) : c'est de la télémétrie steady-state, pas une anomalie.
     async signIn({ user, account, isNewUser }) {
-      try {
-        const headersList = await headers();
-        Sentry.captureMessage("auth:sign-in", {
-          level: "info",
-          tags: {
-            context: "auth",
-            provider: account?.provider ?? "unknown",
-            is_new_user: String(isNewUser ?? false),
-          },
-          extra: {
-            user_agent: headersList.get("user-agent") ?? "unknown",
-            referer: headersList.get("referer") ?? "unknown",
-            email_domain: user.email?.split("@")[1] ?? "unknown",
-          },
-        });
-      } catch {
-        // Observabilité uniquement — ne doit jamais bloquer le sign-in
-        // (headers() indisponible hors scope requête, Sentry down, etc.)
-      }
+      const requestContext = await getRequestObservability();
+      void captureServerEvent(user.id ?? user.email ?? "unknown", "auth_sign_in", {
+        ...requestContext,
+        provider: account?.provider ?? "unknown",
+        is_new_user: isNewUser ?? false,
+        email_domain: user.email?.split("@")[1] ?? "unknown",
+      });
     },
   },
   callbacks: {
