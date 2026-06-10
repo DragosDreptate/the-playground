@@ -131,7 +131,12 @@ export function HostMessageDialog({
 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{t("dialogTitle")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="bg-primary/10 border-primary/20 flex size-[34px] shrink-0 items-center justify-center rounded-[9px] border">
+              <Mail className="text-primary size-[18px]" />
+            </div>
+            {t("dialogTitle")}
+          </DialogTitle>
           <DialogDescription>
             {hasWaitlist
               ? t("dialogDescription", { momentTitle })
