@@ -701,22 +701,27 @@
     "empty": {
       "description": "Aucun événement pour le moment. Créez votre premier événement."
     },
-    "broadcast": {
-      "triggerButton": "Inviter ma communauté",
-      "alreadySent": "Invitation envoyée le {date}",
-      "dialogTitle": "Inviter ma communauté",
-      "dialogDescription": "Un email d'invitation sera envoyé aux membres de {circleName}.",
-      "customMessageLabel": "Message personnalisé (optionnel)",
-      "customMessagePlaceholder": "Ex : Ne manquez pas cet événement ! Places limitées.",
+    "hostMessage": {
+      "triggerButton": "Message aux participants",
+      "hint": "Envoyez un email aux inscrits de votre événement",
+      "writeButton": "Écrire",
+      "dialogTitle": "Message aux participants",
+      "dialogDescription": "Votre message sera envoyé par email aux participants de {momentTitle}.",
+      "dialogDescriptionNoWaitlist": "Votre message sera envoyé par email aux {count} inscrits de {momentTitle}.",
+      "toLabel": "À",
+      "segmentRegistered": "Inscrits",
+      "segmentWaitlisted": "Liste d'attente",
+      "segmentAll": "Tous",
+      "subjectLabel": "Objet",
+      "subjectPlaceholder": "Ex : Informations pratiques",
+      "bodyLabel": "Message",
+      "bodyPlaceholder": "Écrivez votre message…",
+      "softLimitWarning": "Vous avez déjà envoyé un message il y a moins de 24h. Évitez de solliciter trop souvent vos participants.",
       "sendButton": "Envoyer",
       "cancelButton": "Annuler",
       "sending": "Envoi en cours...",
-      "successToast": "Invitation envoyée à {count} personnes",
-      "alreadySentError": "L'invitation a déjà été envoyée",
-      "notHostError": "Seul l'organisateur peut inviter la communauté",
-      "hint": "Envoyez un email d'invitation à tous les membres",
-      "alreadySentShort": "Envoyée",
-      "cooldownHint": "Prochain envoi disponible dans {time}"
+      "successToast": "{count, plural, one {Message envoyé à # participant} other {Message envoyé à # participants}}",
+      "noRecipientsError": "Aucun destinataire pour cette audience"
     },
     "errors": {
       "notFound": "Événement introuvable",
@@ -1007,6 +1012,15 @@
       "dark": "Mode sombre"
     }
   },
+  "RichTextEditor": {
+    "bold": "Gras",
+    "italic": "Italique",
+    "bulletList": "Liste à puces",
+    "orderedList": "Liste numérotée",
+    "link": "Lien",
+    "linkPlaceholder": "https://exemple.com",
+    "linkApply": "Appliquer"
+  },
   "Email": {
     "coHostPromoted": {
       "subject": "Vous êtes co-organisateur de {circleName}",
@@ -1094,16 +1108,14 @@
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la communauté.",
       "ctaLabel": "Voir la communauté"
     },
-    "broadcastMoment": {
-      "subject": "Nouveau : {momentTitle}",
-      "preheader": "{circleName} vous invite à un événement",
-      "heading": "{circleName} vous invite",
-      "intro": "{hostName} partage un événement avec vous",
+    "momentHostMessage": {
+      "greeting": "Bonjour {firstName},",
+      "greetingFallback": "Bonjour,",
+      "preheader": "Message de {hostName} à propos de {momentTitle}",
       "dateLabel": "Date",
       "locationLabel": "Lieu",
       "ctaLabel": "Voir l'événement",
-      "unsubscribeText": "Vous recevez cet email car vous êtes membre de {circleName}.",
-      "unsubscribeLabel": "Gérer mes notifications"
+      "footer": "Vous recevez cet email car vous êtes inscrit à {momentTitle}."
     },
     "circleInvitation": {
       "subject": "{inviterName} vous invite à rejoindre {circleName}",
@@ -1808,7 +1820,7 @@
       },
       "contact": {
         "title": "Contacter vos participants",
-        "intro": "Depuis le tableau de bord de l'événement, le bouton <strong>Inviter ma communauté</strong> vous permet d'envoyer un email à l'ensemble des membres de votre communauté pour les inviter à l'événement. Vous pouvez personnaliser le message. Un même envoi ne peut être relancé qu'après 24 heures.",
+        "intro": "Depuis le tableau de bord de l'événement, le bloc <strong>Message aux participants</strong> vous permet d'écrire un email aux personnes inscrites : rappel pratique, changement de dernière minute, mot de remerciement après l'événement. Vous choisissez les destinataires (inscrits, liste d'attente ou tous), rédigez l'objet et le message avec une mise en forme simple, et chaque participant le reçoit avec une salutation personnalisée. Les réponses arrivent directement dans votre boîte email.",
         "inboundNote": "Les participants peuvent également vous envoyer un message privé via le lien « Contacter l'organisateur » affiché sur la page de l'événement ou de la communauté. Vous recevez ce message par email et pouvez répondre directement."
       },
       "editCancel": {
@@ -1850,7 +1862,7 @@
         "rightsIntro": "Un co-organisateur peut :",
         "right1": "Créer, éditer, publier et supprimer des événements",
         "right2": "Approuver ou rejeter les inscriptions et les demandes d'adhésion",
-        "right3": "Modifier les paramètres de la communauté et diffuser des messages aux membres",
+        "right3": "Modifier les paramètres de la communauté et écrire aux participants des événements",
         "right4": "Recevoir les mêmes notifications que vous (nouvelles inscriptions, commentaires, etc.)",
         "limitsIntro": "Seul le propriétaire peut :",
         "limit1": "Supprimer la communauté",

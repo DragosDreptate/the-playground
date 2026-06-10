@@ -11,6 +11,9 @@ export type RegistrationStatus =
 
 export type PaymentStatus = "NONE" | "PENDING" | "PAID" | "REFUNDED";
 
+/** Audience d'un message Organisateur → Participants d'un Moment. */
+export type HostMessageSegment = "REGISTERED" | "WAITLISTED" | "ALL";
+
 export type Registration = {
   id: string;
   momentId: string;

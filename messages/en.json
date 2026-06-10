@@ -701,22 +701,27 @@
     "empty": {
       "description": "No Events yet. Create your first event."
     },
-    "broadcast": {
-      "triggerButton": "Invite my community",
-      "alreadySent": "Invited on {date}",
-      "dialogTitle": "Invite my community",
-      "dialogDescription": "An invitation email will be sent to the members of {circleName}.",
-      "customMessageLabel": "Custom message (optional)",
-      "customMessagePlaceholder": "E.g. Don't miss this event! Limited spots available.",
+    "hostMessage": {
+      "triggerButton": "Message to attendees",
+      "hint": "Send an email to the people registered for your event",
+      "writeButton": "Write",
+      "dialogTitle": "Message to attendees",
+      "dialogDescription": "Your message will be sent by email to the attendees of {momentTitle}.",
+      "dialogDescriptionNoWaitlist": "Your message will be sent by email to the {count} registered attendees of {momentTitle}.",
+      "toLabel": "To",
+      "segmentRegistered": "Registered",
+      "segmentWaitlisted": "Waitlist",
+      "segmentAll": "All",
+      "subjectLabel": "Subject",
+      "subjectPlaceholder": "E.g. Practical information",
+      "bodyLabel": "Message",
+      "bodyPlaceholder": "Write your message…",
+      "softLimitWarning": "You already sent a message less than 24 hours ago. Avoid messaging your attendees too often.",
       "sendButton": "Send",
       "cancelButton": "Cancel",
       "sending": "Sending...",
-      "successToast": "Invitation sent to {count} people",
-      "alreadySentError": "The invitation has already been sent",
-      "notHostError": "Only the organizer can invite the community",
-      "hint": "Send an invitation email to all members",
-      "alreadySentShort": "Sent",
-      "cooldownHint": "Next send available in {time}"
+      "successToast": "{count, plural, one {Message sent to # attendee} other {Message sent to # attendees}}",
+      "noRecipientsError": "No recipients for this audience"
     },
     "errors": {
       "notFound": "Event not found",
@@ -1007,6 +1012,15 @@
       "dark": "Dark mode"
     }
   },
+  "RichTextEditor": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "bulletList": "Bullet list",
+    "orderedList": "Numbered list",
+    "link": "Link",
+    "linkPlaceholder": "https://example.com",
+    "linkApply": "Apply"
+  },
   "Email": {
     "coHostPromoted": {
       "subject": "You're a co-organizer of {circleName}",
@@ -1094,16 +1108,14 @@
       "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the community.",
       "ctaLabel": "View community"
     },
-    "broadcastMoment": {
-      "subject": "New event: {momentTitle}",
-      "preheader": "{circleName} invites you to an event",
-      "heading": "{circleName} invites you",
-      "intro": "{hostName} is sharing an event with you",
+    "momentHostMessage": {
+      "greeting": "Hi {firstName},",
+      "greetingFallback": "Hi,",
+      "preheader": "Message from {hostName} about {momentTitle}",
       "dateLabel": "Date",
       "locationLabel": "Location",
       "ctaLabel": "View event",
-      "unsubscribeText": "You're receiving this email because you are a member of {circleName}.",
-      "unsubscribeLabel": "Manage notifications"
+      "footer": "You're receiving this email because you are registered for {momentTitle}."
     },
     "circleInvitation": {
       "subject": "{inviterName} invited you to join {circleName}",
@@ -1808,7 +1820,7 @@
       },
       "contact": {
         "title": "Contact your members",
-        "intro": "From the event dashboard, the <strong>Invite my community</strong> button lets you send an email to all community members to invite them to the event. You can personalize the message. The same broadcast can only be resent after 24 hours.",
+        "intro": "From the event dashboard, the <strong>Message to attendees</strong> block lets you email the people registered for your event: practical reminders, last-minute changes, or a thank-you note after the event. You pick the audience (registered, waitlist or all), write the subject and message with simple formatting, and each attendee receives it with a personalized greeting. Replies land directly in your inbox.",
         "inboundNote": "Members can also send you a private message via the \"Contact the organizer\" link shown on the event or community page. You receive this message by email and can reply directly."
       },
       "editCancel": {
@@ -1850,7 +1862,7 @@
         "rightsIntro": "A co-organizer can:",
         "right1": "Create, edit, publish and delete events",
         "right2": "Approve or reject registrations and membership requests",
-        "right3": "Update community settings and broadcast messages to members",
+        "right3": "Update community settings and message event attendees",
         "right4": "Receive the same notifications you do (new registrations, comments, etc.)",
         "limitsIntro": "Only the owner can:",
         "limit1": "Delete the community",

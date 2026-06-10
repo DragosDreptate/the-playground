@@ -181,26 +181,34 @@ export type MomentCancelledEmailData = {
   };
 };
 
-export type BroadcastMomentEmailData = {
+export type MomentHostMessageEmailData = {
   to: string;
+  recipientFirstName: string | null;
+  /** Email de l'Organisateur — les réponses lui arrivent directement. */
+  replyTo: string;
+  /** Nom affiché de l'Organisateur (from + tête de l'email). */
+  hostName: string;
+  hostAvatarUrl: string | null;
+  /** Objet saisi par l'Organisateur, tel quel. */
+  subject: string;
+  /** Corps HTML déjà sanitizé côté action (allowlist stricte). */
+  bodyHtml: string;
   strings: {
-    subject: string;
+    /** Template de salutation avec placeholder {firstName}. */
+    greeting: string;
+    /** Salutation quand le prénom est absent. */
+    greetingFallback: string;
     preheader: string;
-    heading: string;
-    intro: string;
-    customMessage?: string;
     dateLabel: string;
     locationLabel: string;
     ctaLabel: string;
-    unsubscribeText: string;
-    unsubscribeLabel: string;
+    footer: string;
   };
   momentTitle: string;
   momentDate: string;
   momentDateMonth: string;
   momentDateDay: string;
   momentLocation: string | null;
-  circleName: string;
   momentSlug: string;
   appUrl: string;
 };
@@ -249,8 +257,11 @@ export type CircleInvitationsBatchEmailData = Omit<CircleInvitationEmailData, "t
   recipients: string[];
 };
 
-export type BroadcastMomentsBatchEmailData = Omit<BroadcastMomentEmailData, "to"> & {
-  recipients: string[];
+export type MomentHostMessagesBatchEmailData = Omit<
+  MomentHostMessageEmailData,
+  "to" | "recipientFirstName"
+> & {
+  recipients: Array<{ to: string; firstName: string | null }>;
 };
 
 export type NewMomentMembersEmailData = Omit<NewMomentMemberEmailData, "to" | "recipientName"> & {
@@ -511,7 +522,7 @@ export interface EmailService {
   sendMomentCancelled(data: MomentCancelledEmailData): Promise<void>;
   sendMomentCancelledBatch(data: MomentCancelledBatchEmailData): Promise<void>;
   sendHostMomentCreated(data: HostMomentCreatedEmailData): Promise<void>;
-  sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void>;
+  sendMomentHostMessages(data: MomentHostMessagesBatchEmailData): Promise<void>;
   sendAdminEntityCreated(data: AdminEntityCreatedEmailData): Promise<void>;
   sendAdminMomentUpdated(data: AdminMomentUpdatedEmailData): Promise<void>;
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;

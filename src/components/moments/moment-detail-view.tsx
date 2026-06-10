@@ -3,7 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
-import { BroadcastMomentDialog } from "@/components/moments/broadcast-moment-dialog";
+import { HostMessageDialog } from "@/components/moments/host-message-dialog";
 import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
 import { PendingRegistrationsList } from "@/components/circles/pending-requests-list";
@@ -698,7 +698,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 </div>
               )}
 
-              {moment.status !== "PAST" && moment.status !== "CANCELLED" && (
+              {moment.status !== "DRAFT" && (
                 <>
                   <div className="border-border ml-11 border-t" />
                   <div className="flex items-center gap-3 py-3">
@@ -706,14 +706,17 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                       <Mail className="size-[15px]" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium">{t("broadcast.triggerButton")}</p>
-                      <p className="text-muted-foreground text-xs">{t("broadcast.hint")}</p>
+                      <p className="text-[13px] font-medium">{t("hostMessage.triggerButton")}</p>
+                      <p className="text-muted-foreground text-xs">{t("hostMessage.hint")}</p>
                     </div>
-                    <BroadcastMomentDialog
+                    <HostMessageDialog
                       momentId={moment.id}
-                      circleId={circle.id}
-                      circleName={circle.name}
-                      broadcastSentAt={moment.broadcastSentAt?.toISOString() ?? null}
+                      momentTitle={moment.title}
+                      registeredCount={registeredCount}
+                      waitlistedCount={waitlistedCount}
+                      lastHostMessageSentAt={
+                        moment.lastHostMessageSentAt?.toISOString() ?? null
+                      }
                     />
                   </div>
                 </>

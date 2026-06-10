@@ -13,7 +13,7 @@ import type {
   MomentCancelledEmailData,
   MomentCancelledBatchEmailData,
   HostMomentCreatedEmailData,
-  BroadcastMomentsBatchEmailData,
+  MomentHostMessagesBatchEmailData,
   AdminEntityCreatedEmailData,
   AdminMomentUpdatedEmailData,
   CircleInvitationEmailData,
@@ -37,7 +37,7 @@ import { NewMomentNotificationEmail } from "./templates/new-moment-notification"
 import { MomentUpdateEmail } from "./templates/moment-update";
 import { MomentCancelledEmail } from "./templates/moment-cancelled";
 import { HostMomentCreatedEmail } from "./templates/host-moment-created";
-import { BroadcastMomentEmail } from "./templates/broadcast-moment";
+import { MomentHostMessageEmail } from "./templates/moment-host-message";
 import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
 import { AdminMomentUpdatedEmail } from "./templates/admin-moment-updated";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
@@ -290,14 +290,27 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void> {
+    async sendMomentHostMessages(
+      data: MomentHostMessagesBatchEmailData
+    ): Promise<void> {
       const { recipients, ...emailData } = data;
+      // From personnalisé : nom de l'Organisateur, adresse plateforme (DKIM).
+      const senderAddress = from.match(/<(.+)>/)?.[1] ?? from;
+      const personalizedFrom = `${emailData.hostName} via The Playground <${senderAddress}>`;
       await sendBatch(
-        recipients.map((to) => ({
-          from,
+        recipients.map(({ to, firstName }) => ({
+          from: personalizedFrom,
           to,
-          subject: emailData.strings.subject,
-          react: BroadcastMomentEmail({ ...emailData, to }),
+          replyTo: emailData.replyTo,
+          subject: emailData.subject,
+          react: MomentHostMessageEmail({
+            ...emailData,
+            to,
+            recipientFirstName: firstName,
+            greeting: firstName
+              ? emailData.strings.greeting.replace("{firstName}", firstName)
+              : emailData.strings.greetingFallback,
+          }),
         }))
       );
     },
