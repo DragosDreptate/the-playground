@@ -78,7 +78,12 @@ export function EmbedSnippetDialog({ momentSlug, momentTitle, appUrl }: Props) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader className="gap-3">
-          <DialogTitle>{t("dashboardTitle")}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2.5">
+            <div className="bg-primary/10 border-primary/20 flex size-[34px] shrink-0 items-center justify-center rounded-[9px] border">
+              <Code className="text-primary size-[18px]" />
+            </div>
+            {t("dashboardTitle")}
+          </DialogTitle>
           <DialogDescription>{t("dashboardNote")}</DialogDescription>
         </DialogHeader>
 
