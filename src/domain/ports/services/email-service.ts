@@ -185,8 +185,10 @@ export type MomentHostMessageEmailData = {
   to: string;
   /** Email de l'Organisateur — les réponses lui arrivent directement. */
   replyTo: string;
-  /** Nom affiché de l'Organisateur (from + tête de l'email). */
+  /** Nom complet affiché de l'Organisateur (tête de l'email, preheader). */
   hostName: string;
+  /** Prénom seul pour le From (« Dragos via The Playground ») — null si inconnu. */
+  hostFirstName: string | null;
   hostAvatarUrl: string | null;
   /** Objet saisi par l'Organisateur, tel quel. */
   subject: string;
