@@ -6,12 +6,6 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Github, Loader2, Mail } from "lucide-react";
 import {
   signInWithGitHub,
@@ -50,27 +44,12 @@ function SubmitButton({
   );
 }
 
-function DisabledOAuthButton({
-  label,
-  icon,
-  tooltip,
-}: {
-  label: string;
-  icon: ReactNode;
-  tooltip: string;
-}) {
+function DisabledOAuthButton({ label, icon }: { label: string; icon: ReactNode }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button variant="outline" className="w-full opacity-50 cursor-not-allowed" type="button" disabled>
-          {icon}
-          {label}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-64 text-center">
-        <p>{tooltip}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Button variant="outline" className="w-full opacity-50 cursor-not-allowed" type="button" disabled>
+      {icon}
+      {label}
+    </Button>
   );
 }
 
@@ -92,8 +71,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
   }, []);
 
   return (
-    <TooltipProvider>
-      <div className="space-y-4">
+    <div className="space-y-4">
         {error && (
           <div
             role="alert"
@@ -114,16 +92,8 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
 
         {webview ? (
           <>
-            <DisabledOAuthButton
-              label={t("signIn.google")}
-              icon={<GoogleIcon />}
-              tooltip={t("signIn.webviewTooltip")}
-            />
-            <DisabledOAuthButton
-              label={t("signIn.github")}
-              icon={<Github className="size-4" />}
-              tooltip={t("signIn.webviewTooltip")}
-            />
+            <DisabledOAuthButton label={t("signIn.google")} icon={<GoogleIcon />} />
+            <DisabledOAuthButton label={t("signIn.github")} icon={<Github className="size-4" />} />
           </>
         ) : (
           <>
@@ -163,7 +133,6 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           )}
           <SubmitButton label={t("signIn.magicLink")} />
         </form>
-      </div>
-    </TooltipProvider>
+    </div>
   );
 }
