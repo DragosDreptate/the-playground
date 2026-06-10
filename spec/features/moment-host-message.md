@@ -96,9 +96,17 @@ Session, `isAdminInHostMode`, validation des entrées (longueurs, segment), **sa
 
 ### Modèle de données
 
-- `Moment.broadcastSentAt` → remplacé par `Moment.lastHostMessageSentAt` (`DateTime?`). Perte de l'ancienne valeur acceptée (elle traçait une feature supprimée).
+- `Moment.broadcastSentAt` → remplacé par `Moment.lastHostMessageSentAt` (`DateTime?`). Perte de l'ancienne valeur acceptée (elle traçait une feature supprimée) ; on ne copie pas les valeurs (un broadcast d'invitation récent ne doit pas armer l'avertissement 24h de la nouvelle feature).
 - `MomentRepository.markBroadcastSent` → `markHostMessageSent`.
-- Push schema sur dev **et** prod (`pnpm db:push` + `pnpm db:push:prod`).
+
+#### Migration DB — séquence additive, PAS de `db:push` (arbitrée 2026-06-10)
+
+Un rename de colonne via `db push` = DROP + ADD : il casserait l'ancien code prod encore en route (lecture de `broadcastSentAt`) et le CI e2e des autres branches (dérivé de la DB dev). Séquence retenue :
+
+1. **Dev** : les deux colonnes coexistent (`lastHostMessageSentAt` ajoutée en SQL direct le 2026-06-10, `broadcastSentAt` conservée pour le CI des autres branches). Aucun `db:push` dev depuis cette branche — jamais répondre `--accept-data-loss`.
+2. **Avant le merge** : `ALTER TABLE "moments" ADD COLUMN IF NOT EXISTS "lastHostMessageSentAt" TIMESTAMP(3)` en SQL direct sur **prod** (additif, zéro downtime : l'ancien code continue de lire `broadcastSentAt`).
+3. Merge → déploiement Vercel du nouveau code (lit `lastHostMessageSentAt`).
+4. **Nettoyage différé** après déploiement vérifié : `DROP COLUMN "broadcastSentAt"` sur prod ; sur dev, seulement quand plus aucune branche ouverte n'en dépend. Puis supprimer la mémoire projet `project_dev_column_conflict_broadcast.md`.
 
 ### UI (`src/components/moments/host-message-dialog.tsx`)
 
