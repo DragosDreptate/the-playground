@@ -44,7 +44,7 @@ import {
   createMockRegistrationRepository,
   makeRegistration,
 } from "../helpers/mock-registration-repository";
-import { createMockUserRepository } from "../helpers/mock-user-repository";
+import { createMockUserRepository, makeUser } from "../helpers/mock-user-repository";
 import { createMockPaymentService } from "../helpers/mock-payment-service";
 import { createMockEmailService } from "../helpers/mock-email-service";
 
@@ -410,7 +410,9 @@ describe("CO_HOST security — message aux participants", () => {
           },
         ]),
       }),
-      userRepository: createMockUserRepository(),
+      userRepository: createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser()),
+      }),
       emailService: createMockEmailService(),
       emailStrings: {
         greeting: "Bonjour {firstName},",

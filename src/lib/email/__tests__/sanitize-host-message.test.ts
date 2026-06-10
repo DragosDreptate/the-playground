@@ -23,7 +23,8 @@ describe("sanitizeHostMessageHtml", () => {
       const result = sanitizeHostMessageHtml('<p><a href="https://example.com">infos</a></p>');
 
       expect(result).toContain('href="https://example.com"');
-      expect(result).toContain("color: #ec4899");
+      // sanitize-html normalise le style inline (espaces et ; final retirés)
+      expect(result).toContain("color:#ec4899");
       expect(result).toContain('rel="noopener noreferrer"');
     });
   });
