@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { classifyAuthError } from "@/lib/auth/error-kinds";
+import { classifyAuthError, normalizeAuthErrorCode } from "@/lib/auth/error-kinds";
 
 describe("classifyAuthError", () => {
   describe("given a code that occurs in normal user flows", () => {
@@ -33,6 +33,47 @@ describe("classifyAuthError", () => {
       expect(classifyAuthError("Verification: token expired")).toBe(
         "expected_user_flow"
       );
+    });
+  });
+});
+
+describe("normalizeAuthErrorCode", () => {
+  describe("given a known Auth.js error code", () => {
+    it.each([
+      "Verification",
+      "AccessDenied",
+      "UnknownAction",
+      "Configuration",
+      "OAuthAccountNotLinked",
+      "OAuthCallbackError",
+      "OAuthSignInError",
+      "Default",
+    ])("should keep %s as-is", (code) => {
+      expect(normalizeAuthErrorCode(code)).toBe(code);
+    });
+
+    it("should strip extra information after the colon", () => {
+      expect(normalizeAuthErrorCode("Verification: token expired")).toBe(
+        "Verification"
+      );
+    });
+  });
+
+  describe("given a user-controlled or unset value", () => {
+    it.each([
+      "CredentialsSignin",
+      "<script>alert(1)</script>",
+      "x".repeat(300),
+    ])("should bucket %s under Unknown to bound Sentry tag cardinality", (code) => {
+      expect(normalizeAuthErrorCode(code)).toBe("Unknown");
+    });
+
+    it("should return Unknown for null", () => {
+      expect(normalizeAuthErrorCode(null)).toBe("Unknown");
+    });
+
+    it("should return Unknown for undefined", () => {
+      expect(normalizeAuthErrorCode(undefined)).toBe("Unknown");
     });
   });
 });
