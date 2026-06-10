@@ -151,6 +151,7 @@ export function RichTextEditor({
               type="button"
               variant="ghost"
               size="sm"
+              tabIndex={-1}
               aria-label={t("link")}
               title={t("link")}
               className={cn(
@@ -195,6 +196,7 @@ export function RichTextEditor({
                 type="button"
                 variant="ghost"
                 size="sm"
+                tabIndex={-1}
                 disabled={!editor}
                 title={token.label}
                 className="h-7 gap-1 px-1.5 text-xs font-medium"
@@ -240,6 +242,9 @@ function ToolbarButton({
       type="button"
       variant="ghost"
       size="sm"
+      // Hors de l'ordre de tabulation : Tab passe du champ précédent
+      // directement à la zone de saisie, sans traverser la toolbar.
+      tabIndex={-1}
       disabled={!editor}
       aria-label={label}
       aria-pressed={active}
