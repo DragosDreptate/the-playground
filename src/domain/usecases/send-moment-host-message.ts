@@ -166,6 +166,7 @@ export async function sendMomentHostMessage(
     })),
     replyTo: sender.email,
     hostName,
+    hostFirstName: sender.firstName,
     hostAvatarUrl: sender.image ?? null,
     subject,
     bodyHtml: input.bodyHtml,

@@ -311,9 +311,10 @@ export function createResendEmailService(): EmailService {
       data: MomentHostMessagesBatchEmailData
     ): Promise<void> {
       const { recipients, ...emailData } = data;
-      // From personnalisé : nom de l'Organisateur, adresse plateforme (DKIM).
+      // From personnalisé : prénom de l'Organisateur (fallback nom affiché),
+      // adresse plateforme (DKIM).
       const personalizedFrom = formatFromWithDisplayName(
-        `${emailData.hostName} via The Playground`,
+        `${emailData.hostFirstName ?? emailData.hostName} via The Playground`,
         from
       );
       await sendBatch(

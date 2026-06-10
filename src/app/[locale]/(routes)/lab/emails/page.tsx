@@ -323,6 +323,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         to: "alice@example.com",
         replyTo: "bob@example.com",
         hostName: "Bob Dupont",
+        hostFirstName: "Bob",
         hostAvatarUrl: null,
         subject: "Changement de salle pour vendredi",
         // Placeholder {prénom} déjà résolu par destinataire (ici : Alice)
