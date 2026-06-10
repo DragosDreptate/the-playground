@@ -22,6 +22,7 @@ import { promoteToCoHost } from "@/domain/usecases/promote-to-co-host";
 import { demoteFromCoHost } from "@/domain/usecases/demote-from-co-host";
 import { approveMomentRegistration } from "@/domain/usecases/approve-moment-registration";
 import { updateCircle } from "@/domain/usecases/update-circle";
+import { sendMomentHostMessage } from "@/domain/usecases/send-moment-host-message";
 
 import {
   UnauthorizedCircleActionError,
@@ -43,8 +44,9 @@ import {
   createMockRegistrationRepository,
   makeRegistration,
 } from "../helpers/mock-registration-repository";
-import { createMockUserRepository } from "../helpers/mock-user-repository";
+import { createMockUserRepository, makeUser } from "../helpers/mock-user-repository";
 import { createMockPaymentService } from "../helpers/mock-payment-service";
+import { createMockEmailService } from "../helpers/mock-email-service";
 
 const CIRCLE_ID = "circle-1";
 const MOMENT_ID = "moment-1";
@@ -376,6 +378,104 @@ describe("CO_HOST security — transition de rôle", () => {
           registrationRepository: createMockRegistrationRepository(),
         }
       )
+    ).rejects.toThrow(UnauthorizedMomentActionError);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────
+// Message Organisateur → Participants (issue #515)
+// ─────────────────────────────────────────────────────────────
+
+describe("CO_HOST security — message aux participants", () => {
+  function makeHostMessageDeps(membership: ReturnType<typeof makeMembership> | null) {
+    return {
+      momentRepository: createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(makeMoment({ id: MOMENT_ID })),
+      }),
+      circleRepository: createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(membership),
+      }),
+      registrationRepository: createMockRegistrationRepository({
+        findActiveWithUserByMomentId: vi.fn().mockResolvedValue([
+          {
+            ...makeRegistration({ userId: PLAYER_ID, momentId: MOMENT_ID }),
+            user: {
+              id: PLAYER_ID,
+              firstName: "Player",
+              lastName: "One",
+              email: "player@example.com",
+              image: null,
+              publicId: null,
+            },
+          },
+        ]),
+      }),
+      userRepository: createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser()),
+      }),
+      emailService: createMockEmailService(),
+      emailStrings: {
+        greeting: "Bonjour {firstName},",
+        greetingFallback: "Bonjour,",
+        preheader: "p",
+        dateLabel: "Date",
+        locationLabel: "Lieu",
+        ctaLabel: "Voir",
+        footer: "f",
+      },
+      buildEmailContext: () => ({
+        momentDate: "d",
+        momentDateMonth: "M",
+        momentDateDay: "1",
+        momentLocation: null,
+      }),
+      appUrl: "https://the-playground.fr",
+    };
+  }
+
+  const input = {
+    momentId: MOMENT_ID,
+    segment: "REGISTERED" as const,
+    subject: "Objet",
+    bodyHtml: "<p>corps</p>",
+    bodyTextLength: 5,
+  };
+
+  it("should allow a CO_HOST ACTIVE to message the participants", async () => {
+    const deps = makeHostMessageDeps(
+      makeMembership({ userId: CO_HOST_ID, role: "CO_HOST", status: "ACTIVE" })
+    );
+
+    await expect(
+      sendMomentHostMessage({ ...input, senderId: CO_HOST_ID }, deps)
+    ).resolves.toMatchObject({ recipientCount: 1 });
+  });
+
+  it("should reject a PLAYER ACTIVE", async () => {
+    const deps = makeHostMessageDeps(
+      makeMembership({ userId: PLAYER_ID, role: "PLAYER", status: "ACTIVE" })
+    );
+
+    await expect(
+      sendMomentHostMessage({ ...input, senderId: PLAYER_ID }, deps)
+    ).rejects.toThrow(UnauthorizedMomentActionError);
+  });
+
+  it("should reject a CO_HOST with PENDING status (D17)", async () => {
+    const deps = makeHostMessageDeps(
+      makeMembership({ userId: CO_HOST_ID, role: "CO_HOST", status: "PENDING" })
+    );
+
+    await expect(
+      sendMomentHostMessage({ ...input, senderId: CO_HOST_ID }, deps)
+    ).rejects.toThrow(UnauthorizedMomentActionError);
+  });
+
+  it("should reject a non-member of the Circle", async () => {
+    const deps = makeHostMessageDeps(null);
+
+    await expect(
+      sendMomentHostMessage({ ...input, senderId: "stranger-user" }, deps)
     ).rejects.toThrow(UnauthorizedMomentActionError);
   });
 });

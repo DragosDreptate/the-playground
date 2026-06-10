@@ -49,7 +49,7 @@ export type Moment = {
   status: MomentStatus;
   refundable: boolean;
   requiresApproval: boolean;
-  broadcastSentAt: Date | null;
+  lastHostMessageSentAt: Date | null;
   reminder24hSentAt: Date | null;
   createdAt: Date;
   updatedAt: Date;

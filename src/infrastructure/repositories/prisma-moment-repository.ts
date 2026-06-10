@@ -43,7 +43,7 @@ function toDomainMoment(record: PrismaMoment): Moment {
     status: record.status,
     refundable: record.refundable,
     requiresApproval: record.requiresApproval,
-    broadcastSentAt: record.broadcastSentAt,
+    lastHostMessageSentAt: record.lastHostMessageSentAt,
     reminder24hSentAt: record.reminder24hSentAt,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
@@ -383,10 +383,10 @@ export const prismaMomentRepository: MomentRepository = {
     return { upcoming, past };
   },
 
-  async markBroadcastSent(momentId: string): Promise<void> {
+  async markHostMessageSent(momentId: string): Promise<void> {
     await prisma.moment.update({
       where: { id: momentId },
-      data: { broadcastSentAt: new Date() },
+      data: { lastHostMessageSentAt: new Date() },
     });
   },
 

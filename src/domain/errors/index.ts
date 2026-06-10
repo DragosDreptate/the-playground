@@ -67,3 +67,10 @@ export {
   ContactHostsRateLimitedError,
   SenderEmailMissingError,
 } from "./contact-errors";
+export {
+  HostMessageSubjectInvalidError,
+  HostMessageBodyEmptyError,
+  HostMessageBodyTooLongError,
+  HostMessageNotAllowedOnDraftError,
+  HostMessageNoRecipientsError,
+} from "./host-message-errors";

@@ -11,7 +11,7 @@ import { HostContactMessageEmail } from "@/infrastructure/services/email/templat
 import { MomentUpdateEmail } from "@/infrastructure/services/email/templates/moment-update";
 import { MomentCancelledEmail } from "@/infrastructure/services/email/templates/moment-cancelled";
 import { NewMomentNotificationEmail } from "@/infrastructure/services/email/templates/new-moment-notification";
-import { BroadcastMomentEmail } from "@/infrastructure/services/email/templates/broadcast-moment";
+import { MomentHostMessageEmail } from "@/infrastructure/services/email/templates/moment-host-message";
 import { CircleInvitationEmail } from "@/infrastructure/services/email/templates/circle-invitation";
 import { AdminEntityCreatedEmail } from "@/infrastructure/services/email/templates/admin-entity-created";
 import { AdminMomentUpdatedEmail } from "@/infrastructure/services/email/templates/admin-moment-updated";
@@ -316,30 +316,33 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
       }),
     },
     {
-      id: "broadcast-moment",
-      label: "Diffusion événement (broadcast)",
-      subject: "Nouveau : Soirée JS & Pizza",
-      element: BroadcastMomentEmail({
+      id: "moment-host-message",
+      label: "Message de l'Organisateur aux participants",
+      subject: "Changement de salle pour vendredi",
+      element: MomentHostMessageEmail({
         to: "alice@example.com",
+        greeting: "Bonjour Alice,",
+        replyTo: "bob@example.com",
+        hostName: "Bob Dupont",
+        hostAvatarUrl: null,
+        subject: "Changement de salle pour vendredi",
+        bodyHtml:
+          "<p>Petit changement pour vendredi : nous serons finalement dans la <strong>salle Horizon, au 2e étage</strong> (même adresse).</p><ul><li>Accueil dès 18h30</li><li>Début des talks à 19h</li></ul><p>À vendredi !</p>",
         momentTitle: "Soirée JS & Pizza",
         momentDate: "vendredi 21 mars 2026, 19:00",
         momentDateMonth: "MAR",
         momentDateDay: "21",
         momentLocation: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
         momentSlug: "soiree-js-pizza",
         appUrl: BASE_URL,
         strings: {
-          subject: "Nouveau : Soirée JS & Pizza",
-          preheader: "Paris Creative Tech vous invite à un événement",
-          heading: "Paris Creative Tech vous invite",
-          intro: "Bob Dupont partage un événement avec vous",
-          customMessage: "Cet événement est spécial — venez nombreux, on a prévu des surprises 🎉",
+          greeting: "Bonjour {firstName},",
+          greetingFallback: "Bonjour,",
+          preheader: "Message de Bob Dupont à propos de Soirée JS & Pizza",
           dateLabel: "Date",
           locationLabel: "Lieu",
           ctaLabel: "Voir l'événement",
-          unsubscribeText: "Vous recevez cet email car vous êtes membre de Paris Creative Tech.",
-          unsubscribeLabel: "Gérer mes notifications",
+          footer: "Vous recevez cet email car vous êtes inscrit à Soirée JS & Pizza.",
         },
       }),
     },

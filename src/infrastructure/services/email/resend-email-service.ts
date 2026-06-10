@@ -13,7 +13,7 @@ import type {
   MomentCancelledEmailData,
   MomentCancelledBatchEmailData,
   HostMomentCreatedEmailData,
-  BroadcastMomentsBatchEmailData,
+  MomentHostMessagesBatchEmailData,
   AdminEntityCreatedEmailData,
   AdminMomentUpdatedEmailData,
   CircleInvitationEmailData,
@@ -37,7 +37,7 @@ import { NewMomentNotificationEmail } from "./templates/new-moment-notification"
 import { MomentUpdateEmail } from "./templates/moment-update";
 import { MomentCancelledEmail } from "./templates/moment-cancelled";
 import { HostMomentCreatedEmail } from "./templates/host-moment-created";
-import { BroadcastMomentEmail } from "./templates/broadcast-moment";
+import { MomentHostMessageEmail } from "./templates/moment-host-message";
 import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
 import { AdminMomentUpdatedEmail } from "./templates/admin-moment-updated";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
@@ -75,6 +75,22 @@ export function getOnboardingSender(): string {
     process.env.ONBOARDING_EMAIL_FROM ||
     "Dragos · The Playground <dragos@the-playground.fr>"
   );
+}
+
+/**
+ * Construit un header From valide RFC 5322 à partir d'un display-name
+ * contenant des données utilisateur (nom de l'Organisateur). Le nom est mis
+ * en quoted-string (" et \ échappés) : sans ça, un nom contenant une virgule,
+ * des guillemets ou une adresse email (fallback de getDisplayName) produit un
+ * header malformé que Resend peut rejeter pour tout le batch.
+ */
+export function formatFromWithDisplayName(
+  displayName: string,
+  senderString: string
+): string {
+  const address = senderString.match(/<([^<>]+)>$/)?.[1] ?? senderString;
+  const quoted = `"${displayName.replace(/[\\"]/g, "\\$&")}"`;
+  return `${quoted} <${address}>`;
 }
 
 // Contenu centralisé — re-exporté pour le script de backfill one-shot.
@@ -290,14 +306,29 @@ export function createResendEmailService(): EmailService {
       });
     },
 
-    async sendBroadcastMoments(data: BroadcastMomentsBatchEmailData): Promise<void> {
+    async sendMomentHostMessages(
+      data: MomentHostMessagesBatchEmailData
+    ): Promise<void> {
       const { recipients, ...emailData } = data;
+      // From personnalisé : nom de l'Organisateur, adresse plateforme (DKIM).
+      const personalizedFrom = formatFromWithDisplayName(
+        `${emailData.hostName} via The Playground`,
+        from
+      );
       await sendBatch(
-        recipients.map((to) => ({
-          from,
+        recipients.map(({ to, firstName }) => ({
+          from: personalizedFrom,
           to,
-          subject: emailData.strings.subject,
-          react: BroadcastMomentEmail({ ...emailData, to }),
+          replyTo: emailData.replyTo,
+          subject: emailData.subject,
+          react: MomentHostMessageEmail({
+            ...emailData,
+            to,
+            // Forme fonction : neutralise les motifs $ de String.replace dans un prénom.
+            greeting: firstName
+              ? emailData.strings.greeting.replace("{firstName}", () => firstName)
+              : emailData.strings.greetingFallback,
+          }),
         }))
       );
     },

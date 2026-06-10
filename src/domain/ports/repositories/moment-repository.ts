@@ -124,8 +124,8 @@ export interface MomentRepository {
    * Upcoming : status PUBLISHED. Past : status PAST.
    */
   findAllByHostUserId(hostUserId: string): Promise<{ upcoming: HostMomentSummary[]; past: HostMomentSummary[] }>;
-  /** Marque un Moment comme ayant été diffusé (broadcast email envoyé). */
-  markBroadcastSent(momentId: string): Promise<void>;
+  /** Marque la date du dernier message Organisateur envoyé aux participants. */
+  markHostMessageSent(momentId: string): Promise<void>;
   /** Événements PUBLISHED dont le rappel 24h n'a pas encore été envoyé, démarrant dans la fenêtre donnée. */
   findMomentsNeedingReminder(windowStart: Date, windowEnd: Date): Promise<MomentForReminder[]>;
   /** Marque un Moment comme ayant reçu son rappel 24h. */

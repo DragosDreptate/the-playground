@@ -248,7 +248,7 @@ model Moment {
   status                MomentStatus @default(PUBLISHED)
   refundable            Boolean      @default(true)
   requiresApproval     Boolean      @default(false) @map("requires_approval")
-  broadcastSentAt       DateTime?
+  lastHostMessageSentAt DateTime?
   reminder24hSentAt     DateTime?
 
   // Explorer scoring
