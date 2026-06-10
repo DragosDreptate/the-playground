@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Message aux participants (issue #515)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #e8457a;
+  --primary-foreground: #ffffff;
+  --background: #f5f5fa;
+  --foreground: #1a1b2e;
+  --card: #ffffff;
+  --card-foreground: #1a1b2e;
+  --muted: #f0eff7;
+  --muted-foreground: #6b6f87;
+  --border: #e3e3ec;
+  --input: #e3e3ec;
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(26, 27, 46, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26, 27, 46, 0.08), 0 2px 4px -2px rgba(26, 27, 46, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(26,27,46,0.10), 0 4px 6px -4px rgba(26,27,46,0.07);
+}
+html.dark {
+  --background: #1a1b2e;
+  --foreground: #f0f0f5;
+  --card: #252638;
+  --card-foreground: #f0f0f5;
+  --border: #383a55;
+  --muted: #222336;
+  --muted-foreground: #8385a0;
+  --input: #383a55;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--background);
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ── Layout ── */
+.page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  margin-bottom: 0.75rem;
+  margin-top: 2.5rem;
+}
+.section-title:first-of-type { margin-top: 0; }
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2em 0.6em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted-foreground);
+  background: var(--muted);
+  margin-bottom: 0.5rem;
+}
+
+/* ── Carte « Partager mon événement » (réplique moment-detail-view) ── */
+.share-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 1.5rem;     /* p-6 */
+  box-shadow: var(--shadow-sm);
+}
+.share-card-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  margin-bottom: 0.75rem;
+}
+.share-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+}
+.share-row.row-top { align-items: flex-start; padding-top: 0; }
+.share-icon {
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 0.5rem;
+  background: rgba(232, 69, 122, 0.1);
+  color: var(--primary);
+}
+.share-row-label { font-size: 13px; font-weight: 500; color: var(--foreground); }
+.share-row-hint { font-size: 0.75rem; color: var(--muted-foreground); }
+.share-sep { border: none; border-top: 1px solid var(--border); margin-left: 2.75rem; }
+.link-display {
+  flex: 1; min-width: 0;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: var(--muted-foreground);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.75rem;
+  text-decoration: none;
+}
+.btn-default { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-default:hover { background: #d63d6e; }
+.btn-outline { background: transparent; border-color: var(--border); color: var(--foreground); }
+.btn-outline:hover { background: var(--muted); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--foreground); }
+.btn-ghost:hover { background: var(--muted); }
+.btn-disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+.btn-md { font-size: 0.875rem; padding: 0.45rem 1.125rem; }
+
+/* ── Dialog ── */
+.dialog-frame {
+  position: relative;
+  background: rgba(26,27,46,0.08);
+  border-radius: 0.875rem;
+  padding: 2rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.dialog {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 1.5rem;
+  width: min(520px, 100%);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  position: relative;
+}
+.dialog-header { display: flex; flex-direction: column; gap: 0.35rem; padding-right: 1.5rem; }
+.dialog-title { font-size: 1.0625rem; font-weight: 600; color: var(--foreground); }
+.dialog-description { font-size: 0.875rem; color: var(--muted-foreground); line-height: 1.5; }
+.dialog-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--muted-foreground);
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; padding: 2px;
+  transition: background 0.15s, color 0.15s;
+}
+.dialog-close:hover { background: var(--muted); color: var(--foreground); }
+.dialog-footer { display: flex; justify-content: flex-end; gap: 0.5rem; }
+
+.field { display: flex; flex-direction: column; gap: 0.45rem; }
+.form-label { font-size: 0.8125rem; font-weight: 500; color: var(--foreground); }
+.char-count { font-weight: 400; font-size: 0.7rem; color: var(--muted-foreground); float: right; }
+
+input[type=text] {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type=text]::placeholder { color: var(--muted-foreground); }
+input[type=text]:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.12); }
+
+/* ── Ligne « À » (sélecteur de destinataires condensé) ── */
+.to-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.6rem;
+}
+.to-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+}
+.inline-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.inline-select:hover { background: var(--muted); }
+.inline-select .count-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: rgba(232,69,122,0.1);
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+}
+.inline-select svg { color: var(--muted-foreground); }
+.select-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 230px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.625rem;
+  box-shadow: var(--shadow-lg);
+  padding: 0.25rem;
+  z-index: 10;
+}
+.select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.select-item:hover { background: var(--muted); }
+.select-item.selected { background: rgba(232,69,122,0.08); color: var(--primary); font-weight: 500; }
+.select-item .count-pill {
+  font-size: 0.7rem; font-weight: 600;
+  background: var(--muted); color: var(--muted-foreground);
+  border-radius: 999px; padding: 0.05rem 0.45rem;
+}
+.select-item.selected .count-pill { background: rgba(232,69,122,0.15); color: var(--primary); }
+
+/* ── Éditeur rich text (Tiptap) ── */
+.rte {
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.rte.focused { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(232,69,122,0.12); }
+.rte-toolbar {
+  display: flex; align-items: center; gap: 0.125rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--muted);
+  padding: 0.3rem 0.4rem;
+}
+.rte-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border: none; background: transparent;
+  border-radius: 6px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.rte-btn:hover { background: var(--card); color: var(--foreground); }
+.rte-btn.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow-sm); }
+.rte-sep { width: 1px; height: 16px; background: var(--border); margin: 0 0.3rem; }
+.rte-content {
+  padding: 0.6rem 0.75rem;
+  min-height: 120px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--foreground);
+  outline: none;
+}
+.rte-content p { margin-bottom: 0.5rem; }
+.rte-content p:last-child { margin-bottom: 0; }
+.rte-content ul { padding-left: 1.25rem; margin-bottom: 0.5rem; }
+.rte-content a { color: var(--primary); text-decoration: underline; }
+.rte-placeholder { color: var(--muted-foreground); }
+
+/* ── Avertissement limite souple ── */
+.soft-limit-warning {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8125rem;
+  color: #92600a;
+  line-height: 1.45;
+}
+html.dark .soft-limit-warning { color: #f5b04b; }
+.soft-limit-warning svg { color: #f59e0b; flex-shrink: 0; margin-top: 2px; }
+
+/* ── Mobile frames ── */
+.mobile-row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; }
+.phone {
+  width: 390px;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  background: var(--background);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.phone-statusbar {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.7rem; font-weight: 600;
+  padding: 0.5rem 1.25rem 0.25rem;
+  color: var(--foreground);
+}
+.phone-body { padding: 0.75rem 1rem 1.5rem; }
+.phone .share-card { padding: 1.25rem; }
+.phone-dialog-overlay {
+  background: rgba(26,27,46,0.45);
+  padding: 1rem 0.75rem;
+  min-height: 600px;
+  display: flex; align-items: center;
+}
+.phone .dialog { width: 100%; padding: 1.25rem; }
+
+/* ── Toast ── */
+.toast {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid #10b981;
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  display: inline-flex; align-items: center; gap: 0.625rem;
+  box-shadow: var(--shadow-md);
+  font-size: 0.875rem;
+  min-width: 280px;
+}
+
+/* ── Theme toggle ── */
+.topbar { position: fixed; top: 1rem; right: 1.5rem; z-index: 200; }
+.theme-toggle {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  color: var(--foreground);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 0.35rem;
+  box-shadow: var(--shadow-sm);
+}
+.theme-toggle:hover { background: var(--muted); }
+
+/* ── Spinner ── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="theme-toggle" onclick="document.documentElement.classList.toggle('dark')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    Mode sombre
+  </button>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div style="margin-bottom: 2.5rem;">
+    <h1 style="font-size: 1.375rem; font-weight: 700; margin-bottom: 0.25rem;">
+      Message aux participants — Mockup (issue #515)
+    </h1>
+    <p style="font-size: 0.875rem; color: var(--muted-foreground);">
+      Remplace « Inviter ma communauté » dans la section « Partager mon événement » · Desktop + Mobile · Ligne « À » condensée, rich text, limite souple
+    </p>
+  </div>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 1 — Carte Partager mon événement (desktop) -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">1 · Section « Partager mon événement » — vue Organisateur, desktop</p>
+  <div class="state-badge">La rangée « Inviter ma communauté » est remplacée par « Message aux participants »</div>
+
+  <div class="share-card" style="max-width: 560px;">
+    <p class="share-card-title">Partager mon événement</p>
+
+    <!-- Lien partageable -->
+    <div class="share-row row-top">
+      <div class="share-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div style="min-width: 0; flex: 1;">
+        <p class="share-row-label" style="margin-bottom: 0.375rem;">Lien partageable</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div class="link-display">the-playground.fr/m/apero-produit-mars</div>
+          <button class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copier
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <hr class="share-sep">
+
+    <!-- Embed -->
+    <div class="share-row">
+      <div class="share-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <div style="min-width: 0; flex: 1;">
+        <p class="share-row-label">Intégrer sur mon site</p>
+        <p class="share-row-hint">Affichez cet événement sur votre site web</p>
+      </div>
+      <button class="btn btn-outline">Obtenir le code</button>
+    </div>
+
+    <hr class="share-sep">
+
+    <!-- ✨ NOUVEAU : Message aux participants -->
+    <div class="share-row" style="background: rgba(232,69,122,0.04); margin: 0 -0.75rem; padding-left: 0.75rem; padding-right: 0.75rem; border-radius: 0.625rem;">
+      <div class="share-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+      </div>
+      <div style="min-width: 0; flex: 1;">
+        <p class="share-row-label">Message aux participants</p>
+        <p class="share-row-hint">Envoyez un email aux inscrits de votre événement</p>
+      </div>
+      <button class="btn btn-outline" onclick="document.getElementById('dialog-live').style.display='flex'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Écrire
+      </button>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 2 — Dialog état initial (desktop) -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">2 · Dialog — état initial, avec liste d'attente (sélecteur « À », menu ouvert pour la démo)</p>
+
+  <div class="dialog-frame" style="align-items: flex-start; padding-top: 2.5rem;">
+    <div class="dialog">
+      <button class="dialog-close" aria-label="Fermer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="dialog-header">
+        <h2 class="dialog-title">Message aux participants</h2>
+        <p class="dialog-description">Envoyé par email aux participants de <strong>Apéro Produit de mars</strong>.</p>
+      </div>
+
+      <!-- Ligne À : sélecteur compact, menu ouvert pour la démo -->
+      <div class="to-row" style="position: relative;">
+        <span class="to-label">À</span>
+        <div style="position: relative;">
+          <button class="inline-select">
+            Inscrits <span class="count-pill">23</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <!-- Menu déroulant (état ouvert, pour la démo) -->
+          <div class="select-menu">
+            <div class="select-item selected">
+              <span>Inscrits</span><span class="count-pill">23</span>
+            </div>
+            <div class="select-item">
+              <span>Liste d'attente</span><span class="count-pill">5</span>
+            </div>
+            <div class="select-item">
+              <span>Tous</span><span class="count-pill">28</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objet -->
+      <div class="field" style="margin-top: 2.25rem;">
+        <label class="form-label" for="subject-1">Objet</label>
+        <input type="text" id="subject-1" placeholder="Ex : Informations pratiques pour jeudi" maxlength="150">
+      </div>
+
+      <!-- Message (rich text) -->
+      <div class="field">
+        <label class="form-label">Message <span class="char-count">0 / 5000</span></label>
+        <div class="rte">
+          <div class="rte-toolbar">
+            <button class="rte-btn" title="Gras"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg></button>
+            <button class="rte-btn" title="Italique"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Liste à puces"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            <button class="rte-btn" title="Liste numérotée"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Lien"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="rte-content">
+            <p class="rte-placeholder">Écrivez votre message… Chaque participant recevra « Bonjour {prénom}, » en introduction.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn btn-outline btn-md">Annuler</button>
+        <button class="btn btn-default btn-md btn-disabled">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+  <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.5rem;">
+    La ligne « À » remplace le bloc segments + le récap : le compteur vit dans le sélecteur, le menu affiche les compteurs par segment.
+    Le bouton « Envoyer » est désactivé tant que l'objet ou le message est vide, ou si le segment sélectionné compte 0 destinataire.
+  </p>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 2bis — Cas sans liste d'attente -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">2bis · Dialog — sans liste d'attente : pas de ligne « À », compteur dans la description</p>
+
+  <div class="dialog-frame">
+    <div class="dialog">
+      <button class="dialog-close" aria-label="Fermer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="dialog-header">
+        <h2 class="dialog-title">Message aux participants</h2>
+        <p class="dialog-description">Envoyé par email aux <strong>23 inscrits</strong> de <strong>Apéro Produit de mars</strong>.</p>
+      </div>
+
+      <div class="field">
+        <label class="form-label" for="subject-static">Objet</label>
+        <input type="text" id="subject-static" placeholder="Ex : Informations pratiques pour jeudi" maxlength="150">
+      </div>
+
+      <div class="field">
+        <label class="form-label">Message <span class="char-count">0 / 5000</span></label>
+        <div class="rte">
+          <div class="rte-toolbar">
+            <button class="rte-btn" title="Gras"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg></button>
+            <button class="rte-btn" title="Italique"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Liste à puces"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            <button class="rte-btn" title="Liste numérotée"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Lien"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="rte-content">
+            <p class="rte-placeholder">Écrivez votre message…</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn btn-outline btn-md">Annuler</button>
+        <button class="btn btn-default btn-md btn-disabled">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+  <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 0.5rem;">
+    Quand la liste d'attente est vide, « Inscrits » et « Tous » sont équivalents : la ligne « À » disparaît entièrement.
+    Le récapitulatif du nombre de destinataires est déplacé dans la description du dialog (« aux 23 inscrits »), qui suit le seul segment possible.
+  </p>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 3 — Dialog rempli + avertissement 24h (desktop) -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">3 · Dialog — message rempli + avertissement limite souple 24h (desktop)</p>
+
+  <div class="dialog-frame">
+    <div class="dialog">
+      <button class="dialog-close" aria-label="Fermer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <div class="dialog-header">
+        <h2 class="dialog-title">Message aux participants</h2>
+        <p class="dialog-description">Envoyé par email aux participants de <strong>Apéro Produit de mars</strong>.</p>
+      </div>
+
+      <!-- Avertissement limite souple (non bloquant) -->
+      <div class="soft-limit-warning">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Vous avez déjà envoyé un message il y a moins de 24h. Évitez de solliciter trop souvent vos participants.</span>
+      </div>
+
+      <!-- Ligne À : « Tous » sélectionné, menu fermé -->
+      <div class="to-row">
+        <span class="to-label">À</span>
+        <button class="inline-select">
+          Tous <span class="count-pill">28</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <!-- Objet rempli -->
+      <div class="field">
+        <label class="form-label" for="subject-2">Objet</label>
+        <input type="text" id="subject-2" value="Changement de salle pour jeudi" maxlength="150">
+      </div>
+
+      <!-- Message rich text rempli (gras + liste + lien) -->
+      <div class="field">
+        <label class="form-label">Message <span class="char-count">312 / 5000</span></label>
+        <div class="rte focused">
+          <div class="rte-toolbar">
+            <button class="rte-btn active" title="Gras"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg></button>
+            <button class="rte-btn" title="Italique"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Liste à puces"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+            <button class="rte-btn" title="Liste numérotée"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+            <div class="rte-sep"></div>
+            <button class="rte-btn" title="Lien"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+          </div>
+          <div class="rte-content" contenteditable="true">
+            <p>Petit changement pour jeudi : nous serons finalement dans la <strong>salle Horizon, au 2e étage</strong> (même adresse).</p>
+            <ul>
+              <li>Accueil dès 18h30</li>
+              <li>Début des démos à 19h</li>
+            </ul>
+            <p>Le code d'accès du bâtiment reste le même. Plus d'infos sur <a href="#">la page de l'événement</a>. À jeudi !</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-footer">
+        <button class="btn btn-outline btn-md">Annuler</button>
+        <button class="btn btn-default btn-md">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 4 — Mobile -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">4 · Mobile (390px) — section Partager + dialog</p>
+
+  <div class="mobile-row">
+
+    <!-- Phone 1 : section Partager -->
+    <div>
+      <div class="state-badge">Section « Partager mon événement » — mobile</div>
+      <div class="phone">
+        <div class="phone-statusbar"><span>9:41</span><span>𝄃𝄃𝄂 ᯤ 𝍢</span></div>
+        <div class="phone-body">
+          <div class="share-card">
+            <p class="share-card-title">Partager mon événement</p>
+
+            <div class="share-row row-top">
+              <div class="share-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </div>
+              <div style="min-width: 0; flex: 1;">
+                <p class="share-row-label" style="margin-bottom: 0.375rem;">Lien partageable</p>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <div class="link-display">the-playground.fr/m/apero-produit…</div>
+                  <button class="btn btn-ghost" style="padding: 0.35rem 0.5rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <hr class="share-sep">
+
+            <!-- Message aux participants (l'embed est masqué sur mobile, comme aujourd'hui) -->
+            <div class="share-row">
+              <div class="share-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              </div>
+              <div style="min-width: 0; flex: 1;">
+                <p class="share-row-label">Message aux participants</p>
+                <p class="share-row-hint">Envoyez un email aux inscrits</p>
+              </div>
+              <button class="btn btn-outline">Écrire</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone 2 : dialog ouvert -->
+    <div>
+      <div class="state-badge">Dialog — mobile (pleine largeur, scroll interne)</div>
+      <div class="phone">
+        <div class="phone-statusbar"><span>9:41</span><span>𝄃𝄃𝄂 ᯤ 𝍢</span></div>
+        <div class="phone-dialog-overlay">
+          <div class="dialog">
+            <button class="dialog-close" aria-label="Fermer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+
+            <div class="dialog-header">
+              <h2 class="dialog-title">Message aux participants</h2>
+              <p class="dialog-description">Envoyé par email aux participants de <strong>Apéro Produit de mars</strong>.</p>
+            </div>
+
+            <!-- Ligne À mobile : sélecteur compact -->
+            <div class="to-row">
+              <span class="to-label">À</span>
+              <button class="inline-select">
+                Inscrits <span class="count-pill">23</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+            </div>
+
+            <div class="field">
+              <label class="form-label" for="subject-m">Objet</label>
+              <input type="text" id="subject-m" value="Changement de salle pour jeudi">
+            </div>
+
+            <div class="field">
+              <label class="form-label">Message <span class="char-count">118 / 5000</span></label>
+              <div class="rte">
+                <div class="rte-toolbar">
+                  <button class="rte-btn" title="Gras"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg></button>
+                  <button class="rte-btn" title="Italique"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+                  <div class="rte-sep"></div>
+                  <button class="rte-btn" title="Liste à puces"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+                  <button class="rte-btn" title="Liste numérotée"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+                  <div class="rte-sep"></div>
+                  <button class="rte-btn" title="Lien"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+                </div>
+                <div class="rte-content" style="min-height: 96px;">
+                  <p>Petit changement pour jeudi : nous serons dans la <strong>salle Horizon, au 2e étage</strong>.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="dialog-footer" style="flex-direction: column-reverse; gap: 0.5rem;">
+              <button class="btn btn-outline btn-md" style="width: 100%;">Annuler</button>
+              <button class="btn btn-default btn-md" style="width: 100%;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+                Envoyer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ───────────────────────────────────────────── -->
+  <!-- SECTION 5 — États d'envoi -->
+  <!-- ───────────────────────────────────────────── -->
+  <p class="section-title">5 · Envoi en cours + toast de succès</p>
+
+  <div style="display: flex; gap: 2rem; align-items: flex-end; flex-wrap: wrap;">
+    <div>
+      <div class="state-badge">Bouton pendant l'envoi</div>
+      <div>
+        <button class="btn btn-default btn-md btn-disabled" style="opacity: 1;">
+          <div class="spinner"></div>
+          Envoi en cours…
+        </button>
+      </div>
+    </div>
+    <div>
+      <div class="state-badge">Toast après envoi</div>
+      <div class="toast">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span style="font-weight: 500;">Message envoyé à 28 participants</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size: 0.75rem; color: var(--muted-foreground); margin-top: 2rem; line-height: 1.6;">
+    Notes : la ligne « À » porte le sélecteur de segment ET le récapitulatif du nombre de destinataires (un seul bloc).
+    Liste d'attente non vide → sélecteur 3 options (Inscrits / Liste d'attente / Tous) ; liste d'attente vide → pas de ligne « À », compteur dans la description du dialog (section 2bis).
+    La rangée « Message aux participants » reste visible pour les événements passés et annulés (suivi post-événement), contrairement à l'ancienne rangée « Inviter ma communauté ».
+  </p>
+
+</div>
+
+<!-- Dialog interactif (clic sur « Écrire » de la section 1) -->
+<div id="dialog-live" style="display:none; position: fixed; inset: 0; background: rgba(26,27,46,0.45); align-items: center; justify-content: center; z-index: 50; backdrop-filter: blur(2px); padding: 1rem;" onclick="if(event.target===this)this.style.display='none'">
+  <div class="dialog">
+    <button class="dialog-close" onclick="document.getElementById('dialog-live').style.display='none'" aria-label="Fermer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="dialog-header">
+      <h2 class="dialog-title">Message aux participants</h2>
+      <p class="dialog-description">Envoyé par email aux participants de <strong>Apéro Produit de mars</strong>.</p>
+    </div>
+
+    <!-- Ligne À interactive -->
+    <div class="to-row" style="position: relative;">
+      <span class="to-label">À</span>
+      <div style="position: relative;">
+        <button class="inline-select" id="live-select-btn" onclick="document.getElementById('live-menu').style.display = document.getElementById('live-menu').style.display === 'block' ? 'none' : 'block'">
+          <span id="live-select-label">Inscrits</span> <span class="count-pill" id="live-select-count">23</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="select-menu" id="live-menu" style="display: none;">
+          <div class="select-item selected" data-label="Inscrits" data-count="23"><span>Inscrits</span><span class="count-pill">23</span></div>
+          <div class="select-item" data-label="Liste d'attente" data-count="5"><span>Liste d'attente</span><span class="count-pill">5</span></div>
+          <div class="select-item" data-label="Tous" data-count="28"><span>Tous</span><span class="count-pill">28</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="form-label" for="subject-live">Objet</label>
+      <input type="text" id="subject-live" placeholder="Ex : Informations pratiques pour jeudi" maxlength="150">
+    </div>
+    <div class="field">
+      <label class="form-label">Message <span class="char-count">0 / 5000</span></label>
+      <div class="rte">
+        <div class="rte-toolbar">
+          <button class="rte-btn" title="Gras"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 12a4 4 0 0 0 0-8H6v8"/><path d="M15 20a4 4 0 0 0 0-8H6v8Z"/></svg></button>
+          <button class="rte-btn" title="Italique"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg></button>
+          <div class="rte-sep"></div>
+          <button class="rte-btn" title="Liste à puces"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+          <button class="rte-btn" title="Liste numérotée"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button>
+          <div class="rte-sep"></div>
+          <button class="rte-btn" title="Lien"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+        </div>
+        <div class="rte-content" contenteditable="true"></div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-outline btn-md" onclick="document.getElementById('dialog-live').style.display='none'">Annuler</button>
+      <button class="btn btn-default btn-md">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Sélecteur « À » interactif (dialog live)
+document.querySelectorAll('#live-menu .select-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    document.querySelectorAll('#live-menu .select-item').forEach(function(i) { i.classList.remove('selected'); });
+    item.classList.add('selected');
+    document.getElementById('live-select-label').textContent = item.dataset.label;
+    document.getElementById('live-select-count').textContent = item.dataset.count;
+    document.getElementById('live-menu').style.display = 'none';
+  });
+});
+</script>
+
+</body>
+</html>
