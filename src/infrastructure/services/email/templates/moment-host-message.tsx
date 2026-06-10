@@ -12,13 +12,9 @@ import {
   metaValue,
 } from "./components/email-styles";
 
-type Props = MomentHostMessageEmailData & {
-  /** Salutation résolue par destinataire dans l'adapter (template déclaratif). */
-  greeting: string;
-};
+type Props = MomentHostMessageEmailData;
 
 export function MomentHostMessageEmail({
-  greeting,
   hostName,
   hostAvatarUrl,
   bodyHtml,
@@ -42,10 +38,8 @@ export function MomentHostMessageEmail({
         <Text style={hostNameText}>{hostName}</Text>
       </Section>
 
-      <Text style={greetingText}>{greeting}</Text>
-
       <Section style={messageBlock}>
-        {/* HTML passé par l'allowlist stricte côté serveur avant injection */}
+        {/* HTML passé par l'allowlist stricte côté serveur, placeholder prénom résolu par destinataire */}
         <div style={messageBody} dangerouslySetInnerHTML={{ __html: bodyHtml }} />
       </Section>
 
@@ -94,13 +88,6 @@ const hostNameText: React.CSSProperties = {
   fontWeight: 600,
   color: "#18181b",
   margin: 0,
-};
-
-const greetingText: React.CSSProperties = {
-  fontSize: "14px",
-  color: "#3f3f46",
-  margin: "0 0 12px 0",
-  lineHeight: "22px",
 };
 
 const messageBlock: React.CSSProperties = {

@@ -77,11 +77,9 @@ export async function sendMomentHostMessageAction(input: {
         registrationRepository: prismaRegistrationRepository,
         userRepository: prismaUserRepository,
         emailService,
-        // Templates bruts : {firstName}, {hostName} et {momentTitle} sont résolus
-        // par le usecase, qui détient le sender et le moment (pattern contact-circle-hosts).
+        // Templates bruts : {hostName} et {momentTitle} sont résolus par le
+        // usecase, qui détient le sender et le moment (pattern contact-circle-hosts).
         emailStrings: {
-          greeting: t("greeting"),
-          greetingFallback: t("greetingFallback"),
           preheader: t("preheader"),
           dateLabel: t("dateLabel"),
           locationLabel: t("locationLabel"),

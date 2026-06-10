@@ -214,6 +214,8 @@ export function HostMessageDialog({
             placeholder={t("subjectPlaceholder")}
             maxLength={HOST_MESSAGE_SUBJECT_MAX_LENGTH}
             disabled={isPending}
+            // Focus neutre, aligné sur l'éditeur en dessous (pas de ring rose)
+            className="focus-visible:border-muted-foreground/40 focus-visible:ring-0"
           />
         </div>
 
@@ -229,11 +231,15 @@ export function HostMessageDialog({
             placeholder={t("bodyPlaceholder")}
             initialContent={bodyHtml}
             disabled={isPending}
+            tokens={[{ label: t("firstNameTokenLabel"), value: t("firstNameToken") }]}
             onChange={(html, textLength) => {
               setBodyHtml(html);
               setBodyTextLength(textLength);
             }}
           />
+          <p className="text-muted-foreground text-xs leading-snug">
+            {t("firstNameTokenHint", { token: t("firstNameToken") })}
+          </p>
         </div>
 
         <DialogFooter className="gap-2">

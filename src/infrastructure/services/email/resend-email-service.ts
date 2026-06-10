@@ -1,4 +1,5 @@
 import { createSafeResend } from "@/lib/email/safe-resend";
+import { resolveFirstNamePlaceholders } from "@/lib/email/host-message-placeholders";
 import type {
   EmailService,
   RegistrationConfirmationEmailData,
@@ -324,10 +325,9 @@ export function createResendEmailService(): EmailService {
           react: MomentHostMessageEmail({
             ...emailData,
             to,
-            // Forme fonction : neutralise les motifs $ de String.replace dans un prénom.
-            greeting: firstName
-              ? emailData.strings.greeting.replace("{firstName}", () => firstName)
-              : emailData.strings.greetingFallback,
+            // Le placeholder {prénom} inséré par l'Organisateur est résolu
+            // par destinataire (retiré proprement si le prénom est inconnu).
+            bodyHtml: resolveFirstNamePlaceholders(emailData.bodyHtml, firstName),
           }),
         }))
       );

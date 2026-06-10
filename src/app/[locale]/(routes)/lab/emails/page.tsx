@@ -321,13 +321,13 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
       subject: "Changement de salle pour vendredi",
       element: MomentHostMessageEmail({
         to: "alice@example.com",
-        greeting: "Bonjour Alice,",
         replyTo: "bob@example.com",
         hostName: "Bob Dupont",
         hostAvatarUrl: null,
         subject: "Changement de salle pour vendredi",
+        // Placeholder {prénom} déjà résolu par destinataire (ici : Alice)
         bodyHtml:
-          "<p>Petit changement pour vendredi : nous serons finalement dans la <strong>salle Horizon, au 2e étage</strong> (même adresse).</p><ul><li>Accueil dès 18h30</li><li>Début des talks à 19h</li></ul><p>À vendredi !</p>",
+          "<p>Bonjour Alice,</p><p>Petit changement pour vendredi : nous serons finalement dans la <strong>salle Horizon, au 2e étage</strong> (même adresse).</p><ul><li>Accueil dès 18h30</li><li>Début des talks à 19h</li></ul><p>À vendredi !</p>",
         momentTitle: "Soirée JS & Pizza",
         momentDate: "vendredi 21 mars 2026, 19:00",
         momentDateMonth: "MAR",
@@ -336,8 +336,6 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         momentSlug: "soiree-js-pizza",
         appUrl: BASE_URL,
         strings: {
-          greeting: "Bonjour {firstName},",
-          greetingFallback: "Bonjour,",
           preheader: "Message de Bob Dupont à propos de Soirée JS & Pizza",
           dateLabel: "Date",
           locationLabel: "Lieu",

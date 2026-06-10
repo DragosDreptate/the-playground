@@ -4,7 +4,7 @@ import * as React from "react";
 import { useTranslations } from "next-intl";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Italic, Link2, List, ListOrdered } from "lucide-react";
+import { AtSign, Bold, Italic, Link2, List, ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,6 +20,11 @@ type Props = {
   disabled?: boolean;
   /** HTML restauré au montage (ex : réouverture d'une modale fermée par erreur). */
   initialContent?: string;
+  /**
+   * Jetons insérables au curseur depuis la barre d'outils (ex : placeholder
+   * prénom). Le `value` est inséré tel quel dans le contenu.
+   */
+  tokens?: Array<{ label: string; value: string }>;
   /** HTML + longueur du texte seul, à chaque frappe. */
   onChange: (html: string, textLength: number) => void;
   className?: string;
@@ -35,6 +40,7 @@ export function RichTextEditor({
   placeholder,
   disabled,
   initialContent,
+  tokens,
   onChange,
   className,
 }: Props) {
@@ -99,7 +105,8 @@ export function RichTextEditor({
   return (
     <div
       className={cn(
-        "border-input rounded-md border shadow-xs transition-[color,box-shadow] focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]",
+        // Focus neutre (bordure assombrie), sans le ring rose du design system
+        "border-input rounded-md border shadow-xs transition-colors focus-within:border-muted-foreground/40",
         disabled && "pointer-events-none opacity-50",
         className
       )}
@@ -145,6 +152,7 @@ export function RichTextEditor({
               type="button"
               variant="ghost"
               size="sm"
+              tabIndex={-1}
               aria-label={t("link")}
               title={t("link")}
               className={cn(
@@ -180,6 +188,27 @@ export function RichTextEditor({
             </form>
           </PopoverContent>
         </Popover>
+        {tokens && tokens.length > 0 && (
+          <>
+            <div className="bg-border mx-1 h-4 w-px" />
+            {tokens.map((token) => (
+              <Button
+                key={token.value}
+                type="button"
+                variant="ghost"
+                size="sm"
+                tabIndex={-1}
+                disabled={!editor}
+                title={token.label}
+                className="h-7 gap-1 px-1.5 text-xs font-medium"
+                onClick={() => editor?.chain().focus().insertContent(token.value).run()}
+              >
+                <AtSign className="size-3" />
+                {token.label}
+              </Button>
+            ))}
+          </>
+        )}
       </div>
       <div className="relative">
         {editor && editor.isEmpty && placeholder && (
@@ -214,6 +243,9 @@ function ToolbarButton({
       type="button"
       variant="ghost"
       size="sm"
+      // Hors de l'ordre de tabulation : Tab passe du champ précédent
+      // directement à la zone de saisie, sans traverser la toolbar.
+      tabIndex={-1}
       disabled={!editor}
       aria-label={label}
       aria-pressed={active}

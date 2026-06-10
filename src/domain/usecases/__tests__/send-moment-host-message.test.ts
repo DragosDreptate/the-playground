@@ -89,8 +89,6 @@ function makeDeps(
     }),
     emailService: createMockEmailService(),
     emailStrings: {
-      greeting: "Bonjour {firstName},",
-      greetingFallback: "Bonjour,",
       preheader: "Message",
       dateLabel: "Date",
       locationLabel: "Lieu",
