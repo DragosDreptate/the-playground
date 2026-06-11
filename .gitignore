@@ -77,6 +77,11 @@ public/workbox-*.js.map
 # Exports locaux (données sensibles)
 exports/
 
+# Scripts de debug locaux contenant des données sensibles (emails réels, IDs prod).
+# Jamais committés. Convention : voir scripts/local/README.md.
+/scripts/local/*
+!/scripts/local/README.md
+
 # spec — marketing local uniquement
 /spec/mkt/
 

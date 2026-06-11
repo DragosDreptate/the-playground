@@ -126,7 +126,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           auth_error_kind: kind,
         },
         // Le user-agent distingue un token expiré détonné par un scanner
-        // email d'un vrai clic humain tardif (incident @interieur.gouv.fr).
+        // email d'un vrai clic humain tardif (incident réseau d'administration).
         extra: await getRequestObservability(),
       });
     },
@@ -146,7 +146,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   events: {
     // Trace serveur de chaque sign-in réussi, avec user-agent : permet de
     // distinguer un clic humain d'une détonation de scanner email (incident
-    // @interieur.gouv.fr — Users fantômes créés 6s après l'envoi du lien).
+    // réseau d'administration — Users fantômes créés 6s après l'envoi du lien).
     // Chaque clic sur un magic link réutilisable apparaît ici. Canal PostHog
     // (pas Sentry) : c'est de la télémétrie steady-state, pas une anomalie.
     async signIn({ user, account, isNewUser }) {
