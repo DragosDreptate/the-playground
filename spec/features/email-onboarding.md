@@ -246,18 +246,22 @@ Liste codée en dur au début du script. Ces comptes apparaissent dans la base m
 
 ```typescript
 const EXCLUDED_EMAILS = [
-  "dragos.dreptate@gmail.com",   // fondateur principal
-  "dragos@thespark.fr",          // alt fondateur
-  "darie.dreptate@gmail.com",    // famille
-  "swykin.ed@gmail.com",         // famille (Edouard Dreptate)
-  "ddreptate@mailinator.com",    // test throwaway
-  "testeric@yopmail.com",        // test throwaway
+  "fondateur@exemple.com",       // fondateur principal
+  "fondateur-alt@exemple.com",   // alt fondateur
+  "famille-1@exemple.com",       // famille
+  "famille-2@exemple.com",       // famille
+  "throwaway@mailinator.com",    // test throwaway
+  "throwaway@yopmail.com",       // test throwaway
 ];
 ```
 
-### Script
+### Script (backfill one-shot — retiré)
 
-`scripts/send-onboarding-welcome-backfill.ts`
+> **Obsolète depuis le 2026-06-11.** Le rattrapage historique est terminé (lettre
+> envoyée aux utilisateurs inscrits après le 12/03). Le cron
+> `/api/cron/send-onboarding-welcome` assure désormais l'envoi en continu. Le
+> script `send-onboarding-welcome-backfill.ts` et ses commandes pnpm ont été
+> supprimés. La logique de ciblage ci-dessous est conservée à titre documentaire.
 
 Requête de ciblage :
 
@@ -289,19 +293,10 @@ const users = await prisma.user.findMany({
 
 ### Commandes pnpm
 
-```bash
-# Dev (dry-run par défaut)
-pnpm db:send-onboarding-welcome-backfill
-
-# Dev réel
-pnpm db:send-onboarding-welcome-backfill --execute
-
-# Prod (dry-run par défaut, avec bash wrapper qui fetch le connection string)
-pnpm db:send-onboarding-welcome-backfill:prod
-
-# Prod réel (avec double confirmation dans le wrapper bash)
-pnpm db:send-onboarding-welcome-backfill:prod --execute
-```
+> Les commandes `pnpm db:send-onboarding-welcome-backfill[:prod]` ont été
+> supprimées en même temps que le script (backfill terminé). Pour un éventuel
+> rattrapage ponctuel futur, recréer un script dédié dans `scripts/local/`
+> (gitignored) sur le même modèle.
 
 ### Ordre d'exécution recommandé
 
