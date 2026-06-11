@@ -74,7 +74,7 @@ Ce squelette est présent dans : `create-moment`, `update-moment`, `delete-momen
 | D15 | Connexion / modification du compte **Stripe Connect** réservée au HOST principal | Action financière irréversible (lie un compte bancaire à la Communauté). Cohérent avec les autres actions structurantes réservées au HOST |
 | D16 | Un CO_HOST **ne peut pas** annuler sa propre inscription à un événement de sa Communauté (même règle que le HOST) | Cohérence : un organisateur reste présent à ses événements. Cas d'empêchement réel → le HOST peut retirer l'inscription via `removeRegistrationByHost` |
 | D17 | **Uniformisation du check d'autorisation** : les droits d'Organisateur s'exercent uniquement si `status === "ACTIVE"`. Helper `isActiveOrganizer(membership)` centralise le check partout | Règle simple ("tant que l'adhésion n'est pas validée, pas de pouvoir"). Corrige une incohérence existante entre usecases |
-| D18 | `transferOwnership` **reporté après le MVP** co-organisateurs | Cas rare, géré manuellement via `pnpm transfer-circle-host:prod` en attendant |
+| D18 | `transferOwnership` **reporté après le MVP** co-organisateurs | Cas rare, géré manuellement via le script local `scripts/local/transfer-circle-host.ts` (hors repo public) en attendant |
 | D19 | **Emails systématiques** à chaque changement de rôle : "Vous êtes co-organisateur" à la promotion, "Votre rôle a changé" à la rétrogradation | Sans email, la feature est invisible côté CO_HOST. Transparence : apprendre la rétrogradation "par accident" est frustrant. Cohérent avec le reste de la plateforme (tous les changements d'état importants déclenchent un email) |
 | D20 | Renommer la prop booléenne `isHost` → `isOrganizer` (85 occurrences, 15 fichiers). Conserver `isHostView` (mode de rendu) et la clé i18n `detail.isHost` | Avec CO_HOST, la prop actuelle devient trompeuse (un CO_HOST a les droits de gestion sans être HOST). TypeScript attrape les manquants |
 | D21 | **Les inscriptions existantes ne sont jamais impactées** par une promotion ou rétrogradation. Les memberships (rôle) et les registrations (inscription à un événement) vivent indépendamment | Simplicité et prévisibilité : Bob ne voit pas son inscription changer sans action explicite. Cohérent avec la logique actuelle (changer de rôle ne touche pas aux registrations ; seul `leaveCircle` annule les inscriptions futures) |
@@ -96,7 +96,7 @@ Ces actions ne seront **jamais** accessibles à un CO_HOST :
 | Connecter / modifier le compte Stripe Connect | `onboardStripeConnect` | Action financière irréversible — lie un compte bancaire à la Communauté (**D15**) |
 | Annuler sa propre inscription à un événement de la Communauté | `cancelRegistration` | Même règle que le HOST — un organisateur (principal ou co) est toujours présent à ses événements (**D16**) |
 
-> **Évolution future (hors MVP)** : `transferOwnership` — le HOST cède la propriété à un CO_HOST ou PLAYER. Cas d'usage rare, reporté. En attendant, le script `pnpm transfer-circle-host:prod` gère les cas exceptionnels manuellement.
+> **Évolution future (hors MVP)** : `transferOwnership` — le HOST cède la propriété à un CO_HOST ou PLAYER. Cas d'usage rare, reporté. En attendant, le script local `scripts/local/transfer-circle-host.ts` (hors repo public, gitignored) gère les cas exceptionnels manuellement.
 
 ---
 

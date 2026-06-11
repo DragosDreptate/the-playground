@@ -11,7 +11,7 @@ type Props = {
 };
 
 // Capture côté serveur : les réseaux d'entreprise/administration qui bloquent
-// sentry.io (incident @interieur.gouv.fr) ne remontent jamais une capture
+// sentry.io (incident réseau d'administration) ne remontent jamais une capture
 // client. Le rendu serveur, lui, voit chaque visite de la page avec son
 // user-agent — ce qui permet de distinguer humains et scanners email.
 export default async function AuthErrorPage({ searchParams }: Props) {

@@ -8,7 +8,7 @@
 
 ### Le déclencheur
 
-Le 2026-05-27, on a tracé `julie.ramondougazo@i-bp.fr` (BPCE/Microsoft 365) qui voulait s'inscrire à un événement. Parcours :
+Le 2026-05-27, on a tracé un utilisateur A (réseau corporate d'un grand groupe bancaire, Microsoft 365) qui voulait s'inscrire à un événement. Parcours :
 
 1. Découverte de l'événement sur poste pro Windows (Edge)
 2. Demande de magic link
@@ -22,19 +22,19 @@ Drop-off UX, pas bug technique.
 
 Sur les 4 magic links pending dans les dernières 24h :
 
-| Email | Statut |
+| Utilisateur | Statut |
 |---|---|
-| `julie.ramondougazo@i-bp.fr` | ❌ Vrai drop-off (User absent) |
-| `corinne.favaro@bpce-si.fr` (×2) | ❌ Vrai drop-off (2 tentatives, frustration) |
-| `philnoe@hotmail.fr` | ✅ Faux positif (s'est connecté avec un autre lien) |
+| Utilisateur A (corporate, grand groupe bancaire) | ❌ Vrai drop-off (User absent) |
+| Utilisateur B (corporate, même groupe) (×2) | ❌ Vrai drop-off (2 tentatives, frustration) |
+| Utilisateur C (email grand public) | ✅ Faux positif (s'est connecté avec un autre lien) |
 
-**Pattern corporate confirmé** : 3/4 cas sur 24h sont des users corporate BPCE (i-bp.fr, bpce-si.fr) bloqués par la page intermédiaire.
+**Pattern corporate confirmé** : 3/4 cas sur 24h sont des users corporate d'un même grand groupe bancaire bloqués par la page intermédiaire.
 
 ### Raison d'être de la page intermédiaire
 
 `/auth/confirm` existe pour protéger le token magic link des scanners email (Defender Safe Links, Mimecast, Proofpoint) qui prefetchent les liens d'emails. Sans elle, le scanner consommerait le token avant l'utilisateur humain. La page est un `<form>` POST inerte que seul un humain peut déclencher.
 
-Le coût : friction UX qui crée du drop-off (cas Julie + Corinne).
+Le coût : friction UX qui crée du drop-off (utilisateurs A et B).
 
 ## Décision
 
@@ -46,7 +46,7 @@ Le contenu de l'email magic link continue d'être servi dans la bonne langue : o
 
 ### Pourquoi ce pivot
 
-- **Résout 100% du drop-off Julie/Corinne** vs ~partiel pour un simple ré-wording
+- **Résout 100% du drop-off des utilisateurs A et B** vs ~partiel pour un simple ré-wording
 - **Code plus simple** : ~30 lignes ajoutées vs ~150 lignes pour la refonte page + allowlist + locale
 - **Surface UI supprimée** : page, i18n, tests, mockup, helpers d'URL
 - **Trade-off sécurité acceptable** : on échange une fenêtre 24h fermée par un humain (page intermédiaire) contre une fenêtre 15 min ouverte à tout porteur du token. Si l'attaquant a accès en lecture à la boîte mail, il peut de toute façon redemander un magic link.
@@ -59,7 +59,7 @@ Le contenu de l'email magic link continue d'être servi dans la bonne langue : o
 | **Sessions orphelines** : 1-3 sessions sans cookie associé par magic link | TTL 30j → auto-cleanup, aucun enjeu sécurité |
 | **`isNewUser` faux négatif** : si l'humain clique >2 min après le scanner | Élargir la fenêtre `isNewUser` à **10 min** (vs 2 min actuel) |
 | **Fenêtre interception 15 min** | Risque résiduel validé : si attaquant a accès au mail il peut redemander un lien |
-| **Fenêtre de transition au déploiement** | Accepter : tokens pending actuels expirent dans 1-2h, philnoe déjà connecté |
+| **Fenêtre de transition au déploiement** | Accepter : tokens pending actuels expirent dans 1-2h, utilisateur C déjà connecté |
 
 ### Protection scanner orthogonale (déjà en place)
 
@@ -183,7 +183,7 @@ session.user.isNewUser = ageMs < 10 * 60 * 1000;
 
 - `spec/auth-confirm-redesign.md` → supprimer
 - `spec/mockups/auth-confirm-redesign.mockup.html` → supprimer
-- `scripts/trace-julie.ts` → conserver (utile pour traces ad-hoc)
+- script de trace ad-hoc → déplacé dans `scripts/local/` (gitignored, contenait des données prod)
 - `scripts/check-pending-magic-links.ts` → conserver (monitoring ponctuel)
 
 ## Stratégie de transition
@@ -191,7 +191,7 @@ session.user.isNewUser = ageMs < 10 * 60 * 1000;
 **Option A retenue : accepter le 404 sur les magic links envoyés avant le déploiement.**
 
 Justification :
-- Sondage 24h : 4 tokens pending, dont 1 user déjà connecté (philnoe) et 3 abandons confirmés (Julie + Corinne).
+- Sondage 24h : 4 tokens pending, dont 1 user déjà connecté (utilisateur C) et 3 abandons confirmés (utilisateurs A et B).
 - Aucune raison qu'un de ces 4 users clique son lien dans la fenêtre post-déploiement.
 - Si futur cas marginal : 404 → user redemande un lien → flow nouveau parcours.
 
