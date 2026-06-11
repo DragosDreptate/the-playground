@@ -156,6 +156,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         provider: account?.provider ?? "unknown",
         is_new_user: isNewUser ?? false,
         email_domain: user.email?.split("@")[1] ?? "unknown",
+        // Renseigne l'email/nom sur la person dès le serveur : si le client
+        // PostHog est bloqué (ad-blocker, ITP), la person reste retrouvable
+        // par email au lieu de devenir un profil anonyme introuvable.
+        $set: {
+          ...(user.email ? { email: user.email } : {}),
+          ...(user.name ? { name: user.name } : {}),
+        },
       });
     },
   },
