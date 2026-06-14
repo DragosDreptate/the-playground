@@ -1,9 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { unstable_rethrow } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
+import { isLikelyBot } from "@/infrastructure/security/bot-protection";
+import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 import { safeCallbackUrl } from "@/lib/url";
@@ -27,7 +29,18 @@ async function postSignInRedirectTo() {
   return `/${locale}/dashboard/profile/setup`;
 }
 
+// Page de connexion dans la locale courante (locale par défaut sans préfixe,
+// cf. localePrefix "as-needed"). Sert de cible de redirection quand BotID
+// classe un flux OAuth comme bot.
+async function signInPath() {
+  const locale = await getLocale();
+  return locale === routing.defaultLocale
+    ? "/auth/sign-in"
+    : `/${locale}/auth/sign-in`;
+}
+
 export async function signInWithGitHub(formData: FormData) {
+  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   // Toujours passer par le setup : la page setup redirige vers callbackUrl
@@ -36,13 +49,14 @@ export async function signInWithGitHub(formData: FormData) {
 }
 
 export async function signInWithGoogle(formData: FormData) {
+  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   await signIn("google", { redirectTo: await postSignInRedirectTo() });
 }
 
 export type SignInWithEmailState =
-  | { error: "INVALID_EMAIL" | "DISPOSABLE_EMAIL" | "SEND_FAILED" }
+  | { error: "INVALID_EMAIL" | "DISPOSABLE_EMAIL" | "SEND_FAILED" | "BOT_DETECTED" }
   | null;
 
 export async function signInWithEmail(
@@ -55,6 +69,9 @@ export async function signInWithEmail(
   }
   if (isDisposableEmailDomain(email)) {
     return { error: "DISPOSABLE_EMAIL" };
+  }
+  if (await isLikelyBot()) {
+    return { error: "BOT_DETECTED" };
   }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);

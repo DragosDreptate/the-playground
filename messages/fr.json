@@ -145,6 +145,7 @@
       "invalidEmail": "Adresse email invalide. Vérifiez votre saisie.",
       "disposableEmail": "Les adresses email jetables ne sont pas acceptées. Utilisez une adresse permanente.",
       "sendFailed": "Impossible d'envoyer l'email pour le moment. Réessayez dans un instant.",
+      "botDetected": "La vérification de sécurité a échoué. Rechargez la page et réessayez.",
       "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous, elle fonctionne partout. Pour vous connecter avec Google ou GitHub, ouvrez le site dans votre navigateur (Safari, Chrome...)."
     },
     "verifyRequest": {
@@ -168,6 +169,7 @@
       "OAuthAccountNotLinked": "Cet email est déjà associé à une autre méthode de connexion. Utilisez celle-ci pour continuer.",
       "OAuthCallbackError": "La connexion via le fournisseur a échoué. Réessayez.",
       "OAuthSignInError": "La connexion via le fournisseur n'a pas pu démarrer. Réessayez.",
+      "BotDetected": "La vérification de sécurité a échoué. Rechargez la page et réessayez.",
       "Default": "Une erreur est survenue lors de la connexion."
     },
     "signOut": "Se déconnecter"

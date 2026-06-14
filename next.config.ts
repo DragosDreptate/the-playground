@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { withSentryConfig } from "@sentry/nextjs";
 import withPWAInit from "@ducanh2912/next-pwa";
+import { withBotId } from "botid/next/config";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -144,7 +145,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(withPWA(withNextIntl(nextConfig)), {
+// withBotId enveloppe la config la plus brute pour fusionner ses rewrites de
+// proxy (challenge BotID servi en first-party) avec nos rewrites PostHog.
+export default withSentryConfig(withPWA(withNextIntl(withBotId(nextConfig))), {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
