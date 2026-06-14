@@ -5,11 +5,17 @@ vi.mock("botid/server", () => ({
   checkBotId: () => checkBotId(),
 }));
 
+const captureException = vi.fn();
+vi.mock("@sentry/nextjs", () => ({
+  captureException: (error: unknown) => captureException(error),
+}));
+
 import { isLikelyBot } from "../bot-protection";
 
 describe("isLikelyBot (wrapper Vercel BotID)", () => {
   beforeEach(() => {
     checkBotId.mockReset();
+    captureException.mockReset();
   });
 
   describe("given BotID classe la session comme un bot", () => {
@@ -30,6 +36,13 @@ describe("isLikelyBot (wrapper Vercel BotID)", () => {
     it("should fail-open et renvoyer false pour ne pas bloquer un humain", async () => {
       checkBotId.mockRejectedValue(new Error("BotID outage"));
       await expect(isLikelyBot()).resolves.toBe(false);
+    });
+
+    it("should remonter l'erreur à Sentry pour rendre la panne observable", async () => {
+      const outage = new Error("BotID outage");
+      checkBotId.mockRejectedValue(outage);
+      await isLikelyBot();
+      expect(captureException).toHaveBeenCalledWith(outage);
     });
   });
 });

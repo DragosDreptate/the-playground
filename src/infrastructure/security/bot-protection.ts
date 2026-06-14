@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { checkBotId } from "botid/server";
 
 /**
@@ -11,6 +12,8 @@ import { checkBotId } from "botid/server";
  * - **Fail-open** : toute erreur (panne BotID, classification indisponible) renvoie
  *   `false`. On ne bloque jamais un humain à cause d'une indisponibilité du service.
  *   Les autres garde-fous (blocklist sign-in, domaines jetables) restent actifs.
+ *   L'erreur est remontée à Sentry pour qu'une panne durable (qui neutraliserait
+ *   la protection en silence) reste observable.
  * - En local, BotID renvoie toujours `isBot: false` (cf. doc « local development
  *   behavior »), donc le développement et les tests E2E ne sont pas impactés.
  */
@@ -18,7 +21,8 @@ export async function isLikelyBot(): Promise<boolean> {
   try {
     const { isBot } = await checkBotId();
     return isBot;
-  } catch {
+  } catch (error) {
+    Sentry.captureException(error);
     return false;
   }
 }
