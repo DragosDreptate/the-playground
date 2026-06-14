@@ -3,7 +3,7 @@
 import { after } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
-import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
+import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -55,24 +55,22 @@ export async function joinMomentAction(
       }
     );
 
-    if (!isAdminUser(session)) {
-      // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
-      // doit s'exécuter dans le request context, avant `after()`.
-      const resolver = await buildEmailLocaleResolver(userId);
-      // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
-      // de la Server Action. Une promesse fire-and-forget nue serait larguée au
-      // gel de l'instance (emails + Slack perdus par intermittence).
-      after(async () => {
-        try {
-          await (result.pendingApproval
-            ? notifyHostsPendingApproval(momentId, userId, resolver)
-            : sendRegistrationEmails(momentId, userId, result.registration, resolver));
-        } catch (err) {
-          console.error(err);
-          Sentry.captureException(err);
-        }
-      });
-    }
+    // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
+    // doit s'exécuter dans le request context, avant `after()`.
+    const resolver = await buildEmailLocaleResolver(userId);
+    // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
+    // de la Server Action. Une promesse fire-and-forget nue serait larguée au
+    // gel de l'instance (emails + Slack perdus par intermittence).
+    after(async () => {
+      try {
+        await (result.pendingApproval
+          ? notifyHostsPendingApproval(momentId, userId, resolver)
+          : sendRegistrationEmails(momentId, userId, result.registration, resolver));
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    });
 
     invalidateDashboardCache(userId);
     return result.registration;
