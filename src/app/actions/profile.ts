@@ -13,6 +13,7 @@ import { after } from "next/server";
 import { createResendEmailService } from "@/infrastructure/services";
 import { formatLongDate } from "@/lib/format-date";
 import { getDisplayName } from "@/lib/display-name";
+import { isImpersonatingName } from "@/lib/impersonation-guard";
 import { notifySlackNewUser, isAdminEmailEnabled } from "@/infrastructure/services/slack/slack-notification-service";
 import type { User, NotificationPreferences } from "@/domain/models/user";
 import type { ActionResult } from "./types";
@@ -39,6 +40,11 @@ export async function updateProfileAction(
   }
   if (!lastName?.trim()) {
     return { success: false, error: "Last name is required", code: "VALIDATION" };
+  }
+  // Anti-usurpation : interdit les noms se faisant passer pour la plateforme,
+  // le support ou l'admin (filet secondaire de la blocklist de sign-in).
+  if (isImpersonatingName(firstName, lastName)) {
+    return { success: false, error: "This name is not allowed", code: "VALIDATION" };
   }
 
   const bio = formData.get("bio") as string | null;

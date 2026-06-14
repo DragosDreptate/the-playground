@@ -15,6 +15,7 @@ import { classifyAuthError } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
+import { isBlockedSignIn } from "@/infrastructure/auth/sign-in-blocklist";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -167,7 +168,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   callbacks: {
-    async signIn({ user, profile }) {
+    async signIn({ user, account, profile }) {
+      // Anti-abus : refuse la connexion des acteurs malveillants connus
+      // (identité OAuth ou email blocklistés), avant toute autre logique.
+      if (isBlockedSignIn(user.email, account?.providerAccountId)) {
+        return false;
+      }
+
       // Synchro image OAuth — ne doit jamais bloquer le sign-in
       try {
         if (user.id && profile) {
