@@ -31,19 +31,33 @@ const DISPOSABLE_DOMAINS = new Set<string>([
   ...CUSTOM_DISPOSABLE_DOMAINS,
 ]);
 
-/** Extrait le domaine normalisé (minuscules) d'une adresse email. */
+/** Extrait le domaine normalisé (minuscules, sans point final FQDN) d'un email. */
 function extractDomain(email: string): string | null {
   const at = email.lastIndexOf("@");
   if (at === -1) return null;
-  const domain = email.slice(at + 1).trim().toLowerCase();
+  const domain = email
+    .slice(at + 1)
+    .trim()
+    .toLowerCase()
+    .replace(/\.+$/, ""); // retire le point final (forme FQDN : "ibymail.com.")
   return domain || null;
 }
 
 /**
  * Retourne true si l'email appartient à un domaine jetable connu.
- * Insensible à la casse. Renvoie false si l'email est malformé (pas de `@`).
+ *
+ * Teste le domaine ET ses suffixes parents (>= 2 labels), pour bloquer aussi
+ * les sous-domaines distribués par les providers jetables (ex.
+ * `mail.mailinator.com`, `x.ibymail.com`). Insensible à la casse. Renvoie false
+ * si l'email est malformé (pas de `@`).
  */
 export function isDisposableEmailDomain(email: string): boolean {
   const domain = extractDomain(email);
-  return domain !== null && DISPOSABLE_DOMAINS.has(domain);
+  if (domain === null) return false;
+  const labels = domain.split(".");
+  // i s'arrête à length-2 pour ne jamais tester un TLD seul.
+  for (let i = 0; i + 2 <= labels.length; i++) {
+    if (DISPOSABLE_DOMAINS.has(labels.slice(i).join("."))) return true;
+  }
+  return false;
 }

@@ -63,13 +63,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
       maxAge: MAGIC_LINK_MAX_AGE_SECONDS,
       async sendVerificationRequest({ identifier, url, request }) {
-        // Blocage des domaines jetables AVANT tout envoi. Placé ici (couche
-        // Auth.js) et pas seulement dans la server action : couvre aussi l'appel
-        // direct de l'endpoint NextAuth `/api/auth/signin/resend`.
-        if (isDisposableEmailDomain(identifier)) {
-          throw new Error("[AUTH] Disposable email domain rejected");
-        }
-
         const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -180,6 +173,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Anti-abus : refuse la connexion des acteurs malveillants connus
       // (identité OAuth ou email blocklistés), avant toute autre logique.
       if (isBlockedSignIn(user.email, account?.providerAccountId)) {
+        return false;
+      }
+
+      // Domaines jetables : pour le magic link, ce callback s'exécute AVANT la
+      // génération du token et l'envoi (cf. @auth/core sendToken). Un `return
+      // false` ici devient un AccessDenied propre (pas de token orphelin, erreur
+      // classée "expected" côté Sentry), et couvre l'appel direct de l'endpoint
+      // `/api/auth/signin/resend` que la server action ne protège pas.
+      if (
+        account?.provider === "resend" &&
+        user.email &&
+        isDisposableEmailDomain(user.email)
+      ) {
         return false;
       }
 

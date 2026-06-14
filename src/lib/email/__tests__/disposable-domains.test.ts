@@ -10,6 +10,9 @@ describe("isDisposableEmailDomain", () => {
       "USER@IBYMAIL.COM", // insensible à la casse
       "user@mailinator.com", // présent dans la liste du package
       "user@guerrillamail.com",
+      "user@mail.ibymail.com", // sous-domaine d'un domaine jetable
+      "user@x.y.mailinator.com", // sous-domaine profond
+      "user@ibymail.com.", // forme FQDN (point final)
     ])("should flag %s as disposable", (email) => {
       expect(isDisposableEmailDomain(email)).toBe(true);
     });
@@ -23,6 +26,7 @@ describe("isDisposableEmailDomain", () => {
       "user@interieur.gouv.fr",
       "user@yahoo.fr",
       "user@capgemini.com",
+      "user@mail.gmail.com", // sous-domaine d'un domaine légitime : pas de faux positif
     ])("should not flag %s", (email) => {
       expect(isDisposableEmailDomain(email)).toBe(false);
     });
