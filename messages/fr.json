@@ -143,6 +143,7 @@
       "or": "ou",
       "linkedin": "Continuer avec LinkedIn",
       "invalidEmail": "Adresse email invalide. Vérifiez votre saisie.",
+      "disposableEmail": "Les adresses email jetables ne sont pas acceptées. Utilisez une adresse permanente.",
       "sendFailed": "Impossible d'envoyer l'email pour le moment. Réessayez dans un instant.",
       "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous, elle fonctionne partout. Pour vous connecter avec Google ou GitHub, ouvrez le site dans votre navigateur (Safari, Chrome...)."
     },

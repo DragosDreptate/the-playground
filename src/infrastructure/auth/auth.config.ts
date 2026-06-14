@@ -16,6 +16,7 @@ import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
 import { isBlockedSignIn } from "@/infrastructure/auth/sign-in-blocklist";
+import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -62,6 +63,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",
       maxAge: MAGIC_LINK_MAX_AGE_SECONDS,
       async sendVerificationRequest({ identifier, url, request }) {
+        // Blocage des domaines jetables AVANT tout envoi. Placé ici (couche
+        // Auth.js) et pas seulement dans la server action : couvre aussi l'appel
+        // direct de l'endpoint NextAuth `/api/auth/signin/resend`.
+        if (isDisposableEmailDomain(identifier)) {
+          throw new Error("[AUTH] Disposable email domain rejected");
+        }
+
         const resend = createSafeResend(process.env.AUTH_RESEND_KEY);
         const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

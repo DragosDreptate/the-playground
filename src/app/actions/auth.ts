@@ -5,6 +5,7 @@ import { unstable_rethrow } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
 import { isValidEmail } from "@/lib/email";
+import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 import { safeCallbackUrl } from "@/lib/url";
 
 async function setCallbackCookie(callbackUrl: string) {
@@ -41,7 +42,7 @@ export async function signInWithGoogle(formData: FormData) {
 }
 
 export type SignInWithEmailState =
-  | { error: "INVALID_EMAIL" | "SEND_FAILED" }
+  | { error: "INVALID_EMAIL" | "DISPOSABLE_EMAIL" | "SEND_FAILED" }
   | null;
 
 export async function signInWithEmail(
@@ -51,6 +52,9 @@ export async function signInWithEmail(
   const email = ((formData.get("email") as string | null) ?? "").trim();
   if (!isValidEmail(email)) {
     return { error: "INVALID_EMAIL" };
+  }
+  if (isDisposableEmailDomain(email)) {
+    return { error: "DISPOSABLE_EMAIL" };
   }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
