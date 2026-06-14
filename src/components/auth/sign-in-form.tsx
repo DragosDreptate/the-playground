@@ -135,6 +135,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
                   INVALID_EMAIL: "signIn.invalidEmail",
                   DISPOSABLE_EMAIL: "signIn.disposableEmail",
                   SEND_FAILED: "signIn.sendFailed",
+                  BOT_DETECTED: "signIn.botDetected",
                 }[emailState.error]
               )}
             </p>

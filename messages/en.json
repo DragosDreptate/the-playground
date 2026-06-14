@@ -145,6 +145,7 @@
       "invalidEmail": "Invalid email address. Please check your input.",
       "disposableEmail": "Disposable email addresses are not allowed. Please use a permanent address.",
       "sendFailed": "Couldn't send the email right now. Please try again in a moment.",
+      "botDetected": "Security verification failed. Please reload the page and try again.",
       "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below, it works everywhere. To sign in with Google or GitHub, open the site in your browser (Safari, Chrome...)."
     },
     "verifyRequest": {
@@ -168,6 +169,7 @@
       "OAuthAccountNotLinked": "This email is already linked to another sign-in method. Use that one to continue.",
       "OAuthCallbackError": "Sign-in via the provider failed. Please try again.",
       "OAuthSignInError": "Sign-in via the provider couldn't start. Please try again.",
+      "BotDetected": "Security verification failed. Please reload the page and try again.",
       "Default": "An error occurred during sign in."
     },
     "signOut": "Sign out"
