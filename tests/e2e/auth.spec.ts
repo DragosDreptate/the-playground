@@ -41,6 +41,15 @@ test.describe("Authentification — page de connexion", () => {
     expect(isInvalid).toBe(true);
   });
 
+  test("should reject a disposable email domain without sending anything", async ({ page }) => {
+    // L'email jetable est rejeté par la server action AVANT tout appel à Resend
+    // (aucun email envoyé). On reste sur la page avec le message d'erreur dédié.
+    await page.fill("input[type='email']", "attacker@ibymail.com");
+    await page.locator("button").filter({ hasText: /envoyer.*lien|magic.*link/i }).click();
+    await expect(page.locator("#email-error")).toContainText(/jetable/i);
+    await expect(page).toHaveURL(/\/auth\/sign-in/);
+  });
+
   test("should redirect after submitting a valid email (verify-request or error if email not configured)", async ({ page }) => {
     await page.fill("input[type='email']", "test@example.com");
     await page.locator("button").filter({ hasText: /envoyer.*lien|magic.*link/i }).click();

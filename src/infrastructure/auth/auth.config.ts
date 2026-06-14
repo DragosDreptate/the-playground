@@ -16,6 +16,7 @@ import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
 import { isBlockedSignIn } from "@/infrastructure/auth/sign-in-blocklist";
+import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -172,6 +173,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Anti-abus : refuse la connexion des acteurs malveillants connus
       // (identité OAuth ou email blocklistés), avant toute autre logique.
       if (isBlockedSignIn(user.email, account?.providerAccountId)) {
+        return false;
+      }
+
+      // Domaines jetables : pour le magic link, ce callback s'exécute AVANT la
+      // génération du token et l'envoi (cf. @auth/core sendToken). Un `return
+      // false` ici devient un AccessDenied propre (pas de token orphelin, erreur
+      // classée "expected" côté Sentry), et couvre l'appel direct de l'endpoint
+      // `/api/auth/signin/resend` que la server action ne protège pas.
+      if (
+        account?.provider === "resend" &&
+        user.email &&
+        isDisposableEmailDomain(user.email)
+      ) {
         return false;
       }
 
