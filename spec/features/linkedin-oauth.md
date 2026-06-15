@@ -47,30 +47,30 @@ uploadé manuellement.
 > fonctionnera pas sur les URLs de preview Vercel dynamiques. Google/GitHub/magic
 > link couvrent la preview.
 
-## Auto-remplissage du champ « LinkedIn » du profil — BLOQUÉ (décision en attente)
+## Données récupérées à la connexion
 
-**Exigence demandée** : à la connexion LinkedIn, renseigner automatiquement le
-champ `linkedinUrl` du profil de l'utilisateur (`prisma/schema.prisma:149`).
+LinkedIn OIDC (scopes `openid profile email`) renvoie : `sub`, `name`,
+`given_name`, `family_name`, `picture`, `email`, `email_verified`, `locale`.
 
-**Constat technique** : ce n'est **pas réalisable** avec le produit OIDC standard
-de LinkedIn. Les scopes disponibles (`openid profile email`) renvoient uniquement :
-`sub`, `name`, `given_name`, `family_name`, `picture`, `email`, `email_verified`,
-`locale`. **Aucune URL de profil publique n'est exposée.** Le claim `sub` est un
-identifiant membre opaque, qui ne permet pas de reconstruire une URL
-`linkedin.com/in/...`.
+Captés **automatiquement** par Auth.js / l'adapter Prisma, sans code dédié :
 
-L'ancien scope `r_liteprofile` exposait un `vanityName` (d'où on pouvait dériver
-l'URL), mais il est déprécié et indisponible pour les nouvelles apps.
+- **Email** (`email`) — enregistré sur le `User` à la création / liaison du compte,
+  comme pour Google et GitHub.
+- **Nom** (`name`) — idem.
+- **Avatar** (`picture`) — synchronisé par le callback `signIn` existant
+  (`rawProfile.picture`), sans écraser un avatar uploadé manuellement.
 
-**Options :**
+## Auto-remplissage du champ « LinkedIn » du profil — ABANDONNÉ (décision prise)
 
-1. **Abandonner l'auto-remplissage** (recommandé) — techniquement impossible
-   proprement. On s'en tient au cœur OAuth. Le champ `linkedinUrl` reste rempli
-   manuellement par l'utilisateur dans son profil, comme aujourd'hui.
-2. **Nudge à l'onboarding** — après une première connexion LinkedIn, si
-   `linkedinUrl` est vide, proposer (sans pré-remplir) d'ajouter son profil
-   LinkedIn dans l'écran de setup. Ne remplit pas « automatiquement », mais
-   capitalise sur le contexte.
+**Exigence initiale** : à la connexion LinkedIn, renseigner automatiquement le
+champ `linkedinUrl` du profil (`prisma/schema.prisma:149`).
 
-> Décision à trancher avant de coder cette partie. Le reste de la feature
-> (connexion LinkedIn) est fonctionnel indépendamment.
+**Décision (2026-06-15) : abandonné.** Techniquement impossible avec le produit
+OIDC standard de LinkedIn : aucune URL de profil publique n'est exposée dans les
+claims. Le `sub` est un identifiant membre opaque, qui ne permet pas de
+reconstruire une URL `linkedin.com/in/...`. L'ancien scope `r_liteprofile`
+(`vanityName`) est déprécié et indisponible pour les nouvelles apps.
+
+Le champ `linkedinUrl` reste donc rempli manuellement par l'utilisateur dans son
+profil, comme aujourd'hui. L'email, le nom et l'avatar sont eux récupérés
+automatiquement (cf. section ci-dessus).
