@@ -43,7 +43,7 @@ async function signInPath() {
 // être bloquée, redirige vers la page de connexion. Le redirect interrompt
 // l'action, donc l'appelant ne poursuit pas vers signIn(). La journalisation
 // éventuelle est gérée dans evaluateBotSignIn.
-async function redirectIfBot(provider: "google" | "github") {
+async function redirectIfBot(provider: "google" | "github" | "linkedin") {
   const { shouldBlock } = await evaluateBotSignIn({ provider });
   if (shouldBlock) redirect(`${await signInPath()}?error=BotDetected`);
 }
@@ -62,6 +62,13 @@ export async function signInWithGoogle(formData: FormData) {
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   await signIn("google", { redirectTo: await postSignInRedirectTo() });
+}
+
+export async function signInWithLinkedIn(formData: FormData) {
+  await redirectIfBot("linkedin");
+  const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
+  if (callbackUrl) await setCallbackCookie(callbackUrl);
+  await signIn("linkedin", { redirectTo: await postSignInRedirectTo() });
 }
 
 export type SignInWithEmailState =

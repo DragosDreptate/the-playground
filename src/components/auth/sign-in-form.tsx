@@ -6,10 +6,11 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Github, Loader2, Mail } from "lucide-react";
+import { Github, Linkedin, Loader2, Mail } from "lucide-react";
 import {
   signInWithGitHub,
   signInWithGoogle,
+  signInWithLinkedIn,
   signInWithEmail,
   type SignInWithEmailState,
 } from "@/app/actions/auth";
@@ -94,6 +95,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           <>
             <DisabledOAuthButton label={t("signIn.google")} icon={<GoogleIcon />} />
             <DisabledOAuthButton label={t("signIn.github")} icon={<Github className="size-4" />} />
+            <DisabledOAuthButton label={t("signIn.linkedin")} icon={<Linkedin className="size-4" />} />
           </>
         ) : (
           <>
@@ -104,6 +106,10 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
             <form action={signInWithGitHub}>
               {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
               <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
+            </form>
+            <form action={signInWithLinkedIn}>
+              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+              <SubmitButton label={t("signIn.linkedin")} icon={<Linkedin className="size-4" />} variant="outline" />
             </form>
           </>
         )}

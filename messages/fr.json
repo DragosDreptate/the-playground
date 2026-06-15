@@ -1681,7 +1681,7 @@
         "stepsLabel": "Sur la page de l'événement :",
         "step1": "Lisez les informations : date, lieu, description, nombre de participants",
         "step2": "Cliquez sur <strong>S'inscrire</strong>",
-        "step3": "Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google / GitHub) — aucun formulaire à remplir",
+        "step3": "Si vous n'avez pas encore de compte, vous pouvez vous connecter en quelques secondes (lien magique par email ou via Google, GitHub ou LinkedIn) — aucun formulaire à remplir",
         "step4": "Une fois inscrit, vous recevez un <strong>email de confirmation</strong> avec les détails et un lien pour ajouter l'événement à votre calendrier (Google Calendar, Apple Calendar, ou fichier .ics)",
         "callout": "Aucun compte préalable n'est nécessaire pour voir la page d'un événement. L'inscription se fait en moins d'une minute.",
         "approvalNote": "Certains événements requièrent une validation par l'organisateur. Dans ce cas, le bouton affiche « S'inscrire (soumis à validation) ». Votre demande est transmise à l'organisateur, et vous recevez un email de confirmation dès qu'elle est acceptée. Si votre demande est refusée, vous en êtes notifié par email. Tant que votre demande est en attente, elle apparaît dans Mon espace avec le statut « En attente de validation »."
@@ -1929,7 +1929,7 @@
       },
       "q5": {
         "question": "Les participants ont-ils besoin d'un compte pour s'inscrire ?",
-        "answer": "Ils doivent créer un compte, mais le processus est très rapide : un email suffit (lien magique, sans mot de passe), ou une connexion Google / GitHub. Aucun formulaire long."
+        "answer": "Ils doivent créer un compte, mais le processus est très rapide : un email suffit (lien magique, sans mot de passe), ou une connexion Google, GitHub ou LinkedIn. Aucun formulaire long."
       },
       "q6": {
         "question": "Comment récupérer ou supprimer mes données ?",
