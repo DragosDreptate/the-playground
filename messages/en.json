@@ -146,7 +146,7 @@
       "disposableEmail": "Disposable email addresses are not allowed. Please use a permanent address.",
       "sendFailed": "Couldn't send the email right now. Please try again in a moment.",
       "botDetected": "Security verification failed. Please reload the page and try again.",
-      "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below, it works everywhere. To sign in with Google or GitHub, open the site in your browser (Safari, Chrome...)."
+      "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below, it works everywhere. To sign in with Google, GitHub or LinkedIn, open the site in your browser (Safari, Chrome...)."
     },
     "verifyRequest": {
       "title": "Check your email",
@@ -1681,7 +1681,7 @@
         "stepsLabel": "On the event page:",
         "step1": "Read the details: date, location, description, number of attendees",
         "step2": "Click <strong>Join</strong>",
-        "step3": "If you don't have an account yet, you can sign in in seconds (magic link by email or via Google / GitHub) — no form to fill out",
+        "step3": "If you don't have an account yet, you can sign in in seconds (magic link by email or via Google, GitHub or LinkedIn) — no form to fill out",
         "step4": "Once registered, you receive a <strong>confirmation email</strong> with the details and a link to add the event to your calendar (Google Calendar, Apple Calendar, or .ics file)",
         "callout": "No prior account is needed to view an event page. Registration takes less than a minute.",
         "approvalNote": "Some events require approval by the organizer. In that case, the button reads “Join (subject to approval)”. Your request is sent to the organizer, and you receive a confirmation email once it is accepted. If your request is declined, you are notified by email. While your request is pending, it appears in Dashboard with the status “Pending approval”."
@@ -1929,7 +1929,7 @@
       },
       "q5": {
         "question": "Do attendees need an account to register?",
-        "answer": "They need to create an account, but the process is very quick: an email is enough (magic link, no password), or sign in with Google / GitHub. No long forms."
+        "answer": "They need to create an account, but the process is very quick: an email is enough (magic link, no password), or sign in with Google, GitHub or LinkedIn. No long forms."
       },
       "q6": {
         "question": "How do I access or delete my data?",

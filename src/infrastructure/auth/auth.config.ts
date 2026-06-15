@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import LinkedIn from "next-auth/providers/linkedin";
 import ResendProvider from "next-auth/providers/resend";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { getTranslations } from "next-intl/server";
@@ -55,9 +56,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // feedback. Risque : un attaquant qui contrôlerait un compte OAuth avec un
     // email primaire correspondant à un User existant pourrait usurper. Mitigé
     // pour Google (email_verified=true requis via OIDC) et pour GitHub (verif
-    // email obligatoire avant de marquer une adresse comme primary).
+    // email obligatoire avant de marquer une adresse comme primary). LinkedIn
+    // est OIDC et renvoie également email_verified : même mitigation que Google.
     GitHub({ allowDangerousEmailAccountLinking: true }),
     Google({ allowDangerousEmailAccountLinking: true }),
+    LinkedIn({ allowDangerousEmailAccountLinking: true }),
     ResendProvider({
       apiKey: process.env.AUTH_RESEND_KEY,
       from: process.env.EMAIL_FROM ?? "onboarding@resend.dev",

@@ -32,7 +32,7 @@ export async function isLikelyBot(): Promise<boolean> {
 }
 
 /** Provider de connexion à l'origine de la détection BotID. */
-export type BotBlockProvider = "google" | "github" | "resend";
+export type BotBlockProvider = "google" | "github" | "linkedin" | "resend";
 
 /**
  * Mode d'application de BotID au sign-in, piloté par la variable d'environnement

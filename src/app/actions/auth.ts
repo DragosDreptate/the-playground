@@ -43,25 +43,34 @@ async function signInPath() {
 // être bloquée, redirige vers la page de connexion. Le redirect interrompt
 // l'action, donc l'appelant ne poursuit pas vers signIn(). La journalisation
 // éventuelle est gérée dans evaluateBotSignIn.
-async function redirectIfBot(provider: "google" | "github") {
+type OAuthProvider = "google" | "github" | "linkedin";
+
+async function redirectIfBot(provider: OAuthProvider) {
   const { shouldBlock } = await evaluateBotSignIn({ provider });
   if (shouldBlock) redirect(`${await signInPath()}?error=BotDetected`);
 }
 
-export async function signInWithGitHub(formData: FormData) {
-  await redirectIfBot("github");
+// Flux OAuth générique partagé par tous les fournisseurs : protection BotID,
+// mémorisation du callbackUrl, puis délégation à Auth.js. Toujours passer par le
+// setup : la page setup redirige vers callbackUrl si le profil est déjà complété,
+// sinon affiche le formulaire.
+async function signInWithOAuth(provider: OAuthProvider, formData: FormData) {
+  await redirectIfBot(provider);
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  // Toujours passer par le setup : la page setup redirige vers callbackUrl
-  // si le profil est déjà complété, sinon affiche le formulaire.
-  await signIn("github", { redirectTo: await postSignInRedirectTo() });
+  await signIn(provider, { redirectTo: await postSignInRedirectTo() });
+}
+
+export async function signInWithGitHub(formData: FormData) {
+  await signInWithOAuth("github", formData);
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  await redirectIfBot("google");
-  const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
-  if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn("google", { redirectTo: await postSignInRedirectTo() });
+  await signInWithOAuth("google", formData);
+}
+
+export async function signInWithLinkedIn(formData: FormData) {
+  await signInWithOAuth("linkedin", formData);
 }
 
 export type SignInWithEmailState =
