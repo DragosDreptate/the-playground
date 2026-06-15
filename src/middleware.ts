@@ -92,5 +92,15 @@ export default function middleware(request: NextRequest) {
 export const config = {
   // `embed(?:/|$)` (vs simple `embed`) évite de matcher des paths futurs
   // comme /embedded-foo qui ne sont pas l'app widget embed.
-  matcher: ["/((?!api|_next|_vercel|monitoring|ingest|icon|embed(?:/|$)|.*\\..*).*)"],
+  //
+  // `149e9513-01fa-4fb0-aad4-566afd725d1b` = préfixe proxy FIXE de Vercel BotID
+  // (challenge servi en first-party via les rewrites de withBotId, cf.
+  // next.config.ts). Les chemins du challenge AVEC extension (.js) sont déjà
+  // exclus par `.*\\..*`, mais ses appels proxy SANS extension étaient captés
+  // par next-intl et renvoyés en 404 — cassant le challenge (faux positifs +
+  // latence au sign-in pour tous). Le matcher doit être un littéral statique
+  // (analysé au build), d'où l'UUID en dur. Constante documentée par Vercel.
+  matcher: [
+    "/((?!api|_next|_vercel|monitoring|ingest|icon|embed(?:/|$)|149e9513-01fa-4fb0-aad4-566afd725d1b|.*\\..*).*)",
+  ],
 };
