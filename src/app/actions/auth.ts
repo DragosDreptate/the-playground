@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
-import { isLikelyBot, recordBotBlock } from "@/infrastructure/security/bot-protection";
+import { evaluateBotSignIn } from "@/infrastructure/security/bot-protection";
 import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
@@ -39,14 +39,13 @@ async function signInPath() {
     : `/${locale}/auth/sign-in`;
 }
 
-// Pour les flux OAuth : si BotID classe la requête comme bot, journalise le
-// blocage puis redirige vers la page de connexion (le redirect interrompt
-// l'action, donc l'appelant ne poursuit pas vers signIn()).
+// Pour les flux OAuth : évalue BotID (selon BOTID_MODE) et, si la requête doit
+// être bloquée, redirige vers la page de connexion. Le redirect interrompt
+// l'action, donc l'appelant ne poursuit pas vers signIn(). La journalisation
+// éventuelle est gérée dans evaluateBotSignIn.
 async function redirectIfBot(provider: "google" | "github") {
-  if (await isLikelyBot()) {
-    await recordBotBlock({ provider });
-    redirect(`${await signInPath()}?error=BotDetected`);
-  }
+  const { shouldBlock } = await evaluateBotSignIn({ provider });
+  if (shouldBlock) redirect(`${await signInPath()}?error=BotDetected`);
 }
 
 export async function signInWithGitHub(formData: FormData) {
@@ -80,8 +79,8 @@ export async function signInWithEmail(
   if (isDisposableEmailDomain(email)) {
     return { error: "DISPOSABLE_EMAIL" };
   }
-  if (await isLikelyBot()) {
-    await recordBotBlock({ provider: "resend", email });
+  const { shouldBlock } = await evaluateBotSignIn({ provider: "resend", email });
+  if (shouldBlock) {
     return { error: "BOT_DETECTED" };
   }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
