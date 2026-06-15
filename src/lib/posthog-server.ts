@@ -4,8 +4,34 @@
  * Non-bloquant : une erreur ici ne doit jamais interrompre le flux utilisateur.
  */
 
+import { cookies } from "next/headers";
+
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const POSTHOG_HOST = "https://eu.posthog.com";
+
+/**
+ * Récupère le `distinct_id` du navigateur depuis le cookie PostHog
+ * (`ph_<key>_posthog`), pour rattacher un event serveur à la même person et au
+ * même parcours que les events client ($pageview, etc.). Indispensable pour
+ * corréler un blocage serveur (ex. `bot_blocked`) avec la navigation qui l'a
+ * précédé, sans jointure manuelle.
+ *
+ * Renvoie `null` si le cookie est absent (navigateur neuf, PostHog bloqué) ou
+ * illisible — l'appelant retombe alors sur un identifiant de repli.
+ */
+export async function getPosthogDistinctId(): Promise<string | null> {
+  if (!POSTHOG_KEY) return null;
+  try {
+    const raw = (await cookies()).get(`ph_${POSTHOG_KEY}_posthog`)?.value;
+    if (!raw) return null;
+    // La valeur est un JSON, parfois URL-encodé selon le navigateur.
+    const json = raw.startsWith("{") ? raw : decodeURIComponent(raw);
+    const parsed = JSON.parse(json) as { distinct_id?: string };
+    return parsed.distinct_id ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function captureServerEvent(
   distinctId: string,

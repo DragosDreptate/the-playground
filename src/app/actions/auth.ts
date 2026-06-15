@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
-import { isLikelyBot } from "@/infrastructure/security/bot-protection";
+import { isLikelyBot, recordBotBlock } from "@/infrastructure/security/bot-protection";
 import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
@@ -39,8 +39,18 @@ async function signInPath() {
     : `/${locale}/auth/sign-in`;
 }
 
+// Pour les flux OAuth : si BotID classe la requête comme bot, journalise le
+// blocage puis redirige vers la page de connexion (le redirect interrompt
+// l'action, donc l'appelant ne poursuit pas vers signIn()).
+async function redirectIfBot(provider: "google" | "github") {
+  if (await isLikelyBot()) {
+    await recordBotBlock({ provider });
+    redirect(`${await signInPath()}?error=BotDetected`);
+  }
+}
+
 export async function signInWithGitHub(formData: FormData) {
-  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
+  await redirectIfBot("github");
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   // Toujours passer par le setup : la page setup redirige vers callbackUrl
@@ -49,7 +59,7 @@ export async function signInWithGitHub(formData: FormData) {
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
+  await redirectIfBot("google");
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   await signIn("google", { redirectTo: await postSignInRedirectTo() });
@@ -71,6 +81,7 @@ export async function signInWithEmail(
     return { error: "DISPOSABLE_EMAIL" };
   }
   if (await isLikelyBot()) {
+    await recordBotBlock({ provider: "resend", email });
     return { error: "BOT_DETECTED" };
   }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
