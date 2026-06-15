@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { signIn, signOut } from "@/infrastructure/auth/auth.config";
-import { isLikelyBot } from "@/infrastructure/security/bot-protection";
+import { evaluateBotSignIn } from "@/infrastructure/security/bot-protection";
 import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
@@ -39,8 +39,17 @@ async function signInPath() {
     : `/${locale}/auth/sign-in`;
 }
 
+// Pour les flux OAuth : évalue BotID (selon BOTID_MODE) et, si la requête doit
+// être bloquée, redirige vers la page de connexion. Le redirect interrompt
+// l'action, donc l'appelant ne poursuit pas vers signIn(). La journalisation
+// éventuelle est gérée dans evaluateBotSignIn.
+async function redirectIfBot(provider: "google" | "github") {
+  const { shouldBlock } = await evaluateBotSignIn({ provider });
+  if (shouldBlock) redirect(`${await signInPath()}?error=BotDetected`);
+}
+
 export async function signInWithGitHub(formData: FormData) {
-  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
+  await redirectIfBot("github");
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   // Toujours passer par le setup : la page setup redirige vers callbackUrl
@@ -49,7 +58,7 @@ export async function signInWithGitHub(formData: FormData) {
 }
 
 export async function signInWithGoogle(formData: FormData) {
-  if (await isLikelyBot()) redirect(`${await signInPath()}?error=BotDetected`);
+  await redirectIfBot("google");
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   await signIn("google", { redirectTo: await postSignInRedirectTo() });
@@ -70,7 +79,8 @@ export async function signInWithEmail(
   if (isDisposableEmailDomain(email)) {
     return { error: "DISPOSABLE_EMAIL" };
   }
-  if (await isLikelyBot()) {
+  const { shouldBlock } = await evaluateBotSignIn({ provider: "resend", email });
+  if (shouldBlock) {
     return { error: "BOT_DETECTED" };
   }
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
