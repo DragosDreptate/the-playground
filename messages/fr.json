@@ -146,7 +146,7 @@
       "disposableEmail": "Les adresses email jetables ne sont pas acceptées. Utilisez une adresse permanente.",
       "sendFailed": "Impossible d'envoyer l'email pour le moment. Réessayez dans un instant.",
       "botDetected": "La vérification de sécurité a échoué. Rechargez la page et réessayez.",
-      "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous, elle fonctionne partout. Pour vous connecter avec Google ou GitHub, ouvrez le site dans votre navigateur (Safari, Chrome...)."
+      "webviewNotice": "Vous utilisez un navigateur intégré (LinkedIn, Instagram...). Utilisez la connexion par email ci-dessous, elle fonctionne partout. Pour vous connecter avec Google, GitHub ou LinkedIn, ouvrez le site dans votre navigateur (Safari, Chrome...)."
     },
     "verifyRequest": {
       "title": "Vérifiez votre email",
