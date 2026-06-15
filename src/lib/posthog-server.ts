@@ -13,8 +13,8 @@ const POSTHOG_HOST = "https://eu.posthog.com";
  * Récupère le `distinct_id` du navigateur depuis le cookie PostHog
  * (`ph_<key>_posthog`), pour rattacher un event serveur à la même person et au
  * même parcours que les events client ($pageview, etc.). Indispensable pour
- * corréler un blocage serveur (ex. `bot_blocked`) avec la navigation qui l'a
- * précédé, sans jointure manuelle.
+ * corréler une détection serveur (ex. `bot_detected`) avec la navigation qui
+ * l'a précédée, sans jointure manuelle.
  *
  * Renvoie `null` si le cookie est absent (navigateur neuf, PostHog bloqué) ou
  * illisible — l'appelant retombe alors sur un identifiant de repli.

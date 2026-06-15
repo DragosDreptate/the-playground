@@ -96,29 +96,36 @@ async function recordBotDetection(input: {
   email?: string;
   mode: Exclude<BotIdMode, "off">;
 }): Promise<void> {
-  const [{ user_agent, referer }, locale, distinctId] = await Promise.all([
-    getRequestObservability(),
-    getLocale(),
-    getPosthogDistinctId(),
-  ]);
+  // Télémétrie best-effort : ne doit JAMAIS faire échouer le sign-in. La collecte
+  // de contexte (notamment getLocale, non protégé en interne contrairement à
+  // getRequestObservability/getPosthogDistinctId) est donc entièrement gardée.
+  try {
+    const [{ user_agent, referer }, locale, distinctId] = await Promise.all([
+      getRequestObservability(),
+      getLocale(),
+      getPosthogDistinctId(),
+    ]);
 
-  const properties = {
-    provider: input.provider,
-    mode: input.mode,
-    blocked: input.mode === "enforce",
-    locale,
-    user_agent,
-    referer,
-    ...(input.email
-      ? { email_domain: input.email.split("@")[1] ?? "unknown" }
-      : {}),
-  };
+    const properties = {
+      provider: input.provider,
+      mode: input.mode,
+      blocked: input.mode === "enforce",
+      locale,
+      user_agent,
+      referer,
+      ...(input.email
+        ? { email_domain: input.email.split("@")[1] ?? "unknown" }
+        : {}),
+    };
 
-  after(() =>
-    captureServerEvent(
-      distinctId ?? input.email ?? "anonymous_bot",
-      "bot_detected",
-      properties
-    )
-  );
+    after(() =>
+      captureServerEvent(
+        distinctId ?? input.email ?? "anonymous_bot",
+        "bot_detected",
+        properties
+      )
+    );
+  } catch (error) {
+    Sentry.captureException(error);
+  }
 }

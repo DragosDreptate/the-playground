@@ -105,6 +105,7 @@ describe("evaluateBotSignIn (modes BotID + journalisation)", () => {
     after.mockClear();
     checkBotId.mockReset();
     captureServerEvent.mockReset();
+    captureException.mockReset();
     getLocale.mockReset();
     getRequestObservability.mockReset();
     getPosthogDistinctId.mockReset();
@@ -131,6 +132,17 @@ describe("evaluateBotSignIn (modes BotID + journalisation)", () => {
       await expect(evaluateBotSignIn({ provider: "google" })).resolves.toEqual({
         shouldBlock: true,
       });
+    });
+
+    it("should bloquer quand même si la journalisation échoue (télémétrie best-effort)", async () => {
+      // getLocale n'est pas protégé en interne : s'il throw, le sign-in ne doit
+      // pas planter et le blocage doit rester effectif.
+      getLocale.mockRejectedValue(new Error("i18n context indisponible"));
+
+      await expect(evaluateBotSignIn({ provider: "google" })).resolves.toEqual({
+        shouldBlock: true,
+      });
+      expect(captureException).toHaveBeenCalled();
     });
 
     it("should émettre bot_detected avec blocked=true et le contexte de requête", async () => {
