@@ -6,7 +6,7 @@ import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Github, Linkedin, Loader2, Mail } from "lucide-react";
+import { Github, Loader2, Mail } from "lucide-react";
 import {
   signInWithGitHub,
   signInWithGoogle,
@@ -23,6 +23,17 @@ function GoogleIcon() {
       <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
       <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
       <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4" aria-hidden="true">
+      <path
+        fill="#0A66C2"
+        d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.8 0 0 .78 0 1.74v20.52C0 23.22.8 24 1.77 24h20.45c.97 0 1.78-.78 1.78-1.74V1.74C24 .78 23.19 0 22.22 0z"
+      />
     </svg>
   );
 }
@@ -94,8 +105,8 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
         {webview ? (
           <>
             <DisabledOAuthButton label={t("signIn.google")} icon={<GoogleIcon />} />
+            <DisabledOAuthButton label={t("signIn.linkedin")} icon={<LinkedInIcon />} />
             <DisabledOAuthButton label={t("signIn.github")} icon={<Github className="size-4" />} />
-            <DisabledOAuthButton label={t("signIn.linkedin")} icon={<Linkedin className="size-4" />} />
           </>
         ) : (
           <>
@@ -103,13 +114,13 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
               {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
               <SubmitButton label={t("signIn.google")} icon={<GoogleIcon />} variant="outline" />
             </form>
+            <form action={signInWithLinkedIn}>
+              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+              <SubmitButton label={t("signIn.linkedin")} icon={<LinkedInIcon />} variant="outline" />
+            </form>
             <form action={signInWithGitHub}>
               {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
               <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
-            </form>
-            <form action={signInWithLinkedIn}>
-              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-              <SubmitButton label={t("signIn.linkedin")} icon={<Linkedin className="size-4" />} variant="outline" />
             </form>
           </>
         )}
