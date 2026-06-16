@@ -554,50 +554,15 @@ Inclut les modèles domaine + modèles Auth.js (Account, Session, VerificationTo
 
 ## Décisions prises
 
-| Date | Décision |
-| --- | --- |
-| 2026-02-19 | L'Escale est l'unité virale, page autonome partageable (inspiration Luma) |
-| 2026-02-19 | Rejoindre une Escale = inscription automatique au Cercle (pas de friction) |
-| 2026-02-19 | Design-first comme principe structurant (Luma = benchmark UX) |
-| 2026-02-19 | 100% gratuit, 0% commission plateforme, seuls frais Stripe |
-| 2026-02-19 | IA basique dès le MVP (descriptions, emails, suggestions) |
-| 2026-02-19 | Liste d'attente dans le MVP (pas en Phase 2) |
-| 2026-02-19 | Notifications multi-canal en architecture, email-only en V1 |
-| 2026-02-19 | La Carte : répertoire public de Circles (annuaire simple, pas de marketplace) |
-| 2026-02-19 | On garde le nom "Circle" malgré la collision avec Circle.so |
-| 2026-02-19 | Fil de commentaires sur Escale (pas de forum complet) |
-| 2026-02-19 | Mobile-first pour le parcours Participant |
-| 2026-02-19 | Export données ambitieux (CSV + JSON + API Pro) |
-| 2026-02-19 | UI bilingue FR/EN dès V1, architecture i18n native pour multi-langue futur |
-| 2026-02-19 | Lancement France d'abord, puis expansion européenne et internationale |
-| 2026-02-19 | Stack technique : TypeScript full-stack (Next.js 16, Prisma, PostgreSQL, Auth.js, Stripe Connect, Tailwind + shadcn/ui, Resend, Anthropic SDK, Vercel + Neon/Supabase) |
-| 2026-02-19 | Architecture hexagonale : domain/ (models, ports, usecases) + infrastructure/ (repositories, services) + app/ (routes Next.js) |
-| 2026-02-19 | Questions ouvertes résolues : découverte publique = oui, freemium = non, langue = bilingue FR/EN, géo = France d'abord |
-| 2026-02-19 | Track retiré du MVP V1 → Phase 2. MVP se concentre sur Circle + Escale |
-| 2026-02-19 | Auth : Magic link + OAuth (Google, GitHub) via Auth.js v5 |
-| 2026-02-19 | Data model V1 : User, Circle, CircleMembership, Moment, Registration, Comment |
-| 2026-02-19 | Modèle User unique (pas d'entités Host/Player séparées) — rôle via CircleMembership |
-| 2026-02-19 | Prix en centimes (int) — convention Stripe, pas de floating point |
-| 2026-02-19 | Tests : BDD lightweight (Given/When/Then natif Vitest) + Specification by Example (test.each), pas de Gherkin/Cucumber |
-| 2026-02-19 | Sécu MVP : tests d'autorisation multi-tenant dans Vitest + pnpm audit en CI. Pentest → pré-lancement |
-| 2026-02-19 | Perf MVP : Lighthouse CI sur pages Escale + détection N+1. Load testing → pré-lancement |
-| 2026-02-19 | A11y : axe-core intégré dans tests Playwright E2E |
-| 2026-02-19 | Benchmark Luma intégré : page Escale = 80% de la valeur (titre, date, lieu, CTA, social proof) |
-| 2026-02-19 | Social proof MVP : liste inscrits avec avatars/initiales + places restantes sur page Escale |
-| 2026-02-19 | Ajout calendrier natif post-inscription (Google Calendar, Apple Calendar, ICS) |
-| 2026-02-19 | Formulaire création Escale minimaliste : titre/date/lieu/description, options avancées masquées |
-| 2026-02-19 | Branding : marque visible mais discrète — "Powered by The Playground" en footer, Organisateur au premier plan |
-| 2026-02-19 | Distribution par les Organisateurs (liens partageables + calendrier), pas d'algo de distribution plateforme |
-| 2026-02-19 | Traductions FR : Circle → Cercle, Moment → Escale, Host → Organisateur, Player → Participant. Termes EN conservés dans le code. |
-| 2026-02-19 | Tagline officielle : "Lancez votre communauté. Organisez vos événements. Animez votre réseau." |
-| 2026-02-20 | Positionnement clarifié : community-centric (Meetup) + UX premium (Luma) + 100% gratuit. Circle = entité centrale, Escale = porte d'entrée virale, la page Cercle est la couche de rétention absente chez Luma |
-| 2026-02-21 | Dashboard redesigné : pill tabs (Mes Escales / Mes Cercles), timeline unifiée (upcoming + past), empty states avec CTA. Pas de CTAs dans les tab headers. |
-| 2026-02-21 | CircleAvatar : composant réutilisable (gradient + initial), prêt pour future prop `image` (avatar Circle personnalisé) |
-| 2026-02-21 | CircleMembersList : liste des membres sur page Circle, Organisateurs d'abord (Crown), emails visibles uniquement pour les Organisateurs (prop `variant`) |
-| 2026-02-21 | Terminologie FR renommée : Moment → **Escale** (féminin), S'inscrire → **Rejoindre**, Dashboard → **Mon Playground**. Code/clés JSON inchangés. |
-| 2026-02-21 | Terminologie EN renommée : Player → **Member**, Register → **Join**, Dashboard → **My Playground**. Moment reste "Moment" en EN. |
-| 2026-02-23 | Terminologie EN alignée sur FR : Circle → **Community**, Moment → **Event**, My Playground → **Dashboard**. Code/clés JSON inchangés. FR inchangé. |
-| 2026-02-21 | Le Répertoire renommé **La Carte** (FR) / **Explore** (EN). Route `/explorer` et clé i18n `Explorer` inchangées. La Boussole réservée pour l'assistant IA (futur). |
-| 2026-02-22 | Terminologie FR simplifiée pour accessibilité : Cercle → **Communauté**, Escale → **événement** (masculin : Brouillon, Publié, Annulé, Passé), Mon Playground → **Mon espace**, La Carte → **Découvrir**, Rejoindre → **S'inscrire**. Code/clés JSON inchangés. EN inchangé. |
-| 2026-03-14 | Statut **DRAFT (Brouillon)** ajouté à `MomentStatus`. Tout événement créé est en DRAFT par défaut. Transition DRAFT → PUBLISHED via usecase `publishMoment` (sens unique). Notifications membres et email Organisateur déplacés à la publication. Événements DRAFT exclus de l'Explorer, du sitemap, sans OG tags. Inscription bloquée sur un événement DRAFT. |
-| 2026-04-22 | **Distinction "Rejoindre" vs "S'inscrire" (FR) verrouillée** comme choix volontaire non unifiable. Rejoindre = Circle (adhésion durable), S'inscrire = Moment (RSVP ponctuel). En EN les deux utilisent "Join". |
+> **Registre canonique : [`spec/decisions.md`](spec/decisions.md).** Tout l'historique des décisions structurantes y est consigné (avec des ADR détaillés dans [`spec/decisions/`](spec/decisions/) pour les plus lourdes). Cette section ne duplique plus le journal, pour éviter la divergence.
+
+### Règle normative — consigner les décisions structurantes
+
+> **Cette règle est normative.** Dès qu'une décision structurante émerge d'une conversation (fonctionnelle, stratégique, technique, produit, UX, sécu, infra) — une décision qui **contraint la suite** du projet et qu'on regretterait de devoir re-débattre — elle DOIT être consignée **sans attendre une demande explicite de l'utilisateur** :
+>
+> 1. **Toujours** : une ligne dans `spec/decisions.md` (date + décision + contexte court).
+> 2. **Si la décision est vraiment lourde** : un ADR dans `spec/decisions/NNNN-slug.md` au format Contexte → Décision → Alternatives écartées → Conséquences, lié depuis la ligne du journal.
+>
+> Objectif : capturer le **pourquoi** et les **alternatives écartées**, pas seulement le quoi, pour ne pas réinventer la roue ni s'écarter d'un choix déjà tranché.
+>
+> **Ne pas consigner** les éléments réversibles sans coût (fix de bug, renommage local, détail d'implémentation). Voir [`spec/decisions/README.md`](spec/decisions/README.md) pour le mode d'emploi et la définition de « structurant ».

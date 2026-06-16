@@ -1,7 +1,10 @@
 # Décisions clés — The Playground
 
-> Journal chronologique des décisions architecturales et produit prises au fil du projet.
-> Les décisions intermédiaires supersédées ont été retirées.
+> **Registre canonique des décisions du projet.** Source unique de vérité.
+> Journal chronologique des décisions structurantes (architecturales, produit, stratégiques, techniques) prises au fil du projet. Les décisions intermédiaires supersédées ont été retirées.
+>
+> **Deux niveaux** : une ligne ici pour toute décision structurante ; un ADR détaillé dans [`spec/decisions/`](decisions/) (Contexte → Décision → Alternatives écartées → Conséquences) pour les décisions vraiment lourdes. Voir [`spec/decisions/README.md`](decisions/README.md).
+>
 > Règles de vie du projet (terminologie, principes, stack) : `CLAUDE.md`.
 
 ---
@@ -34,4 +37,6 @@
 | 2026-04-18 | Refonte du backlog : fichier unique `spec/BACKLOG.md` au format minimaliste (5 champs fixes), items ajoutés uniquement sur demande explicite. Phase 2 + Stripe déplacés dans `spec/ideas.md`, décisions clés dans `spec/decisions.md`. |
 | 2026-04-19 | `spec/BACKLOG.md` sorti du tracking git. Source unique dans le repo principal, symlink dans les worktrees créé automatiquement par `scripts/worktree-new.sh`. Modifications en local sans commit / PR. |
 | 2026-05-06 | Migration du backlog vers GitHub Issues + Project v2 « Backlog » (https://github.com/users/DragosDreptate/projects/1). Labels `type:*` (feature, evol, fix, chore, idea), fields Project `Status` (Backlog, Up Next, In Progress, In Review, Done) et `Priority` (high, medium, low). 22 items migrés en issues #423 → #444. `spec/BACKLOG.md` supprimé, symlink retiré du script worktree. |
-| 2026-05-07 | `allowDangerousEmailAccountLinking: true` activé sur Google et GitHub. Évite l'erreur `OAuthAccountNotLinked` quand un User a un compte existant (créé via magic link ou autre provider) et tente de se connecter avec un OAuth pour la première fois sur le même email. Risque mitigé : Google vérifie l'email via OIDC (`email_verified`), GitHub exige une vérification avant qu'une adresse soit marquée comme primary. La page `/auth/sign-in` lit désormais `searchParams.error` et affiche un bandeau pour les `SignInError` qui transitent encore par cette page (`OAuthCallbackError`, `OAuthSignInError`, `AccessDenied`, fallback `Default`). Issue #429. |
+| 2026-04-22 | **Distinction « Rejoindre » vs « S'inscrire » (FR) verrouillée** comme choix volontaire non unifiable. Rejoindre = action sur un Circle (adhésion durable à une communauté). S'inscrire = action sur un Moment (RSVP ponctuel). En EN les deux contextes utilisent « Join ». Ne pas chercher à unifier en FR. |
+| 2026-05-07 | `allowDangerousEmailAccountLinking: true` activé sur Google et GitHub. Évite l'erreur `OAuthAccountNotLinked` quand un User a un compte existant (créé via magic link ou autre provider) et tente de se connecter avec un OAuth pour la première fois sur le même email. Risque mitigé : Google vérifie l'email via OIDC (`email_verified`), GitHub exige une vérification avant qu'une adresse soit marquée comme primary. La page `/auth/sign-in` lit désormais `searchParams.error` et affiche un bandeau pour les `SignInError` qui transitent encore par cette page (`OAuthCallbackError`, `OAuthSignInError`, `AccessDenied`, fallback `Default`). Issue #429. **[→ ADR-0001](decisions/0001-oauth-account-linking.md)** |
+| 2026-06-16 | **Gouvernance des décisions formalisée.** `spec/decisions.md` devient le registre canonique unique. Système à deux niveaux : ligne ici + ADR détaillé dans `spec/decisions/` pour les décisions lourdes. Table « Décisions prises » de `CLAUDE.md` remplacée par un pointeur (évite la divergence constatée : la table CLAUDE.md s'arrêtait en avril, ce journal allait jusqu'en mai). Règle normative ajoutée dans `CLAUDE.md` : consigner toute décision structurante sans attendre une demande explicite. |
