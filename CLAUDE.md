@@ -184,6 +184,16 @@ L'`AlertDialogAction` dans la modale de confirmation utilise `className="bg-dest
 
 Ne jamais avoir deux boutons qui déclenchent la même action sur la même page. Si une action est déjà accessible via un élément UI (lien, icône), ne pas ajouter un bouton redondant.
 
+### Focus des champs de saisie — jamais de ring rose
+
+> **Règle normative.** Un champ de saisie (input, textarea, select, autocomplete) ne doit **jamais** afficher de liseré/ring rose au focus (`focus-visible:ring-ring`, `focus-within:ring-ring`, `border-ring`, la couleur `--ring`). Le focus se signale par une **bordure neutre assombrie** : `focus-visible:border-muted-foreground` (ou `focus-within:border-muted-foreground` pour un conteneur englobant), **sans ring de focus**.
+>
+> **Seule exception au « pas de ring » sur un champ** : le **ring d'erreur** de validation (`aria-invalid:ring-[3px]` + `aria-invalid:ring-destructive`), rouge — ce n'est pas un highlight de focus mais un signal d'état invalide.
+>
+> Appliqué à la source dans les primitives `ui/input.tsx`, `ui/textarea.tsx`, `ui/select.tsx`, `ui/place-autocomplete-input.tsx` : tout nouveau champ hérite du bon comportement. Ne jamais réintroduire `ring-ring` / `border-ring` au focus sur un champ.
+>
+> Le ring de focus **reste autorisé** sur les contrôles interactifs non-texte (boutons, tabs, switch, badge, fermeture de dialog/sheet, calendrier) : il y sert d'indicateur d'accessibilité pour la navigation clavier.
+
 ## Monétisation
 
 - **100% gratuit** — aucune commission plateforme, aucun abonnement requis

@@ -214,8 +214,6 @@ export function HostMessageDialog({
             placeholder={t("subjectPlaceholder")}
             maxLength={HOST_MESSAGE_SUBJECT_MAX_LENGTH}
             disabled={isPending}
-            // Focus neutre, aligné sur l'éditeur en dessous (pas de ring rose)
-            className="focus-visible:border-muted-foreground/40 focus-visible:ring-0"
           />
         </div>
 

@@ -7,7 +7,7 @@ import { sendContactMessageAction } from "@/app/actions/contact";
 type FormState = { success: true } | { success: false; error: string } | null;
 
 const inputClassName =
-  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+  "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-muted-foreground disabled:cursor-not-allowed disabled:opacity-50";
 
 const labelClassName = "text-sm font-medium text-foreground";
 
@@ -148,7 +148,7 @@ export function ContactForm() {
           name="message"
           required
           rows={5}
-          className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:border-muted-foreground resize-none disabled:cursor-not-allowed disabled:opacity-50"
           placeholder={t("messagePlaceholder")}
           disabled={pending}
         />

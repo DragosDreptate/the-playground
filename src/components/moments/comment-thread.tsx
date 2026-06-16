@@ -366,7 +366,7 @@ export function CommentThread({
         {isAuthenticated ? (
           <div className="space-y-2 pt-2">
             {/* Textarea + char count in a single bordered container */}
-            <div className="border-input bg-background focus-within:ring-ring focus-within:border-ring rounded-xl border focus-within:ring-2 focus-within:ring-offset-2">
+            <div className="border-input bg-background focus-within:border-muted-foreground rounded-xl border transition-colors">
               <textarea
                 ref={textareaRef}
                 value={content}
