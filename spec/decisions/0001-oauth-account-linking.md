@@ -28,3 +28,7 @@ En complément, la page `/auth/sign-in` lit `searchParams.error` et affiche un b
 - **Positives** : parcours de connexion sans rupture, quel que soit l'ordre des providers utilisés sur un même email.
 - **Risques mitigés** : le risque d'usurpation via email non vérifié est couvert par les providers eux-mêmes. Google vérifie l'email via OIDC (`email_verified`). GitHub exige qu'une adresse soit vérifiée avant de pouvoir être marquée comme primary. On ne lie donc jamais sur un email non prouvé.
 - **Ce que ça verrouille pour la suite** : tout nouveau provider OAuth ajouté devra garantir la vérification d'email côté provider avant d'activer la même option. Sans cette garantie, la liaison auto devient une vraie faille (d'où le nom `dangerous`).
+
+## Mise à jour — 2026-06-15 : ajout de LinkedIn (OIDC)
+
+LinkedIn ajouté comme 3e provider OAuth (à côté de Google et GitHub), avec `allowDangerousEmailAccountLinking: true`. La contrainte verrouillée ci-dessus est respectée : LinkedIn est un provider **OIDC** qui renvoie `email_verified`, donc on ne lie jamais sur un email non prouvé. La server action `signInWithLinkedIn` est intégrée à la protection BotID (cf. [ADR-0004](0004-botid-sign-in-fail-open.md)). PR #542.

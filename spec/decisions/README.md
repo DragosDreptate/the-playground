@@ -34,3 +34,6 @@ Une décision qui **contraint la suite** du projet et qu'on regretterait de devo
 | ADR | Titre | Statut |
 |---|---|---|
 | [0001](0001-oauth-account-linking.md) | Liaison automatique des comptes OAuth sur email vérifié | Accepté |
+| [0002](0002-reusable-magic-link.md) | Magic link réutilisable (15 min) au lieu d'un token à usage unique | Accepté |
+| [0003](0003-explorer-score-vs-no-global-ranking.md) | Score de pertinence Explorer, compatible avec « pas de ranking global » | Accepté |
+| [0004](0004-botid-sign-in-fail-open.md) | Protection anti-bot du sign-in via Vercel BotID (fail-open) | Accepté |
