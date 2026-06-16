@@ -60,7 +60,7 @@ src/domain/ports/repositories/admin-repository.ts
 
 Port dédié aux requêtes transversales admin. Séparé des ports domaine existants (CircleRepository, MomentRepository, etc.) car les requêtes admin sont cross-domain et ne suivent pas les mêmes patterns d'accès.
 
-#### Interface (14 méthodes)
+#### Interface (26 méthodes)
 
 ```typescript
 interface AdminRepository {
@@ -79,13 +79,31 @@ interface AdminRepository {
   findCircleById(id: string): Promise<AdminCircleDetail | null>;
   deleteCircle(id: string): Promise<void>;
 
+  // Explorer scoring
+  findAllExplorerCircles(filters: AdminExplorerFilters): Promise<AdminExplorerCircleRow[]>;
+  countExplorerCircles(filters: AdminExplorerFilters): Promise<number>;
+  updateCircleExcluded(id: string, excluded: boolean): Promise<void>;
+  updateCircleOverrideScore(id: string, score: number | null): Promise<void>;
+  findAllExplorerMoments(filters: AdminExplorerMomentFilters): Promise<AdminExplorerMomentRow[]>;
+  countExplorerMoments(filters: AdminExplorerMomentFilters): Promise<number>;
+
   // Moments
   findAllMoments(filters: AdminMomentFilters): Promise<AdminMomentRow[]>;
   countMoments(filters: AdminMomentFilters): Promise<number>;
   findMomentById(id: string): Promise<AdminMomentDetail | null>;
   deleteMoment(id: string): Promise<void>;
   updateMomentStatus(id: string, status: MomentStatus): Promise<void>;
+
+  // Time series & Insights
+  getTimeSeries(days: number): Promise<AdminTimeSeries>;
+  getActivationStats(): Promise<AdminActivationStats>;
+  getRegistrationsInsight(days: number, limit: number, offset: number, sortBy?: string, sortOrder?: "asc" | "desc"): Promise<{ registrations: AdminInsightRegistration[]; total: number }>;
+  getMembersInsight(days: number, limit: number, offset: number, sortBy?: string, sortOrder?: "asc" | "desc"): Promise<{ members: AdminInsightMember[]; total: number }>;
+  getCommentsInsight(days: number, limit: number, offset: number, sortBy?: string, sortOrder?: "asc" | "desc"): Promise<{ comments: AdminInsightComment[]; total: number }>;
+  getUsersByActivation(segment: "never" | "once" | "retained", limit: number, offset: number, sortBy?: string, sortOrder?: "asc" | "desc"): Promise<{ users: AdminUserRow[]; total: number }>;
 }
+
+// Note : les usecases Réseaux utilisent CircleNetworkRepository (port séparé).
 ```
 
 #### Types
@@ -97,9 +115,13 @@ type AdminStats = {
   totalCircles: number;
   totalMoments: number;
   totalRegistrations: number;
+  totalComments: number;
+  totalMembers: number;
   recentUsers: number;        // 7 derniers jours
   recentCircles: number;
   recentMoments: number;
+  recentComments: number;
+  recentMembers: number;
 };
 ```
 
@@ -131,25 +153,39 @@ src/infrastructure/repositories/prisma-admin-repository.ts
 - `deleteCircle()` : cascade Prisma naturelle (memberships, moments, registrations)
 - `deleteMoment()` : cascade Prisma naturelle (registrations, comments)
 
-### Usecases (11 fichiers)
+### Usecases (25 fichiers)
 
 ```
 src/domain/usecases/admin/
 ```
 
-| Fichier | Signature | Description |
-|---------|-----------|-------------|
-| `get-admin-stats.ts` | `getAdminStats(callerRole, deps)` | Stats globales plateforme |
-| `get-admin-users.ts` | `getAdminUsers(callerRole, filters, deps)` | Liste utilisateurs paginée |
-| `get-admin-user.ts` | `getAdminUser(callerRole, userId, deps)` | Détail utilisateur |
-| `admin-delete-user.ts` | `adminDeleteUser(callerRole, userId, deps)` | Supprimer un utilisateur |
-| `get-admin-circles.ts` | `getAdminCircles(callerRole, filters, deps)` | Liste Communautés paginée |
-| `get-admin-circle.ts` | `getAdminCircle(callerRole, circleId, deps)` | Détail Communauté |
-| `admin-delete-circle.ts` | `adminDeleteCircle(callerRole, circleId, deps)` | Supprimer une Communauté |
-| `get-admin-moments.ts` | `getAdminMoments(callerRole, filters, deps)` | Liste événements paginée |
-| `get-admin-moment.ts` | `getAdminMoment(callerRole, momentId, deps)` | Détail événement |
-| `admin-delete-moment.ts` | `adminDeleteMoment(callerRole, momentId, deps)` | Supprimer un événement |
-| `admin-update-moment-status.ts` | `adminUpdateMomentStatus(callerRole, momentId, status, deps)` | Forcer annulation (PUBLISHED → CANCELLED) |
+| Fichier | Description |
+|---------|-------------|
+| `get-admin-stats.ts` | Stats globales plateforme |
+| `get-admin-time-series.ts` | Données temporelles (courbes d'activité) |
+| `get-admin-activation-stats.ts` | Stats d'activation utilisateurs (jamais / une fois / retenus) |
+| `get-admin-users.ts` | Liste utilisateurs paginée |
+| `get-admin-user.ts` | Détail utilisateur |
+| `admin-delete-user.ts` | Supprimer un utilisateur |
+| `get-admin-circles.ts` | Liste Communautés paginée |
+| `get-admin-circle.ts` | Détail Communauté |
+| `admin-delete-circle.ts` | Supprimer une Communauté |
+| `get-admin-explorer-circles.ts` | Liste des Communautés dans Explorer (scoring) |
+| `get-admin-explorer-moments.ts` | Liste des Moments dans Explorer (scoring) |
+| `admin-update-circle-excluded.ts` | Exclure / réintégrer une Communauté de Explorer |
+| `admin-update-circle-override-score.ts` | Forcer le score Explorer d'une Communauté |
+| `set-featured-circles-enabled.ts` | Activer / désactiver la section "À la une" |
+| `get-admin-moments.ts` | Liste événements paginée |
+| `get-admin-moment.ts` | Détail événement |
+| `admin-delete-moment.ts` | Supprimer un événement |
+| `admin-update-moment-status.ts` | Forcer annulation (PUBLISHED → CANCELLED) |
+| `get-admin-networks.ts` | Liste des réseaux de Communautés |
+| `get-admin-network.ts` | Détail d'un réseau |
+| `admin-create-network.ts` | Créer un réseau |
+| `admin-update-network.ts` | Modifier un réseau |
+| `admin-delete-network.ts` | Supprimer un réseau |
+| `admin-add-circle-to-network.ts` | Ajouter une Communauté à un réseau |
+| `admin-remove-circle-from-network.ts` | Retirer une Communauté d'un réseau |
 
 **Pattern commun** :
 ```typescript
@@ -171,7 +207,7 @@ export async function adminXxx(
 src/app/actions/admin.ts
 ```
 
-11 fonctions exportées (correspondant aux 11 usecases admin), toutes suivent le même pattern :
+Les fonctions exportées correspondent aux usecases admin (25 au total), toutes suivent le même pattern :
 
 ```typescript
 export async function xxxAction(...): Promise<ActionResult<T>> {
@@ -205,19 +241,30 @@ src/app/[locale]/(routes)/admin/layout.tsx
 
 - Guard : `session.user.role !== "ADMIN"` → `redirect("/")`
 - Layout : sidebar fixe (gauche) + main content (droite, `max-w-6xl`)
-- `AdminSidebar` : navigation Dashboard / Utilisateurs / Communautés / Événements + lien "Retour au site"
+- `AdminSidebar` : navigation Dashboard / Utilisateurs / Communautés / Événements / Explorer / Réseaux / Insights + lien "Retour au site"
 
-### Pages (7 routes + layout)
+### Pages (18 routes + layout)
 
 | Route | Contenu |
 |-------|---------|
-| `/admin` | Dashboard : 4 cartes stats (Users, Circles, Moments, Inscriptions) + deltas "cette semaine" |
+| `/admin` | Dashboard : cartes stats (Users, Circles, Moments, Inscriptions, Commentaires, Membres) + deltas "cette semaine" |
 | `/admin/users` | Table paginée (20/page) : nom, email, rôle badge, circles, moments, date inscription. Recherche |
 | `/admin/users/[id]` | Détail : infos personnelles, rôle, onboarding, membre depuis, liste des Circles avec rôle. Bouton supprimer |
 | `/admin/circles` | Table paginée (20/page) : nom, organisateur, membres, moments, visibilité, catégorie, date. Recherche |
 | `/admin/circles/[id]` | Détail : slug, visibilité, catégorie, ville, date création, Hosts, 10 Moments récents. Bouton supprimer |
 | `/admin/moments` | Table paginée (20/page) : titre, circle, date, statut badge, inscrits/capacité, date. Recherche |
 | `/admin/moments/[id]` | Détail : slug, circle (lien), créateur, statut, date, capacité, description, liste inscriptions. Bouton forcer annulation + supprimer |
+| `/admin/explorer` | Gestion du scoring Explorer (Communautés) : score calculé, override, exclusion, section "À la une" |
+| `/admin/explorer/moments` | Gestion du scoring Explorer (Moments) : score calculé, exclusion |
+| `/admin/networks` | Liste des réseaux de Communautés |
+| `/admin/networks/new` | Création d'un réseau |
+| `/admin/networks/[id]` | Détail d'un réseau : membres (Communautés), gestion ajout/retrait |
+| `/admin/insights/users` | Courbes d'activité utilisateurs (time series) |
+| `/admin/insights/registrations` | Inscriptions récentes (tableau trié/filtré) |
+| `/admin/insights/members` | Adhésions récentes |
+| `/admin/insights/comments` | Commentaires récents |
+| `/admin/insights/moments` | Moments récents |
+| `/admin/insights/activation` | Segmentation par activation (jamais / une fois / retenus) |
 
 ### Composants partagés
 
@@ -287,8 +334,8 @@ Les termes domaine suivent la convention de nommage : Circle → Communauté (FR
 |---------|------|
 | `src/domain/ports/repositories/admin-repository.ts` | Port AdminRepository (interface + 10 types) |
 | `src/infrastructure/repositories/prisma-admin-repository.ts` | Adapter Prisma |
-| `src/domain/usecases/admin/*.ts` | 11 usecases admin |
-| `src/app/actions/admin.ts` | 11 server actions |
+| `src/domain/usecases/admin/*.ts` | 25 usecases admin |
+| `src/app/actions/admin.ts` | Server actions admin |
 | `src/app/[locale]/(routes)/admin/layout.tsx` | Layout + guard admin |
 | `src/app/[locale]/(routes)/admin/page.tsx` | Dashboard stats |
 | `src/app/[locale]/(routes)/admin/users/page.tsx` | Liste utilisateurs |

@@ -160,9 +160,10 @@ Contient :
 - Gestion de la liste d'attente ✅
 - Export CSV des inscrits ✅ (colonnes : prénom, nom, email, statut, date)
 - Export données Communauté (membres, historique) — *pas encore implémenté*
-- Communiquer avec les Participants inscrits (email direct groupé) — *pas encore implémenté* *(l'invitation Communauté "Broadcast" sur un événement est implémentée — bouton "Inviter ma Communauté" — mais pas l'email groupé libre Organisateur → Participants)*
+- Communiquer avec les Participants inscrits (email direct groupé) ✅ (usecase `send-moment-host-message` — objet + corps libre, ciblage par segment : tous inscrits / liste d'attente / inscrits seulement)
 - Retirer un membre de la Communauté ✅ (avec annulation automatique des inscriptions à venir)
 - Inviter par lien privé ✅ (token d'invitation unique sur la Communauté, page `/circles/join/[token]`)
+- Co-organisateurs ✅ (promotion d'un membre au rang de CO_HOST, rétrogradation)
 - Assistant IA basique *(pas encore implémenté)*
 
 ## Côté Participant
@@ -297,13 +298,15 @@ Chaque événement est une page autonome, design premium (benchmark Luma), optim
 - Pages événement autonomes et partageables ✅
 - Inscriptions (avec inscription automatique à la Communauté) ✅
 - Liste d'attente avec promotion automatique ✅
-- Emails transactionnels (confirmation inscription, liste d'attente, promotion, notification Organisateur nouvelle inscription, notification Organisateur nouveau commentaire, mise à jour événement, annulation événement, confirmation publication événement, notification nouvel événement dans communauté aux membres à la publication, broadcast "Inviter ma Communauté") ✅
+- Emails transactionnels (24 templates) ✅ — voir `spec/features/email-transactional.md` pour la liste complète
 - Stripe Connect (événements payants) ✅ — livré v2.0.0
 - Assistant IA basique (descriptions, emails) — pas encore implémenté
 - Explorer (répertoire public de Communautés + événements) ✅
 - Export données (CSV inscrits) ✅ — export membres Communauté et export historique pas encore implémentés
 - Admin plateforme (dashboard stats, listes paginées, modération) ✅
-- Gestion membres Communauté : retrait de membre ✅, invitation par lien privé (token) ✅
+- Gestion membres Communauté : retrait de membre ✅, invitation par lien privé (token) ✅, co-organisateurs ✅ (promotion/rétrogradation)
+- Communication directe Organisateur → Participants (email groupé par segment) ✅
+- Réseaux de Communautés ✅ (regroupement administratif de Communautés, géré via admin plateforme)
 
 ## Phase 2 – Engagement
 

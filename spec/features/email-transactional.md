@@ -43,7 +43,7 @@ Server Action (joinMomentAction)
 
 ---
 
-## 21 emails implémentés
+## 24 emails implémentés
 
 | Email | Template | Déclencheur | Destinataire | Pièce jointe .ics |
 |-------|----------|-------------|--------------|---------------------|
@@ -68,6 +68,9 @@ Server Action (joinMomentAction)
 | Notification approbation / refus inscription | `approval-notification` | `approveRegistrationAction` / `rejectRegistrationAction` | Participant | Non |
 | Notification annulation payante (Organisateur) | `host-paid-cancellation` | `cancelRegistrationAction` (remboursement) | Organisateur | Non |
 | Email de bienvenue personnalisé | `onboarding-welcome` | Post-onboarding (différé +24h, min 3h) | Nouvel utilisateur | Non |
+| Promotion co-organisateur | `co-host-promoted` | `promoteToCoHostAction` | Membre promu | Non |
+| Rétrogradation co-organisateur | `co-host-demoted` | `demoteFromCoHostAction` | Membre rétrogradé | Non |
+| Message direct Organisateur → Participants | `host-message` | `sendMomentHostMessageAction` | Inscrits (par segment : tous / REGISTERED / WAITLISTED) | Non |
 
 **Note** : confirmation inscription et liste d'attente utilisent le même template, différenciés par les `strings` i18n.
 
