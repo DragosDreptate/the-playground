@@ -39,35 +39,36 @@ export default async function AboutPage() {
       <section className="space-y-6">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           <span className="text-violet-500">✦</span>
-          <span>
-            {isFr
-              ? "Construit avec Claude Code · The Playground"
-              : "Built with Claude Code · The Playground"}
-          </span>
+          <span>The Playground</span>
         </div>
         <h1 className="text-4xl font-extrabold tracking-tight leading-tight">
           {isFr ? (
             <>
-              Ce projet a commencé comme{" "}
+              Une alternative{" "}
               <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-                un prétexte
-              </span>
-              .
+                gratuite et française
+              </span>{" "}
+              à Meetup.
             </>
           ) : (
             <>
-              This project started as{" "}
+              A{" "}
               <span className="bg-gradient-to-r from-pink-500 to-violet-500 bg-clip-text text-transparent">
-                a pretext
-              </span>
-              .
+                free, French
+              </span>{" "}
+              alternative to Meetup.
             </>
           )}
         </h1>
         <p className="text-lg leading-relaxed text-muted-foreground">
           {isFr
-            ? "Un prétexte pour explorer Claude Code — l'outil de développement IA d'Anthropic — sur un vrai projet avec de vraies contraintes. Quelques jours plus tard, j'avais un MVP fonctionnel. Quelques semaines plus tard, une plateforme complète en production — avec ses communautés, ses événements, ses utilisateurs."
-            : "A pretext to explore Claude Code — Anthropic's AI development tool — on a real project with real constraints. A few days later, I had a working MVP. A few weeks later, a full platform in production — with real communities, events, and users."}
+            ? "Organisateur d'événements depuis des années, je vois la frustration grandir chez celles et ceux qui animent des communautés, à cause de leurs outils. Meetup en premier : il fait payer l'organisateur pour animer son propre groupe, et garde la main sur son audience s'il veut partir. Animer une communauté, c'est un travail utile et exigeant. Ça mérite un outil à la hauteur. C'est pour ça que j'ai construit The Playground."
+            : "An event organizer myself for years, I see the frustration growing among the people who run communities, because of the tools they're stuck with. Meetup first of all: it charges organizers to run their own group, and keeps hold of their audience if they want to leave. Running a community is useful, demanding work. It deserves a tool that lives up to it. That's why I built The Playground."}
+        </p>
+        <p className="text-lg leading-relaxed text-muted-foreground">
+          {isFr
+            ? "Des communautés y ont déjà installé leurs événements et leurs membres. The Playground couvre l'essentiel de ce que fait Meetup, s'enrichit chaque semaine, et c'est un projet pensé pour durer."
+            : "Communities have already moved their events and members in. The Playground covers the essentials of what Meetup does, gets better every week, and it's built to last."}
         </p>
       </section>
 
@@ -81,8 +82,8 @@ export default async function AboutPage() {
         <div className="space-y-4 text-[17px] leading-relaxed text-muted-foreground">
           <p>
             {isFr
-              ? "Ça fait des années que j'organise des événements communautaires. Et depuis des années, je me heurte au même mur."
-              : "I've been running community events for years. And for years, I've hit the same wall."}
+              ? "Le problème ne tient pas qu'à Meetup. Quel que soit l'outil que j'ai essayé, je retombe sur le même mur."
+              : "And it's not just Meetup. Whatever tool I've tried, I hit the same wall."}
           </p>
           <p>
             {isFr ? (
@@ -185,28 +186,34 @@ export default async function AboutPage() {
             : "Meetup's community model + Luma's experience + 100% free. No subscription, no platform commission."}
         </p>
 
+        <p className="text-[17px] leading-relaxed text-muted-foreground">
+          {isFr
+            ? "Et tout ce qu'il faut pour faire vivre une communauté au quotidien :"
+            : "And everything it takes to keep a community alive, day to day:"}
+        </p>
+
         {/* ── Fonctionnalités concrètes ── */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
           {(isFr
             ? [
-                { icon: Users, label: "Communautés persistantes", desc: "Membres, rôles, invitations par lien" },
-                { icon: CalendarCheck, label: "Événements partageables", desc: "Pages autonomes, brouillons, ajout calendrier" },
-                { icon: Bell, label: "Notifications automatiques", desc: "Confirmations, rappels, mises à jour" },
-                { icon: CreditCard, label: "Billetterie intégrée", desc: "Paiements via Stripe, 0% commission plateforme" },
-                { icon: MessageCircle, label: "Commentaires", desc: "Fil de discussion sur chaque événement" },
-                { icon: ListChecks, label: "Liste d'attente", desc: "Promotion automatique sur désistement" },
-                { icon: Globe, label: "Explorer", desc: "Répertoire public de communautés" },
-                { icon: Radar, label: "Radar IA", desc: "Détection d'événements similaires via Claude" },
+                { icon: Users, label: "Communautés persistantes", desc: "L'audience reste à l'organisateur, exportable à tout moment" },
+                { icon: CreditCard, label: "Billetterie intégrée", desc: "Paiements Stripe, 0% de commission plateforme" },
+                { icon: CalendarCheck, label: "Événements partageables", desc: "Une page propre par événement, prête à partager" },
+                { icon: ListChecks, label: "Liste d'attente", desc: "Une place se libère, le suivant est promu tout seul" },
+                { icon: Bell, label: "Notifications automatiques", desc: "Confirmations, rappels et annulations, sans y penser" },
+                { icon: MessageCircle, label: "Commentaires", desc: "Une discussion par événement, photos comprises" },
+                { icon: Globe, label: "Explorer", desc: "Un annuaire public pour se faire découvrir" },
+                { icon: Radar, label: "Radar d'événements", desc: "Détecte les événements qui se chevauchent sur le même créneau" },
               ]
             : [
-                { icon: Users, label: "Persistent communities", desc: "Members, roles, invite links" },
-                { icon: CalendarCheck, label: "Shareable events", desc: "Standalone pages, drafts, calendar sync" },
-                { icon: Bell, label: "Automated notifications", desc: "Confirmations, reminders, updates" },
+                { icon: Users, label: "Persistent communities", desc: "The audience stays with the organizer, exportable anytime" },
                 { icon: CreditCard, label: "Built-in ticketing", desc: "Stripe payments, 0% platform fee" },
-                { icon: MessageCircle, label: "Comments", desc: "Discussion thread on every event" },
-                { icon: ListChecks, label: "Waitlist", desc: "Auto-promotion on cancellation" },
-                { icon: Globe, label: "Explore", desc: "Public community directory" },
-                { icon: Radar, label: "AI Radar", desc: "Similar event detection via Claude" },
+                { icon: CalendarCheck, label: "Shareable events", desc: "A clean page per event, ready to share" },
+                { icon: ListChecks, label: "Waitlist", desc: "A spot opens up, the next in line is promoted automatically" },
+                { icon: Bell, label: "Automated notifications", desc: "Confirmations, reminders and cancellations, handled for you" },
+                { icon: MessageCircle, label: "Comments", desc: "One discussion per event, photos included" },
+                { icon: Globe, label: "Explore", desc: "A public directory to get discovered" },
+                { icon: Radar, label: "Event radar", desc: "Flags events that clash on the same time slot" },
               ]
           ).map(({ icon: Icon, label, desc }) => (
             <div
@@ -286,8 +293,8 @@ export default async function AboutPage() {
             </p>
             <p>
               {isFr
-                ? "Depuis des années, j'organise des événements — conférences produit, masterclasses, événements internes ou dans la communauté agile. C'est ce vécu d'organisateur, confronté aux mêmes outils bancals en boucle, qui est à l'origine de The Playground."
-                : "For years, I've been running events — product conferences, masterclasses, internal events and agile community meetups. That experience as an organizer, running into the same broken tools over and over, is what sparked The Playground."}
+                ? "Conférences produit, masterclasses, rencontres internes, événements dans la communauté agile : j'ai organisé un peu de tout. C'est ce vécu d'organisateur qui est derrière The Playground."
+                : "Product conferences, masterclasses, internal events, agile community meetups: I've organized a bit of everything. That organizer experience is what's behind The Playground."}
             </p>
             <p>
               {isFr ? (
