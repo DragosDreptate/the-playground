@@ -37,17 +37,16 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - **Billetterie intégrée** via Stripe Connect — 0% commission plateforme
 - **Inscriptions sur validation** pour filtrer les participants si besoin
 - Gérer ses participants de façon persistante (pas événement par événement)
-- **Broadcast email** à toute sa communauté
-- Check-in, export CSV, liste d'attente automatique
+- **Email groupé** aux participants d'un événement (inscrits, liste d'attente ou tous)
+- Export CSV des inscrits, liste d'attente automatique
 - **Radar IA** — détection des événements similaires à venir (via Claude)
-- Assistant IA pour les descriptions, emails, suggestions
 
 **Pour le participant**
 - Découverte via lien partagé (mobile-first)
 - Inscription en quelques secondes — magic link, pas de compte requis
 - Devient automatiquement membre de la communauté
 - **Profil public** avec bio, ville, liens sociaux
-- Notifications email (confirmation, rappels 24h et 1h, changements, annulations)
+- Notifications email (confirmation, rappel 24h avant, changements, annulations)
 - Page communauté : prochains événements, membres, historique
 - Fil de commentaires sur chaque événement
 
@@ -67,7 +66,7 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 | **Langage** | TypeScript strict, full-stack |
 | **Base de données** | PostgreSQL · Neon serverless (EU) |
 | **ORM** | Prisma |
-| **Auth** | Auth.js v5 · Magic link + OAuth (Google, GitHub) |
+| **Auth** | Auth.js v5 · Magic link + OAuth (Google, GitHub, LinkedIn) |
 | **UI** | Tailwind CSS 4 + shadcn/ui |
 | **Email** | Resend + react-email |
 | **IA** | Anthropic SDK (Claude) |
@@ -99,6 +98,7 @@ src/
   components/      → Composants React réutilisables
   lib/             → Utilitaires partagés (helpers purs)
   hooks/           → React hooks personnalisés
+  types/           → Types TypeScript partagés (non domaine)
   i18n/            → Configuration next-intl (routing, request)
   content/         → Contenu statique (articles de blog en Markdown)
   assets/          → Assets statiques (images, SVG)
@@ -149,6 +149,7 @@ Trois options, **au moins une** doit être configurée dans `.env.local` :
 | **Resend (magic link)** | 2 min | recommandée — c'est le flow par défaut de l'app. Crée un compte resend.com, mets ta clé dans `AUTH_RESEND_KEY` et ton email dans `STAGING_EMAIL_ALLOWLIST`. |
 | **Google OAuth** | 5 min | Crée un OAuth client sur console.cloud.google.com avec callback `http://localhost:3000/api/auth/callback/google` |
 | **GitHub OAuth** | 5 min | Idem sur github.com/settings/developers, callback `http://localhost:3000/api/auth/callback/github` |
+| **LinkedIn OAuth** | 5 min | Idem sur linkedin.com/developers, callback `http://localhost:3000/api/auth/callback/linkedin` |
 
 > **Garde-fou email** : `safe-resend.ts` bloque tous les envois vers de vraies adresses dès que `VERCEL_ENV !== "production"`. En local, seuls les emails listés dans `STAGING_EMAIL_ALLOWLIST` (ou se terminant par `@test.playground` / `@demo.playground`) sont effectivement envoyés. Voir `spec/email-testing.md`.
 
