@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { AUTO_JOIN_PARAM, withAutoJoin, canAutoJoin } from "@/lib/auto-join";
+import {
+  AUTO_JOIN_PARAM,
+  withAutoJoin,
+  canAutoJoin,
+  signInUrlWithAutoJoin,
+} from "@/lib/auto-join";
 
 describe("withAutoJoin", () => {
   it("should append the join marker to a path", () => {
@@ -8,6 +13,21 @@ describe("withAutoJoin", () => {
     );
     expect(withAutoJoin("/circles/the-spark")).toBe(
       `/circles/the-spark?${AUTO_JOIN_PARAM}=1`
+    );
+  });
+});
+
+describe("signInUrlWithAutoJoin", () => {
+  it("should build a sign-in URL with the encoded callbackUrl carrying the join marker", () => {
+    expect(signInUrlWithAutoJoin("fr", "/fr/m/cloud-pi-native")).toBe(
+      `/fr/auth/sign-in?callbackUrl=${encodeURIComponent(
+        `/fr/m/cloud-pi-native?${AUTO_JOIN_PARAM}=1`
+      )}`
+    );
+    expect(signInUrlWithAutoJoin("en", "/en/circles/the-spark")).toBe(
+      `/en/auth/sign-in?callbackUrl=${encodeURIComponent(
+        `/en/circles/the-spark?${AUTO_JOIN_PARAM}=1`
+      )}`
     );
   });
 });

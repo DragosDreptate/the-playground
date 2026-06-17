@@ -16,6 +16,16 @@ export function withAutoJoin(path: string): string {
 }
 
 /**
+ * URL de connexion qui ramène sur `targetPath` après authentification et y
+ * déclenche l'auto-inscription. Centralise le motif partagé par les CTA
+ * « S'inscrire » (événement) et « Rejoindre » (Communauté) : route d'auth +
+ * callbackUrl encodé + marqueur `?join=1`.
+ */
+export function signInUrlWithAutoJoin(locale: string, targetPath: string): string {
+  return `/${locale}/auth/sign-in?callbackUrl=${encodeURIComponent(withAutoJoin(targetPath))}`;
+}
+
+/**
  * Éligibilité à l'auto-inscription post-auth, vue côté bouton :
  * - `isAuthenticated` : la session est établie (au retour post-auth, toujours vrai) ;
  * - `alreadyEngaged` : déjà inscrit / membre / en attente de validation → ne rien faire ;
