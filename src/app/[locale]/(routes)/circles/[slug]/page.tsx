@@ -2,6 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
+import { withAutoJoin } from "@/lib/auto-join";
 import { degradedQuery } from "@/lib/degraded-query";
 import { stripProtocol } from "@/lib/url";
 import type { Metadata } from "next";
@@ -375,7 +376,11 @@ export default async function PublicCirclePage({
           {/* CTA Se connecter — visible pour les visiteurs non-authentifiés */}
           {showSignInToJoin && (
             <Button variant="default" size="sm" asChild className="w-full gap-2">
-              <a href={`/${locale}/auth/sign-in?callbackUrl=/${locale}/circles/${slug}`}>
+              <a
+                href={`/${locale}/auth/sign-in?callbackUrl=${encodeURIComponent(
+                  withAutoJoin(`/${locale}/circles/${slug}`)
+                )}`}
+              >
                 <Users className="size-4" />
                 {t("detail.signInToJoin")}
               </a>

@@ -7,6 +7,7 @@ import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
 import { handleOnboardingRequired } from "@/lib/onboarding";
+import { useAutoJoin } from "@/components/auth/use-auto-join";
 import { useTranslations } from "next-intl";
 
 type Props = {
@@ -20,11 +21,12 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
   const [state, setState] = useState<"idle" | "joined" | "pending">("idle");
   const [isPending, startTransition] = useTransition();
 
-  function handleJoin() {
+  // Partagé par le clic et l'auto-adhésion post-auth.
+  function runJoin(trigger: "click" | "auto") {
     startTransition(async () => {
       const result = await joinCircleDirectlyAction(circleId);
       if (result.success) {
-        posthog.capture("circle_joined_directly", { circle_id: circleId });
+        posthog.capture("circle_joined_directly", { circle_id: circleId, trigger });
         setState(result.data.pendingApproval ? "pending" : "joined");
         router.refresh();
         return;
@@ -32,6 +34,14 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
       handleOnboardingRequired(result, router);
     });
   }
+
+  // Auto-adhésion post-auth : ce composant n'est monté que pour un utilisateur
+  // connecté non-membre. Si l'URL porte `?join=1` (CTA « Rejoindre » avant
+  // authentification), déclenche l'adhésion au retour, sans re-cliquer.
+  useAutoJoin({
+    enabled: state === "idle",
+    onTrigger: () => runJoin("auto"),
+  });
 
   if (state === "joined") {
     return (
@@ -55,7 +65,7 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
     <Button
       variant="default"
       size="sm"
-      onClick={handleJoin}
+      onClick={() => runJoin("click")}
       disabled={isPending}
       className="w-full gap-2"
     >

@@ -22,6 +22,8 @@ import {
 } from "@/app/actions/registration";
 import { createCheckoutAction } from "@/app/actions/checkout";
 import { handleOnboardingRequired } from "@/lib/onboarding";
+import { canAutoJoin } from "@/lib/auto-join";
+import { useAutoJoin } from "@/components/auth/use-auto-join";
 import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { CalendarEventData } from "@/lib/calendar";
@@ -76,6 +78,45 @@ export function RegistrationButton({
     existingRegistration?.id ?? null
   );
   const [error, setError] = useState<string | null>(null);
+
+  // Inscription gratuite (le chemin payant passe par Stripe, cf. plus bas).
+  // Partagé par le clic et l'auto-inscription post-auth.
+  function runJoin(trigger: "click" | "auto") {
+    startTransition(async () => {
+      setError(null);
+      const result = await joinMomentAction(momentId);
+      if (result.success) {
+        setLocalStatus(result.data.status);
+        setLocalRegistrationId(result.data.id);
+        posthog.capture("moment_joined", {
+          moment_id: momentId,
+          circle_id: circleId,
+          circle_name: circleName,
+          registration_status: result.data.status,
+          trigger,
+        });
+        router.refresh();
+        return;
+      }
+      if (handleOnboardingRequired(result, router)) return;
+      setError(result.error);
+    });
+  }
+
+  // Auto-inscription post-auth : si l'utilisateur vient d'un CTA « S'inscrire »
+  // (marqueur `?join=1`), déclenche l'inscription au retour, sans re-cliquer.
+  // Exclut le payant (blocked) et les inscriptions déjà actives (alreadyEngaged).
+  useAutoJoin({
+    enabled: canAutoJoin({
+      isAuthenticated,
+      alreadyEngaged:
+        localStatus !== null &&
+        localStatus !== "CANCELLED" &&
+        localStatus !== "REJECTED",
+      blocked: price > 0,
+    }),
+    onTrigger: () => runJoin("auto"),
+  });
 
   // Not authenticated: link to sign-in (same for free and paid)
   if (!isAuthenticated) {
@@ -231,26 +272,7 @@ export function RegistrationButton({
         className="w-full"
         size="sm"
         disabled={isPending}
-        onClick={() => {
-          startTransition(async () => {
-            setError(null);
-            const result = await joinMomentAction(momentId);
-            if (result.success) {
-              setLocalStatus(result.data.status);
-              setLocalRegistrationId(result.data.id);
-              posthog.capture("moment_joined", {
-                moment_id: momentId,
-                circle_id: circleId,
-                circle_name: circleName,
-                registration_status: result.data.status,
-              });
-              router.refresh();
-              return;
-            }
-            if (handleOnboardingRequired(result, router)) return;
-            setError(result.error);
-          });
-        }}
+        onClick={() => runJoin("click")}
       >
         {isPending
           ? tCommon("loading")
