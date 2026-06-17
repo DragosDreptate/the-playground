@@ -22,3 +22,14 @@ export function isInAppBrowser(): boolean {
   const ua = navigator.userAgent;
   return WEBVIEW_PATTERNS.some((p) => ua.includes(p));
 }
+
+/**
+ * Détecte spécifiquement la webview in-app de LinkedIn. Contrairement aux autres
+ * webviews, l'OAuth LinkedIn y aboutit (l'utilisateur est déjà dans l'écosystème
+ * LinkedIn) : on peut donc proposer la connexion LinkedIn en un tap plutôt que de
+ * forcer l'ouverture dans un navigateur externe. Vérifié manuellement en staging.
+ */
+export function isLinkedInInAppBrowser(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return navigator.userAgent.includes("LinkedInApp");
+}

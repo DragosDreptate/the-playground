@@ -146,7 +146,8 @@
       "disposableEmail": "Disposable email addresses are not allowed. Please use a permanent address.",
       "sendFailed": "Couldn't send the email right now. Please try again in a moment.",
       "botDetected": "Security verification failed. Please reload the page and try again.",
-      "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below, it works everywhere. To sign in with Google, GitHub or LinkedIn, open the site in your browser (Safari, Chrome...)."
+      "webviewNotice": "You're using an in-app browser (LinkedIn, Instagram...). Use the email sign-in below, it works everywhere. To sign in with Google, GitHub or LinkedIn, open the site in your browser (Safari, Chrome...).",
+      "webviewNoticeLinkedin": "You're in LinkedIn's in-app browser. Sign in with LinkedIn below, or by email. For Google or GitHub, open the site in your browser (Safari, Chrome...)."
     },
     "verifyRequest": {
       "title": "Check your email",

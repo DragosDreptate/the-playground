@@ -14,7 +14,7 @@ import {
   signInWithEmail,
   type SignInWithEmailState,
 } from "@/app/actions/auth";
-import { isInAppBrowser } from "@/lib/detect-webview";
+import { isInAppBrowser, isLinkedInInAppBrowser } from "@/lib/detect-webview";
 
 function GoogleIcon() {
   return (
@@ -65,6 +65,25 @@ function DisabledOAuthButton({ label, icon }: { label: string; icon: ReactNode }
   );
 }
 
+function OAuthForm({
+  action,
+  label,
+  icon,
+  callbackUrl,
+}: {
+  action: (formData: FormData) => void | Promise<void>;
+  label: string;
+  icon: ReactNode;
+  callbackUrl?: string;
+}) {
+  return (
+    <form action={action}>
+      {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
+      <SubmitButton label={label} icon={icon} variant="outline" />
+    </form>
+  );
+}
+
 type SignInFormProps = {
   callbackUrl?: string;
   error?: string;
@@ -73,6 +92,7 @@ type SignInFormProps = {
 export function SignInForm({ callbackUrl, error }: SignInFormProps) {
   const t = useTranslations("Auth");
   const [webview, setWebview] = useState(false);
+  const [linkedinWebview, setLinkedinWebview] = useState(false);
   const [emailState, emailAction] = useActionState<SignInWithEmailState, FormData>(
     signInWithEmail,
     null
@@ -80,6 +100,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
 
   useEffect(() => {
     setWebview(isInAppBrowser());
+    setLinkedinWebview(isLinkedInInAppBrowser());
   }, []);
 
   return (
@@ -97,12 +118,29 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           <div className="rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
               <Mail className="size-4 shrink-0 mt-0.5 text-primary" />
-              <p>{t("signIn.webviewNotice")}</p>
+              <p>
+                {linkedinWebview
+                  ? t("signIn.webviewNoticeLinkedin")
+                  : t("signIn.webviewNotice")}
+              </p>
             </div>
           </div>
         )}
 
-        {webview ? (
+        {linkedinWebview ? (
+          // Webview LinkedIn : l'OAuth LinkedIn y aboutit, on le propose en
+          // premier et en un tap. Google/GitHub restent bloqués (webview tierce).
+          <>
+            <OAuthForm
+              action={signInWithLinkedIn}
+              label={t("signIn.linkedin")}
+              icon={<LinkedInIcon />}
+              callbackUrl={callbackUrl}
+            />
+            <DisabledOAuthButton label={t("signIn.google")} icon={<GoogleIcon />} />
+            <DisabledOAuthButton label={t("signIn.github")} icon={<Github className="size-4" />} />
+          </>
+        ) : webview ? (
           <>
             <DisabledOAuthButton label={t("signIn.google")} icon={<GoogleIcon />} />
             <DisabledOAuthButton label={t("signIn.linkedin")} icon={<LinkedInIcon />} />
@@ -110,18 +148,24 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           </>
         ) : (
           <>
-            <form action={signInWithGoogle}>
-              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-              <SubmitButton label={t("signIn.google")} icon={<GoogleIcon />} variant="outline" />
-            </form>
-            <form action={signInWithLinkedIn}>
-              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-              <SubmitButton label={t("signIn.linkedin")} icon={<LinkedInIcon />} variant="outline" />
-            </form>
-            <form action={signInWithGitHub}>
-              {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-              <SubmitButton label={t("signIn.github")} icon={<Github className="size-4" />} variant="outline" />
-            </form>
+            <OAuthForm
+              action={signInWithGoogle}
+              label={t("signIn.google")}
+              icon={<GoogleIcon />}
+              callbackUrl={callbackUrl}
+            />
+            <OAuthForm
+              action={signInWithLinkedIn}
+              label={t("signIn.linkedin")}
+              icon={<LinkedInIcon />}
+              callbackUrl={callbackUrl}
+            />
+            <OAuthForm
+              action={signInWithGitHub}
+              label={t("signIn.github")}
+              icon={<Github className="size-4" />}
+              callbackUrl={callbackUrl}
+            />
           </>
         )}
 
