@@ -3,11 +3,14 @@
  * Google blocks OAuth from these browsers with `Error 403: disallowed_useragent`.
  */
 
+/** Token UA de la webview in-app LinkedIn (cf. `isLinkedInInAppBrowser`). */
+const LINKEDIN_APP = "LinkedInApp";
+
 const WEBVIEW_PATTERNS = [
   "FBAN", // Facebook App
   "FBAV", // Facebook App (version)
   "Instagram",
-  "LinkedInApp",
+  LINKEDIN_APP,
   "Line/",
   "Twitter", // X app
   "Snapchat",
@@ -31,5 +34,5 @@ export function isInAppBrowser(): boolean {
  */
 export function isLinkedInInAppBrowser(): boolean {
   if (typeof navigator === "undefined") return false;
-  return navigator.userAgent.includes("LinkedInApp");
+  return navigator.userAgent.includes(LINKEDIN_APP);
 }
