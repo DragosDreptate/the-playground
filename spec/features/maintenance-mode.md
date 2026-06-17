@@ -23,7 +23,7 @@ Un mécanisme activable en quelques secondes qui :
 
 ### Lecture du flag (fail-open)
 
-1. `MAINTENANCE_MODE=true` → maintenance forcée (override local/dev, sans Edge Config).
+1. `MAINTENANCE_MODE=true` → maintenance forcée, **en dev uniquement** (sans Edge Config). Ignoré en prod (`NODE_ENV === "production"`) pour ne pas coincer le site avec une env var dont la sortie imposerait un redeploy.
 2. Sinon, lecture de la clé `maintenance` dans Edge Config (`@vercel/edge-config`).
 3. **Toute erreur de lecture → `false`** : on ne coupe jamais le site à cause du mécanisme lui-même.
 
@@ -46,7 +46,13 @@ La comparaison du token est **timing-safe** (`timingSafeEqual`, sans `node:crypt
 3. **Connecter le store au projet** → injecte la variable `EDGE_CONFIG`.
 4. Ajouter le secret **`MAINTENANCE_BYPASS_TOKEN`** (`openssl rand -hex 32`) au projet.
 
-## Utilisation
+## Utilisation (runbook incident)
+
+Le toggle revient à écrire la clé `maintenance` (`true`/`false`) dans le store Edge Config. **Deux voies équivalentes** écrivent dans le même store, l'app lit ce store à chaque requête :
+
+### Voie A — script (recommandé, le plus rapide)
+
+Depuis ta machine, dans le repo (pas de CLI Vercel requise, appels API directs) :
 
 ```bash
 pnpm maintenance:on       # active la maintenance (503 sous quelques secondes)
@@ -54,12 +60,24 @@ pnpm maintenance:off      # désactive
 pnpm maintenance:status   # état courant
 ```
 
-Le script utilise `VERCEL_TOKEN` (`.env.local`) et l'API Edge Config. Pendant la maintenance, vérifier le site via `https://the-playground.fr/?maintenance_bypass=<token>`.
+Nécessite `VERCEL_TOKEN` dans `.env.local`. Le store ciblé est `EDGE_CONFIG_ID` (défaut codé dans le script).
 
-### Tester en local
+### Voie B — dashboard Vercel (fallback)
+
+Si tu n'as pas accès au terminal / au token : Vercel → **Storage** → store `the-playground-edge-maintenance` → onglet **Items** → éditer `maintenance` : `false` → `true` (ou l'inverse) → sauvegarder.
+
+### Vérifier le site pendant la maintenance
+
+Ouvrir `https://the-playground.fr/?maintenance_bypass=<MAINTENANCE_BYPASS_TOKEN>` : un cookie est posé (8h), tu vois le site live pendant que les visiteurs voient la page 503.
+
+### ⚠️ À ne jamais faire en prod
+
+**Ne pas poser `MAINTENANCE_MODE=true` comme variable d'environnement en production.** C'est un override réservé au dev local : il est ignoré en prod (`NODE_ENV === "production"`), et le poser quand même déclenche un redeploy. En prod, **seul Edge Config** (voies A/B) pilote la maintenance.
+
+### Tester la page en local
 
 ```bash
-MAINTENANCE_MODE=true pnpm dev    # affiche la page /maintenance sans Edge Config
+MAINTENANCE_MODE=true pnpm dev    # affiche la page /maintenance sans Edge Config (dev only)
 ```
 
 ## Alternatives écartées

@@ -55,11 +55,19 @@ function matchesAny(ua: string, bots: readonly string[]): boolean {
  * Lit le flag de maintenance. Indépendant de la DB et fail-open : toute erreur
  * de lecture laisse passer le trafic (on ne coupe jamais le site à cause du
  * mécanisme lui-même).
- * - `MAINTENANCE_MODE=true` force la maintenance (override local/dev sans Edge Config)
+ * - `MAINTENANCE_MODE=true` force la maintenance **en dev uniquement** (pour
+ *   tester la page localement, sans Edge Config). Volontairement ignoré en prod :
+ *   une env var posée en prod coincerait le site (sortie = redeploy, ce qui
+ *   contredit l'objectif « sans rebuild »). En prod, seul Edge Config pilote.
  * - sinon, lecture de la clé `maintenance` dans Edge Config (preview/prod)
  */
 async function isMaintenanceOn(): Promise<boolean> {
-  if (process.env.MAINTENANCE_MODE === "true") return true;
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.MAINTENANCE_MODE === "true"
+  ) {
+    return true;
+  }
   if (!process.env.EDGE_CONFIG) return false;
   try {
     return (await get<boolean>("maintenance")) === true;
@@ -118,7 +126,12 @@ export default async function middleware(request: NextRequest) {
       maintenanceUrl.pathname = MAINTENANCE_PATH;
       return NextResponse.rewrite(maintenanceUrl, {
         status: 503,
-        headers: { "Retry-After": String(MAINTENANCE_RETRY_AFTER_SECONDS) },
+        headers: {
+          "Retry-After": String(MAINTENANCE_RETRY_AFTER_SECONDS),
+          // Jamais mettre la page de maintenance en cache (CDN/proxy/bfcache) :
+          // sinon elle resterait servie après le rétablissement du site.
+          "Cache-Control": "no-store",
+        },
       });
     }
   }
