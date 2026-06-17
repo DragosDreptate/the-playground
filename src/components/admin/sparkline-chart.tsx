@@ -48,10 +48,12 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
   const gradId = `grad-${id}`;
   const total = data.reduce((sum, d) => sum + d.count, 0);
 
+  // key par position (pas par valeur) : quand max vaut 1, mid = ceil(1/2) = 1,
+  // donc deux graduations partageraient la même valeur → clés React dupliquées.
   const yTicks = [
-    { value: max, y: toY(max) },
-    { value: mid, y: toY(mid) },
-    { value: 0, y: toY(0) },
+    { id: "max", value: max, y: toY(max) },
+    { id: "mid", value: mid, y: toY(mid) },
+    { id: "zero", value: 0, y: toY(0) },
   ];
 
   return (
@@ -70,9 +72,9 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
         </defs>
 
         {/* Lignes de grille horizontales */}
-        {yTicks.map(({ value, y }) => (
+        {yTicks.map(({ id, y }) => (
           <line
-            key={value}
+            key={id}
             x1={PAD_LEFT}
             y1={y.toFixed(1)}
             x2={W - PAD_RIGHT}
@@ -84,9 +86,9 @@ export function SparklineChart({ data, id, height = 72 }: SparklineChartProps) {
         ))}
 
         {/* Labels axe Y */}
-        {yTicks.map(({ value, y }) => (
+        {yTicks.map(({ id, value, y }) => (
           <text
-            key={value}
+            key={id}
             x={PAD_LEFT - 5}
             y={y.toFixed(1)}
             textAnchor="end"
