@@ -353,7 +353,9 @@
       "manageCircle": "Gérer cette communauté",
       "shareableLink": "Lien partageable",
       "signInToSeeMembers": "Connecte-toi pour voir les membres de cette communauté",
-      "signInToJoin": "Se connecter pour rejoindre"
+      "signInToJoin": "Se connecter pour rejoindre",
+      "autoJoinSuccess": "Vous avez rejoint la communauté",
+      "autoJoinPending": "Demande d'adhésion envoyée"
     },
     "removeMember": {
       "action": "Retirer de la communauté",
@@ -596,6 +598,9 @@
       "spotsAvailable": "{count} places",
       "registerFree": "S'inscrire",
       "requestToJoin": "S'inscrire (soumis à validation)",
+      "autoJoinSuccess": "Inscription confirmée",
+      "autoJoinWaitlisted": "Vous êtes sur la liste d'attente",
+      "autoJoinPending": "Demande d'inscription envoyée",
       "registerPaid": "S'inscrire — {price} {currency}",
       "comingSoon": "Bientôt disponible",
       "priceTtc": "Prix TTC",

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import { measureTime } from "@/lib/perf-logger";
+import { signInUrlWithAutoJoin } from "@/lib/auto-join";
 import { isValidSlug } from "@/lib/slug";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
@@ -155,7 +156,9 @@ export default async function PublicMomentPage({
 
   const isFull =
     moment.capacity !== null && registeredCount >= moment.capacity;
-  const signInUrl = `/${locale}/auth/sign-in?callbackUrl=/${locale}/m/${slug}`;
+  // `?join=1` porte l'intention d'inscription à travers l'auth : au retour,
+  // le bouton auto-inscrit sans re-cliquer.
+  const signInUrl = signInUrlWithAutoJoin(locale, `/${locale}/m/${slug}`);
   const waitlistedCount = allAttendees.filter(
     (r) => r.status === "WAITLISTED"
   ).length;

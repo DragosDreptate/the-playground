@@ -353,7 +353,9 @@
       "manageCircle": "Manage this community",
       "shareableLink": "Shareable link",
       "signInToSeeMembers": "Sign in to see the members of this community",
-      "signInToJoin": "Sign in to join"
+      "signInToJoin": "Sign in to join",
+      "autoJoinSuccess": "You've joined the community",
+      "autoJoinPending": "Membership request sent"
     },
     "removeMember": {
       "action": "Remove from community",
@@ -596,6 +598,9 @@
       "spotsAvailable": "{count} spots",
       "registerFree": "Join",
       "requestToJoin": "Join (subject to approval)",
+      "autoJoinSuccess": "You're registered",
+      "autoJoinWaitlisted": "You're on the waitlist",
+      "autoJoinPending": "Registration request sent",
       "registerPaid": "Join — {price} {currency}",
       "comingSoon": "Coming soon",
       "priceTtc": "All taxes included",
