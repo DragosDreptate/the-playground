@@ -330,6 +330,9 @@ Ne jamais avoir deux boutons qui déclenchent la même action sur la même page.
 | `pnpm db:backfill-public-id:prod` | Backfill des identifiants publics en production (avec confirmation) |
 | `pnpm db:backfill-is-demo` | Backfill du flag `isDemo` sur les Communautés démo (dev) |
 | `pnpm db:backfill-is-demo:prod` | Backfill du flag `isDemo` en production (avec confirmation) |
+| `pnpm maintenance:on` | Active le mode maintenance (Edge Config, sans rebuild — voir [spec/features/maintenance-mode.md](spec/features/maintenance-mode.md)) |
+| `pnpm maintenance:off` | Désactive le mode maintenance |
+| `pnpm maintenance:status` | Affiche l'état courant du mode maintenance |
 | `pnpm version:sync` | Synchronise le numéro de version dans les fichiers concernés |
 | `pnpm changelog:humanize` | Génère un changelog lisible depuis les commits conventionnels |
 | `pnpm test:e2e` | Lance les tests E2E Playwright |
