@@ -28,6 +28,7 @@ import { formatPrice } from "@/lib/format-price";
 import type { Registration, RegistrationStatus } from "@/domain/models/registration";
 import type { CalendarEventData } from "@/lib/calendar";
 import posthog from "posthog-js";
+import { toast } from "sonner";
 
 type RegistrationButtonProps = {
   momentId: string;
@@ -95,6 +96,17 @@ export function RegistrationButton({
           registration_status: result.data.status,
           trigger,
         });
+        // L'auto-inscription se déclenche sans clic : un toast confirme
+        // explicitement le succès (le clic manuel a déjà le retour du bouton).
+        if (trigger === "auto") {
+          if (result.data.status === "REGISTERED") {
+            toast.success(t("public.autoJoinSuccess"));
+          } else if (result.data.status === "WAITLISTED") {
+            toast(t("public.autoJoinWaitlisted"));
+          } else if (result.data.status === "PENDING_APPROVAL") {
+            toast(t("public.autoJoinPending"));
+          }
+        }
         router.refresh();
         return;
       }

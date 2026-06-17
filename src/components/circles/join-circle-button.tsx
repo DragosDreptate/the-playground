@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import posthog from "posthog-js";
+import { toast } from "sonner";
 import { Users, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { joinCircleDirectlyAction } from "@/app/actions/circle";
@@ -28,6 +29,14 @@ export function JoinCircleButton({ circleId, requiresApproval = false }: Props) 
       if (result.success) {
         posthog.capture("circle_joined_directly", { circle_id: circleId, trigger });
         setState(result.data.pendingApproval ? "pending" : "joined");
+        // L'auto-adhésion se déclenche sans clic : un toast confirme le succès.
+        if (trigger === "auto") {
+          if (result.data.pendingApproval) {
+            toast(t("autoJoinPending"));
+          } else {
+            toast.success(t("autoJoinSuccess"));
+          }
+        }
         router.refresh();
         return;
       }
