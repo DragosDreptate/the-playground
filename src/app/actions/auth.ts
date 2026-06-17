@@ -9,6 +9,7 @@ import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 import { safeCallbackUrl } from "@/lib/url";
+import { buildSetupRedirectPath } from "@/lib/auth/post-sign-in-redirect";
 
 async function setCallbackCookie(callbackUrl: string) {
   (await cookies()).set("auth-callback-url", callbackUrl, {
@@ -18,15 +19,11 @@ async function setCallbackCookie(callbackUrl: string) {
   });
 }
 
-// Le prefix locale dans le `redirectTo` est ce qui permet à
-// `detectLocaleForMagicLink` (côté sendVerificationRequest) de servir le mail
-// dans la bonne langue, indépendamment du cookie NEXT_LOCALE ou du header
-// Accept-Language du navigateur. Cf. spec/magic-link-reusable-token.md (sujet
-// 5). Pour les flows OAuth c'est cosmétique (le middleware next-intl
-// canonicalisera l'URL).
-async function postSignInRedirectTo() {
-  const locale = await getLocale();
-  return `/${locale}/dashboard/profile/setup`;
+// Cible post-connexion. La construction (préfixe locale + portage du
+// callbackUrl dans la query) et ses invariants sont documentés dans
+// `buildSetupRedirectPath`. Cf. spec/magic-link-reusable-token.md (sujet 5).
+async function postSignInRedirectTo(callbackUrl?: string) {
+  return buildSetupRedirectPath(await getLocale(), callbackUrl);
 }
 
 // Page de connexion dans la locale courante (locale par défaut sans préfixe,
@@ -58,7 +55,7 @@ async function signInWithOAuth(provider: OAuthProvider, formData: FormData) {
   await redirectIfBot(provider);
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
-  await signIn(provider, { redirectTo: await postSignInRedirectTo() });
+  await signIn(provider, { redirectTo: await postSignInRedirectTo(callbackUrl) });
 }
 
 export async function signInWithGitHub(formData: FormData) {
@@ -95,7 +92,10 @@ export async function signInWithEmail(
   const callbackUrl = safeCallbackUrl(formData.get("callbackUrl") as string);
   if (callbackUrl) await setCallbackCookie(callbackUrl);
   try {
-    await signIn("resend", { email, redirectTo: await postSignInRedirectTo() });
+    await signIn("resend", {
+      email,
+      redirectTo: await postSignInRedirectTo(callbackUrl),
+    });
   } catch (error) {
     // Relance les erreurs spéciales Next.js (redirect, notFound) pour préserver le flow nominal.
     unstable_rethrow(error);

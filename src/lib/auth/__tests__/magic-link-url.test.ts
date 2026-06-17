@@ -30,6 +30,16 @@ describe("detectLocaleForMagicLink", () => {
       expect(detectLocaleForMagicLink(url, makeRequest())).toBe("fr");
     });
 
+    // Non-régression : depuis le portage du callbackUrl dans la query, le
+    // `redirectTo` Auth.js vaut `/${locale}/dashboard/profile/setup?callbackUrl=...`.
+    // La langue doit toujours se déduire du préfixe de tête, pas du param imbriqué.
+    it.each([
+      ["/fr/dashboard/profile/setup?callbackUrl=/m/foo", "fr"],
+      ["/en/dashboard/profile/setup?callbackUrl=/en/m/foo", "en"],
+    ])("should read the head locale prefix of a setup redirect (%s)", (callback, expected) => {
+      expect(detectLocaleForMagicLink(authUrl(callback), makeRequest())).toBe(expected);
+    });
+
     it("should beat the cookie when the prefix says otherwise", () => {
       const request = makeRequest({ cookie: "NEXT_LOCALE=en" });
       expect(detectLocaleForMagicLink(authUrl("/fr/m/foo"), request)).toBe("fr");
