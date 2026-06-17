@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
+import { get } from "@vercel/edge-config";
 import { routing } from "./i18n/routing";
 import { isValidSlug } from "./lib/slug";
 import { AGGRESSIVE_CRAWLERS, AI_TRAINING_BOTS } from "./lib/blocked-bots";
 import { dashboardEventPublicPath } from "./lib/dashboard-event-public-redirect";
+import {
+  MAINTENANCE_BYPASS_COOKIE,
+  MAINTENANCE_BYPASS_COOKIE_MAX_AGE,
+  MAINTENANCE_BYPASS_QUERY_PARAM,
+  MAINTENANCE_PATH,
+  MAINTENANCE_RETRY_AFTER_SECONDS,
+  isBypassTokenValid,
+} from "./lib/maintenance";
 
 // Auth.js v5 stores the session under `authjs.session-token` (HTTP) or
 // `__Secure-authjs.session-token` (HTTPS). Presence-only check — middleware
@@ -42,7 +51,32 @@ function matchesAny(ua: string, bots: readonly string[]): boolean {
   return bots.some((bot) => lower.includes(bot));
 }
 
-export default function middleware(request: NextRequest) {
+/**
+ * Lit le flag de maintenance. Indépendant de la DB et fail-open : toute erreur
+ * de lecture laisse passer le trafic (on ne coupe jamais le site à cause du
+ * mécanisme lui-même).
+ * - `MAINTENANCE_MODE=true` force la maintenance **en dev uniquement** (pour
+ *   tester la page localement, sans Edge Config). Volontairement ignoré en prod :
+ *   une env var posée en prod coincerait le site (sortie = redeploy, ce qui
+ *   contredit l'objectif « sans rebuild »). En prod, seul Edge Config pilote.
+ * - sinon, lecture de la clé `maintenance` dans Edge Config (preview/prod)
+ */
+async function isMaintenanceOn(): Promise<boolean> {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.MAINTENANCE_MODE === "true"
+  ) {
+    return true;
+  }
+  if (!process.env.EDGE_CONFIG) return false;
+  try {
+    return (await get<boolean>("maintenance")) === true;
+  } catch {
+    return false;
+  }
+}
+
+export default async function middleware(request: NextRequest) {
   // 1. Block known aggressive bots early (Edge, zero serverless cost).
   // AI training bots are blocked only on user-generated content paths.
   const ua = request.headers.get("user-agent") ?? "";
@@ -58,7 +92,58 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Bypass next-intl for Next.js metadata file routes. The i18n middleware
+  // 2. Mode maintenance. Lu en tête (avant tout le reste) pour court-circuiter
+  // le site lors d'un incident majeur. Webhook Stripe et `/api/*` sont hors
+  // matcher → restent vivants. La page /maintenance est statique (zéro DB).
+  if (await isMaintenanceOn()) {
+    const expected = process.env.MAINTENANCE_BYPASS_TOKEN;
+    const provided = request.nextUrl.searchParams.get(
+      MAINTENANCE_BYPASS_QUERY_PARAM
+    );
+
+    // Activation du bypass via URL : pose le cookie, nettoie le paramètre,
+    // puis recharge l'URL propre (le cookie portera l'accès aux requêtes suivantes).
+    if (provided && isBypassTokenValid(provided, expected)) {
+      const cleanUrl = request.nextUrl.clone();
+      cleanUrl.searchParams.delete(MAINTENANCE_BYPASS_QUERY_PARAM);
+      const response = NextResponse.redirect(cleanUrl);
+      response.cookies.set(MAINTENANCE_BYPASS_COOKIE, provided, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: MAINTENANCE_BYPASS_COOKIE_MAX_AGE,
+      });
+      return response;
+    }
+
+    // Cookie de bypass déjà valide → on laisse passer (le maintainer voit le site).
+    const cookie = request.cookies.get(MAINTENANCE_BYPASS_COOKIE)?.value;
+    if (!isBypassTokenValid(cookie, expected)) {
+      // Sert la page statique en 503 + Retry-After (crawlers et sondes uptime
+      // comprennent que c'est temporaire).
+      const maintenanceUrl = request.nextUrl.clone();
+      maintenanceUrl.pathname = MAINTENANCE_PATH;
+      return NextResponse.rewrite(maintenanceUrl, {
+        status: 503,
+        headers: {
+          "Retry-After": String(MAINTENANCE_RETRY_AFTER_SECONDS),
+          // Jamais mettre la page de maintenance en cache (CDN/proxy/bfcache) :
+          // sinon elle resterait servie après le rétablissement du site.
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+  }
+
+  // 3. La route /maintenance est hors i18n : ne pas la passer à next-intl
+  // (sinon préfixe de locale parasite). Atteinte en direct hors maintenance,
+  // ou rendue via le rewrite ci-dessus.
+  if (request.nextUrl.pathname === MAINTENANCE_PATH) {
+    return NextResponse.next();
+  }
+
+  // 4. Bypass next-intl for Next.js metadata file routes. The i18n middleware
   // strips the default locale prefix (e.g. /fr/...) via a 307 redirect, which
   // drops the hash query string and breaks social crawlers (LinkedIn, X...)
   // that don't follow redirects on og:image URLs. Next.js file-based routing
@@ -67,7 +152,7 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. Validate slugs on public routes before any processing
+  // 5. Validate slugs on public routes before any processing
   const slugMatch = request.nextUrl.pathname.match(slugRouteRe);
   if (slugMatch) {
     const slug = decodeURIComponent(slugMatch[1]);
@@ -76,7 +161,7 @@ export default function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Bounce shared dashboard event links to the public page for visitors
+  // 6. Bounce shared dashboard event links to the public page for visitors
   // without a session, so they stay in the funnel instead of hitting sign-in.
   const dashboardEventPath = dashboardEventPublicPath(request.nextUrl.pathname);
   if (dashboardEventPath && !hasSessionCookie(request)) {
@@ -85,7 +170,7 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 5. Delegate to next-intl middleware
+  // 7. Delegate to next-intl middleware
   return intlMiddleware(request);
 }
 
