@@ -6,11 +6,11 @@ import posthog from "posthog-js";
 import {
   clearLastIdentifiedUserId,
   decideIdentityAction,
+  isSignupTracked,
+  markSignupTracked,
   readLastIdentifiedUserId,
   writeLastIdentifiedUserId,
-} from "./posthog-identity-logic";
-
-const SIGNUP_TRACKED_PREFIX = "ph_signup_tracked_";
+} from "@/lib/posthog-identity-logic";
 
 export function PostHogIdentity() {
   const { data: session, status } = useSession();
@@ -26,6 +26,8 @@ export function PostHogIdentity() {
 
     switch (action.type) {
       case "identify":
+        // (Ré)identification à chaque render : idempotent côté PostHog, garde
+        // les propriétés (email, name) fraîches.
         posthog.identify(action.userId, {
           email: session?.user?.email ?? undefined,
           name: session?.user?.name ?? undefined,
@@ -44,12 +46,11 @@ export function PostHogIdentity() {
 
     // Tracking nouvel utilisateur — côté client pour fiabilité en serverless.
     // Découplé de la décision d'identité : doit rester évalué dès que l'utilisateur
-    // est présent, même si `identify` n'a pas été (re)déclenché ce render.
+    // est présent.
     if (session?.user?.id && session.user.isNewUser && !trackedRef.current) {
-      const storageKey = `${SIGNUP_TRACKED_PREFIX}${session.user.id}`;
-      if (!localStorage.getItem(storageKey)) {
+      if (!isSignupTracked(session.user.id)) {
         posthog.capture("user_signed_up");
-        localStorage.setItem(storageKey, "1");
+        markSignupTracked(session.user.id);
       }
       trackedRef.current = true;
     }
