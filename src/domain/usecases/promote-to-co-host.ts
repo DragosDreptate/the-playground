@@ -1,5 +1,6 @@
 import type { CircleMembership } from "@/domain/models/circle";
 import { isActivePrimaryHost } from "@/domain/models/circle";
+import { isConfirmedParticipation } from "@/domain/models/registration";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
@@ -94,28 +95,33 @@ export async function promoteToCoHost(
       moment.startsAt > now &&
       (moment.status === "DRAFT" || moment.status === "PUBLISHED")
   );
+  // Une seule requête pour les inscriptions existantes du membre sur ces
+  // événements (évite le N+1).
+  const existingByMoment = await registrationRepository.findByMomentIdsAndUser(
+    upcoming.map((moment) => moment.id),
+    input.targetUserId
+  );
   await Promise.all(
-    upcoming.map(async (moment) => {
-      const existing = await registrationRepository.findByMomentAndUser(
-        moment.id,
-        input.targetUserId
-      );
-      if (!existing) {
-        await registrationRepository.create({
-          momentId: moment.id,
-          userId: input.targetUserId,
-          status: "REGISTERED",
-        });
-      } else if (
-        existing.status === "CANCELLED" ||
-        existing.status === "REJECTED"
-      ) {
-        await registrationRepository.update(existing.id, {
+    upcoming.map((moment) => {
+      const existing = existingByMoment.get(moment.id) ?? null;
+      // Déjà participant (REGISTERED / CHECKED_IN) : idempotent, rien à faire.
+      if (existing && isConfirmedParticipation(existing.status)) {
+        return undefined;
+      }
+      // WAITLISTED / PENDING_APPROVAL / CANCELLED / REJECTED → forcé REGISTERED
+      // (un organisateur n'est ni en liste d'attente ni en attente de validation
+      // d'un événement de son propre Circle).
+      if (existing) {
+        return registrationRepository.update(existing.id, {
           status: "REGISTERED",
           cancelledAt: null,
         });
       }
-      // Sinon (inscription déjà active) : idempotent, rien à faire.
+      return registrationRepository.create({
+        momentId: moment.id,
+        userId: input.targetUserId,
+        status: "REGISTERED",
+      });
     })
   );
 

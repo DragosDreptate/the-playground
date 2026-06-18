@@ -40,7 +40,7 @@ Quand un membre est promu CO_HOST, l'inscrire à **tous les événements à veni
 
 - Après `updateMembershipRole(..., "CO_HOST")` (ligne 70-73) :
   - Charger les événements du Circle (`momentRepository.findByCircleId(circleId)`), filtrer **à venir et non annulés** : `startsAt > now` ET `status ∈ {DRAFT, PUBLISHED}`.
-  - Pour chacun, **idempotence** : si le membre a déjà une `Registration` active (`findByMomentAndUser`), ne rien faire ; si elle est `CANCELLED`/`REJECTED`, la réactiver (`update` → `REGISTERED`) ; sinon `create` `REGISTERED`.
+  - Charger en **une seule requête** les inscriptions existantes du membre sur ces événements (`findByMomentIdsAndUser`, évite le N+1), puis pour chacun : si l'inscription est déjà **confirmée** (`isConfirmedParticipation` → `REGISTERED`/`CHECKED_IN`), ne rien faire ; tout autre statut existant (`WAITLISTED`, `PENDING_APPROVAL`, `CANCELLED`, `REJECTED`) est **forcé à `REGISTERED`** (`update`) ; sinon `create` `REGISTERED`.
 - Insertion directe → **aucun email** (on ne passe pas par `joinMoment`). La notif existante au membre promu (`emailStrings.promotedBy`) est inchangée.
 - **Deps à ajouter** au usecase : `momentRepository`, `registrationRepository` (actuellement : `circleRepository`, `userRepository`, `emailService`).
 
@@ -48,7 +48,7 @@ Quand un membre est promu CO_HOST, l'inscrire à **tous les événements à veni
 
 Répare les événements **déjà créés** (le cas réel « Club du Mont Saint Léger ») : l'auto-inscription à la création ne s'applique pas rétroactivement.
 
-- Script `scripts/backfill-organizer-registrations.ts` : pour chaque événement **à venir** (`startsAt > now`, `status ∈ {DRAFT, PUBLISHED}`), inscrire en `REGISTERED` les organisateurs actifs (`role ∈ {HOST, CO_HOST}`, `status = ACTIVE`) qui n'ont pas déjà une `Registration` active sur ce Moment.
+- Script `scripts/backfill-organizer-registrations.ts` : pour chaque événement **à venir** (`startsAt > now`, `status ∈ {DRAFT, PUBLISHED}`), inscrire en `REGISTERED` les organisateurs actifs (`role ∈ {HOST, CO_HOST}`, `status = ACTIVE`) dont l'inscription n'est pas déjà **confirmée** sur ce Moment (`isConfirmedParticipation`) — les statuts non confirmés sont forcés à `REGISTERED`, même définition partagée que le usecase.
 - **Direct via Prisma**, sans passer par les usecases / actions → **aucune notification ne part vers les hosts** (contrainte explicite).
 - Idempotent (skip si déjà inscrit). Dry-run par défaut + `--execute`, variante prod, entrées `pnpm db:backfill-organizer-registrations[:prod]` (convention des scripts existants).
 - **Capacité** : aucun risque de dépassement aujourd'hui (le cas capacité < nb organisateurs n'existe pas en prod). Les organisateurs sont inscrits `REGISTERED` sans contrôle de capacité, cohérent avec l'auto-inscription du créateur.
@@ -61,14 +61,15 @@ Répare les événements **déjà créés** (le cas réel « Club du Mont Saint 
 
 | Fichier | Changement |
 | --- | --- |
+| `src/domain/models/registration.ts` | Helper partagé `isConfirmedParticipation` (`REGISTERED`/`CHECKED_IN`) — définition unique du « déjà inscrit » pour usecase + backfill |
 | `src/domain/usecases/create-moment.ts` | Boucle sur `findOrganizers` au lieu d'une inscription unique |
-| `src/domain/usecases/promote-to-co-host.ts` | Inscrire le promu aux événements à venir ; ajout des deps `momentRepository` + `registrationRepository` |
+| `src/domain/usecases/promote-to-co-host.ts` | Inscrire le promu aux événements à venir (lecture batch `findByMomentIdsAndUser`) ; ajout des deps `momentRepository` + `registrationRepository` |
 | `src/app/actions/circle.ts` | `promoteToCoHostAction` : injecter `prismaMomentRepository` (à importer) + `prismaRegistrationRepository` (déjà importé ligne 29) dans `promoteToCoHost` |
 | `scripts/backfill-organizer-registrations.ts` (+ `*-prod.sh`, entrées `package.json`) | Backfill direct en base des événements existants à venir |
 | `src/domain/usecases/__tests__/create-moment.test.ts` | « inscrit tous les organisateurs » (au lieu du seul Host) |
 | `src/domain/usecases/__tests__/promote-to-co-host.test.ts` | « inscrit le promu aux événements à venir », idempotence ; mocks des 2 nouvelles deps ajoutés même aux cas existants |
 
-> **Note perf** : la promotion et le backfill chargent les moments via `findByCircleId` (tous les moments du Circle) puis filtrent en JS (`startsAt > now`, `status ∈ {DRAFT, PUBLISHED}`). Chemins rares/ponctuels → pas de méthode repository dédiée, compromis assumé.
+> **Note perf** : la promotion charge les moments via `findByCircleId` (tous les moments du Circle) puis filtre en JS (`startsAt > now`, `status ∈ {DRAFT, PUBLISHED}`) ; les inscriptions existantes sont lues en une requête batch (`findByMomentIdsAndUser`). Chemin rare → pas de méthode repository SQL dédiée pour le filtre des moments, compromis assumé. Le backfill, lui, filtre les moments en SQL (`prisma.moment.findMany`).
 
 **Aucun changement** : UI (`moment-detail-view.tsx`, `registration-button.tsx`), `join-moment.ts`, `cancel-registration.ts` (D16 préservée), `m/[slug]/page.tsx`, i18n, schema Prisma.
 

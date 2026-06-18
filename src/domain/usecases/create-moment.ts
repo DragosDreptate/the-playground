@@ -115,7 +115,9 @@ export async function createMoment(
 
   // Tous les organisateurs actifs (HOST + CO_HOST) sont automatiquement inscrits
   // en tant que Participants — voir spec/features/co-host-event-participation.md.
-  // findOrganizers inclut le créateur (organisateur actif vérifié plus haut).
+  // findOrganizers inclut le créateur quand c'est un vrai membre. Un admin en
+  // host mode (membership synthétique, non persistée) n'apparaît volontairement
+  // pas ici : on ne crée pas de Registration fantôme pour un non-membre.
   const organizers = await circleRepository.findOrganizers(input.circleId);
   await Promise.all(
     organizers.map((organizer) =>

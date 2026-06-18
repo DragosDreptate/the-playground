@@ -329,53 +329,59 @@ describe("promoteToCoHost", () => {
       });
     });
 
-    it("should be idempotent — skip events with an already active registration", async () => {
-      const momentRepo = createMockMomentRepository({
+    function momentRepoWith(id: string) {
+      return createMockMomentRepository({
         findByCircleId: vi
           .fn()
-          .mockResolvedValue([makeMoment({ id: "m-pub", status: "PUBLISHED", startsAt: FUTURE })]),
+          .mockResolvedValue([makeMoment({ id, status: "PUBLISHED", startsAt: FUTURE })]),
       });
-      const registrationRepo = createMockRegistrationRepository({
-        findByMomentAndUser: vi.fn().mockResolvedValue(
-          makeRegistration({ momentId: "m-pub", userId: TARGET_ID, status: "REGISTERED" })
-        ),
-      });
+    }
 
-      await promoteToCoHost(makeInput(), {
-        circleRepository: validPromotionCircleRepo(),
-        momentRepository: momentRepo,
-        registrationRepository: registrationRepo,
-        userRepository: createMockUserRepository(),
-      });
+    it.each(["REGISTERED", "CHECKED_IN"] as const)(
+      "should be idempotent — skip events where the member is already %s",
+      async (status) => {
+        const registrationRepo = createMockRegistrationRepository({
+          findByMomentIdsAndUser: vi.fn().mockResolvedValue(
+            new Map([["m-pub", makeRegistration({ momentId: "m-pub", userId: TARGET_ID, status })]])
+          ),
+        });
 
-      expect(registrationRepo.create).not.toHaveBeenCalled();
-      expect(registrationRepo.update).not.toHaveBeenCalled();
-    });
+        await promoteToCoHost(makeInput(), {
+          circleRepository: validPromotionCircleRepo(),
+          momentRepository: momentRepoWith("m-pub"),
+          registrationRepository: registrationRepo,
+          userRepository: createMockUserRepository(),
+        });
 
-    it("should reactivate a CANCELLED registration to REGISTERED", async () => {
-      const momentRepo = createMockMomentRepository({
-        findByCircleId: vi
-          .fn()
-          .mockResolvedValue([makeMoment({ id: "m-pub", status: "PUBLISHED", startsAt: FUTURE })]),
-      });
-      const registrationRepo = createMockRegistrationRepository({
-        findByMomentAndUser: vi.fn().mockResolvedValue(
-          makeRegistration({ id: "reg-cancelled", momentId: "m-pub", userId: TARGET_ID, status: "CANCELLED" })
-        ),
-      });
+        expect(registrationRepo.create).not.toHaveBeenCalled();
+        expect(registrationRepo.update).not.toHaveBeenCalled();
+      }
+    );
 
-      await promoteToCoHost(makeInput(), {
-        circleRepository: validPromotionCircleRepo(),
-        momentRepository: momentRepo,
-        registrationRepository: registrationRepo,
-        userRepository: createMockUserRepository(),
-      });
+    it.each(["CANCELLED", "REJECTED", "WAITLISTED", "PENDING_APPROVAL"] as const)(
+      "should force a %s registration to REGISTERED",
+      async (status) => {
+        const registrationRepo = createMockRegistrationRepository({
+          findByMomentIdsAndUser: vi.fn().mockResolvedValue(
+            new Map([
+              ["m-pub", makeRegistration({ id: "reg-1", momentId: "m-pub", userId: TARGET_ID, status })],
+            ])
+          ),
+        });
 
-      expect(registrationRepo.update).toHaveBeenCalledWith("reg-cancelled", {
-        status: "REGISTERED",
-        cancelledAt: null,
-      });
-      expect(registrationRepo.create).not.toHaveBeenCalled();
-    });
+        await promoteToCoHost(makeInput(), {
+          circleRepository: validPromotionCircleRepo(),
+          momentRepository: momentRepoWith("m-pub"),
+          registrationRepository: registrationRepo,
+          userRepository: createMockUserRepository(),
+        });
+
+        expect(registrationRepo.update).toHaveBeenCalledWith("reg-1", {
+          status: "REGISTERED",
+          cancelledAt: null,
+        });
+        expect(registrationRepo.create).not.toHaveBeenCalled();
+      }
+    );
   });
 });

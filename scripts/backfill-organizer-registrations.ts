@@ -22,6 +22,10 @@ config({ path: ".env.local" });
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
+import {
+  isConfirmedParticipation,
+  type RegistrationStatus,
+} from "@/domain/models/registration";
 
 if (!process.env.DATABASE_URL) {
   console.error("❌ DATABASE_URL non défini.");
@@ -33,14 +37,6 @@ const EXECUTE = process.argv.includes("--execute");
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });
-
-// Statuts d'inscription considérés comme "actifs" (l'organisateur participe déjà).
-const ACTIVE_STATUSES = [
-  "REGISTERED",
-  "WAITLISTED",
-  "PENDING_APPROVAL",
-  "CHECKED_IN",
-] as const;
 
 async function main() {
   const now = new Date();
@@ -87,7 +83,7 @@ async function main() {
     for (const organizer of organizers) {
       const existing = byUser.get(organizer.userId);
 
-      if (existing && (ACTIVE_STATUSES as readonly string[]).includes(existing.status)) {
+      if (existing && isConfirmedParticipation(existing.status as RegistrationStatus)) {
         skipped++;
         continue;
       }
@@ -105,7 +101,8 @@ async function main() {
         }
         created++;
       } else {
-        // Inscription CANCELLED ou REJECTED → réactivée en REGISTERED.
+        // Inscription non confirmée (WAITLISTED / PENDING_APPROVAL / CANCELLED /
+        // REJECTED) → forcée en REGISTERED.
         console.log(`  ↻ ${moment.slug} → réactivation de ${organizer.userId}`);
         if (EXECUTE) {
           await prisma.registration.update({
