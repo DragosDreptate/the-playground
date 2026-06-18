@@ -113,12 +113,19 @@ export async function createMoment(
     ...(input.requiresApproval !== undefined && { requiresApproval: input.requiresApproval }),
   });
 
-  // L'organisateur est automatiquement inscrit en tant que Participant
-  await registrationRepository.create({
-    momentId: moment.id,
-    userId: input.userId,
-    status: "REGISTERED",
-  });
+  // Tous les organisateurs actifs (HOST + CO_HOST) sont automatiquement inscrits
+  // en tant que Participants — voir spec/features/co-host-event-participation.md.
+  // findOrganizers inclut le créateur (organisateur actif vérifié plus haut).
+  const organizers = await circleRepository.findOrganizers(input.circleId);
+  await Promise.all(
+    organizers.map((organizer) =>
+      registrationRepository.create({
+        momentId: moment.id,
+        userId: organizer.userId,
+        status: "REGISTERED",
+      })
+    )
+  );
 
   return { moment };
 }

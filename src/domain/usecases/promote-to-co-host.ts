@@ -1,6 +1,8 @@
 import type { CircleMembership } from "@/domain/models/circle";
 import { isActivePrimaryHost } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
+import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
+import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { UserRepository } from "@/domain/ports/repositories/user-repository";
 import type { EmailService } from "@/domain/ports/services/email-service";
 import {
@@ -18,6 +20,8 @@ type PromoteToCoHostInput = {
 
 type PromoteToCoHostDeps = {
   circleRepository: CircleRepository;
+  momentRepository: MomentRepository;
+  registrationRepository: RegistrationRepository;
   userRepository: UserRepository;
   emailService?: EmailService;
   emailStrings?: {
@@ -46,7 +50,14 @@ export async function promoteToCoHost(
   input: PromoteToCoHostInput,
   deps: PromoteToCoHostDeps
 ): Promise<CircleMembership> {
-  const { circleRepository, userRepository, emailService, emailStrings } = deps;
+  const {
+    circleRepository,
+    momentRepository,
+    registrationRepository,
+    userRepository,
+    emailService,
+    emailStrings,
+  } = deps;
 
   // D3 : seul le HOST principal peut promouvoir (garde strict HOST, pas CO_HOST).
   const [callerMembership, targetMembership] = await Promise.all([
@@ -71,6 +82,41 @@ export async function promoteToCoHost(
     input.circleId,
     input.targetUserId,
     "CO_HOST"
+  );
+
+  // Le nouveau co-host est automatiquement inscrit à tous les événements à venir
+  // du Circle (REGISTERED), comme tout organisateur — voir
+  // spec/features/co-host-event-participation.md. Insertion directe sans email.
+  const now = new Date();
+  const moments = await momentRepository.findByCircleId(input.circleId);
+  const upcoming = moments.filter(
+    (moment) =>
+      moment.startsAt > now &&
+      (moment.status === "DRAFT" || moment.status === "PUBLISHED")
+  );
+  await Promise.all(
+    upcoming.map(async (moment) => {
+      const existing = await registrationRepository.findByMomentAndUser(
+        moment.id,
+        input.targetUserId
+      );
+      if (!existing) {
+        await registrationRepository.create({
+          momentId: moment.id,
+          userId: input.targetUserId,
+          status: "REGISTERED",
+        });
+      } else if (
+        existing.status === "CANCELLED" ||
+        existing.status === "REJECTED"
+      ) {
+        await registrationRepository.update(existing.id, {
+          status: "REGISTERED",
+          cancelledAt: null,
+        });
+      }
+      // Sinon (inscription déjà active) : idempotent, rien à faire.
+    })
   );
 
   // D19 : email de promotion best-effort — un échec ne bloque pas la promotion.

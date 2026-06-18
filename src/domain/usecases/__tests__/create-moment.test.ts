@@ -63,9 +63,23 @@ describe("CreateMoment", () => {
       expect(result.moment.status).toBe("DRAFT");
     });
 
-    it("should automatically register the Host as a Participant", async () => {
+    it("should automatically register all active organizers as Participants", async () => {
+      const organizer = (userId: string, role: "HOST" | "CO_HOST") => ({
+        ...makeMembership({ userId, role }),
+        user: {
+          id: userId,
+          firstName: null,
+          lastName: null,
+          email: `${userId}@test.dev`,
+          image: null,
+          publicId: null,
+        },
+      });
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(makeMembership()),
+        findOrganizers: vi
+          .fn()
+          .mockResolvedValue([organizer("user-1", "HOST"), organizer("user-2", "CO_HOST")]),
       });
       const momentRepo = createMockMomentRepository({
         create: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1" })),
@@ -78,9 +92,15 @@ describe("CreateMoment", () => {
         registrationRepository: registrationRepo,
       });
 
+      expect(registrationRepo.create).toHaveBeenCalledTimes(2);
       expect(registrationRepo.create).toHaveBeenCalledWith({
         momentId: "moment-1",
         userId: "user-1",
+        status: "REGISTERED",
+      });
+      expect(registrationRepo.create).toHaveBeenCalledWith({
+        momentId: "moment-1",
+        userId: "user-2",
         status: "REGISTERED",
       });
     });

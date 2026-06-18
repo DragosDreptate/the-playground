@@ -47,6 +47,8 @@
     "db:backfill-public-id:prod": "bash scripts/backfill-public-id-prod.sh",
     "db:backfill-is-demo": "tsx scripts/backfill-explorer-is-demo.ts",
     "db:backfill-is-demo:prod": "bash scripts/backfill-explorer-is-demo-prod.sh",
+    "db:backfill-organizer-registrations": "tsx scripts/backfill-organizer-registrations.ts",
+    "db:backfill-organizer-registrations:prod": "bash scripts/backfill-organizer-registrations-prod.sh",
     "db:subscribe-demo-to-the-spark:prod": "bash scripts/db-subscribe-demo-to-the-spark-prod.sh",
     "db:seed-covers": "tsx scripts/seed-covers.ts",
     "db:seed-covers:execute": "tsx scripts/seed-covers.ts --execute",
