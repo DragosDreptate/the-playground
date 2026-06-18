@@ -21,7 +21,7 @@ C'est ça, The Playground. Rien de plus, rien de moins.
 
 La plateforme tourne. La structure est solide, les fonctionnalités sont là.
 
-Les premières communautés s'y sont installées, et c'est déjà un signe de confiance et d'utilité.
+Les premières communautés s'y sont installées, et c'est déjà un signe de confiance et d'utilité. The Playground s'enrichit chaque semaine, et c'est un projet pensé pour durer.
 
 Mais pour qu'une plateforme communautaire prouve quelque chose, il en faut plus. Plus de communautés qui vivent, qui grandissent, dont les membres reviennent.
 
