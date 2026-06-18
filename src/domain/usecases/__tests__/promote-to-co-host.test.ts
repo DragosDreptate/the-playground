@@ -8,6 +8,14 @@ import {
 import { createMockUserRepository, makeUser } from "./helpers/mock-user-repository";
 import { createMockEmailService } from "./helpers/mock-email-service";
 import {
+  createMockMomentRepository,
+  makeMoment,
+} from "./helpers/mock-moment-repository";
+import {
+  createMockRegistrationRepository,
+  makeRegistration,
+} from "./helpers/mock-registration-repository";
+import {
   UnauthorizedCircleActionError,
   NotMemberOfCircleError,
   CannotPromotePendingMemberError,
@@ -34,6 +42,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(UnauthorizedCircleActionError);
@@ -49,6 +59,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(UnauthorizedCircleActionError);
@@ -64,6 +76,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(UnauthorizedCircleActionError);
@@ -82,6 +96,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(NotMemberOfCircleError);
@@ -102,6 +118,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(CannotPromotePendingMemberError);
@@ -122,6 +140,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(InvalidPromotionTargetError);
@@ -140,6 +160,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         })
       ).rejects.toThrow(InvalidPromotionTargetError);
@@ -165,6 +187,8 @@ describe("promoteToCoHost", () => {
 
       const result = await promoteToCoHost(makeInput(), {
         circleRepository: circleRepo,
+        momentRepository: createMockMomentRepository(),
+        registrationRepository: createMockRegistrationRepository(),
         userRepository: createMockUserRepository(),
       });
 
@@ -201,6 +225,8 @@ describe("promoteToCoHost", () => {
 
       await promoteToCoHost(makeInput(), {
         circleRepository: circleRepo,
+        momentRepository: createMockMomentRepository(),
+        registrationRepository: createMockRegistrationRepository(),
         userRepository: userRepo,
         emailService,
         emailStrings: { promotedBy },
@@ -236,6 +262,8 @@ describe("promoteToCoHost", () => {
       await expect(
         promoteToCoHost(makeInput(), {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: userRepo,
           emailService,
           emailStrings: {
@@ -249,5 +277,111 @@ describe("promoteToCoHost", () => {
         })
       ).resolves.toBeDefined();
     });
+  });
+
+  describe("given a valid promotion, the promoted member is registered to upcoming events", () => {
+    const FUTURE = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+    const PAST = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
+
+    function validPromotionCircleRepo() {
+      return createMockCircleRepository({
+        findMembership: vi
+          .fn()
+          .mockResolvedValueOnce(makeMembership({ role: "HOST", status: "ACTIVE" }))
+          .mockResolvedValueOnce(
+            makeMembership({ userId: TARGET_ID, role: "PLAYER", status: "ACTIVE" })
+          ),
+        updateMembershipRole: vi.fn().mockResolvedValue(
+          makeMembership({ userId: TARGET_ID, role: "CO_HOST", status: "ACTIVE" })
+        ),
+      });
+    }
+
+    it("should register the member to upcoming DRAFT and PUBLISHED events only", async () => {
+      const momentRepo = createMockMomentRepository({
+        findByCircleId: vi.fn().mockResolvedValue([
+          makeMoment({ id: "m-pub", status: "PUBLISHED", startsAt: FUTURE }),
+          makeMoment({ id: "m-draft", status: "DRAFT", startsAt: FUTURE }),
+          makeMoment({ id: "m-past", status: "PAST", startsAt: PAST }),
+          makeMoment({ id: "m-cancelled", status: "CANCELLED", startsAt: FUTURE }),
+          makeMoment({ id: "m-pub-past", status: "PUBLISHED", startsAt: PAST }),
+        ]),
+      });
+      const registrationRepo = createMockRegistrationRepository();
+
+      await promoteToCoHost(makeInput(), {
+        circleRepository: validPromotionCircleRepo(),
+        momentRepository: momentRepo,
+        registrationRepository: registrationRepo,
+        userRepository: createMockUserRepository(),
+      });
+
+      expect(registrationRepo.create).toHaveBeenCalledTimes(2);
+      expect(registrationRepo.create).toHaveBeenCalledWith({
+        momentId: "m-pub",
+        userId: TARGET_ID,
+        status: "REGISTERED",
+      });
+      expect(registrationRepo.create).toHaveBeenCalledWith({
+        momentId: "m-draft",
+        userId: TARGET_ID,
+        status: "REGISTERED",
+      });
+    });
+
+    function momentRepoWith(id: string) {
+      return createMockMomentRepository({
+        findByCircleId: vi
+          .fn()
+          .mockResolvedValue([makeMoment({ id, status: "PUBLISHED", startsAt: FUTURE })]),
+      });
+    }
+
+    it.each(["REGISTERED", "CHECKED_IN"] as const)(
+      "should be idempotent — skip events where the member is already %s",
+      async (status) => {
+        const registrationRepo = createMockRegistrationRepository({
+          findByMomentIdsAndUser: vi.fn().mockResolvedValue(
+            new Map([["m-pub", makeRegistration({ momentId: "m-pub", userId: TARGET_ID, status })]])
+          ),
+        });
+
+        await promoteToCoHost(makeInput(), {
+          circleRepository: validPromotionCircleRepo(),
+          momentRepository: momentRepoWith("m-pub"),
+          registrationRepository: registrationRepo,
+          userRepository: createMockUserRepository(),
+        });
+
+        expect(registrationRepo.create).not.toHaveBeenCalled();
+        expect(registrationRepo.update).not.toHaveBeenCalled();
+      }
+    );
+
+    it.each(["CANCELLED", "REJECTED", "WAITLISTED", "PENDING_APPROVAL"] as const)(
+      "should force a %s registration to REGISTERED",
+      async (status) => {
+        const registrationRepo = createMockRegistrationRepository({
+          findByMomentIdsAndUser: vi.fn().mockResolvedValue(
+            new Map([
+              ["m-pub", makeRegistration({ id: "reg-1", momentId: "m-pub", userId: TARGET_ID, status })],
+            ])
+          ),
+        });
+
+        await promoteToCoHost(makeInput(), {
+          circleRepository: validPromotionCircleRepo(),
+          momentRepository: momentRepoWith("m-pub"),
+          registrationRepository: registrationRepo,
+          userRepository: createMockUserRepository(),
+        });
+
+        expect(registrationRepo.update).toHaveBeenCalledWith("reg-1", {
+          status: "REGISTERED",
+          cancelledAt: null,
+        });
+        expect(registrationRepo.create).not.toHaveBeenCalled();
+      }
+    );
   });
 });

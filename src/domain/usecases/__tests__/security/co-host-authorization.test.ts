@@ -214,6 +214,8 @@ describe("CO_HOST security — actions réservées au HOST (D3, D15)", () => {
         { circleId: CIRCLE_ID, hostUserId: CO_HOST_ID, targetUserId: PLAYER_ID },
         {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         }
       )
@@ -318,6 +320,8 @@ describe("CO_HOST security — D22 (promotion d'un PENDING refusée)", () => {
         { circleId: CIRCLE_ID, hostUserId: HOST_ID, targetUserId: PLAYER_ID },
         {
           circleRepository: circleRepo,
+          momentRepository: createMockMomentRepository(),
+          registrationRepository: createMockRegistrationRepository(),
           userRepository: createMockUserRepository(),
         }
       )

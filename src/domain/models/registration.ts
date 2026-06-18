@@ -11,6 +11,17 @@ export type RegistrationStatus =
 
 export type PaymentStatus = "NONE" | "PENDING" | "PAID" | "REFUNDED";
 
+/**
+ * Une inscription « confirmée » : l'utilisateur participe déjà (`REGISTERED`) ou
+ * a été pointé (`CHECKED_IN`). Source unique pour décider si un organisateur doit
+ * être (ré)inscrit à un événement : tout autre statut (`WAITLISTED`,
+ * `PENDING_APPROVAL`, `CANCELLED`, `REJECTED`) doit être forcé à `REGISTERED`.
+ * Voir spec/features/co-host-event-participation.md.
+ */
+export function isConfirmedParticipation(status: RegistrationStatus): boolean {
+  return status === "REGISTERED" || status === "CHECKED_IN";
+}
+
 /** Audience d'un message Organisateur → Participants d'un Moment. */
 export type HostMessageSegment = "REGISTERED" | "WAITLISTED" | "ALL";
 
