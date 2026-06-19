@@ -1,4 +1,5 @@
 import { escapeHtml } from "@/lib/html";
+import { extractNewVisitors } from "./fetch-dashboard";
 import type {
   PosthogDashboard,
   PosthogInsight,
@@ -146,6 +147,23 @@ export function buildReportHtml(
   const sessionsSeries = sessionsInsight?.result?.[0];
   const sessions = Math.round(sessionsSeries?.count ?? 0);
 
+  // ─── Primo-visiteurs vs revenants ──────────────────────────
+  // Optionnel : rendu seulement si la tile "Primo-visiteurs" existe.
+  const newVisitors = extractNewVisitors(dashboard);
+  const returningVisitors =
+    newVisitors == null ? null : Math.max(0, uniqueVisitors - newVisitors);
+  const newVisitorsPct =
+    newVisitors != null && uniqueVisitors > 0
+      ? Math.round((newVisitors / uniqueVisitors) * 100)
+      : null;
+  const newVisitorsBlock =
+    newVisitors == null
+      ? ""
+      : `<div style="margin-top:12px;padding:12px 16px;background:#fdf2f8;border-radius:8px;">
+<p style="margin:0;font-size:13px;color:#1a1a1a;">Sur ${uniqueVisitors} visiteur(s) unique(s) : <strong>${newVisitors}</strong> primo-visiteur(s)${newVisitorsPct != null ? ` (${newVisitorsPct}%)` : ""} et <strong>${returningVisitors}</strong> revenant(s).</p>
+<p style="margin:6px 0 0 0;font-size:11px;color:#9ca3af;line-height:1.4;">Distinction fiable à partir du 18/06/2026 (correction du tracking d'identité anonyme). Les primo-visiteurs restent transitoirement surévalués, le temps que les visiteurs récurrents accumulent un historique post-correction.</p>
+</div>`;
+
   // ─── Peaks ─────────────────────────────────────────────────
   const pvPeak = peakPoint(pvSeries[0], period);
   const sessionsPeak = peakPoint(sessionsSeries, period);
@@ -284,6 +302,7 @@ export function buildReportHtml(
 </td>
 </tr>
 </table>
+${newVisitorsBlock}
 </td></tr>
 
 <tr><td style="padding:32px 32px 0 32px;">

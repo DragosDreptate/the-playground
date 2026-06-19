@@ -109,3 +109,23 @@ export function patchUniqueVisitors(dashboard: PosthogDashboard): number | null 
   }
   return rounded;
 }
+
+const NEW_VISITORS_INSIGHT_PREFIX = "Primo-visiteurs";
+
+/**
+ * Extrait le nombre de primo-visiteurs (personnes dont la toute première venue
+ * tombe dans la période) depuis la tile "Primo-visiteurs" (insight BoldNumber,
+ * math `first_time_for_user`, `aggregated_value`).
+ *
+ * Retourne le nombre de primo-visiteurs, ou null si la tile est absente — le
+ * rapport masque alors la répartition primo / revenants (dégradation propre
+ * tant que la tile n'a pas été ajoutée au dashboard).
+ */
+export function extractNewVisitors(dashboard: PosthogDashboard): number | null {
+  const insight = dashboard.tiles.find((t) =>
+    t.insight?.name.startsWith(NEW_VISITORS_INSIGHT_PREFIX)
+  )?.insight;
+  const value = insight?.result?.[0]?.aggregated_value;
+  if (value == null) return null;
+  return Math.round(value);
+}

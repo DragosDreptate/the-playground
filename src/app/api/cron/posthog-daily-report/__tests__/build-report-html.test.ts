@@ -88,6 +88,43 @@ describe("buildReportHtml", () => {
       // 2026-04-10 20:30 UTC → 22:30 local summer time varies; we just check the date part
       expect(html).toMatch(/10\/04\/2026/);
     });
+
+    it("should not render the new/returning breakdown when the Primo-visiteurs tile is absent", () => {
+      // The fixture has no "Primo-visiteurs" tile → breakdown is omitted.
+      expect(html).not.toContain("primo-visiteur");
+    });
+  });
+
+  describe("given a dashboard with a Primo-visiteurs tile", () => {
+    function withPrimoTile(newVisitors: number): PosthogDashboard {
+      const dashboard = structuredClone(
+        realDashboard
+      ) as unknown as PosthogDashboard;
+      dashboard.tiles.push({
+        id: 999999,
+        insight: {
+          id: 999999,
+          short_id: "primo24h",
+          name: "Primo-visiteurs – 24h",
+          description: null,
+          result: [{ label: "Pageview", aggregated_value: newVisitors }],
+        },
+      });
+      return dashboard;
+    }
+
+    it("should render the primo / returning split and the percentage", () => {
+      // Fixture unique visitors (unpatched) = 25 ; primo = 10 → revenants = 15, 40%
+      const html = buildReportHtml(withPrimoTile(10), fixedDate);
+      expect(html).toContain("<strong>10</strong> primo-visiteur(s)");
+      expect(html).toContain("(40%)");
+      expect(html).toContain("<strong>15</strong> revenant(s)");
+    });
+
+    it("should render the post-fix reliability caveat", () => {
+      const html = buildReportHtml(withPrimoTile(10), fixedDate);
+      expect(html).toContain("Distinction fiable à partir du 18/06/2026");
+    });
   });
 
   describe("given an empty dashboard", () => {

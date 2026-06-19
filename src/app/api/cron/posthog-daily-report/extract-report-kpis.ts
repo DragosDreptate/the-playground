@@ -1,4 +1,5 @@
 import type { PosthogDashboard } from "./fetch-dashboard";
+import { extractNewVisitors } from "./fetch-dashboard";
 
 /**
  * Lightweight KPI extractor used by the Slack notification path.
@@ -10,6 +11,10 @@ export interface ReportKpis {
   pageviews: number;
   uniqueVisitors: number;
   sessions: number;
+  /** Primo-visiteurs (null si la tile "Primo-visiteurs" est absente). */
+  newVisitors: number | null;
+  /** Revenants = uniques − primo (null si primo indisponible). */
+  returningVisitors: number | null;
 }
 
 // Match by name prefix so both the daily ("– 24h") and weekly ("– 7j")
@@ -30,5 +35,15 @@ export function extractReportKpis(dashboard: PosthogDashboard): ReportKpis {
   )?.insight;
   const sessions = Math.round(sessionsInsight?.result?.[0]?.count ?? 0);
 
-  return { pageviews, uniqueVisitors, sessions };
+  const newVisitors = extractNewVisitors(dashboard);
+  const returningVisitors =
+    newVisitors == null ? null : Math.max(0, uniqueVisitors - newVisitors);
+
+  return {
+    pageviews,
+    uniqueVisitors,
+    sessions,
+    newVisitors,
+    returningVisitors,
+  };
 }
