@@ -2,7 +2,6 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
-import { fileTypeFromBuffer } from "file-type";
 import { auth } from "@/infrastructure/auth/auth.config";
 import {
   prismaMomentAttachmentRepository,
@@ -10,98 +9,86 @@ import {
   prismaCircleRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
-import { prismaRateLimiter } from "@/infrastructure/services/rate-limiter/prisma-rate-limiter";
 import { addMomentAttachment } from "@/domain/usecases/add-moment-attachment";
 import { removeMomentAttachment } from "@/domain/usecases/remove-moment-attachment";
-import {
-  ALLOWED_ATTACHMENT_CONTENT_TYPES,
-  MAX_ATTACHMENT_SIZE_BYTES,
-} from "@/domain/models/moment-attachment";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import type { ActionResult } from "./types";
 import { toActionResult } from "./helpers/to-action-result";
 
-const UPLOAD_RATE_LIMIT = { max: 10, windowMs: 60 * 1000 };
+type ConfirmAttachmentInput = {
+  url: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+};
 
-export async function uploadMomentAttachmentAction(
+/**
+ * Persists an attachment after the file has been uploaded client-direct to
+ * Blob (see /api/moments/attachments/upload). The host permission, content
+ * type and size are re-validated by the usecase. If validation fails, the
+ * already-uploaded blob is deleted to avoid an orphan in storage.
+ */
+export async function confirmMomentAttachmentAction(
   momentId: string,
-  formData: FormData
+  blob: ConfirmAttachmentInput
 ): Promise<ActionResult<MomentAttachment>> {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, error: "Non authentifié", code: "UNAUTHORIZED" };
   }
 
-  const rate = await prismaRateLimiter.checkLimit(
-    `attachment-upload:${session.user.id}`,
-    UPLOAD_RATE_LIMIT.max,
-    UPLOAD_RATE_LIMIT.windowMs
-  );
-  if (!rate.allowed) {
-    return {
-      success: false,
-      error: "Trop de tentatives, réessayez dans quelques instants",
-      code: "RATE_LIMITED",
-    };
-  }
-
-  const file = formData.get("file") as File | null;
-  if (!file || file.size === 0) {
-    return { success: false, error: "Fichier manquant", code: "MISSING_FILE" };
-  }
-
-  if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
-    return {
-      success: false,
-      error: `Fichier trop volumineux (max ${MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024} MB)`,
-      code: "ATTACHMENT_TOO_LARGE",
-    };
-  }
-
-  let buffer: Buffer;
+  // Validate the URL is genuinely a Vercel Blob object in THIS moment's
+  // namespace. Checking only the path substring would let a host register an
+  // arbitrary external URL (e.g. https://evil.tld/moment-attachments/<id>/x),
+  // which the download proxy would then fetch server-side (SSRF) and the public
+  // page would load as <video>/<img>.
+  let parsedUrl: URL;
   try {
-    buffer = Buffer.from(await file.arrayBuffer());
-  } catch (err) {
-    Sentry.captureException(err);
-    return {
-      success: false,
-      error: "Erreur de lecture du fichier",
-      code: "READ_ERROR",
-    };
+    parsedUrl = new URL(blob.url);
+  } catch {
+    return { success: false, error: "URL invalide", code: "INVALID_URL" };
+  }
+  if (
+    parsedUrl.protocol !== "https:" ||
+    !parsedUrl.hostname.endsWith(".public.blob.vercel-storage.com") ||
+    !parsedUrl.pathname.startsWith(`/moment-attachments/${momentId}/`)
+  ) {
+    return { success: false, error: "URL invalide", code: "INVALID_URL" };
   }
 
-  // Trust the actual bytes, not the client-declared contentType.
-  const detected = await fileTypeFromBuffer(buffer);
-  const detectedMime = detected?.mime;
-  if (!detectedMime || !ALLOWED_ATTACHMENT_CONTENT_TYPES.has(detectedMime)) {
-    return {
-      success: false,
-      error: "Format non supporté",
-      code: "ATTACHMENT_TYPE_NOT_ALLOWED",
-    };
+  // Reject empty files (guard the old server action enforced via file.size === 0):
+  // a 0-byte blob would create a phantom attachment that counts toward the quota.
+  if (blob.sizeBytes <= 0) {
+    return { success: false, error: "Fichier vide", code: "EMPTY_FILE" };
   }
 
   return toActionResult(async () => {
-    const attachment = await addMomentAttachment(
-      {
-        momentId,
-        userId: session.user.id,
-        file: {
-          buffer,
-          filename: file.name,
-          contentType: detectedMime,
-          sizeBytes: buffer.length,
+    try {
+      const attachment = await addMomentAttachment(
+        {
+          momentId,
+          userId: session.user.id,
+          url: blob.url,
+          filename: blob.filename,
+          contentType: blob.contentType,
+          sizeBytes: blob.sizeBytes,
         },
-      },
-      {
-        attachmentRepository: prismaMomentAttachmentRepository,
-        momentRepository: prismaMomentRepository,
-        circleRepository: prismaCircleRepository,
-        storage: vercelBlobStorageService,
-      }
-    );
-    revalidatePath(`/m/[slug]`, "page");
-    return attachment;
+        {
+          attachmentRepository: prismaMomentAttachmentRepository,
+          momentRepository: prismaMomentRepository,
+          circleRepository: prismaCircleRepository,
+        }
+      );
+      revalidatePath(`/m/[slug]`, "page");
+      return attachment;
+    } catch (err) {
+      // The blob is already on storage; validation rejected it → roll back so
+      // it doesn't linger as an orphan.
+      await vercelBlobStorageService
+        .delete(blob.url)
+        .catch((e) => Sentry.captureException(e));
+      throw err;
+    }
   }, "Erreur lors de l'envoi");
 }
 

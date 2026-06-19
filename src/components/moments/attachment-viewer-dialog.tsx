@@ -10,6 +10,7 @@ import {
   formatAttachmentType,
   isImageAttachment,
   isPdfAttachment,
+  isVideoAttachment,
 } from "./attachment-format";
 
 type AttachmentViewerDialogProps = {
@@ -33,6 +34,7 @@ export function AttachmentViewerDialog({
   const isOpen = attachment !== null;
   const isImage = attachment ? isImageAttachment(attachment.contentType) : false;
   const isPdf = attachment ? isPdfAttachment(attachment.contentType) : false;
+  const isVideo = attachment ? isVideoAttachment(attachment.contentType) : false;
 
   const downloadHref = attachment
     ? `/api/moments/${momentSlug}/attachments/${attachment.id}/download`
@@ -120,6 +122,16 @@ export function AttachmentViewerDialog({
                 className="size-full border-0"
                 title={attachment.filename}
               />
+            )}
+            {isVideo && attachment && (
+              <video
+                src={attachment.url}
+                controls
+                playsInline
+                className="max-h-full max-w-full"
+              >
+                {attachment.filename}
+              </video>
             )}
           </div>
         </DialogPrimitive.Content>

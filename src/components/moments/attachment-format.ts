@@ -6,6 +6,10 @@ export function isPdfAttachment(contentType: string): boolean {
   return contentType === "application/pdf";
 }
 
+export function isVideoAttachment(contentType: string): boolean {
+  return contentType.startsWith("video/");
+}
+
 /**
  * Format bytes as "X KB" or "X,Y MB" (French decimal separator).
  */
@@ -19,7 +23,7 @@ export function formatAttachmentSize(bytes: number): string {
 }
 
 /**
- * Format a content type for display: "PDF", "JPG", "PNG", "WEBP", or fallback.
+ * Format a content type for display: "PDF", "JPG", "MP4", etc., or fallback.
  */
 export function formatAttachmentType(contentType: string): string {
   switch (contentType) {
@@ -31,6 +35,12 @@ export function formatAttachmentType(contentType: string): string {
       return "PNG";
     case "image/webp":
       return "WEBP";
+    case "video/mp4":
+      return "MP4";
+    case "video/quicktime":
+      return "MOV";
+    case "video/webm":
+      return "WEBM";
     default:
       return contentType;
   }

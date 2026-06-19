@@ -13,9 +13,9 @@ import { SLUGS, AUTH } from "./fixtures";
  *   - Le document apparaît dans la section "Documents" de la page publique
  *   - Un click sur une carte ouvre la modale de consultation
  *
- * Fixture : un PDF minimal valide généré à la volée (le magic number
- * "%PDF-" suffit à ce que la bibliothèque file-type le reconnaisse
- * côté server action).
+ * Fixture : un PDF minimal valide généré à la volée. L'upload est
+ * client-direct (navigateur → Vercel Blob via /api/moments/attachments/upload),
+ * puis confirmé côté serveur.
  *
  * Ordre d'exécution : Playwright lance les tests d'un même fichier
  * en séquence par défaut, donc l'upload (qui persiste l'attachment
@@ -78,9 +78,9 @@ test.describe.serial("Pièces jointes — éditeur (HOST)", () => {
     const fileInput = page.getByTestId("moment-attachments-file-input");
     await fileInput.setInputFiles(FIXTURE_PATH);
 
-    // 3. Wait for the upload server action to complete (blob write + DB insert).
-    //    First run of the dev server is slow because the action is compiled
-    //    on demand + Vercel Blob has network latency.
+    // 3. Wait for the client-direct upload to complete (browser → Blob) and the
+    //    confirm action to insert the row. First run of the dev server is slow
+    //    because the route is compiled on demand + Vercel Blob has network latency.
     await page.waitForLoadState("networkidle", { timeout: 30_000 });
 
     // 4. The filename appears in a card (either still uploading or persisted,

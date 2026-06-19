@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ChevronRight, FileText, ImageIcon } from "lucide-react";
+import { ChevronRight, FileText, ImageIcon, Video } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import { isCoarsePointer } from "@/lib/coarse-pointer";
@@ -11,6 +11,7 @@ import {
   formatAttachmentSize,
   formatAttachmentType,
   isImageAttachment,
+  isVideoAttachment,
 } from "./attachment-format";
 
 type MomentAttachmentsListProps = {
@@ -60,7 +61,11 @@ export function MomentAttachmentsList({
         </h2>
         <div className="divide-border divide-y">
           {attachments.map((attachment) => {
-            const Icon = isImageAttachment(attachment.contentType) ? ImageIcon : FileText;
+            const Icon = isVideoAttachment(attachment.contentType)
+              ? Video
+              : isImageAttachment(attachment.contentType)
+                ? ImageIcon
+                : FileText;
             return (
               <button
                 key={attachment.id}

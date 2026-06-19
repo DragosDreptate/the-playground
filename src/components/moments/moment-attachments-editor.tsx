@@ -13,19 +13,25 @@ import {
   FileText,
   ImageIcon,
   Upload,
+  Video,
   X,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { upload } from "@vercel/blob/client";
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import {
   ALLOWED_ATTACHMENT_CONTENT_TYPES,
   MAX_ATTACHMENT_SIZE_BYTES,
+  MAX_VIDEO_ATTACHMENT_SIZE_BYTES,
   MAX_ATTACHMENTS_PER_MOMENT,
+  isVideoContentType,
+  maxSizeForContentType,
 } from "@/domain/models/moment-attachment";
+import { sanitizeFilename } from "@/lib/sanitize-filename";
 import {
+  confirmMomentAttachmentAction,
   deleteMomentAttachmentAction,
-  uploadMomentAttachmentAction,
 } from "@/app/actions/moment-attachments";
 import {
   AlertDialog,
@@ -48,6 +54,8 @@ type UploadingFile = {
   filename: string;
   sizeBytes: number;
   contentType: string;
+  /** 0–100, updated live during the client-direct upload. */
+  progress?: number;
   error?: string;
 };
 
@@ -63,14 +71,31 @@ export type MomentAttachmentsEditorHandle = {
   hasStagedFiles(): boolean;
 };
 
-const MAX_MB = MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024;
+const MAX_DOC_MB = MAX_ATTACHMENT_SIZE_BYTES / 1024 / 1024;
+const MAX_VIDEO_MB = MAX_VIDEO_ATTACHMENT_SIZE_BYTES / 1024 / 1024;
 const ACCEPT = Array.from(ALLOWED_ATTACHMENT_CONTENT_TYPES).join(",");
+
+function iconFor(contentType: string): LucideIcon {
+  if (isVideoContentType(contentType)) return Video;
+  if (isImageAttachment(contentType)) return ImageIcon;
+  return FileText;
+}
 
 function newTempId(): string {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
   }
   return `${Date.now()}-${Math.random()}`;
+}
+
+function makeUploadingEntry(file: File, tempId: string): UploadingFile {
+  return {
+    tempId,
+    filename: file.name,
+    sizeBytes: file.size,
+    contentType: file.type,
+    progress: 0,
+  };
 }
 
 /**
@@ -108,10 +133,64 @@ export const MomentAttachmentsEditor = forwardRef<
       if (!ALLOWED_ATTACHMENT_CONTENT_TYPES.has(file.type)) {
         return t("errorTypeNotAllowed");
       }
-      if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
-        return t("errorTooLarge", { max: MAX_MB });
+      const maxSize = maxSizeForContentType(file.type);
+      if (file.size > maxSize) {
+        return t("errorTooLarge", { max: maxSize / 1024 / 1024 });
       }
       return null;
+    },
+    [t]
+  );
+
+  // Uploads a single file client-direct to Blob, then confirms it server-side.
+  // Shared by live mode (handleFiles) and staged flush. Returns true on success.
+  const uploadFile = useCallback(
+    async (file: File, targetMomentId: string, tempId: string): Promise<boolean> => {
+      try {
+        const pathname = `moment-attachments/${targetMomentId}/${sanitizeFilename(file.name)}`;
+        const blob = await upload(pathname, file, {
+          access: "public",
+          handleUploadUrl: "/api/moments/attachments/upload",
+          contentType: file.type,
+          clientPayload: JSON.stringify({
+            momentId: targetMomentId,
+            contentType: file.type,
+          }),
+          onUploadProgress: ({ percentage }) => {
+            setUploading((prev) =>
+              prev.map((u) =>
+                u.tempId === tempId ? { ...u, progress: percentage } : u
+              )
+            );
+          },
+        });
+
+        const result = await confirmMomentAttachmentAction(targetMomentId, {
+          url: blob.url,
+          filename: file.name,
+          contentType: blob.contentType,
+          sizeBytes: file.size,
+        });
+
+        if (result.success) {
+          setAttachments((prev) => [...prev, result.data]);
+          setUploading((prev) => prev.filter((u) => u.tempId !== tempId));
+          return true;
+        }
+        setUploading((prev) =>
+          prev.map((u) =>
+            u.tempId === tempId ? { ...u, error: result.error } : u
+          )
+        );
+        return false;
+      } catch {
+        setUploading((prev) =>
+          prev.map((u) =>
+            u.tempId === tempId ? { ...u, error: t("uploadError") } : u
+          )
+        );
+        return false;
+      }
     },
     [t]
   );
@@ -158,33 +237,12 @@ export const MomentAttachmentsEditor = forwardRef<
           continue;
         }
 
-        setUploading((prev) => [
-          ...prev,
-          {
-            tempId,
-            filename: file.name,
-            sizeBytes: file.size,
-            contentType: file.type,
-          },
-        ]);
+        setUploading((prev) => [...prev, makeUploadingEntry(file, tempId)]);
 
-        const formData = new FormData();
-        formData.append("file", file);
-        const result = await uploadMomentAttachmentAction(momentId!, formData);
-
-        if (result.success) {
-          setAttachments((prev) => [...prev, result.data]);
-          setUploading((prev) => prev.filter((u) => u.tempId !== tempId));
-        } else {
-          setUploading((prev) =>
-            prev.map((u) =>
-              u.tempId === tempId ? { ...u, error: result.error } : u
-            )
-          );
-        }
+        await uploadFile(file, momentId!, tempId);
       }
     },
-    [clientValidate, isLiveMode, momentId, t, totalCount]
+    [clientValidate, isLiveMode, momentId, t, totalCount, uploadFile]
   );
 
   useImperativeHandle(
@@ -196,50 +254,22 @@ export const MomentAttachmentsEditor = forwardRef<
 
         // Move staged files to the uploading state immediately so the user
         // sees progress cards instead of a silent wait during the flush.
-        const uploadingEntries: UploadingFile[] = filesToUpload.map((s) => ({
-          tempId: s.tempId,
-          filename: s.file.name,
-          sizeBytes: s.file.size,
-          contentType: s.file.type,
-        }));
+        const uploadingEntries = filesToUpload.map((s) =>
+          makeUploadingEntry(s.file, s.tempId)
+        );
         setStaged([]);
         setUploading(uploadingEntries);
 
-        let failedCount = 0;
-
-        await Promise.all(
-          filesToUpload.map(async (stagedFile) => {
-            const formData = new FormData();
-            formData.append("file", stagedFile.file);
-            const result = await uploadMomentAttachmentAction(
-              newMomentId,
-              formData
-            );
-            if (result.success) {
-              setAttachments((prev) => [...prev, result.data]);
-              setUploading((prev) =>
-                prev.filter((u) => u.tempId !== stagedFile.tempId)
-              );
-            } else {
-              failedCount += 1;
-              setUploading((prev) =>
-                prev.map((u) =>
-                  u.tempId === stagedFile.tempId
-                    ? { ...u, error: result.error }
-                    : u
-                )
-              );
-            }
-          })
+        const results = await Promise.all(
+          filesToUpload.map((s) => uploadFile(s.file, newMomentId, s.tempId))
         );
-
-        return { failedCount };
+        return { failedCount: results.filter((ok) => !ok).length };
       },
       hasStagedFiles() {
         return staged.some((s) => !s.error);
       },
     }),
-    [staged]
+    [staged, uploadFile]
   );
 
   const onDrop = useCallback(
@@ -332,7 +362,7 @@ export const MomentAttachmentsEditor = forwardRef<
             {t("dropzoneBrowse")}
           </span>
           <p className="text-muted-foreground mt-1 text-xs">
-            {t("dropzoneHint", { max: MAX_MB })}
+            {t("dropzoneHint", { maxDoc: MAX_DOC_MB, maxVideo: MAX_VIDEO_MB })}
           </p>
         </button>
       )}
@@ -347,7 +377,7 @@ export const MomentAttachmentsEditor = forwardRef<
           {attachments.map((a) => (
             <AttachmentCard
               key={a.id}
-              icon={isImageAttachment(a.contentType) ? ImageIcon : FileText}
+              icon={iconFor(a.contentType)}
               filename={a.filename}
               subtitle={formatAttachmentSize(a.sizeBytes)}
               onRemove={() => setPendingDelete(a)}
@@ -358,13 +388,7 @@ export const MomentAttachmentsEditor = forwardRef<
           {staged.map((s) => (
             <AttachmentCard
               key={s.tempId}
-              icon={
-                s.error
-                  ? AlertCircle
-                  : isImageAttachment(s.file.type)
-                    ? ImageIcon
-                    : FileText
-              }
+              icon={s.error ? AlertCircle : iconFor(s.file.type)}
               filename={s.file.name}
               subtitle={
                 s.error ? (
@@ -382,13 +406,7 @@ export const MomentAttachmentsEditor = forwardRef<
           {uploading.map((u) => (
             <AttachmentCard
               key={u.tempId}
-              icon={
-                u.error
-                  ? AlertCircle
-                  : isImageAttachment(u.contentType)
-                    ? ImageIcon
-                    : FileText
-              }
+              icon={u.error ? AlertCircle : iconFor(u.contentType)}
               filename={u.filename}
               subtitle={
                 u.error ? (
@@ -396,10 +414,14 @@ export const MomentAttachmentsEditor = forwardRef<
                 ) : (
                   <>
                     <span className="bg-border mt-1.5 block h-1 overflow-hidden rounded-full">
-                      <span className="bg-primary block h-full w-1/2 animate-pulse" />
+                      <span
+                        className="bg-primary block h-full rounded-full transition-[width] duration-200 ease-out"
+                        style={{ width: `${u.progress ?? 0}%` }}
+                      />
                     </span>
                     <span className="mt-1 block">
-                      {t("uploading")} · {formatAttachmentSize(u.sizeBytes)}
+                      {t("uploading")} · {u.progress ?? 0}% ·{" "}
+                      {formatAttachmentSize(u.sizeBytes)}
                     </span>
                   </>
                 )
