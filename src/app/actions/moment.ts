@@ -271,7 +271,10 @@ export async function updateMomentAction(
       await vercelBlobStorageService.delete(oldCoverImage);
     }
 
-    // Notifier les participants si date/heure ou lieu ont changé
+    // Notifier les participants si date/heure ou lieu ont changé.
+    // Uniquement pour les événements PUBLISHED : un brouillon n'a pas
+    // d'inscrits légitimes (seuls les organisateurs y sont auto-inscrits),
+    // et un passage DRAFT → PUBLISHED est couvert par la notif de création.
     if (existingMoment) {
       const dateChanged =
         (startsAtRaw && new Date(startsAtRaw).getTime() !== existingMoment.startsAt.getTime()) ||
@@ -285,7 +288,11 @@ export async function updateMomentAction(
         (locationName !== null && locationName !== existingMoment.locationName) ||
         (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
 
-      if ((dateChanged || locationChanged) && !isAdminUser(session)) {
+      if (
+        (dateChanged || locationChanged) &&
+        existingMoment.status === "PUBLISHED" &&
+        !isAdminUser(session)
+      ) {
         const resolver = await buildEmailLocaleResolver(userId);
         sendMomentUpdateEmails(
           result.moment,
