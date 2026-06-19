@@ -42,6 +42,9 @@ const baseCspDirectives = [
   "style-src 'self' 'unsafe-inline'",
   // Images : domaine propre + blobs + avatars OAuth + Unsplash + Stripe
   "img-src 'self' data: blob: *.unsplash.com *.public.blob.vercel-storage.com avatars.githubusercontent.com lh3.googleusercontent.com q.stripe.com",
+  // Vidéos : pièces jointes lues directement depuis le store Vercel Blob
+  // (sans media-src, la lecture retomberait sur default-src 'self' et serait bloquée)
+  "media-src 'self' *.public.blob.vercel-storage.com",
   // Connexions : domaine propre + Sentry (tunnel via /monitoring) + Stripe API + PostHog (tunnel via /ingest)
   // + Vercel Blob (upload client-direct des pièces jointes : initiation via vercel.com/api/blob, PUT vers le store)
   "connect-src 'self' *.sentry.io api.stripe.com api-adresse.data.gouv.fr vercel.com blob.vercel-storage.com *.public.blob.vercel-storage.com",
