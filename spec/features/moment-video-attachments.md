@@ -59,3 +59,12 @@ Conséquences :
 - **Orphelins** : `storage.delete` au rejet de validation ; reste le cas « upload OK mais confirm jamais appelée » (crash/onglet) → accepté MVP, note pour un cron de nettoyage ultérieur.
 - **Hors-scope** : cover image (10 Mo) et avatar (5 Mo) ont le **même bug latent** 4,5 Mo (même pattern server action). Ticket séparé.
 - Pas de nouvelle dépendance (`@vercel/blob@2.3.3` expose `/client`). Pas de changement de schema Prisma.
+
+## Configuration CSP requise (piège vérifié en test)
+
+L'upload client-direct et la lecture vidéo nécessitent d'élargir la CSP (`next.config.ts`), sinon l'upload reste figé à 0 % et la vidéo ne se lit pas :
+
+- `connect-src` : ajouter `vercel.com` (initiation `vercel.com/api/blob`), `blob.vercel-storage.com` et `*.public.blob.vercel-storage.com` (PUT vers le store).
+- `media-src` : créer la directive (absente) avec `'self' *.public.blob.vercel-storage.com`, sinon `<video>` retombe sur `default-src 'self'` et la source Blob est bloquée.
+
+> À reproduire si la dette cover/avatar est migrée vers le client-direct.
