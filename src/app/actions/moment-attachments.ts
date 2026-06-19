@@ -37,10 +37,29 @@ export async function confirmMomentAttachmentAction(
     return { success: false, error: "Non authentifié", code: "UNAUTHORIZED" };
   }
 
-  // Tie the confirmed URL to this moment's blob namespace: a host cannot
-  // register an arbitrary external URL as one of their attachments.
-  if (!blob.url.includes(`/moment-attachments/${momentId}/`)) {
+  // Validate the URL is genuinely a Vercel Blob object in THIS moment's
+  // namespace. Checking only the path substring would let a host register an
+  // arbitrary external URL (e.g. https://evil.tld/moment-attachments/<id>/x),
+  // which the download proxy would then fetch server-side (SSRF) and the public
+  // page would load as <video>/<img>.
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(blob.url);
+  } catch {
     return { success: false, error: "URL invalide", code: "INVALID_URL" };
+  }
+  if (
+    parsedUrl.protocol !== "https:" ||
+    !parsedUrl.hostname.endsWith(".public.blob.vercel-storage.com") ||
+    !parsedUrl.pathname.startsWith(`/moment-attachments/${momentId}/`)
+  ) {
+    return { success: false, error: "URL invalide", code: "INVALID_URL" };
+  }
+
+  // Reject empty files (guard the old server action enforced via file.size === 0):
+  // a 0-byte blob would create a phantom attachment that counts toward the quota.
+  if (blob.sizeBytes <= 0) {
+    return { success: false, error: "Fichier vide", code: "EMPTY_FILE" };
   }
 
   return toActionResult(async () => {
