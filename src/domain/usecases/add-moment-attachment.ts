@@ -1,14 +1,13 @@
 import type { MomentAttachment } from "@/domain/models/moment-attachment";
 import {
   MAX_ATTACHMENTS_PER_MOMENT,
-  MAX_ATTACHMENT_SIZE_BYTES,
   ALLOWED_ATTACHMENT_CONTENT_TYPES,
+  maxSizeForContentType,
 } from "@/domain/models/moment-attachment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentAttachmentRepository } from "@/domain/ports/repositories/moment-attachment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
-import type { StorageService } from "@/domain/ports/services/storage-service";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
@@ -16,39 +15,40 @@ import {
   AttachmentTooLargeError,
   AttachmentTypeNotAllowedError,
 } from "@/domain/errors";
-import { sanitizeFilename } from "@/lib/sanitize-filename";
 
+/**
+ * The file is already on Blob storage (client-direct upload) by the time this
+ * runs. The usecase validates the metadata and the host's permission, then
+ * persists the row — it no longer performs the upload itself.
+ */
 type AddMomentAttachmentInput = {
   momentId: string;
   userId: string;
-  file: {
-    buffer: Buffer;
-    filename: string;
-    contentType: string;
-    sizeBytes: number;
-  };
+  url: string;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
 };
 
 type AddMomentAttachmentDeps = {
   attachmentRepository: MomentAttachmentRepository;
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
-  storage: StorageService;
 };
 
 export async function addMomentAttachment(
   input: AddMomentAttachmentInput,
   deps: AddMomentAttachmentDeps
 ): Promise<MomentAttachment> {
-  const { attachmentRepository, momentRepository, circleRepository, storage } =
-    deps;
+  const { attachmentRepository, momentRepository, circleRepository } = deps;
 
   // Cheap input validation first — fail fast before any DB round-trip.
-  if (!ALLOWED_ATTACHMENT_CONTENT_TYPES.has(input.file.contentType)) {
-    throw new AttachmentTypeNotAllowedError(input.file.contentType);
+  if (!ALLOWED_ATTACHMENT_CONTENT_TYPES.has(input.contentType)) {
+    throw new AttachmentTypeNotAllowedError(input.contentType);
   }
-  if (input.file.sizeBytes > MAX_ATTACHMENT_SIZE_BYTES) {
-    throw new AttachmentTooLargeError(MAX_ATTACHMENT_SIZE_BYTES);
+  const maxSize = maxSizeForContentType(input.contentType);
+  if (input.sizeBytes > maxSize) {
+    throw new AttachmentTooLargeError(maxSize);
   }
 
   const moment = await momentRepository.findById(input.momentId);
@@ -68,17 +68,11 @@ export async function addMomentAttachment(
     throw new AttachmentLimitReachedError(MAX_ATTACHMENTS_PER_MOMENT);
   }
 
-  // Format is preserved (no WebP conversion, unlike cover images) so
-  // participants download a bit-identical copy of what the host uploaded.
-  const safeFilename = sanitizeFilename(input.file.filename);
-  const path = `moment-attachments/${input.momentId}-${Date.now()}-${safeFilename}`;
-  const url = await storage.upload(path, input.file.buffer, input.file.contentType);
-
   return attachmentRepository.create({
     momentId: input.momentId,
-    url,
-    filename: input.file.filename,
-    contentType: input.file.contentType,
-    sizeBytes: input.file.sizeBytes,
+    url: input.url,
+    filename: input.filename,
+    contentType: input.contentType,
+    sizeBytes: input.sizeBytes,
   });
 }
