@@ -88,6 +88,16 @@ function newTempId(): string {
   return `${Date.now()}-${Math.random()}`;
 }
 
+function makeUploadingEntry(file: File, tempId: string): UploadingFile {
+  return {
+    tempId,
+    filename: file.name,
+    sizeBytes: file.size,
+    contentType: file.type,
+    progress: 0,
+  };
+}
+
 /**
  * Two modes, picked by `momentId`:
  * - **Staged** (create): files stay in browser memory until the parent
@@ -158,7 +168,7 @@ export const MomentAttachmentsEditor = forwardRef<
         const result = await confirmMomentAttachmentAction(targetMomentId, {
           url: blob.url,
           filename: file.name,
-          contentType: file.type,
+          contentType: blob.contentType,
           sizeBytes: file.size,
         });
 
@@ -227,16 +237,7 @@ export const MomentAttachmentsEditor = forwardRef<
           continue;
         }
 
-        setUploading((prev) => [
-          ...prev,
-          {
-            tempId,
-            filename: file.name,
-            sizeBytes: file.size,
-            contentType: file.type,
-            progress: 0,
-          },
-        ]);
+        setUploading((prev) => [...prev, makeUploadingEntry(file, tempId)]);
 
         await uploadFile(file, momentId!, tempId);
       }
@@ -253,13 +254,9 @@ export const MomentAttachmentsEditor = forwardRef<
 
         // Move staged files to the uploading state immediately so the user
         // sees progress cards instead of a silent wait during the flush.
-        const uploadingEntries: UploadingFile[] = filesToUpload.map((s) => ({
-          tempId: s.tempId,
-          filename: s.file.name,
-          sizeBytes: s.file.size,
-          contentType: s.file.type,
-          progress: 0,
-        }));
+        const uploadingEntries = filesToUpload.map((s) =>
+          makeUploadingEntry(s.file, s.tempId)
+        );
         setStaged([]);
         setUploading(uploadingEntries);
 
