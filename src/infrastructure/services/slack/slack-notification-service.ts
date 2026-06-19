@@ -128,8 +128,14 @@ export async function notifySlackTrafficReport(params: {
   uniqueVisitors: number;
   sessions: number;
   dashboardUrl: string;
+  newVisitors?: number | null;
+  returningVisitors?: number | null;
 }): Promise<void> {
-  const summary = `*${params.pageviews}* pageviews · *${params.uniqueVisitors}* visiteurs uniques · *${params.sessions}* sessions`;
+  const breakdown =
+    params.newVisitors != null && params.returningVisitors != null
+      ? ` (${params.newVisitors} primo / ${params.returningVisitors} revenants)`
+      : "";
+  const summary = `*${params.pageviews}* pageviews · *${params.uniqueVisitors}* visiteurs uniques${breakdown} · *${params.sessions}* sessions`;
   await sendSlack({
     text: `📊 ${params.dashboardName} — ${params.pageviews} pv · ${params.uniqueVisitors} vis · ${params.sessions} sess`,
     blocks: [

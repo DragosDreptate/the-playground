@@ -75,6 +75,8 @@ async function handler(request: NextRequest) {
       pageviews: kpis.pageviews,
       uniqueVisitors: kpis.uniqueVisitors,
       sessions: kpis.sessions,
+      newVisitors: kpis.newVisitors,
+      returningVisitors: kpis.returningVisitors,
       dashboardUrl: DASHBOARD_URL,
     });
 
