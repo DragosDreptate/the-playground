@@ -216,6 +216,23 @@ export async function notifySlackNewComment(params: {
   });
 }
 
+export async function notifySlackCommentPending(params: {
+  playerName: string;
+  momentTitle: string;
+  commentPreview: string;
+  adminUrl: string;
+}): Promise<void> {
+  await sendSlack({
+    text: `🕓 Commentaire à valider — ${params.playerName} sur ${params.momentTitle}`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: "🕓 Commentaire à valider", emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${params.playerName}* (compte récent) a commenté sur *${params.momentTitle}*. En attente de validation.` } },
+      { type: "section", text: { type: "mrkdwn", text: `> ${params.commentPreview}` } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Modérer" }, url: params.adminUrl }] },
+    ],
+  });
+}
+
 export async function notifySlackQuotaWarning(
   used: number,
   tier: number,

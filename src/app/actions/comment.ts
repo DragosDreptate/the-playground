@@ -18,6 +18,7 @@ import { addComment } from "@/domain/usecases/add-comment";
 import type { CommentPhotoInput } from "@/domain/usecases/add-comment";
 import { deleteComment } from "@/domain/usecases/delete-comment";
 import { notifySlackNewComment } from "@/infrastructure/services/slack/slack-notification-service";
+import { notifyAdminCommentPending } from "./notify-admin-comment-pending";
 import {
   ALLOWED_COMMENT_PHOTO_TYPES,
   MAX_COMMENT_PHOTO_SIZE_BYTES,
@@ -123,28 +124,44 @@ export async function addCommentAction(
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,
+        userRepository: prismaUserRepository,
+        circleRepository: prismaCircleRepository,
         registrationRepository: prismaRegistrationRepository,
         commentAttachmentRepository: prismaCommentAttachmentRepository,
         storage: vercelBlobStorageService,
+        now: new Date(),
       }
     );
 
-    // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
-    // doit s'exécuter dans le request context, avant `after()`.
-    const resolver = await buildEmailLocaleResolver(userId);
+    if (result.comment.status === "PUBLISHED") {
+      // `buildEmailLocaleResolver` lit `getLocale()` (dépend de `headers()`) :
+      // doit s'exécuter dans le request context, avant `after()`.
+      const resolver = await buildEmailLocaleResolver(userId);
 
-    // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
-    // de la Server Action. La callback DOIT être async et await la promise —
-    // une callback synchrone qui n'attend pas la Promise reproduirait le bug
-    // d'origine (5/39 emails partis, incident 2026-05-31).
-    after(async () => {
-      try {
-        await sendCommentNotifications(momentId, userId, content, resolver);
-      } catch (err) {
-        console.error(err);
-        Sentry.captureException(err);
-      }
-    });
+      // `after()` garantit la complétion sur Vercel Fluid Compute après le retour
+      // de la Server Action. La callback DOIT être async et await la promise —
+      // une callback synchrone qui n'attend pas la Promise reproduirait le bug
+      // d'origine (5/39 emails partis, incident 2026-05-31).
+      after(async () => {
+        try {
+          await sendCommentNotifications(momentId, userId, content, resolver);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      });
+    } else {
+      // PENDING_REVIEW (compte de moins de 24h) : aucun broadcast aux
+      // participants tant que l'admin n'a pas validé. On alerte l'admin.
+      after(async () => {
+        try {
+          await notifyPendingComment(momentId, userId, content);
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      });
+    }
 
     return result.comment;
   });
@@ -279,5 +296,33 @@ async function sendCommentNotifications(
     momentTitle: moment.title,
     commentPreview,
     momentUrl: `${baseUrl}/m/${moment.slug}`,
+  });
+}
+
+/**
+ * Commentaire mis en file de validation (compte de moins de 24h) : on n'envoie
+ * RIEN aux participants, on alerte uniquement l'admin pour modération.
+ */
+async function notifyPendingComment(
+  momentId: string,
+  commenterId: string,
+  content: string
+): Promise<void> {
+  const [commenter, moment] = await Promise.all([
+    prismaUserRepository.findById(commenterId),
+    prismaMomentRepository.findById(momentId),
+  ]);
+  if (!commenter || !moment) return;
+
+  const playerName =
+    [commenter.firstName, commenter.lastName].filter(Boolean).join(" ") ||
+    commenter.email;
+  const commentPreview =
+    content.length > 200 ? `${content.slice(0, 200)}…` : content;
+
+  await notifyAdminCommentPending({
+    playerName,
+    momentTitle: moment.title,
+    commentPreview,
   });
 }

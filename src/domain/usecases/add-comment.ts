@@ -1,9 +1,13 @@
-import type { Comment } from "@/domain/models/comment";
+import type { Comment, CommentStatus } from "@/domain/models/comment";
 import type { CommentRepository } from "@/domain/ports/repositories/comment-repository";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { CommentAttachmentRepository } from "@/domain/ports/repositories/comment-attachment-repository";
+import type { UserRepository } from "@/domain/ports/repositories/user-repository";
+import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { StorageService } from "@/domain/ports/services/storage-service";
+import { isActiveOrganizer } from "@/domain/models/circle";
+import { isNewAccount } from "@/lib/account-trust";
 import {
   MAX_COMMENT_PHOTOS,
   MAX_COMMENT_PHOTO_SIZE_BYTES,
@@ -38,9 +42,13 @@ type AddCommentInput = {
 type AddCommentDeps = {
   commentRepository: CommentRepository;
   momentRepository: MomentRepository;
+  userRepository: UserRepository;
+  circleRepository: CircleRepository;
   registrationRepository?: RegistrationRepository;
   commentAttachmentRepository?: CommentAttachmentRepository;
   storage?: StorageService;
+  /** Horloge injectée (déterminisme/tests) pour le gate « compte trop récent ». */
+  now: Date;
 };
 
 type AddCommentResult = {
@@ -96,11 +104,26 @@ export async function addComment(
     }
   }
 
+  // Décision de statut : un commentaire d'un compte de moins de 24h passe en
+  // file de validation (PENDING_REVIEW : invisible aux autres, non broadcasté)
+  // SAUF si l'auteur est organisateur actif du Circle de l'événement (on ne
+  // gate jamais quelqu'un sur sa propre Communauté). Fail-closed : auteur
+  // introuvable → traité comme nouveau → mis en file.
+  const [author, membership] = await Promise.all([
+    deps.userRepository.findById(input.userId),
+    deps.circleRepository.findMembership(moment.circleId, input.userId),
+  ]);
+  const isOrganizer = isActiveOrganizer(membership);
+  const accountIsNew = !author || isNewAccount(author.createdAt, deps.now);
+  const status: CommentStatus =
+    !isOrganizer && accountIsNew ? "PENDING_REVIEW" : "PUBLISHED";
+
   // Phase 2: create comment, then upload photos
   const comment = await commentRepository.create({
     momentId: input.momentId,
     userId: input.userId,
     content: trimmed,
+    status,
   });
 
   let uploadedCount = 0;
