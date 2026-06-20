@@ -92,19 +92,17 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
           <TableHeader>
             <TableRow>
               <SH label="Auteur" column="userName" />
-              <SH label="Email" column="userEmail" />
               <TableHead>Contenu</TableHead>
               <SH label="Événement" column="momentTitle" />
-              <SH label="Communauté" column="circleName" className="w-px" />
               <TableHead className="w-px">Statut</TableHead>
-              <SH label="Date" column="createdAt" className="w-px" />
+              <SH label="Date" column="createdAt" className="w-px whitespace-nowrap" />
               <TableHead className="w-px text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {comments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                   {statusFilter
                     ? "Aucun commentaire en attente"
                     : "Aucun commentaire sur cette période"}
@@ -117,31 +115,35 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
                     <Link
                       href={`/admin/users/${c.userId}`}
                       className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                      title={c.userEmail}
                     >
-                      {c.userName ?? "—"}
+                      {c.userName ?? c.userEmail}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{c.userEmail}</TableCell>
-                  <TableCell className="max-w-xs truncate text-muted-foreground">
-                    {c.content}
+                  <TableCell className="max-w-sm">
+                    <span className="line-clamp-2 text-muted-foreground">
+                      {c.content}
+                    </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="max-w-[14rem]">
                     <Link
                       href={`/m/${c.momentSlug}`}
                       target="_blank"
-                      className="flex items-center gap-1 hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                      className="flex items-center gap-1 truncate hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
                     >
-                      {c.momentTitle}
+                      <span className="truncate">{c.momentTitle}</span>
                       <ExternalLink className="size-3 shrink-0 text-muted-foreground" />
                     </Link>
+                    <span className="text-muted-foreground block truncate text-xs">
+                      {c.circleName}
+                    </span>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{c.circleName}</TableCell>
                   <TableCell>
                     <Badge variant={c.status === "PENDING_REVIEW" ? "secondary" : "outline"}>
                       {c.status === "PENDING_REVIEW" ? "En attente" : "Publié"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">
+                  <TableCell className="text-muted-foreground whitespace-nowrap">
                     {c.createdAt.toLocaleDateString("fr-FR")}
                   </TableCell>
                   <TableCell>
