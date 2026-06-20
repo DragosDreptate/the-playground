@@ -2012,6 +2012,7 @@
     "successTitle": "Message sent",
     "successDescription": "The organizer will receive your message in a few moments.",
     "errorRateLimited": "You've already sent several messages recently. Please try again in an hour.",
+    "errorAccountTooNew": "Your account is too new to contact the organizers. This option will be available 24 hours after it was created.",
     "errorTooShort": "Message must be at least {min} characters.",
     "errorTooLong": "Message cannot exceed {max} characters.",
     "errorNoHosts": "This Community has no reachable organizer at the moment.",

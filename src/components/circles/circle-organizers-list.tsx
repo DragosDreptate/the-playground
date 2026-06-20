@@ -8,6 +8,8 @@ type ContactOrganizerConfig = {
   circleId: string;
   senderEmail: string | null;
   signInUrl: string | null;
+  /** Compte de moins de 24h : grise le lien "Contacter l'organisateur". */
+  accountTooNew?: boolean;
 };
 
 type Props = {
@@ -77,6 +79,7 @@ export function CircleOrganizersList({ organizers, linkable, label, anonymousFal
             circleId={contactOrganizer.circleId}
             senderEmail={contactOrganizer.senderEmail}
             signInUrl={contactOrganizer.signInUrl}
+            accountTooNew={contactOrganizer.accountTooNew}
           />
         )}
       </div>

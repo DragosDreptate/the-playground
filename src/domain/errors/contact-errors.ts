@@ -6,6 +6,7 @@ export const CONTACT_ERROR_CODES = {
   ContactMessageTooShort: "CONTACT_MESSAGE_TOO_SHORT",
   ContactMessageTooLong: "CONTACT_MESSAGE_TOO_LONG",
   ContactHostsRateLimited: "CONTACT_HOSTS_RATE_LIMITED",
+  ContactHostsAccountTooNew: "CONTACT_HOSTS_ACCOUNT_TOO_NEW",
   SenderEmailMissing: "SENDER_EMAIL_MISSING",
 } as const;
 
@@ -46,6 +47,16 @@ export class ContactHostsRateLimitedError extends DomainError {
 
   constructor() {
     super("Too many contact messages sent in the last hour");
+  }
+}
+
+export class ContactHostsAccountTooNewError extends DomainError {
+  readonly code = CONTACT_ERROR_CODES.ContactHostsAccountTooNew;
+
+  constructor(minAgeHours: number) {
+    super(
+      `Account must be at least ${minAgeHours} hours old to contact organizers`
+    );
   }
 }
 

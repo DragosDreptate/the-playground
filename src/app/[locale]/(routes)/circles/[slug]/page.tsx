@@ -2,6 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
+import { isSessionAccountNew } from "@/lib/account-trust";
 import { signInUrlWithAutoJoin } from "@/lib/auto-join";
 import { degradedQuery } from "@/lib/degraded-query";
 import { stripProtocol } from "@/lib/url";
@@ -310,6 +311,7 @@ export default async function PublicCirclePage({
                     signInUrl: isConnected
                       ? null
                       : `/${locale}/auth/sign-in?callbackUrl=/${locale}/circles/${slug}`,
+                    accountTooNew: isSessionAccountNew(session),
                   }
             }
           />

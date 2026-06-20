@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { stripProtocol } from "@/lib/url";
+import { isSessionAccountNew } from "@/lib/account-trust";
 import { degradedQuery } from "@/lib/degraded-query";
 import { formatLongDate } from "@/lib/format-date";
 import type { RegistrationWithUser } from "@/domain/models/registration";
@@ -219,6 +220,7 @@ export default async function CircleDetailPage({
                     circleId: circle.id,
                     senderEmail: session.user.email ?? null,
                     signInUrl: null,
+                    accountTooNew: isSessionAccountNew(session),
                   }
             }
           />

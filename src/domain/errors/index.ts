@@ -65,6 +65,7 @@ export {
   ContactMessageTooShortError,
   ContactMessageTooLongError,
   ContactHostsRateLimitedError,
+  ContactHostsAccountTooNewError,
   SenderEmailMissingError,
 } from "./contact-errors";
 export {

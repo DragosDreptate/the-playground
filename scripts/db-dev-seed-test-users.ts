@@ -23,6 +23,11 @@ const adapter = new PrismaNeon({
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+  // Comptes "établis" (créés il y a 30 jours) : depuis le hard gate 24h sur
+  // « Contacter les organisateurs », un user créé à l'instant (createdAt = now)
+  // serait gaté. On simule des comptes normaux.
+  const establishedCreatedAt = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
   for (const { email, firstName, lastName } of TEST_USERS) {
     const name = `${firstName} ${lastName}`;
     const user = await prisma.user.upsert({
@@ -34,6 +39,7 @@ async function main() {
         lastName,
         onboardingCompleted: true,
         emailVerified: new Date(),
+        createdAt: establishedCreatedAt,
       },
       update: {
         name,
@@ -41,6 +47,7 @@ async function main() {
         lastName,
         onboardingCompleted: true,
         emailVerified: new Date(),
+        createdAt: establishedCreatedAt,
       },
     });
     console.log(`✓ ${user.email} (${user.name}) — id: ${user.id}`);

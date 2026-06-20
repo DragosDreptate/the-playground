@@ -28,6 +28,7 @@ import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { MomentNotFoundError } from "@/domain/errors";
 import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { isSessionAccountNew } from "@/lib/account-trust";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
 // Deduplicate DB calls between generateMetadata and the page
@@ -277,6 +278,7 @@ export default async function PublicMomentPage({
         attachments={attachments}
         currentUserId={session?.user?.id ?? null}
         currentUserEmail={session?.user?.email ?? null}
+        contactAccountTooNew={isSessionAccountNew(session)}
         isAuthenticated={isAuthenticated}
         isOrganizer={isOrganizer}
         existingRegistration={existingRegistration}

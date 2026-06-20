@@ -12,6 +12,7 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
 import { CircleNotFoundError, MomentNotFoundError } from "@/domain/errors";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
+import { isSessionAccountNew } from "@/lib/account-trust";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
@@ -110,6 +111,7 @@ export default async function MomentDetailPage({
         attachments={attachments}
         currentUserId={session.user.id}
         currentUserEmail={session.user.email ?? null}
+        contactAccountTooNew={isSessionAccountNew(session)}
         isAuthenticated={true}
         isOrganizer={false}
         existingRegistration={existingRegistration}

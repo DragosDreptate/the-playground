@@ -7,6 +7,7 @@ import {
 } from "@/domain/usecases/contact-circle-hosts";
 import {
   CircleNotFoundError,
+  ContactHostsAccountTooNewError,
   ContactHostsRateLimitedError,
   ContactMessageTooLongError,
   ContactMessageTooShortError,
@@ -85,6 +86,7 @@ function makeDeps(overrides: {
   sender?: ReturnType<typeof makeUser> | null;
   circle?: ReturnType<typeof makeCircle> | null;
   moment?: ReturnType<typeof makeMoment> | null;
+  now?: Date;
 } = {}) {
   const sender =
     overrides.sender === undefined
@@ -116,6 +118,9 @@ function makeDeps(overrides: {
     rateLimiter,
     emailStrings,
     appUrl: "https://app.example.com",
+    // Par défaut bien après le createdAt des users mockés (2026-01-01) : le gate
+    // « compte trop récent » ne se déclenche pas, sauf override explicite.
+    now: overrides.now ?? new Date("2026-06-15T12:00:00.000Z"),
   };
 }
 
@@ -249,6 +254,66 @@ describe("contactCircleHosts", () => {
           deps
         )
       ).rejects.toThrow(NoHostsToContactError);
+    });
+  });
+
+  describe("given the sender account is less than 24h old", () => {
+    const now = new Date("2026-06-15T12:00:00.000Z");
+
+    it("should throw ContactHostsAccountTooNewError when the sender is not an organizer", async () => {
+      const deps = makeDeps({
+        now,
+        sender: makeUser({
+          id: SENDER_ID,
+          email: "player@example.com",
+          createdAt: new Date("2026-06-15T06:00:00.000Z"), // 6h ago
+        }),
+        organizers: [makeOrganizer({ userId: "host-1", email: "host-1@example.com" })],
+      });
+      await expect(
+        contactCircleHosts(
+          { senderId: SENDER_ID, circleId: CIRCLE_ID, message: validMessage() },
+          deps
+        )
+      ).rejects.toThrow(ContactHostsAccountTooNewError);
+      expect(deps.emailService.sendHostContactMessage).not.toHaveBeenCalled();
+    });
+
+    it("should allow a new account that is itself an active organizer of the circle", async () => {
+      const deps = makeDeps({
+        now,
+        sender: makeUser({
+          id: SENDER_ID,
+          email: "player@example.com",
+          createdAt: new Date("2026-06-15T06:00:00.000Z"),
+        }),
+        organizers: [
+          makeOrganizer({ userId: SENDER_ID, email: "player@example.com" }),
+          makeOrganizer({ userId: "host-2", email: "host-2@example.com" }),
+        ],
+      });
+      const result = await contactCircleHosts(
+        { senderId: SENDER_ID, circleId: CIRCLE_ID, message: validMessage() },
+        deps
+      );
+      expect(result.recipientsCount).toBe(2);
+    });
+
+    it("should allow an account exactly 24h old (strict boundary)", async () => {
+      const deps = makeDeps({
+        now,
+        sender: makeUser({
+          id: SENDER_ID,
+          email: "player@example.com",
+          createdAt: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+        }),
+        organizers: [makeOrganizer({ userId: "host-1", email: "host-1@example.com" })],
+      });
+      const result = await contactCircleHosts(
+        { senderId: SENDER_ID, circleId: CIRCLE_ID, message: validMessage() },
+        deps
+      );
+      expect(result.recipientsCount).toBe(1);
     });
   });
 

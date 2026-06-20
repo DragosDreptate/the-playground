@@ -11,6 +11,8 @@ declare module "next-auth" {
       role: "USER" | "ADMIN";
       dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
       isNewUser?: boolean;
+      /** Epoch millis (sérialisable, contrairement à un Date qui devient string en RSC). */
+      createdAt: number;
     };
   }
 }
