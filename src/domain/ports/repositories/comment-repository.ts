@@ -12,18 +12,6 @@ export type CreateCommentInput = {
   status?: CommentStatus;
 };
 
-/** Ligne enrichie pour la console de modération admin (contexte événement + Circle). */
-export type AdminCommentRow = CommentWithUser & {
-  moment: { id: string; slug: string; title: string };
-  circle: { slug: string; name: string };
-};
-
-export type FindCommentsForAdminInput = {
-  status?: CommentStatus;
-  skip?: number;
-  take?: number;
-};
-
 export interface CommentRepository {
   create(input: CreateCommentInput): Promise<Comment>;
   findById(id: string): Promise<Comment | null>;
@@ -39,9 +27,6 @@ export interface CommentRepository {
   delete(id: string): Promise<void>;
   /** Nombre de commentaires PUBLISHED (compteur public). */
   countByMomentId(momentId: string): Promise<number>;
-  /** Console admin : tous les commentaires (filtrable par statut), paginé. */
-  findForAdmin(
-    input?: FindCommentsForAdminInput
-  ): Promise<{ items: AdminCommentRow[]; total: number }>;
+  /** Modération : passe un commentaire à un autre statut (ex. approbation). */
   updateStatus(id: string, status: CommentStatus): Promise<void>;
 }

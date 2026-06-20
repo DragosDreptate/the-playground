@@ -6,6 +6,7 @@ import type {
   MembershipStatus,
 } from "@/domain/models/circle";
 import type { MomentStatus } from "@/domain/models/moment";
+import type { CommentStatus } from "@/domain/models/comment";
 
 // ─────────────────────────────────────────────
 // Stats
@@ -251,6 +252,7 @@ export type AdminInsightComment = {
   userEmail: string;
   userName: string | null;
   content: string;
+  status: CommentStatus;
   momentTitle: string;
   momentSlug: string;
   circleName: string;
@@ -366,7 +368,12 @@ export interface AdminRepository {
     limit: number,
     offset: number,
     sortBy?: string,
-    sortOrder?: "asc" | "desc"
+    sortOrder?: "asc" | "desc",
+    /**
+     * Filtre par statut (modération). Quand fourni, la période `days` est
+     * ignorée (un commentaire en attente peut être ancien).
+     */
+    statusFilter?: CommentStatus
   ): Promise<{ comments: AdminInsightComment[]; total: number }>;
   getUsersByActivation(
     segment: "never" | "once" | "retained",

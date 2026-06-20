@@ -23,7 +23,7 @@ export type AdminCommentPendingParams = {
 export async function notifyAdminCommentPending(
   params: AdminCommentPendingParams
 ): Promise<void> {
-  const adminUrl = `${getAppUrl()}/admin/comments`;
+  const adminUrl = `${getAppUrl()}/admin/insights/comments?status=pending`;
 
   const adminEmails = await prismaUserRepository.findAdminEmails();
   if (adminEmails.length > 0 && isAdminEmailEnabled()) {

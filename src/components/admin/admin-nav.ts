@@ -7,7 +7,6 @@ import {
   Network,
   TicketCheck,
   MessageSquare,
-  MessageSquareWarning,
   TrendingUp,
   UserPlus,
 } from "lucide-react";
@@ -17,7 +16,6 @@ export const adminNavItems = [
   { key: "users", href: "/admin/users", icon: Users },
   { key: "circles", href: "/admin/circles", icon: CircleDot },
   { key: "moments", href: "/admin/moments", icon: CalendarDays },
-  { key: "commentsModeration", href: "/admin/comments", icon: MessageSquareWarning },
   { key: "networks", href: "/admin/networks", icon: Network },
   { key: "explorerNav", href: "/admin/explorer", icon: Compass },
 ] as const;

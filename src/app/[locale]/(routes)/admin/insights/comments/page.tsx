@@ -4,6 +4,8 @@ import { prismaAdminRepository } from "@/infrastructure/repositories";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { PeriodSelector } from "@/components/admin/period-selector";
 import { SortableTableHead } from "@/components/admin/sortable-table-head";
+import { AdminCommentRowActions } from "@/components/admin/admin-comment-row-actions";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -12,12 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { CommentStatus } from "@/domain/models/comment";
 
 const PAGE_SIZE = 20;
 const BASE = "/admin/insights/comments";
 
 type Props = {
-  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string }>;
+  searchParams: Promise<{ days?: string; page?: string; sort?: string; order?: string; status?: string }>;
 };
 
 export default async function AdminInsightCommentsPage({ searchParams }: Props) {
@@ -27,8 +30,13 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
   const sort = params.sort;
   const order = params.order === "asc" ? "asc" : "desc";
   const offset = (page - 1) * PAGE_SIZE;
+  const statusFilter: CommentStatus | undefined =
+    params.status === "pending" ? "PENDING_REVIEW" : undefined;
 
-  const sortParams: Record<string, string> = { days: String(days) };
+  const sortParams: Record<string, string> = {
+    days: String(days),
+    ...(statusFilter ? { status: "pending" } : {}),
+  };
   const SH = ({ label, column, className }: { label: string; column: string; className?: string }) => (
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
@@ -38,8 +46,14 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
     PAGE_SIZE,
     offset,
     sort,
-    order
+    order,
+    statusFilter
   );
+
+  const statusFilters: { label: string; href: string; active: boolean }[] = [
+    { label: "Tous", href: BASE, active: !statusFilter },
+    { label: "En attente", href: `${BASE}?status=pending`, active: !!statusFilter },
+  ];
 
   return (
     <div className="space-y-6">
@@ -57,6 +71,22 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
         <PeriodSelector currentDays={days} basePath={BASE} />
       </div>
 
+      <div className="flex gap-2">
+        {statusFilters.map((f) => (
+          <Link
+            key={f.label}
+            href={f.href}
+            className={`rounded-full px-3 py-1 text-sm ${
+              f.active
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {f.label}
+          </Link>
+        ))}
+      </div>
+
       <div className="overflow-x-auto rounded-md border">
         <Table>
           <TableHeader>
@@ -66,14 +96,18 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
               <TableHead>Contenu</TableHead>
               <SH label="Événement" column="momentTitle" />
               <SH label="Communauté" column="circleName" className="w-px" />
+              <TableHead className="w-px">Statut</TableHead>
               <SH label="Date" column="createdAt" className="w-px" />
+              <TableHead className="w-px text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {comments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                  Aucun commentaire sur cette période
+                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                  {statusFilter
+                    ? "Aucun commentaire en attente"
+                    : "Aucun commentaire sur cette période"}
                 </TableCell>
               </TableRow>
             ) : (
@@ -102,8 +136,19 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
                     </Link>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{c.circleName}</TableCell>
+                  <TableCell>
+                    <Badge variant={c.status === "PENDING_REVIEW" ? "secondary" : "outline"}>
+                      {c.status === "PENDING_REVIEW" ? "En attente" : "Publié"}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-muted-foreground">
                     {c.createdAt.toLocaleDateString("fr-FR")}
+                  </TableCell>
+                  <TableCell>
+                    <AdminCommentRowActions
+                      commentId={c.id}
+                      isPending={c.status === "PENDING_REVIEW"}
+                    />
                   </TableCell>
                 </TableRow>
               ))

@@ -15,9 +15,6 @@ export function createMockCommentRepository(
     countByMomentId: vi
       .fn<CommentRepository["countByMomentId"]>()
       .mockResolvedValue(0),
-    findForAdmin: vi
-      .fn<CommentRepository["findForAdmin"]>()
-      .mockResolvedValue({ items: [], total: 0 }),
     updateStatus: vi
       .fn<CommentRepository["updateStatus"]>()
       .mockResolvedValue(undefined),
