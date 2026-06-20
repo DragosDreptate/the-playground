@@ -28,6 +28,18 @@ describe("isNewAccount", () => {
     expect(isNewAccount(createdAt, now)).toBe(false);
   });
 
+  it("should accept a serialized createdAt (ISO string, e.g. from a NextAuth session)", () => {
+    const recentIso = new Date(now.getTime() - 60 * 1000).toISOString();
+    expect(isNewAccount(recentIso, now)).toBe(true);
+    const oldIso = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
+    expect(isNewAccount(oldIso, now)).toBe(false);
+  });
+
+  it("should accept a createdAt as epoch millis (number)", () => {
+    expect(isNewAccount(now.getTime() - 60 * 1000, now)).toBe(true);
+    expect(isNewAccount(now.getTime() - 48 * 60 * 60 * 1000, now)).toBe(false);
+  });
+
   it("should expose a 24h window", () => {
     expect(NEW_ACCOUNT_WINDOW_HOURS).toBe(24);
     expect(NEW_ACCOUNT_WINDOW_MS).toBe(24 * 60 * 60 * 1000);

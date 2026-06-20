@@ -255,7 +255,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.user.onboardingCompleted = dbUser.onboardingCompleted;
       session.user.role = dbUser.role;
       session.user.dashboardMode = dbUser.dashboardMode ?? null;
-      session.user.createdAt = new Date(dbUser.createdAt);
+      session.user.createdAt = new Date(dbUser.createdAt).getTime();
       const ageMs = Date.now() - new Date(dbUser.createdAt).getTime();
       session.user.isNewUser = ageMs < NEW_USER_WINDOW_MS;
       return session;

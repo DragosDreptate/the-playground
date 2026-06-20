@@ -11,7 +11,13 @@
 export const NEW_ACCOUNT_WINDOW_HOURS = 24;
 export const NEW_ACCOUNT_WINDOW_MS = NEW_ACCOUNT_WINDOW_HOURS * 60 * 60 * 1000;
 
-/** Vrai si le compte a été créé il y a moins de `NEW_ACCOUNT_WINDOW_MS`. */
-export function isNewAccount(createdAt: Date, now: Date): boolean {
-  return now.getTime() - createdAt.getTime() < NEW_ACCOUNT_WINDOW_MS;
+/**
+ * Vrai si le compte a été créé il y a moins de `NEW_ACCOUNT_WINDOW_MS`.
+ *
+ * `createdAt` est coercé via `new Date(...)` : côté domaine c'est un vrai `Date`
+ * (mapping Prisma), mais côté session NextAuth il arrive sérialisé en string
+ * après le passage RSC. On accepte donc Date | string | number.
+ */
+export function isNewAccount(createdAt: Date | string | number, now: Date): boolean {
+  return now.getTime() - new Date(createdAt).getTime() < NEW_ACCOUNT_WINDOW_MS;
 }
