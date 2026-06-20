@@ -43,6 +43,28 @@ describe("DeleteComment", () => {
     });
   });
 
+  describe("given a platform admin (isAdmin bypass)", () => {
+    it("should delete any comment without being author nor organizer", async () => {
+      const comment = makeComment({ userId: "someone-else" });
+      const deps = makeDeps({
+        commentRepository: {
+          findById: vi.fn().mockResolvedValue(comment),
+          delete: vi.fn().mockResolvedValue(undefined),
+        },
+        // findMembership renvoie null par défaut → non-organisateur.
+      });
+
+      await deleteComment(
+        { commentId: "comment-1", userId: "admin-user", isAdmin: true },
+        deps
+      );
+
+      expect(deps.commentRepository.delete).toHaveBeenCalledWith("comment-1");
+      // Le bypass admin n'a pas besoin de consulter l'appartenance.
+      expect(deps.circleRepository.findMembership).not.toHaveBeenCalled();
+    });
+  });
+
   describe("given a Host of the Circle that owns the Moment", () => {
     it("should delete any comment in their Circle", async () => {
       const comment = makeComment({ userId: "user-2", momentId: "moment-1" });

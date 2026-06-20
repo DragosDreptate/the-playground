@@ -333,6 +333,14 @@ export function CommentThread({
                       <span className="text-muted-foreground text-xs" suppressHydrationWarning>
                         {formatRelativeTime(comment.createdAt)}
                       </span>
+                      {comment.status === "PENDING_REVIEW" && (
+                        <span
+                          className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                          title={t("comments.pendingReviewHint")}
+                        >
+                          {t("comments.pendingReview")}
+                        </span>
+                      )}
                       {canDelete && (
                         <DeleteCommentButton
                           commentId={comment.id}

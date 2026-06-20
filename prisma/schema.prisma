@@ -50,6 +50,11 @@ enum MomentStatus {
   PAST
 }
 
+enum CommentStatus {
+  PUBLISHED
+  PENDING_REVIEW
+}
+
 enum RegistrationStatus {
   PENDING_APPROVAL
   REGISTERED
@@ -321,10 +326,11 @@ model Registration {
 }
 
 model Comment {
-  id       String @id @default(cuid())
+  id       String        @id @default(cuid())
   momentId String
   userId   String
-  content  String @db.Text
+  content  String        @db.Text
+  status   CommentStatus @default(PUBLISHED)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -333,8 +339,8 @@ model Comment {
   user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   attachments CommentAttachment[]
 
-  // Index sur momentId : utilisé dans findByMomentIdWithUser, countByMomentId
-  @@index([momentId])
+  // Index (momentId, status) : affichage public filtré sur status=PUBLISHED.
+  @@index([momentId, status])
   @@map("comments")
 }
 

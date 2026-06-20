@@ -3,7 +3,11 @@ import type {
   CommentRepository,
   CreateCommentInput,
 } from "@/domain/ports/repositories/comment-repository";
-import type { Comment, CommentWithUser } from "@/domain/models/comment";
+import type {
+  Comment,
+  CommentStatus,
+  CommentWithUser,
+} from "@/domain/models/comment";
 import type { CommentAttachment } from "@/domain/models/comment-attachment";
 import type {
   Comment as PrismaComment,
@@ -16,6 +20,7 @@ function toDomainComment(record: PrismaComment): Comment {
     momentId: record.momentId,
     userId: record.userId,
     content: record.content,
+    status: record.status,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -60,6 +65,14 @@ function toDomainCommentWithUser(record: PrismaCommentWithUser): CommentWithUser
   };
 }
 
+const userSelect = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  image: true,
+} as const;
+
 export const prismaCommentRepository: CommentRepository = {
   async create(input: CreateCommentInput): Promise<Comment> {
     const record = await prisma.comment.create({
@@ -67,6 +80,8 @@ export const prismaCommentRepository: CommentRepository = {
         momentId: input.momentId,
         userId: input.userId,
         content: input.content,
+        // undefined → Prisma applique @default(PUBLISHED).
+        status: input.status,
       },
     });
     return toDomainComment(record);
@@ -77,22 +92,27 @@ export const prismaCommentRepository: CommentRepository = {
     return record ? toDomainComment(record) : null;
   },
 
-  async findByMomentIdWithUser(momentId: string): Promise<CommentWithUser[]> {
+  async findByMomentIdWithUser(
+    momentId: string,
+    viewerId?: string
+  ): Promise<CommentWithUser[]> {
     const records = await prisma.comment.findMany({
-      where: { momentId },
+      // PUBLISHED pour tous + ses propres PENDING_REVIEW pour l'auteur courant.
+      // La 2e branche est bornée à PENDING_REVIEW : la frontière de
+      // confidentialité est explicite (un viewerId erroné ne pourrait exposer
+      // que des pending, pas relâcher la sémantique).
+      where: {
+        momentId,
+        OR: [
+          { status: "PUBLISHED" as const },
+          ...(viewerId
+            ? [{ status: "PENDING_REVIEW" as const, userId: viewerId }]
+            : []),
+        ],
+      },
       include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            image: true,
-          },
-        },
-        attachments: {
-          orderBy: { createdAt: "asc" },
-        },
+        user: { select: userSelect },
+        attachments: { orderBy: { createdAt: "asc" } },
       },
       orderBy: { createdAt: "asc" },
     });
@@ -104,6 +124,10 @@ export const prismaCommentRepository: CommentRepository = {
   },
 
   async countByMomentId(momentId: string): Promise<number> {
-    return prisma.comment.count({ where: { momentId } });
+    return prisma.comment.count({ where: { momentId, status: "PUBLISHED" } });
+  },
+
+  async updateStatus(id: string, status: CommentStatus): Promise<void> {
+    await prisma.comment.update({ where: { id }, data: { status } });
   },
 };

@@ -5,6 +5,11 @@ import { createMockCommentRepository, makeComment } from "./helpers/mock-comment
 import { createMockMomentRepository, makeMoment } from "./helpers/mock-moment-repository";
 import { createMockCommentAttachmentRepository } from "./helpers/mock-comment-attachment-repository";
 import { createMockStorageService } from "./helpers/mock-storage-service";
+import { createMockUserRepository, makeUser } from "./helpers/mock-user-repository";
+import {
+  createMockCircleRepository,
+  makeMembership,
+} from "./helpers/mock-circle-repository";
 import {
   CommentContentEmptyError,
   CommentContentTooLongError,
@@ -31,14 +36,26 @@ describe("AddComment", () => {
   function makeDeps(overrides: {
     commentRepository?: Partial<ReturnType<typeof createMockCommentRepository>>;
     momentRepository?: Partial<ReturnType<typeof createMockMomentRepository>>;
+    userRepository?: Partial<ReturnType<typeof createMockUserRepository>>;
+    circleRepository?: Partial<ReturnType<typeof createMockCircleRepository>>;
     commentAttachmentRepository?: Partial<ReturnType<typeof createMockCommentAttachmentRepository>>;
     storage?: Partial<ReturnType<typeof createMockStorageService>>;
+    now?: Date;
   } = {}) {
     return {
       commentRepository: createMockCommentRepository(overrides.commentRepository),
       momentRepository: createMockMomentRepository(overrides.momentRepository),
+      // Par défaut : auteur "établi" (createdAt 2026-01-01) et non-membre.
+      // Avec `now` = 2026-06-15, le compte n'est pas récent → statut PUBLISHED,
+      // donc le comportement historique des tests est préservé.
+      userRepository: createMockUserRepository({
+        findById: vi.fn().mockResolvedValue(makeUser()),
+        ...overrides.userRepository,
+      }),
+      circleRepository: createMockCircleRepository(overrides.circleRepository),
       commentAttachmentRepository: createMockCommentAttachmentRepository(overrides.commentAttachmentRepository),
       storage: createMockStorageService(overrides.storage),
+      now: overrides.now ?? new Date("2026-06-15T12:00:00.000Z"),
     };
   }
 
@@ -75,7 +92,78 @@ describe("AddComment", () => {
         momentId: "moment-1",
         userId: "user-1",
         content: "Hello world",
+        status: "PUBLISHED",
       });
+    });
+
+    it("should create the comment as PENDING_REVIEW for an account younger than 24h (non-organizer)", async () => {
+      const now = new Date("2026-06-15T12:00:00.000Z");
+      const deps = makeDeps({
+        now,
+        momentRepository: { findById: vi.fn().mockResolvedValue(makeMoment()) },
+        userRepository: {
+          findById: vi
+            .fn()
+            .mockResolvedValue(
+              makeUser({ createdAt: new Date("2026-06-15T06:00:00.000Z") })
+            ),
+        },
+        // findMembership renvoie null par défaut → non-organisateur.
+      });
+
+      await addComment(
+        { momentId: "moment-1", userId: "user-1", content: "Coucou" },
+        deps
+      );
+
+      expect(deps.commentRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "PENDING_REVIEW" })
+      );
+    });
+
+    it("should PUBLISH directly when a young account is an active organizer of the circle", async () => {
+      const now = new Date("2026-06-15T12:00:00.000Z");
+      const deps = makeDeps({
+        now,
+        momentRepository: { findById: vi.fn().mockResolvedValue(makeMoment()) },
+        userRepository: {
+          findById: vi
+            .fn()
+            .mockResolvedValue(
+              makeUser({ createdAt: new Date("2026-06-15T06:00:00.000Z") })
+            ),
+        },
+        circleRepository: {
+          findMembership: vi
+            .fn()
+            .mockResolvedValue(makeMembership({ role: "HOST", status: "ACTIVE" })),
+        },
+      });
+
+      await addComment(
+        { momentId: "moment-1", userId: "user-1", content: "Coucou" },
+        deps
+      );
+
+      expect(deps.commentRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "PUBLISHED" })
+      );
+    });
+
+    it("should PUBLISH directly for an established account (older than 24h)", async () => {
+      // makeDeps fournit par défaut un auteur créé en 2026-01-01 (ancien).
+      const deps = makeDeps({
+        momentRepository: { findById: vi.fn().mockResolvedValue(makeMoment()) },
+      });
+
+      await addComment(
+        { momentId: "moment-1", userId: "user-1", content: "Coucou" },
+        deps
+      );
+
+      expect(deps.commentRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ status: "PUBLISHED" })
+      );
     });
 
     it("should trim the content before saving", async () => {

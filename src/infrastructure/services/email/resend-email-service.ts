@@ -20,6 +20,7 @@ import type {
   CircleInvitationEmailData,
   CircleInvitationsBatchEmailData,
   AdminNewUserEmailData,
+  AdminCommentPendingEmailData,
   HostNewCircleMemberEmailData,
   MemberRemovedFromCircleEmailData,
   RegistrationRemovedByHostEmailData,
@@ -43,6 +44,7 @@ import { AdminEntityCreatedEmail } from "./templates/admin-entity-created";
 import { AdminMomentUpdatedEmail } from "./templates/admin-moment-updated";
 import { CircleInvitationEmail } from "./templates/circle-invitation";
 import { AdminNewUserEmail } from "./templates/admin-new-user";
+import { AdminCommentPendingEmail } from "./templates/admin-comment-pending";
 import { HostNewCircleMemberEmail } from "./templates/host-new-circle-member";
 import { RegistrationReminderEmail } from "./templates/registration-reminder";
 import { MemberRemovedFromCircleEmail } from "./templates/member-removed-from-circle";
@@ -379,6 +381,17 @@ export function createResendEmailService(): EmailService {
         to: data.to,
         subject: data.strings.subject,
         react: AdminNewUserEmail({ ...data, baseUrl }),
+      });
+    },
+
+    async sendAdminCommentPending(
+      data: AdminCommentPendingEmailData
+    ): Promise<void> {
+      await send({
+        from,
+        to: data.to,
+        subject: data.strings.subject,
+        react: AdminCommentPendingEmail({ ...data, baseUrl }),
       });
     },
 

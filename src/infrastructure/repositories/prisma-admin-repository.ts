@@ -24,6 +24,7 @@ import type {
   AdminInsightComment,
 } from "@/domain/ports/repositories/admin-repository";
 import type { MomentStatus } from "@/domain/models/moment";
+import type { CommentStatus } from "@/domain/models/comment";
 import { Prisma } from "@prisma/client";
 
 const DEFAULT_LIMIT = 20;
@@ -875,13 +876,18 @@ export const prismaAdminRepository: AdminRepository = {
     limit: number,
     offset: number,
     sortBy?: string,
-    sortOrder?: "asc" | "desc"
+    sortOrder?: "asc" | "desc",
+    statusFilter?: CommentStatus
   ): Promise<{ comments: AdminInsightComment[]; total: number }> {
-    const since = daysAgo(days);
     const userFilter = realUserWhere();
+    // Modération (statusFilter fourni) : on ignore la période pour ne pas masquer
+    // d'anciens commentaires en attente. Sinon : analytics par période.
+    const where = statusFilter
+      ? { status: statusFilter, user: userFilter }
+      : { createdAt: { gte: daysAgo(days) }, user: userFilter };
     const [comments, total] = await Promise.all([
       prisma.comment.findMany({
-        where: { createdAt: { gte: since }, user: userFilter },
+        where,
         include: {
           user: { select: { email: true, firstName: true, lastName: true } },
           moment: { select: { title: true, slug: true, circle: { select: { name: true } } } },
@@ -890,9 +896,7 @@ export const prismaAdminRepository: AdminRepository = {
         take: limit,
         skip: offset,
       }),
-      prisma.comment.count({
-        where: { createdAt: { gte: since }, user: userFilter },
-      }),
+      prisma.comment.count({ where }),
     ]);
     return {
       comments: comments.map((c) => ({
@@ -901,6 +905,7 @@ export const prismaAdminRepository: AdminRepository = {
         userEmail: c.user.email,
         userName: [c.user.firstName, c.user.lastName].filter(Boolean).join(" ") || null,
         content: c.content,
+        status: c.status,
         momentTitle: c.moment.title,
         momentSlug: c.moment.slug,
         circleName: c.moment.circle.name,

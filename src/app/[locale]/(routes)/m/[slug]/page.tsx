@@ -125,7 +125,7 @@ export default async function PublicMomentPage({
           : Promise.resolve(null),
         prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
         getMomentComments(
-          { momentId: moment.id },
+          { momentId: moment.id, viewerId: session?.user?.id },
           { commentRepository: prismaCommentRepository }
         ),
         prismaMomentRepository.findUpcomingByCircleId(moment.circleId, moment.id, 3),

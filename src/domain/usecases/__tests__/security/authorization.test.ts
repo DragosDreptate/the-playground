@@ -38,6 +38,10 @@ import {
   makeMembership,
 } from "../helpers/mock-circle-repository";
 import {
+  createMockUserRepository,
+  makeUser,
+} from "../helpers/mock-user-repository";
+import {
   createMockMomentRepository,
   makeMoment,
 } from "../helpers/mock-moment-repository";
@@ -566,6 +570,11 @@ describe("Security — RBAC", () => {
       const result = await addComment(baseInput, {
         commentRepository: commentRepo,
         momentRepository: momentRepo,
+        userRepository: createMockUserRepository({
+          findById: vi.fn().mockResolvedValue(makeUser()),
+        }),
+        circleRepository: createMockCircleRepository(),
+        now: new Date("2026-06-15T12:00:00.000Z"),
       });
 
       expect(result.comment.userId).toBe("any-authenticated-user");
@@ -586,6 +595,9 @@ describe("Security — RBAC", () => {
         addComment(baseInput, {
           commentRepository: commentRepo,
           momentRepository: momentRepo,
+          userRepository: createMockUserRepository(),
+          circleRepository: createMockCircleRepository(),
+          now: new Date("2026-06-15T12:00:00.000Z"),
         })
       ).rejects.toThrow(MomentNotFoundError);
 
@@ -605,7 +617,15 @@ describe("Security — RBAC", () => {
 
       const result = await addComment(
         { momentId: "moment-1", userId: "player-user", content: "Excellent !" },
-        { commentRepository: commentRepo, momentRepository: momentRepo }
+        {
+          commentRepository: commentRepo,
+          momentRepository: momentRepo,
+          userRepository: createMockUserRepository({
+            findById: vi.fn().mockResolvedValue(makeUser()),
+          }),
+          circleRepository: createMockCircleRepository(),
+          now: new Date("2026-06-15T12:00:00.000Z"),
+        }
       );
 
       expect(result.comment.userId).toBe("player-user");

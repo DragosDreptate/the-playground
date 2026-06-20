@@ -15,6 +15,9 @@ export function createMockCommentRepository(
     countByMomentId: vi
       .fn<CommentRepository["countByMomentId"]>()
       .mockResolvedValue(0),
+    updateStatus: vi
+      .fn<CommentRepository["updateStatus"]>()
+      .mockResolvedValue(undefined),
     ...overrides,
   };
 }
@@ -25,6 +28,7 @@ export function makeComment(overrides: Partial<Comment> = {}): Comment {
     momentId: "moment-1",
     userId: "user-1",
     content: "Great Moment!",
+    status: "PUBLISHED",
     createdAt: new Date("2026-01-01"),
     updatedAt: new Date("2026-01-01"),
     ...overrides,
