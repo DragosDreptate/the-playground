@@ -1,9 +1,15 @@
 import { prisma } from "@/infrastructure/db/prisma";
 import type {
+  AdminCommentRow,
   CommentRepository,
   CreateCommentInput,
+  FindCommentsForAdminInput,
 } from "@/domain/ports/repositories/comment-repository";
-import type { Comment, CommentWithUser } from "@/domain/models/comment";
+import type {
+  Comment,
+  CommentStatus,
+  CommentWithUser,
+} from "@/domain/models/comment";
 import type { CommentAttachment } from "@/domain/models/comment-attachment";
 import type {
   Comment as PrismaComment,
@@ -16,6 +22,7 @@ function toDomainComment(record: PrismaComment): Comment {
     momentId: record.momentId,
     userId: record.userId,
     content: record.content,
+    status: record.status,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
@@ -60,6 +67,38 @@ function toDomainCommentWithUser(record: PrismaCommentWithUser): CommentWithUser
   };
 }
 
+type PrismaAdminCommentRecord = PrismaCommentWithUser & {
+  moment: {
+    id: string;
+    slug: string;
+    title: string;
+    circle: { slug: string; name: string };
+  };
+};
+
+function toAdminCommentRow(record: PrismaAdminCommentRecord): AdminCommentRow {
+  return {
+    ...toDomainCommentWithUser(record),
+    moment: {
+      id: record.moment.id,
+      slug: record.moment.slug,
+      title: record.moment.title,
+    },
+    circle: {
+      slug: record.moment.circle.slug,
+      name: record.moment.circle.name,
+    },
+  };
+}
+
+const userSelect = {
+  id: true,
+  firstName: true,
+  lastName: true,
+  email: true,
+  image: true,
+} as const;
+
 export const prismaCommentRepository: CommentRepository = {
   async create(input: CreateCommentInput): Promise<Comment> {
     const record = await prisma.comment.create({
@@ -67,6 +106,8 @@ export const prismaCommentRepository: CommentRepository = {
         momentId: input.momentId,
         userId: input.userId,
         content: input.content,
+        // undefined → Prisma applique @default(PUBLISHED).
+        status: input.status,
       },
     });
     return toDomainComment(record);
@@ -77,22 +118,22 @@ export const prismaCommentRepository: CommentRepository = {
     return record ? toDomainComment(record) : null;
   },
 
-  async findByMomentIdWithUser(momentId: string): Promise<CommentWithUser[]> {
+  async findByMomentIdWithUser(
+    momentId: string,
+    viewerId?: string
+  ): Promise<CommentWithUser[]> {
     const records = await prisma.comment.findMany({
-      where: { momentId },
+      // PUBLISHED pour tous + ses propres PENDING_REVIEW pour l'auteur courant.
+      where: {
+        momentId,
+        OR: [
+          { status: "PUBLISHED" },
+          ...(viewerId ? [{ userId: viewerId }] : []),
+        ],
+      },
       include: {
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            image: true,
-          },
-        },
-        attachments: {
-          orderBy: { createdAt: "asc" },
-        },
+        user: { select: userSelect },
+        attachments: { orderBy: { createdAt: "asc" } },
       },
       orderBy: { createdAt: "asc" },
     });
@@ -104,6 +145,38 @@ export const prismaCommentRepository: CommentRepository = {
   },
 
   async countByMomentId(momentId: string): Promise<number> {
-    return prisma.comment.count({ where: { momentId } });
+    return prisma.comment.count({ where: { momentId, status: "PUBLISHED" } });
+  },
+
+  async findForAdmin(
+    input: FindCommentsForAdminInput = {}
+  ): Promise<{ items: AdminCommentRow[]; total: number }> {
+    const where = input.status ? { status: input.status } : {};
+    const [records, total] = await Promise.all([
+      prisma.comment.findMany({
+        where,
+        include: {
+          user: { select: userSelect },
+          attachments: { orderBy: { createdAt: "asc" } },
+          moment: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              circle: { select: { slug: true, name: true } },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: input.skip,
+        take: input.take,
+      }),
+      prisma.comment.count({ where }),
+    ]);
+    return { items: records.map(toAdminCommentRow), total };
+  },
+
+  async updateStatus(id: string, status: CommentStatus): Promise<void> {
+    await prisma.comment.update({ where: { id }, data: { status } });
   },
 };
