@@ -91,6 +91,8 @@ type PublicViewProps = CommonProps & {
   upcomingCircleMoments: UpcomingCircleMoment[];
   /** Email du Participant connecté — pour la note "reply-to" du formulaire de contact. */
   currentUserEmail: string | null;
+  /** Compte de moins de 24h : grise le bouton "Contacter l'organisateur". */
+  contactAccountTooNew: boolean;
 };
 
 export type MomentDetailViewProps = HostViewProps | PublicViewProps;
@@ -376,6 +378,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     momentId={moment.id}
                     senderEmail={publicProps.currentUserEmail}
                     signInUrl={publicProps.isAuthenticated ? null : publicProps.signInUrl}
+                    accountTooNew={publicProps.contactAccountTooNew}
                   />
                 )}
               </div>

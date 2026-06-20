@@ -11,6 +11,7 @@ declare module "next-auth" {
       role: "USER" | "ADMIN";
       dashboardMode: "PARTICIPANT" | "ORGANIZER" | null;
       isNewUser?: boolean;
+      createdAt: Date;
     };
   }
 }
