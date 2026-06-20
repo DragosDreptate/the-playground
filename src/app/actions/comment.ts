@@ -17,6 +17,7 @@ import { createResendEmailService } from "@/infrastructure/services";
 import { addComment } from "@/domain/usecases/add-comment";
 import type { CommentPhotoInput } from "@/domain/usecases/add-comment";
 import { deleteComment } from "@/domain/usecases/delete-comment";
+import { adminApproveComment } from "@/domain/usecases/admin/admin-approve-comment";
 import { notifySlackNewComment } from "@/infrastructure/services/slack/slack-notification-service";
 import { notifyAdminCommentPending } from "./notify-admin-comment-pending";
 import {
@@ -179,6 +180,74 @@ export async function deleteCommentAction(
   return toActionResult(async () => {
     await deleteComment(
       { commentId, userId },
+      {
+        commentRepository: prismaCommentRepository,
+        momentRepository: prismaMomentRepository,
+        circleRepository: prismaCircleRepository,
+        commentAttachmentRepository: prismaCommentAttachmentRepository,
+        storage: vercelBlobStorageService,
+      }
+    );
+  });
+}
+
+// --- Modération admin ---
+
+/**
+ * Approuve un commentaire en attente (admin plateforme uniquement) : passe en
+ * PUBLISHED puis broadcaste aux participants (c'est au moment de l'approbation
+ * que la notification part, le commentaire ayant été retenu à la création).
+ */
+export async function adminApproveCommentAction(
+  commentId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "ADMIN_UNAUTHORIZED" };
+  }
+
+  return toActionResult(async () => {
+    const comment = await adminApproveComment(
+      { commentId },
+      { commentRepository: prismaCommentRepository }
+    );
+
+    // Resolver construit dans le request context (lit getLocale via headers),
+    // avant after().
+    const resolver = await buildEmailLocaleResolver(comment.userId);
+    after(async () => {
+      try {
+        await sendCommentNotifications(
+          comment.momentId,
+          comment.userId,
+          comment.content,
+          resolver
+        );
+      } catch (err) {
+        console.error(err);
+        Sentry.captureException(err);
+      }
+    });
+  });
+}
+
+/**
+ * Supprime n'importe quel commentaire (admin plateforme uniquement), pending ou
+ * publié. Réutilise le usecase deleteComment avec le bypass isAdmin (et son
+ * nettoyage des pièces jointes).
+ */
+export async function adminDeleteCommentAction(
+  commentId: string
+): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return { success: false, error: "Unauthorized", code: "ADMIN_UNAUTHORIZED" };
+  }
+  const adminId = session.user.id;
+
+  return toActionResult(async () => {
+    await deleteComment(
+      { commentId, userId: adminId, isAdmin: true },
       {
         commentRepository: prismaCommentRepository,
         momentRepository: prismaMomentRepository,

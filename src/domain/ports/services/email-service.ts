@@ -411,6 +411,22 @@ export type AdminNewUserEmailData = {
   };
 };
 
+export type AdminCommentPendingEmailData = {
+  to: string;
+  playerName: string;
+  momentTitle: string;
+  commentPreview: string;
+  adminUrl: string;
+  strings: {
+    subject: string;
+    heading: string;
+    message: string;
+    commentLabel: string;
+    ctaLabel: string;
+    footer: string;
+  };
+};
+
 // --- Approval notification types ---
 
 export type ApprovalNotificationEmailData = {
@@ -525,6 +541,7 @@ export interface EmailService {
   sendCircleInvitation(data: CircleInvitationEmailData): Promise<void>;
   sendCircleInvitations(data: CircleInvitationsBatchEmailData): Promise<void>;
   sendAdminNewUser(data: AdminNewUserEmailData): Promise<void>;
+  sendAdminCommentPending(data: AdminCommentPendingEmailData): Promise<void>;
   sendHostNewCircleMember(data: HostNewCircleMemberEmailData): Promise<void>;
   sendRegistrationReminderBatch(data: RegistrationReminderEmailData[]): Promise<void>;
   sendMemberRemovedFromCircle(data: MemberRemovedFromCircleEmailData): Promise<void>;

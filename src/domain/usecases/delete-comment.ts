@@ -12,6 +12,12 @@ import {
 type DeleteCommentInput = {
   commentId: string;
   userId: string;
+  /**
+   * Modération plateforme : un admin peut supprimer n'importe quel commentaire,
+   * en court-circuitant le contrôle auteur/organisateur. À ne passer que depuis
+   * une action déjà gardée par `requireAdmin`.
+   */
+  isAdmin?: boolean;
 };
 
 type DeleteCommentDeps = {
@@ -33,9 +39,9 @@ export async function deleteComment(
     throw new CommentNotFoundError(input.commentId);
   }
 
-  // Check authorization: author or organizer (HOST or CO_HOST, ACTIVE) can delete
+  // Check authorization: admin (plateforme), author, or active organizer can delete
   const isAuthor = comment.userId === input.userId;
-  if (!isAuthor) {
+  if (!input.isAdmin && !isAuthor) {
     const moment = await momentRepository.findById(comment.momentId);
     if (!moment) {
       throw new UnauthorizedCommentDeletionError();
