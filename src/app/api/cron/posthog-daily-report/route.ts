@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSafeResend } from "@/lib/email/safe-resend";
 import { getSender } from "@/infrastructure/services/email/resend-email-service";
 import { notifySlackTrafficReport } from "@/infrastructure/services/slack/slack-notification-service";
-import { fetchPosthogDashboard, patchUniqueVisitors } from "./fetch-dashboard";
+import {
+  fetchPosthogDashboard,
+  overrideDailyTilesToYesterday,
+  patchUniqueVisitors,
+} from "./fetch-dashboard";
 import { buildReportHtml } from "./build-report-html";
 import { extractReportKpis } from "./extract-report-kpis";
 
@@ -11,8 +15,13 @@ import { extractReportKpis } from "./extract-report-kpis";
  * GET /api/cron/posthog-daily-report
  *
  * Envoie chaque matin un récap HTML du dashboard PostHog "Synthèse trafic
- * quotidienne" (trafic 24h, interactions, engagement, top pages) au
- * destinataire configuré via DAILY_REPORT_RECIPIENT.
+ * quotidienne" (interactions, engagement, top pages) au destinataire configuré
+ * via DAILY_REPORT_RECIPIENT.
+ *
+ * Le dashboard est configuré sur « aujourd'hui depuis minuit » (consultation
+ * live), mais le rapport matinal doit résumer la veille complète : on rejoue
+ * donc les tiles sur « hier » via overrideDailyTilesToYesterday avant de
+ * construire l'email. Voir fetch-dashboard.ts pour le détail.
  *
  * Déclenché quotidiennement à 08:07 UTC via Vercel Cron (vercel.json).
  * Vercel Cron invoque les endpoints en GET — on expose aussi POST pour
@@ -55,7 +64,13 @@ async function handler(request: NextRequest) {
   const startedAt = Date.now();
 
   try {
-    const dashboard = await fetchPosthogDashboard(DASHBOARD_ID);
+    // Pas de force_refresh : on récupère les définitions de requêtes, qu'on
+    // rejoue ensuite sur « hier » (le recalcul « today » du dashboard serait
+    // jeté).
+    const dashboard = await fetchPosthogDashboard(DASHBOARD_ID, {
+      forceRefresh: false,
+    });
+    await overrideDailyTilesToYesterday(dashboard);
     patchUniqueVisitors(dashboard);
     const html = buildReportHtml(dashboard);
 
