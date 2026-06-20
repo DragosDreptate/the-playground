@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isNewAccount,
+  isSessionAccountNew,
   NEW_ACCOUNT_WINDOW_HOURS,
   NEW_ACCOUNT_WINDOW_MS,
 } from "@/lib/account-trust";
@@ -40,8 +41,35 @@ describe("isNewAccount", () => {
     expect(isNewAccount(now.getTime() - 48 * 60 * 60 * 1000, now)).toBe(false);
   });
 
+  it("should fail-closed on an invalid createdAt (NaN) and treat it as new", () => {
+    expect(isNewAccount("not-a-date", now)).toBe(true);
+    expect(isNewAccount(NaN, now)).toBe(true);
+  });
+
   it("should expose a 24h window", () => {
     expect(NEW_ACCOUNT_WINDOW_HOURS).toBe(24);
     expect(NEW_ACCOUNT_WINDOW_MS).toBe(24 * 60 * 60 * 1000);
+  });
+});
+
+describe("isSessionAccountNew", () => {
+  it("should be false when there is no session", () => {
+    expect(isSessionAccountNew(null)).toBe(false);
+    expect(isSessionAccountNew(undefined)).toBe(false);
+    expect(isSessionAccountNew({})).toBe(false);
+  });
+
+  it("should be true for a session whose account is under 24h", () => {
+    expect(
+      isSessionAccountNew({ user: { createdAt: Date.now() - 60 * 1000 } })
+    ).toBe(true);
+  });
+
+  it("should be false for a session whose account is older than 24h", () => {
+    expect(
+      isSessionAccountNew({
+        user: { createdAt: Date.now() - 48 * 60 * 60 * 1000 },
+      })
+    ).toBe(false);
   });
 });

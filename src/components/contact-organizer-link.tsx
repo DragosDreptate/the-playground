@@ -45,8 +45,9 @@ type Props = {
   accountTooNew?: boolean;
 };
 
-const triggerClassName =
-  "group inline-flex items-center gap-1.5 py-1 text-xs font-normal text-muted-foreground hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors";
+const baseTriggerClassName =
+  "inline-flex items-center gap-1.5 py-1 text-xs font-normal text-muted-foreground";
+const triggerClassName = `group ${baseTriggerClassName} hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors`;
 
 function TriggerInner() {
   const t = useTranslations("ContactOrganizer");
@@ -58,8 +59,7 @@ function TriggerInner() {
   );
 }
 
-const disabledTriggerClassName =
-  "inline-flex items-center gap-1.5 py-1 text-xs font-normal text-muted-foreground opacity-50 cursor-not-allowed";
+const disabledTriggerClassName = `${baseTriggerClassName} opacity-50 cursor-not-allowed`;
 
 export function ContactOrganizerLink({
   circleId,
