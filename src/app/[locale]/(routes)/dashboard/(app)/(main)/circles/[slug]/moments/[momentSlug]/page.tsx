@@ -63,7 +63,7 @@ export default async function MomentDetailPage({
   const [allAttendees, comments, pendingRegistrations, attachments] = await Promise.all([
     prismaRegistrationRepository.findActiveWithUserByMomentId(moment.id),
     getMomentComments(
-      { momentId: moment.id },
+      { momentId: moment.id, viewerId: session.user.id },
       { commentRepository: prismaCommentRepository }
     ),
     isOrganizer ? prismaRegistrationRepository.findPendingApprovals(moment.id) : Promise.resolve([]),

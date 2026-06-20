@@ -688,6 +688,8 @@
       "title": "Commentaires",
       "count": "{count} commentaire(s)",
       "empty": "Aucun commentaire pour le moment. Soyez le premier à réagir !",
+      "pendingReview": "En attente de validation",
+      "pendingReviewHint": "Votre commentaire sera visible une fois validé par un modérateur.",
       "placeholder": "Partagez votre avis...",
       "placeholderPast": "Remerciements, photos, retours... partagez !",
       "submit": "Publier",

@@ -42,7 +42,24 @@ describe("GetMomentComments", () => {
       expect(result[1].content).toBe("Looking forward to it.");
       expect(result[1].user.firstName).toBe("Bob");
       expect(commentRepository.findByMomentIdWithUser).toHaveBeenCalledWith(
-        "moment-1"
+        "moment-1",
+        undefined
+      );
+    });
+
+    it("should forward the viewerId so the author sees their own pending comments", async () => {
+      const commentRepository = createMockCommentRepository({
+        findByMomentIdWithUser: vi.fn().mockResolvedValue([]),
+      });
+
+      await getMomentComments(
+        { momentId: "moment-1", viewerId: "viewer-9" },
+        { commentRepository }
+      );
+
+      expect(commentRepository.findByMomentIdWithUser).toHaveBeenCalledWith(
+        "moment-1",
+        "viewer-9"
       );
     });
   });
@@ -60,7 +77,8 @@ describe("GetMomentComments", () => {
 
       expect(result).toEqual([]);
       expect(commentRepository.findByMomentIdWithUser).toHaveBeenCalledWith(
-        "moment-empty"
+        "moment-empty",
+        undefined
       );
     });
   });

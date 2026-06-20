@@ -688,6 +688,8 @@
       "title": "Comments",
       "count": "{count} comment(s)",
       "empty": "No comments yet. Be the first to say something!",
+      "pendingReview": "Pending review",
+      "pendingReviewHint": "Your comment will be visible once approved by a moderator.",
       "placeholder": "Share your thoughts...",
       "placeholderPast": "Thanks, photos, feedback... share it!",
       "submit": "Post",
