@@ -5,8 +5,10 @@ import type { EmailService } from "@/domain/ports/services/email-service";
 import type { RateLimiter } from "@/domain/ports/services/rate-limiter";
 import { isOrganizerRole } from "@/domain/models/circle";
 import { getDisplayName } from "@/lib/display-name";
+import { isNewAccount, NEW_ACCOUNT_WINDOW_HOURS } from "@/lib/account-trust";
 import {
   CircleNotFoundError,
+  ContactHostsAccountTooNewError,
   ContactHostsRateLimitedError,
   ContactMessageTooLongError,
   ContactMessageTooShortError,
@@ -53,6 +55,8 @@ export type ContactCircleHostsDeps = {
   };
   /** URL de base utilisée par le template pour charger le logo. */
   appUrl: string;
+  /** Horloge injectée (déterminisme/tests) pour le gate « compte trop récent ». */
+  now: Date;
 };
 
 export type ContactCircleHostsResult = {
@@ -102,6 +106,18 @@ export async function contactCircleHosts(
   if (moment && moment.circleId !== input.circleId) {
     throw new MomentNotInCircleError(input.momentId!, input.circleId);
   }
+
+  // Hard gate anti-nuisance : un compte de moins de 24h ne peut pas contacter
+  // les organisateurs, SAUF s'il est lui-même organisateur actif du Circle (ne
+  // jamais gater quelqu'un sur sa propre Communauté). `organizers` est déjà
+  // filtré HOST/CO_HOST + ACTIVE par le repository.
+  const senderIsOrganizer = organizers.some(
+    (m) => m.user.id === input.senderId && isOrganizerRole(m.role) && m.status === "ACTIVE"
+  );
+  if (!senderIsOrganizer && isNewAccount(sender.createdAt, deps.now)) {
+    throw new ContactHostsAccountTooNewError(NEW_ACCOUNT_WINDOW_HOURS);
+  }
+
   if (!rateLimit.allowed) throw new ContactHostsRateLimitedError();
 
   const activeHosts = organizers.filter(

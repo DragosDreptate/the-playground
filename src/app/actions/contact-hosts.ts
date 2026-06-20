@@ -40,6 +40,7 @@ export async function contactCircleHostsAction(input: {
         emailService,
         rateLimiter: prismaRateLimiter,
         appUrl: getAppUrl(),
+        now: new Date(),
         emailStrings: {
           subject: t("subject"),
           heading: t("heading"),

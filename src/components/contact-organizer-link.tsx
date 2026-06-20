@@ -141,6 +141,8 @@ function errorMessageFor(
   switch (code) {
     case CONTACT_ERROR_CODES.ContactHostsRateLimited:
       return t("errorRateLimited");
+    case CONTACT_ERROR_CODES.ContactHostsAccountTooNew:
+      return t("errorAccountTooNew");
     case CONTACT_ERROR_CODES.ContactMessageTooShort:
       return t("errorTooShort", { min: CONTACT_MESSAGE_MIN_LENGTH });
     case CONTACT_ERROR_CODES.ContactMessageTooLong:
