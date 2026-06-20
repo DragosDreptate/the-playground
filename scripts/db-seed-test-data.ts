@@ -360,6 +360,11 @@ async function main() {
   console.log("👤 Utilisateurs...");
   const userMap: Record<string, string> = {};
 
+  // Comptes "établis" (créés il y a 30 jours) : représente le cas normal des
+  // flows E2E. Indispensable depuis le hard gate 24h sur « Contacter les
+  // organisateurs » — un user fraîchement créé (createdAt = now) serait gaté.
+  const establishedCreatedAt = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
   for (const { key, email, firstName, lastName, dashboardMode, publicId } of USERS) {
     const user = await prisma.user.upsert({
       where: { email },
@@ -372,6 +377,7 @@ async function main() {
         onboardingCompleted: true,
         emailVerified: new Date(),
         dashboardMode,
+        createdAt: establishedCreatedAt,
       },
       update: {
         name: `${firstName} ${lastName}`,
@@ -381,6 +387,7 @@ async function main() {
         onboardingCompleted: true,
         emailVerified: new Date(),
         dashboardMode,
+        createdAt: establishedCreatedAt,
       },
     });
     userMap[key] = user.id;
