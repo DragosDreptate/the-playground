@@ -98,11 +98,16 @@ export const prismaCommentRepository: CommentRepository = {
   ): Promise<CommentWithUser[]> {
     const records = await prisma.comment.findMany({
       // PUBLISHED pour tous + ses propres PENDING_REVIEW pour l'auteur courant.
+      // La 2e branche est bornée à PENDING_REVIEW : la frontière de
+      // confidentialité est explicite (un viewerId erroné ne pourrait exposer
+      // que des pending, pas relâcher la sémantique).
       where: {
         momentId,
         OR: [
-          { status: "PUBLISHED" },
-          ...(viewerId ? [{ userId: viewerId }] : []),
+          { status: "PUBLISHED" as const },
+          ...(viewerId
+            ? [{ status: "PENDING_REVIEW" as const, userId: viewerId }]
+            : []),
         ],
       },
       include: {

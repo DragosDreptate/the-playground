@@ -68,7 +68,8 @@ export default async function AdminInsightCommentsPage({ searchParams }: Props) 
           </Link>
           <h1 className="text-2xl font-bold">Commentaires</h1>
         </div>
-        <PeriodSelector currentDays={days} basePath={BASE} />
+        {/* La période ne s'applique pas au filtre « En attente » (tout l'historique). */}
+        {!statusFilter && <PeriodSelector currentDays={days} basePath={BASE} />}
       </div>
 
       <div className="flex gap-2">

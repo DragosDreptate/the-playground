@@ -207,27 +207,31 @@ export async function adminApproveCommentAction(
   }
 
   return toActionResult(async () => {
-    const comment = await adminApproveComment(
+    const { comment, wasPending } = await adminApproveComment(
       { commentId },
       { commentRepository: prismaCommentRepository }
     );
 
-    // Resolver construit dans le request context (lit getLocale via headers),
-    // avant after().
-    const resolver = await buildEmailLocaleResolver(comment.userId);
-    after(async () => {
-      try {
-        await sendCommentNotifications(
-          comment.momentId,
-          comment.userId,
-          comment.content,
-          resolver
-        );
-      } catch (err) {
-        console.error(err);
-        Sentry.captureException(err);
-      }
-    });
+    // Broadcast UNIQUEMENT lors d'une vraie première approbation. Ré-approuver
+    // un commentaire déjà publié ne doit pas renvoyer l'email à tout le monde.
+    if (wasPending) {
+      // Resolver construit dans le request context (lit getLocale via headers),
+      // avant after().
+      const resolver = await buildEmailLocaleResolver(comment.userId);
+      after(async () => {
+        try {
+          await sendCommentNotifications(
+            comment.momentId,
+            comment.userId,
+            comment.content,
+            resolver
+          );
+        } catch (err) {
+          console.error(err);
+          Sentry.captureException(err);
+        }
+      });
+    }
   });
 }
 

@@ -7,7 +7,7 @@ import {
 import { CommentNotFoundError } from "@/domain/errors";
 
 describe("adminApproveComment", () => {
-  it("should set a pending comment to PUBLISHED and return it (for broadcast)", async () => {
+  it("should set a pending comment to PUBLISHED and report wasPending=true (for broadcast)", async () => {
     const pending = makeComment({
       id: "c1",
       status: "PENDING_REVIEW",
@@ -28,10 +28,26 @@ describe("adminApproveComment", () => {
       "c1",
       "PUBLISHED"
     );
-    expect(result.status).toBe("PUBLISHED");
-    expect(result.momentId).toBe("m1");
-    expect(result.userId).toBe("u1");
-    expect(result.content).toBe("Coucou");
+    expect(result.wasPending).toBe(true);
+    expect(result.comment.status).toBe("PUBLISHED");
+    expect(result.comment.momentId).toBe("m1");
+    expect(result.comment.userId).toBe("u1");
+    expect(result.comment.content).toBe("Coucou");
+  });
+
+  it("should be a no-op for an already-published comment (no re-broadcast)", async () => {
+    const published = makeComment({ id: "c2", status: "PUBLISHED" });
+    const commentRepository = createMockCommentRepository({
+      findById: vi.fn().mockResolvedValue(published),
+    });
+
+    const result = await adminApproveComment(
+      { commentId: "c2" },
+      { commentRepository }
+    );
+
+    expect(result.wasPending).toBe(false);
+    expect(commentRepository.updateStatus).not.toHaveBeenCalled();
   });
 
   it("should throw CommentNotFoundError when the comment does not exist", async () => {
