@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
+import {
+  isDisposableEmailDomain,
+  isDisposableEmailDomainWith,
+} from "@/lib/email/disposable-domains";
 
 describe("isDisposableEmailDomain", () => {
   describe("given a disposable email domain", () => {
@@ -39,5 +42,31 @@ describe("isDisposableEmailDomain", () => {
         expect(isDisposableEmailDomain(email)).toBe(false);
       }
     );
+  });
+});
+
+describe("isDisposableEmailDomainWith", () => {
+  const extras = ["evil-temp.test", "Throwaway.IO"];
+
+  describe("given un domaine dynamique supplémentaire", () => {
+    it.each([
+      "user@evil-temp.test", // domaine exact ajouté dynamiquement
+      "user@sub.evil-temp.test", // sous-domaine via suffix-walk
+      "USER@THROWAWAY.IO", // normalisation casse de la surcouche
+    ])("should flag %s as disposable", (email) => {
+      expect(isDisposableEmailDomainWith(email, extras)).toBe(true);
+    });
+  });
+
+  describe("given la baseline statique", () => {
+    it("should rester active même avec une surcouche vide", () => {
+      expect(isDisposableEmailDomainWith("user@ibymail.com", [])).toBe(true);
+    });
+  });
+
+  describe("given un domaine légitime hors surcouche", () => {
+    it("should ne pas flaguer", () => {
+      expect(isDisposableEmailDomainWith("user@gmail.com", extras)).toBe(false);
+    });
   });
 });

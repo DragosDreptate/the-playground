@@ -7,7 +7,7 @@ import { signIn, signOut } from "@/infrastructure/auth/auth.config";
 import { evaluateBotSignIn } from "@/infrastructure/security/bot-protection";
 import { routing } from "@/i18n/routing";
 import { isValidEmail } from "@/lib/email";
-import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
+import { isDisposableEmailDomain } from "@/infrastructure/auth/dynamic-blocklist";
 import { safeCallbackUrl } from "@/lib/url";
 import { buildSetupRedirectPath } from "@/lib/auth/post-sign-in-redirect";
 
@@ -82,7 +82,7 @@ export async function signInWithEmail(
   if (!isValidEmail(email)) {
     return { error: "INVALID_EMAIL" };
   }
-  if (isDisposableEmailDomain(email)) {
+  if (await isDisposableEmailDomain(email)) {
     return { error: "DISPOSABLE_EMAIL" };
   }
   const { shouldBlock } = await evaluateBotSignIn({ provider: "resend", email });
