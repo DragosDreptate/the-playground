@@ -40,7 +40,7 @@ async function signInPath() {
 // être bloquée, redirige vers la page de connexion. Le redirect interrompt
 // l'action, donc l'appelant ne poursuit pas vers signIn(). La journalisation
 // éventuelle est gérée dans evaluateBotSignIn.
-type OAuthProvider = "google" | "github" | "linkedin";
+export type OAuthProvider = "google" | "github" | "linkedin";
 
 async function redirectIfBot(provider: OAuthProvider) {
   const { shouldBlock } = await evaluateBotSignIn({ provider });
