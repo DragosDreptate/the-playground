@@ -11,7 +11,12 @@
  */
 
 /** Emails bloqués (comparaison insensible à la casse). */
-const BLOCKED_EMAILS = new Set<string>(["ixewufoy22@gmail.com"]);
+const BLOCKED_EMAILS = new Set<string>([
+  "ixewufoy22@gmail.com",
+  // Spam/SEO via magic link — Circle « Yoga Workshop » pointant vers
+  // ticketsfresh.com, proxy résidentiel rotatif (2026-06-21)
+  "ln941535@mailsecondary.com",
+]);
 
 /**
  * Identités OAuth bloquées par `providerAccountId`.
