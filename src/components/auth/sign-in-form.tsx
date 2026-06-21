@@ -13,19 +13,22 @@ import {
   signInWithGoogle,
   signInWithLinkedIn,
   signInWithEmail,
+  type OAuthProvider,
   type SignInWithEmailState,
 } from "@/app/actions/auth";
 import { isInAppBrowser, isLinkedInInAppBrowser } from "@/lib/detect-webview";
 
-type SignInProvider = "google" | "linkedin" | "github" | "email";
+type SignInProvider = OAuthProvider | "email";
 
-// Capture l'intention de connexion juste avant la redirection (OAuth) ou
-// l'envoi du magic link. Permet de mesurer le taux clic → connexion aboutie,
+// Capture l'intention de connexion à la soumission du formulaire (donc après
+// la validation native du champ email pour le magic link), juste avant la
+// redirection OAuth. Permet de mesurer le taux clic → connexion aboutie,
 // notamment la déperdition après le départ vers le fournisseur OAuth.
 function trackProviderClick(provider: SignInProvider, callbackUrl?: string) {
   posthog.capture("sign_in_provider_clicked", {
     provider,
-    callback_url: callbackUrl,
+    // Pathname seul : la query string du callbackUrl peut transporter du PII.
+    callback_path: callbackUrl?.split("?")[0],
   });
 }
 
@@ -55,22 +58,14 @@ function SubmitButton({
   label,
   icon,
   variant = "default",
-  onClick,
 }: {
   label: string;
   icon?: ReactNode;
   variant?: "default" | "outline";
-  onClick?: () => void;
 }) {
   const { pending } = useFormStatus();
   return (
-    <Button
-      variant={variant}
-      className="w-full"
-      type="submit"
-      disabled={pending}
-      onClick={onClick}
-    >
+    <Button variant={variant} className="w-full" type="submit" disabled={pending}>
       {pending ? <Loader2 className="size-4 animate-spin" /> : icon}
       {label}
     </Button>
@@ -100,14 +95,9 @@ function OAuthForm({
   callbackUrl?: string;
 }) {
   return (
-    <form action={action}>
+    <form action={action} onSubmit={() => trackProviderClick(provider, callbackUrl)}>
       {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-      <SubmitButton
-        label={label}
-        icon={icon}
-        variant="outline"
-        onClick={() => trackProviderClick(provider, callbackUrl)}
-      />
+      <SubmitButton label={label} icon={icon} variant="outline" />
     </form>
   );
 }
@@ -207,7 +197,11 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           <Separator className="flex-1" />
         </div>
 
-        <form action={emailAction} className="space-y-3">
+        <form
+          action={emailAction}
+          onSubmit={() => trackProviderClick("email", callbackUrl)}
+          className="space-y-3"
+        >
           {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
           <Input
             name="email"
@@ -233,10 +227,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
               )}
             </p>
           )}
-          <SubmitButton
-            label={t("signIn.magicLink")}
-            onClick={() => trackProviderClick("email", callbackUrl)}
-          />
+          <SubmitButton label={t("signIn.magicLink")} />
         </form>
     </div>
   );
