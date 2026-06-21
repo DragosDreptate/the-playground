@@ -24,6 +24,9 @@ const CUSTOM_DISPOSABLE_DOMAINS = [
   "animatimg.com",
   "animateany.com",
   "usechrono.com",
+  // Roundcube auto-hébergé (domaine créé déc. 2024), utilisé comme jetable pour
+  // un compte spam/SEO le 21/06/2026.
+  "mailsecondary.com",
 ];
 
 const DISPOSABLE_DOMAINS = new Set<string>([
