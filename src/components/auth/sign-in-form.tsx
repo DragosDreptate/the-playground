@@ -3,6 +3,7 @@
 import { type ReactNode, useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useFormStatus } from "react-dom";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -15,6 +16,18 @@ import {
   type SignInWithEmailState,
 } from "@/app/actions/auth";
 import { isInAppBrowser, isLinkedInInAppBrowser } from "@/lib/detect-webview";
+
+type SignInProvider = "google" | "linkedin" | "github" | "email";
+
+// Capture l'intention de connexion juste avant la redirection (OAuth) ou
+// l'envoi du magic link. Permet de mesurer le taux clic → connexion aboutie,
+// notamment la déperdition après le départ vers le fournisseur OAuth.
+function trackProviderClick(provider: SignInProvider, callbackUrl?: string) {
+  posthog.capture("sign_in_provider_clicked", {
+    provider,
+    callback_url: callbackUrl,
+  });
+}
 
 function GoogleIcon() {
   return (
@@ -42,14 +55,22 @@ function SubmitButton({
   label,
   icon,
   variant = "default",
+  onClick,
 }: {
   label: string;
   icon?: ReactNode;
   variant?: "default" | "outline";
+  onClick?: () => void;
 }) {
   const { pending } = useFormStatus();
   return (
-    <Button variant={variant} className="w-full" type="submit" disabled={pending}>
+    <Button
+      variant={variant}
+      className="w-full"
+      type="submit"
+      disabled={pending}
+      onClick={onClick}
+    >
       {pending ? <Loader2 className="size-4 animate-spin" /> : icon}
       {label}
     </Button>
@@ -67,11 +88,13 @@ function DisabledOAuthButton({ label, icon }: { label: string; icon: ReactNode }
 
 function OAuthForm({
   action,
+  provider,
   label,
   icon,
   callbackUrl,
 }: {
   action: (formData: FormData) => void | Promise<void>;
+  provider: SignInProvider;
   label: string;
   icon: ReactNode;
   callbackUrl?: string;
@@ -79,7 +102,12 @@ function OAuthForm({
   return (
     <form action={action}>
       {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
-      <SubmitButton label={label} icon={icon} variant="outline" />
+      <SubmitButton
+        label={label}
+        icon={icon}
+        variant="outline"
+        onClick={() => trackProviderClick(provider, callbackUrl)}
+      />
     </form>
   );
 }
@@ -133,6 +161,7 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           <>
             <OAuthForm
               action={signInWithLinkedIn}
+              provider="linkedin"
               label={t("signIn.linkedin")}
               icon={<LinkedInIcon />}
               callbackUrl={callbackUrl}
@@ -150,18 +179,21 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
           <>
             <OAuthForm
               action={signInWithGoogle}
+              provider="google"
               label={t("signIn.google")}
               icon={<GoogleIcon />}
               callbackUrl={callbackUrl}
             />
             <OAuthForm
               action={signInWithLinkedIn}
+              provider="linkedin"
               label={t("signIn.linkedin")}
               icon={<LinkedInIcon />}
               callbackUrl={callbackUrl}
             />
             <OAuthForm
               action={signInWithGitHub}
+              provider="github"
               label={t("signIn.github")}
               icon={<Github className="size-4" />}
               callbackUrl={callbackUrl}
@@ -201,7 +233,10 @@ export function SignInForm({ callbackUrl, error }: SignInFormProps) {
               )}
             </p>
           )}
-          <SubmitButton label={t("signIn.magicLink")} />
+          <SubmitButton
+            label={t("signIn.magicLink")}
+            onClick={() => trackProviderClick("email", callbackUrl)}
+          />
         </form>
     </div>
   );
