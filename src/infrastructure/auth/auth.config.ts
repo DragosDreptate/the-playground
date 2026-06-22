@@ -12,15 +12,14 @@ import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
-import {
-  classifyAuthError,
-  normalizeAuthErrorCode,
-  resolveAuthErrorCode,
-} from "@/lib/auth/error-kinds";
+import { classifyAuthError, resolveAuthErrorCode } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
-import { checkBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
+import {
+  checkBlockedSignIn,
+  type BlockMatch,
+} from "@/infrastructure/auth/dynamic-blocklist";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
@@ -45,6 +44,51 @@ const adapter: typeof basePrismaAdapter = {
   ...basePrismaAdapter,
   useVerificationToken: createReusableVerificationToken(prisma),
 };
+
+/** Raison d'un rejet de sign-in journalisé (blocklist + domaine jetable). */
+type RejectReason = BlockMatch | "disposable";
+
+/**
+ * Journalise un rejet de sign-in dans Sentry AVANT le `return false` du callback.
+ *
+ * Le `return false` lève un AccessDenied anonyme (le hook logger.error ne reçoit
+ * que l'Error, sans identité) ; on capte donc ICI qui est rejeté et pourquoi.
+ * L'identité va dans le titre (domaine) et les tags (email complet, raison,
+ * provider) car ce sont les seuls champs que les notifs Sentry email/Slack
+ * affichent, ce qui évite d'aller fouiller les logs.
+ *
+ * - Niveau warning : déclenche la règle « new issue » (notif) sans high-priority.
+ * - `context: auth` : conservé par le beforeSend.
+ * - fingerprint borné à (raison, domaine) : un scanner faisant tourner les
+ *   adresses ne crée qu'UNE issue par domaine, pas une avalanche de notifs ;
+ *   l'AccessDenied doublon, lui, est dropé par le beforeSend.
+ */
+async function reportRejectedSignIn(
+  reason: RejectReason,
+  identity: {
+    email?: string | null;
+    oauthId?: string | null;
+    provider?: string | null;
+  }
+) {
+  const emailDomain = identity.email?.split("@")[1] || "unknown";
+  Sentry.captureMessage(`auth: connexion bloquée [${reason}] ${emailDomain}`, {
+    level: "warning",
+    fingerprint: ["auth-sign-in-blocked", reason, emailDomain],
+    tags: {
+      context: "auth",
+      auth_event: "sign_in_blocked",
+      blocked_reason: reason,
+      email_domain: emailDomain,
+      provider: identity.provider ?? "unknown",
+      blocked_email: identity.email ?? "unknown",
+    },
+    extra: {
+      provider_account_id: identity.oauthId ?? null,
+      ...(await getRequestObservability()),
+    },
+  });
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -126,6 +170,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // ce qui faisait classer des rejets blocklist ATTENDUS en « unexpected »
       // (fausses alertes error-level). resolveAuthErrorCode récupère le code
       // canonique depuis le message @auth/core en priorité, repli sur error.name.
+      // resolveAuthErrorCode rend un code DÉJÀ borné : le code @auth/core extrait
+      // du message (set fini du framework, ex. « adaptererror » = panne DB) ou,
+      // à défaut, error.name normalisé (« v » minifié -> « Unknown »). On le pose
+      // tel quel : le re-normaliser écraserait les vraies pannes infra sous
+      // « Unknown » et les rendrait intriables.
       const code = resolveAuthErrorCode(error);
       const kind = classifyAuthError(code);
       // Les erreurs "attendues dans le flow utilisateur" (token expiré,
@@ -135,14 +184,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         level: kind === "expected_user_flow" ? "warning" : "error",
         tags: {
           context: "auth",
-          // Tag normalisé pour borner la cardinalité Sentry (un name minifié ou
-          // arbitraire retombe sous « Unknown ») ; le code brut reste en extra.
-          error_code: normalizeAuthErrorCode(code),
+          error_code: code,
           auth_error_kind: kind,
         },
         // Le user-agent distingue un token expiré détonné par un scanner
         // email d'un vrai clic humain tardif (incident réseau d'administration).
-        extra: { raw_error_code: code, ...(await getRequestObservability()) },
+        // raw_error_name = nom brut (souvent minifié) gardé pour le débogage.
+        extra: {
+          raw_error_name: error?.name ?? null,
+          ...(await getRequestObservability()),
+        },
       });
     },
     async warn(code) {
@@ -190,31 +241,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         account?.providerAccountId
       );
       if (blockMatch) {
-        // Capture délibérée AVANT le `return false`. L'AccessDenied qui en
-        // découle est anonyme (le hook `logger.error` ne reçoit que l'Error,
-        // sans identité). On journalise donc ICI qui est bloqué et pourquoi,
-        // dans le titre + les tags (les seuls champs que les notifs Sentry
-        // affichent), pour éviter d'aller fouiller les logs. Niveau warning :
-        // déclenche la règle « new issue » (notif email/Slack) sans repasser
-        // en high-priority. Tag `context: auth` => conservé par le beforeSend.
-        Sentry.captureMessage(
-          `auth: tentative bloquée — ${user.email ?? "(sans email)"} [${blockMatch}]`,
-          {
-            level: "warning",
-            tags: {
-              context: "auth",
-              auth_event: "sign_in_blocked",
-              blocked_match: blockMatch,
-              email_domain: user.email?.split("@")[1] ?? "unknown",
-              provider: account?.provider ?? "unknown",
-            },
-            extra: {
-              blocked_email: user.email ?? null,
-              provider_account_id: account?.providerAccountId ?? null,
-              ...(await getRequestObservability()),
-            },
-          }
-        );
+        await reportRejectedSignIn(blockMatch, {
+          email: user.email,
+          oauthId: account?.providerAccountId,
+          provider: account?.provider,
+        });
         return false;
       }
 
@@ -228,6 +259,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user.email &&
         isDisposableEmailDomain(user.email)
       ) {
+        await reportRejectedSignIn("disposable", {
+          email: user.email,
+          provider: account.provider,
+        });
         return false;
       }
 

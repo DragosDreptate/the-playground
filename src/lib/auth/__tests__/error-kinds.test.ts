@@ -96,9 +96,19 @@ describe("authErrorCodeFromMessage", () => {
     });
   });
 
-  describe("given un message sans hash @auth/core connu", () => {
+  describe("given un message @auth/core dont le hash n'est pas dans la map", () => {
+    // Préserve le code exact (panne infra triable) plutôt que de le perdre.
     it.each([
-      "errors.authjs.dev#somethingunknown",
+      ["AdapterError. Read more at https://errors.authjs.dev#adaptererror", "adaptererror"],
+      ["Read more at https://errors.authjs.dev#jwtsessionerror", "jwtsessionerror"],
+      ["errors.authjs.dev#somethingunknown", "somethingunknown"],
+    ])("should renvoyer le hash brut pour %s", (message, expected) => {
+      expect(authErrorCodeFromMessage(message)).toBe(expected);
+    });
+  });
+
+  describe("given un message sans hash @auth/core", () => {
+    it.each([
       "TypeError: cannot read properties of undefined",
       "Database connection failed",
       "",
@@ -132,10 +142,21 @@ describe("resolveAuthErrorCode", () => {
     );
   });
 
-  it("should retomber sur error.name si le message ne porte pas de hash connu", () => {
-    const error = { name: "AdapterError", message: "Database connection failed" };
-    expect(resolveAuthErrorCode(error)).toBe("AdapterError");
+  // Régression (review #2) : une vraie panne infra (#adaptererror) ne doit PAS
+  // se collapser sous « Unknown » ; on garde le code exact, classé unexpected.
+  it("should préserver le code d'une panne infra @auth/core", () => {
+    const error = {
+      name: "v",
+      message: "AdapterError. Read more at https://errors.authjs.dev#adaptererror",
+    };
+    expect(resolveAuthErrorCode(error)).toBe("adaptererror");
     expect(classifyAuthError(resolveAuthErrorCode(error))).toBe("unexpected");
+  });
+
+  it("should normaliser le repli sur error.name minifié sous Unknown (cardinalité)", () => {
+    // Pas de hash @auth/core dans le message -> repli normalisé sur error.name.
+    const error = { name: "v", message: "boom" };
+    expect(resolveAuthErrorCode(error)).toBe("Unknown");
   });
 
   it.each([{}, null, undefined])(

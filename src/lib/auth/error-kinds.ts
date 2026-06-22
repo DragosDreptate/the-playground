@@ -58,7 +58,12 @@ export function authErrorCodeFromMessage(
 ): string | undefined {
   if (!message) return undefined;
   const hash = message.toLowerCase().match(/errors\.authjs\.dev#([a-z]+)/)?.[1];
-  return hash ? CANONICAL_CODE_BY_HASH.get(hash) : undefined;
+  if (!hash) return undefined;
+  // Code canonique si connu (« accessdenied » -> « AccessDenied »), sinon le
+  // hash brut : il identifie quand même précisément l'erreur @auth/core (ex.
+  // « adaptererror » = panne DB) et reste borné au set fini du framework. Sans
+  // ça, ces pannes infra retombaient sur error.name minifié puis « Unknown ».
+  return CANONICAL_CODE_BY_HASH.get(hash) ?? hash;
 }
 
 /**
@@ -73,7 +78,13 @@ export function authErrorCodeFromMessage(
 export function resolveAuthErrorCode(
   error: { name?: string | null; message?: string | null } | null | undefined
 ): string {
-  return authErrorCodeFromMessage(error?.message) ?? error?.name ?? "Unknown";
+  // Code du message @auth/core en priorité (fiable, borné). À défaut, on retombe
+  // sur `error.name` en le NORMALISANT : minifié en prod (« v ») ou nom arbitraire
+  // d'une exception non-@auth/core, il retombe sous « Unknown » (cardinalité bornée).
+  return (
+    authErrorCodeFromMessage(error?.message) ??
+    normalizeAuthErrorCode(error?.name)
+  );
 }
 
 /**

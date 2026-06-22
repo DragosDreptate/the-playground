@@ -10,7 +10,7 @@
  * lock-out global (fail-open).
  *
  * Périmètre des entrées dynamiques (toutes appliquées à TOUS les providers,
- * magic link ET OAuth, via `isBlockedSignIn`) :
+ * magic link ET OAuth, via `checkBlockedSignIn`) :
  *  - `emails`   : adresses exactes
  *  - `oauthIds` : `providerAccountId`
  *  - `domains`  : domaines (suffix-walk, couvre les sous-domaines)
@@ -125,20 +125,10 @@ export function matchIdentityReason(
 }
 
 /**
- * Variante booléenne de `matchIdentityReason` (email OU oauth présent).
- */
-export function matchesIdentityBlocklist(
-  data: DynamicBlocklist,
-  identity: { email?: string | null; oauthId?: string | null }
-): boolean {
-  return matchIdentityReason(data, identity) !== null;
-}
-
-/**
  * Bloqué au sign-in (tous providers) : baseline statique OU surcouche dynamique
  * (email, providerAccountId, ou domaine via suffix-walk). Renvoie la raison du
  * blocage (`BlockMatch`) ou `null` si l'acteur passe. Une seule lecture Edge
- * Config, partagée avec `isBlockedSignIn`.
+ * Config.
  */
 export async function checkBlockedSignIn(
   email?: string | null,
@@ -150,15 +140,4 @@ export async function checkBlockedSignIn(
   if (identityReason) return identityReason;
   if (email && matchesDomainSuffix(email, dynamic.domains)) return "domain";
   return null;
-}
-
-/**
- * Variante booléenne de `checkBlockedSignIn`, pour les appelants qui n'ont
- * besoin que de savoir si l'acteur est bloqué.
- */
-export async function isBlockedSignIn(
-  email?: string | null,
-  oauthId?: string | null
-): Promise<boolean> {
-  return (await checkBlockedSignIn(email, oauthId)) !== null;
 }
