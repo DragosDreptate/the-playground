@@ -38,10 +38,28 @@ export function classifyAuthError(code: string | null | undefined): AuthErrorKin
   return EXPECTED_AUTH_ERROR_CODES.has(normalized) ? "expected_user_flow" : "unexpected";
 }
 
-// Hash des codes attendus dans l'URL d'erreur @auth/core (ex. "#accessdenied").
-const EXPECTED_AUTHJS_HASHES = new Set(
-  [...EXPECTED_AUTH_ERROR_CODES].map((code) => code.toLowerCase())
+// Reverse-map du hash @auth/core (ex. "#accessdenied") vers le code canonique
+// ("AccessDenied"). Permet de récupérer le vrai code quand `error.name` est
+// minifié dans le bundle de prod (ex. "v") et ne correspond plus au code Auth.js.
+const CANONICAL_CODE_BY_HASH = new Map(
+  [...KNOWN_AUTH_ERROR_CODES].map((code) => [code.toLowerCase(), code])
 );
+
+/**
+ * Récupère le code d'erreur Auth.js canonique depuis le message `@auth/core`
+ * (« … errors.authjs.dev#accessdenied » -> "AccessDenied").
+ *
+ * Robuste à la minification du bundle de prod, où `error.name` perd sa valeur
+ * (« AccessDenied » devient « v »). Retourne `undefined` si le message ne porte
+ * pas de hash connu — l'appelant retombe alors sur `error.name`.
+ */
+export function authErrorCodeFromMessage(
+  message: string | null | undefined
+): string | undefined {
+  if (!message) return undefined;
+  const hash = message.toLowerCase().match(/errors\.authjs\.dev#([a-z]+)/)?.[1];
+  return hash ? CANONICAL_CODE_BY_HASH.get(hash) : undefined;
+}
 
 /**
  * Détecte si un message d'exception correspond à un rejet d'authentification
@@ -56,7 +74,6 @@ const EXPECTED_AUTHJS_HASHES = new Set(
 export function isExpectedAuthRejectionMessage(
   message: string | null | undefined
 ): boolean {
-  if (!message) return false;
-  const hash = message.toLowerCase().match(/errors\.authjs\.dev#([a-z]+)/)?.[1];
-  return hash !== undefined && EXPECTED_AUTHJS_HASHES.has(hash);
+  const code = authErrorCodeFromMessage(message);
+  return code !== undefined && classifyAuthError(code) === "expected_user_flow";
 }

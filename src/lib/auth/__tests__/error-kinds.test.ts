@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  authErrorCodeFromMessage,
   classifyAuthError,
   isExpectedAuthRejectionMessage,
   normalizeAuthErrorCode,
@@ -78,6 +79,48 @@ describe("normalizeAuthErrorCode", () => {
 
     it("should return Unknown for undefined", () => {
       expect(normalizeAuthErrorCode(undefined)).toBe("Unknown");
+    });
+  });
+});
+
+describe("authErrorCodeFromMessage", () => {
+  describe("given un message @auth/core portant un hash de code connu", () => {
+    it.each([
+      ["AccessDenied. Read more at https://errors.authjs.dev#accessdenied", "AccessDenied"],
+      ["Verification. Read more at https://errors.authjs.dev#verification", "Verification"],
+      ["Configuration. Read more at https://errors.authjs.dev#configuration", "Configuration"],
+      ["Read more at HTTPS://ERRORS.AUTHJS.DEV#ACCESSDENIED", "AccessDenied"], // insensible à la casse
+    ])("should extraire le code canonique de %s", (message, expected) => {
+      expect(authErrorCodeFromMessage(message)).toBe(expected);
+    });
+  });
+
+  describe("given un message sans hash @auth/core connu", () => {
+    it.each([
+      "errors.authjs.dev#somethingunknown",
+      "TypeError: cannot read properties of undefined",
+      "Database connection failed",
+      "",
+    ])("should renvoyer undefined pour %s", (message) => {
+      expect(authErrorCodeFromMessage(message)).toBeUndefined();
+    });
+
+    it.each([null, undefined])("should gérer %s sans lever", (message) => {
+      expect(authErrorCodeFromMessage(message)).toBeUndefined();
+    });
+  });
+
+  // Régression : en prod, `error.name` est minifié (« AccessDenied » -> « v »),
+  // mais le message porte toujours le code canonique. La classification doit
+  // donc s'appuyer sur le message pour éviter les fausses alertes error-level.
+  describe("given un name minifié mais un message canonique (bundle prod)", () => {
+    it("should reclasser un rejet AccessDenied en expected_user_flow", () => {
+      const minifiedName = "v";
+      const message =
+        "AccessDenied. Read more at https://errors.authjs.dev#accessdenied";
+      const code = authErrorCodeFromMessage(message) ?? minifiedName;
+      expect(code).toBe("AccessDenied");
+      expect(classifyAuthError(code)).toBe("expected_user_flow");
     });
   });
 });
