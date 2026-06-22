@@ -22,12 +22,31 @@ describe("dropExpectedAuthRejections", () => {
     });
   });
 
-  describe("given une capture délibérée taggée context=auth", () => {
-    it("should la conserver même si le message matche (observabilité préservée)", () => {
+  describe("given une exception AccessDenied taggée context=auth (re-capture logger.error)", () => {
+    it("should la droper : doublon du captureMessage de rejet (avec identité)", () => {
       const event = exceptionEvent(ACCESS_DENIED, {
         level: "warning",
         tags: { context: "auth", error_code: "AccessDenied" },
       });
+      expect(dropExpectedAuthRejections(event)).toBeNull();
+    });
+  });
+
+  describe("given une capture délibérée taggée context=auth", () => {
+    it("should conserver une Verification context=auth (signal d'abus préservé)", () => {
+      const event = exceptionEvent(VERIFICATION, {
+        level: "warning",
+        tags: { context: "auth", error_code: "Verification" },
+      });
+      expect(dropExpectedAuthRejections(event)).toBe(event);
+    });
+
+    it("should conserver le captureMessage de rejet (sans exception, tag sign_in_blocked)", () => {
+      const event = {
+        level: "warning",
+        message: "auth: connexion bloquée [domain] nms.asia",
+        tags: { context: "auth", auth_event: "sign_in_blocked" },
+      } as unknown as ErrorEvent;
       expect(dropExpectedAuthRejections(event)).toBe(event);
     });
 

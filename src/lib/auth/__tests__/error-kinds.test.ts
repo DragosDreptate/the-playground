@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
+  authErrorCodeFromMessage,
   classifyAuthError,
-  isExpectedAuthRejectionMessage,
+  isAlwaysDuplicateRejectionCode,
   normalizeAuthErrorCode,
+  resolveAuthErrorCode,
 } from "@/lib/auth/error-kinds";
 
 describe("classifyAuthError", () => {
@@ -82,30 +84,98 @@ describe("normalizeAuthErrorCode", () => {
   });
 });
 
-describe("isExpectedAuthRejectionMessage", () => {
-  describe("given un message d'exception @auth/core d'un rejet attendu", () => {
+describe("authErrorCodeFromMessage", () => {
+  describe("given un message @auth/core portant un hash de code connu", () => {
     it.each([
-      "AccessDenied. Read more at https://errors.authjs.dev#accessdenied",
-      "Verification. Read more at https://errors.authjs.dev#verification",
-      "Read more at HTTPS://ERRORS.AUTHJS.DEV#ACCESSDENIED", // insensible à la casse
-    ])("should reconnaître %s", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(true);
+      ["AccessDenied. Read more at https://errors.authjs.dev#accessdenied", "AccessDenied"],
+      ["Verification. Read more at https://errors.authjs.dev#verification", "Verification"],
+      ["Configuration. Read more at https://errors.authjs.dev#configuration", "Configuration"],
+      ["Read more at HTTPS://ERRORS.AUTHJS.DEV#ACCESSDENIED", "AccessDenied"], // insensible à la casse
+    ])("should extraire le code canonique de %s", (message, expected) => {
+      expect(authErrorCodeFromMessage(message)).toBe(expected);
     });
   });
 
-  describe("given un message d'erreur non attendu ou hors auth", () => {
+  describe("given un message @auth/core dont le hash n'est pas dans la map", () => {
+    // Préserve le code exact (panne infra triable) plutôt que de le perdre.
     it.each([
-      "Configuration. Read more at https://errors.authjs.dev#configuration",
-      "OAuthCallbackError. Read more at https://errors.authjs.dev#oauthcallbackerror",
+      ["AdapterError. Read more at https://errors.authjs.dev#adaptererror", "adaptererror"],
+      ["Read more at https://errors.authjs.dev#jwtsessionerror", "jwtsessionerror"],
+      ["errors.authjs.dev#somethingunknown", "somethingunknown"],
+    ])("should renvoyer le hash brut pour %s", (message, expected) => {
+      expect(authErrorCodeFromMessage(message)).toBe(expected);
+    });
+  });
+
+  describe("given un message sans hash @auth/core", () => {
+    it.each([
       "TypeError: cannot read properties of undefined",
       "Database connection failed",
       "",
-    ])("should ne pas reconnaître %s", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
+    ])("should renvoyer undefined pour %s", (message) => {
+      expect(authErrorCodeFromMessage(message)).toBeUndefined();
     });
 
     it.each([null, undefined])("should gérer %s sans lever", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
+      expect(authErrorCodeFromMessage(message)).toBeUndefined();
     });
   });
+
+});
+
+// Exerce le VRAI chemin de résolution utilisé par le logger d'auth.config
+// (pas une réimplémentation du fallback) : un changement d'ordre de priorité
+// dans resolveAuthErrorCode casse ces tests.
+describe("resolveAuthErrorCode", () => {
+  // Régression : en prod, `error.name` est minifié (« AccessDenied » -> « v »),
+  // mais le message porte toujours le code canonique. La résolution doit donc
+  // privilégier le message pour éviter les fausses alertes error-level.
+  it("should privilégier le code du message quand error.name est minifié", () => {
+    const error = {
+      name: "v",
+      message:
+        "AccessDenied. Read more at https://errors.authjs.dev#accessdenied",
+    };
+    expect(resolveAuthErrorCode(error)).toBe("AccessDenied");
+    expect(classifyAuthError(resolveAuthErrorCode(error))).toBe(
+      "expected_user_flow"
+    );
+  });
+
+  // Régression (review #2) : une vraie panne infra (#adaptererror) ne doit PAS
+  // se collapser sous « Unknown » ; on garde le code exact, classé unexpected.
+  it("should préserver le code d'une panne infra @auth/core", () => {
+    const error = {
+      name: "v",
+      message: "AdapterError. Read more at https://errors.authjs.dev#adaptererror",
+    };
+    expect(resolveAuthErrorCode(error)).toBe("adaptererror");
+    expect(classifyAuthError(resolveAuthErrorCode(error))).toBe("unexpected");
+  });
+
+  it("should normaliser le repli sur error.name minifié sous Unknown (cardinalité)", () => {
+    // Pas de hash @auth/core dans le message -> repli normalisé sur error.name.
+    const error = { name: "v", message: "boom" };
+    expect(resolveAuthErrorCode(error)).toBe("Unknown");
+  });
+
+  it.each([{}, null, undefined])(
+    "should renvoyer Unknown sans name ni message exploitable (%o)",
+    (error) => {
+      expect(resolveAuthErrorCode(error)).toBe("Unknown");
+    }
+  );
+});
+
+describe("isAlwaysDuplicateRejectionCode", () => {
+  it("should reconnaître AccessDenied (doublon d'une capture délibérée)", () => {
+    expect(isAlwaysDuplicateRejectionCode("AccessDenied")).toBe(true);
+  });
+
+  it.each(["Verification", "adaptererror", "Unknown", null, undefined])(
+    "should renvoyer false pour %s",
+    (code) => {
+      expect(isAlwaysDuplicateRejectionCode(code)).toBe(false);
+    }
+  );
 });

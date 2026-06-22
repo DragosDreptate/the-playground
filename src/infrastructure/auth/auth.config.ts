@@ -12,12 +12,18 @@ import { MagicLinkEmail } from "@/infrastructure/services/email/templates/magic-
 import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
-import { classifyAuthError } from "@/lib/auth/error-kinds";
+import { classifyAuthError, resolveAuthErrorCode } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
-import { isBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
-import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
+import {
+  checkBlockedSignIn,
+  type BlockMatch,
+} from "@/infrastructure/auth/dynamic-blocklist";
+import {
+  extractDomain,
+  isDisposableEmailDomain,
+} from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -41,6 +47,54 @@ const adapter: typeof basePrismaAdapter = {
   ...basePrismaAdapter,
   useVerificationToken: createReusableVerificationToken(prisma),
 };
+
+/** Raison d'un rejet de sign-in journalisé (blocklist + domaine jetable). */
+type RejectReason = BlockMatch | "disposable";
+
+/**
+ * Journalise un rejet de sign-in dans Sentry AVANT le `return false` du callback.
+ *
+ * Le `return false` lève un AccessDenied anonyme (le hook logger.error ne reçoit
+ * que l'Error, sans identité) ; on capte donc ICI qui est rejeté et pourquoi.
+ * L'identité va dans le titre (domaine) et les tags (email complet, raison,
+ * provider) car ce sont les seuls champs que les notifs Sentry email/Slack
+ * affichent, ce qui évite d'aller fouiller les logs.
+ *
+ * - Niveau warning : déclenche la règle « new issue » (notif) sans high-priority.
+ * - `context: auth` : conservé par le beforeSend.
+ * - fingerprint borné à (raison, domaine) : un scanner faisant tourner les
+ *   adresses ne crée qu'UNE issue par domaine, pas une avalanche de notifs ;
+ *   l'AccessDenied doublon, lui, est dropé par le beforeSend.
+ */
+async function reportRejectedSignIn(
+  reason: RejectReason,
+  identity: {
+    email?: string | null;
+    oauthId?: string | null;
+    provider?: string | null;
+  }
+) {
+  // Domaine normalisé (minuscules, sans point FQDN) : sinon « Evil.COM » et
+  // « evil.com » fingerprinteraient en 2 issues distinctes => avalanche.
+  const emailDomain =
+    (identity.email ? extractDomain(identity.email) : null) ?? "unknown";
+  Sentry.captureMessage(`auth: connexion bloquée [${reason}] ${emailDomain}`, {
+    level: "warning",
+    fingerprint: ["auth-sign-in-blocked", reason, emailDomain],
+    tags: {
+      context: "auth",
+      auth_event: "sign_in_blocked",
+      blocked_reason: reason,
+      email_domain: emailDomain,
+      provider: identity.provider ?? "unknown",
+      blocked_email: identity.email ?? "unknown",
+    },
+    extra: {
+      provider_account_id: identity.oauthId ?? null,
+      ...(await getRequestObservability()),
+    },
+  });
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: process.env.NODE_ENV !== "production",
@@ -118,7 +172,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   logger: {
     async error(error) {
       console.error("[AUTH ERROR]", error);
-      const code = error?.name ?? "Unknown";
+      // `error.name` est minifié dans le bundle de prod (« AccessDenied » -> « v »),
+      // ce qui faisait classer des rejets blocklist ATTENDUS en « unexpected »
+      // (fausses alertes error-level). resolveAuthErrorCode récupère le code
+      // canonique depuis le message @auth/core en priorité, repli sur error.name.
+      // resolveAuthErrorCode rend un code DÉJÀ borné : le code @auth/core extrait
+      // du message (set fini du framework, ex. « adaptererror » = panne DB) ou,
+      // à défaut, error.name normalisé (« v » minifié -> « Unknown »). On le pose
+      // tel quel : le re-normaliser écraserait les vraies pannes infra sous
+      // « Unknown » et les rendrait intriables.
+      const code = resolveAuthErrorCode(error);
       const kind = classifyAuthError(code);
       // Les erreurs "attendues dans le flow utilisateur" (token expiré,
       // prefetch scanner, refus OAuth) restent capturées mais en niveau
@@ -132,7 +195,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
         // Le user-agent distingue un token expiré détonné par un scanner
         // email d'un vrai clic humain tardif (incident réseau d'administration).
-        extra: await getRequestObservability(),
+        // raw_error_name = nom brut (souvent minifié) gardé pour le débogage.
+        extra: {
+          raw_error_name: error?.name ?? null,
+          ...(await getRequestObservability()),
+        },
       });
     },
     async warn(code) {
@@ -175,7 +242,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account, profile }) {
       // Anti-abus : refuse la connexion des acteurs malveillants connus
       // (identité OAuth ou email blocklistés), avant toute autre logique.
-      if (await isBlockedSignIn(user.email, account?.providerAccountId)) {
+      const blockMatch = await checkBlockedSignIn(
+        user.email,
+        account?.providerAccountId
+      );
+      if (blockMatch) {
+        await reportRejectedSignIn(blockMatch, {
+          email: user.email,
+          oauthId: account?.providerAccountId,
+          provider: account?.provider,
+        });
         return false;
       }
 
@@ -189,6 +265,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user.email &&
         isDisposableEmailDomain(user.email)
       ) {
+        await reportRejectedSignIn("disposable", {
+          email: user.email,
+          provider: account.provider,
+        });
         return false;
       }
 

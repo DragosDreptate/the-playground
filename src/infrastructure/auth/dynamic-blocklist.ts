@@ -10,7 +10,7 @@
  * lock-out global (fail-open).
  *
  * Périmètre des entrées dynamiques (toutes appliquées à TOUS les providers,
- * magic link ET OAuth, via `isBlockedSignIn`) :
+ * magic link ET OAuth, via `checkBlockedSignIn`) :
  *  - `emails`   : adresses exactes
  *  - `oauthIds` : `providerAccountId`
  *  - `domains`  : domaines (suffix-walk, couvre les sous-domaines)
@@ -98,35 +98,46 @@ async function readDynamic(): Promise<DynamicBlocklist> {
 }
 
 /**
- * Matching pur de l'identité (email + OAuth id) contre la surcouche dynamique.
- * Le matching domaine n'est PAS traité ici (délégué à `matchesDomainSuffix`).
- * Testable sans IO.
+ * Quelle liste a provoqué le blocage. Sert à journaliser un rejet de façon
+ * actionnable (la notif Sentry indique POURQUOI l'acteur est bloqué).
+ *  - `static` : baseline statique du code (`sign-in-blocklist.ts`)
+ *  - `email` / `oauth` / `domain` : surcouche dynamique Edge Config
  */
-export function matchesIdentityBlocklist(
+export type BlockMatch = "static" | "email" | "oauth" | "domain";
+
+/**
+ * Matching pur de l'identité (email + OAuth id) contre la surcouche dynamique,
+ * en renvoyant LAQUELLE a matché (ou `null`). Le matching domaine n'est PAS
+ * traité ici (délégué à `matchesDomainSuffix`). Testable sans IO.
+ */
+export function matchIdentityReason(
   data: DynamicBlocklist,
   identity: { email?: string | null; oauthId?: string | null }
-): boolean {
+): "email" | "oauth" | null {
   const email = identity.email?.trim().toLowerCase();
   if (email && data.emails.some((e) => e.trim().toLowerCase() === email)) {
-    return true;
+    return "email";
   }
   if (identity.oauthId && data.oauthIds.includes(identity.oauthId)) {
-    return true;
+    return "oauth";
   }
-  return false;
+  return null;
 }
 
 /**
  * Bloqué au sign-in (tous providers) : baseline statique OU surcouche dynamique
- * (email, providerAccountId, ou domaine via suffix-walk).
+ * (email, providerAccountId, ou domaine via suffix-walk). Renvoie la raison du
+ * blocage (`BlockMatch`) ou `null` si l'acteur passe. Une seule lecture Edge
+ * Config.
  */
-export async function isBlockedSignIn(
+export async function checkBlockedSignIn(
   email?: string | null,
   oauthId?: string | null
-): Promise<boolean> {
-  if (isStaticBlockedSignIn(email, oauthId)) return true;
+): Promise<BlockMatch | null> {
+  if (isStaticBlockedSignIn(email, oauthId)) return "static";
   const dynamic = await readDynamic();
-  if (matchesIdentityBlocklist(dynamic, { email, oauthId })) return true;
-  if (email && matchesDomainSuffix(email, dynamic.domains)) return true;
-  return false;
+  const identityReason = matchIdentityReason(dynamic, { email, oauthId });
+  if (identityReason) return identityReason;
+  if (email && matchesDomainSuffix(email, dynamic.domains)) return "domain";
+  return null;
 }

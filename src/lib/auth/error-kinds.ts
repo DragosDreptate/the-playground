@@ -20,9 +20,14 @@ const KNOWN_AUTH_ERROR_CODES = new Set([
   "Default",
 ]);
 
+/** Retire l'info après le `:` d'un code Auth.js (« Verification: token expired »). */
+function stripCodePrefix(code: string): string {
+  return code.split(":")[0]?.trim() ?? "";
+}
+
 export function normalizeAuthErrorCode(code: string | null | undefined): string {
   if (!code) return "Unknown";
-  const normalized = code.split(":")[0]?.trim() ?? "";
+  const normalized = stripCodePrefix(code);
   return KNOWN_AUTH_ERROR_CODES.has(normalized) ? normalized : "Unknown";
 }
 
@@ -34,29 +39,75 @@ export function normalizeAuthErrorCode(code: string | null | undefined): string 
  */
 export function classifyAuthError(code: string | null | undefined): AuthErrorKind {
   if (!code) return "unexpected";
-  const normalized = code.split(":")[0]?.trim() ?? "";
-  return EXPECTED_AUTH_ERROR_CODES.has(normalized) ? "expected_user_flow" : "unexpected";
+  return EXPECTED_AUTH_ERROR_CODES.has(stripCodePrefix(code))
+    ? "expected_user_flow"
+    : "unexpected";
 }
 
-// Hash des codes attendus dans l'URL d'erreur @auth/core (ex. "#accessdenied").
-const EXPECTED_AUTHJS_HASHES = new Set(
-  [...EXPECTED_AUTH_ERROR_CODES].map((code) => code.toLowerCase())
+// Reverse-map du hash @auth/core (ex. "#accessdenied") vers le code canonique
+// ("AccessDenied"). Permet de récupérer le vrai code quand `error.name` est
+// minifié dans le bundle de prod (ex. "v") et ne correspond plus au code Auth.js.
+const CANONICAL_CODE_BY_HASH = new Map(
+  [...KNOWN_AUTH_ERROR_CODES].map((code) => [code.toLowerCase(), code])
 );
 
 /**
- * Détecte si un message d'exception correspond à un rejet d'authentification
- * ATTENDU levé par `@auth/core` (ex. « AccessDenied. Read more at
- * https://errors.authjs.dev#accessdenied »).
+ * Récupère le code d'erreur Auth.js canonique depuis le message `@auth/core`
+ * (« … errors.authjs.dev#accessdenied » -> "AccessDenied").
  *
- * Sert au `beforeSend` de Sentry à droper l'exception error-level auto-captée
- * par le SDK sur les routes `/api/auth/*` : ces refus (blocklist, token expiré)
- * sont déjà observés via le `captureMessage` warning de la page `/auth/error`.
- * On supprime le doublon error-level, pas l'observabilité.
+ * Robuste à la minification du bundle de prod, où `error.name` perd sa valeur
+ * (« AccessDenied » devient « v »). Retourne `undefined` si le message ne porte
+ * pas de hash connu — l'appelant retombe alors sur `error.name`.
  */
-export function isExpectedAuthRejectionMessage(
+export function authErrorCodeFromMessage(
   message: string | null | undefined
-): boolean {
-  if (!message) return false;
+): string | undefined {
+  if (!message) return undefined;
   const hash = message.toLowerCase().match(/errors\.authjs\.dev#([a-z]+)/)?.[1];
-  return hash !== undefined && EXPECTED_AUTHJS_HASHES.has(hash);
+  if (!hash) return undefined;
+  // Code canonique si connu (« accessdenied » -> « AccessDenied »), sinon le
+  // hash brut : il identifie quand même précisément l'erreur @auth/core (ex.
+  // « adaptererror » = panne DB) et reste borné au set fini du framework. Sans
+  // ça, ces pannes infra retombaient sur error.name minifié puis « Unknown ».
+  return CANONICAL_CODE_BY_HASH.get(hash) ?? hash;
+}
+
+/**
+ * Code d'erreur effectif pour une exception Auth.js : le code canonique tiré du
+ * message `@auth/core` en priorité (robuste à la minification de `error.name` en
+ * prod), avec repli sur `error.name` puis « Unknown ».
+ *
+ * Centralise le fallback pour qu'il soit testable directement (le callsite ne
+ * réimplémente plus l'ordre de priorité). Le résultat est DÉJÀ borné (code
+ * @auth/core du set fini, ou error.name normalisé) : pas de re-normalisation.
+ */
+export function resolveAuthErrorCode(
+  error: { name?: string | null; message?: string | null } | null | undefined
+): string {
+  // Code du message @auth/core en priorité (fiable, borné). À défaut, on retombe
+  // sur `error.name` en le NORMALISANT : minifié en prod (« v ») ou nom arbitraire
+  // d'une exception non-@auth/core, il retombe sous « Unknown » (cardinalité bornée).
+  return (
+    authErrorCodeFromMessage(error?.message) ??
+    normalizeAuthErrorCode(error?.name)
+  );
+}
+
+/**
+ * Codes dont l'exception auto-captée (SDK ou hook logger.error) est TOUJOURS un
+ * doublon d'une capture délibérée portant l'identité (`reportRejectedSignIn`),
+ * donc à droper même si taggée `context: auth`.
+ *
+ * `AccessDenied` : seul moyen pour `@auth/core` de signaler un refus du callback
+ * signIn (`return false`), et nos deux seuls `return false` (blocklist + domaine
+ * jetable) journalisent l'identité via `reportRejectedSignIn`. Source unique de
+ * vérité ici plutôt qu'un littéral disséminé dans le `beforeSend`.
+ */
+const ALWAYS_DUPLICATE_REJECTION_CODES = new Set(["AccessDenied"]);
+
+/** Le code (issu de `authErrorCodeFromMessage`) est-il un doublon à toujours droper ? */
+export function isAlwaysDuplicateRejectionCode(
+  code: string | null | undefined
+): boolean {
+  return code !== undefined && code !== null && ALWAYS_DUPLICATE_REJECTION_CODES.has(code);
 }
