@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  checkBlockedSignIn,
   coerceBlocklist,
   isBlockedSignIn,
   matchesIdentityBlocklist,
+  matchIdentityReason,
   type DynamicBlocklist,
 } from "@/infrastructure/auth/dynamic-blocklist";
 
@@ -58,6 +60,26 @@ describe("matchesIdentityBlocklist", () => {
         matchesIdentityBlocklist(data, { email: null, oauthId: null })
       ).toBe(false);
     });
+  });
+});
+
+describe("matchIdentityReason", () => {
+  it("should renvoyer 'email' sur correspondance email (prioritaire)", () => {
+    const data = blocklist({ emails: ["a@b.com"], oauthIds: ["x"] });
+    expect(matchIdentityReason(data, { email: "A@B.com", oauthId: "x" })).toBe(
+      "email"
+    );
+  });
+
+  it("should renvoyer 'oauth' quand seul l'oauthId matche", () => {
+    const data = blocklist({ oauthIds: ["x"] });
+    expect(
+      matchIdentityReason(data, { email: "legit@gmail.com", oauthId: "x" })
+    ).toBe("oauth");
+  });
+
+  it("should renvoyer null sans correspondance", () => {
+    expect(matchIdentityReason(blocklist(), { email: "a@b.com" })).toBeNull();
   });
 });
 
@@ -152,5 +174,47 @@ describe("isBlockedSignIn", () => {
       getMock.mockResolvedValue({ oauthIds: ["github-999"] });
       expect(await isBlockedSignIn("whoever@gmail.com", "github-999")).toBe(true);
     });
+  });
+});
+
+describe("checkBlockedSignIn", () => {
+  const ORIGINAL_EDGE_CONFIG = process.env.EDGE_CONFIG;
+
+  beforeEach(() => {
+    getMock.mockReset();
+    process.env.EDGE_CONFIG = "edge-config-connection-string";
+  });
+
+  afterEach(() => {
+    if (ORIGINAL_EDGE_CONFIG === undefined) delete process.env.EDGE_CONFIG;
+    else process.env.EDGE_CONFIG = ORIGINAL_EDGE_CONFIG;
+  });
+
+  it("should renvoyer 'static' pour une entrée de la baseline du code", async () => {
+    // Email présent dans sign-in-blocklist.ts (baseline statique).
+    expect(await checkBlockedSignIn("ixewufoy22@gmail.com")).toBe("static");
+    expect(getMock).not.toHaveBeenCalled(); // court-circuite Edge Config
+  });
+
+  it("should renvoyer 'email' pour un email bloqué dynamiquement", async () => {
+    getMock.mockResolvedValue({ emails: ["x@y.com"] });
+    expect(await checkBlockedSignIn("X@Y.com")).toBe("email");
+  });
+
+  it("should renvoyer 'oauth' pour un providerAccountId bloqué", async () => {
+    getMock.mockResolvedValue({ oauthIds: ["github-999"] });
+    expect(await checkBlockedSignIn("whoever@gmail.com", "github-999")).toBe(
+      "oauth"
+    );
+  });
+
+  it("should renvoyer 'domain' pour un domaine bloqué (sous-domaine inclus)", async () => {
+    getMock.mockResolvedValue({ domains: ["evil.com"] });
+    expect(await checkBlockedSignIn("attacker@sub.evil.com")).toBe("domain");
+  });
+
+  it("should renvoyer null pour un acteur non bloqué", async () => {
+    getMock.mockResolvedValue({ emails: ["someone@evil.test"] });
+    expect(await checkBlockedSignIn("legit@gmail.com", "42")).toBeNull();
   });
 });

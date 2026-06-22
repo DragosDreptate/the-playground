@@ -20,7 +20,7 @@ import {
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
-import { isBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
+import { checkBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
 import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
@@ -185,7 +185,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async signIn({ user, account, profile }) {
       // Anti-abus : refuse la connexion des acteurs malveillants connus
       // (identité OAuth ou email blocklistés), avant toute autre logique.
-      if (await isBlockedSignIn(user.email, account?.providerAccountId)) {
+      const blockMatch = await checkBlockedSignIn(
+        user.email,
+        account?.providerAccountId
+      );
+      if (blockMatch) {
+        // Capture délibérée AVANT le `return false`. L'AccessDenied qui en
+        // découle est anonyme (le hook `logger.error` ne reçoit que l'Error,
+        // sans identité). On journalise donc ICI qui est bloqué et pourquoi,
+        // dans le titre + les tags (les seuls champs que les notifs Sentry
+        // affichent), pour éviter d'aller fouiller les logs. Niveau warning :
+        // déclenche la règle « new issue » (notif email/Slack) sans repasser
+        // en high-priority. Tag `context: auth` => conservé par le beforeSend.
+        Sentry.captureMessage(
+          `auth: tentative bloquée — ${user.email ?? "(sans email)"} [${blockMatch}]`,
+          {
+            level: "warning",
+            tags: {
+              context: "auth",
+              auth_event: "sign_in_blocked",
+              blocked_match: blockMatch,
+              email_domain: user.email?.split("@")[1] ?? "unknown",
+              provider: account?.provider ?? "unknown",
+            },
+            extra: {
+              blocked_email: user.email ?? null,
+              provider_account_id: account?.providerAccountId ?? null,
+              ...(await getRequestObservability()),
+            },
+          }
+        );
         return false;
       }
 
