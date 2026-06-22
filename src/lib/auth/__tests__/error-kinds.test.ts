@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { classifyAuthError, normalizeAuthErrorCode } from "@/lib/auth/error-kinds";
+import {
+  classifyAuthError,
+  isExpectedAuthRejectionMessage,
+  normalizeAuthErrorCode,
+} from "@/lib/auth/error-kinds";
 
 describe("classifyAuthError", () => {
   describe("given a code that occurs in normal user flows", () => {
@@ -74,6 +78,34 @@ describe("normalizeAuthErrorCode", () => {
 
     it("should return Unknown for undefined", () => {
       expect(normalizeAuthErrorCode(undefined)).toBe("Unknown");
+    });
+  });
+});
+
+describe("isExpectedAuthRejectionMessage", () => {
+  describe("given un message d'exception @auth/core d'un rejet attendu", () => {
+    it.each([
+      "AccessDenied. Read more at https://errors.authjs.dev#accessdenied",
+      "Verification. Read more at https://errors.authjs.dev#verification",
+      "Read more at HTTPS://ERRORS.AUTHJS.DEV#ACCESSDENIED", // insensible à la casse
+    ])("should reconnaître %s", (message) => {
+      expect(isExpectedAuthRejectionMessage(message)).toBe(true);
+    });
+  });
+
+  describe("given un message d'erreur non attendu ou hors auth", () => {
+    it.each([
+      "Configuration. Read more at https://errors.authjs.dev#configuration",
+      "OAuthCallbackError. Read more at https://errors.authjs.dev#oauthcallbackerror",
+      "TypeError: cannot read properties of undefined",
+      "Database connection failed",
+      "",
+    ])("should ne pas reconnaître %s", (message) => {
+      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
+    });
+
+    it.each([null, undefined])("should gérer %s sans lever", (message) => {
+      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
     });
   });
 });
