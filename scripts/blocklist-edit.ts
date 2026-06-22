@@ -18,12 +18,16 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
+import {
+  coerceBlocklist,
+  SIGN_IN_BLOCKLIST_KEY,
+  type DynamicBlocklist,
+} from "@/infrastructure/auth/dynamic-blocklist";
+
 // Store Edge Config de production (partagé avec le mode maintenance, issue #545).
 const DEFAULT_EDGE_CONFIG_ID = "ecfg_290ik5kuib6seqd7pz7hkoibuhaf";
-const EDGE_KEY = "signInBlocklist";
 
-type Blocklist = { emails: string[]; oauthIds: string[]; domains: string[] };
-type Category = keyof Blocklist;
+type Category = keyof DynamicBlocklist;
 
 const action = process.argv[2];
 if (!action || !["add", "remove", "list"].includes(action)) {
@@ -44,7 +48,7 @@ const teamQuery = process.env.VERCEL_TEAM_ID
 const base = `https://api.vercel.com/v1/edge-config/${edgeConfigId}`;
 const authHeaders = { Authorization: `Bearer ${token}` };
 
-const EMPTY: Blocklist = { emails: [], oauthIds: [], domains: [] };
+const normalize = (s: string) => s.trim().toLowerCase();
 
 /** `domain:x` → ["domains","x"], `oauth:x` → ["oauthIds","x"], sinon email. */
 function parseTarget(raw: string): { category: Category; value: string } {
@@ -58,31 +62,26 @@ function parseTarget(raw: string): { category: Category; value: string } {
   return { category: "emails", value: normalize(target) };
 }
 
-const normalize = (s: string) => s.trim().toLowerCase();
-
-async function readBlocklist(): Promise<Blocklist> {
-  const res = await fetch(`${base}/item/${EDGE_KEY}${teamQuery}`, {
+async function readBlocklist(): Promise<DynamicBlocklist> {
+  const res = await fetch(`${base}/item/${SIGN_IN_BLOCKLIST_KEY}${teamQuery}`, {
     headers: authHeaders,
   });
-  if (res.status === 404) return { ...EMPTY };
+  if (res.status === 404) return coerceBlocklist(undefined);
   if (!res.ok) {
     throw new Error(`Lecture échouée (${res.status}) : ${await res.text()}`);
   }
-  const data = (await res.json()) as { value?: Partial<Blocklist> };
-  const v = data.value ?? {};
-  return {
-    emails: v.emails ?? [],
-    oauthIds: v.oauthIds ?? [],
-    domains: v.domains ?? [],
-  };
+  const data = (await res.json()) as { value?: unknown };
+  // Même coercion que le runtime : tolère une valeur éditée à la main /
+  // corrompue (non-array, éléments non-string) sans crasher.
+  return coerceBlocklist(data.value);
 }
 
-async function writeBlocklist(value: Blocklist): Promise<void> {
+async function writeBlocklist(value: DynamicBlocklist): Promise<void> {
   const res = await fetch(`${base}/items${teamQuery}`, {
     method: "PATCH",
     headers: { ...authHeaders, "Content-Type": "application/json" },
     body: JSON.stringify({
-      items: [{ operation: "upsert", key: EDGE_KEY, value }],
+      items: [{ operation: "upsert", key: SIGN_IN_BLOCKLIST_KEY, value }],
     }),
   });
   if (!res.ok) {
@@ -90,7 +89,7 @@ async function writeBlocklist(value: Blocklist): Promise<void> {
   }
 }
 
-function printBlocklist(b: Blocklist): void {
+function printBlocklist(b: DynamicBlocklist): void {
   const fmt = (xs: string[]) => (xs.length ? xs.join(", ") : "—");
   console.log("📋 Blocklist dynamique (Edge Config) :");
   console.log(`   emails   : ${fmt(b.emails)}`);
@@ -114,6 +113,14 @@ async function main() {
   const { category, value } = parseTarget(targetArg);
   if (!value) {
     console.error("❌ Cible vide après normalisation.");
+    process.exit(1);
+  }
+  // Le suffix-walk runtime ne matche jamais un domaine d'un seul label : un
+  // tel blocage serait silencieusement inerte. On le refuse explicitement.
+  if (category === "domains" && value.split(".").length < 2) {
+    console.error(
+      `❌ Domaine invalide « ${value} » : au moins 2 labels requis (ex. evil.com).`
+    );
     process.exit(1);
   }
 

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   isDisposableEmailDomain,
-  isDisposableEmailDomainWith,
+  matchesDomainSuffix,
 } from "@/lib/email/disposable-domains";
 
 describe("isDisposableEmailDomain", () => {
@@ -45,28 +45,33 @@ describe("isDisposableEmailDomain", () => {
   });
 });
 
-describe("isDisposableEmailDomainWith", () => {
-  const extras = ["evil-temp.test", "Throwaway.IO"];
+describe("matchesDomainSuffix", () => {
+  const domains = ["evil-temp.test", "Throwaway.IO"]; // casse mélangée volontaire
 
-  describe("given un domaine dynamique supplémentaire", () => {
+  describe("given un email dont le domaine figure dans l'ensemble", () => {
     it.each([
-      "user@evil-temp.test", // domaine exact ajouté dynamiquement
+      "user@evil-temp.test", // domaine exact
       "user@sub.evil-temp.test", // sous-domaine via suffix-walk
-      "USER@THROWAWAY.IO", // normalisation casse de la surcouche
-    ])("should flag %s as disposable", (email) => {
-      expect(isDisposableEmailDomainWith(email, extras)).toBe(true);
+      "USER@THROWAWAY.IO", // normalisation casse des deux côtés
+      "user@throwaway.io.", // forme FQDN (point final)
+    ])("should match %s", (email) => {
+      expect(matchesDomainSuffix(email, domains)).toBe(true);
     });
   });
 
-  describe("given la baseline statique", () => {
-    it("should rester active même avec une surcouche vide", () => {
-      expect(isDisposableEmailDomainWith("user@ibymail.com", [])).toBe(true);
-    });
+  describe("given un email hors de l'ensemble", () => {
+    it.each(["user@gmail.com", "user@evil-temp.com"])(
+      "should not match %s",
+      (email) => {
+        expect(matchesDomainSuffix(email, domains)).toBe(false);
+      }
+    );
   });
 
-  describe("given un domaine légitime hors surcouche", () => {
-    it("should ne pas flaguer", () => {
-      expect(isDisposableEmailDomainWith("user@gmail.com", extras)).toBe(false);
+  describe("given un ensemble vide ou un email malformé", () => {
+    it("should ne jamais matcher", () => {
+      expect(matchesDomainSuffix("user@evil-temp.test", [])).toBe(false);
+      expect(matchesDomainSuffix("not-an-email", domains)).toBe(false);
     });
   });
 });

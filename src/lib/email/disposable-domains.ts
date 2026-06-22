@@ -34,54 +34,61 @@ const DISPOSABLE_DOMAINS = new Set<string>([
   ...CUSTOM_DISPOSABLE_DOMAINS,
 ]);
 
+/** Normalise un domaine : minuscules, trim, sans point final FQDN. */
+export function normalizeDomain(domain: string): string {
+  return domain.trim().toLowerCase().replace(/\.+$/, "");
+}
+
 /** Extrait le domaine normalisé (minuscules, sans point final FQDN) d'un email. */
 export function extractDomain(email: string): string | null {
   const at = email.lastIndexOf("@");
   if (at === -1) return null;
-  const domain = email
-    .slice(at + 1)
-    .trim()
-    .toLowerCase()
-    .replace(/\.+$/, ""); // retire le point final (forme FQDN : "ibymail.com.")
+  const domain = normalizeDomain(email.slice(at + 1));
   return domain || null;
 }
 
 /**
- * Variante de `isDisposableEmailDomain` qui ajoute des domaines supplémentaires
- * (ex. surcouche dynamique Edge Config) au même suffix-walk que la baseline
- * statique. Garde toute la logique de matching domaine au même endroit.
- *
- * `extraDomains` est normalisé (minuscules, trim) ; le suffix-walk couvre donc
- * aussi leurs sous-domaines.
+ * Suffixes parents d'un domaine (>= 2 labels), pour matcher aussi les
+ * sous-domaines distribués par les providers (ex. `mail.mailinator.com`,
+ * `x.ibymail.com`). N'inclut jamais un TLD seul.
  */
-export function isDisposableEmailDomainWith(
-  email: string,
-  extraDomains: Iterable<string>
-): boolean {
-  const domain = extractDomain(email);
-  if (domain === null) return false;
-  const extras = new Set<string>();
-  for (const d of extraDomains) {
-    const norm = d.trim().toLowerCase().replace(/\.+$/, "");
-    if (norm) extras.add(norm);
-  }
+function domainSuffixes(domain: string): string[] {
   const labels = domain.split(".");
-  // i s'arrête à length-2 pour ne jamais tester un TLD seul.
+  const suffixes: string[] = [];
   for (let i = 0; i + 2 <= labels.length; i++) {
-    const suffix = labels.slice(i).join(".");
-    if (DISPOSABLE_DOMAINS.has(suffix) || extras.has(suffix)) return true;
+    suffixes.push(labels.slice(i).join("."));
   }
-  return false;
+  return suffixes;
 }
 
 /**
- * Retourne true si l'email appartient à un domaine jetable connu.
- *
- * Teste le domaine ET ses suffixes parents (>= 2 labels), pour bloquer aussi
- * les sous-domaines distribués par les providers jetables (ex.
- * `mail.mailinator.com`, `x.ibymail.com`). Insensible à la casse. Renvoie false
- * si l'email est malformé (pas de `@`).
+ * Retourne true si le domaine de l'email (ou un de ses suffixes parents) figure
+ * dans `domains`. Insensible à la casse. `domains` est normalisé à chaque appel
+ * (prévu pour de petits ensembles, ex. la surcouche dynamique Edge Config).
+ * Renvoie false si l'email est malformé (pas de `@`).
+ */
+export function matchesDomainSuffix(
+  email: string,
+  domains: Iterable<string>
+): boolean {
+  const domain = extractDomain(email);
+  if (domain === null) return false;
+  const set = new Set<string>();
+  for (const d of domains) {
+    const norm = normalizeDomain(d);
+    if (norm) set.add(norm);
+  }
+  if (set.size === 0) return false;
+  return domainSuffixes(domain).some((suffix) => set.has(suffix));
+}
+
+/**
+ * Retourne true si l'email appartient à un domaine jetable connu (liste
+ * statique de ~120k domaines + blocklist custom). Insensible à la casse, couvre
+ * les sous-domaines. Renvoie false si l'email est malformé (pas de `@`).
  */
 export function isDisposableEmailDomain(email: string): boolean {
-  return isDisposableEmailDomainWith(email, []);
+  const domain = extractDomain(email);
+  if (domain === null) return false;
+  return domainSuffixes(domain).some((suffix) => DISPOSABLE_DOMAINS.has(suffix));
 }

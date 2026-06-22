@@ -16,10 +16,8 @@ import { classifyAuthError } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
-import {
-  isBlockedSignIn,
-  isDisposableEmailDomain,
-} from "@/infrastructure/auth/dynamic-blocklist";
+import { isBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
+import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -189,7 +187,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (
         account?.provider === "resend" &&
         user.email &&
-        (await isDisposableEmailDomain(user.email))
+        isDisposableEmailDomain(user.email)
       ) {
         return false;
       }
