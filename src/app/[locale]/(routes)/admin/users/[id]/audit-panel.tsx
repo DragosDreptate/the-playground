@@ -171,10 +171,7 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
         label={t("blockAccount")}
         confirmTitle={t("confirmAccountTitle")}
         confirmDescription={t("confirmAccountDesc")}
-        targets={{
-          emails: [targets.email],
-          oauthIds: targets.oauthId ? [targets.oauthId] : [],
-        }}
+        targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
       />
       {targets.domain && (
         <BlockButton

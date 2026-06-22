@@ -31,7 +31,8 @@ export type BlockTargets = {
 export type BlockResult = "blocked" | "skipped" | "failed";
 
 function mergeUnique(existing: string[], add: string[]): string[] {
-  return Array.from(new Set([...existing, ...add]));
+  // Ignore les cibles vides/blanches (sinon on écrirait "" dans la blocklist).
+  return Array.from(new Set([...existing, ...add.filter((s) => s.length > 0)]));
 }
 
 /**

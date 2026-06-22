@@ -79,7 +79,7 @@ export type AuditReport = {
 export type AuditTargets = {
   email: string | null;
   domain: string | null;
-  oauthId: string | null;
+  oauthIds: string[]; // tous les providers liés, pas seulement le premier
   alreadyBlocked: boolean;
 };
 

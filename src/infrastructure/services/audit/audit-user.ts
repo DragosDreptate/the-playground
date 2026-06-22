@@ -13,17 +13,19 @@ import type {
 const NO_TARGETS: AuditTargets = {
   email: null,
   domain: null,
-  oauthId: null,
+  oauthIds: [],
   alreadyBlocked: false,
 };
 
 /** Cibles de blocage déduites du dossier (le blocage reste une action humaine). */
 function targetsFromDossier(dossier: AuditDossier): AuditTargets {
   if (!dossier.found || !dossier.account) return NO_TARGETS;
+  const domain = dossier.derived?.emailDomain;
   return {
     email: dossier.account.email,
-    domain: dossier.derived?.emailDomain ?? null,
-    oauthId: dossier.account.providers[0]?.providerAccountId ?? null,
+    // null si pas de vrai domaine ("unknown" ne doit pas devenir une cible).
+    domain: domain && domain !== "unknown" ? domain : null,
+    oauthIds: dossier.account.providers.map((p) => p.providerAccountId),
     alreadyBlocked: dossier.derived?.blocked ?? false,
   };
 }
@@ -138,37 +140,47 @@ export async function auditUser(identifier: string): Promise<AuditOutcome> {
     };
   }
 
-  const client = new Anthropic({ apiKey });
-  const resp = await client.messages.create({
-    model: AUDIT_MODEL,
-    max_tokens: 1500,
-    messages: [{ role: "user", content: buildAuditPrompt(dossier) }],
-  });
+  try {
+    const client = new Anthropic({ apiKey });
+    const resp = await client.messages.create({
+      model: AUDIT_MODEL,
+      max_tokens: 3000, // marge pour le thinking adaptatif + le rapport
+      thinking: { type: "adaptive" },
+      messages: [{ role: "user", content: buildAuditPrompt(dossier) }],
+    });
 
-  const tb = resp.content.find(
-    (b): b is Anthropic.Messages.TextBlock => b.type === "text"
-  );
-  const parsed = tb ? parseAuditReport(tb.text) : null;
-  if (!parsed) {
+    const tb = resp.content.find(
+      (b): b is Anthropic.Messages.TextBlock => b.type === "text"
+    );
+    const parsed = tb ? parseAuditReport(tb.text) : null;
+    if (!parsed) {
+      return {
+        targets,
+        report: fallbackReport(
+          dossier,
+          "le LLM n'a pas renvoyé un rapport exploitable"
+        ),
+      };
+    }
+
     return {
       targets,
-      report: fallbackReport(
-        dossier,
-        "le LLM n'a pas renvoyé un rapport exploitable"
-      ),
+      report: {
+        found: true,
+        ...parsed,
+        usage: {
+          inputTokens: resp.usage.input_tokens,
+          outputTokens: resp.usage.output_tokens,
+          model: AUDIT_MODEL,
+        },
+      },
+    };
+  } catch {
+    // Refus, 429, panne réseau, modèle 404… : on préserve le dossier
+    // déterministe plutôt que de remonter une erreur opaque à l'admin.
+    return {
+      targets,
+      report: fallbackReport(dossier, "erreur lors de l'appel au modèle"),
     };
   }
-
-  return {
-    targets,
-    report: {
-      found: true,
-      ...parsed,
-      usage: {
-        inputTokens: resp.usage.input_tokens,
-        outputTokens: resp.usage.output_tokens,
-        model: AUDIT_MODEL,
-      },
-    },
-  };
 }

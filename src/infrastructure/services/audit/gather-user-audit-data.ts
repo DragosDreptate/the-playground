@@ -33,8 +33,6 @@ function nameAllCaps(first: string | null, last: string | null): boolean {
   return letters === letters.toUpperCase() && letters !== letters.toLowerCase();
 }
 
-const SERVER_GEOIP_CITY = "Frankfurt am Main"; // geoip server-side (Vercel), à exclure
-
 /** Collecte le dossier d'audit d'un compte (DB + PostHog + signaux dérivés). */
 export async function gatherUserAuditData(
   identifier: string
@@ -67,27 +65,30 @@ export async function gatherUserAuditData(
 
   const providerAccountId = user.accounts[0]?.providerAccountId;
   const emailDomain = extractDomain(user.email) ?? "unknown";
-
-  // Signaux dérivés (déterministes).
   const localpart = user.email.split("@")[0] ?? "";
-  const blocked =
-    (await checkBlockedSignIn(user.email, providerAccountId)) !== null;
 
-  // Comportemental PostHog (best-effort).
   const idLit = hogqlString(user.id);
   const emailLit = hogqlString(user.email);
   const where = `(distinct_id = '${idLit}' OR person.properties.email = '${emailLit}')`;
 
-  const cityRows = (await queryPostHog(
-    `SELECT properties.$geoip_city_name AS city, count() AS n FROM events WHERE ${where} AND properties.$geoip_city_name IS NOT NULL GROUP BY city ORDER BY n DESC LIMIT 20`
-  )) as [string, number][];
-  const overall = (await queryPostHog(
-    `SELECT min(timestamp) AS first, max(timestamp) AS last, count() AS n, any(properties.referer) AS referer FROM events WHERE ${where}`
-  )) as [string | null, string | null, number, string | null][];
+  // Ces 3 I/O ne dépendent que du `user` déjà chargé → en parallèle
+  // (latence = max d'un round-trip, pas la somme).
+  const [blockedReason, cityRows, overall] = await Promise.all([
+    checkBlockedSignIn(user.email, providerAccountId),
+    // Géoloc depuis les events CLIENT uniquement ($pageview) : les events
+    // serveur (auth_sign_in) portent le geoip du serveur Vercel, pas le client.
+    queryPostHog(
+      `SELECT properties.$geoip_city_name AS city, count() AS n FROM events WHERE ${where} AND event = '$pageview' AND properties.$geoip_city_name IS NOT NULL GROUP BY city ORDER BY n DESC LIMIT 20`
+    ) as Promise<[string, number][]>,
+    queryPostHog(
+      `SELECT min(timestamp) AS first, max(timestamp) AS last, count() AS n, any(properties.referer) AS referer FROM events WHERE ${where}`
+    ) as Promise<[string | null, string | null, number, string | null][]>,
+  ]);
+  const blocked = blockedReason !== null;
 
   const clientCities = cityRows
-    .map((r) => r[0])
-    .filter((c): c is string => !!c && c !== SERVER_GEOIP_CITY);
+    .filter((r): r is [string, number] => Array.isArray(r) && !!r[0])
+    .map((r) => r[0]);
   const [first, last, eventCount, referer] = overall[0] ?? [null, null, 0, null];
 
   return {
