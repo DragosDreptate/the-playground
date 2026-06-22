@@ -28,9 +28,14 @@ function targetsFromDossier(dossier: AuditDossier): AuditTargets {
   };
 }
 
-// Modèle par défaut Opus (meilleure finesse de jugement ; ~23 ¢/audit, négligeable
-// au volume manuel admin). Configurable par env AUDIT_MODEL.
-const AUDIT_MODEL = process.env.AUDIT_MODEL ?? "claude-opus-4-8";
+// Modèle par défaut selon l'environnement : Opus en prod (meilleure finesse,
+// ~23 ¢/audit, négligeable au volume manuel) ; Sonnet en dev/staging/local
+// (~5 ¢, pour ne pas payer Opus en test). Override explicite via AUDIT_MODEL.
+const AUDIT_MODEL =
+  process.env.AUDIT_MODEL ??
+  (process.env.VERCEL_ENV === "production"
+    ? "claude-opus-4-8"
+    : "claude-sonnet-4-6");
 
 const VERDICTS: AuditVerdictLean[] = [
   "likely_legit",
