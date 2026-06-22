@@ -1,4 +1,5 @@
 import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "../sentry/analysis-meta";
+import type { AuditReport, AuditVerdictLean } from "../audit/types";
 
 const ADMIN_WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
 // Canal dédié aux erreurs Sentry (#sentry). Si non configuré, les notifs Sentry
@@ -275,4 +276,39 @@ export async function notifySlackSentryIssue(params: {
     },
     SENTRY_WEBHOOK_URL || ADMIN_WEBHOOK_URL,
   );
+}
+
+const AUDIT_VERDICT_META: Record<
+  AuditVerdictLean,
+  { emoji: string; label: string }
+> = {
+  likely_legit: { emoji: "🟢", label: "Plutôt légitime" },
+  ambiguous: { emoji: "🟠", label: "Ambigu" },
+  likely_spam: { emoji: "🔴", label: "Plutôt spam" },
+};
+
+/** Pousse un rapport d'audit de compte (`/audit-user`) sur #admin. */
+export async function notifySlackAuditReport(params: {
+  report: AuditReport;
+  email: string;
+  adminUrl: string;
+}): Promise<void> {
+  const { report, email, adminUrl } = params;
+  const meta = AUDIT_VERDICT_META[report.verdictLean];
+  const list = (items: string[]) =>
+    items.length ? items.map((s) => `• ${s}`).join("\n") : "—";
+
+  await sendSlack({
+    text: `${meta.emoji} Audit compte — ${email} (${meta.label})`,
+    blocks: [
+      { type: "header", text: { type: "plain_text", text: `${meta.emoji} Audit compte — ${meta.label}`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: `*${email}*\n${report.identitySummary}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Contenu*\n${report.contentSummary || "—"}` } },
+      { type: "divider" },
+      { type: "section", text: { type: "mrkdwn", text: `*À charge*\n${list(report.signalsFor)}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*À décharge*\n${list(report.signalsAgainst)}` } },
+      { type: "section", text: { type: "mrkdwn", text: `*Recommandation*\n${report.recommendation}` } },
+      { type: "actions", elements: [{ type: "button", text: { type: "plain_text", text: "Ouvrir la fiche admin" }, url: adminUrl }] },
+    ],
+  });
 }

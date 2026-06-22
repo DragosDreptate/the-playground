@@ -824,6 +824,36 @@
     "loadMore": "Voir plus"
   },
   "Admin": {
+    "audit": {
+      "title": "Audit anti-spam",
+      "run": "Auditer ce compte",
+      "rerun": "Relancer l'audit",
+      "running": "Analyse en cours…",
+      "error": "L'audit a échoué. Réessaie.",
+      "identity": "Identité",
+      "content": "Contenu",
+      "behavior": "Comportement",
+      "for": "À charge",
+      "against": "À décharge",
+      "reco": "Recommandation",
+      "cancel": "Annuler",
+      "confirmBlock": "Bloquer",
+      "blockAccount": "Bloquer ce compte",
+      "blockDomain": "Bloquer le domaine @{domain}",
+      "blockedDone": "Bloqué",
+      "blockFailed": "Échec du blocage",
+      "blockSkipped": "Local : non écrit (prod uniquement)",
+      "alreadyBlocked": "Déjà dans la blocklist",
+      "confirmAccountTitle": "Bloquer ce compte ?",
+      "confirmAccountDesc": "L'email (et l'identité OAuth si présente) sera ajouté à la blocklist. La personne ne pourra plus se connecter. Action réversible via la CLI.",
+      "confirmDomainTitle": "Bloquer le domaine ?",
+      "confirmDomainDesc": "Tout email @{domain} sera bloqué à la connexion. Vérifie que ce n'est PAS un domaine grand public (gmail.com, etc.).",
+      "verdict": {
+        "likely_legit": "Plutôt légitime",
+        "ambiguous": "Ambigu",
+        "likely_spam": "Plutôt spam"
+      }
+    },
     "title": "Administration",
     "dashboard": "Tableau de bord",
     "users": "Utilisateurs",

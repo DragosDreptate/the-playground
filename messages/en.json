@@ -824,6 +824,36 @@
     "loadMore": "Show more"
   },
   "Admin": {
+    "audit": {
+      "title": "Anti-spam audit",
+      "run": "Audit this account",
+      "rerun": "Re-run audit",
+      "running": "Analyzing…",
+      "error": "Audit failed. Try again.",
+      "identity": "Identity",
+      "content": "Content",
+      "behavior": "Behavior",
+      "for": "Against (spam)",
+      "against": "In favor (legit)",
+      "reco": "Recommendation",
+      "cancel": "Cancel",
+      "confirmBlock": "Block",
+      "blockAccount": "Block this account",
+      "blockDomain": "Block domain @{domain}",
+      "blockedDone": "Blocked",
+      "blockFailed": "Block failed",
+      "blockSkipped": "Local: not written (prod only)",
+      "alreadyBlocked": "Already in blocklist",
+      "confirmAccountTitle": "Block this account?",
+      "confirmAccountDesc": "The email (and OAuth identity if any) will be added to the blocklist. This person won't be able to sign in. Reversible via the CLI.",
+      "confirmDomainTitle": "Block this domain?",
+      "confirmDomainDesc": "Any @{domain} email will be blocked at sign-in. Make sure it is NOT a public domain (gmail.com, etc.).",
+      "verdict": {
+        "likely_legit": "Likely legitimate",
+        "ambiguous": "Ambiguous",
+        "likely_spam": "Likely spam"
+      }
+    },
     "title": "Administration",
     "dashboard": "Dashboard",
     "users": "Users",
