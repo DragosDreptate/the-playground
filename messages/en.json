@@ -824,6 +824,24 @@
     "loadMore": "Show more"
   },
   "Admin": {
+    "audit": {
+      "title": "Anti-spam audit",
+      "run": "Audit this account",
+      "rerun": "Re-run audit",
+      "running": "Analyzing…",
+      "error": "Audit failed. Try again.",
+      "identity": "Identity",
+      "content": "Content",
+      "behavior": "Behavior",
+      "for": "Against (spam)",
+      "against": "In favor (legit)",
+      "reco": "Recommendation",
+      "verdict": {
+        "likely_legit": "Likely legitimate",
+        "ambiguous": "Ambiguous",
+        "likely_spam": "Likely spam"
+      }
+    },
     "title": "Administration",
     "dashboard": "Dashboard",
     "users": "Users",

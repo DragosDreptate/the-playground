@@ -12,6 +12,7 @@ import { buildSentryIssuesSearchUrl } from "@/lib/sentry-url";
 import { buildPostHogPersonUrl } from "@/lib/posthog-url";
 import type { CircleMemberRole } from "@/domain/models/circle";
 import { AdminUserDeleteButton } from "./delete-button";
+import { AdminUserAuditPanel } from "./audit-panel";
 
 const ROLE_I18N_KEY: Record<CircleMemberRole, "host" | "coHost" | "player"> = {
   HOST: "host",
@@ -157,6 +158,8 @@ export default async function AdminUserDetailPage({ params }: Props) {
           </div>
         </CardContent>
       </Card>
+
+      <AdminUserAuditPanel userId={user.id} email={user.email} />
 
       <Card>
         <CardHeader>
