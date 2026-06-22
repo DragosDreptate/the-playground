@@ -20,7 +20,10 @@ import {
   checkBlockedSignIn,
   type BlockMatch,
 } from "@/infrastructure/auth/dynamic-blocklist";
-import { isDisposableEmailDomain } from "@/lib/email/disposable-domains";
+import {
+  extractDomain,
+  isDisposableEmailDomain,
+} from "@/lib/email/disposable-domains";
 
 // Validité du magic link. On le rend volontairement court (vs 24h par défaut
 // Auth.js) parce que le token est désormais réutilisable pendant cette fenêtre,
@@ -71,7 +74,10 @@ async function reportRejectedSignIn(
     provider?: string | null;
   }
 ) {
-  const emailDomain = identity.email?.split("@")[1] || "unknown";
+  // Domaine normalisé (minuscules, sans point FQDN) : sinon « Evil.COM » et
+  // « evil.com » fingerprinteraient en 2 issues distinctes => avalanche.
+  const emailDomain =
+    (identity.email ? extractDomain(identity.email) : null) ?? "unknown";
   Sentry.captureMessage(`auth: connexion bloquée [${reason}] ${emailDomain}`, {
     level: "warning",
     fingerprint: ["auth-sign-in-blocked", reason, emailDomain],

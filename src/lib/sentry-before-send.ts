@@ -2,7 +2,8 @@ import type { ErrorEvent } from "@sentry/nextjs";
 
 import {
   authErrorCodeFromMessage,
-  isExpectedAuthRejectionMessage,
+  classifyAuthError,
+  isAlwaysDuplicateRejectionCode,
 } from "@/lib/auth/error-kinds";
 
 /** Tag posé par NOS captures d'auth délibérées (logger auth + page /auth/error). */
@@ -38,22 +39,22 @@ const DELIBERATE_AUTH_CONTEXT = "auth";
 export function dropExpectedAuthRejections(
   event: ErrorEvent
 ): ErrorEvent | null {
-  const values = event.exception?.values;
+  // Code @auth/core de chaque exception, calculé UNE fois (hot path : ce hook
+  // tourne sur chaque erreur captée, en majorité non-auth).
+  const codes = event.exception?.values?.map((v) =>
+    authErrorCodeFromMessage(v.value)
+  );
 
   // (1) Exception AccessDenied (SDK ou logger.error) → doublon du captureMessage
-  // délibéré de rejet. Dropée quel que soit le tag.
-  if (
-    values?.some((v) => authErrorCodeFromMessage(v.value) === "AccessDenied")
-  ) {
-    return null;
-  }
+  // délibéré de rejet (avec identité). Dropée quel que soit le tag.
+  if (codes?.some(isAlwaysDuplicateRejectionCode)) return null;
 
   // (2) Capture délibérée (taggée context=auth) → conservée : captureMessage de
   // rejet/erreur-page et Verification context=auth (signal d'abus).
   if (event.tags?.context === DELIBERATE_AUTH_CONTEXT) return event;
 
   // (3) Autre rejet attendu auto-capté par le SDK (Verification sans tag) → doublon.
-  if (values?.some((value) => isExpectedAuthRejectionMessage(value.value))) {
+  if (codes?.some((c) => classifyAuthError(c) === "expected_user_flow")) {
     return null;
   }
   return event;

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   authErrorCodeFromMessage,
   classifyAuthError,
-  isExpectedAuthRejectionMessage,
+  isAlwaysDuplicateRejectionCode,
   normalizeAuthErrorCode,
   resolveAuthErrorCode,
 } from "@/lib/auth/error-kinds";
@@ -167,30 +167,15 @@ describe("resolveAuthErrorCode", () => {
   );
 });
 
-describe("isExpectedAuthRejectionMessage", () => {
-  describe("given un message d'exception @auth/core d'un rejet attendu", () => {
-    it.each([
-      "AccessDenied. Read more at https://errors.authjs.dev#accessdenied",
-      "Verification. Read more at https://errors.authjs.dev#verification",
-      "Read more at HTTPS://ERRORS.AUTHJS.DEV#ACCESSDENIED", // insensible à la casse
-    ])("should reconnaître %s", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(true);
-    });
+describe("isAlwaysDuplicateRejectionCode", () => {
+  it("should reconnaître AccessDenied (doublon d'une capture délibérée)", () => {
+    expect(isAlwaysDuplicateRejectionCode("AccessDenied")).toBe(true);
   });
 
-  describe("given un message d'erreur non attendu ou hors auth", () => {
-    it.each([
-      "Configuration. Read more at https://errors.authjs.dev#configuration",
-      "OAuthCallbackError. Read more at https://errors.authjs.dev#oauthcallbackerror",
-      "TypeError: cannot read properties of undefined",
-      "Database connection failed",
-      "",
-    ])("should ne pas reconnaître %s", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
-    });
-
-    it.each([null, undefined])("should gérer %s sans lever", (message) => {
-      expect(isExpectedAuthRejectionMessage(message)).toBe(false);
-    });
-  });
+  it.each(["Verification", "adaptererror", "Unknown", null, undefined])(
+    "should renvoyer false pour %s",
+    (code) => {
+      expect(isAlwaysDuplicateRejectionCode(code)).toBe(false);
+    }
+  );
 });
