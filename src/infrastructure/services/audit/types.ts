@@ -74,3 +74,16 @@ export type AuditReport = {
   /** Coût réel de l'appel (tokens), pour instrumentation. */
   usage?: { inputTokens: number; outputTokens: number; model: string };
 };
+
+/** Cibles de blocage proposées par l'audit (le blocage reste une action humaine). */
+export type AuditTargets = {
+  email: string | null;
+  domain: string | null;
+  oauthId: string | null;
+  alreadyBlocked: boolean;
+};
+
+export type AuditOutcome = {
+  report: AuditReport;
+  targets: AuditTargets;
+};

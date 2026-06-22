@@ -2,7 +2,31 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { gatherUserAuditData } from "./gather-user-audit-data";
 import { buildAuditPrompt } from "./build-audit-prompt";
-import type { AuditDossier, AuditReport, AuditVerdictLean } from "./types";
+import type {
+  AuditDossier,
+  AuditOutcome,
+  AuditReport,
+  AuditTargets,
+  AuditVerdictLean,
+} from "./types";
+
+const NO_TARGETS: AuditTargets = {
+  email: null,
+  domain: null,
+  oauthId: null,
+  alreadyBlocked: false,
+};
+
+/** Cibles de blocage déduites du dossier (le blocage reste une action humaine). */
+function targetsFromDossier(dossier: AuditDossier): AuditTargets {
+  if (!dossier.found || !dossier.account) return NO_TARGETS;
+  return {
+    email: dossier.account.email,
+    domain: dossier.derived?.emailDomain ?? null,
+    oauthId: dossier.account.providers[0]?.providerAccountId ?? null,
+    alreadyBlocked: dossier.derived?.blocked ?? false,
+  };
+}
 
 // Modèle par défaut Opus (meilleure finesse de jugement ; ~23 ¢/audit, négligeable
 // au volume manuel admin). Configurable par env AUDIT_MODEL.
@@ -77,29 +101,36 @@ function fallbackReport(dossier: AuditDossier, note: string): AuditReport {
 }
 
 /** Audit complet d'un compte : collecte + jugement LLM (mode bouton admin). */
-export async function auditUser(identifier: string): Promise<AuditReport> {
+export async function auditUser(identifier: string): Promise<AuditOutcome> {
   const dossier = await gatherUserAuditData(identifier);
+  const targets = targetsFromDossier(dossier);
 
   if (!dossier.found) {
     return {
-      found: false,
-      identitySummary: `Aucun compte trouvé pour « ${identifier} » (supprimé, ou identifiant inconnu).`,
-      contentSummary: "",
-      behaviorSummary: "",
-      signalsFor: [],
-      signalsAgainst: [],
-      verdictLean: "ambiguous",
-      recommendation:
-        "Compte introuvable en base. Si supprimé : le contenu qui trancherait n'existe plus — auditer AVANT de supprimer la prochaine fois.",
+      targets,
+      report: {
+        found: false,
+        identitySummary: `Aucun compte trouvé pour « ${identifier} » (supprimé, ou identifiant inconnu).`,
+        contentSummary: "",
+        behaviorSummary: "",
+        signalsFor: [],
+        signalsAgainst: [],
+        verdictLean: "ambiguous",
+        recommendation:
+          "Compte introuvable en base. Si supprimé : le contenu qui trancherait n'existe plus, auditer AVANT de supprimer la prochaine fois.",
+      },
     };
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return fallbackReport(
-      dossier,
-      "analyse LLM indisponible (ANTHROPIC_API_KEY manquante)"
-    );
+    return {
+      targets,
+      report: fallbackReport(
+        dossier,
+        "analyse LLM indisponible (ANTHROPIC_API_KEY manquante)"
+      ),
+    };
   }
 
   const client = new Anthropic({ apiKey });
@@ -114,16 +145,25 @@ export async function auditUser(identifier: string): Promise<AuditReport> {
   );
   const parsed = tb ? parseAuditReport(tb.text) : null;
   if (!parsed) {
-    return fallbackReport(dossier, "le LLM n'a pas renvoyé un rapport exploitable");
+    return {
+      targets,
+      report: fallbackReport(
+        dossier,
+        "le LLM n'a pas renvoyé un rapport exploitable"
+      ),
+    };
   }
 
   return {
-    found: true,
-    ...parsed,
-    usage: {
-      inputTokens: resp.usage.input_tokens,
-      outputTokens: resp.usage.output_tokens,
-      model: AUDIT_MODEL,
+    targets,
+    report: {
+      found: true,
+      ...parsed,
+      usage: {
+        inputTokens: resp.usage.input_tokens,
+        outputTokens: resp.usage.output_tokens,
+        model: AUDIT_MODEL,
+      },
     },
   };
 }

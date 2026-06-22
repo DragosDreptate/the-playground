@@ -5,9 +5,23 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { auditUserAction } from "@/app/actions/audit-user";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Ban, ShieldX } from "lucide-react";
+import { auditUserAction, blockSignInAction } from "@/app/actions/audit-user";
+import type { BlockTargets } from "@/infrastructure/services/audit/blocklist-admin";
 import type {
   AuditReport,
+  AuditTargets,
   AuditVerdictLean,
 } from "@/infrastructure/services/audit/types";
 
@@ -54,6 +68,115 @@ function SignalBox({
   );
 }
 
+function BlockButton({
+  label,
+  confirmTitle,
+  confirmDescription,
+  targets,
+}: {
+  label: string;
+  confirmTitle: string;
+  confirmDescription: string;
+  targets: BlockTargets;
+}) {
+  const t = useTranslations("Admin.audit");
+  const [open, setOpen] = useState(false);
+  const [done, setDone] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [pending, start] = useTransition();
+
+  const run = () =>
+    start(async () => {
+      const res = await blockSignInAction(targets);
+      setOpen(false);
+      if (res.ok) setDone(true);
+      else setFailed(true);
+    });
+
+  if (done) {
+    return (
+      <Badge className="bg-red-100 text-red-800 border-transparent">
+        <ShieldX className="mr-1 size-3" />
+        {t("blockedDone")}
+      </Badge>
+    );
+  }
+
+  return (
+    <span className="inline-flex items-center gap-2">
+      {failed && (
+        <span className="text-xs text-destructive">{t("blockFailed")}</span>
+      )}
+      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Ban className="mr-1.5 size-3.5" />
+          {label}
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
+          <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={run}
+            disabled={pending}
+            className="bg-destructive text-white hover:bg-destructive/90"
+          >
+            {t("confirmBlock")}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+      </AlertDialog>
+    </span>
+  );
+}
+
+function BlockActions({ targets }: { targets: AuditTargets }) {
+  const t = useTranslations("Admin.audit");
+  if (!targets.email) return null;
+
+  if (targets.alreadyBlocked) {
+    return (
+      <div className="border-t pt-3">
+        <Badge className="bg-red-100 text-red-800 border-transparent">
+          <ShieldX className="mr-1 size-3" />
+          {t("alreadyBlocked")}
+        </Badge>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+      <BlockButton
+        label={t("blockAccount")}
+        confirmTitle={t("confirmAccountTitle")}
+        confirmDescription={t("confirmAccountDesc")}
+        targets={{
+          emails: [targets.email],
+          oauthIds: targets.oauthId ? [targets.oauthId] : [],
+        }}
+      />
+      {targets.domain && (
+        <BlockButton
+          label={t("blockDomain", { domain: targets.domain })}
+          confirmTitle={t("confirmDomainTitle")}
+          confirmDescription={t("confirmDomainDesc", { domain: targets.domain })}
+          targets={{ domains: [targets.domain] }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function AdminUserAuditPanel({
   userId,
   email,
@@ -64,16 +187,20 @@ export function AdminUserAuditPanel({
   const t = useTranslations("Admin.audit");
   const [pending, start] = useTransition();
   const [report, setReport] = useState<AuditReport | null>(null);
+  const [targets, setTargets] = useState<AuditTargets | null>(null);
   const [failed, setFailed] = useState(false);
 
   const run = () => {
     setFailed(false);
     start(async () => {
       const res = await auditUserAction(userId, email);
-      if (res.ok) setReport(res.report);
-      else {
+      if (res.ok) {
+        setReport(res.report);
+        setTargets(res.targets);
+      } else {
         setFailed(true);
         setReport(null);
+        setTargets(null);
       }
     });
   };
@@ -124,6 +251,7 @@ export function AdminUserAuditPanel({
                 <span className="font-medium">{t("reco")} : </span>
                 {report.recommendation}
               </p>
+              {targets && <BlockActions targets={targets} />}
               {report.usage && (
                 <p className="text-xs text-muted-foreground">
                   {report.usage.model} · {report.usage.inputTokens}+
