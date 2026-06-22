@@ -93,9 +93,43 @@ Canal : **email admin ET Slack** (décision actée).
 4. **Lien avec la suspension réversible** (#533) : l'alerte HIGH pourrait proposer un bouton « suspendre » une fois ce mécanisme en place.
 5. **Mismatch nom OAuth** : nécessite de capturer le nom brut du provider (Google) à la création pour le comparer ; aujourd'hui seul `name` est stocké.
 
+## Mise à jour 22/06/2026 — 2ᵉ menace : le « slop » (création de contenu publicitaire)
+
+Une série de comptes (22/06) a révélé un profil distinct de celui du 14/06 : des acteurs (humains réels OU bots) qui s'inscrivent **uniquement pour créer une Communauté/un événement publicitaire** pointant vers leur produit/site externe. Détail des cas (avec PII) : `spec/security/2026-06-22-bug-notif-publicid-manquants-krishna.md` (local, gitignored).
+
+### Leçon centrale : la mécanique du compte ne discrimine PAS
+
+Un des cas (« krishna ») était un **vrai compte Google**, arrivé **organiquement via recherche Google**, géoloc **stable** (pas de proxy), session de **18 min / 564 frappes** (humain authentique)… et c'était quand même du spam. Tous les signaux « statiques/mécaniques » du scoring actuel le classaient LÉGITIME.
+
+→ **Le discriminant fort du slop est le CONTENU/l'INTENT, pas le compte.** Conséquence directe pour le scoring : un score calculé **uniquement à l'inscription** rate cette menace. Il faut un **3ᵉ moment d'évaluation : à la création d'entité** (Circle / Moment), là où le signal apparaît.
+
+### Signaux « slop » (à la création de Circle/Moment) — fort pouvoir discriminant
+
+| Poids | Signal | Source |
+| --- | --- | --- |
+| Fort | `website` du Circle pointe vers un **site commercial/billetterie externe** (promo produit) | `circles.website` |
+| Fort | Description **machine-translated** / copy SEO / promo (texte recopié à l'identique Circle↔Moment) | `circles.description`, `moments.description` |
+| Moyen | **Vélocité** : compte → Circle → Moment en quelques minutes | timestamps |
+| Moyen | Événement = **annonce publicitaire** (pas un vrai rassemblement) ; catégorie incohérente | `moments` |
+| Moyen | Pousse vers la **visibilité publique** (Circle `PUBLIC`, vérifie l'Explorer juste après) | `visibility`, PostHog |
+| Faible | Champ détourné (ex. `city` rempli d'une adresse complète) | `circles.city` |
+
+### Implications pour l'architecture du scoring
+
+- Ajouter un **hook de scoring à la création d'entité** : usecases `createCircle` / `createMoment` (ou leurs server actions) → re-score + alerte si bande MEDIUM/HIGH. Moment le plus rentable contre le slop.
+- Le usecase pur `assessUserRisk` doit accepter des **signaux de contenu** en plus des signaux compte (extensible).
+- **Fiabilité du déclenchement** : NE PAS faire reposer l'alerte sur un `after()` best-effort seul. Bug observé le 22/06 (`project_bug_notif_publicid_deferred_work`) : le travail différé peut être **droppé silencieusement** sur Vercel → alerte ratée = spam non vu. Prévoir un déclenchement fiable + éventuel cron de réconciliation balayant les nouveaux Circles/Moments non scorés.
+- **Quick win rétroactif** (avant scoring temps réel) : un **cron quotidien** qui flague les Circles publics récents avec `website` externe + description suspecte, et alerte Slack.
+
+### Cas de test à ajouter (jeu de calibrage)
+
+Les 3 comptes du 22/06 (2 magic-link à email jetable/louche + 1 Google OAuth « propre » mais slop) doivent tous scorer MEDIUM/HIGH **une fois le contenu pris en compte**, alors qu'au scoring compte-seul le cas Google scorerait LOW. Test clé : prouver que le scoring contenu rattrape ce que le scoring compte rate.
+
 ## Liens
 
 - Issue backlog : #536
 - Rapport d'incident fondateur : `spec/security/2026-06-14-incident-phishing-organisateurs.md`
+- Cas slop 22/06 (PII, local) : `spec/security/2026-06-22-bug-notif-publicid-manquants-krishna.md`
 - Mécanisme de suspension réversible : issue #533
 - Playbook d'investigation : mémoire `reference_account_investigation`
+- Bug fiabilité travail différé (impacte le déclenchement des alertes) : mémoire `project_bug_notif_publicid_deferred_work`
