@@ -6,6 +6,7 @@ import { getAppUrl } from "@/lib/app-url";
 import { auditUser } from "@/infrastructure/services/audit/audit-user";
 import {
   addToBlocklist,
+  type BlockResult,
   type BlockTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
 import { notifySlackAuditReport } from "@/infrastructure/services/slack/slack-notification-service";
@@ -50,8 +51,8 @@ export async function auditUserAction(
  */
 export async function blockSignInAction(
   targets: BlockTargets
-): Promise<{ ok: boolean }> {
+): Promise<{ status: BlockResult | "unauthorized" }> {
   const session = await auth();
-  if (!isAdminUser(session)) return { ok: false };
-  return { ok: await addToBlocklist(targets) };
+  if (!isAdminUser(session)) return { status: "unauthorized" };
+  return { status: await addToBlocklist(targets) };
 }

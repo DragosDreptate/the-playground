@@ -842,6 +842,7 @@
       "blockDomain": "Block domain @{domain}",
       "blockedDone": "Blocked",
       "blockFailed": "Block failed",
+      "blockSkipped": "Local: not written (prod only)",
       "alreadyBlocked": "Already in blocklist",
       "confirmAccountTitle": "Block this account?",
       "confirmAccountDesc": "The email (and OAuth identity if any) will be added to the blocklist. This person won't be able to sign in. Reversible via the CLI.",

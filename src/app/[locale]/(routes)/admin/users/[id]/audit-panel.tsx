@@ -81,19 +81,25 @@ function BlockButton({
 }) {
   const t = useTranslations("Admin.audit");
   const [open, setOpen] = useState(false);
-  const [done, setDone] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [status, setStatus] = useState<
+    "idle" | "blocked" | "skipped" | "failed"
+  >("idle");
   const [pending, start] = useTransition();
 
   const run = () =>
     start(async () => {
       const res = await blockSignInAction(targets);
       setOpen(false);
-      if (res.ok) setDone(true);
-      else setFailed(true);
+      setStatus(
+        res.status === "blocked"
+          ? "blocked"
+          : res.status === "skipped"
+            ? "skipped"
+            : "failed"
+      );
     });
 
-  if (done) {
+  if (status === "blocked") {
     return (
       <Badge className="bg-red-100 text-red-800 border-transparent">
         <ShieldX className="mr-1 size-3" />
@@ -104,7 +110,12 @@ function BlockButton({
 
   return (
     <span className="inline-flex items-center gap-2">
-      {failed && (
+      {status === "skipped" && (
+        <span className="text-xs text-muted-foreground">
+          {t("blockSkipped")}
+        </span>
+      )}
+      {status === "failed" && (
         <span className="text-xs text-destructive">{t("blockFailed")}</span>
       )}
       <AlertDialog open={open} onOpenChange={setOpen}>

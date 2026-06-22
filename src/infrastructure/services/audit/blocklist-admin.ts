@@ -21,17 +21,32 @@ export type BlockTargets = {
   domains?: string[];
 };
 
+/**
+ * - `blocked` : écrit dans la blocklist prod.
+ * - `skipped` : non écrit car hors production (guard symétrique avec sendSlack /
+ *   safe-resend : l'Edge Config est unique/prod, on ne l'édite pas depuis
+ *   local/preview pour éviter un blocage accidentel d'un vrai compte en test).
+ * - `failed` : token manquant ou erreur d'écriture.
+ */
+export type BlockResult = "blocked" | "skipped" | "failed";
+
 function mergeUnique(existing: string[], add: string[]): string[] {
   return Array.from(new Set([...existing, ...add]));
 }
 
 /**
  * Ajoute les cibles fournies à la blocklist (idempotent, dédupliqué).
- * Renvoie `true` si l'écriture a réussi. `VERCEL_TOKEN` requis.
+ * Écriture en **production uniquement**. `VERCEL_TOKEN` requis.
  */
-export async function addToBlocklist(targets: BlockTargets): Promise<boolean> {
+export async function addToBlocklist(
+  targets: BlockTargets
+): Promise<BlockResult> {
+  if (process.env.VERCEL_ENV !== "production") {
+    console.warn("[non-prod] Blocage ignoré (Edge Config = prod) :", targets);
+    return "skipped";
+  }
   const token = process.env.VERCEL_TOKEN;
-  if (!token) return false;
+  if (!token) return "failed";
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   try {
@@ -41,7 +56,7 @@ export async function addToBlocklist(targets: BlockTargets): Promise<boolean> {
     );
     let current: DynamicBlocklist;
     if (getRes.status === 404) current = coerceBlocklist(undefined);
-    else if (!getRes.ok) return false;
+    else if (!getRes.ok) return "failed";
     else
       current = coerceBlocklist(
         ((await getRes.json()) as { value?: unknown }).value
@@ -71,8 +86,8 @@ export async function addToBlocklist(targets: BlockTargets): Promise<boolean> {
         ],
       }),
     });
-    return patchRes.ok;
+    return patchRes.ok ? "blocked" : "failed";
   } catch {
-    return false;
+    return "failed";
   }
 }
