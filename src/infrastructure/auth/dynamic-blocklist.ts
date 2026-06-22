@@ -60,14 +60,28 @@ export function coerceBlocklist(value: unknown): DynamicBlocklist {
   };
 }
 
-/** `get()` borné par un timeout : un hang Edge Config ne doit pas bloquer l'auth. */
+/**
+ * `get()` borné par un timeout : un hang Edge Config ne doit pas bloquer l'auth.
+ * Le timer est toujours annulé (`finally`) pour ne pas laisser de timer parasite
+ * dans l'event loop à chaque sign-in. Les deux promesses étant passées
+ * directement à `Promise.race`, un rejet tardif de la perdante est consommé par
+ * la souscription de race (pas d'unhandled rejection).
+ */
 async function getWithTimeout(): Promise<unknown> {
-  return Promise.race([
-    get(SIGN_IN_BLOCKLIST_KEY),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("edge-config-timeout")), READ_TIMEOUT_MS)
-    ),
-  ]);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      get(SIGN_IN_BLOCKLIST_KEY),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error("edge-config-timeout")),
+          READ_TIMEOUT_MS
+        );
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 /**

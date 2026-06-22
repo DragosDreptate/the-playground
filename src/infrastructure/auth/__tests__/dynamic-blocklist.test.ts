@@ -116,6 +116,20 @@ describe("isBlockedSignIn", () => {
     });
   });
 
+  describe("given une lecture Edge Config qui hang", () => {
+    it("should fail-open après le timeout (pas de connexion bloquée)", async () => {
+      vi.useFakeTimers();
+      try {
+        getMock.mockReturnValue(new Promise(() => {})); // ne se résout jamais
+        const pending = isBlockedSignIn("legit@gmail.com");
+        await vi.advanceTimersByTimeAsync(800);
+        expect(await pending).toBe(false);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
+
   describe("given un domaine bloqué dynamiquement", () => {
     it("should bloquer quel que soit le provider (OAuth inclus)", async () => {
       getMock.mockResolvedValue({ domains: ["evil.com"] });
