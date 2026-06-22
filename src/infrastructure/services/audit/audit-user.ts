@@ -4,8 +4,9 @@ import { gatherUserAuditData } from "./gather-user-audit-data";
 import { buildAuditPrompt } from "./build-audit-prompt";
 import type { AuditDossier, AuditReport, AuditVerdictLean } from "./types";
 
-// Modèle par défaut Sonnet (sweet spot jugement nuancé), configurable par env.
-const AUDIT_MODEL = process.env.AUDIT_MODEL ?? "claude-sonnet-4-6";
+// Modèle par défaut Opus (meilleure finesse de jugement ; ~23 ¢/audit, négligeable
+// au volume manuel admin). Configurable par env AUDIT_MODEL.
+const AUDIT_MODEL = process.env.AUDIT_MODEL ?? "claude-opus-4-8";
 
 const VERDICTS: AuditVerdictLean[] = [
   "likely_legit",
