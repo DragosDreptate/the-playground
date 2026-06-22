@@ -13,8 +13,9 @@ import { isUploadedUrl } from "@/lib/blob";
 import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-repository";
 import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
 import {
-  authErrorCodeFromMessage,
   classifyAuthError,
+  normalizeAuthErrorCode,
+  resolveAuthErrorCode,
 } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { captureServerEvent } from "@/lib/posthog-server";
@@ -123,10 +124,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       console.error("[AUTH ERROR]", error);
       // `error.name` est minifié dans le bundle de prod (« AccessDenied » -> « v »),
       // ce qui faisait classer des rejets blocklist ATTENDUS en « unexpected »
-      // (fausses alertes error-level). On récupère donc le code canonique depuis
-      // le message @auth/core en priorité, et on retombe sur `error.name` sinon.
-      const code =
-        authErrorCodeFromMessage(error?.message) ?? error?.name ?? "Unknown";
+      // (fausses alertes error-level). resolveAuthErrorCode récupère le code
+      // canonique depuis le message @auth/core en priorité, repli sur error.name.
+      const code = resolveAuthErrorCode(error);
       const kind = classifyAuthError(code);
       // Les erreurs "attendues dans le flow utilisateur" (token expiré,
       // prefetch scanner, refus OAuth) restent capturées mais en niveau
@@ -135,12 +135,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         level: kind === "expected_user_flow" ? "warning" : "error",
         tags: {
           context: "auth",
-          error_code: code,
+          // Tag normalisé pour borner la cardinalité Sentry (un name minifié ou
+          // arbitraire retombe sous « Unknown ») ; le code brut reste en extra.
+          error_code: normalizeAuthErrorCode(code),
           auth_error_kind: kind,
         },
         // Le user-agent distingue un token expiré détonné par un scanner
         // email d'un vrai clic humain tardif (incident réseau d'administration).
-        extra: await getRequestObservability(),
+        extra: { raw_error_code: code, ...(await getRequestObservability()) },
       });
     },
     async warn(code) {

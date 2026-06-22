@@ -4,6 +4,7 @@ import {
   classifyAuthError,
   isExpectedAuthRejectionMessage,
   normalizeAuthErrorCode,
+  resolveAuthErrorCode,
 } from "@/lib/auth/error-kinds";
 
 describe("classifyAuthError", () => {
@@ -110,19 +111,39 @@ describe("authErrorCodeFromMessage", () => {
     });
   });
 
+});
+
+// Exerce le VRAI chemin de résolution utilisé par le logger d'auth.config
+// (pas une réimplémentation du fallback) : un changement d'ordre de priorité
+// dans resolveAuthErrorCode casse ces tests.
+describe("resolveAuthErrorCode", () => {
   // Régression : en prod, `error.name` est minifié (« AccessDenied » -> « v »),
-  // mais le message porte toujours le code canonique. La classification doit
-  // donc s'appuyer sur le message pour éviter les fausses alertes error-level.
-  describe("given un name minifié mais un message canonique (bundle prod)", () => {
-    it("should reclasser un rejet AccessDenied en expected_user_flow", () => {
-      const minifiedName = "v";
-      const message =
-        "AccessDenied. Read more at https://errors.authjs.dev#accessdenied";
-      const code = authErrorCodeFromMessage(message) ?? minifiedName;
-      expect(code).toBe("AccessDenied");
-      expect(classifyAuthError(code)).toBe("expected_user_flow");
-    });
+  // mais le message porte toujours le code canonique. La résolution doit donc
+  // privilégier le message pour éviter les fausses alertes error-level.
+  it("should privilégier le code du message quand error.name est minifié", () => {
+    const error = {
+      name: "v",
+      message:
+        "AccessDenied. Read more at https://errors.authjs.dev#accessdenied",
+    };
+    expect(resolveAuthErrorCode(error)).toBe("AccessDenied");
+    expect(classifyAuthError(resolveAuthErrorCode(error))).toBe(
+      "expected_user_flow"
+    );
   });
+
+  it("should retomber sur error.name si le message ne porte pas de hash connu", () => {
+    const error = { name: "AdapterError", message: "Database connection failed" };
+    expect(resolveAuthErrorCode(error)).toBe("AdapterError");
+    expect(classifyAuthError(resolveAuthErrorCode(error))).toBe("unexpected");
+  });
+
+  it.each([{}, null, undefined])(
+    "should renvoyer Unknown sans name ni message exploitable (%o)",
+    (error) => {
+      expect(resolveAuthErrorCode(error)).toBe("Unknown");
+    }
+  );
 });
 
 describe("isExpectedAuthRejectionMessage", () => {

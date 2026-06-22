@@ -62,6 +62,21 @@ export function authErrorCodeFromMessage(
 }
 
 /**
+ * Code d'erreur effectif pour une exception Auth.js : le code canonique tiré du
+ * message `@auth/core` en priorité (robuste à la minification de `error.name` en
+ * prod), avec repli sur `error.name` puis « Unknown ».
+ *
+ * Centralise le fallback pour qu'il soit testable directement (le callsite ne
+ * réimplémente plus l'ordre de priorité). Le résultat doit encore passer par
+ * `normalizeAuthErrorCode` avant d'alimenter un tag Sentry (cardinalité bornée).
+ */
+export function resolveAuthErrorCode(
+  error: { name?: string | null; message?: string | null } | null | undefined
+): string {
+  return authErrorCodeFromMessage(error?.message) ?? error?.name ?? "Unknown";
+}
+
+/**
  * Détecte si un message d'exception correspond à un rejet d'authentification
  * ATTENDU levé par `@auth/core` (ex. « AccessDenied. Read more at
  * https://errors.authjs.dev#accessdenied »).
