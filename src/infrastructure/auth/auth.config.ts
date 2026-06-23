@@ -16,6 +16,7 @@ import { classifyAuthError, resolveAuthErrorCode } from "@/lib/auth/error-kinds"
 import { getRequestObservability } from "@/lib/auth/request-observability";
 import { after } from "next/server";
 import { captureServerEvent, getPosthogDistinctId } from "@/lib/posthog-server";
+import { resolveBlockedSignInDistinctId } from "@/lib/auth/blocked-sign-in";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
 import {
   checkBlockedSignIn,
@@ -108,12 +109,7 @@ async function reportRejectedSignIn(
     const distinctId = await getPosthogDistinctId();
     after(() =>
       captureServerEvent(
-        // Vrai navigateur → on relie à sa person/parcours via le cookie. Sinon
-        // (bot, hit direct, client PostHog bloqué) on regroupe par DOMAINE, pas
-        // par email : un scanner qui fait tourner les adresses ne crée qu'une
-        // person par domaine (même borne que le fingerprint Sentry), et aucun
-        // email brut ne devient un identifiant.
-        distinctId ?? `blocked:${emailDomain}`,
+        resolveBlockedSignInDistinctId(distinctId, emailDomain),
         "sign_in_blocked",
         {
           blocked_reason: reason,
@@ -259,7 +255,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ...requestContext,
         provider: account?.provider ?? "unknown",
         is_new_user: isNewUser ?? false,
-        email_domain: user.email?.split("@")[1] ?? "unknown",
+        // extractDomain (normalisé) et non split('@') : cohérence avec l'event
+        // sign_in_blocked pour que les breakdowns/funnels croisés par domaine
+        // matchent (sinon « Gmail.com » ≠ « gmail.com » entre les deux events).
+        email_domain: (user.email ? extractDomain(user.email) : null) ?? "unknown",
         // Renseigne l'email/nom sur la person dès le serveur : si le client
         // PostHog est bloqué (ad-blocker, ITP), la person reste retrouvable
         // par email au lieu de devenir un profil anonyme introuvable.
