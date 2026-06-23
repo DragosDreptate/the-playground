@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+import { prisma } from "@/infrastructure/db/prisma";
 import {
   coerceBlocklist,
   SIGN_IN_BLOCKLIST_KEY,
@@ -91,4 +93,53 @@ export async function addToBlocklist(
   } catch {
     return "failed";
   }
+}
+
+/**
+ * Filtre Prisma des users visés par un blocage (email / oauthId / domaine).
+ * Pur et testable. Renvoie `null` si aucune cible exploitable, pour éviter un
+ * `deleteMany` sans `where` qui viderait toutes les sessions.
+ */
+export function buildBlockedUsersFilter(
+  targets: BlockTargets
+): Prisma.UserWhereInput | null {
+  const or: Prisma.UserWhereInput[] = [];
+
+  const emails = (targets.emails ?? []).filter((e) => e.length > 0);
+  if (emails.length) or.push({ email: { in: emails } });
+
+  const oauthIds = (targets.oauthIds ?? []).filter((o) => o.length > 0);
+  if (oauthIds.length) {
+    or.push({ accounts: { some: { providerAccountId: { in: oauthIds } } } });
+  }
+
+  for (const d of targets.domains ?? []) {
+    const dom = normalizeDomain(d);
+    // insensitive : un email stocké « X@Domain.COM » doit matcher « domain.com ».
+    if (dom) or.push({ email: { endsWith: `@${dom}`, mode: "insensitive" } });
+  }
+
+  return or.length ? { OR: or } : null;
+}
+
+/**
+ * Révoque (supprime) les sessions actives des comptes visés par un blocage.
+ * Le blocage seul empêche de **se reconnecter** mais ne tue PAS une session DB
+ * déjà ouverte (la blocklist n'est vérifiée qu'au sign-in) : sans ça, un
+ * spammeur déjà connecté garde l'accès jusqu'à expiration. Renvoie le nombre de
+ * sessions supprimées.
+ */
+export async function revokeSessionsForTargets(
+  targets: BlockTargets
+): Promise<number> {
+  const where = buildBlockedUsersFilter(targets);
+  if (!where) return 0;
+
+  const users = await prisma.user.findMany({ where, select: { id: true } });
+  if (!users.length) return 0;
+
+  const { count } = await prisma.session.deleteMany({
+    where: { userId: { in: users.map((u) => u.id) } },
+  });
+  return count;
 }

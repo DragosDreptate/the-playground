@@ -1,11 +1,13 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { isAdminUser } from "@/lib/admin-host-mode";
 import { getAppUrl } from "@/lib/app-url";
 import { auditUser } from "@/infrastructure/services/audit/audit-user";
 import {
   addToBlocklist,
+  revokeSessionsForTargets,
   type BlockResult,
   type BlockTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
@@ -54,5 +56,20 @@ export async function blockSignInAction(
 ): Promise<{ status: BlockResult | "unauthorized" }> {
   const session = await auth();
   if (!isAdminUser(session)) return { status: "unauthorized" };
-  return { status: await addToBlocklist(targets) };
+
+  const status = await addToBlocklist(targets);
+
+  // Le blocage seul empêche de se reconnecter mais ne tue pas une session déjà
+  // ouverte. On révoque donc les sessions actives quand le blocage a bien eu
+  // lieu (prod uniquement). Best-effort : un échec de révocation ne doit pas
+  // faire échouer le blocage déjà appliqué.
+  if (status === "blocked") {
+    try {
+      await revokeSessionsForTargets(targets);
+    } catch (error) {
+      Sentry.captureException(error);
+    }
+  }
+
+  return { status };
 }
