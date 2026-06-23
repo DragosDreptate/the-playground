@@ -82,7 +82,7 @@ Architecture hexagonale (Ports & Adapters), TypeScript strict, tout déployé en
 | | |
 | --- | --- |
 | **2 000+** | commits |
-| **400+** | pull requests |
+| **500+** | pull requests |
 | **80+** | cas d'usage (domain usecases) |
 | **1 000+** | tests (unit + integration + E2E) |
 
@@ -101,7 +101,7 @@ src/
   types/           → Types TypeScript partagés (non domaine)
   i18n/            → Configuration next-intl (routing, request)
   content/         → Contenu statique (articles de blog en Markdown)
-  assets/          → Assets statiques (images, SVG)
+  assets/          → Polices et assets statiques
 ```
 
 Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépendance.
@@ -110,7 +110,7 @@ Voir `CLAUDE.md` pour le contrat strict d'architecture et les règles de dépend
 
 ### Prérequis
 
-- **Node.js** ≥ 24 LTS (aligné avec le runtime Vercel de production)
+- **Node.js** ≥ 22 LTS (version utilisée en CI et en production Vercel)
 - **pnpm** ≥ 10 (le projet déclare `pnpm@10.30.0` via `packageManager`) — `npm install -g pnpm`
 - **PostgreSQL** : un compte gratuit [Neon](https://neon.tech) ou un Postgres local
 - **Compte Resend** (gratuit, 100 emails/jour) : [resend.com](https://resend.com) — pour le magic link et les autres emails
