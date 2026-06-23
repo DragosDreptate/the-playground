@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   checkBlockedSignIn,
   coerceBlocklist,
+  isEmailBlocked,
   matchIdentityReason,
   type DynamicBlocklist,
 } from "@/infrastructure/auth/dynamic-blocklist";
@@ -175,5 +176,28 @@ describe("checkBlockedSignIn", () => {
       expect(await checkBlockedSignIn("x@y.com")).toBe("email");
       expect(await checkBlockedSignIn("safe@gmail.com")).toBeNull();
     });
+  });
+});
+
+describe("isEmailBlocked (criblage en mémoire d'une liste admin)", () => {
+  it("should renvoyer true quand l'email exact est dans la surcouche", () => {
+    expect(
+      isEmailBlocked(blocklist({ emails: ["spam@nms.asia"] }), "spam@nms.asia")
+    ).toBe(true);
+  });
+
+  it("should renvoyer true quand le domaine de l'email est bloqué", () => {
+    expect(
+      isEmailBlocked(blocklist({ domains: ["nms.asia"] }), "anyone@nms.asia")
+    ).toBe(true);
+  });
+
+  it("should renvoyer false pour un email non bloqué", () => {
+    expect(
+      isEmailBlocked(
+        blocklist({ emails: ["spam@nms.asia"], domains: ["nms.asia"] }),
+        "legit@gmail.com"
+      )
+    ).toBe(false);
   });
 });

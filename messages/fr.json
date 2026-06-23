@@ -878,6 +878,7 @@
     "table": {
       "search": "Rechercher...",
       "noResults": "Aucun résultat.",
+      "blocked": "Bloqué",
       "previous": "Précédent",
       "next": "Suivant",
       "showing": "Affichage de {from} à {to} sur {total}"
