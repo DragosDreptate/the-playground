@@ -1,6 +1,9 @@
 import { prisma } from "@/infrastructure/db/prisma";
 import { extractDomain } from "@/lib/email/disposable-domains";
-import { checkBlockedSignIn } from "@/infrastructure/auth/dynamic-blocklist";
+import {
+  checkBlockedSignIn,
+  type BlockMatch,
+} from "@/infrastructure/auth/dynamic-blocklist";
 import type { AuditTargets } from "./types";
 
 /** Aucune cible (compte introuvable). */
@@ -8,7 +11,7 @@ export const NO_TARGETS: AuditTargets = {
   email: null,
   domain: null,
   oauthIds: [],
-  alreadyBlocked: false,
+  blockReason: null,
 };
 
 /**
@@ -20,7 +23,7 @@ export function toAuditTargets(input: {
   email: string;
   oauthIds: string[];
   emailDomain: string; // brut, peut valoir "unknown"
-  blocked: boolean;
+  blockReason: BlockMatch | null;
 }): AuditTargets {
   return {
     email: input.email,
@@ -30,7 +33,7 @@ export function toAuditTargets(input: {
         ? input.emailDomain
         : null,
     oauthIds: input.oauthIds,
-    alreadyBlocked: input.blocked,
+    blockReason: input.blockReason,
   };
 }
 
@@ -48,14 +51,14 @@ export async function buildBlockTargets(userId: string): Promise<AuditTargets> {
   if (!user) return NO_TARGETS;
 
   const oauthIds = user.accounts.map((a) => a.providerAccountId);
-  // checkBlockedSignIn vérifie email + oauthId + domaine ; on passe le 1er
-  // oauthId (cohérent avec le dossier d'audit). Le blocage cible tous les oauthIds.
-  const blockedReason = await checkBlockedSignIn(user.email, oauthIds[0]);
+  // checkBlockedSignIn vérifie statique + email + oauthId + domaine ; on passe le
+  // 1er oauthId (cohérent avec le dossier d'audit). Le blocage cible tous les oauthIds.
+  const blockReason = await checkBlockedSignIn(user.email, oauthIds[0]);
 
   return toAuditTargets({
     email: user.email,
     oauthIds,
     emailDomain: extractDomain(user.email) ?? "unknown",
-    blocked: blockedReason !== null,
+    blockReason,
   });
 }

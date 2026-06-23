@@ -163,8 +163,13 @@ export function buildBlockedUsersFilter(
 
   for (const d of targets.domains ?? []) {
     const dom = normalizeDomain(d);
-    // insensitive : un email stocké « X@Domain.COM » doit matcher « domain.com ».
-    if (dom) or.push({ email: { endsWith: `@${dom}`, mode: "insensitive" } });
+    if (!dom) continue;
+    // Miroir du suffix-walk de matchesDomainSuffix (qui bloque aussi les
+    // sous-domaines au sign-in) : on couvre `@domain` ET `.domain` pour ne pas
+    // laisser de session active à un user en `x@sub.domain`. insensitive : un
+    // email stocké « X@Domain.COM » doit matcher « domain.com ».
+    or.push({ email: { endsWith: `@${dom}`, mode: "insensitive" } });
+    or.push({ email: { endsWith: `.${dom}`, mode: "insensitive" } });
   }
 
   return or.length ? { OR: or } : null;
@@ -180,14 +185,13 @@ export function buildBlockedUsersFilter(
 export async function revokeSessionsForTargets(
   targets: BlockTargets
 ): Promise<number> {
-  const where = buildBlockedUsersFilter(targets);
-  if (!where) return 0;
+  const userWhere = buildBlockedUsersFilter(targets);
+  if (!userWhere) return 0;
 
-  const users = await prisma.user.findMany({ where, select: { id: true } });
-  if (!users.length) return 0;
-
+  // Un seul aller-retour : on supprime les sessions via le filtre de relation
+  // `user` (pas de findMany d'ids intermédiaire).
   const { count } = await prisma.session.deleteMany({
-    where: { userId: { in: users.map((u) => u.id) } },
+    where: { user: userWhere },
   });
   return count;
 }

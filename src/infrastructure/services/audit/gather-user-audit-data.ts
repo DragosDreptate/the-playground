@@ -84,7 +84,6 @@ export async function gatherUserAuditData(
       `SELECT min(timestamp) AS first, max(timestamp) AS last, count() AS n, any(properties.referer) AS referer FROM events WHERE ${where}`
     ) as Promise<[string | null, string | null, number, string | null][]>,
   ]);
-  const blocked = blockedReason !== null;
 
   const clientCities = cityRows
     .filter((r): r is [string, number] => Array.isArray(r) && !!r[0])
@@ -148,7 +147,7 @@ export async function gatherUserAuditData(
       disposableEmail: isDisposableEmailDomain(user.email),
       localpartLooksRandom: localpartLooksRandom(localpart),
       nameAllCaps: nameAllCaps(user.firstName, user.lastName),
-      blocked,
+      blockReason: blockedReason,
     },
   };
 }

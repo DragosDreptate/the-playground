@@ -844,6 +844,7 @@
       "blockFailed": "Échec du blocage",
       "blockSkipped": "Local : non écrit (prod uniquement)",
       "alreadyBlocked": "Déjà dans la blocklist",
+      "staticBlocked": "Bloqué dans le code (non débloquable ici)",
       "confirmAccountTitle": "Bloquer ce compte ?",
       "confirmAccountDesc": "L'email (et l'identité OAuth si présente) sera ajouté à la blocklist. La personne ne pourra plus se connecter et ses sessions actives seront coupées. Réversible via le bouton Débloquer.",
       "confirmDomainTitle": "Bloquer le domaine ?",

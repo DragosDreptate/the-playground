@@ -1,5 +1,7 @@
 // Types partagés de l'audit de compte (`/audit-user`, mode bouton admin).
 
+import type { BlockMatch } from "@/infrastructure/auth/dynamic-blocklist";
+
 /** Dossier brut collecté (DB + PostHog + signaux dérivés), envoyé au LLM. */
 export type AuditDossier = {
   found: boolean;
@@ -55,7 +57,10 @@ export type AuditDossier = {
     disposableEmail: boolean;
     localpartLooksRandom: boolean;
     nameAllCaps: boolean;
-    blocked: boolean; // présent dans la blocklist (email/oauth/domaine)
+    // Canal qui bloque le compte (ou null) : statique (code), email, oauth ou
+    // domaine. Porte la RAISON, pas juste un booléen, pour proposer le bon
+    // déblocage et distinguer un blocage statique (non débloquable via l'UI).
+    blockReason: BlockMatch | null;
   };
 };
 
@@ -80,7 +85,10 @@ export type AuditTargets = {
   email: string | null;
   domain: string | null;
   oauthIds: string[]; // tous les providers liés, pas seulement le premier
-  alreadyBlocked: boolean;
+  // Canal qui bloque ce compte (ou null s'il n'est pas bloqué). Détermine
+  // l'action inverse proposée (débloquer compte vs domaine) et signale un
+  // blocage statique (code) non débloquable depuis l'UI.
+  blockReason: BlockMatch | null;
 };
 
 export type AuditOutcome = {

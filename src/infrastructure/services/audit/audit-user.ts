@@ -18,7 +18,7 @@ function targetsFromDossier(dossier: AuditDossier): AuditTargets {
     email: dossier.account.email,
     oauthIds: dossier.account.providers.map((p) => p.providerAccountId),
     emailDomain: dossier.derived?.emailDomain ?? "unknown",
-    blocked: dossier.derived?.blocked ?? false,
+    blockReason: dossier.derived?.blockReason ?? null,
   });
 }
 
@@ -81,7 +81,7 @@ function fallbackReport(dossier: AuditDossier, note: string): AuditReport {
   if (d?.nameAllCaps) signalsFor.push("Nom tout en majuscules");
   if (dossier.behavior?.geoipUnstable)
     signalsFor.push("Géoloc instable intra-session (proxy possible)");
-  if (d?.blocked) signalsFor.push("Déjà présent dans la blocklist");
+  if (d?.blockReason) signalsFor.push("Déjà présent dans la blocklist");
   return {
     found: true,
     identitySummary: `${dossier.account?.email ?? dossier.identifier} — ${note}`,

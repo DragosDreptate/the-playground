@@ -199,36 +199,55 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
   const t = useTranslations("Admin.audit");
   if (!targets.email) return null;
 
-  // Déjà bloqué → on propose l'action inverse (débloquer compte/domaine),
-  // symétrique aux boutons de blocage. Le retrait est idempotent, donc offrir
-  // les deux est sûr même si un seul canal est réellement bloqué.
-  if (targets.alreadyBlocked) {
+  const reason = targets.blockReason;
+
+  // Bloqué EN DUR dans le code (sign-in-blocklist.ts) : non débloquable depuis
+  // l'UI (ce serait une fausse confirmation). On le signale, sans bouton.
+  if (reason === "static") {
+    return (
+      <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+        <Badge className="bg-red-100 text-red-800 border-transparent">
+          <ShieldX className="mr-1 size-3" />
+          {t("staticBlocked")}
+        </Badge>
+      </div>
+    );
+  }
+
+  // Bloqué dynamiquement → on propose UNIQUEMENT l'action inverse du canal qui
+  // bloque réellement (compte vs domaine), pour ne jamais afficher un faux
+  // « Débloqué » sur un canal qui n'était pas concerné.
+  if (reason) {
+    const isDomain = reason === "domain";
     return (
       <div className="flex flex-wrap items-center gap-2 border-t pt-3">
         <Badge className="bg-red-100 text-red-800 border-transparent">
           <ShieldX className="mr-1 size-3" />
           {t("alreadyBlocked")}
         </Badge>
-        <BlocklistActionButton
-          label={t("unblockAccount")}
-          confirmTitle={t("confirmUnblockAccountTitle")}
-          confirmDescription={t("confirmUnblockAccountDesc")}
-          confirmLabel={t("confirmUnblock")}
-          doneLabel={t("unblockedDone")}
-          targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
-          action={unblockSignInAction}
-          tone="neutral"
-        />
-        {targets.domain && (
+        {isDomain && targets.domain ? (
           <BlocklistActionButton
             label={t("unblockDomain", { domain: targets.domain })}
-            confirmTitle={t("confirmUnblockDomainTitle", { domain: targets.domain })}
+            confirmTitle={t("confirmUnblockDomainTitle", {
+              domain: targets.domain,
+            })}
             confirmDescription={t("confirmUnblockDomainDesc", {
               domain: targets.domain,
             })}
             confirmLabel={t("confirmUnblock")}
             doneLabel={t("unblockedDone")}
             targets={{ domains: [targets.domain] }}
+            action={unblockSignInAction}
+            tone="neutral"
+          />
+        ) : (
+          <BlocklistActionButton
+            label={t("unblockAccount")}
+            confirmTitle={t("confirmUnblockAccountTitle")}
+            confirmDescription={t("confirmUnblockAccountDesc")}
+            confirmLabel={t("confirmUnblock")}
+            doneLabel={t("unblockedDone")}
+            targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
             action={unblockSignInAction}
             tone="neutral"
           />

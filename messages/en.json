@@ -844,6 +844,7 @@
       "blockFailed": "Block failed",
       "blockSkipped": "Local: not written (prod only)",
       "alreadyBlocked": "Already in blocklist",
+      "staticBlocked": "Blocked in code (not removable here)",
       "confirmAccountTitle": "Block this account?",
       "confirmAccountDesc": "The email (and OAuth identity if any) will be added to the blocklist. This person won't be able to sign in and their active sessions will be revoked. Reversible via the Unblock button.",
       "confirmDomainTitle": "Block this domain?",

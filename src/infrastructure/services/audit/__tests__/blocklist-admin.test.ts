@@ -1,9 +1,17 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+const { deleteManyMock } = vi.hoisted(() => ({ deleteManyMock: vi.fn() }));
+vi.mock("@/infrastructure/db/prisma", () => ({
+  prisma: { session: { deleteMany: deleteManyMock } },
+}));
 
 import {
   buildBlockedUsersFilter,
   removeTargetsFromBlocklist,
+  revokeSessionsForTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
+
+afterEach(() => deleteManyMock.mockReset());
 
 describe("buildBlockedUsersFilter", () => {
   describe("given aucune cible exploitable", () => {
@@ -32,9 +40,12 @@ describe("buildBlockedUsersFilter", () => {
   });
 
   describe("given un blocage de domaine", () => {
-    it("matche tous les emails du domaine, en insensible à la casse", () => {
+    it("matche le domaine ET ses sous-domaines, insensible à la casse", () => {
       expect(buildBlockedUsersFilter({ domains: ["NMS.asia"] })).toEqual({
-        OR: [{ email: { endsWith: "@nms.asia", mode: "insensitive" } }],
+        OR: [
+          { email: { endsWith: "@nms.asia", mode: "insensitive" } },
+          { email: { endsWith: ".nms.asia", mode: "insensitive" } },
+        ],
       });
     });
   });
@@ -74,5 +85,21 @@ describe("removeTargetsFromBlocklist", () => {
     expect(
       removeTargetsFromBlocklist(current, { emails: ["ghost@x.com"] })
     ).toEqual(current);
+  });
+});
+
+describe("revokeSessionsForTargets", () => {
+  it("ne supprime rien sans cible exploitable (garde anti deleteMany sans where)", async () => {
+    expect(await revokeSessionsForTargets({})).toBe(0);
+    expect(deleteManyMock).not.toHaveBeenCalled();
+  });
+
+  it("supprime les sessions des users visés via le filtre de relation", async () => {
+    deleteManyMock.mockResolvedValue({ count: 3 });
+    const n = await revokeSessionsForTargets({ emails: ["spam@nms.asia"] });
+    expect(n).toBe(3);
+    expect(deleteManyMock).toHaveBeenCalledWith({
+      where: { user: { OR: [{ email: { in: ["spam@nms.asia"] } }] } },
+    });
   });
 });
