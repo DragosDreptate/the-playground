@@ -14,7 +14,8 @@ import { prismaUserRepository } from "@/infrastructure/repositories/prisma-user-
 import { detectLocaleForMagicLink } from "@/lib/auth/magic-link-url";
 import { classifyAuthError, resolveAuthErrorCode } from "@/lib/auth/error-kinds";
 import { getRequestObservability } from "@/lib/auth/request-observability";
-import { captureServerEvent } from "@/lib/posthog-server";
+import { after } from "next/server";
+import { captureServerEvent, getPosthogDistinctId } from "@/lib/posthog-server";
 import { createReusableVerificationToken } from "@/infrastructure/auth/reusable-verification-token";
 import {
   checkBlockedSignIn,
@@ -78,6 +79,7 @@ async function reportRejectedSignIn(
   // « evil.com » fingerprinteraient en 2 issues distinctes => avalanche.
   const emailDomain =
     (identity.email ? extractDomain(identity.email) : null) ?? "unknown";
+  const observability = await getRequestObservability();
   Sentry.captureMessage(`auth: connexion bloquée [${reason}] ${emailDomain}`, {
     level: "warning",
     fingerprint: ["auth-sign-in-blocked", reason, emailDomain],
@@ -91,9 +93,39 @@ async function reportRejectedSignIn(
     },
     extra: {
       provider_account_id: identity.oauthId ?? null,
-      ...(await getRequestObservability()),
+      ...observability,
     },
   });
+
+  // Miroir analytics du warning Sentry : le warning sert à l'ALERTE, cet event
+  // PostHog sert à la MESURE (volume de rejets, géo/parcours qui a précédé).
+  // Capté côté serveur pour couvrir aussi les hits directs sur l'endpoint (bots
+  // qui ne passent pas par le formulaire). `after` pour qu'il parte après la
+  // réponse malgré l'AccessDenied. Minimisation PII : seulement domaine + raison
+  // (pas l'email complet ni l'oauthId, qui restent dans Sentry pour l'alerte).
+  // Best-effort : ne doit JAMAIS casser le sign-in.
+  try {
+    const distinctId = await getPosthogDistinctId();
+    after(() =>
+      captureServerEvent(
+        // Vrai navigateur → on relie à sa person/parcours via le cookie. Sinon
+        // (bot, hit direct, client PostHog bloqué) on regroupe par DOMAINE, pas
+        // par email : un scanner qui fait tourner les adresses ne crée qu'une
+        // person par domaine (même borne que le fingerprint Sentry), et aucun
+        // email brut ne devient un identifiant.
+        distinctId ?? `blocked:${emailDomain}`,
+        "sign_in_blocked",
+        {
+          blocked_reason: reason,
+          email_domain: emailDomain,
+          provider: identity.provider ?? "unknown",
+          ...observability,
+        }
+      )
+    );
+  } catch (error) {
+    Sentry.captureException(error);
+  }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
