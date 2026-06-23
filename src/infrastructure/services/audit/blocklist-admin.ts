@@ -1,6 +1,12 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/infrastructure/db/prisma";
 import {
+  BASE_DELAY_MS,
+  MAX_RETRIES,
+  isTransientError,
+  sleep,
+} from "@/infrastructure/db/retry-policy";
+import {
   coerceBlocklist,
   SIGN_IN_BLOCKLIST_KEY,
   type DynamicBlocklist,
@@ -189,9 +195,22 @@ export async function revokeSessionsForTargets(
   if (!userWhere) return 0;
 
   // Un seul aller-retour : on supprime les sessions via le filtre de relation
-  // `user` (pas de findMany d'ids intermédiaire).
-  const { count } = await prisma.session.deleteMany({
-    where: { user: userWhere },
-  });
-  return count;
+  // `user` (pas de findMany d'ids intermédiaire). C'est une ÉCRITURE, donc NON
+  // couverte par le retry-policy du client (READ only) ; or une connexion Neon
+  // « stale » peut la faire échouer d'un coup (cf. prisma.ts / spec neon).
+  // On retente nous-mêmes sur erreur transitoire pour ne pas laisser une session
+  // active à un compte qu'on vient de bloquer. Une erreur non transitoire (ou
+  // après MAX_RETRIES) est PROPAGÉE : l'appelant doit savoir que la coupure a
+  // échoué (pas de faux « bloqué » silencieux).
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const { count } = await prisma.session.deleteMany({
+        where: { user: userWhere },
+      });
+      return count;
+    } catch (error) {
+      if (attempt >= MAX_RETRIES || !isTransientError(error)) throw error;
+      await sleep(BASE_DELAY_MS * 2 ** attempt);
+    }
+  }
 }
