@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auth } from "@/infrastructure/auth/auth.config";
 import { isAdminUser } from "@/lib/admin-host-mode";
@@ -60,6 +61,17 @@ export type BlockActionResult = {
 };
 
 /**
+ * Invalide le Router Cache des pages admin users après une mutation de blocklist,
+ * pour que le badge « Bloqué » de la liste et la fiche reflètent l'état frais
+ * sans refresh manuel (sinon Next sert la liste navigée depuis son cache client).
+ * Même convention que les autres mutations admin (cf. admin.ts).
+ */
+function revalidateAdminUserPages() {
+  revalidatePath("/admin/users");
+  revalidatePath("/admin/users/[id]", "page");
+}
+
+/**
  * Ajoute des entrées à la blocklist anti-abus (action humaine explicite,
  * déclenchée depuis l'audit). Admin-only.
  */
@@ -72,6 +84,8 @@ export async function blockSignInAction(
 
   const status = await addToBlocklist(targets);
   if (status !== "applied") return { status, sessionsRevoked: null };
+
+  revalidateAdminUserPages();
 
   // Le blocage seul empêche de se reconnecter mais ne tue pas une session déjà
   // ouverte. On révoque donc les sessions actives. Un échec NE DOIT PAS être
@@ -101,5 +115,7 @@ export async function unblockSignInAction(
 ): Promise<{ status: BlocklistWriteResult | "unauthorized" }> {
   const session = await auth();
   if (!isAdminUser(session)) return { status: "unauthorized" };
-  return { status: await removeFromBlocklist(targets) };
+  const status = await removeFromBlocklist(targets);
+  if (status === "applied") revalidateAdminUserPages();
+  return { status };
 }
