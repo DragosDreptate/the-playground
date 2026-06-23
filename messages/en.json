@@ -841,6 +841,7 @@
       "blockAccount": "Block this account",
       "blockDomain": "Block domain @{domain}",
       "blockedDone": "Blocked",
+      "blockedNoRevoke": "Blocked, but session cutoff failed. Retry.",
       "blockFailed": "Block failed",
       "blockSkipped": "Local: not written (prod only)",
       "alreadyBlocked": "Already in blocklist",

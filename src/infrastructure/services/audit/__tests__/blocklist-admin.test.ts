@@ -1,8 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const { deleteManyMock } = vi.hoisted(() => ({ deleteManyMock: vi.fn() }));
+const { deleteManyMock, isTransientMock } = vi.hoisted(() => ({
+  deleteManyMock: vi.fn(),
+  isTransientMock: vi.fn(),
+}));
 vi.mock("@/infrastructure/db/prisma", () => ({
   prisma: { session: { deleteMany: deleteManyMock } },
+}));
+vi.mock("@/infrastructure/db/retry-policy", () => ({
+  MAX_RETRIES: 3,
+  BASE_DELAY_MS: 0,
+  isTransientError: isTransientMock,
+  sleep: () => Promise.resolve(),
 }));
 
 import {
@@ -11,7 +20,10 @@ import {
   revokeSessionsForTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
 
-afterEach(() => deleteManyMock.mockReset());
+afterEach(() => {
+  deleteManyMock.mockReset();
+  isTransientMock.mockReset();
+});
 
 describe("buildBlockedUsersFilter", () => {
   describe("given aucune cible exploitable", () => {
@@ -101,5 +113,23 @@ describe("revokeSessionsForTargets", () => {
     expect(deleteManyMock).toHaveBeenCalledWith({
       where: { user: { OR: [{ email: { in: ["spam@nms.asia"] } }] } },
     });
+  });
+
+  it("retente sur erreur transitoire (connexion Neon stale) puis réussit", async () => {
+    isTransientMock.mockReturnValue(true);
+    deleteManyMock
+      .mockRejectedValueOnce(new Error("Control plane request failed"))
+      .mockResolvedValueOnce({ count: 1 });
+    expect(await revokeSessionsForTargets({ emails: ["spam@nms.asia"] })).toBe(1);
+    expect(deleteManyMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("propage l'erreur si non transitoire (l'appelant doit savoir que la coupure a échoué)", async () => {
+    isTransientMock.mockReturnValue(false);
+    deleteManyMock.mockRejectedValue(new Error("boom"));
+    await expect(
+      revokeSessionsForTargets({ emails: ["spam@nms.asia"] })
+    ).rejects.toThrow("boom");
+    expect(deleteManyMock).toHaveBeenCalledTimes(1);
   });
 });

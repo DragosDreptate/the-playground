@@ -841,6 +841,7 @@
       "blockAccount": "Bloquer ce compte",
       "blockDomain": "Bloquer le domaine @{domain}",
       "blockedDone": "Bloqué",
+      "blockedNoRevoke": "Bloqué, mais coupure des sessions échouée. Réessaie.",
       "blockFailed": "Échec du blocage",
       "blockSkipped": "Local : non écrit (prod uniquement)",
       "alreadyBlocked": "Déjà dans la blocklist",

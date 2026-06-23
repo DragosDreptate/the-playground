@@ -94,16 +94,19 @@ function BlocklistActionButton({
   confirmLabel: string;
   doneLabel: string;
   targets: BlockTargets;
-  action: (
-    targets: BlockTargets
-  ) => Promise<{ status: BlocklistWriteResult | "unauthorized" }>;
+  action: (targets: BlockTargets) => Promise<{
+    status: BlocklistWriteResult | "unauthorized";
+    // Présent pour le blocage : "failed" = compte bloqué MAIS session active non
+    // coupée (l'admin doit le savoir, pas de faux « bloqué » silencieux).
+    sessionsRevoked?: number | "failed" | null;
+  }>;
   tone: "destructive" | "neutral";
 }) {
   const t = useTranslations("Admin.audit");
   const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState<"idle" | "done" | "skipped" | "failed">(
-    "idle"
-  );
+  const [status, setStatus] = useState<
+    "idle" | "done" | "partial" | "skipped" | "failed"
+  >("idle");
   const [pending, start] = useTransition();
   const destructive = tone === "destructive";
 
@@ -111,13 +114,14 @@ function BlocklistActionButton({
     start(async () => {
       const res = await action(targets);
       setOpen(false);
-      setStatus(
-        res.status === "applied"
-          ? "done"
-          : res.status === "skipped"
-            ? "skipped"
-            : "failed"
-      );
+      if (res.status === "applied") {
+        // Bloqué mais sessions non coupées → "partial" (avertissement), sinon OK.
+        setStatus(res.sessionsRevoked === "failed" ? "partial" : "done");
+      } else if (res.status === "skipped") {
+        setStatus("skipped");
+      } else {
+        setStatus("failed");
+      }
     });
 
   if (status === "done") {
@@ -135,6 +139,17 @@ function BlocklistActionButton({
           <ShieldCheck className="mr-1 size-3" />
         )}
         {doneLabel}
+      </Badge>
+    );
+  }
+
+  // Blocage appliqué mais coupure de session échouée : le compte est bloqué
+  // (plus de reconnexion) mais une session reste active. À signaler clairement.
+  if (status === "partial") {
+    return (
+      <Badge className="bg-amber-100 text-amber-800 border-transparent">
+        <ShieldX className="mr-1 size-3" />
+        {t("blockedNoRevoke")}
       </Badge>
     );
   }

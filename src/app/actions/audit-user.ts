@@ -49,30 +49,43 @@ export async function auditUserAction(
 }
 
 /**
+ * Résultat d'un blocage : le statut d'écriture blocklist + le sort des sessions
+ * actives. `sessionsRevoked` = nombre coupé, `"failed"` si la coupure a échoué
+ * (le compte est bloqué mais une session reste ouverte → l'admin DOIT le savoir),
+ * `null` quand non applicable (blocage non écrit).
+ */
+export type BlockActionResult = {
+  status: BlocklistWriteResult | "unauthorized";
+  sessionsRevoked: number | "failed" | null;
+};
+
+/**
  * Ajoute des entrées à la blocklist anti-abus (action humaine explicite,
  * déclenchée depuis l'audit). Admin-only.
  */
 export async function blockSignInAction(
   targets: BlockTargets
-): Promise<{ status: BlocklistWriteResult | "unauthorized" }> {
+): Promise<BlockActionResult> {
   const session = await auth();
-  if (!isAdminUser(session)) return { status: "unauthorized" };
+  if (!isAdminUser(session))
+    return { status: "unauthorized", sessionsRevoked: null };
 
   const status = await addToBlocklist(targets);
+  if (status !== "applied") return { status, sessionsRevoked: null };
 
   // Le blocage seul empêche de se reconnecter mais ne tue pas une session déjà
-  // ouverte. On révoque donc les sessions actives quand le blocage a bien eu
-  // lieu (prod uniquement). Best-effort : un échec de révocation ne doit pas
-  // faire échouer le blocage déjà appliqué.
-  if (status === "applied") {
-    try {
-      await revokeSessionsForTargets(targets);
-    } catch (error) {
-      Sentry.captureException(error);
-    }
+  // ouverte. On révoque donc les sessions actives. Un échec NE DOIT PAS être
+  // avalé en silence (sinon faux « bloqué » avec session encore active) : on le
+  // remonte à l'UI et on s'assure que Sentry reçoit bien l'erreur (flush, sinon
+  // perdue en serverless).
+  try {
+    const sessionsRevoked = await revokeSessionsForTargets(targets);
+    return { status, sessionsRevoked };
+  } catch (error) {
+    Sentry.captureException(error);
+    await Sentry.flush(2000);
+    return { status, sessionsRevoked: "failed" };
   }
-
-  return { status };
 }
 
 /**
