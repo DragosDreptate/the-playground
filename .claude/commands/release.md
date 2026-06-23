@@ -201,13 +201,38 @@ gh release list --limit 3
 
 Afficher la nouvelle release et son tag (`the-playground-vX.Y.Z`).
 
+### Étape 11 — Scrub + synchroniser le corps du GitHub Release (OBLIGATOIRE)
+
+> ⚠️ **Le dépôt est PUBLIC. Le changelog ne doit JAMAIS divulguer l'outillage admin / modération / anti-abus.** Le détail de la règle (quoi exclure) est dans la mémoire `feedback_changelog_no_admin_disclosure.md`.
+
+Deux surfaces, pas une :
+
+1. **`CHANGELOG.md`** (humanisé par le workflow, rendu sur `/changelog`). Le script `scripts/humanize-changelog.ts` est censé déjà exclure l'anti-abus, mais **vérifier** la section de la nouvelle version :
+
+```bash
+sed -n "/## \[X.Y.Z\]/,/## \[/p" CHANGELOG.md | grep -iE "admin|blocage|bloqué|modération|anti-spam|audit|révoc|validation des commentaires|moins de 24" && echo "⚠️ fuite anti-abus dans CHANGELOG.md — nettoyer + commit direct sur main" || echo "✅ CHANGELOG.md propre"
+```
+
+2. **Corps du GitHub Release** : Release Please le génère en **commits BRUTS** (jamais humanisé) → il liste les commits `admin:` verbatim. **Toujours le remplacer** par la section humanisée et nettoyée du `CHANGELOG.md` :
+
+```bash
+# Extraire la section humanisée nettoyée et la pousser comme notes du release
+sed -n "/## \[X.Y.Z\]/,/^## \[/p" CHANGELOG.md | sed '$d' > /tmp/release-notes.md
+gh release edit the-playground-vX.Y.Z --notes-file /tmp/release-notes.md
+# Vérifier qu'aucun terme sensible ne subsiste
+gh release view the-playground-vX.Y.Z --json body --jq .body | grep -iqE "admin|blocage|modération|anti-spam|audit|révoc" && echo "⚠️ termes sensibles encore présents" || echo "✅ release body propre"
+```
+
+Si une fuite est détectée dans `CHANGELOG.md`, la corriger (édition manuelle de la section, commit direct sur main car `*.md`) **avant** de resynchroniser le corps du release.
+
 ## Règles absolues
 
 - ❌ Ne jamais merger si le CI est rouge
 - ❌ Ne jamais pousser du code (fix, refactoring) sur la branche release-please — seuls les commits vides `ci: trigger CI checks` sont autorisés
 - ❌ Ne jamais sauter l'étape de vérification schema Prisma
 - ❌ Ne jamais créer de tag git manuellement
-- ❌ Ne jamais modifier `CHANGELOG.md` ou `package.json` version manuellement
+- ❌ Ne jamais bumper la version dans `CHANGELOG.md` ou `package.json` manuellement (laisser Release Please) — scrubber la prose d'une section déjà publiée pour retirer une fuite anti-abus reste autorisé (étape 11)
+- ❌ **Ne jamais divulguer l'outillage admin / modération / anti-abus dans le changelog public** (CHANGELOG.md ET corps du GitHub Release) — repo public, voir étape 11
 - ❌ Ne jamais utiliser `gh workflow run` pour redéclencher le CI (ne génère pas de PR checks)
 - ❌ Ne jamais chercher la PR par titre avec `--search` (les parenthèses cassent la recherche GitHub)
 - ✅ Toujours chercher la PR par branche avec `--head "release-please--branches--main--components--the-playground"`
