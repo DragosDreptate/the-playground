@@ -3,6 +3,9 @@ import { getLocale } from "next-intl/server";
 import { getChangelog } from "@/lib/parse-changelog";
 import { buildAlternates } from "@/lib/seo";
 
+// `getChangelog` lit CHANGELOG.md à l'exécution depuis le filesystem du build :
+// le contenu est figé au build, donc toute édition du changelog nécessite un
+// redéploiement (cf. le trigger CHANGELOG.md dans scripts/vercel-ignore.sh).
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
