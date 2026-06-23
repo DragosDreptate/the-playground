@@ -30,13 +30,15 @@ export default async function AdminUserDetailPage({ params }: Props) {
   const t = await getTranslations("Admin");
   const tRole = await getTranslations("Dashboard.role");
   const locale = await getLocale();
-  const user = await prismaAdminRepository.findUserById(id);
+  // Les deux ne dépendent que de `id` → en parallèle (pas de round-trip en
+  // série). buildBlockTargets calcule les cibles de blocage au rendu pour
+  // afficher les boutons en permanence (pas seulement après un audit).
+  const [user, blockTargets] = await Promise.all([
+    prismaAdminRepository.findUserById(id),
+    buildBlockTargets(id),
+  ]);
 
   if (!user) notFound();
-
-  // Cibles de blocage calculées au rendu pour afficher les boutons en
-  // permanence (pas seulement après un audit).
-  const blockTargets = await buildBlockTargets(user.id);
 
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "—";
 
