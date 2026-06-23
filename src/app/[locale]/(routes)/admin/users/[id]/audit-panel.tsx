@@ -188,9 +188,11 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
 export function AdminUserAuditPanel({
   userId,
   email,
+  initialTargets,
 }: {
   userId: string;
   email: string;
+  initialTargets: AuditTargets;
 }) {
   const t = useTranslations("Admin.audit");
   const [pending, start] = useTransition();
@@ -221,55 +223,55 @@ export function AdminUserAuditPanel({
           {pending ? t("running") : report ? t("rerun") : t("run")}
         </Button>
       </CardHeader>
-      {(report || failed) && (
-        <CardContent className="space-y-2.5 p-5 pt-0 text-sm">
-          {failed && <p className="text-destructive">{t("error")}</p>}
-          {report && (
-            <>
-              <Badge
-                className={`${VERDICT_CLASS[report.verdictLean]} px-3 py-1 text-sm`}
-              >
-                {t(`verdict.${report.verdictLean}`)}
-              </Badge>
-              <p className="leading-snug">
-                <span className="font-medium">{t("identity")} : </span>
-                {report.identitySummary}
+      <CardContent className="space-y-2.5 p-5 pt-0 text-sm">
+        {failed && <p className="text-destructive">{t("error")}</p>}
+        {report && (
+          <>
+            <Badge
+              className={`${VERDICT_CLASS[report.verdictLean]} px-3 py-1 text-sm`}
+            >
+              {t(`verdict.${report.verdictLean}`)}
+            </Badge>
+            <p className="leading-snug">
+              <span className="font-medium">{t("identity")} : </span>
+              {report.identitySummary}
+            </p>
+            <p className="leading-snug">
+              <span className="font-medium">{t("content")} : </span>
+              {report.contentSummary || "—"}
+            </p>
+            <p className="leading-snug">
+              <span className="font-medium">{t("behavior")} : </span>
+              {report.behaviorSummary || "—"}
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <SignalBox
+                title={t("for")}
+                items={report.signalsFor}
+                tone="danger"
+              />
+              <SignalBox
+                title={t("against")}
+                items={report.signalsAgainst}
+                tone="success"
+              />
+            </div>
+            <p className="leading-snug">
+              <span className="font-medium">{t("reco")} : </span>
+              {report.recommendation}
+            </p>
+            {report.usage && (
+              <p className="text-xs text-muted-foreground">
+                {report.usage.model} · {report.usage.inputTokens}+
+                {report.usage.outputTokens} tok
               </p>
-              <p className="leading-snug">
-                <span className="font-medium">{t("content")} : </span>
-                {report.contentSummary || "—"}
-              </p>
-              <p className="leading-snug">
-                <span className="font-medium">{t("behavior")} : </span>
-                {report.behaviorSummary || "—"}
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <SignalBox
-                  title={t("for")}
-                  items={report.signalsFor}
-                  tone="danger"
-                />
-                <SignalBox
-                  title={t("against")}
-                  items={report.signalsAgainst}
-                  tone="success"
-                />
-              </div>
-              <p className="leading-snug">
-                <span className="font-medium">{t("reco")} : </span>
-                {report.recommendation}
-              </p>
-              {targets && <BlockActions targets={targets} />}
-              {report.usage && (
-                <p className="text-xs text-muted-foreground">
-                  {report.usage.model} · {report.usage.inputTokens}+
-                  {report.usage.outputTokens} tok
-                </p>
-              )}
-            </>
-          )}
-        </CardContent>
-      )}
+            )}
+          </>
+        )}
+        {/* Boutons de blocage TOUJOURS visibles. Après un audit, on prend les
+            cibles fraîchement renvoyées ; sinon celles calculées au rendu. */}
+        <BlockActions targets={targets ?? initialTargets} />
+      </CardContent>
     </Card>
   );
 }
