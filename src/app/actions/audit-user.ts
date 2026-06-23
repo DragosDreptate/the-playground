@@ -7,8 +7,9 @@ import { getAppUrl } from "@/lib/app-url";
 import { auditUser } from "@/infrastructure/services/audit/audit-user";
 import {
   addToBlocklist,
+  removeFromBlocklist,
   revokeSessionsForTargets,
-  type BlockResult,
+  type BlocklistWriteResult,
   type BlockTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
 import { notifySlackAuditReport } from "@/infrastructure/services/slack/slack-notification-service";
@@ -53,7 +54,7 @@ export async function auditUserAction(
  */
 export async function blockSignInAction(
   targets: BlockTargets
-): Promise<{ status: BlockResult | "unauthorized" }> {
+): Promise<{ status: BlocklistWriteResult | "unauthorized" }> {
   const session = await auth();
   if (!isAdminUser(session)) return { status: "unauthorized" };
 
@@ -63,7 +64,7 @@ export async function blockSignInAction(
   // ouverte. On révoque donc les sessions actives quand le blocage a bien eu
   // lieu (prod uniquement). Best-effort : un échec de révocation ne doit pas
   // faire échouer le blocage déjà appliqué.
-  if (status === "blocked") {
+  if (status === "applied") {
     try {
       await revokeSessionsForTargets(targets);
     } catch (error) {
@@ -72,4 +73,17 @@ export async function blockSignInAction(
   }
 
   return { status };
+}
+
+/**
+ * Retire des entrées de la blocklist (action inverse du blocage). Admin-only.
+ * Ne touche pas aux sessions : débloquer ne reconnecte personne, ça réautorise
+ * juste les futurs sign-in.
+ */
+export async function unblockSignInAction(
+  targets: BlockTargets
+): Promise<{ status: BlocklistWriteResult | "unauthorized" }> {
+  const session = await auth();
+  if (!isAdminUser(session)) return { status: "unauthorized" };
+  return { status: await removeFromBlocklist(targets) };
 }

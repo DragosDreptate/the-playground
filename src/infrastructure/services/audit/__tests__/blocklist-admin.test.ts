@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { buildBlockedUsersFilter } from "@/infrastructure/services/audit/blocklist-admin";
+import {
+  buildBlockedUsersFilter,
+  removeTargetsFromBlocklist,
+} from "@/infrastructure/services/audit/blocklist-admin";
 
 describe("buildBlockedUsersFilter", () => {
   describe("given aucune cible exploitable", () => {
@@ -34,5 +37,42 @@ describe("buildBlockedUsersFilter", () => {
         OR: [{ email: { endsWith: "@nms.asia", mode: "insensitive" } }],
       });
     });
+  });
+});
+
+describe("removeTargetsFromBlocklist", () => {
+  const current = {
+    emails: ["spam@nms.asia", "keep@gmail.com"],
+    oauthIds: ["g-1", "g-keep"],
+    domains: ["nms.asia", "keep.com"],
+  };
+
+  it("retire la cible et conserve le reste", () => {
+    expect(
+      removeTargetsFromBlocklist(current, {
+        emails: ["spam@nms.asia"],
+        oauthIds: ["g-1"],
+        domains: ["nms.asia"],
+      })
+    ).toEqual({
+      emails: ["keep@gmail.com"],
+      oauthIds: ["g-keep"],
+      domains: ["keep.com"],
+    });
+  });
+
+  it("matche email et domaine quelle que soit la casse", () => {
+    expect(
+      removeTargetsFromBlocklist(current, {
+        emails: ["SPAM@NMS.asia"],
+        domains: ["NMS.ASIA"],
+      }).emails
+    ).toEqual(["keep@gmail.com"]);
+  });
+
+  it("est idempotent : retirer une entrée absente ne change rien", () => {
+    expect(
+      removeTargetsFromBlocklist(current, { emails: ["ghost@x.com"] })
+    ).toEqual(current);
   });
 });
