@@ -1,6 +1,11 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { Ban } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
+import {
+  getDynamicBlocklist,
+  isEmailBlocked,
+} from "@/infrastructure/auth/dynamic-blocklist";
 import { AdminSearch } from "@/components/admin/admin-search";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { SortableTableHead } from "@/components/admin/sortable-table-head";
@@ -35,9 +40,11 @@ export default async function AdminUsersPage({ searchParams }: Props) {
     <SortableTableHead label={label} column={column} currentSort={sort} currentOrder={order} basePath={BASE} params={sortParams} className={className} />
   );
 
-  const [users, total] = await Promise.all([
+  const [users, total, blocklist] = await Promise.all([
     prismaAdminRepository.findAllUsers({ search, limit: PAGE_SIZE, offset, sortBy: sort, sortOrder: order }),
     prismaAdminRepository.countUsers({ search }),
+    // Une seule lecture Edge Config pour criber toute la page en mémoire.
+    getDynamicBlocklist(),
   ]);
 
   return (
@@ -69,12 +76,20 @@ export default async function AdminUsersPage({ searchParams }: Props) {
               users.map((user) => (
                 <TableRow key={user.id}>
                   <TableCell>
-                    <Link
-                      href={`/admin/users/${user.id}`}
-                      className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
-                    >
-                      {[user.firstName, user.lastName].filter(Boolean).join(" ") || "—"}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/users/${user.id}`}
+                        className="font-medium hover:text-primary dark:hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                      >
+                        {[user.firstName, user.lastName].filter(Boolean).join(" ") || "—"}
+                      </Link>
+                      {isEmailBlocked(blocklist, user.email) && (
+                        <Badge className="bg-red-100 text-red-800 border-transparent">
+                          <Ban className="mr-1 size-3" />
+                          {t("table.blocked")}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{user.email}</TableCell>
                   <TableCell>

@@ -16,9 +16,16 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Ban, ShieldX } from "lucide-react";
-import { auditUserAction, blockSignInAction } from "@/app/actions/audit-user";
-import type { BlockTargets } from "@/infrastructure/services/audit/blocklist-admin";
+import { Ban, ShieldCheck, ShieldX } from "lucide-react";
+import {
+  auditUserAction,
+  blockSignInAction,
+  unblockSignInAction,
+} from "@/app/actions/audit-user";
+import type {
+  BlocklistWriteResult,
+  BlockTargets,
+} from "@/infrastructure/services/audit/blocklist-admin";
 import type {
   AuditReport,
   AuditTargets,
@@ -68,42 +75,66 @@ function SignalBox({
   );
 }
 
-function BlockButton({
+// Bouton générique pour une mutation de blocklist (blocage OU déblocage) :
+// même mécanique (confirmation + transition + états done/skipped/failed), seuls
+// l'action, le ton (destructif vs restauratif) et les libellés changent.
+function BlocklistActionButton({
   label,
   confirmTitle,
   confirmDescription,
+  confirmLabel,
+  doneLabel,
   targets,
+  action,
+  tone,
 }: {
   label: string;
   confirmTitle: string;
   confirmDescription: string;
+  confirmLabel: string;
+  doneLabel: string;
   targets: BlockTargets;
+  action: (
+    targets: BlockTargets
+  ) => Promise<{ status: BlocklistWriteResult | "unauthorized" }>;
+  tone: "destructive" | "neutral";
 }) {
   const t = useTranslations("Admin.audit");
   const [open, setOpen] = useState(false);
-  const [status, setStatus] = useState<
-    "idle" | "blocked" | "skipped" | "failed"
-  >("idle");
+  const [status, setStatus] = useState<"idle" | "done" | "skipped" | "failed">(
+    "idle"
+  );
   const [pending, start] = useTransition();
+  const destructive = tone === "destructive";
 
   const run = () =>
     start(async () => {
-      const res = await blockSignInAction(targets);
+      const res = await action(targets);
       setOpen(false);
       setStatus(
-        res.status === "blocked"
-          ? "blocked"
+        res.status === "applied"
+          ? "done"
           : res.status === "skipped"
             ? "skipped"
             : "failed"
       );
     });
 
-  if (status === "blocked") {
+  if (status === "done") {
     return (
-      <Badge className="bg-red-100 text-red-800 border-transparent">
-        <ShieldX className="mr-1 size-3" />
-        {t("blockedDone")}
+      <Badge
+        className={
+          destructive
+            ? "bg-red-100 text-red-800 border-transparent"
+            : "bg-green-100 text-green-800 border-transparent"
+        }
+      >
+        {destructive ? (
+          <ShieldX className="mr-1 size-3" />
+        ) : (
+          <ShieldCheck className="mr-1 size-3" />
+        )}
+        {doneLabel}
       </Badge>
     );
   }
@@ -116,35 +147,49 @@ function BlockButton({
         </span>
       )}
       {status === "failed" && (
-        <span className="text-xs text-destructive">{t("blockFailed")}</span>
+        <span className="text-xs text-destructive">
+          {destructive ? t("blockFailed") : t("unblockFailed")}
+        </span>
       )}
       <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Ban className="mr-1.5 size-3.5" />
-          {label}
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
-          <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={run}
-            disabled={pending}
-            className="bg-destructive text-white hover:bg-destructive/90"
+        <AlertDialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={
+              destructive
+                ? "border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive"
+                : undefined
+            }
           >
-            {t("confirmBlock")}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+            {destructive ? (
+              <Ban className="mr-1.5 size-3.5" />
+            ) : (
+              <ShieldCheck className="mr-1.5 size-3.5" />
+            )}
+            {label}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{confirmTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{confirmDescription}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={run}
+              disabled={pending}
+              className={
+                destructive
+                  ? "bg-destructive text-white hover:bg-destructive/90"
+                  : undefined
+              }
+            >
+              {confirmLabel}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
       </AlertDialog>
     </span>
   );
@@ -154,31 +199,85 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
   const t = useTranslations("Admin.audit");
   if (!targets.email) return null;
 
-  if (targets.alreadyBlocked) {
+  const reason = targets.blockReason;
+
+  // Bloqué EN DUR dans le code (sign-in-blocklist.ts) : non débloquable depuis
+  // l'UI (ce serait une fausse confirmation). On le signale, sans bouton.
+  if (reason === "static") {
     return (
-      <div className="border-t pt-3">
+      <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+        <Badge className="bg-red-100 text-red-800 border-transparent">
+          <ShieldX className="mr-1 size-3" />
+          {t("staticBlocked")}
+        </Badge>
+      </div>
+    );
+  }
+
+  // Bloqué dynamiquement → on propose UNIQUEMENT l'action inverse du canal qui
+  // bloque réellement (compte vs domaine), pour ne jamais afficher un faux
+  // « Débloqué » sur un canal qui n'était pas concerné.
+  if (reason) {
+    const isDomain = reason === "domain";
+    return (
+      <div className="flex flex-wrap items-center gap-2 border-t pt-3">
         <Badge className="bg-red-100 text-red-800 border-transparent">
           <ShieldX className="mr-1 size-3" />
           {t("alreadyBlocked")}
         </Badge>
+        {isDomain && targets.domain ? (
+          <BlocklistActionButton
+            label={t("unblockDomain", { domain: targets.domain })}
+            confirmTitle={t("confirmUnblockDomainTitle", {
+              domain: targets.domain,
+            })}
+            confirmDescription={t("confirmUnblockDomainDesc", {
+              domain: targets.domain,
+            })}
+            confirmLabel={t("confirmUnblock")}
+            doneLabel={t("unblockedDone")}
+            targets={{ domains: [targets.domain] }}
+            action={unblockSignInAction}
+            tone="neutral"
+          />
+        ) : (
+          <BlocklistActionButton
+            label={t("unblockAccount")}
+            confirmTitle={t("confirmUnblockAccountTitle")}
+            confirmDescription={t("confirmUnblockAccountDesc")}
+            confirmLabel={t("confirmUnblock")}
+            doneLabel={t("unblockedDone")}
+            targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
+            action={unblockSignInAction}
+            tone="neutral"
+          />
+        )}
       </div>
     );
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2 border-t pt-3">
-      <BlockButton
+      <BlocklistActionButton
         label={t("blockAccount")}
         confirmTitle={t("confirmAccountTitle")}
         confirmDescription={t("confirmAccountDesc")}
+        confirmLabel={t("confirmBlock")}
+        doneLabel={t("blockedDone")}
         targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
+        action={blockSignInAction}
+        tone="destructive"
       />
       {targets.domain && (
-        <BlockButton
+        <BlocklistActionButton
           label={t("blockDomain", { domain: targets.domain })}
           confirmTitle={t("confirmDomainTitle")}
           confirmDescription={t("confirmDomainDesc", { domain: targets.domain })}
+          confirmLabel={t("confirmBlock")}
+          doneLabel={t("blockedDone")}
           targets={{ domains: [targets.domain] }}
+          action={blockSignInAction}
+          tone="destructive"
         />
       )}
     </div>

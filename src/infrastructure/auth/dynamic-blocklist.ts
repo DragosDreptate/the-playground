@@ -141,3 +141,24 @@ export async function checkBlockedSignIn(
   if (email && matchesDomainSuffix(email, dynamic.domains)) return "domain";
   return null;
 }
+
+/**
+ * Lecture publique de la surcouche dynamique (une seule lecture Edge Config).
+ * Pour cribler une LISTE d'utilisateurs en une fois (fiche admin) au lieu de
+ * `checkBlockedSignIn` par ligne, qui relirait Edge Config N fois.
+ */
+export async function getDynamicBlocklist(): Promise<DynamicBlocklist> {
+  return readDynamic();
+}
+
+/**
+ * Un email est-il bloqué (baseline statique OU email/domaine dynamique) ? Pur,
+ * sans IO : la blocklist est passée en argument (lue une seule fois en amont).
+ * Ne couvre pas le blocage par `oauthId` seul (rare, posé via la CLI) : la liste
+ * admin n'a pas les `providerAccountId` sous la main.
+ */
+export function isEmailBlocked(data: DynamicBlocklist, email: string): boolean {
+  if (isStaticBlockedSignIn(email, null)) return true;
+  if (matchIdentityReason(data, { email })) return true;
+  return matchesDomainSuffix(email, data.domains);
+}

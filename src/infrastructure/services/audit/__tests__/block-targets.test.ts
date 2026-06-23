@@ -4,19 +4,19 @@ import { toAuditTargets } from "@/infrastructure/services/audit/block-targets";
 
 describe("toAuditTargets", () => {
   describe("given un vrai domaine", () => {
-    it("renvoie email, domaine, oauthIds et statut bloqué", () => {
+    it("renvoie email, domaine, oauthIds et la raison du blocage", () => {
       expect(
         toAuditTargets({
           email: "spam@nms.asia",
           oauthIds: ["g-123", "gh-456"],
           emailDomain: "nms.asia",
-          blocked: false,
+          blockReason: null,
         })
       ).toEqual({
         email: "spam@nms.asia",
         domain: "nms.asia",
         oauthIds: ["g-123", "gh-456"],
-        alreadyBlocked: false,
+        blockReason: null,
       });
     });
   });
@@ -28,7 +28,7 @@ describe("toAuditTargets", () => {
           email: "x@y",
           oauthIds: [],
           emailDomain: "unknown",
-          blocked: false,
+          blockReason: null,
         }).domain
       ).toBeNull();
     });
@@ -39,22 +39,22 @@ describe("toAuditTargets", () => {
           email: "x@y",
           oauthIds: [],
           emailDomain: "",
-          blocked: false,
+          blockReason: null,
         }).domain
       ).toBeNull();
     });
   });
 
   describe("given un compte déjà bloqué", () => {
-    it("remonte alreadyBlocked = true", () => {
+    it("remonte la raison du blocage (canal)", () => {
       expect(
         toAuditTargets({
           email: "a@b.com",
           oauthIds: [],
           emailDomain: "b.com",
-          blocked: true,
-        }).alreadyBlocked
-      ).toBe(true);
+          blockReason: "domain",
+        }).blockReason
+      ).toBe("domain");
     });
   });
 });

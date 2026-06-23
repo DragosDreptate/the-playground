@@ -1,3 +1,5 @@
+import type { Prisma } from "@prisma/client";
+import { prisma } from "@/infrastructure/db/prisma";
 import {
   coerceBlocklist,
   SIGN_IN_BLOCKLIST_KEY,
@@ -22,13 +24,14 @@ export type BlockTargets = {
 };
 
 /**
- * - `blocked` : écrit dans la blocklist prod.
+ * Résultat d'une mutation de la blocklist (blocage OU déblocage) :
+ * - `applied` : écrit dans la blocklist prod.
  * - `skipped` : non écrit car hors production (guard symétrique avec sendSlack /
  *   safe-resend : l'Edge Config est unique/prod, on ne l'édite pas depuis
- *   local/preview pour éviter un blocage accidentel d'un vrai compte en test).
+ *   local/preview pour éviter de toucher la vraie blocklist en test).
  * - `failed` : token manquant ou erreur d'écriture.
  */
-export type BlockResult = "blocked" | "skipped" | "failed";
+export type BlocklistWriteResult = "applied" | "skipped" | "failed";
 
 function mergeUnique(existing: string[], add: string[]): string[] {
   // Ignore les cibles vides/blanches (sinon on écrirait "" dans la blocklist).
@@ -36,14 +39,15 @@ function mergeUnique(existing: string[], add: string[]): string[] {
 }
 
 /**
- * Ajoute les cibles fournies à la blocklist (idempotent, dédupliqué).
- * Écriture en **production uniquement**. `VERCEL_TOKEN` requis.
+ * Scaffolding read-merge-write de la blocklist Edge Config, partagé par le
+ * blocage et le déblocage. `transform` reçoit l'état courant et renvoie l'état
+ * cible. Écriture en **production uniquement** (`VERCEL_TOKEN` requis).
  */
-export async function addToBlocklist(
-  targets: BlockTargets
-): Promise<BlockResult> {
+async function mutateBlocklist(
+  transform: (current: DynamicBlocklist) => DynamicBlocklist
+): Promise<BlocklistWriteResult> {
   if (process.env.VERCEL_ENV !== "production") {
-    console.warn("[non-prod] Blocage ignoré (Edge Config = prod) :", targets);
+    console.warn("[non-prod] Mutation blocklist ignorée (Edge Config = prod)");
     return "skipped";
   }
   const token = process.env.VERCEL_TOKEN;
@@ -63,32 +67,131 @@ export async function addToBlocklist(
         ((await getRes.json()) as { value?: unknown }).value
       );
 
-    const next: DynamicBlocklist = {
-      emails: mergeUnique(
-        current.emails,
-        (targets.emails ?? []).map((e) => e.trim().toLowerCase())
-      ),
-      oauthIds: mergeUnique(
-        current.oauthIds,
-        (targets.oauthIds ?? []).map((o) => o.trim())
-      ),
-      domains: mergeUnique(
-        current.domains,
-        (targets.domains ?? []).map((d) => normalizeDomain(d))
-      ),
-    };
-
     const patchRes = await fetch(`${base}/items${teamQuery}`, {
       method: "PATCH",
       headers: { ...authHeaders, "Content-Type": "application/json" },
       body: JSON.stringify({
         items: [
-          { operation: "upsert", key: SIGN_IN_BLOCKLIST_KEY, value: next },
+          {
+            operation: "upsert",
+            key: SIGN_IN_BLOCKLIST_KEY,
+            value: transform(current),
+          },
         ],
       }),
     });
-    return patchRes.ok ? "blocked" : "failed";
+    return patchRes.ok ? "applied" : "failed";
   } catch {
     return "failed";
   }
+}
+
+/**
+ * Ajoute les cibles fournies à la blocklist (idempotent, dédupliqué).
+ */
+export async function addToBlocklist(
+  targets: BlockTargets
+): Promise<BlocklistWriteResult> {
+  return mutateBlocklist((current) => ({
+    emails: mergeUnique(
+      current.emails,
+      (targets.emails ?? []).map((e) => e.trim().toLowerCase())
+    ),
+    oauthIds: mergeUnique(
+      current.oauthIds,
+      (targets.oauthIds ?? []).map((o) => o.trim())
+    ),
+    domains: mergeUnique(
+      current.domains,
+      (targets.domains ?? []).map((d) => normalizeDomain(d))
+    ),
+  }));
+}
+
+/**
+ * Retire les cibles d'une blocklist (transformation pure, testable). Idempotent :
+ * retirer une entrée absente laisse la liste inchangée. Comparaisons normalisées
+ * (email lowercase, domaine via normalizeDomain) pour matcher quelle que soit la
+ * casse stockée.
+ */
+export function removeTargetsFromBlocklist(
+  current: DynamicBlocklist,
+  targets: BlockTargets
+): DynamicBlocklist {
+  const emails = new Set(
+    (targets.emails ?? []).map((e) => e.trim().toLowerCase())
+  );
+  const oauthIds = new Set((targets.oauthIds ?? []).map((o) => o.trim()));
+  const domains = new Set(
+    (targets.domains ?? []).map((d) => normalizeDomain(d)).filter(Boolean)
+  );
+  return {
+    emails: current.emails.filter((e) => !emails.has(e.trim().toLowerCase())),
+    oauthIds: current.oauthIds.filter((o) => !oauthIds.has(o.trim())),
+    domains: current.domains.filter((d) => !domains.has(normalizeDomain(d))),
+  };
+}
+
+/**
+ * Retire les cibles fournies de la blocklist (action inverse du blocage).
+ */
+export async function removeFromBlocklist(
+  targets: BlockTargets
+): Promise<BlocklistWriteResult> {
+  return mutateBlocklist((current) =>
+    removeTargetsFromBlocklist(current, targets)
+  );
+}
+
+/**
+ * Filtre Prisma des users visés par un blocage (email / oauthId / domaine).
+ * Pur et testable. Renvoie `null` si aucune cible exploitable, pour éviter un
+ * `deleteMany` sans `where` qui viderait toutes les sessions.
+ */
+export function buildBlockedUsersFilter(
+  targets: BlockTargets
+): Prisma.UserWhereInput | null {
+  const or: Prisma.UserWhereInput[] = [];
+
+  const emails = (targets.emails ?? []).filter((e) => e.length > 0);
+  if (emails.length) or.push({ email: { in: emails } });
+
+  const oauthIds = (targets.oauthIds ?? []).filter((o) => o.length > 0);
+  if (oauthIds.length) {
+    or.push({ accounts: { some: { providerAccountId: { in: oauthIds } } } });
+  }
+
+  for (const d of targets.domains ?? []) {
+    const dom = normalizeDomain(d);
+    if (!dom) continue;
+    // Miroir du suffix-walk de matchesDomainSuffix (qui bloque aussi les
+    // sous-domaines au sign-in) : on couvre `@domain` ET `.domain` pour ne pas
+    // laisser de session active à un user en `x@sub.domain`. insensitive : un
+    // email stocké « X@Domain.COM » doit matcher « domain.com ».
+    or.push({ email: { endsWith: `@${dom}`, mode: "insensitive" } });
+    or.push({ email: { endsWith: `.${dom}`, mode: "insensitive" } });
+  }
+
+  return or.length ? { OR: or } : null;
+}
+
+/**
+ * Révoque (supprime) les sessions actives des comptes visés par un blocage.
+ * Le blocage seul empêche de **se reconnecter** mais ne tue PAS une session DB
+ * déjà ouverte (la blocklist n'est vérifiée qu'au sign-in) : sans ça, un
+ * spammeur déjà connecté garde l'accès jusqu'à expiration. Renvoie le nombre de
+ * sessions supprimées.
+ */
+export async function revokeSessionsForTargets(
+  targets: BlockTargets
+): Promise<number> {
+  const userWhere = buildBlockedUsersFilter(targets);
+  if (!userWhere) return 0;
+
+  // Un seul aller-retour : on supprime les sessions via le filtre de relation
+  // `user` (pas de findMany d'ids intermédiaire).
+  const { count } = await prisma.session.deleteMany({
+    where: { user: userWhere },
+  });
+  return count;
 }
