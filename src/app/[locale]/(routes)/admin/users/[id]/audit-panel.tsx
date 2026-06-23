@@ -26,6 +26,7 @@ import type {
   BlocklistWriteResult,
   BlockTargets,
 } from "@/infrastructure/services/audit/blocklist-admin";
+import type { BlockMatch } from "@/infrastructure/auth/dynamic-blocklist";
 import type {
   AuditReport,
   AuditTargets,
@@ -87,6 +88,7 @@ function BlocklistActionButton({
   targets,
   action,
   tone,
+  onApplied,
 }: {
   label: string;
   confirmTitle: string;
@@ -101,6 +103,9 @@ function BlocklistActionButton({
     sessionsRevoked?: number | "failed" | null;
   }>;
   tone: "destructive" | "neutral";
+  // Appelé après une mutation pleinement réussie, pour que le parent bascule les
+  // boutons (bloquer ↔ débloquer) sans attendre un refresh serveur.
+  onApplied?: () => void;
 }) {
   const t = useTranslations("Admin.audit");
   const [open, setOpen] = useState(false);
@@ -115,8 +120,14 @@ function BlocklistActionButton({
       const res = await action(targets);
       setOpen(false);
       if (res.status === "applied") {
-        // Bloqué mais sessions non coupées → "partial" (avertissement), sinon OK.
-        setStatus(res.sessionsRevoked === "failed" ? "partial" : "done");
+        if (res.sessionsRevoked === "failed") {
+          // Bloqué mais sessions non coupées : on garde l'avertissement, on ne
+          // bascule PAS les boutons (l'admin doit pouvoir réessayer).
+          setStatus("partial");
+        } else {
+          setStatus("done");
+          onApplied?.();
+        }
       } else if (res.status === "skipped") {
         setStatus("skipped");
       } else {
@@ -210,11 +221,17 @@ function BlocklistActionButton({
   );
 }
 
-function BlockActions({ targets }: { targets: AuditTargets }) {
+function BlockActions({
+  targets,
+  reason,
+  onReasonChange,
+}: {
+  targets: AuditTargets;
+  reason: BlockMatch | null;
+  onReasonChange: (reason: BlockMatch | null) => void;
+}) {
   const t = useTranslations("Admin.audit");
   if (!targets.email) return null;
-
-  const reason = targets.blockReason;
 
   // Bloqué EN DUR dans le code (sign-in-blocklist.ts) : non débloquable depuis
   // l'UI (ce serait une fausse confirmation). On le signale, sans bouton.
@@ -254,6 +271,7 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
             targets={{ domains: [targets.domain] }}
             action={unblockSignInAction}
             tone="neutral"
+            onApplied={() => onReasonChange(null)}
           />
         ) : (
           <BlocklistActionButton
@@ -265,6 +283,7 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
             targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
             action={unblockSignInAction}
             tone="neutral"
+            onApplied={() => onReasonChange(null)}
           />
         )}
       </div>
@@ -282,6 +301,7 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
         targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
         action={blockSignInAction}
         tone="destructive"
+        onApplied={() => onReasonChange("email")}
       />
       {targets.domain && (
         <BlocklistActionButton
@@ -293,6 +313,7 @@ function BlockActions({ targets }: { targets: AuditTargets }) {
           targets={{ domains: [targets.domain] }}
           action={blockSignInAction}
           tone="destructive"
+          onApplied={() => onReasonChange("domain")}
         />
       )}
     </div>
@@ -313,9 +334,17 @@ export function AdminUserAuditPanel({
   const [report, setReport] = useState<AuditReport | null>(null);
   const [targets, setTargets] = useState<AuditTargets | null>(null);
   const [failed, setFailed] = useState(false);
+  // Override optimiste du canal de blocage après une action (bloquer/débloquer),
+  // pour basculer les boutons immédiatement sans dépendre d'un refresh serveur
+  // (l'Edge Config n'est pas cohérente instantanément après écriture).
+  // undefined = pas d'override, on suit la valeur serveur.
+  const [reasonOverride, setReasonOverride] = useState<
+    BlockMatch | null | undefined
+  >(undefined);
 
   const run = () => {
     setFailed(false);
+    setReasonOverride(undefined); // un nouvel audit refait foi sur l'état blocklist
     start(async () => {
       const res = await auditUserAction(userId, email);
       if (res.ok) {
@@ -328,6 +357,12 @@ export function AdminUserAuditPanel({
       }
     });
   };
+
+  const effectiveTargets = targets ?? initialTargets;
+  const reason =
+    reasonOverride === undefined
+      ? effectiveTargets.blockReason
+      : reasonOverride;
 
   return (
     <Card>
@@ -383,8 +418,13 @@ export function AdminUserAuditPanel({
           </>
         )}
         {/* Boutons de blocage TOUJOURS visibles. Après un audit, on prend les
-            cibles fraîchement renvoyées ; sinon celles calculées au rendu. */}
-        <BlockActions targets={targets ?? initialTargets} />
+            cibles fraîchement renvoyées ; sinon celles calculées au rendu. Le
+            `reason` bascule de façon optimiste après une action. */}
+        <BlockActions
+          targets={effectiveTargets}
+          reason={reason}
+          onReasonChange={setReasonOverride}
+        />
       </CardContent>
     </Card>
   );
