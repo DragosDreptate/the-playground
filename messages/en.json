@@ -878,6 +878,7 @@
     "table": {
       "search": "Search...",
       "noResults": "No results.",
+      "blocked": "Blocked",
       "previous": "Previous",
       "next": "Next",
       "showing": "Showing {from} to {to} of {total}"
