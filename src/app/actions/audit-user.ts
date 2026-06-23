@@ -83,7 +83,10 @@ export async function blockSignInAction(
     return { status, sessionsRevoked };
   } catch (error) {
     Sentry.captureException(error);
-    await Sentry.flush(2000);
+    // flush pour ne pas perdre l'event en serverless, mais il ne doit JAMAIS
+    // faire échouer l'action (sinon l'UI n'afficherait pas l'avertissement
+    // « bloqué mais session non coupée » — l'inverse du but recherché).
+    await Sentry.flush(2000).catch(() => {});
     return { status, sessionsRevoked: "failed" };
   }
 }

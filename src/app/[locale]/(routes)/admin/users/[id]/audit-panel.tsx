@@ -84,7 +84,6 @@ function BlocklistActionButton({
   confirmTitle,
   confirmDescription,
   confirmLabel,
-  doneLabel,
   targets,
   action,
   tone,
@@ -94,7 +93,6 @@ function BlocklistActionButton({
   confirmTitle: string;
   confirmDescription: string;
   confirmLabel: string;
-  doneLabel: string;
   targets: BlockTargets;
   action: (targets: BlockTargets) => Promise<{
     status: BlocklistWriteResult | "unauthorized";
@@ -110,7 +108,7 @@ function BlocklistActionButton({
   const t = useTranslations("Admin.audit");
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<
-    "idle" | "done" | "partial" | "skipped" | "failed"
+    "idle" | "partial" | "skipped" | "failed"
   >("idle");
   const [pending, start] = useTransition();
   const destructive = tone === "destructive";
@@ -121,11 +119,13 @@ function BlocklistActionButton({
       setOpen(false);
       if (res.status === "applied") {
         if (res.sessionsRevoked === "failed") {
-          // Bloqué mais sessions non coupées : on garde l'avertissement, on ne
-          // bascule PAS les boutons (l'admin doit pouvoir réessayer).
+          // Bloqué mais sessions non coupées : on NE bascule PAS les boutons. On
+          // affiche l'avertissement à côté du bouton, qui reste cliquable pour
+          // relancer le blocage (idempotent) + une nouvelle tentative de coupure.
           setStatus("partial");
         } else {
-          setStatus("done");
+          // Succès complet : le parent bascule les boutons (bloquer ↔ débloquer),
+          // ce qui démonte ce bouton — pas d'état « done » à rendre ici.
           onApplied?.();
         }
       } else if (res.status === "skipped") {
@@ -134,36 +134,6 @@ function BlocklistActionButton({
         setStatus("failed");
       }
     });
-
-  if (status === "done") {
-    return (
-      <Badge
-        className={
-          destructive
-            ? "bg-red-100 text-red-800 border-transparent"
-            : "bg-green-100 text-green-800 border-transparent"
-        }
-      >
-        {destructive ? (
-          <ShieldX className="mr-1 size-3" />
-        ) : (
-          <ShieldCheck className="mr-1 size-3" />
-        )}
-        {doneLabel}
-      </Badge>
-    );
-  }
-
-  // Blocage appliqué mais coupure de session échouée : le compte est bloqué
-  // (plus de reconnexion) mais une session reste active. À signaler clairement.
-  if (status === "partial") {
-    return (
-      <Badge className="bg-amber-100 text-amber-800 border-transparent">
-        <ShieldX className="mr-1 size-3" />
-        {t("blockedNoRevoke")}
-      </Badge>
-    );
-  }
 
   return (
     <span className="inline-flex items-center gap-2">
@@ -175,6 +145,11 @@ function BlocklistActionButton({
       {status === "failed" && (
         <span className="text-xs text-destructive">
           {destructive ? t("blockFailed") : t("unblockFailed")}
+        </span>
+      )}
+      {status === "partial" && (
+        <span className="text-xs text-amber-700 dark:text-amber-500">
+          {t("blockedNoRevoke")}
         </span>
       )}
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -267,7 +242,6 @@ function BlockActions({
               domain: targets.domain,
             })}
             confirmLabel={t("confirmUnblock")}
-            doneLabel={t("unblockedDone")}
             targets={{ domains: [targets.domain] }}
             action={unblockSignInAction}
             tone="neutral"
@@ -279,7 +253,6 @@ function BlockActions({
             confirmTitle={t("confirmUnblockAccountTitle")}
             confirmDescription={t("confirmUnblockAccountDesc")}
             confirmLabel={t("confirmUnblock")}
-            doneLabel={t("unblockedDone")}
             targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
             action={unblockSignInAction}
             tone="neutral"
@@ -297,7 +270,6 @@ function BlockActions({
         confirmTitle={t("confirmAccountTitle")}
         confirmDescription={t("confirmAccountDesc")}
         confirmLabel={t("confirmBlock")}
-        doneLabel={t("blockedDone")}
         targets={{ emails: [targets.email], oauthIds: targets.oauthIds }}
         action={blockSignInAction}
         tone="destructive"
@@ -309,7 +281,6 @@ function BlockActions({
           confirmTitle={t("confirmDomainTitle")}
           confirmDescription={t("confirmDomainDesc", { domain: targets.domain })}
           confirmLabel={t("confirmBlock")}
-          doneLabel={t("blockedDone")}
           targets={{ domains: [targets.domain] }}
           action={blockSignInAction}
           tone="destructive"
