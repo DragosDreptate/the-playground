@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 import { gatherUserAuditData } from "./gather-user-audit-data";
 import { buildAuditPrompt } from "./build-audit-prompt";
+import { NO_TARGETS, toAuditTargets } from "./block-targets";
 import type {
   AuditDossier,
   AuditOutcome,
@@ -10,24 +11,15 @@ import type {
   AuditVerdictLean,
 } from "./types";
 
-const NO_TARGETS: AuditTargets = {
-  email: null,
-  domain: null,
-  oauthIds: [],
-  alreadyBlocked: false,
-};
-
 /** Cibles de blocage déduites du dossier (le blocage reste une action humaine). */
 function targetsFromDossier(dossier: AuditDossier): AuditTargets {
   if (!dossier.found || !dossier.account) return NO_TARGETS;
-  const domain = dossier.derived?.emailDomain;
-  return {
+  return toAuditTargets({
     email: dossier.account.email,
-    // null si pas de vrai domaine ("unknown" ne doit pas devenir une cible).
-    domain: domain && domain !== "unknown" ? domain : null,
     oauthIds: dossier.account.providers.map((p) => p.providerAccountId),
-    alreadyBlocked: dossier.derived?.blocked ?? false,
-  };
+    emailDomain: dossier.derived?.emailDomain ?? "unknown",
+    blocked: dossier.derived?.blocked ?? false,
+  });
 }
 
 // Modèle par défaut selon l'environnement : Opus en prod (meilleure finesse,

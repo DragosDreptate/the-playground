@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { prismaAdminRepository } from "@/infrastructure/repositories";
+import { buildBlockTargets } from "@/infrastructure/services/audit/block-targets";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,7 +30,13 @@ export default async function AdminUserDetailPage({ params }: Props) {
   const t = await getTranslations("Admin");
   const tRole = await getTranslations("Dashboard.role");
   const locale = await getLocale();
-  const user = await prismaAdminRepository.findUserById(id);
+  // Les deux ne dépendent que de `id` → en parallèle (pas de round-trip en
+  // série). buildBlockTargets calcule les cibles de blocage au rendu pour
+  // afficher les boutons en permanence (pas seulement après un audit).
+  const [user, blockTargets] = await Promise.all([
+    prismaAdminRepository.findUserById(id),
+    buildBlockTargets(id),
+  ]);
 
   if (!user) notFound();
 
@@ -159,7 +166,11 @@ export default async function AdminUserDetailPage({ params }: Props) {
         </CardContent>
       </Card>
 
-      <AdminUserAuditPanel userId={user.id} email={user.email} />
+      <AdminUserAuditPanel
+        userId={user.id}
+        email={user.email}
+        initialTargets={blockTargets}
+      />
 
       <Card>
         <CardHeader>
