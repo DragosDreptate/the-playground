@@ -45,6 +45,10 @@ describe("renderOgImage", () => {
 
       expect(res.headers.get("content-type")).toBe("image/jpeg");
       expect(res.headers.get("cache-control")).toContain("stale-while-revalidate");
+      // Content-Length explicite : requis par le proxy d'image de Slack.
+      const len = Number(res.headers.get("content-length"));
+      const body = new Uint8Array(await res.arrayBuffer());
+      expect(len).toBe(body.byteLength);
     });
 
     it("produit un corps réellement encodé en JPEG (magic bytes FF D8 FF)", async () => {
