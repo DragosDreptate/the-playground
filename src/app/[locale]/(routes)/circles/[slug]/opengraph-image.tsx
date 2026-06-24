@@ -1,17 +1,12 @@
 import { getTranslations } from "next-intl/server";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
-import { renderOgImage } from "@/lib/og/render";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
 import { getMomentGradient } from "@/lib/gradient";
-import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
+import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
+import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
 import { truncate } from "@/lib/text";
-import {
-  OG_COLORS,
-  OgBrandingPill,
-  OgCoverBackground,
-  OgPureCoverLayout,
-} from "@/lib/og/components";
+import { OgFallbackFrame } from "@/lib/og/components";
 
 export const runtime = "nodejs";
 export const alt = "Community — The Playground";
@@ -44,14 +39,12 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const coverDataUrl = circle.coverImage
-    ? await loadOgCoverAsDataUrl(circle.coverImage)
+  const coverJpeg = circle.coverImage
+    ? await loadCoverAsOgJpeg(circle.coverImage)
     : null;
 
-  if (coverDataUrl) {
-    return renderOgImage(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
-      ...size,
-    });
+  if (coverJpeg) {
+    return ogJpegResponse(coverJpeg);
   }
 
   // Pas de cover → fallback content-rich : titre et meta dans l'image.
@@ -62,23 +55,9 @@ export default async function OgImage({
   const memberLabel = t("members", { count: memberCount });
   const metaText = circle.city ? `${memberLabel} · ${circle.city}` : memberLabel;
 
-  return renderOgImage(
+  return ogFallbackResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          position: "relative",
-          background: OG_COLORS.bgDark,
-        }}
-      >
-        <OgCoverBackground
-          coverDataUrl={null}
-          gradient={getMomentGradient(circle.id)}
-        />
-        <OgBrandingPill />
-
+      <OgFallbackFrame gradient={getMomentGradient(circle.id)}>
         <div
           style={{
             position: "absolute",
@@ -115,7 +94,7 @@ export default async function OgImage({
             {truncate(metaText, META_MAX)}
           </div>
         </div>
-      </div>
+      </OgFallbackFrame>
     ),
     { ...size },
   );

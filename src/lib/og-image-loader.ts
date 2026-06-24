@@ -1,24 +1,20 @@
 import sharp from "sharp";
+import { OG_JPEG_OPTIONS } from "@/lib/og/render";
 
 const OG_COVER_SIZE = 1200;
 
 /**
- * Charge la cover, la re-encode systématiquement en JPEG q80 redimensionné à
- * 1200×1200 puis la renvoie comme data URL inlinable.
+ * Charge la cover et la renvoie comme JPEG carré 1200×1200 directement
+ * servable en og:image — sans aucune composition (pas de pill, pas de Satori).
  *
- * Pourquoi forcer JPEG + resize :
- * - Satori (next/og) ne sait pas décoder le WebP — il faut convertir.
- * - Inliner une cover originale (souvent 1080–4000 px, parfois en PNG)
- *   gonfle la réponse de plusieurs centaines de Ko et fait travailler Satori
- *   pour rien. On la cale au format de la canvas (1200×1200).
- * - La cover est toujours rendue derrière un scrim noir 55% → JPEG q80 est
- *   visuellement indiscernable du PNG et ~5–10× plus léger.
+ * - `flatten` sur blanc : les covers PNG/WebP transparentes (logos conçus pour
+ *   fond clair) seraient illisibles sinon. Aucun effet sur les covers opaques.
+ * - JPEG q82 : indispensable pour le poids — WhatsApp n'affiche pas les images
+ *   trop lourdes (le PNG 1200×1200 d'origine pesait ~1 Mo et était ignoré).
  *
- * Renvoie null en cas d'échec : le caller retombe sur un fallback gradient.
+ * Renvoie null en cas d'échec → le caller retombe sur le fallback gradient.
  */
-export async function loadOgCoverAsDataUrl(
-  url: string,
-): Promise<string | null> {
+export async function loadCoverAsOgJpeg(url: string): Promise<Buffer | null> {
   try {
     const response = await fetch(url, {
       cache: "force-cache",
@@ -27,12 +23,11 @@ export async function loadOgCoverAsDataUrl(
     if (!response.ok) return null;
 
     const buffer = Buffer.from(await response.arrayBuffer());
-    const output = await sharp(buffer)
+    return await sharp(buffer)
       .resize(OG_COVER_SIZE, OG_COVER_SIZE, { fit: "cover" })
-      .jpeg({ quality: 80, mozjpeg: true })
+      .flatten({ background: "#ffffff" })
+      .jpeg(OG_JPEG_OPTIONS)
       .toBuffer();
-
-    return `data:image/jpeg;base64,${output.toString("base64")}`;
   } catch {
     return null;
   }

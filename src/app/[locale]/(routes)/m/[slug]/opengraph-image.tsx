@@ -2,20 +2,15 @@ import {
   prismaMomentRepository,
   prismaCircleRepository,
 } from "@/infrastructure/repositories";
-import { renderOgImage } from "@/lib/og/render";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { getMomentGradient } from "@/lib/gradient";
-import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
+import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
+import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
 import { formatOgDateBadge } from "@/lib/format-date";
 import { truncate } from "@/lib/text";
-import {
-  OG_COLORS,
-  OgBrandingPill,
-  OgCoverBackground,
-  OgPureCoverLayout,
-} from "@/lib/og/components";
+import { OG_COLORS, OgFallbackFrame } from "@/lib/og/components";
 import type { LocationType } from "@/domain/models/moment";
 
 export const runtime = "nodejs";
@@ -61,14 +56,12 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const coverDataUrl = moment.coverImage
-    ? await loadOgCoverAsDataUrl(moment.coverImage)
+  const coverJpeg = moment.coverImage
+    ? await loadCoverAsOgJpeg(moment.coverImage)
     : null;
 
-  if (coverDataUrl) {
-    return renderOgImage(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
-      ...size,
-    });
+  if (coverJpeg) {
+    return ogJpegResponse(coverJpeg);
   }
 
   // Pas de cover → fallback content-rich : tout dans l'image puisque rien d'autre n'y figure.
@@ -82,23 +75,9 @@ export default async function OgImage({
   );
   const metaText = location ? `${weekday} ${time} · ${location}` : `${weekday} ${time}`;
 
-  return renderOgImage(
+  return ogFallbackResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          position: "relative",
-          background: OG_COLORS.bgDark,
-        }}
-      >
-        <OgCoverBackground
-          coverDataUrl={null}
-          gradient={getMomentGradient(moment.id)}
-        />
-        <OgBrandingPill />
-
+      <OgFallbackFrame gradient={getMomentGradient(moment.id)}>
         <div
           style={{
             position: "absolute",
@@ -196,7 +175,7 @@ export default async function OgImage({
             </div>
           </div>
         </div>
-      </div>
+      </OgFallbackFrame>
     ),
     { ...size },
   );

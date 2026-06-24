@@ -20,13 +20,28 @@ vi.mock("next/og", () => ({
   },
 }));
 
-import { renderOgImage } from "../render";
+import { ogJpegResponse, ogFallbackResponse } from "../render";
 
 const element = null as never;
-const size = { width: 1200, height: 630 };
+const size = { width: 1200, height: 1200 };
 
-describe("renderOgImage", () => {
-  describe("given un PNG rendu valide", () => {
+describe("ogJpegResponse", () => {
+  it("sert un JPEG avec cache-control et SANS Content-Length", async () => {
+    const res = ogJpegResponse(Buffer.from([1, 2, 3, 4]));
+
+    expect(res.headers.get("content-type")).toBe("image/jpeg");
+    expect(res.headers.get("cache-control")).toContain("stale-while-revalidate");
+    // Garde anti-régression : surtout PAS de Content-Length, sinon le CDN
+    // tronque la réponse aux 32 Ko du Range de Slack.
+    expect(res.headers.get("content-length")).toBeNull();
+
+    const body = new Uint8Array(await res.arrayBuffer());
+    expect(Array.from(body)).toEqual([1, 2, 3, 4]);
+  });
+});
+
+describe("ogFallbackResponse", () => {
+  describe("given un rendu Satori valide", () => {
     let realPng: Uint8Array;
 
     beforeAll(async () => {
@@ -39,22 +54,12 @@ describe("renderOgImage", () => {
       realPng.set(buf);
     });
 
-    it("renvoie une réponse JPEG avec les bons en-têtes de cache", async () => {
+    it("re-encode en JPEG (magic bytes FF D8 FF)", async () => {
       ogBytes.current = realPng;
-      const res = await renderOgImage(element, size);
+      const res = await ogFallbackResponse(element, size);
 
       expect(res.headers.get("content-type")).toBe("image/jpeg");
-      expect(res.headers.get("cache-control")).toContain("stale-while-revalidate");
-      // Garde anti-régression : surtout PAS de Content-Length, sinon le CDN
-      // Vercel tronque la réponse aux 32 Ko du Range de Slack (cf. render.ts).
-      expect(res.headers.get("content-length")).toBeNull();
-    });
-
-    it("produit un corps réellement encodé en JPEG (magic bytes FF D8 FF)", async () => {
-      ogBytes.current = realPng;
-      const res = await renderOgImage(element, size);
       const out = new Uint8Array(await res.arrayBuffer());
-
       expect(out[0]).toBe(0xff);
       expect(out[1]).toBe(0xd8);
       expect(out[2]).toBe(0xff);
@@ -62,16 +67,15 @@ describe("renderOgImage", () => {
   });
 
   describe("given un re-encodage qui échoue (octets non décodables)", () => {
-    it("retombe sur le PNG brut plutôt qu'un aperçu vide", async () => {
-      // Des octets qui ne sont pas une image → sharp rejette → fallback.
+    it("retombe sur le PNG brut plutôt qu'un 500", async () => {
       const garbage = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
       ogBytes.current = garbage;
 
-      const res = await renderOgImage(element, size);
-      const out = new Uint8Array(await res.arrayBuffer());
+      const res = await ogFallbackResponse(element, size);
 
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toBe("image/png");
+      const out = new Uint8Array(await res.arrayBuffer());
       expect(Array.from(out)).toEqual(Array.from(garbage));
     });
   });

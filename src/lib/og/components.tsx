@@ -6,7 +6,7 @@
  * imposés par le moteur de rendu — ne pas les supprimer.
  */
 
-const OG_SIZE = 1200;
+import type { ReactNode } from "react";
 
 const BRAND_PINK = "#ec4899";
 const BRAND_PURPLE = "#a855f7";
@@ -23,51 +23,19 @@ export const OG_COLORS = {
   logoGradient: `linear-gradient(135deg, ${BRAND_PINK}, ${BRAND_PURPLE})`,
 } as const;
 
-export function OgCoverBackground({
-  coverDataUrl,
-  gradient,
-}: {
-  coverDataUrl: string | null;
-  gradient?: string;
-}) {
-  if (coverDataUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={coverDataUrl}
-        alt=""
-        width={OG_SIZE}
-        height={OG_SIZE}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-      />
-    );
-  }
-  return (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: gradient,
-        display: "flex",
-      }}
-    />
-  );
-}
-
 /**
- * Layout og:image en mode "cover pure" : juste la cover plein cadre + la pill
- * de branding. Utilisé quand une cover est disponible — le titre, la date et
- * la description ne sont pas rasterisés dans l'image puisque les clients
- * (WhatsApp, iMessage, Slack…) les affichent déjà sous l'image via og:title
- * et og:description. Évite la triple redondance.
+ * Châssis de l'og:image quand il n'y a pas de cover : fond gradient (dérivé de
+ * l'ID de l'entité) + pill de branding. Le contenu spécifique (date, titre,
+ * nom de Communauté…) est passé en `children`. Les pages avec cover ne passent
+ * plus par ici : leur cover est servie en JPEG brut (cf. loadCoverAsOgJpeg).
  */
-export function OgPureCoverLayout({ coverDataUrl }: { coverDataUrl: string }) {
+export function OgFallbackFrame({
+  gradient,
+  children,
+}: {
+  gradient: string;
+  children: ReactNode;
+}) {
   return (
     <div
       style={{
@@ -78,8 +46,16 @@ export function OgPureCoverLayout({ coverDataUrl }: { coverDataUrl: string }) {
         background: OG_COLORS.bgDark,
       }}
     >
-      <OgCoverBackground coverDataUrl={coverDataUrl} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: gradient,
+          display: "flex",
+        }}
+      />
       <OgBrandingPill />
+      {children}
     </div>
   );
 }
