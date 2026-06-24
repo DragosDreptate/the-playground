@@ -1,6 +1,6 @@
-import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
+import { renderOgImage } from "@/lib/og/render";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
 import { getMomentGradient } from "@/lib/gradient";
@@ -16,7 +16,7 @@ import {
 export const runtime = "nodejs";
 export const alt = "Community — The Playground";
 export const size = { width: 1200, height: 1200 };
-export const contentType = "image/png";
+export const contentType = "image/jpeg";
 
 const NAME_MAX = 50;
 const META_MAX = 56;
@@ -49,7 +49,7 @@ export default async function OgImage({
     : null;
 
   if (coverDataUrl) {
-    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
+    return renderOgImage(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
       ...size,
     });
   }
@@ -62,7 +62,7 @@ export default async function OgImage({
   const memberLabel = t("members", { count: memberCount });
   const metaText = circle.city ? `${memberLabel} · ${circle.city}` : memberLabel;
 
-  return new ImageResponse(
+  return renderOgImage(
     (
       <div
         style={{
