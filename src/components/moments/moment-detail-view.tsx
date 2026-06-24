@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DeleteMomentDialog } from "@/components/moments/delete-moment-dialog";
+import { CancelMomentDialog } from "@/components/moments/cancel-moment-dialog";
 import { HostMessageDialog } from "@/components/moments/host-message-dialog";
 import { PublishMomentButton } from "@/components/moments/publish-moment-button";
 import { RegistrationButton } from "@/components/moments/registration-button";
@@ -108,6 +109,7 @@ type MomentCoverBlockProps = {
   gradient: string;
   sizes: string;
   demoLabel: string;
+  cancelledLabel?: string;
   children?: React.ReactNode;
 };
 
@@ -120,13 +122,21 @@ const breadcrumbStatusStyle: Record<string, string> = {
 
 function MomentCoverBlock({
   coverImage, coverImageAttribution, title, status, isDemo, gradient,
-  sizes, demoLabel, children,
+  sizes, demoLabel, cancelledLabel, children,
 }: MomentCoverBlockProps) {
   return (
     <div className="relative">
+      {/* Badge "Annulé" — hors du conteneur grayscale pour rester rouge et lisible */}
+      {status === "CANCELLED" && cancelledLabel && (
+        <div className="absolute top-3 left-3 z-20">
+          <span className="bg-destructive inline-flex items-center rounded-md px-2.5 py-1 text-sm leading-none text-white shadow-sm">
+            {cancelledLabel}
+          </span>
+        </div>
+      )}
       <div className="absolute inset-x-4 -bottom-3 h-10 opacity-60 blur-xl" style={{ background: gradient }} />
       <div
-        className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" ? "opacity-70 grayscale" : ""}`}
+        className={`relative w-full overflow-hidden rounded-2xl transition-all ${status === "PAST" || status === "CANCELLED" ? "opacity-70 grayscale" : ""}`}
         style={{ aspectRatio: "1 / 1" }}
       >
         {coverImage ? (
@@ -304,6 +314,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               gradient={gradient}
               sizes="(max-width: 1024px) 100vw, 340px"
               demoLabel={tCommon("demo")}
+              cancelledLabel={t("status.cancelled")}
             >
               {(moment.status === "PUBLISHED" || moment.status === "PAST") && props.appUrl && (
                 <MomentShareButton
@@ -388,18 +399,53 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
           <div className="border-border border-t max-lg:hidden" />
 
           {isHostView ? (
-            <div className="flex gap-2">
-              <Button asChild size="sm" className="flex-1">
+            moment.status === "DRAFT" ? (
+              <div className="flex gap-2">
+                <PublishMomentButton
+                  momentId={moment.id}
+                  circleSlug={props.circleSlug}
+                  momentSlug={props.momentSlug}
+                  className="flex-1"
+                />
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary flex-1"
+                >
+                  <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
+                    {tCommon("edit")}
+                  </Link>
+                </Button>
+              </div>
+            ) : moment.status === "PUBLISHED" ? (
+              <div className="flex gap-2">
+                <Button asChild size="sm" className="flex-1">
+                  <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
+                    {tCommon("edit")}
+                  </Link>
+                </Button>
+                <CancelMomentDialog momentId={moment.id} triggerClassName="flex-1" />
+              </div>
+            ) : moment.status === "CANCELLED" ? (
+              <DeleteMomentDialog
+                momentId={moment.id}
+                circleSlug={props.circleSlug}
+                triggerClassName="w-full"
+              />
+            ) : (
+              /* PAST — enrichir l'archive (l'événement a eu lieu) */
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary w-full"
+              >
                 <Link href={`/dashboard/circles/${props.circleSlug}/moments/${props.momentSlug}/edit`}>
                   {tCommon("edit")}
                 </Link>
               </Button>
-              <DeleteMomentDialog
-                momentId={moment.id}
-                circleSlug={props.circleSlug}
-                triggerClassName="flex-1"
-              />
-            </div>
+            )
           ) : props.isOrganizer ? (
             <Button asChild size="sm" className="w-full gap-1.5">
               <Link href={`/dashboard/circles/${circle.slug}/moments/${moment.slug}`}>
@@ -478,10 +524,10 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 {t("public.draftNotice")}
               </p>
               {isHostView && (
-                <PublishMomentButton
+                <DeleteMomentDialog
                   momentId={moment.id}
                   circleSlug={(props as HostViewProps).circleSlug}
-                  momentSlug={(props as HostViewProps).momentSlug}
+                  discreet
                 />
               )}
             </div>
@@ -503,6 +549,15 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     </span>
                   </>
                 )}
+              </p>
+            </div>
+          )}
+
+          {moment.status === "CANCELLED" && (
+            <div className="border-destructive/40 bg-destructive/5 flex items-center gap-3 rounded-xl border px-4 py-3 max-lg:order-3">
+              <CalendarIcon className="text-destructive size-4 shrink-0" />
+              <p className="text-destructive flex-1 text-sm font-medium">
+                {t("public.cancelledBannerTitle")}
               </p>
             </div>
           )}

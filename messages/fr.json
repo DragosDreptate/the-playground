@@ -567,6 +567,11 @@
       "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
       "confirm": "Oui, supprimer cet événement"
     },
+    "cancel": {
+      "title": "Annuler cet événement",
+      "description": "Cet événement sera marqué comme annulé. Les inscrits seront prévenus par email et remboursés automatiquement si l'événement était payant. Il restera visible dans ta Communauté avec le statut « Annulé ».",
+      "confirm": "Oui, annuler cet événement"
+    },
     "detail": {
       "when": "Quand",
       "where": "Où",
@@ -584,7 +589,9 @@
     },
     "actions": {
       "publish": "Publier",
-      "publishing": "Publication..."
+      "publishing": "Publication...",
+      "cancel": "Annuler l'événement",
+      "cancelling": "Annulation..."
     },
     "public": {
       "hostedBy": "Organisé par",
@@ -630,6 +637,7 @@
       "eventTookPlace": "Cet événement a eu lieu le",
       "eventEnded": "Événement terminé",
       "eventCancelled": "Événement annulé",
+      "cancelledBannerTitle": "Cet événement a été annulé",
       "attendedCount": "{count} personnes ont participé",
       "viewCircleMoments": "Voir les prochains événements de la communauté",
       "proposedByCommunity": "Proposé par la communauté",

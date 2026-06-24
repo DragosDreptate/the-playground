@@ -8,13 +8,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Moment, LocationType } from "@/domain/models/moment";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -283,30 +276,9 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             </div>
           )}
 
-          {/* Status select (edit mode, PUBLISHED/CANCELLED only — DRAFT uses publish button) */}
-          {moment && moment.status !== "DRAFT" && (
-            <div className="flex justify-end">
-              <Select
-                name="status"
-                defaultValue={moment.status === "PAST" ? undefined : moment.status}
-                disabled={moment.status === "PAST"}
-              >
-                <SelectTrigger className="w-auto">
-                  <SelectValue
-                    placeholder={moment.status === "PAST" ? t("status.past") : undefined}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PUBLISHED">
-                    {t("status.published")}
-                  </SelectItem>
-                  <SelectItem value="CANCELLED">
-                    {t("status.cancelled")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+          {/* Le statut n'est plus piloté ici : les transitions (Publier / Annuler /
+              Supprimer / Republier) passent par des boutons d'action contextuels
+              sur la page de gestion de l'événement. */}
 
           {/* Title — heading-style input */}
           <input

@@ -567,6 +567,11 @@
       "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",
       "confirm": "Yes, delete this Event"
     },
+    "cancel": {
+      "title": "Cancel this event",
+      "description": "This event will be marked as cancelled. Registered members will be notified by email and automatically refunded if the event was paid. It will remain visible in your Community with a \"Cancelled\" status.",
+      "confirm": "Yes, cancel this event"
+    },
     "detail": {
       "when": "When",
       "where": "Where",
@@ -584,7 +589,9 @@
     },
     "actions": {
       "publish": "Publish",
-      "publishing": "Publishing..."
+      "publishing": "Publishing...",
+      "cancel": "Cancel event",
+      "cancelling": "Cancelling..."
     },
     "public": {
       "hostedBy": "Hosted by",
@@ -630,6 +637,7 @@
       "eventTookPlace": "This event took place on",
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
+      "cancelledBannerTitle": "This event has been cancelled",
       "attendedCount": "{count} members attended",
       "viewCircleMoments": "See upcoming Events from this community",
       "proposedByCommunity": "Proposed by the community",

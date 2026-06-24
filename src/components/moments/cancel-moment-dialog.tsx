@@ -15,36 +15,32 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { deleteMomentAction } from "@/app/actions/moment";
+import { cancelMomentAction } from "@/app/actions/moment";
 
-type DeleteMomentDialogProps = {
+type CancelMomentDialogProps = {
   momentId: string;
-  circleSlug: string;
   triggerClassName?: string;
-  /** Rendu discret (lien ghost destructif sans bordure), pour un placement en bandeau. */
-  discreet?: boolean;
 };
 
-export function DeleteMomentDialog({
+export function CancelMomentDialog({
   momentId,
-  circleSlug,
   triggerClassName,
-  discreet = false,
-}: DeleteMomentDialogProps) {
+}: CancelMomentDialogProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleDelete() {
+  async function handleCancel() {
     setIsPending(true);
     setError(null);
 
-    const result = await deleteMomentAction(momentId);
+    const result = await cancelMomentAction(momentId);
 
     if (result.success) {
-      router.push(`/dashboard/circles/${circleSlug}`);
+      // L'événement reste sur la même page, en affichage annulé.
+      router.refresh();
     } else {
       setError(result.error);
       setIsPending(false);
@@ -55,22 +51,18 @@ export function DeleteMomentDialog({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button
-          variant={discreet ? "ghost" : "outline"}
+          variant="outline"
           size="sm"
-          className={
-            discreet
-              ? `text-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`
-              : `border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`
-          }
+          className={`text-primary border-primary/40 hover:border-primary hover:bg-primary/10 hover:text-primary ${triggerClassName ?? ""}`}
         >
-          {tCommon("delete")}
+          {t("actions.cancel")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("cancel.title")}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t("delete.description")}
+            {t("cancel.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
@@ -80,12 +72,8 @@ export function DeleteMomentDialog({
         )}
         <AlertDialogFooter>
           <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            disabled={isPending}
-            className="bg-destructive text-white hover:bg-destructive/90"
-          >
-            {isPending ? tCommon("loading") : t("delete.confirm")}
+          <AlertDialogAction onClick={handleCancel} disabled={isPending}>
+            {isPending ? t("actions.cancelling") : t("cancel.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
