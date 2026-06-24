@@ -1,5 +1,6 @@
 import { URGENCY_META, USER_IMPACT_META, type AnalysisResult } from "../sentry/analysis-meta";
 import type { AuditReport, AuditVerdictLean } from "../audit/types";
+import type { QuotaTier } from "@/lib/resend-quota";
 
 const ADMIN_WEBHOOK_URL = process.env.SLACK_ADMIN_WEBHOOK_URL;
 // Canal dédié aux erreurs Sentry (#sentry). Si non configuré, les notifs Sentry
@@ -18,28 +19,38 @@ type SlackBlock =
   | { type: "context"; elements: { type: "mrkdwn"; text: string }[] }
   | { type: "actions"; elements: { type: "button"; text: { type: "plain_text"; text: string }; url: string; style?: "primary" | "danger" }[] };
 
+/**
+ * Renvoie `true` uniquement si le message a été RÉELLEMENT délivré (webhook
+ * configuré, prod, réponse 2xx). `false` couvre webhook absent, garde non-prod,
+ * timeout, et réponse non-2xx (un fetch ne throw PAS sur 4xx/5xx — d'où le
+ * `res.ok` explicite). La plupart des appelants ignorent ce retour (Slack =
+ * best-effort), mais un appelant qui persiste un état « notifié » doit pouvoir
+ * distinguer délivré d'avalé en silence (cf. dédup quota Resend).
+ */
 async function sendSlack(
   payload: { text: string; blocks?: SlackBlock[] },
   webhookUrl: string | undefined = ADMIN_WEBHOOK_URL,
-): Promise<void> {
-  if (!webhookUrl) return;
+): Promise<boolean> {
+  if (!webhookUrl) return false;
 
   // Guard symétrique avec safe-resend : seul VERCEL_ENV=production laisse
   // passer. Tout le reste (preview, staging, local, CI) bloque — fail-closed.
   if (process.env.VERCEL_ENV !== "production") {
     console.warn("[staging-guard] Blocked Slack notification:", payload.text);
-    return;
+    return false;
   }
 
   try {
-    await fetch(webhookUrl, {
+    const res = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(5000),
     });
+    return res.ok;
   } catch {
-    // Silent failure — Slack is best-effort, never block the main flow
+    // Échec réseau/timeout — Slack est best-effort, on ne bloque jamais le flux.
+    return false;
   }
 }
 
@@ -234,15 +245,26 @@ export async function notifySlackCommentPending(params: {
   });
 }
 
+// Renvoie `true` si l'alerte a été délivrée à Slack — l'appelant (cron quota)
+// ne persiste l'état dédup que dans ce cas, pour ne pas figer un palier comme
+// notifié alors que le message a été avalé (timeout / non-2xx / webhook absent).
 export async function notifySlackQuotaWarning(
   used: number,
-  tier: number,
-): Promise<void> {
-  await sendSlack({
-    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} dépassé)`,
+  tier: QuotaTier,
+): Promise<boolean> {
+  // 100 = plafond atteint (envois bloqués), pas un simple seuil franchi.
+  const reached = tier === 100;
+  const icon = reached ? "🚨" : "⚠️";
+  const headline = reached
+    ? `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\n*Quota du jour atteint* : les nouveaux envois sont bloqués jusqu'à demain (minuit UTC).`
+    : `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* dépassé.`;
+  return sendSlack({
+    text: reached
+      ? `🚨 Quota Resend atteint : ${used}/100 aujourd'hui (envois bloqués)`
+      : `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} dépassé)`,
     blocks: [
-      { type: "header", text: { type: "plain_text", text: "⚠️ Quota emails Resend", emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* dépassé.` } },
+      { type: "header", text: { type: "plain_text", text: `${icon} Quota emails Resend`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: headline } },
       { type: "context", elements: [{ type: "mrkdwn", text: "Au-delà de 100/jour, les envois sont bloqués jusqu'au lendemain. Pense à passer sur un plan payant." }] },
     ],
   });

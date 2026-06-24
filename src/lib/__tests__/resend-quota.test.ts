@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { countSentToday, quotaTier } from "@/lib/resend-quota";
+import {
+  countSentToday,
+  quotaTier,
+  shouldNotifyQuota,
+  type QuotaAlertState,
+  type QuotaTier,
+} from "@/lib/resend-quota";
 
 describe("countSentToday", () => {
   const today = "2026-06-03";
@@ -26,8 +32,37 @@ describe("quotaTier", () => {
     [70, 70],
     [89, 70],
     [90, 90],
-    [100, 90],
+    [99, 90],
+    [100, 100],
+    [120, 100],
   ])("used=%i → palier %s", (used, expected) => {
-    expect(quotaTier(used as number)).toBe(expected as 70 | 90 | null);
+    expect(quotaTier(used as number)).toBe(expected as QuotaTier | null);
+  });
+});
+
+describe("shouldNotifyQuota", () => {
+  const today = "2026-06-24";
+
+  it("notifie au premier franchissement du jour (aucun état)", () => {
+    expect(shouldNotifyQuota(70, today, undefined)).toBe(true);
+  });
+
+  it("ne re-notifie pas un palier déjà notifié aujourd'hui", () => {
+    const state: QuotaAlertState = { date: today, tier: 70 };
+    expect(shouldNotifyQuota(70, today, state)).toBe(false);
+  });
+
+  it("notifie la montée vers un palier supérieur (70 → 90 → 100)", () => {
+    expect(shouldNotifyQuota(90, today, { date: today, tier: 70 })).toBe(true);
+    expect(shouldNotifyQuota(100, today, { date: today, tier: 90 })).toBe(true);
+  });
+
+  it("ne notifie pas un palier inférieur déjà couvert (jamais le cas en pratique)", () => {
+    expect(shouldNotifyQuota(70, today, { date: today, tier: 90 })).toBe(false);
+  });
+
+  it("re-notifie un nouveau jour UTC, même palier (reset implicite à minuit)", () => {
+    const veille: QuotaAlertState = { date: "2026-06-23", tier: 100 };
+    expect(shouldNotifyQuota(70, today, veille)).toBe(true);
   });
 });
