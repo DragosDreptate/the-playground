@@ -1,22 +1,17 @@
-import { ImageResponse } from "next/og";
 import { getTranslations } from "next-intl/server";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
 import { getMomentGradient } from "@/lib/gradient";
-import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
+import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
+import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
 import { truncate } from "@/lib/text";
-import {
-  OG_COLORS,
-  OgBrandingPill,
-  OgCoverBackground,
-  OgPureCoverLayout,
-} from "@/lib/og/components";
+import { OG_COLORS, OgBrandingPill, OgCoverBackground } from "@/lib/og/components";
 
 export const runtime = "nodejs";
 export const alt = "Community — The Playground";
 export const size = { width: 1200, height: 1200 };
-export const contentType = "image/png";
+export const contentType = "image/jpeg";
 
 const NAME_MAX = 50;
 const META_MAX = 56;
@@ -44,14 +39,12 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const coverDataUrl = circle.coverImage
-    ? await loadOgCoverAsDataUrl(circle.coverImage)
+  const coverJpeg = circle.coverImage
+    ? await loadCoverAsOgJpeg(circle.coverImage)
     : null;
 
-  if (coverDataUrl) {
-    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
-      ...size,
-    });
+  if (coverJpeg) {
+    return ogJpegResponse(coverJpeg);
   }
 
   // Pas de cover → fallback content-rich : titre et meta dans l'image.
@@ -62,7 +55,7 @@ export default async function OgImage({
   const memberLabel = t("members", { count: memberCount });
   const metaText = circle.city ? `${memberLabel} · ${circle.city}` : memberLabel;
 
-  return new ImageResponse(
+  return ogFallbackResponse(
     (
       <div
         style={{

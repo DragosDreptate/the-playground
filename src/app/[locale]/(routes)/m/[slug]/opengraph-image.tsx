@@ -1,4 +1,3 @@
-import { ImageResponse } from "next/og";
 import {
   prismaMomentRepository,
   prismaCircleRepository,
@@ -7,21 +6,17 @@ import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { getMomentGradient } from "@/lib/gradient";
-import { loadOgCoverAsDataUrl } from "@/lib/og-image-loader";
+import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
+import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
 import { formatOgDateBadge } from "@/lib/format-date";
 import { truncate } from "@/lib/text";
-import {
-  OG_COLORS,
-  OgBrandingPill,
-  OgCoverBackground,
-  OgPureCoverLayout,
-} from "@/lib/og/components";
+import { OG_COLORS, OgBrandingPill, OgCoverBackground } from "@/lib/og/components";
 import type { LocationType } from "@/domain/models/moment";
 
 export const runtime = "nodejs";
 export const alt = "Event — The Playground";
 export const size = { width: 1200, height: 1200 };
-export const contentType = "image/png";
+export const contentType = "image/jpeg";
 
 const TITLE_MAX = 70;
 const META_MAX = 56;
@@ -61,14 +56,12 @@ export default async function OgImage({
     return new Response("Not found", { status: 404 });
   }
 
-  const coverDataUrl = moment.coverImage
-    ? await loadOgCoverAsDataUrl(moment.coverImage)
+  const coverJpeg = moment.coverImage
+    ? await loadCoverAsOgJpeg(moment.coverImage)
     : null;
 
-  if (coverDataUrl) {
-    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
-      ...size,
-    });
+  if (coverJpeg) {
+    return ogJpegResponse(coverJpeg);
   }
 
   // Pas de cover → fallback content-rich : tout dans l'image puisque rien d'autre n'y figure.
@@ -82,7 +75,7 @@ export default async function OgImage({
   );
   const metaText = location ? `${weekday} ${time} · ${location}` : `${weekday} ${time}`;
 
-  return new ImageResponse(
+  return ogFallbackResponse(
     (
       <div
         style={{
