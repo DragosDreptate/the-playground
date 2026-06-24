@@ -1,12 +1,12 @@
+import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { getPostBySlug, getPostSlugs } from "@/lib/blog";
-import { renderOgImage } from "@/lib/og/render";
 
 export const runtime = "nodejs";
 export const alt = "Blog — The Playground";
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/jpeg";
+export const contentType = "image/png";
 
 export async function generateStaticParams() {
   const locales = ["fr", "en"];
@@ -41,7 +41,7 @@ export default async function OgImage({
   const title =
     post.title.length > 80 ? post.title.slice(0, 77) + "..." : post.title;
 
-  return renderOgImage(
+  return new ImageResponse(
     (
       <div
         style={{

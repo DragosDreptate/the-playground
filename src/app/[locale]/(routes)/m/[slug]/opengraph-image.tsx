@@ -1,8 +1,8 @@
+import { ImageResponse } from "next/og";
 import {
   prismaMomentRepository,
   prismaCircleRepository,
 } from "@/infrastructure/repositories";
-import { renderOgImage } from "@/lib/og/render";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
@@ -21,7 +21,7 @@ import type { LocationType } from "@/domain/models/moment";
 export const runtime = "nodejs";
 export const alt = "Event — The Playground";
 export const size = { width: 1200, height: 1200 };
-export const contentType = "image/jpeg";
+export const contentType = "image/png";
 
 const TITLE_MAX = 70;
 const META_MAX = 56;
@@ -66,7 +66,7 @@ export default async function OgImage({
     : null;
 
   if (coverDataUrl) {
-    return renderOgImage(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
+    return new ImageResponse(<OgPureCoverLayout coverDataUrl={coverDataUrl} />, {
       ...size,
     });
   }
@@ -82,7 +82,7 @@ export default async function OgImage({
   );
   const metaText = location ? `${weekday} ${time} · ${location}` : `${weekday} ${time}`;
 
-  return renderOgImage(
+  return new ImageResponse(
     (
       <div
         style={{

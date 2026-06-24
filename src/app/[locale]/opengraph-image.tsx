@@ -1,11 +1,11 @@
+import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { renderOgImage } from "@/lib/og/render";
 
 export const runtime = "nodejs";
 export const alt = "The Playground — Lancez votre communauté, organisez vos événements";
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/jpeg";
+export const contentType = "image/png";
 
 export default async function OgImage() {
   const [interRegular, interBold, phoneImg] = await Promise.all([
@@ -16,7 +16,7 @@ export default async function OgImage() {
 
   const phoneBase64 = `data:image/png;base64,${phoneImg.toString("base64")}`;
 
-  return renderOgImage(
+  return new ImageResponse(
     (
       <div
         style={{
