@@ -236,13 +236,21 @@ export async function notifySlackCommentPending(params: {
 
 export async function notifySlackQuotaWarning(
   used: number,
-  tier: number,
+  tier: 70 | 90 | 100,
 ): Promise<void> {
+  // 100 = plafond atteint (envois bloqués), pas un simple seuil franchi.
+  const reached = tier === 100;
+  const icon = reached ? "🚨" : "⚠️";
+  const headline = reached
+    ? `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\n*Quota du jour atteint* : les nouveaux envois sont bloqués jusqu'à demain (minuit UTC).`
+    : `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* dépassé.`;
   await sendSlack({
-    text: `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} dépassé)`,
+    text: reached
+      ? `🚨 Quota Resend atteint : ${used}/100 aujourd'hui (envois bloqués)`
+      : `⚠️ Quota Resend à ${used}/100 aujourd'hui (seuil ${tier} dépassé)`,
     blocks: [
-      { type: "header", text: { type: "plain_text", text: "⚠️ Quota emails Resend", emoji: true } },
-      { type: "section", text: { type: "mrkdwn", text: `*${used}/100* emails envoyés aujourd'hui (plan gratuit).\nSeuil de *${tier}* dépassé.` } },
+      { type: "header", text: { type: "plain_text", text: `${icon} Quota emails Resend`, emoji: true } },
+      { type: "section", text: { type: "mrkdwn", text: headline } },
       { type: "context", elements: [{ type: "mrkdwn", text: "Au-delà de 100/jour, les envois sont bloqués jusqu'au lendemain. Pense à passer sur un plan payant." }] },
     ],
   });

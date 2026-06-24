@@ -1,13 +1,17 @@
 import * as Sentry from "@sentry/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { notifySlackQuotaWarning } from "@/infrastructure/services/slack/slack-notification-service";
-import { countSentToday, quotaTier } from "@/lib/resend-quota";
+import {
+  readQuotaAlertState,
+  writeQuotaAlertState,
+} from "@/infrastructure/services/edge-config/resend-quota-state";
+import { countSentToday, quotaTier, shouldNotifyQuota } from "@/lib/resend-quota";
 
 /**
  * GET /api/cron/check-resend-quota
  *
  * Surveille le quota d'envoi quotidien Resend (plan gratuit : 100 emails/jour)
- * et alerte sur Slack dès qu'un palier (70 puis 90) est dépassé.
+ * et alerte sur Slack dès qu'un palier (70, 90 puis 100) est franchi.
  *
  * Lecture du compteur : on COMPTE les emails du jour via `GET /emails`, pas via
  * le header `x-resend-daily-quota` (qui n'est renvoyé que sur l'envoi, jamais en
@@ -15,9 +19,10 @@ import { countSentToday, quotaTier } from "@/lib/resend-quota";
  * au plus ancien, une seule page de 100 contient toujours tous les envois du jour.
  * Avantage : couvre TOUS les chemins d'envoi (magic links, transactionnel, batch).
  *
- * Sans persistance : ré-alerte à chaque passage tant qu'on reste au-dessus du
- * seuil (cadence basse côté Vercel Cron, cf. vercel.json). Le nombre envoyé dans
- * l'alerte est le compteur réel au moment de la notif.
+ * Dédup via Edge Config : on persiste le dernier palier notifié du jour
+ * (`resendQuotaAlert`) et on ne re-notifie qu'au FRANCHISSEMENT d'un palier
+ * supérieur (cf. `shouldNotifyQuota`). Reset implicite à minuit UTC par
+ * comparaison de date. Le nombre envoyé dans l'alerte est le compteur réel.
  *
  * Vercel Cron invoque en GET ; on expose aussi POST pour un déclenchement manuel.
  * Protection : header Authorization: Bearer CRON_SECRET (ajouté par Vercel).
@@ -86,10 +91,28 @@ async function handler(request: NextRequest) {
   }
 
   const tier = quotaTier(used);
-  if (tier) await notifySlackQuotaWarning(used, tier);
+  let notified = false;
+  if (tier) {
+    const state = await readQuotaAlertState();
+    if (shouldNotifyQuota(tier, todayUtc, state)) {
+      await notifySlackQuotaWarning(used, tier);
+      notified = true;
+      // Persiste le palier notifié pour ne pas re-pinger au prochain passage.
+      // Échec d'écriture => fail-open : on re-notifiera l'heure suivante (mieux
+      // qu'une alerte perdue), mais on le signale pour ne pas spammer en silence.
+      if ((await writeQuotaAlertState({ date: todayUtc, tier })) === "failed") {
+        Sentry.captureMessage(
+          `[cron] check-resend-quota: échec persistance état dédup (tier=${tier})`,
+          "warning"
+        );
+      }
+    }
+  }
 
-  console.log(`[check-resend-quota] used=${used}, tier=${tier ?? "none"}`);
-  return NextResponse.json({ ok: true, used, tier });
+  console.log(
+    `[check-resend-quota] used=${used}, tier=${tier ?? "none"}, notified=${notified}`
+  );
+  return NextResponse.json({ ok: true, used, tier, notified });
 }
 
 export async function GET(request: NextRequest) {
