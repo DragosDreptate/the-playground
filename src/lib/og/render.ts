@@ -23,10 +23,14 @@ const CACHE_CONTROL = "public, max-age=3600, stale-while-revalidate=86400";
  * Si le re-encodage échoue, on sert le PNG brut plutôt qu'un aperçu vide :
  * une image lourde reste préférable à pas d'image du tout.
  *
- * On pose explicitement `Content-Length` : sans lui, Vercel sert la réponse en
- * chunked et le proxy d'image de Slack (Slack-ImgProxy) refuse l'image (aperçu
- * vide), là où WhatsApp et un fetch direct s'en passent. next/og le posait
- * nativement ; notre Response custom doit le restaurer.
+ * NE PAS poser de `Content-Length`. Le proxy d'image de Slack récupère l'image
+ * avec `Range: bytes=0-32768` (32 Ko, le plus strict des crawlers). Si la
+ * réponse porte un Content-Length, le CDN Vercel honore le Range et renvoie un
+ * `200` (et non un `206`) tronqué aux 32 premiers Ko : Slack croit tenir
+ * l'image entière mais n'en a qu'un tiers → aperçu vide pour toute image
+ * > 32 Ko (typiquement dès qu'il y a une cover). Sans Content-Length, le CDN ne
+ * peut pas tronquer et sert le corps complet en 200, que Slack consomme bien
+ * (comme WhatsApp et les fetch directs).
  *
  * Toute route opengraph-image doit exporter `contentType = "image/jpeg"`.
  */
@@ -46,7 +50,6 @@ export async function renderOgImage(
     return new Response(new Uint8Array(jpeg), {
       headers: {
         "content-type": "image/jpeg",
-        "content-length": String(jpeg.byteLength),
         "cache-control": CACHE_CONTROL,
       },
     });
@@ -54,7 +57,6 @@ export async function renderOgImage(
     return new Response(new Uint8Array(pngBuffer), {
       headers: {
         "content-type": "image/png",
-        "content-length": String(pngBuffer.byteLength),
         "cache-control": CACHE_CONTROL,
       },
     });
