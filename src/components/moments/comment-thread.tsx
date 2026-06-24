@@ -45,6 +45,8 @@ type CommentThreadProps = {
   currentUserId: string | null;
   isOrganizer: boolean;
   isPastMoment: boolean;
+  /** false → fil en lecture seule (ex. événement annulé) : pas de formulaire d'ajout. */
+  canComment: boolean;
   signInUrl: string;
 };
 
@@ -180,6 +182,7 @@ export function CommentThread({
   currentUserId,
   isOrganizer,
   isPastMoment,
+  canComment,
   signInUrl,
 }: CommentThreadProps) {
   const t = useTranslations("Moment");
@@ -370,8 +373,12 @@ export function CommentThread({
           </div>
         )}
 
-        {/* Form or sign-in prompt */}
-        {isAuthenticated ? (
+        {/* Lecture seule (événement annulé), formulaire, ou invite à se connecter */}
+        {!canComment ? (
+          <p className="text-muted-foreground pt-2 text-sm">
+            {t("comments.closed")}
+          </p>
+        ) : isAuthenticated ? (
           <div className="space-y-2 pt-2">
             {/* Textarea + char count in a single bordered container */}
             <div className="border-input bg-background focus-within:border-muted-foreground rounded-xl border transition-colors">

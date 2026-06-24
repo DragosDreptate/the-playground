@@ -54,7 +54,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug, locale } = await params;
   const moment = await getMoment(slug);
-  if (!moment || moment.status === "CANCELLED" || moment.status === "DRAFT") return {};
+  if (!moment || moment.status === "DRAFT") return {};
+  // Événement annulé : la page reste accessible en direct (cf. page ci-dessous),
+  // mais non indexable et sans aperçu social riche — on ne met pas en avant un
+  // événement annulé, on permet juste d'atteindre la page via un lien existant.
+  if (moment.status === "CANCELLED") {
+    return {
+      title: collapseWhitespace(moment.title),
+      alternates: buildAlternates(locale, `/m/${slug}`),
+      robots: { index: false, follow: false },
+    };
+  }
 
   const circle = await getCircle(moment.circleId);
   const t = await getTranslations({ locale, namespace: "Moment" });
@@ -101,7 +111,12 @@ export default async function PublicMomentPage({
   const moment = await measureTime("moment-page:moment", () => getMoment(slug));
   if (!moment) notFound();
 
-  if (moment.status === "CANCELLED") notFound();
+  // Événement annulé : page volontairement servie (et non 404) pour que les liens
+  // déjà partagés (notif de commentaire/d'annulation, qui pointent vers /m/[slug])
+  // mènent à l'explication plutôt qu'à une page cassée. La vue affiche le bandeau
+  // « Événement annulé » + le fil de commentaires, sans CTA d'inscription.
+  // L'exclusion de la découverte (Explorer, sitemap, listes du Circle) est gérée
+  // en amont par les requêtes de listing, pas ici.
 
   // Auth chargée AVANT le Promise.all pour pouvoir conditionner getUserRegistration.
   // getCachedSession est cache() donc déjà résolu (appelé par le layout) — coût proche de 0.
@@ -150,7 +165,9 @@ export default async function PublicMomentPage({
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =
-    existingRegistration?.status === "WAITLISTED" && session?.user?.id
+    existingRegistration?.status === "WAITLISTED" &&
+    session?.user?.id &&
+    moment.status !== "CANCELLED"
       ? await measureTime("moment-page:waitlist", () =>
           prismaRegistrationRepository.countWaitlistPosition(moment.id, session!.user!.id!)
         )
@@ -260,13 +277,15 @@ export default async function PublicMomentPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <MomentViewTracker
-        momentId={moment.id}
-        momentSlug={moment.slug}
-        circleId={moment.circleId}
-        circleName={circle.name}
-        status={moment.status}
-      />
+      {moment.status !== "CANCELLED" && (
+        <MomentViewTracker
+          momentId={moment.id}
+          momentSlug={moment.slug}
+          circleId={moment.circleId}
+          circleName={circle.name}
+          status={moment.status}
+        />
+      )}
       <MomentDetailView
         variant="public"
         moment={moment}

@@ -93,6 +93,13 @@ export async function addComment(
     throw new MomentNotFoundError(input.momentId);
   }
 
+  // Événement annulé : fil en lecture seule. L'UI masque déjà le formulaire ;
+  // ce garde-fou (défense en profondeur) empêche un POST direct de créer un
+  // commentaire qui broadcasterait un email aux inscrits d'un événement terminal.
+  if (moment.status === "CANCELLED") {
+    throw new MomentNotFoundError(input.momentId);
+  }
+
   // Block comments from users with PENDING_APPROVAL registration
   if (deps.registrationRepository) {
     const registration = await deps.registrationRepository.findByMomentAndUser(
