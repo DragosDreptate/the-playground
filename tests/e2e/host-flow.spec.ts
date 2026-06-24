@@ -160,7 +160,7 @@ test.describe("Flux Host — création d'un Moment", () => {
  *   - Cliquer "Enregistrer le brouillon" crée/met à jour un DRAFT (comportement inchangé)
  *   - Cliquer "Publier" crée/publie l'événement en une seule action
  *   - Sur mobile, le bouton Publier est masqué (hidden sm:inline-flex)
- *   - En édition d'un PUBLISHED, le bouton Publier n'apparaît pas (sélecteur de statut à la place)
+ *   - En édition d'un PUBLISHED, le bouton Publier n'apparaît pas (les transitions de statut sont des boutons d'action hors du formulaire)
  *   - Presser Enter dans un input soumet en mode draft par défaut (1er submit button
  *     dans le DOM) — aucun risque de publication accidentelle au clavier
  */
@@ -309,7 +309,8 @@ test.describe("Flux Host — publication directe d'un Moment", () => {
     // le DOM pendant ~ms (cause profonde non résolue, voir spec/BACKLOG.md).
     await expect(page.locator("input[name='title']").first()).toBeVisible({ timeout: 15_000 });
 
-    // En édition PUBLISHED, le bouton Publier n'existe pas (le statut se gère via le select)
+    // En édition PUBLISHED, le bouton Publier n'existe pas (les transitions de statut
+    // passent par les boutons d'action de la page de gestion, pas par le formulaire)
     await expect(page.locator("button[name='intent'][value='publish']")).toHaveCount(0);
     await expect(page.locator("button[name='intent'][value='draft']")).toBeVisible();
   });
