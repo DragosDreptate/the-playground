@@ -70,7 +70,7 @@ Règles :
 ### 5.0 Styles des boutons (colonne gauche)
 Trois styles, conformes au design system + capture validée le 24/06 :
 - **Principal** : `variant="default"` (rose plein). Un seul par état au maximum.
-- **Secondaire non destructif** : outline à accent rose — fond sombre, bordure subtile, **texte rose** (primary). Utilisé par « Modifier » (quand il est secondaire) et « Annuler l'événement ». ⚠️ Vérifier le `variant="outline"` existant : s'il est neutre, ajouter `text-primary` + bordure primary douce pour matcher la capture.
+- **Secondaire non destructif** : outline à accent rose — fond sombre, bordure subtile, **texte rose** (primary). Utilisé par « Modifier » (quand il est secondaire) et « Annuler l'événement ». ⚠️ Le `variant="outline"` est **neutre** (`ui/button.tsx:15`) → il **faut** ajouter `text-primary border-primary/40 hover:border-primary` (ou équivalent) pour matcher la capture. Pas un simple `outline`.
 - **Destructif** : `variant="outline" size="sm"` + classes destructive (**rouge**), réservé à « Supprimer ». Normatif (design system), jamais en rose.
 
 ### 5.1 Formulaire d'édition — `moment-form.tsx`
@@ -149,7 +149,7 @@ Calquée sur `publishMomentAction` (`:549`). Logique :
 5. `revalidatePath` `/m/[slug]` (+ `/en`) + `dashboard/circles/[circleId]` ; `invalidateDashboardCache(userId)`.
 
 ### 6.3 `updateMoment` / `updateMomentAction` — nettoyage
-- **`updateMoment`** (`update-moment.ts`) : retirer le champ `status?` de `UpdateMomentInput` et la logique D13 (`:146-149`, déplacée dans `cancelMoment`). Les transitions de statut ne passent plus par l'update. (Call sites : seul le form, qui ne soumet plus `status` — sûr.)
+- **`updateMoment`** (`update-moment.ts`) : retirer le champ `status?` de `UpdateMomentInput` et la logique D13 (`:146-149`, déplacée dans `cancelMoment`). Les transitions de statut ne passent plus par l'update. (Call sites : seul le form, qui ne soumet plus `status` — sûr.) **Bénéfice sécu** : ferme le bypass documenté dans `business-logic-guards.test.ts` (transition de statut arbitraire — ex. `DRAFT→PUBLISHED` sans passer par `publishMoment` — via le champ `status` de l'update).
 - **`updateMomentAction`** (`moment.ts:203,254`) : retirer la lecture de `formData.get("status")` et son passage à `updateMoment`.
 
 ### 6.4 `deleteMoment` / `deleteMomentAction`
@@ -162,7 +162,7 @@ Ajouter (pattern `DomainError` existant) + exports dans `errors/index.ts` :
 - `MomentCannotBeCancelledError(momentId, currentStatus)` — code `MOMENT_CANNOT_BE_CANCELLED`.
 - `MomentCannotBeDeletedError(momentId)` — code `MOMENT_CANNOT_BE_DELETED`.
 
-Mapper ces erreurs dans `toActionResult` si un code utilisateur lisible est attendu (vérifier le mapping existant des erreurs moment).
+`toActionResult` mappe **automatiquement** toute `DomainError` (`err.code` / `err.message`, `helpers/to-action-result.ts:26`) — rien à ajouter côté mapping ; seul l'export dans `errors/index.ts` est requis.
 
 ---
 
@@ -194,9 +194,10 @@ Clés **à ajouter** (FR / EN) :
   - given DRAFT / CANCELLED / PAST → `MomentCannotBeCancelledError`.
   - given moment inexistant → `MomentNotFoundError`.
 - **`delete-moment.test.ts`** (étendre) : given PAST → `MomentCannotBeDeletedError`, `delete` non appelé, refund non appelé.
-- **`update-moment.test.ts`** (adapter) : retirer les cas liés à `status`/D13 (déplacés). Vérifier que l'update ne touche plus au statut.
+- **`update-moment.test.ts`** : **retirer** le test `:199-223` (« HOST cancelling a Moment via status update ») — le comportement disparaît, le scénario migre vers `cancel-moment.test.ts`. La logique D13 (`rejectAllPendingApprovals`) part dans `cancel-moment`.
+- **`business-logic-guards.test.ts`** (`:49-130`) : ce test **documente** que `updateMoment` accepte aujourd'hui `status="PUBLISHED"` (bypass possible de `publishMoment`). En retirant `status`, **ce bypass se ferme** → gain de sécurité. Mettre le test à jour pour refléter que les transitions de statut ne passent plus par `updateMoment`.
 - **E2E (inclus)** : scénario « organisateur annule un événement publié ». Confirmation via le dialogue, puis l'événement passe en affichage annulé : **bandeau « annulé »** + **badge cover**, la colonne gauche n'expose plus que **Supprimer**, et côté public le bouton **S'inscrire a disparu**. On vérifie l'**état UI**, pas la réception d'email.
-  > ⚠️ Le scénario crée un Moment et déclenche `sendMomentCancelledEmails` → respecter le garde-fou emails de test (`spec/email-testing.md`, `safe-resend`). Pas d'envoi réel ; jamais `--repeat-each`/`--retries` sans avoir vérifié `AUTH_RESEND_KEY`.
+  > ⚠️ **Utiliser un Moment dédié sans inscrits** (créé pour le test, host seul). Raisons : (1) ne pas polluer l'état partagé — annuler `SLUGS.PUBLISHED_MOMENT` casserait join-moment et autres specs ; (2) le host est exclu des destinataires, donc `sendMomentCancelledEmails` n'envoie rien. Sinon, les inscrits `@test.playground` sont **auto-whitelistés** dans `safe-resend` → les emails **partent réellement**. Respecter `spec/email-testing.md` ; jamais `--repeat-each`/`--retries` sans avoir vérifié `AUTH_RESEND_KEY`.
 
 ---
 
