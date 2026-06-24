@@ -246,6 +246,25 @@ describe("AddComment", () => {
     });
   });
 
+  describe("given a CANCELLED Moment", () => {
+    it("should reject and not create a comment (read-only thread)", async () => {
+      const create = vi.fn();
+      const deps = makeDeps({
+        momentRepository: {
+          findById: vi.fn().mockResolvedValue(makeMoment({ status: "CANCELLED" })),
+        },
+        commentRepository: { create },
+      });
+      await expect(
+        addComment(
+          { momentId: "moment-1", userId: "user-1", content: "Hello" },
+          deps
+        )
+      ).rejects.toThrow(MomentNotFoundError);
+      expect(create).not.toHaveBeenCalled();
+    });
+  });
+
   // --- Comments with photos ---
 
   describe("given valid content and valid photos", () => {

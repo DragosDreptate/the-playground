@@ -840,6 +840,7 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
               currentUserId={props.currentUserId}
               isOrganizer={isHostView || (!isHostView && (props as PublicViewProps).isOrganizer)}
               isPastMoment={moment.status === "PAST"}
+              canComment={moment.status !== "CANCELLED"}
               signInUrl={!isHostView ? (props as PublicViewProps).signInUrl : ""}
             />
           </div>

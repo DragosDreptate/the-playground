@@ -165,7 +165,9 @@ export default async function PublicMomentPage({
 
   // Position liste d'attente : dépend de existingRegistration → séquentiel volontaire
   const waitlistPosition =
-    existingRegistration?.status === "WAITLISTED" && session?.user?.id
+    existingRegistration?.status === "WAITLISTED" &&
+    session?.user?.id &&
+    moment.status !== "CANCELLED"
       ? await measureTime("moment-page:waitlist", () =>
           prismaRegistrationRepository.countWaitlistPosition(moment.id, session!.user!.id!)
         )
@@ -275,13 +277,15 @@ export default async function PublicMomentPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       )}
-      <MomentViewTracker
-        momentId={moment.id}
-        momentSlug={moment.slug}
-        circleId={moment.circleId}
-        circleName={circle.name}
-        status={moment.status}
-      />
+      {moment.status !== "CANCELLED" && (
+        <MomentViewTracker
+          momentId={moment.id}
+          momentSlug={moment.slug}
+          circleId={moment.circleId}
+          circleName={circle.name}
+          status={moment.status}
+        />
+      )}
       <MomentDetailView
         variant="public"
         moment={moment}

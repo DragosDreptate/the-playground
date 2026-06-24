@@ -694,6 +694,7 @@
       "placeholderPast": "Remerciements, photos, retours... partagez !",
       "submit": "Publier",
       "signInToComment": "Se connecter pour commenter",
+      "closed": "Les commentaires sont fermés pour cet événement annulé.",
       "deleteTitle": "Supprimer le commentaire",
       "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce commentaire ? Cette action est irréversible.",
       "confirmDelete": "Oui, supprimer",

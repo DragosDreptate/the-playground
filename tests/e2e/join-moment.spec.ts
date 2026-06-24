@@ -106,10 +106,13 @@ test.describe("Inscription à un Moment — utilisateur authentifié", () => {
 });
 
 test.describe("Page Moment — Moment annulé", () => {
-  test("should show a 404 page for a CANCELLED Moment", async ({ page }) => {
+  test("sert la page publique d'un Moment annulé avec le bandeau d'annulation", async ({ page }) => {
     await page.goto(`/fr/m/${SLUGS.CANCELLED_MOMENT}`);
-    // Next.js appelle notFound() pour les Moments CANCELLED.
-    // En dev, le status HTTP peut varier — on vérifie que le contenu du Moment n'est pas affiché.
-    await expect(page.locator("h1")).not.toContainText("Webinaire TypeScript", { timeout: 5_000 });
+    // La page d'un Moment annulé est désormais servie (plus de 404) pour que les
+    // liens déjà partagés (notif de commentaire/d'annulation, qui pointent vers
+    // /m/[slug]) mènent à l'explication plutôt qu'à une page cassée. Elle affiche
+    // le titre + le bandeau « Événement annulé », sans CTA d'inscription.
+    await expect(page.locator("h1").first()).toContainText("Webinaire TypeScript", { timeout: 10_000 });
+    await expect(page.getByText("Événement annulé").first()).toBeVisible();
   });
 });
