@@ -23,6 +23,11 @@ const CACHE_CONTROL = "public, max-age=3600, stale-while-revalidate=86400";
  * Si le re-encodage échoue, on sert le PNG brut plutôt qu'un aperçu vide :
  * une image lourde reste préférable à pas d'image du tout.
  *
+ * On pose explicitement `Content-Length` : sans lui, Vercel sert la réponse en
+ * chunked et le proxy d'image de Slack (Slack-ImgProxy) refuse l'image (aperçu
+ * vide), là où WhatsApp et un fetch direct s'en passent. next/og le posait
+ * nativement ; notre Response custom doit le restaurer.
+ *
  * Toute route opengraph-image doit exporter `contentType = "image/jpeg"`.
  */
 export async function renderOgImage(
@@ -41,6 +46,7 @@ export async function renderOgImage(
     return new Response(new Uint8Array(jpeg), {
       headers: {
         "content-type": "image/jpeg",
+        "content-length": String(jpeg.byteLength),
         "cache-control": CACHE_CONTROL,
       },
     });
@@ -48,6 +54,7 @@ export async function renderOgImage(
     return new Response(new Uint8Array(pngBuffer), {
       headers: {
         "content-type": "image/png",
+        "content-length": String(pngBuffer.byteLength),
         "cache-control": CACHE_CONTROL,
       },
     });
