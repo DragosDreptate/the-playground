@@ -16,6 +16,7 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
+import { cancelMoment } from "@/domain/usecases/cancel-moment";
 import {
   getMomentParticipantsPage,
   type GetMomentParticipantsPageResult,
@@ -200,7 +201,6 @@ export async function updateMomentAction(
   const capacityRaw = formData.get("capacity") as string | null;
   const priceRaw = formData.get("price") as string | null;
   const currency = formData.get("currency") as string | null;
-  const status = formData.get("status") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
   if (title !== null && !title.trim()) {
@@ -251,7 +251,6 @@ export async function updateMomentAction(
         ...(capacity !== undefined && { capacity }),
         ...(price !== undefined && { price }),
         ...(currency && { currency }),
-        ...(status && { status: status as Moment["status"] }),
         ...(refundable !== undefined && { refundable }),
         requiresApproval: requiresApprovalUpdate,
       },
@@ -483,11 +482,19 @@ export async function deleteMomentAction(
       ).catch((err) => Sentry.captureException(err));
     }
 
-    // Skip notifications only when admin moderates someone else's event.
+    // Filet de sécurité : la notif d'annulation part normalement au passage en
+    // CANCELLED (cancelMomentAction). Ici on ne notifie que la suppression directe
+    // d'un événement PUBLISHED (chemins hors-UI : admin/API). Un CANCELLED supprimé
+    // a déjà été notifié à l'annulation ; un DRAFT/PAST n'a pas à l'être.
+    // Skip aussi quand un admin modère l'événement de quelqu'un d'autre.
     const isOrganizerOfEvent = momentToDelete
       ? isActiveOrganizer(await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))
       : false;
-    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isOrganizerOfEvent);
+    const shouldNotify =
+      momentToDelete &&
+      momentToDelete.status === "PUBLISHED" &&
+      registrationsToNotify.length > 0 &&
+      (!isAdminUser(session) || isOrganizerOfEvent);
     if (shouldNotify) {
       const resolver = await buildEmailLocaleResolver(userId);
       sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
@@ -565,6 +572,56 @@ export async function publishMomentAction(
 
     const resolver = await buildEmailLocaleResolver(userId);
     sendMomentPublishedNotifications(result.moment, userId, resolver);
+
+    revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
+    revalidatePath(`/m/${result.moment.slug}`);
+    revalidatePath(`/en/m/${result.moment.slug}`);
+
+    invalidateDashboardCache(userId);
+    return result.moment;
+  });
+}
+
+export async function cancelMomentAction(
+  momentId: string
+): Promise<ActionResult<Moment>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const userId = session.user.id;
+  return toActionResult(async () => {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
+    // Récupère les inscrits AVANT la bascule pour les notifier de l'annulation.
+    const registrationsToNotify =
+      await prismaRegistrationRepository.findActiveWithUserByMomentId(momentId);
+
+    const result = await cancelMoment(
+      { momentId, userId },
+      {
+        momentRepository: prismaMomentRepository,
+        circleRepository: circleRepo,
+        registrationRepository: prismaRegistrationRepository,
+        paymentService,
+      }
+    );
+
+    // Email d'annulation aux inscrits (fire-and-forget).
+    // Skip quand un admin modère l'événement de quelqu'un d'autre.
+    const isOrganizerOfEvent = isActiveOrganizer(
+      await prismaCircleRepository.findMembership(result.moment.circleId, userId)
+    );
+    if (
+      registrationsToNotify.length > 0 &&
+      (!isAdminUser(session) || isOrganizerOfEvent)
+    ) {
+      const resolver = await buildEmailLocaleResolver(userId);
+      sendMomentCancelledEmails(result.moment, registrationsToNotify, resolver).catch(
+        (err) => Sentry.captureException(err)
+      );
+    }
 
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
     revalidatePath(`/m/${result.moment.slug}`);

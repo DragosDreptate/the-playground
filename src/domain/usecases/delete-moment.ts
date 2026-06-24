@@ -7,6 +7,7 @@ import { refundRegistration } from "./refund-registration";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
+  MomentCannotBeDeletedError,
 } from "@/domain/errors";
 
 type DeleteMomentInput = {
@@ -40,6 +41,12 @@ export async function deleteMoment(
 
   if (!isActiveOrganizer(membership)) {
     throw new UnauthorizedMomentActionError();
+  }
+
+  // Un événement passé fait partie de l'historique de la Communauté : on ne le supprime pas.
+  // (La modération admin a son propre chemin, sans cette garde.)
+  if (existing.status === "PAST") {
+    throw new MomentCannotBeDeletedError(input.momentId);
   }
 
   // Refund all PAID registrations before deletion (Organisateur cancellation = force)

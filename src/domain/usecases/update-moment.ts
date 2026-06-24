@@ -1,4 +1,4 @@
-import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
+import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
@@ -32,7 +32,6 @@ type UpdateMomentInput = {
   capacity?: number | null;
   price?: number;
   currency?: string;
-  status?: MomentStatus;
   refundable?: boolean;
   requiresApproval?: boolean;
 };
@@ -142,11 +141,6 @@ export async function updateMoment(
   const { momentId: _, userId: __, ...updates } = input;
 
   const moment = await momentRepository.update(input.momentId, updates);
-
-  // D13: auto-reject PENDING_APPROVAL registrations when moment is cancelled
-  if (input.status === "CANCELLED" && deps.registrationRepository) {
-    await deps.registrationRepository.rejectAllPendingApprovals(input.momentId);
-  }
 
   return { moment };
 }

@@ -3,6 +3,7 @@ import { deleteMoment } from "@/domain/usecases/delete-moment";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
+  MomentCannotBeDeletedError,
 } from "@/domain/errors";
 import {
   createMockMomentRepository,
@@ -60,6 +61,27 @@ describe("DeleteMoment", () => {
         "circle-1",
         "user-1"
       );
+    });
+  });
+
+  describe("given a PAST Moment", () => {
+    it("should throw MomentCannotBeDeletedError and not delete it", async () => {
+      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", status: "PAST" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      await expect(
+        deleteMoment(defaultInput, {
+          momentRepository: momentRepo,
+          circleRepository: circleRepo,
+        })
+      ).rejects.toThrow(MomentCannotBeDeletedError);
+
+      expect(momentRepo.delete).not.toHaveBeenCalled();
     });
   });
 

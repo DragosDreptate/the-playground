@@ -23,6 +23,8 @@ export {
   PriceLockedError,
   CannotMakePaidWithRegistrationsError,
   PaidMomentCannotRequireApprovalError,
+  MomentCannotBeCancelledError,
+  MomentCannotBeDeletedError,
 } from "./moment-errors";
 export {
   AttachmentLimitReachedError,

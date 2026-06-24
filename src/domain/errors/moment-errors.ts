@@ -81,3 +81,21 @@ export class PaidMomentCannotRequireApprovalError extends DomainError {
     super("Paid events cannot require registration approval");
   }
 }
+
+export class MomentCannotBeCancelledError extends DomainError {
+  readonly code = "MOMENT_CANNOT_BE_CANCELLED";
+
+  constructor(momentId: string, currentStatus: string) {
+    super(
+      `Moment can only be cancelled when published: ${momentId} (current status: ${currentStatus})`
+    );
+  }
+}
+
+export class MomentCannotBeDeletedError extends DomainError {
+  readonly code = "MOMENT_CANNOT_BE_DELETED";
+
+  constructor(momentId: string) {
+    super(`A past Moment cannot be deleted: ${momentId}`);
+  }
+}
