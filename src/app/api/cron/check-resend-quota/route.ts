@@ -95,16 +95,21 @@ async function handler(request: NextRequest) {
   if (tier) {
     const state = await readQuotaAlertState();
     if (shouldNotifyQuota(tier, todayUtc, state)) {
-      await notifySlackQuotaWarning(used, tier);
-      notified = true;
-      // Persiste le palier notifié pour ne pas re-pinger au prochain passage.
-      // Échec d'écriture => fail-open : on re-notifiera l'heure suivante (mieux
-      // qu'une alerte perdue), mais on le signale pour ne pas spammer en silence.
-      if ((await writeQuotaAlertState({ date: todayUtc, tier })) === "failed") {
-        Sentry.captureMessage(
-          `[cron] check-resend-quota: échec persistance état dédup (tier=${tier})`,
-          "warning"
-        );
+      // On ne persiste le palier que si l'alerte a été RÉELLEMENT délivrée :
+      // sinon (timeout / non-2xx / webhook absent) on laisse l'état intact pour
+      // re-tenter au prochain passage, plutôt que de figer un palier comme
+      // notifié et perdre définitivement l'alerte du jour (surtout le 100 =
+      // envois bloqués).
+      notified = await notifySlackQuotaWarning(used, tier);
+      if (notified) {
+        // Échec d'écriture => fail-open : on re-notifiera l'heure suivante (mieux
+        // qu'une alerte perdue), mais on le signale pour ne pas spammer en silence.
+        if ((await writeQuotaAlertState({ date: todayUtc, tier })) === "failed") {
+          Sentry.captureMessage(
+            `[cron] check-resend-quota: échec persistance état dédup (tier=${tier})`,
+            "warning"
+          );
+        }
       }
     }
   }
