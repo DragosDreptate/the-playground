@@ -42,12 +42,13 @@ Faire des transitions de statut des **actions de premier ordre** (boutons explic
 |---|---|---|---|
 | **DRAFT** | **Publier** (rose, principal) · **Modifier** (outline) | Info « pas encore visible » + **Supprimer** (lien ghost destructif discret) | — |
 | **PUBLISHED** | **Modifier** (rose, principal) · **Annuler l'événement** (outline neutre, même ligne) | — | — |
-| **CANCELLED** | **Modifier** (outline) | **« Cet événement a été annulé »** + **Supprimer** (lien ghost destructif discret) | badge « Annulé » + grayscale |
+| **CANCELLED** | **Supprimer** (outline destructif, `w-full`) | **« Cet événement a été annulé »** (texte seul) | badge « Annulé » + grayscale |
 | **PAST** | **Modifier** (outline) | « A eu lieu le … · X participants » (existant, **sans** Supprimer) | grayscale (existant) |
 
 Règles :
 - **Un seul bouton `default` (rose) par état** au maximum (design system). PUBLISHED et DRAFT ont un principal rose ; CANCELLED et PAST n'en ont pas (états terminaux).
-- **« Supprimer » n'est exposé que** sur DRAFT (jamais publié) et CANCELLED (déjà retiré, inscrits prévenus). Jamais sur PUBLISHED (annuler d'abord) ni PAST (archive).
+- **Placement de « Supprimer » = importance.** Sur CANCELLED, supprimer est la **seule action restante** (ni republier, ni modifier) → bouton **outline destructif dans la colonne** (`w-full`). Sur DRAFT, supprimer est **secondaire** (l'action attendue est Publier) → **lien ghost discret dans le bandeau**. Jamais sur PUBLISHED (annuler d'abord) ni PAST (archive).
+- **Pas de « Modifier » sur CANCELLED** : un annulé **n'a pas eu lieu**, rien à enrichir. PAST le garde (enrichir l'archive d'un événement qui **a eu lieu** : photos, compte-rendu).
 - **« Annuler » n'est jamais caché** (leçon de l'incident) : bouton visible, pas un lien enfoui. Style **outline neutre**, pas le rouge destructif (annuler n'est pas une suppression, et reste sémantiquement « doux » côté orga).
 
 ### Vue membre (page publique `/m/[slug]`)
@@ -76,28 +77,28 @@ Remplacer le bloc actuel `[Modifier | DeleteMomentDialog]` par un rendu **condit
 - **DRAFT** : `[PublishMomentButton (principal) | Modifier (outline)]`.
   Le `PublishMomentButton` est **remonté** ici depuis le bandeau DRAFT (voir 5.4). Il devient le CTA principal (rose, fullwidth dans la ligne).
 - **PUBLISHED** : `[Modifier (rose, principal) | CancelMomentDialog (outline neutre)]` sur la même ligne (`flex gap-2`, `flex-1` chacun).
-- **CANCELLED** : `[Modifier (outline)]` seul.
-- **PAST** : `[Modifier (outline)]` seul.
+- **CANCELLED** : `[DeleteMomentDialog]` seul (trigger standard outline destructif, `w-full`). **Pas de Modifier** (événement terminal, n'a pas eu lieu → rien à enrichir).
+- **PAST** : `[Modifier (outline)]` seul (enrichir l'archive).
 
-> « Modifier » reste un `<Link>` vers `…/moments/[slug]/edit`. Son variant passe `default` (rose) pour PUBLISHED, `outline` pour CANCELLED/PAST, et `outline` pour DRAFT (le principal y est Publier).
+> « Modifier » reste un `<Link>` vers `…/moments/[slug]/edit`, présent sur DRAFT (outline), PUBLISHED (`default` rose) et PAST (outline). **Absent de CANCELLED.**
 
 ### 5.3 Bandeau « annulé » — nouveau (`moment-detail-view.tsx`, colonne droite)
 Créer un bandeau haut de page pour CANCELLED, calqué sur le bandeau PAST (`:490-508`) :
 - Texte : `Moment.public.cancelledBannerTitle` (+ description courte si utile).
 - Style : bordure/fond façon PAST mais teinte destructive douce (cf. `breadcrumbStatusStyle.CANCELLED`).
-- **Host-only** : à droite, le **Supprimer** en lien ghost destructif discret (voir 5.5).
-- **Visible côté membre aussi** (sans le Supprimer).
+- **Informatif uniquement** (pas de bouton). Le Supprimer est dans la colonne gauche, host-only (§5.2).
+- **Visible côté membre aussi.**
 
 ### 5.4 Bandeau DRAFT — `moment-detail-view.tsx:474-488`
 - **Retirer** le `PublishMomentButton` du bandeau (il monte en colonne gauche, anti-doublon).
 - Le bandeau devient **purement informatif** + à droite le **Supprimer** ghost discret (même pattern que l'annulé).
 
-### 5.5 Composant Supprimer discret — `delete-moment-dialog.tsx`
-Le trigger actuel est un `Button variant="outline" size="sm"` avec classes destructive. Pour le rendu « lien ghost discret » dans les bandeaux :
-- Ajouter une prop `discreet?: boolean` (ou `triggerVariant`).
-- En mode discret : `variant="ghost" size="sm"` + `text-destructive` sobre, sans bordure.
-- Le reste du dialogue (AlertDialog, confirmation `Moment.delete.*`) **inchangé** : confirmation forte, irréversible (hard delete maintenu, D5).
-- Le composant est utilisé **uniquement** sur DRAFT (bandeau) et CANCELLED (bandeau).
+### 5.5 Composant Supprimer — `delete-moment-dialog.tsx`
+Deux usages selon le contexte :
+- **CANCELLED (colonne gauche)** : trigger **standard existant** (`variant="outline" size="sm"` + classes destructive) en `w-full`. Aucune modif du composant nécessaire.
+- **DRAFT (bandeau)** : rendu discret. Ajouter une prop `discreet?: boolean` → trigger `variant="ghost" size="sm"` + `text-destructive` sobre, sans bordure.
+
+Le reste du dialogue (AlertDialog, confirmation `Moment.delete.*`) **inchangé** : confirmation forte, irréversible (hard delete maintenu, D5).
 
 ### 5.6 Bouton « Annuler l'événement » — nouveau composant `cancel-moment-dialog.tsx`
 Calqué sur `delete-moment-dialog.tsx`, mais **non destructif** visuellement :
