@@ -41,7 +41,7 @@ Faire des transitions de statut des **actions de premier ordre** (boutons explic
 | État | Colonne gauche (sous la cover) | Bandeau haut de page | Cover |
 |---|---|---|---|
 | **DRAFT** | **Publier** (rose, principal) · **Modifier** (outline) | Info « pas encore visible » + **Supprimer** (lien ghost destructif discret) | — |
-| **PUBLISHED** | **Modifier** (rose, principal) · **Annuler l'événement** (outline neutre, même ligne) | — | — |
+| **PUBLISHED** | **Modifier** (rose plein, principal) · **Annuler l'événement** (outline rose, même ligne) | — | — |
 | **CANCELLED** | **Supprimer** (outline destructif, `w-full`) | **« Cet événement a été annulé »** (texte seul) | badge « Annulé » + grayscale |
 | **PAST** | **Modifier** (outline) | « A eu lieu le … · X participants » (existant, **sans** Supprimer) | grayscale (existant) |
 
@@ -49,7 +49,8 @@ Règles :
 - **Un seul bouton `default` (rose) par état** au maximum (design system). PUBLISHED et DRAFT ont un principal rose ; CANCELLED et PAST n'en ont pas (états terminaux).
 - **Placement de « Supprimer » = importance.** Sur CANCELLED, supprimer est la **seule action restante** (ni republier, ni modifier) → bouton **outline destructif dans la colonne** (`w-full`). Sur DRAFT, supprimer est **secondaire** (l'action attendue est Publier) → **lien ghost discret dans le bandeau**. Jamais sur PUBLISHED (annuler d'abord) ni PAST (archive).
 - **Pas de « Modifier » sur CANCELLED** : un annulé **n'a pas eu lieu**, rien à enrichir. PAST le garde (enrichir l'archive d'un événement qui **a eu lieu** : photos, compte-rendu).
-- **« Annuler » n'est jamais caché** (leçon de l'incident) : bouton visible, pas un lien enfoui. Style **outline neutre**, pas le rouge destructif (annuler n'est pas une suppression, et reste sémantiquement « doux » côté orga).
+- **Trois styles de boutons** (cf. §5.0) : principal = rose plein ; secondaire non destructif (Modifier en secondaire, Annuler) = outline à accent rose ; Supprimer = outline **destructif rouge**, réservé aux suppressions (design system normatif, jamais en rose).
+- **« Annuler » n'est jamais caché** (leçon de l'incident) : bouton visible, pas un lien enfoui. Outline rose, jamais le rouge (annuler n'est pas une suppression, reste « doux » côté orga).
 
 ### Vue membre (page publique `/m/[slug]`)
 
@@ -66,6 +67,12 @@ Règles :
 
 ## 5. Spécification UI
 
+### 5.0 Styles des boutons (colonne gauche)
+Trois styles, conformes au design system + capture validée le 24/06 :
+- **Principal** : `variant="default"` (rose plein). Un seul par état au maximum.
+- **Secondaire non destructif** : outline à accent rose — fond sombre, bordure subtile, **texte rose** (primary). Utilisé par « Modifier » (quand il est secondaire) et « Annuler l'événement ». ⚠️ Vérifier le `variant="outline"` existant : s'il est neutre, ajouter `text-primary` + bordure primary douce pour matcher la capture.
+- **Destructif** : `variant="outline" size="sm"` + classes destructive (**rouge**), réservé à « Supprimer ». Normatif (design system), jamais en rose.
+
 ### 5.1 Formulaire d'édition — `moment-form.tsx`
 - **Retirer** le bloc `<Select name="status">` (lignes 286-309) entièrement.
 - Le formulaire ne pilote plus le statut. Les transitions sont des actions hors-form.
@@ -80,7 +87,7 @@ Remplacer le bloc actuel `[Modifier | DeleteMomentDialog]` par un rendu **condit
 - **CANCELLED** : `[DeleteMomentDialog]` seul (trigger standard outline destructif, `w-full`). **Pas de Modifier** (événement terminal, n'a pas eu lieu → rien à enrichir).
 - **PAST** : `[Modifier (outline)]` seul (enrichir l'archive).
 
-> « Modifier » reste un `<Link>` vers `…/moments/[slug]/edit`, présent sur DRAFT (outline), PUBLISHED (`default` rose) et PAST (outline). **Absent de CANCELLED.**
+> « Modifier » reste un `<Link>` vers `…/moments/[slug]/edit`, présent sur DRAFT (outline rose), PUBLISHED (`default` rose plein) et PAST (outline rose). **Absent de CANCELLED.**
 
 ### 5.3 Bandeau « annulé » — nouveau (`moment-detail-view.tsx`, colonne droite)
 Créer un bandeau haut de page pour CANCELLED, calqué sur le bandeau PAST (`:490-508`) :
@@ -102,7 +109,7 @@ Le reste du dialogue (AlertDialog, confirmation `Moment.delete.*`) **inchangé**
 
 ### 5.6 Bouton « Annuler l'événement » — nouveau composant `cancel-moment-dialog.tsx`
 Calqué sur `delete-moment-dialog.tsx`, mais **non destructif** visuellement :
-- Trigger : `Button variant="outline" size="sm"` neutre, label `Moment.actions.cancel` (« Annuler l'événement »).
+- Trigger : `Button variant="outline" size="sm"` à accent rose (outline rose, §5.0), label `Moment.actions.cancel` (« Annuler l'événement »). **Pas** de classes destructive (annuler n'est pas une suppression).
 - AlertDialog de confirmation : `Moment.cancel.title` / `Moment.cancel.description` (explique : inscrits prévenus par email, remboursés si applicable, l'événement reste visible avec le statut Annulé) / `Moment.cancel.confirm`.
 - `AlertDialogAction` : style **neutre** (pas `bg-destructive`), appelle `cancelMomentAction(momentId)`.
 - Après succès : `router.refresh()` (l'événement reste sur la même page, passe en affichage annulé).
