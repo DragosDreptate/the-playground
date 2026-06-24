@@ -148,7 +148,7 @@ Calquée sur `publishMomentAction` (`:549`). Logique :
 ### 6.4 `deleteMoment` / `deleteMomentAction`
 - **`deleteMoment`** (`delete-moment.ts`) : ajouter une garde `if (existing.status === "PAST") throw new MomentCannotBeDeletedError(momentId)` (D4). Le remboursement existant reste pour DRAFT/PUBLISHED/CANCELLED.
 - **`deleteMomentAction`** (`moment.ts:486-496`) : restreindre la notif au filet → n'envoyer `sendMomentCancelledEmails` que si `momentToDelete.status === "PUBLISHED"` (D6). CANCELLED (déjà notifié), DRAFT, PAST → pas de notif.
-- **Admin** (`adminDeleteMoment`, `admin-delete-moment.ts`) : **inchangé** (chemin de modération distinct, pas concerné par la garde PAST host — à confirmer si on veut aussi le protéger).
+- **Admin** (`adminDeleteMoment`, `admin-delete-moment.ts`) : **inchangé**. L'admin conserve le droit de tout supprimer, y compris un passé (modération). La garde PAST ne s'applique **qu'au flux organisateur** (`deleteMoment`).
 
 ### 6.5 Erreurs domaine — `src/domain/errors/moment-errors.ts`
 Ajouter (pattern `DomainError` existant) + exports dans `errors/index.ts` :
@@ -188,7 +188,8 @@ Clés **à ajouter** (FR / EN) :
   - given moment inexistant → `MomentNotFoundError`.
 - **`delete-moment.test.ts`** (étendre) : given PAST → `MomentCannotBeDeletedError`, `delete` non appelé, refund non appelé.
 - **`update-moment.test.ts`** (adapter) : retirer les cas liés à `status`/D13 (déplacés). Vérifier que l'update ne touche plus au statut.
-- **E2E** : aucun test E2E ne couvre delete/cancel aujourd'hui. Optionnel : un scénario « organisateur annule un événement publié → bandeau annulé visible, inscrits notifiés (mock) ». À cadrer hors périmètre strict si trop lourd.
+- **E2E (inclus)** : scénario « organisateur annule un événement publié ». Confirmation via le dialogue, puis l'événement passe en affichage annulé : **bandeau « annulé »** + **badge cover**, la colonne gauche n'expose plus que **Supprimer**, et côté public le bouton **S'inscrire a disparu**. On vérifie l'**état UI**, pas la réception d'email.
+  > ⚠️ Le scénario crée un Moment et déclenche `sendMomentCancelledEmails` → respecter le garde-fou emails de test (`spec/email-testing.md`, `safe-resend`). Pas d'envoi réel ; jamais `--repeat-each`/`--retries` sans avoir vérifié `AUTH_RESEND_KEY`.
 
 ---
 
@@ -206,7 +207,7 @@ Clés **à ajouter** (FR / EN) :
 ## 10. Plan d'implémentation (ordre)
 
 1. **Domaine** : erreurs (`MomentCannotBeCancelledError`, `MomentCannotBeDeletedError`) ; usecase `cancelMoment` ; garde PAST dans `deleteMoment` ; nettoyage `updateMoment` (retrait `status` + D13).
-2. **Tests domaine** : `cancel-moment.test.ts`, extension `delete-moment.test.ts`, adaptation `update-moment.test.ts`.
+2. **Tests domaine + E2E** : `cancel-moment.test.ts`, extension `delete-moment.test.ts`, adaptation `update-moment.test.ts` ; **test E2E d'annulation** (organisateur annule un publié → affichage annulé, S'inscrire disparu côté public).
 3. **Actions** : `cancelMomentAction` ; restriction du filet dans `deleteMomentAction` ; retrait de `status` dans `updateMomentAction`.
 4. **i18n** : ajout des clés FR/EN.
 5. **Composants** : `cancel-moment-dialog.tsx` (nouveau) ; prop discrète sur `delete-moment-dialog.tsx` ; déplacement `PublishMomentButton` ; bandeau annulé + badge/grayscale cover dans `moment-detail-view.tsx` ; retrait du `<select>` dans `moment-form.tsx`.
