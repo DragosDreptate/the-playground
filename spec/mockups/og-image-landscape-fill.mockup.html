@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OG Image paysage 1200×630 (fill) — cover seule</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { box-sizing: border-box; }
+      :root {
+        --bg: #0a0710;
+        --bg-soft: #14101e;
+        --pink: #ec4899;
+        --violet: #a855f7;
+        --text: #f1f1f3;
+        --muted: #8b8b9a;
+        --cov-event: url("https://s4da3qkysw6xnvuo.public.blob.vercel-storage.com/covers/1771931328554.webp");
+        --cov-com: url("https://s4da3qkysw6xnvuo.public.blob.vercel-storage.com/covers/1771954439558.webp");
+        --cov-cloudpi: url("https://s4da3qkysw6xnvuo.public.blob.vercel-storage.com/covers/1780391821101.webp");
+      }
+      body { margin: 0; background: var(--bg); color: var(--text); font-family: "Inter", system-ui, -apple-system, sans-serif; }
+      .page { max-width: 1100px; margin: 0 auto; padding: 48px 32px 96px; }
+      .pre-h2 { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--pink); }
+      h1 { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin: 0 0 12px; }
+      h1 span { background: linear-gradient(135deg, var(--pink), var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 64px 0 6px; }
+      .lead { color: var(--muted); font-size: 15px; line-height: 1.55; max-width: 760px; }
+      .lead strong { color: var(--text); }
+      .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; margin-top: 24px; }
+      .card { background: var(--bg-soft); border: 1px solid #25223a; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+      .card .label { display: flex; align-items: center; gap: 8px; }
+      .card .label .badge { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; color: #f1f1f3; background: rgba(236, 72, 153, 0.18); border: 1px solid rgba(236, 72, 153, 0.4); padding: 4px 8px; border-radius: 999px; }
+      .card .label .name { font-size: 14px; font-weight: 600; }
+      .card .desc { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+      /* ── Canvas OG paysage 1200×630 — cover flottante sur fond flou (aucun overlay) ── */
+      .ogw { width: 100%; aspect-ratio: 1200 / 630; border-radius: 12px; overflow: hidden; position: relative; background: #050308; }
+      .cov-event { background-image: var(--cov-event); }
+      .cov-com { background-image: var(--cov-com); }
+      .cov-cloudpi { background-image: var(--cov-cloudpi); }
+      .bg { position: absolute; inset: -8%; background-size: cover; background-position: center; filter: blur(26px) brightness(0.6); transform: scale(1.12); }
+      /* fond flou des covers transparentes : aplati sombre pour éviter les trous */
+      .bg.flat { background-color: #1a1024; }
+      .scrim { position: absolute; inset: 0; background: rgba(8, 6, 20, 0.40); }
+      .float { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); height: 82%; aspect-ratio: 1 / 1; border-radius: 6%; background-size: cover; background-position: center; box-shadow: 0 18px 44px rgba(0, 0, 0, 0.55); }
+      /* cover aplatie sur blanc (pour les PNG/WebP transparents) */
+      .float.oncard { background-color: #ffffff; background-size: contain; background-repeat: no-repeat; background-position: center; }
+
+      /* ── Aperçu en contexte ── */
+      .messaging { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; margin-top: 24px; }
+      .phone { background: var(--bg-soft); border-radius: 24px; padding: 16px; border: 1px solid #25223a; }
+      .phone .phone-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 12px; text-align: center; }
+      .phone .screen { border-radius: 20px; overflow: hidden; padding: 16px; }
+      .phone.slack .screen { background: #1a1d21; }
+      .phone.whatsapp .screen { background: #0b141a; }
+      .unfurl-slack { border-left: 4px solid #4a154b; padding: 4px 0 4px 12px; }
+      .unfurl-slack .site { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #d1d2d3; font-weight: 700; margin-bottom: 6px; }
+      .unfurl-slack .site .fav { width: 16px; height: 16px; border-radius: 4px; background: linear-gradient(135deg, var(--pink), var(--violet)); display: grid; place-items: center; }
+      .unfurl-slack .site .fav svg { width: 7px; height: 8px; }
+      .unfurl-slack .ttl { font-size: 14px; font-weight: 700; color: #1d9bd1; line-height: 1.3; }
+      .unfurl-slack .dsc { font-size: 12px; color: #aab1b8; margin: 3px 0 8px; }
+      .unfurl-slack .big { width: 100%; max-width: 360px; aspect-ratio: 1200 / 630; border-radius: 8px; overflow: hidden; position: relative; }
+      .wa-bubble { background: #005c4b; border-radius: 12px; padding: 6px; max-width: 300px; margin-left: auto; }
+      .wa-prev { background: rgba(255, 255, 255, 0.06); border-radius: 8px; overflow: hidden; }
+      .wa-prev .big { width: 100%; aspect-ratio: 1200 / 630; position: relative; }
+      .wa-prev .mb { padding: 8px 10px; }
+      .wa-prev .mb .t { font-size: 13px; font-weight: 600; color: #e9edef; }
+      .wa-prev .mb .d { font-size: 11px; color: #8696a0; margin-top: 2px; }
+
+      .compare-note { background: rgba(168, 85, 247, 0.08); border-left: 3px solid var(--violet); padding: 14px 16px; margin-top: 24px; border-radius: 8px; font-size: 13px; line-height: 1.55; color: #cfcfd6; }
+      .compare-note strong { color: white; }
+      .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--muted); margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="pre-h2">Mockup · OG Image paysage</div>
+      <h1>Cover seule sur <span>fond flou</span> — 1200×630</h1>
+      <p class="lead">
+        Image paysage <strong>1200×630</strong> pour toutes les plateformes (WhatsApp, LinkedIn,
+        Slack, X). La cover carrée est <strong>remplie sur les côtés</strong> par un flou de la cover
+        elle-même, et la cover nette flotte au centre. <strong>Aucun logo, aucun texte</strong> :
+        juste la cover. Testée sur une cover photo (event) et une cover logo (communauté).
+      </p>
+      <div class="legend-row"><span>Covers réelles de prod (blob)</span><span>Ratio exact 1.905:1</span></div>
+
+      <h2>Le rendu</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="label"><span class="badge">event</span><span class="name">Cover photo</span></div>
+          <div class="ogw">
+            <div class="bg cov-event"></div><div class="scrim"></div><div class="float cov-event"></div>
+          </div>
+          <div class="desc">Le fond flou hérite des couleurs de la photo, la cover entière reste au centre.</div>
+        </div>
+        <div class="card">
+          <div class="label"><span class="badge">communauté</span><span class="name">Cover logo</span></div>
+          <div class="ogw">
+            <div class="bg cov-com"></div><div class="scrim"></div><div class="float cov-com"></div>
+          </div>
+          <div class="desc">Même template ; fond flou violet, logo entier visible, rien coupé.</div>
+        </div>
+      </div>
+
+      <h2>Cas des covers transparentes (PNG/WebP à alpha)</h2>
+      <p class="lead">
+        Certaines covers sont des logos transparents conçus pour fond clair. Posés directement
+        sur le fond flou sombre, ils deviennent illisibles. Règle validée :
+        <strong>aplatir la cover sur fond blanc</strong> (sans effet sur les covers opaques).
+        Exemple réel : la cover de <em>Cloud Pi Native</em>.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="label"><span class="badge" style="background: rgba(239, 68, 68, 0.18); border-color: rgba(239, 68, 68, 0.4)">✗ direct</span><span class="name">Sans traitement (illisible)</span></div>
+          <div class="ogw">
+            <div class="bg flat cov-cloudpi"></div><div class="scrim"></div>
+            <div class="float cov-cloudpi" style="background-size: contain; background-repeat: no-repeat"></div>
+          </div>
+          <div class="desc">Le logo (texte sombre) se fond dans le fond flou sombre : illisible.</div>
+        </div>
+        <div class="card">
+          <div class="label"><span class="badge">✓ sur blanc</span><span class="name">Aplatie sur blanc</span></div>
+          <div class="ogw">
+            <div class="bg flat cov-cloudpi"></div><div class="scrim"></div>
+            <div class="float oncard cov-cloudpi"></div>
+          </div>
+          <div class="desc">Carte blanche : logo parfaitement lisible, flotte sur le fond flou.</div>
+        </div>
+      </div>
+
+      <h2>Aperçu en contexte (Slack & WhatsApp)</h2>
+      <div class="messaging">
+        <div class="phone slack">
+          <div class="phone-title">Slack · event</div>
+          <div class="screen">
+            <div class="unfurl-slack">
+              <div class="site"><span class="fav"><svg viewBox="0 0 13 15" fill="none"><polygon points="0,0 0,15 13,7.5" fill="white"/></svg></span>the-playground.fr</div>
+              <div class="ttl">🏆⚽️ Coupe du monde France - Norvège</div>
+              <div class="dsc">26 juin 2026 à 21:00 · Au château — Le Club du Mont Saint Leger</div>
+              <div class="big"><div class="bg cov-event"></div><div class="scrim"></div><div class="float cov-event"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="phone whatsapp">
+          <div class="phone-title">WhatsApp · communauté</div>
+          <div class="screen">
+            <div class="wa-bubble">
+              <div class="wa-prev">
+                <div class="big"><div class="bg cov-com"></div><div class="scrim"></div><div class="float cov-com"></div></div>
+                <div class="mb"><div class="t">AIAD — IA &amp; Data</div><div class="d">128 membres · Communauté IA</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-note">
+        <strong>Réglages restants.</strong> Taille de la cover centrale (ici 82 % de la hauteur),
+        intensité du flou du fond, force de l'ombre portée, et arrondi des coins de la cover. Dis-moi
+        si l'équilibre te va ou ce que tu veux ajuster.
+      </div>
+    </div>
+  </body>
+</html>
