@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { OG_JPEG_OPTIONS } from "@/lib/og/render";
 
 const OG_COVER_SIZE = 1200;
 
@@ -25,7 +26,7 @@ export async function loadCoverAsOgJpeg(url: string): Promise<Buffer | null> {
     return await sharp(buffer)
       .resize(OG_COVER_SIZE, OG_COVER_SIZE, { fit: "cover" })
       .flatten({ background: "#ffffff" })
-      .jpeg({ quality: 82, mozjpeg: true })
+      .jpeg(OG_JPEG_OPTIONS)
       .toBuffer();
   } catch {
     return null;

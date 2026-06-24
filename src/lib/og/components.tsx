@@ -6,7 +6,7 @@
  * imposés par le moteur de rendu — ne pas les supprimer.
  */
 
-const OG_SIZE = 1200;
+import type { ReactNode } from "react";
 
 const BRAND_PINK = "#ec4899";
 const BRAND_PURPLE = "#a855f7";
@@ -23,40 +23,40 @@ export const OG_COLORS = {
   logoGradient: `linear-gradient(135deg, ${BRAND_PINK}, ${BRAND_PURPLE})`,
 } as const;
 
-export function OgCoverBackground({
-  coverDataUrl,
+/**
+ * Châssis de l'og:image quand il n'y a pas de cover : fond gradient (dérivé de
+ * l'ID de l'entité) + pill de branding. Le contenu spécifique (date, titre,
+ * nom de Communauté…) est passé en `children`. Les pages avec cover ne passent
+ * plus par ici : leur cover est servie en JPEG brut (cf. loadCoverAsOgJpeg).
+ */
+export function OgFallbackFrame({
   gradient,
+  children,
 }: {
-  coverDataUrl: string | null;
-  gradient?: string;
+  gradient: string;
+  children: ReactNode;
 }) {
-  if (coverDataUrl) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={coverDataUrl}
-        alt=""
-        width={OG_SIZE}
-        height={OG_SIZE}
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-        }}
-      />
-    );
-  }
   return (
     <div
       style={{
-        position: "absolute",
-        inset: 0,
-        background: gradient,
+        width: "100%",
+        height: "100%",
         display: "flex",
+        position: "relative",
+        background: OG_COLORS.bgDark,
       }}
-    />
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: gradient,
+          display: "flex",
+        }}
+      />
+      <OgBrandingPill />
+      {children}
+    </div>
   );
 }
 
