@@ -67,19 +67,14 @@ test.describe("Flux Host — annulation d'un Moment", () => {
     await dialog.getByRole("checkbox").check();
     await dialog.getByRole("button", { name: /oui, annuler/i }).click();
 
-    // Attendre la fin de l'action (fermeture du dialog), puis recharger l'état
-    // serveur frais : on ne dépend pas du timing de router.refresh (flaky en CI,
-    // l'annulation enchaîne plusieurs requêtes DB avant le re-render).
-    await expect(page.getByRole("alertdialog")).toBeHidden({ timeout: 15_000 });
-    await page.goto(
-      `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}`
-    );
-
-    // 3. État annulé côté host : bandeau visible, plus de bouton « Annuler »,
-    //    « Supprimer » disponible à la place, et le message publié en commentaire.
+    // 3. État annulé côté host. L'annulation enchaîne plusieurs requêtes DB
+    //    (remboursement éventuel, rejet des demandes, commentaire, email) AVANT
+    //    le router.refresh() du dialog : on attend le bandeau avec un timeout large
+    //    adapté à la lenteur CI (Neon). Surtout PAS de reload anticipé : Radix ferme
+    //    le dialog au clic même si l'action n'a pas fini → un goto serait une race.
     await expect(
       page.getByText(/cet événement a été annulé/i).first()
-    ).toBeVisible({ timeout: 10_000 });
+    ).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(cancelMessage).first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: /annuler l'événement/i })
