@@ -67,6 +67,10 @@ export default async function EditMomentPage({
 
   if (!isActiveOrganizer(membership)) redirectToPublicMoment(moment.slug);
 
+  // Un événement annulé n'est pas modifiable (l'UI ne propose que Supprimer) :
+  // on ferme l'accès direct à l'URL d'édition.
+  if (moment.status === "CANCELLED") redirectToPublicMoment(moment.slug);
+
   const boundAction = updateMomentAction.bind(null, moment.id);
   const priceLocked = (paymentSummary?.paidCount ?? 0) > 0;
 

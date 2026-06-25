@@ -257,11 +257,14 @@ export async function updateMomentAction(
     const existingMoment = await prismaMomentRepository.findById(momentId);
     const oldCoverImage = existingMoment?.coverImage ?? null;
 
-    const coverData = await processCoverImage(formData);
-    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-
-    // Événement passé : ignorer les dates soumises — elles sont non modifiables
+    // Événement passé : seuls le lieu et la description sont modifiables (règle
+    // appliquée, source de vérité unique, dans le usecase updateMoment). On
+    // intercepte ici le seul effet de bord que le usecase ne peut pas annuler :
+    // le traitement de la cover, pour ne pas uploader un blob ensuite ignoré.
     const isPastMoment = existingMoment?.status === "PAST";
+
+    const coverData = isPastMoment ? {} : await processCoverImage(formData);
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await updateMoment(
       {
@@ -270,8 +273,8 @@ export async function updateMomentAction(
         ...(title && { title: title.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...coverData,
-        ...(!isPastMoment && startsAtRaw && { startsAt: new Date(startsAtRaw) }),
-        ...(!isPastMoment && endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
+        ...(startsAtRaw && { startsAt: new Date(startsAtRaw) }),
+        ...(endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
         ...(locationType && { locationType }),
         ...(locationName !== undefined && { locationName: locationName || null }),
         ...(locationAddress !== undefined && { locationAddress: locationAddress || null }),
