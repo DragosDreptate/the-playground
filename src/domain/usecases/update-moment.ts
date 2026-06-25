@@ -79,6 +79,8 @@ export async function updateMoment(
   // Toute autre modification soumise (titre, dates, capacité, prix, validation,
   // visuels) est ignorée silencieusement. Règle métier centralisée ici pour
   // protéger aussi les appels directs qui contourneraient le formulaire.
+  // Liste blanche fail-closed : tout NOUVEAU champ de UpdateMomentInput rendu
+  // éditable sur un événement passé doit être ajouté ici, sinon il sera ignoré.
   const safeInput: UpdateMomentInput =
     existing.status === "PAST"
       ? {

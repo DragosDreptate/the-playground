@@ -258,9 +258,9 @@ export async function updateMomentAction(
     const oldCoverImage = existingMoment?.coverImage ?? null;
 
     // Événement passé : seuls le lieu et la description sont modifiables (règle
-    // appliquée dans le usecase updateMoment). On évite ici tout traitement de
-    // la cover pour ne pas uploader un blob qui serait ensuite ignoré, et on ne
-    // transmet pas les dates (défense en profondeur).
+    // appliquée, source de vérité unique, dans le usecase updateMoment). On
+    // intercepte ici le seul effet de bord que le usecase ne peut pas annuler :
+    // le traitement de la cover, pour ne pas uploader un blob ensuite ignoré.
     const isPastMoment = existingMoment?.status === "PAST";
 
     const coverData = isPastMoment ? {} : await processCoverImage(formData);
@@ -273,8 +273,8 @@ export async function updateMomentAction(
         ...(title && { title: title.trim() }),
         ...(description !== null && { description: description.trim() }),
         ...coverData,
-        ...(!isPastMoment && startsAtRaw && { startsAt: new Date(startsAtRaw) }),
-        ...(!isPastMoment && endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
+        ...(startsAtRaw && { startsAt: new Date(startsAtRaw) }),
+        ...(endsAtRaw !== undefined && { endsAt: endsAtRaw ? new Date(endsAtRaw) : null }),
         ...(locationType && { locationType }),
         ...(locationName !== undefined && { locationName: locationName || null }),
         ...(locationAddress !== undefined && { locationAddress: locationAddress || null }),
