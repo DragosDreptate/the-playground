@@ -4,7 +4,7 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
-import { refundRegistration } from "./refund-registration";
+import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
@@ -53,30 +53,17 @@ export async function cancelMoment(
     throw new MomentCannotBeCancelledError(input.momentId, existing.status);
   }
 
-  // Rembourse les inscrits payants (annulation Organisateur = force).
-  if (existing.price > 0) {
-    const registrations = await registrationRepository.findActiveByMomentId(
-      input.momentId
-    );
-    const paidRegistrations = registrations.filter(
-      (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
-    );
-    await Promise.all(
-      paidRegistrations.map((r) =>
-        refundRegistration(
-          { registration: r, moment: existing, force: true },
-          { registrationRepository, paymentService }
-        )
-      )
-    );
-  }
-
-  // Rejette les inscriptions en attente d'approbation (déplacé depuis updateMoment).
-  await registrationRepository.rejectAllPendingApprovals(input.momentId);
-
+  // L'annulation est la source de vérité : on bascule le statut EN PREMIER (mutation
+  // fiable), puis on déclenche les effets (remboursements, rejet des demandes en
+  // attente). Si un effet échoue ensuite, l'événement reste correctement annulé et
+  // les remboursements (idempotents) restent retentables — préférable à l'inverse
+  // (remboursé mais toujours PUBLISHED).
   const moment = await momentRepository.update(input.momentId, {
     status: "CANCELLED",
   });
+
+  await refundAllPaidRegistrations(existing, { registrationRepository, paymentService });
+  await registrationRepository.rejectAllPendingApprovals(input.momentId);
 
   return { moment };
 }

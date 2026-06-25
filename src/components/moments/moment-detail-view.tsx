@@ -527,7 +527,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                 <DeleteMomentDialog
                   momentId={moment.id}
                   circleSlug={(props as HostViewProps).circleSlug}
-                  discreet
                 />
               )}
             </div>

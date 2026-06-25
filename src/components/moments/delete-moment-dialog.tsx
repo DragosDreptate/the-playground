@@ -21,19 +21,17 @@ type DeleteMomentDialogProps = {
   momentId: string;
   circleSlug: string;
   triggerClassName?: string;
-  /** Rendu discret (lien ghost destructif sans bordure), pour un placement en bandeau. */
-  discreet?: boolean;
 };
 
 export function DeleteMomentDialog({
   momentId,
   circleSlug,
   triggerClassName,
-  discreet = false,
 }: DeleteMomentDialogProps) {
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,24 +42,23 @@ export function DeleteMomentDialog({
     const result = await deleteMomentAction(momentId);
 
     if (result.success) {
+      setOpen(false);
       router.push(`/dashboard/circles/${circleSlug}`);
     } else {
+      // On garde la modale ouverte pour afficher l'erreur (AlertDialogAction est
+      // neutralisé via preventDefault, sinon Radix la fermerait au clic).
       setError(result.error);
       setIsPending(false);
     }
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
-          variant={discreet ? "ghost" : "outline"}
+          variant="outline"
           size="sm"
-          className={
-            discreet
-              ? `text-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`
-              : `border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`
-          }
+          className={`border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10 hover:text-destructive ${triggerClassName ?? ""}`}
         >
           {tCommon("delete")}
         </Button>
@@ -79,9 +76,14 @@ export function DeleteMomentDialog({
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            {tCommon("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.preventDefault();
+              void handleDelete();
+            }}
             disabled={isPending}
             className="bg-destructive text-white hover:bg-destructive/90"
           >

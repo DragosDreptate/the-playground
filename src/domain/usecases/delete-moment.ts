@@ -3,11 +3,10 @@ import { isActiveOrganizer } from "@/domain/models/circle";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
-import { refundRegistration } from "./refund-registration";
+import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
-  MomentCannotBeDeletedError,
 } from "@/domain/errors";
 
 type DeleteMomentInput = {
@@ -43,31 +42,16 @@ export async function deleteMoment(
     throw new UnauthorizedMomentActionError();
   }
 
-  // Un événement passé fait partie de l'historique de la Communauté : on ne le supprime pas.
-  // (La modération admin a son propre chemin, sans cette garde.)
-  if (existing.status === "PAST") {
-    throw new MomentCannotBeDeletedError(input.momentId);
-  }
+  // La garde « pas de suppression d'un événement passé » dépend du rôle (un admin
+  // qui modère doit pouvoir tout supprimer) : elle vit dans deleteMomentAction,
+  // pas ici, car le usecase pur n'a pas la notion de session/admin.
 
-  // Refund all PAID registrations before deletion (Organisateur cancellation = force)
-  if (existing.price > 0 && deps.registrationRepository && deps.paymentService) {
-    const registrations = await deps.registrationRepository.findActiveByMomentId(
-      input.momentId
-    );
-    const paidRegistrations = registrations.filter(
-      (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
-    );
-    await Promise.all(
-      paidRegistrations.map((r) =>
-        refundRegistration(
-          { registration: r, moment: existing, force: true },
-          {
-            registrationRepository: deps.registrationRepository!,
-            paymentService: deps.paymentService!,
-          }
-        )
-      )
-    );
+  // Remboursement des inscrits payants avant la suppression (cascade DB).
+  if (deps.registrationRepository && deps.paymentService) {
+    await refundAllPaidRegistrations(existing, {
+      registrationRepository: deps.registrationRepository,
+      paymentService: deps.paymentService,
+    });
   }
 
   await momentRepository.delete(input.momentId);

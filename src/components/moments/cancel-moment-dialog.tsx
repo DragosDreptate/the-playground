@@ -32,6 +32,7 @@ export function CancelMomentDialog({
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -51,15 +52,18 @@ export function CancelMomentDialog({
 
     if (result.success) {
       // L'événement reste sur la même page, en affichage annulé.
+      setOpen(false);
       router.refresh();
     } else {
+      // On garde la modale ouverte pour afficher l'erreur (AlertDialogAction est
+      // neutralisé via preventDefault, sinon Radix la fermerait au clic).
       setError(result.error);
       setIsPending(false);
     }
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"
@@ -126,8 +130,16 @@ export function CancelMomentDialog({
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCancel} disabled={isPending}>
+          <AlertDialogCancel disabled={isPending}>
+            {tCommon("cancel")}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              void handleCancel();
+            }}
+            disabled={isPending}
+          >
             {isPending ? t("actions.cancelling") : t("cancel.confirm")}
           </AlertDialogAction>
         </AlertDialogFooter>

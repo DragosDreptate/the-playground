@@ -18,6 +18,7 @@ import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
 import { cancelMoment } from "@/domain/usecases/cancel-moment";
+import { MomentCannotBeDeletedError } from "@/domain/errors";
 import {
   getMomentParticipantsPage,
   type GetMomentParticipantsPageResult,
@@ -48,6 +49,27 @@ const paymentService = createStripePaymentService();
 
 /** Longueur max du mot d'annulation saisi par l'Organisateur (UI + serveur). */
 const MAX_CANCELLATION_MESSAGE_LENGTH = 1000;
+
+/**
+ * Faut-il notifier les inscrits d'une transition (mise à jour / annulation /
+ * suppression) ? Oui, sauf si un admin modère l'événement de quelqu'un d'autre —
+ * un admin qui est lui-même l'organisateur prévient bien ses inscrits.
+ * Retourne aussi `isOrganizerOfEvent`, réutilisé pour décider de poster le
+ * commentaire d'annulation sous l'identité de l'acteur.
+ */
+async function shouldNotifyRegistrants(
+  session: Parameters<typeof isAdminUser>[0],
+  circleId: string,
+  userId: string
+): Promise<{ allowed: boolean; isOrganizerOfEvent: boolean }> {
+  const isOrganizerOfEvent = isActiveOrganizer(
+    await prismaCircleRepository.findMembership(circleId, userId)
+  );
+  return {
+    allowed: !isAdminUser(session) || isOrganizerOfEvent,
+    isOrganizerOfEvent,
+  };
+}
 
 export async function createMomentAction(
   circleId: string,
@@ -296,13 +318,12 @@ export async function updateMomentAction(
         (locationAddress !== null && (locationAddress || null) !== existingMoment.locationAddress);
 
       if ((dateChanged || locationChanged) && existingMoment.status === "PUBLISHED") {
-        // Notifier les inscrits, sauf si un admin modère l'événement de quelqu'un
-        // d'autre. Un admin qui est l'organisateur de SON événement prévient bien
-        // ses inscrits — cohérent avec deleteMomentAction / cancelMomentAction.
-        const isOrganizerOfEvent = isActiveOrganizer(
-          await prismaCircleRepository.findMembership(existingMoment.circleId, userId)
+        const { allowed } = await shouldNotifyRegistrants(
+          session,
+          existingMoment.circleId,
+          userId
         );
-        if (!isAdminUser(session) || isOrganizerOfEvent) {
+        if (allowed) {
           const resolver = await buildEmailLocaleResolver(userId);
           sendMomentUpdateEmails(
             result.moment,
@@ -472,6 +493,14 @@ export async function deleteMomentAction(
       prismaMomentAttachmentRepository.findByMoment(momentId),
     ]);
 
+    // Un événement passé fait partie de l'historique de la Communauté : l'organisateur
+    // ne peut pas le supprimer (il l'annule). L'admin garde ce droit (modération),
+    // y compris en host-mode — la garde dépend du rôle, d'où sa place ici (et non
+    // dans le usecase pur deleteMoment).
+    if (momentToDelete?.status === "PAST" && !isAdminUser(session)) {
+      throw new MomentCannotBeDeletedError(momentId);
+    }
+
     await deleteMoment(
       { momentId, userId },
       {
@@ -498,20 +527,22 @@ export async function deleteMomentAction(
     // CANCELLED (cancelMomentAction). Ici on ne notifie que la suppression directe
     // d'un événement PUBLISHED (chemins hors-UI : admin/API). Un CANCELLED supprimé
     // a déjà été notifié à l'annulation ; un DRAFT/PAST n'a pas à l'être.
-    // Skip aussi quand un admin modère l'événement de quelqu'un d'autre.
-    const isOrganizerOfEvent = momentToDelete
-      ? isActiveOrganizer(await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))
-      : false;
-    const shouldNotify =
+    if (
       momentToDelete &&
       momentToDelete.status === "PUBLISHED" &&
-      registrationsToNotify.length > 0 &&
-      (!isAdminUser(session) || isOrganizerOfEvent);
-    if (shouldNotify) {
-      const resolver = await buildEmailLocaleResolver(userId);
-      sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
-        (err) => Sentry.captureException(err)
+      registrationsToNotify.length > 0
+    ) {
+      const { allowed } = await shouldNotifyRegistrants(
+        session,
+        momentToDelete.circleId,
+        userId
       );
+      if (allowed) {
+        const resolver = await buildEmailLocaleResolver(userId);
+        sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
+          (err) => Sentry.captureException(err)
+        );
+      }
     }
 
     if (momentToDelete) {
@@ -616,9 +647,14 @@ export async function cancelMomentAction(
   return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
-    // Récupère les inscrits AVANT la bascule pour les notifier de l'annulation.
-    const registrationsToNotify =
-      await prismaRegistrationRepository.findActiveWithUserByMomentId(momentId);
+    // Inscrits à prévenir, capturés AVANT la bascule : les actifs
+    // (REGISTERED/CHECKED_IN) ET les demandes en attente d'approbation, qui vont
+    // être rejetées par cancelMoment — sans ça, elles ne recevraient aucune notif.
+    const [activeToNotify, pendingToNotify] = await Promise.all([
+      prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
+      prismaRegistrationRepository.findPendingApprovals(momentId),
+    ]);
+    const registrationsToNotify = [...activeToNotify, ...pendingToNotify];
 
     const result = await cancelMoment(
       { momentId, userId },
@@ -630,25 +666,16 @@ export async function cancelMomentAction(
       }
     );
 
-    // Optionnel : publier le message comme commentaire de l'organisateur sur la
-    // page de l'événement. Création directe (repository) → statut PUBLISHED,
-    // SILENCIEUSE : pas de second email « nouveau commentaire » (l'email
-    // d'annulation porte déjà le message). Contourne volontairement le verrou
-    // « commentaires fermés » du usecase addComment — légitime, c'est le mot
-    // officiel de l'organisateur sur l'annulation.
-    if (postAsComment && message) {
-      await prismaCommentRepository.create({ momentId, userId, content: message });
-    }
-
-    // Email d'annulation aux inscrits (fire-and-forget).
-    // Skip quand un admin modère l'événement de quelqu'un d'autre.
-    const isOrganizerOfEvent = isActiveOrganizer(
-      await prismaCircleRepository.findMembership(result.moment.circleId, userId)
+    const { allowed, isOrganizerOfEvent } = await shouldNotifyRegistrants(
+      session,
+      result.moment.circleId,
+      userId
     );
-    if (
-      registrationsToNotify.length > 0 &&
-      (!isAdminUser(session) || isOrganizerOfEvent)
-    ) {
+
+    // 1) Email d'annulation EN PREMIER (fire-and-forget). Ne doit jamais être
+    //    bloqué par le commentaire optionnel ci-dessous : si le commentaire échoue,
+    //    les inscrits doivent quand même avoir été prévenus.
+    if (registrationsToNotify.length > 0 && allowed) {
       const resolver = await buildEmailLocaleResolver(userId);
       sendMomentCancelledEmails(
         result.moment,
@@ -656,6 +683,20 @@ export async function cancelMomentAction(
         resolver,
         message
       ).catch((err) => Sentry.captureException(err));
+    }
+
+    // 2) Optionnel : publier le message en commentaire sur la page. Best-effort
+    //    (n'échoue jamais l'annulation déjà persistée) et UNIQUEMENT si l'acteur est
+    //    réellement l'organisateur — un admin qui modère ne s'attribue pas un « mot
+    //    de l'organisateur » public sous son identité. Création directe → PUBLISHED,
+    //    silencieuse (pas de second email), contourne volontairement le verrou
+    //    « commentaires fermés » du usecase addComment.
+    if (postAsComment && message && isOrganizerOfEvent) {
+      try {
+        await prismaCommentRepository.create({ momentId, userId, content: message });
+      } catch (err) {
+        Sentry.captureException(err);
+      }
     }
 
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
