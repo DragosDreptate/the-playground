@@ -67,6 +67,14 @@ test.describe("Flux Host — annulation d'un Moment", () => {
     await dialog.getByRole("checkbox").check();
     await dialog.getByRole("button", { name: /oui, annuler/i }).click();
 
+    // Attendre la fin de l'action (fermeture du dialog), puis recharger l'état
+    // serveur frais : on ne dépend pas du timing de router.refresh (flaky en CI,
+    // l'annulation enchaîne plusieurs requêtes DB avant le re-render).
+    await expect(page.getByRole("alertdialog")).toBeHidden({ timeout: 15_000 });
+    await page.goto(
+      `/fr/dashboard/circles/${SLUGS.CIRCLE}/moments/${momentSlug}`
+    );
+
     // 3. État annulé côté host : bandeau visible, plus de bouton « Annuler »,
     //    « Supprimer » disponible à la place, et le message publié en commentaire.
     await expect(
