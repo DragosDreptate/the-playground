@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { CalendarX } from "lucide-react";
 import { useRouter } from "@/i18n/navigation";
 import {
   AlertDialog,
@@ -70,7 +71,12 @@ export function CancelMomentDialog({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("cancel.title")}</AlertDialogTitle>
+          <AlertDialogTitle className="flex items-center gap-2.5">
+            <div className="bg-primary/10 border-primary/20 flex size-[34px] shrink-0 items-center justify-center rounded-[9px] border">
+              <CalendarX className="text-primary size-[18px]" />
+            </div>
+            {t("cancel.title")}
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {t("cancel.description")}
           </AlertDialogDescription>
