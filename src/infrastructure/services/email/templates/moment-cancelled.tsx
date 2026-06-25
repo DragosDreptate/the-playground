@@ -13,14 +13,13 @@ export function MomentCancelledEmail({
   momentTitle,
   momentDateMonth,
   momentDateDay,
-  circleName,
-  circleSlug,
   refundMessage,
   hostMessage,
+  momentSlug,
   baseUrl,
   strings,
 }: Props) {
-  const circleUrl = `${baseUrl}/c/${circleSlug}`;
+  const momentUrl = `${baseUrl}/m/${momentSlug}`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
@@ -45,8 +44,8 @@ export function MomentCancelledEmail({
       )}
 
       <Section style={ctaSection}>
-        <Button style={ctaButton} href={circleUrl}>
-          {strings.ctaLabel} — {circleName}
+        <Button style={ctaButton} href={momentUrl}>
+          {strings.ctaLabel}
         </Button>
       </Section>
     </EmailLayout>

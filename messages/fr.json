@@ -1180,7 +1180,7 @@
       "heading": "Cet événement a été annulé",
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la communauté.",
       "hostMessageLabel": "Message de l'organisateur",
-      "ctaLabel": "Voir la communauté"
+      "ctaLabel": "Voir l'événement"
     },
     "momentHostMessage": {
       "preheader": "Message de {hostName} à propos de {momentTitle}",

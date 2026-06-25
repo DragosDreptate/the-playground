@@ -276,6 +276,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         locationText: "Le Cargo, 18 rue de la Paix, Paris",
         circleName: "Paris Creative Tech",
         circleSlug: "paris-creative-tech",
+        momentSlug: "soiree-js-pizza",
         hostMessage:
           "Désolé pour ce contretemps : le lieu s'est désisté à la dernière minute. On reprogramme très vite, merci de votre compréhension !",
         strings: {
@@ -283,7 +284,7 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
           heading: "Cet événement a été annulé",
           message: "L'organisateur a annulé Soirée JS & Pizza. Nous espérons vous retrouver lors d'un prochain événement.",
           hostMessageLabel: "Message de l'organisateur",
-          ctaLabel: "Voir la Communauté",
+          ctaLabel: "Voir l'événement",
           footer: FOOTER,
         },
         baseUrl: BASE_URL,

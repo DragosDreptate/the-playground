@@ -562,6 +562,7 @@ async function sendMomentCancelledEmails(
       locationText: ctx.locationText,
       circleName: circle.name,
       circleSlug: circle.slug,
+      momentSlug: moment.slug,
       hostMessage: hostMessage || undefined,
       strings,
     });
