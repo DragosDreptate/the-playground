@@ -111,9 +111,14 @@ Le reste du dialogue (AlertDialog, confirmation `Moment.delete.*`) **inchangé**
 Calqué sur `delete-moment-dialog.tsx`, mais **non destructif** visuellement :
 - Trigger : `Button variant="outline" size="sm"` à accent rose (outline rose, §5.0), label `Moment.actions.cancel` (« Annuler l'événement »). **Pas** de classes destructive (annuler n'est pas une suppression).
 - AlertDialog de confirmation : `Moment.cancel.title` / `Moment.cancel.description` (explique : inscrits prévenus par email, remboursés si applicable, l'événement reste visible avec le statut Annulé) / `Moment.cancel.confirm`.
-- `AlertDialogAction` : style **neutre** (pas `bg-destructive`), appelle `cancelMomentAction(momentId)`.
+- `AlertDialogAction` : style **neutre** (pas `bg-destructive`), appelle `cancelMomentAction(momentId, hostMessage?, postAsComment?)`.
 - Après succès : `router.refresh()` (l'événement reste sur la même page, passe en affichage annulé).
 - Props : `{ momentId: string }` (+ `triggerClassName?` pour le `flex-1`).
+
+**Mot optionnel aux inscrits** (ajout) :
+- Un **textarea optionnel** (« Un mot pour les inscrits », max **1000** car., compteur) dont le contenu est **inclus tel quel dans l'email d'annulation** (bloc « Message de l'organisateur » du template `moment-cancelled.tsx`, via `MomentCancelledEmailData.hostMessage`).
+- Une **case « Ajouter aussi ce message en commentaire sur la page »** (désactivée tant que le textarea est vide). Si cochée : `cancelMomentAction` crée le commentaire **en direct** (`prismaCommentRepository.create`, statut `PUBLISHED`) — **silencieux** : pas de second email « nouveau commentaire » (l'email de commentaire vit dans l'action `comment.ts`, non sollicitée), et contourne volontairement le verrou « commentaires fermés » du usecase `addComment` (mot officiel de l'organisateur).
+- Le `hostMessage` est trimé + borné à 1000 côté serveur (défense en profondeur). Texte échappé par react-email (pas d'injection), retours à la ligne préservés (`pre-wrap`).
 
 ### 5.7 Cover — `MomentCoverBlock` (`moment-detail-view.tsx:121-170`)
 - **Grayscale** : étendre la condition `status === "PAST"` (ligne 129) à `status === "PAST" || status === "CANCELLED"`.
