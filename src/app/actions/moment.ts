@@ -287,18 +287,22 @@ export async function updateMomentAction(
         (locationName !== null && locationName !== existingMoment.locationName) ||
         (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
 
-      if (
-        (dateChanged || locationChanged) &&
-        existingMoment.status === "PUBLISHED" &&
-        !isAdminUser(session)
-      ) {
-        const resolver = await buildEmailLocaleResolver(userId);
-        sendMomentUpdateEmails(
-          result.moment,
-          Boolean(dateChanged),
-          Boolean(locationChanged),
-          resolver
-        ).catch((err) => Sentry.captureException(err));
+      if ((dateChanged || locationChanged) && existingMoment.status === "PUBLISHED") {
+        // Notifier les inscrits, sauf si un admin modère l'événement de quelqu'un
+        // d'autre. Un admin qui est l'organisateur de SON événement prévient bien
+        // ses inscrits — cohérent avec deleteMomentAction / cancelMomentAction.
+        const isOrganizerOfEvent = isActiveOrganizer(
+          await prismaCircleRepository.findMembership(existingMoment.circleId, userId)
+        );
+        if (!isAdminUser(session) || isOrganizerOfEvent) {
+          const resolver = await buildEmailLocaleResolver(userId);
+          sendMomentUpdateEmails(
+            result.moment,
+            Boolean(dateChanged),
+            Boolean(locationChanged),
+            resolver
+          ).catch((err) => Sentry.captureException(err));
+        }
       }
 
       // Les passages DRAFT → PUBLISHED sont couverts par la notif de création.
