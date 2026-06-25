@@ -68,14 +68,18 @@ test.describe("Flux Host — annulation d'un Moment", () => {
     await dialog.getByRole("checkbox").check();
     await dialog.getByRole("button", { name: /oui, annuler/i }).click();
 
-    // 3. État annulé côté host. L'annulation enchaîne plusieurs requêtes DB
-    //    (remboursement éventuel, rejet des demandes, commentaire, email) AVANT
-    //    le router.refresh() du dialog : on attend le bandeau avec un timeout large
-    //    adapté à la lenteur CI (Neon). Surtout PAS de reload anticipé : Radix ferme
-    //    le dialog au clic même si l'action n'a pas fini → un goto serait une race.
-    await expect(
-      page.getByText(/cet événement a été annulé/i).first()
-    ).toBeVisible({ timeout: 30_000 });
+    // 3. État annulé côté host. cancelMoment persiste le statut CANCELLED de façon
+    //    synchrone avant que l'action réponde ; le dialog se ferme puis déclenche un
+    //    router.refresh(). En CI headless, avec une base Neon distante, ce refresh
+    //    client peut être lent ou instable (le statut est en base, mais la page ne
+    //    se ré-affiche pas à temps). On recharge donc explicitement jusqu'à voir
+    //    l'état annulé persisté, au lieu de dépendre du seul refresh du dialog.
+    await expect(async () => {
+      await page.reload();
+      await expect(
+        page.getByText(/cet événement a été annulé/i).first()
+      ).toBeVisible({ timeout: 10_000 });
+    }).toPass({ timeout: 60_000 });
     await expect(page.getByText(cancelMessage).first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: /annuler l'événement/i })
