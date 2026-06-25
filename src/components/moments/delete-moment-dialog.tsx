@@ -31,6 +31,7 @@ export function DeleteMomentDialog({
   const t = useTranslations("Moment");
   const tCommon = useTranslations("Common");
   const router = useRouter();
+  const [open, setOpen] = useState(false);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,15 +42,29 @@ export function DeleteMomentDialog({
     const result = await deleteMomentAction(momentId);
 
     if (result.success) {
+      setOpen(false);
       router.push(`/dashboard/circles/${circleSlug}`);
     } else {
-      setError(result.error);
+      // On garde la modale ouverte pour afficher l'erreur (AlertDialogAction est
+      // neutralisé via preventDefault, sinon Radix la fermerait au clic). Message
+      // générique : les erreurs du domaine sont des messages développeur (anglais,
+      // avec l'id interne) qu'on ne montre jamais tel quel à l'Organisateur.
+      setError(t("delete.error"));
+      setIsPending(false);
+    }
+  }
+
+  // Reset à la fermeture pour ne pas réafficher une erreur périmée à la réouverture.
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) {
+      setError(null);
       setIsPending(false);
     }
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"
@@ -72,9 +87,14 @@ export function DeleteMomentDialog({
           </div>
         )}
         <AlertDialogFooter>
-          <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>
+            {tCommon("cancel")}
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={handleDelete}
+            onClick={(e) => {
+              e.preventDefault();
+              void handleDelete();
+            }}
             disabled={isPending}
             className="bg-destructive text-white hover:bg-destructive/90"
           >

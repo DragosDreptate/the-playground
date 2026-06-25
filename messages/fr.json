@@ -565,7 +565,17 @@
     "delete": {
       "title": "Supprimer l'événement",
       "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
-      "confirm": "Oui, supprimer cet événement"
+      "confirm": "Oui, supprimer cet événement",
+      "error": "La suppression n'a pas pu aboutir. Recharge la page et réessaie."
+    },
+    "cancel": {
+      "title": "Annuler cet événement",
+      "description": "Cet événement sera marqué comme annulé. Les inscrits seront prévenus par email et remboursés automatiquement si l'événement était payant. Il restera visible dans ta Communauté avec le statut « Annulé ».",
+      "confirm": "Oui, annuler cet événement",
+      "messageLabel": "Un mot pour les inscrits (optionnel)",
+      "messagePlaceholder": "Expliquez la raison de l'annulation. Ce message sera inclus dans l'email envoyé aux inscrits.",
+      "alsoPostComment": "Ajouter aussi ce message en commentaire sur la page de l'événement",
+      "error": "L'annulation n'a pas pu aboutir. Recharge la page et réessaie."
     },
     "detail": {
       "when": "Quand",
@@ -584,7 +594,9 @@
     },
     "actions": {
       "publish": "Publier",
-      "publishing": "Publication..."
+      "publishing": "Publication...",
+      "cancel": "Annuler l'événement",
+      "cancelling": "Annulation..."
     },
     "public": {
       "hostedBy": "Organisé par",
@@ -630,6 +642,7 @@
       "eventTookPlace": "Cet événement a eu lieu le",
       "eventEnded": "Événement terminé",
       "eventCancelled": "Événement annulé",
+      "cancelledBannerTitle": "Cet événement a été annulé",
       "attendedCount": "{count} personnes ont participé",
       "viewCircleMoments": "Voir les prochains événements de la communauté",
       "proposedByCommunity": "Proposé par la communauté",
@@ -1168,7 +1181,8 @@
       "subject": "Annulé : {momentTitle}",
       "heading": "Cet événement a été annulé",
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la communauté.",
-      "ctaLabel": "Voir la communauté"
+      "hostMessageLabel": "Message de l'organisateur",
+      "ctaLabel": "Voir l'événement"
     },
     "momentHostMessage": {
       "preheader": "Message de {hostName} à propos de {momentTitle}",

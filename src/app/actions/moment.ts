@@ -8,6 +8,7 @@ import {
   prismaRegistrationRepository,
   prismaUserRepository,
   prismaMomentAttachmentRepository,
+  prismaCommentRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
@@ -16,6 +17,9 @@ import { createMoment } from "@/domain/usecases/create-moment";
 import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
+import { cancelMoment } from "@/domain/usecases/cancel-moment";
+import { refundAllPaidRegistrations } from "@/domain/usecases/refund-all-paid-registrations";
+import { MomentCannotBeDeletedError } from "@/domain/errors";
 import {
   getMomentParticipantsPage,
   type GetMomentParticipantsPageResult,
@@ -28,6 +32,7 @@ import { toActionResult } from "./helpers/to-action-result";
 import { partitionMomentUpdateRecipients } from "./helpers/moment-update-recipients";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
@@ -43,6 +48,30 @@ import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
+
+/** Longueur max du mot d'annulation saisi par l'Organisateur (UI + serveur). */
+const MAX_CANCELLATION_MESSAGE_LENGTH = 1000;
+
+/**
+ * Faut-il notifier les inscrits d'une transition (mise à jour / annulation /
+ * suppression) ? Oui, sauf si un admin modère l'événement de quelqu'un d'autre —
+ * un admin qui est lui-même l'organisateur prévient bien ses inscrits.
+ * Retourne aussi `isOrganizerOfEvent`, réutilisé pour décider de poster le
+ * commentaire d'annulation sous l'identité de l'acteur.
+ */
+async function shouldNotifyRegistrants(
+  session: Parameters<typeof isAdminUser>[0],
+  circleId: string,
+  userId: string
+): Promise<{ allowed: boolean; isOrganizerOfEvent: boolean }> {
+  const isOrganizerOfEvent = isActiveOrganizer(
+    await prismaCircleRepository.findMembership(circleId, userId)
+  );
+  return {
+    allowed: !isAdminUser(session) || isOrganizerOfEvent,
+    isOrganizerOfEvent,
+  };
+}
 
 export async function createMomentAction(
   circleId: string,
@@ -200,7 +229,6 @@ export async function updateMomentAction(
   const capacityRaw = formData.get("capacity") as string | null;
   const priceRaw = formData.get("price") as string | null;
   const currency = formData.get("currency") as string | null;
-  const status = formData.get("status") as string | null;
   const requiresApprovalUpdate = formData.get("requiresApproval") === "on";
 
   if (title !== null && !title.trim()) {
@@ -251,7 +279,6 @@ export async function updateMomentAction(
         ...(capacity !== undefined && { capacity }),
         ...(price !== undefined && { price }),
         ...(currency && { currency }),
-        ...(status && { status: status as Moment["status"] }),
         ...(refundable !== undefined && { refundable }),
         requiresApproval: requiresApprovalUpdate,
       },
@@ -283,23 +310,30 @@ export async function updateMomentAction(
             new Date(endsAtRaw).getTime() !== existingMoment.endsAt.getTime()
           : endsAtRaw === "" && existingMoment.endsAt !== null);
 
+      // Normaliser "" → null avant comparaison : le formulaire envoie une chaîne
+      // vide pour un champ de lieu non renseigné, alors qu'en base c'est null.
+      // Sans ça, un simple changement de date sur un événement « À définir »
+      // déclenchait un faux « Nouveau lieu ».
       const locationChanged =
         (locationType && locationType !== existingMoment.locationType) ||
-        (locationName !== null && locationName !== existingMoment.locationName) ||
-        (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
+        (locationName !== null && (locationName || null) !== existingMoment.locationName) ||
+        (locationAddress !== null && (locationAddress || null) !== existingMoment.locationAddress);
 
-      if (
-        (dateChanged || locationChanged) &&
-        existingMoment.status === "PUBLISHED" &&
-        !isAdminUser(session)
-      ) {
-        const resolver = await buildEmailLocaleResolver(userId);
-        sendMomentUpdateEmails(
-          result.moment,
-          Boolean(dateChanged),
-          Boolean(locationChanged),
-          resolver
-        ).catch((err) => Sentry.captureException(err));
+      if ((dateChanged || locationChanged) && existingMoment.status === "PUBLISHED") {
+        const { allowed } = await shouldNotifyRegistrants(
+          session,
+          existingMoment.circleId,
+          userId
+        );
+        if (allowed) {
+          const resolver = await buildEmailLocaleResolver(userId);
+          sendMomentUpdateEmails(
+            result.moment,
+            Boolean(dateChanged),
+            Boolean(locationChanged),
+            resolver
+          ).catch((err) => Sentry.captureException(err));
+        }
       }
 
       // Les passages DRAFT → PUBLISHED sont couverts par la notif de création.
@@ -453,13 +487,31 @@ export async function deleteMomentAction(
   const userId = session.user.id;
 
   return toActionResult(async () => {
-    // Fetch data before deletion — needed for email notifications + blob cleanup
-    const [momentToDelete, registrationsToNotify, circleRepo, attachmentsToCleanup] = await Promise.all([
+    // Fetch data before deletion — needed for the PAST guard + blob cleanup.
+    // Aucune notif ici : la suppression n'est exposée que sur DRAFT (aucun inscrit
+    // réel) et CANCELLED (déjà notifié à l'annulation). Un PUBLISHED ne se supprime
+    // pas (il s'annule), donc rien à prévenir.
+    const [momentToDelete, circleRepo, attachmentsToCleanup] = await Promise.all([
       prismaMomentRepository.findById(momentId),
-      prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
       resolveCircleRepository(session, prismaCircleRepository),
       prismaMomentAttachmentRepository.findByMoment(momentId),
     ]);
+
+    // Un événement publié ne se supprime pas : il s'annule (cancelMomentAction, qui
+    // prévient et rembourse les inscrits). Vrai contrôle serveur, pas seulement un
+    // bouton masqué côté UI — vaut pour tous, admin compris : la modération d'un
+    // publié passe par le panel admin (adminDeleteMoment), chemin délibéré et distinct.
+    if (momentToDelete?.status === "PUBLISHED") {
+      throw new MomentCannotBeDeletedError(momentId, "PUBLISHED");
+    }
+
+    // Un événement passé fait partie de l'historique de la Communauté : l'organisateur
+    // ne peut pas le supprimer (il l'annule). L'admin garde ce droit (modération),
+    // y compris en host-mode — la garde dépend du rôle, d'où sa place ici (et non
+    // dans le usecase pur deleteMoment).
+    if (momentToDelete?.status === "PAST" && !isAdminUser(session)) {
+      throw new MomentCannotBeDeletedError(momentId);
+    }
 
     await deleteMoment(
       { momentId, userId },
@@ -472,26 +524,17 @@ export async function deleteMomentAction(
     );
 
     // Blob cleanup is external to the DB cascade and must run explicitly.
-    // Fire-and-forget: errors captured in Sentry but don't block the response.
+    // Best-effort, différé via after() pour survivre au teardown serverless : les
+    // erreurs sont capturées dans Sentry sans bloquer la réponse.
     if (momentToDelete) {
       const blobsToDelete = [
         ...(momentToDelete.coverImage ? [momentToDelete.coverImage] : []),
         ...attachmentsToCleanup.map((a) => a.url),
       ];
-      Promise.all(
-        blobsToDelete.map((url) => vercelBlobStorageService.delete(url))
-      ).catch((err) => Sentry.captureException(err));
-    }
-
-    // Skip notifications only when admin moderates someone else's event.
-    const isOrganizerOfEvent = momentToDelete
-      ? isActiveOrganizer(await prismaCircleRepository.findMembership(momentToDelete.circleId, userId))
-      : false;
-    const shouldNotify = momentToDelete && registrationsToNotify.length > 0 && (!isAdminUser(session) || isOrganizerOfEvent);
-    if (shouldNotify) {
-      const resolver = await buildEmailLocaleResolver(userId);
-      sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
-        (err) => Sentry.captureException(err)
+      after(() =>
+        Promise.all(
+          blobsToDelete.map((url) => vercelBlobStorageService.delete(url))
+        ).catch((err) => Sentry.captureException(err))
       );
     }
 
@@ -507,11 +550,9 @@ export async function deleteMomentAction(
 async function sendMomentCancelledEmails(
   moment: Moment,
   registrations: RegistrationWithUser[],
-  resolver: EmailLocaleResolver
+  resolver: EmailLocaleResolver,
+  hostMessage?: string
 ): Promise<void> {
-  const circle = await prismaCircleRepository.findById(moment.circleId);
-  if (!circle) return;
-
   // Tous les destinataires sont des participants ≠ déclencheur Host → FR par défaut.
   const t = await resolver.defaultTranslations();
   const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
@@ -520,6 +561,7 @@ async function sendMomentCancelledEmails(
     subject: t("momentCancelled.subject", { momentTitle: moment.title }),
     heading: t("momentCancelled.heading"),
     message: t("momentCancelled.message", { momentTitle: moment.title }),
+    hostMessageLabel: t("momentCancelled.hostMessageLabel"),
     ctaLabel: t("momentCancelled.ctaLabel"),
     footer: t("common.footer"),
   };
@@ -539,8 +581,8 @@ async function sendMomentCancelledEmails(
       momentDateMonth: ctx.momentDateMonth.toUpperCase(),
       momentDateDay: ctx.momentDateDay,
       locationText: ctx.locationText,
-      circleName: circle.name,
-      circleSlug: circle.slug,
+      momentSlug: moment.slug,
+      hostMessage: hostMessage || undefined,
       strings,
     });
   }
@@ -565,6 +607,107 @@ export async function publishMomentAction(
 
     const resolver = await buildEmailLocaleResolver(userId);
     sendMomentPublishedNotifications(result.moment, userId, resolver);
+
+    revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
+    revalidatePath(`/m/${result.moment.slug}`);
+    revalidatePath(`/en/m/${result.moment.slug}`);
+
+    invalidateDashboardCache(userId);
+    return result.moment;
+  });
+}
+
+export async function cancelMomentAction(
+  momentId: string,
+  hostMessage?: string,
+  postAsComment?: boolean
+): Promise<ActionResult<Moment>> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Not authenticated", code: "UNAUTHORIZED" };
+  }
+
+  const userId = session.user.id;
+  // Défense en profondeur : l'UI borne déjà la saisie, on retrim/tronque côté serveur.
+  const message =
+    hostMessage?.trim().slice(0, MAX_CANCELLATION_MESSAGE_LENGTH) || undefined;
+
+  return toActionResult(async () => {
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
+
+    // Inscrits à prévenir, capturés AVANT la bascule : les actifs
+    // (REGISTERED/CHECKED_IN) ET les demandes en attente d'approbation, qui vont
+    // être rejetées par cancelMoment — sans ça, elles ne recevraient aucune notif.
+    const [activeToNotify, pendingToNotify] = await Promise.all([
+      prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
+      prismaRegistrationRepository.findPendingApprovals(momentId),
+    ]);
+    const registrationsToNotify = [...activeToNotify, ...pendingToNotify];
+
+    const result = await cancelMoment(
+      { momentId, userId },
+      {
+        momentRepository: prismaMomentRepository,
+        circleRepository: circleRepo,
+        registrationRepository: prismaRegistrationRepository,
+      }
+    );
+
+    // 0) Remboursement des inscrits payants — best-effort, APRÈS la bascule en
+    //    CANCELLED (déjà persistée) et hors de la garde de statut. On réutilise les
+    //    inscriptions actives déjà chargées (pas de SELECT redondant). Un échec
+    //    Stripe est capturé dans Sentry sans faire échouer l'annulation ; le
+    //    remboursement est idempotent et rejoué au besoin par la suppression de
+    //    l'événement annulé. Différé via after() pour survivre au teardown serverless.
+    //    Indépendant de la notif : pas besoin du contrôle de membership.
+    after(() =>
+      refundAllPaidRegistrations(
+        result.moment,
+        { registrationRepository: prismaRegistrationRepository, paymentService },
+        activeToNotify
+      ).catch((err) => Sentry.captureException(err))
+    );
+
+    // Le contrôle de membership (allowed / isOrganizerOfEvent) ne sert qu'à la notif
+    // et au commentaire : on l'évite quand il n'y a ni inscrit à prévenir ni message
+    // à publier (sinon un SELECT findMembership inutile par annulation à vide).
+    const wantsComment = Boolean(postAsComment && message);
+    if (registrationsToNotify.length > 0 || wantsComment) {
+      const { allowed, isOrganizerOfEvent } = await shouldNotifyRegistrants(
+        session,
+        result.moment.circleId,
+        userId
+      );
+
+      // 1) Email d'annulation aux inscrits (actifs + demandes en attente, qui
+      //    viennent d'être rejetées). Indépendant du commentaire ci-dessous. Différé
+      //    via after() pour survivre au teardown serverless.
+      if (registrationsToNotify.length > 0 && allowed) {
+        const resolver = await buildEmailLocaleResolver(userId);
+        after(() =>
+          sendMomentCancelledEmails(
+            result.moment,
+            registrationsToNotify,
+            resolver,
+            message
+          ).catch((err) => Sentry.captureException(err))
+        );
+      }
+
+      // 2) Optionnel : publier le message en commentaire sur la page. Best-effort
+      //    (n'échoue jamais l'annulation déjà persistée) et UNIQUEMENT si l'acteur est
+      //    réellement l'organisateur — un admin qui modère ne s'attribue pas un « mot
+      //    de l'organisateur » public sous son identité. Création directe → PUBLISHED,
+      //    silencieuse (pas de second email), contourne volontairement le verrou
+      //    « commentaires fermés » du usecase addComment.
+      if (postAsComment && message && isOrganizerOfEvent) {
+        try {
+          await prismaCommentRepository.create({ momentId, userId, content: message });
+        } catch (err) {
+          Sentry.captureException(err);
+        }
+      }
+    }
 
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);
     revalidatePath(`/m/${result.moment.slug}`);

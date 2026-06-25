@@ -13,13 +13,13 @@ export function MomentCancelledEmail({
   momentTitle,
   momentDateMonth,
   momentDateDay,
-  circleName,
-  circleSlug,
   refundMessage,
+  hostMessage,
+  momentSlug,
   baseUrl,
   strings,
 }: Props) {
-  const circleUrl = `${baseUrl}/c/${circleSlug}`;
+  const momentUrl = `${baseUrl}/m/${momentSlug}`;
 
   return (
     <EmailLayout preview={strings.subject} footer={strings.footer}>
@@ -30,6 +30,13 @@ export function MomentCancelledEmail({
       <Text style={heading}>{strings.heading}</Text>
       <Text style={message}>{strings.message}</Text>
 
+      {hostMessage && (
+        <Section style={hostMessageSection}>
+          <Text style={hostMessageLabel}>{strings.hostMessageLabel}</Text>
+          <Text style={hostMessageText}>{hostMessage}</Text>
+        </Section>
+      )}
+
       {refundMessage && (
         <Section style={refundSection}>
           <Text style={refundText}>{refundMessage}</Text>
@@ -37,8 +44,8 @@ export function MomentCancelledEmail({
       )}
 
       <Section style={ctaSection}>
-        <Button style={ctaButton} href={circleUrl}>
-          {strings.ctaLabel} — {circleName}
+        <Button style={ctaButton} href={momentUrl}>
+          {strings.ctaLabel}
         </Button>
       </Section>
     </EmailLayout>
@@ -74,6 +81,31 @@ const refundText: React.CSSProperties = {
   color: "#166534",
   margin: "0",
   lineHeight: "20px",
+};
+
+const hostMessageSection: React.CSSProperties = {
+  backgroundColor: "#fafafa",
+  border: "1px solid #e4e4e7",
+  borderRadius: "8px",
+  padding: "12px 16px",
+  marginBottom: "24px",
+};
+
+const hostMessageLabel: React.CSSProperties = {
+  fontSize: "11px",
+  fontWeight: 600,
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.05em",
+  color: "#71717a",
+  margin: "0 0 6px 0",
+};
+
+const hostMessageText: React.CSSProperties = {
+  fontSize: "14px",
+  color: "#3f3f46",
+  margin: "0",
+  lineHeight: "22px",
+  whiteSpace: "pre-wrap" as const,
 };
 
 const ctaSection: React.CSSProperties = {

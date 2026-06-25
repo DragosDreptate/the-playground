@@ -46,70 +46,34 @@ import { createMockRegistrationRepository } from "../helpers/mock-registration-r
 // ─────────────────────────────────────────────────────────────
 
 describe("Security — Business Logic Guards", () => {
-  describe("updateMoment — status field ne doit pas permettre de passer DRAFT → PUBLISHED", () => {
+  describe("updateMoment — les transitions de statut ne passent plus par l'update", () => {
     /**
-     * Vulnérabilité potentielle : updateMoment accepte un champ `status` en input.
-     * Un HOST pourrait tenter de passer directement status: "PUBLISHED" au lieu
-     * de passer par publishMoment, contournant toute logique de publication
-     * (notifications, validation, etc.).
-     *
-     * Ici on vérifie que :
-     * 1. Le champ status est bien transmis à momentRepository.update (comportement documenté)
-     * 2. Le test sert de regression — si une validation est ajoutée, ces tests doivent être mis à jour
+     * Anciennement updateMoment acceptait un champ `status`, permettant de passer
+     * directement DRAFT → PUBLISHED (bypass de publishMoment et de ses notifications).
+     * Le champ a été retiré : les transitions passent désormais par des usecases
+     * dédiés (publishMoment, cancelMoment). Ce test verrouille la fermeture du bypass.
      */
-    it("should document that updateMoment currently allows passing status=PUBLISHED directly (bypass of publishMoment flow)", async () => {
-      // Ce test documente le comportement ACTUEL, pas le comportement SOUHAITÉ.
-      // Un HOST peut utiliser updateMoment pour passer status="PUBLISHED" sans
-      // passer par publishMoment, ce qui contourne les notifications de publication.
-      // CORRECTION RECOMMANDÉE : ignorer le champ status dans updateMoment,
-      // ou restreindre les valeurs autorisées à CANCELLED uniquement.
+    it("should not forward any status to the repository — updateMoment only edits content", async () => {
       const draftMoment = makeMoment({ id: "moment-1", circleId: "circle-1", status: "DRAFT" });
-      const publishedMoment = makeMoment({ id: "moment-1", status: "PUBLISHED" });
 
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(draftMoment),
-        update: vi.fn().mockResolvedValue(publishedMoment),
+        update: vi.fn().mockResolvedValue(makeMoment({ id: "moment-1", status: "DRAFT", title: "New title" })),
       });
       const circleRepo = createMockCircleRepository({
         findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
       });
 
-      // Actuellement updateMoment n'interdit PAS status="PUBLISHED" — c'est la lacune documentée.
-      // Si une validation est ajoutée, ce test devra throw une erreur appropriée.
-      const result = await updateMoment(
-        { momentId: "moment-1", userId: "host-user", status: "PUBLISHED" },
+      await updateMoment(
+        { momentId: "moment-1", userId: "host-user", title: "New title" },
         { momentRepository: momentRepo, circleRepository: circleRepo }
       );
 
-      // Le comportement actuel : la mise à jour passe (pas de garde sur le statut)
-      expect(momentRepo.update).toHaveBeenCalledWith(
-        "moment-1",
-        expect.objectContaining({ status: "PUBLISHED" })
-      );
-      expect(result.moment.status).toBe("PUBLISHED");
+      const updateArg = vi.mocked(momentRepo.update).mock.calls[0][1];
+      expect(updateArg).not.toHaveProperty("status");
     });
 
-    it("should allow a HOST to cancel a Moment via updateMoment (status=CANCELLED is a legitimate operation)", async () => {
-      const publishedMoment = makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED" });
-      const cancelledMoment = makeMoment({ id: "moment-1", status: "CANCELLED" });
-
-      const momentRepo = createMockMomentRepository({
-        findById: vi.fn().mockResolvedValue(publishedMoment),
-        update: vi.fn().mockResolvedValue(cancelledMoment),
-      });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(makeMembership({ role: "HOST" })),
-      });
-
-      const result = await updateMoment(
-        { momentId: "moment-1", userId: "host-user", status: "CANCELLED" },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
-      );
-
-      expect(result.moment.status).toBe("CANCELLED");
-    });
-
-    it("should throw UnauthorizedMomentActionError when a PLAYER tries to use updateMoment with status=PUBLISHED", async () => {
+    it("should throw UnauthorizedMomentActionError when a PLAYER tries to update a Moment", async () => {
       // Un PLAYER ne peut pas du tout modifier un Moment — la garde RBAC prime sur tout
       const momentRepo = createMockMomentRepository({
         findById: vi.fn().mockResolvedValue(makeMoment({ circleId: "circle-1", status: "DRAFT" })),
@@ -120,7 +84,7 @@ describe("Security — Business Logic Guards", () => {
 
       await expect(
         updateMoment(
-          { momentId: "moment-1", userId: "player-user", status: "PUBLISHED" },
+          { momentId: "moment-1", userId: "player-user", title: "Hack" },
           { momentRepository: momentRepo, circleRepository: circleRepo }
         )
       ).rejects.toThrow(UnauthorizedMomentActionError);

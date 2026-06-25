@@ -196,31 +196,8 @@ describe("UpdateMoment", () => {
     });
   });
 
-  describe("given a HOST cancelling a Moment via status update", () => {
-    it("should update the Moment status to CANCELLED", async () => {
-      const existing = makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED" });
-      const cancelled = makeMoment({ id: "moment-1", status: "CANCELLED" });
-
-      const momentRepo = createMockMomentRepository({
-        findById: vi.fn().mockResolvedValue(existing),
-        update: vi.fn().mockResolvedValue(cancelled),
-      });
-      const circleRepo = createMockCircleRepository({
-        findMembership: vi.fn().mockResolvedValue(makeMembership()),
-      });
-
-      const result = await updateMoment(
-        { momentId: "moment-1", userId: "user-1", status: "CANCELLED" },
-        { momentRepository: momentRepo, circleRepository: circleRepo }
-      );
-
-      expect(momentRepo.update).toHaveBeenCalledWith(
-        "moment-1",
-        expect.objectContaining({ status: "CANCELLED" })
-      );
-      expect(result.moment.status).toBe("CANCELLED");
-    });
-  });
+  // L'annulation ne passe plus par updateMoment (champ `status` retiré).
+  // Elle est couverte par cancel-moment.test.ts.
 
   describe("given a non-existing Moment", () => {
     it("should throw MomentNotFoundError", async () => {

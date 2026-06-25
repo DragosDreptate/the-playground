@@ -1,10 +1,10 @@
-import type { Moment, LocationType, MomentStatus, CoverImageAttribution } from "@/domain/models/moment";
+import type { Moment, LocationType, CoverImageAttribution } from "@/domain/models/moment";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
-import { refundRegistration } from "./refund-registration";
+import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   MomentPastDateError,
@@ -32,7 +32,6 @@ type UpdateMomentInput = {
   capacity?: number | null;
   price?: number;
   currency?: string;
-  status?: MomentStatus;
   refundable?: boolean;
   requiresApproval?: boolean;
 };
@@ -114,23 +113,10 @@ export async function updateMoment(
 
       // Payant → gratuit avec inscrits payants : autorisé, remboursement batch
       if (wasPaid && becomingFree && deps.paymentService) {
-        const registrations = await deps.registrationRepository.findActiveByMomentId(
-          input.momentId
-        );
-        const paidRegistrations = registrations.filter(
-          (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
-        );
-        await Promise.all(
-          paidRegistrations.map((r) =>
-            refundRegistration(
-              { registration: r, moment: existing, force: true },
-              {
-                registrationRepository: deps.registrationRepository!,
-                paymentService: deps.paymentService!,
-              }
-            )
-          )
-        );
+        await refundAllPaidRegistrations(existing, {
+          registrationRepository: deps.registrationRepository,
+          paymentService: deps.paymentService,
+        });
       }
     }
   }
@@ -142,11 +128,6 @@ export async function updateMoment(
   const { momentId: _, userId: __, ...updates } = input;
 
   const moment = await momentRepository.update(input.momentId, updates);
-
-  // D13: auto-reject PENDING_APPROVAL registrations when moment is cancelled
-  if (input.status === "CANCELLED" && deps.registrationRepository) {
-    await deps.registrationRepository.rejectAllPendingApprovals(input.momentId);
-  }
 
   return { moment };
 }

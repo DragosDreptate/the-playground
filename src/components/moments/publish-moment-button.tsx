@@ -10,9 +10,11 @@ type Props = {
   momentId: string;
   circleSlug: string;
   momentSlug: string;
+  /** Classe du conteneur, ex. `flex-1` pour un CTA côte à côte. */
+  className?: string;
 };
 
-export function PublishMomentButton({ momentId, circleSlug, momentSlug }: Props) {
+export function PublishMomentButton({ momentId, circleSlug, momentSlug, className }: Props) {
   const t = useTranslations("Moment");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -31,8 +33,8 @@ export function PublishMomentButton({ momentId, circleSlug, momentSlug }: Props)
   }
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <Button size="sm" onClick={handlePublish} disabled={isPending}>
+    <div className={`flex flex-col gap-1 ${className ?? ""}`}>
+      <Button size="sm" onClick={handlePublish} disabled={isPending} className="w-full">
         {isPending ? t("actions.publishing") : t("actions.publish")}
       </Button>
       {error && <p className="text-destructive text-xs">{error}</p>}

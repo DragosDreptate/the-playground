@@ -565,7 +565,17 @@
     "delete": {
       "title": "Delete Event",
       "description": "Are you sure you want to delete this Event? This action cannot be undone. All registrations will be permanently removed.",
-      "confirm": "Yes, delete this Event"
+      "confirm": "Yes, delete this Event",
+      "error": "The deletion could not be completed. Refresh the page and try again."
+    },
+    "cancel": {
+      "title": "Cancel this event",
+      "description": "This event will be marked as cancelled. Registered members will be notified by email and automatically refunded if the event was paid. It will remain visible in your Community with a \"Cancelled\" status.",
+      "confirm": "Yes, cancel this event",
+      "messageLabel": "A note for registered members (optional)",
+      "messagePlaceholder": "Explain why you're cancelling. This message will be included in the email sent to registered members.",
+      "alsoPostComment": "Also post this message as a comment on the event page",
+      "error": "The cancellation could not be completed. Refresh the page and try again."
     },
     "detail": {
       "when": "When",
@@ -584,7 +594,9 @@
     },
     "actions": {
       "publish": "Publish",
-      "publishing": "Publishing..."
+      "publishing": "Publishing...",
+      "cancel": "Cancel event",
+      "cancelling": "Cancelling..."
     },
     "public": {
       "hostedBy": "Hosted by",
@@ -630,6 +642,7 @@
       "eventTookPlace": "This event took place on",
       "eventEnded": "Event ended",
       "eventCancelled": "Event cancelled",
+      "cancelledBannerTitle": "This event has been cancelled",
       "attendedCount": "{count} members attended",
       "viewCircleMoments": "See upcoming Events from this community",
       "proposedByCommunity": "Proposed by the community",
@@ -1168,7 +1181,8 @@
       "subject": "Cancelled: {momentTitle}",
       "heading": "This event has been cancelled",
       "message": "The organizer has cancelled {momentTitle}. We hope to see you at a future event in the community.",
-      "ctaLabel": "View community"
+      "hostMessageLabel": "A message from the organizer",
+      "ctaLabel": "View event"
     },
     "momentHostMessage": {
       "preheader": "Message from {hostName} about {momentTitle}",

@@ -169,13 +169,16 @@ export type MomentCancelledEmailData = {
   momentDateMonth: string;
   momentDateDay: string;
   locationText: string;
-  circleName: string;
-  circleSlug: string;
+  /** Slug de l'événement — le CTA pointe vers la page (annulée) de l'événement. */
+  momentSlug: string;
   refundMessage?: string; // e.g. "Vous serez remboursé de 15,00 € sous 5-10 jours"
+  /** Mot libre de l'Organisateur saisi à l'annulation, affiché tel quel. */
+  hostMessage?: string;
   strings: {
     subject: string;
     heading: string;
     message: string;
+    hostMessageLabel: string;
     ctaLabel: string;
     footer: string;
   };
