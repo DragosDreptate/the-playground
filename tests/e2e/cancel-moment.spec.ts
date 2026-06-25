@@ -49,7 +49,8 @@ test.describe("Flux Host — annulation d'un Moment", () => {
           !path.endsWith("/moments/new")
         );
       },
-      { timeout: 15_000 }
+      // Création + publication peut être lente en CI (cold compile + Neon) : marge large.
+      { timeout: 30_000 }
     );
     const momentSlug = new URL(page.url()).pathname.split("/").pop()!;
 
