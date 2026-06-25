@@ -56,14 +56,25 @@ export function CancelMomentDialog({
       router.refresh();
     } else {
       // On garde la modale ouverte pour afficher l'erreur (AlertDialogAction est
-      // neutralisé via preventDefault, sinon Radix la fermerait au clic).
-      setError(result.error);
+      // neutralisé via preventDefault, sinon Radix la fermerait au clic). Message
+      // générique : les erreurs du domaine sont des messages développeur (anglais,
+      // avec l'id interne) qu'on ne montre jamais tel quel à l'Organisateur.
+      setError(t("cancel.error"));
+      setIsPending(false);
+    }
+  }
+
+  // Reset à la fermeture pour ne pas réafficher une erreur périmée à la réouverture.
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) {
+      setError(null);
       setIsPending(false);
     }
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button
           variant="outline"

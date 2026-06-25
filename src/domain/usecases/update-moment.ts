@@ -4,7 +4,7 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { PaymentService } from "@/domain/ports/services/payment-service";
-import { refundRegistration } from "./refund-registration";
+import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   MomentPastDateError,
@@ -113,23 +113,10 @@ export async function updateMoment(
 
       // Payant → gratuit avec inscrits payants : autorisé, remboursement batch
       if (wasPaid && becomingFree && deps.paymentService) {
-        const registrations = await deps.registrationRepository.findActiveByMomentId(
-          input.momentId
-        );
-        const paidRegistrations = registrations.filter(
-          (r) => r.paymentStatus === "PAID" && r.stripePaymentIntentId
-        );
-        await Promise.all(
-          paidRegistrations.map((r) =>
-            refundRegistration(
-              { registration: r, moment: existing, force: true },
-              {
-                registrationRepository: deps.registrationRepository!,
-                paymentService: deps.paymentService!,
-              }
-            )
-          )
-        );
+        await refundAllPaidRegistrations(existing, {
+          registrationRepository: deps.registrationRepository,
+          paymentService: deps.paymentService,
+        });
       }
     }
   }

@@ -13,11 +13,7 @@ import {
   createMockCircleRepository,
   makeMembership,
 } from "./helpers/mock-circle-repository";
-import {
-  createMockRegistrationRepository,
-  makeRegistration,
-} from "./helpers/mock-registration-repository";
-import { createMockPaymentService } from "./helpers/mock-payment-service";
+import { createMockRegistrationRepository } from "./helpers/mock-registration-repository";
 
 describe("CancelMoment", () => {
   const input = { momentId: "moment-1", userId: "user-1" };
@@ -25,7 +21,6 @@ describe("CancelMoment", () => {
   function makeDeps(overrides: {
     moment?: ReturnType<typeof makeMoment> | null;
     membership?: ReturnType<typeof makeMembership> | null;
-    registrations?: ReturnType<typeof makeRegistration>[];
   } = {}) {
     const momentRepository = createMockMomentRepository({
       findById: vi.fn().mockResolvedValue(
@@ -40,14 +35,14 @@ describe("CancelMoment", () => {
         overrides.membership === undefined ? makeMembership() : overrides.membership
       ),
     });
-    const registrationRepository = createMockRegistrationRepository({
-      findActiveByMomentId: vi.fn().mockResolvedValue(overrides.registrations ?? []),
-    });
-    const paymentService = createMockPaymentService();
-    return { momentRepository, circleRepository, registrationRepository, paymentService };
+    const registrationRepository = createMockRegistrationRepository();
+    return { momentRepository, circleRepository, registrationRepository };
   }
 
   describe("given a PUBLISHED Moment hosted by an active Organizer", () => {
+    // Le usecase ne fait que les mutations DB fiables (bascule + rejet des demandes).
+    // Les remboursements Stripe sont orchestrés en best-effort par cancelMomentAction,
+    // hors du usecase — testés au niveau action, pas ici.
     it("should transition the Moment to CANCELLED and reject pending approvals", async () => {
       const deps = makeDeps();
 
@@ -60,29 +55,6 @@ describe("CancelMoment", () => {
         "moment-1"
       );
       expect(result.moment.status).toBe("CANCELLED");
-    });
-
-    it("should refund paid registrations when the event was paid", async () => {
-      const deps = makeDeps({
-        moment: makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED", price: 1500 }),
-        registrations: [
-          makeRegistration({ paymentStatus: "PAID", stripePaymentIntentId: "pi_123" }),
-        ],
-      });
-
-      await cancelMoment(input, deps);
-
-      expect(deps.paymentService.refund).toHaveBeenCalledWith("pi_123");
-    });
-
-    it("should not attempt any refund for a free event", async () => {
-      const deps = makeDeps({
-        moment: makeMoment({ id: "moment-1", circleId: "circle-1", status: "PUBLISHED", price: 0 }),
-      });
-
-      await cancelMoment(input, deps);
-
-      expect(deps.paymentService.refund).not.toHaveBeenCalled();
     });
   });
 

@@ -274,8 +274,6 @@ async function buildTemplates(): Promise<{ id: string; label: string; subject: s
         momentDateMonth: "MAR",
         momentDateDay: "21",
         locationText: "Le Cargo, 18 rue de la Paix, Paris",
-        circleName: "Paris Creative Tech",
-        circleSlug: "paris-creative-tech",
         momentSlug: "soiree-js-pizza",
         hostMessage:
           "Désolé pour ce contretemps : le lieu s'est désisté à la dernière minute. On reprogramme très vite, merci de votre compréhension !",

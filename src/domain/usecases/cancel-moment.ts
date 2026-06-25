@@ -3,8 +3,6 @@ import { isActiveOrganizer } from "@/domain/models/circle";
 import type { MomentRepository } from "@/domain/ports/repositories/moment-repository";
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
-import type { PaymentService } from "@/domain/ports/services/payment-service";
-import { refundAllPaidRegistrations } from "./refund-all-paid-registrations";
 import {
   MomentNotFoundError,
   UnauthorizedMomentActionError,
@@ -20,7 +18,6 @@ type CancelMomentDeps = {
   momentRepository: MomentRepository;
   circleRepository: CircleRepository;
   registrationRepository: RegistrationRepository;
-  paymentService: PaymentService;
 };
 
 type CancelMomentResult = {
@@ -31,8 +28,7 @@ export async function cancelMoment(
   input: CancelMomentInput,
   deps: CancelMomentDeps
 ): Promise<CancelMomentResult> {
-  const { momentRepository, circleRepository, registrationRepository, paymentService } =
-    deps;
+  const { momentRepository, circleRepository, registrationRepository } = deps;
 
   const existing = await momentRepository.findById(input.momentId);
   if (!existing) {
@@ -53,16 +49,17 @@ export async function cancelMoment(
     throw new MomentCannotBeCancelledError(input.momentId, existing.status);
   }
 
-  // L'annulation est la source de vérité : on bascule le statut EN PREMIER (mutation
-  // fiable), puis on déclenche les effets (remboursements, rejet des demandes en
-  // attente). Si un effet échoue ensuite, l'événement reste correctement annulé et
-  // les remboursements (idempotents) restent retentables — préférable à l'inverse
-  // (remboursé mais toujours PUBLISHED).
+  // Le usecase ne fait que les mutations DB fiables et idempotentes : bascule du
+  // statut + rejet des demandes en attente. Les effets externes faillibles
+  // (remboursements Stripe, email d'annulation) sont orchestrés en best-effort par
+  // l'action appelante, APRÈS cette transition et HORS de la garde de statut. Ainsi
+  // un échec Stripe ne bloque ni l'annulation déjà persistée, ni un éventuel retry
+  // (que la garde `status !== PUBLISHED` empêcherait sinon), et ne prive pas les
+  // demandes en attente de leur rejet.
   const moment = await momentRepository.update(input.momentId, {
     status: "CANCELLED",
   });
 
-  await refundAllPaidRegistrations(existing, { registrationRepository, paymentService });
   await registrationRepository.rejectAllPendingApprovals(input.momentId);
 
   return { moment };

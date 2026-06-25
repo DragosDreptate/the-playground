@@ -565,7 +565,8 @@
     "delete": {
       "title": "Supprimer l'événement",
       "description": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible. Toutes les inscriptions seront définitivement supprimées.",
-      "confirm": "Oui, supprimer cet événement"
+      "confirm": "Oui, supprimer cet événement",
+      "error": "La suppression n'a pas pu aboutir. Recharge la page et réessaie."
     },
     "cancel": {
       "title": "Annuler cet événement",
@@ -573,7 +574,8 @@
       "confirm": "Oui, annuler cet événement",
       "messageLabel": "Un mot pour les inscrits (optionnel)",
       "messagePlaceholder": "Expliquez la raison de l'annulation. Ce message sera inclus dans l'email envoyé aux inscrits.",
-      "alsoPostComment": "Ajouter aussi ce message en commentaire sur la page de l'événement"
+      "alsoPostComment": "Ajouter aussi ce message en commentaire sur la page de l'événement",
+      "error": "L'annulation n'a pas pu aboutir. Recharge la page et réessaie."
     },
     "detail": {
       "when": "Quand",

@@ -18,6 +18,7 @@ import { updateMoment } from "@/domain/usecases/update-moment";
 import { deleteMoment } from "@/domain/usecases/delete-moment";
 import { publishMoment } from "@/domain/usecases/publish-moment";
 import { cancelMoment } from "@/domain/usecases/cancel-moment";
+import { refundAllPaidRegistrations } from "@/domain/usecases/refund-all-paid-registrations";
 import { MomentCannotBeDeletedError } from "@/domain/errors";
 import {
   getMomentParticipantsPage,
@@ -31,6 +32,7 @@ import { toActionResult } from "./helpers/to-action-result";
 import { partitionMomentUpdateRecipients } from "./helpers/moment-update-recipients";
 import { processCoverImage } from "./cover-image";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { invalidateDashboardCache } from "@/lib/dashboard-cache";
 import { notifyNewMoment } from "./notify-new-moment";
 import { notifyAdminEntityCreated } from "./notify-admin-entity-created";
@@ -485,10 +487,12 @@ export async function deleteMomentAction(
   const userId = session.user.id;
 
   return toActionResult(async () => {
-    // Fetch data before deletion — needed for email notifications + blob cleanup
-    const [momentToDelete, registrationsToNotify, circleRepo, attachmentsToCleanup] = await Promise.all([
+    // Fetch data before deletion — needed for the PAST guard + blob cleanup.
+    // Aucune notif ici : la suppression n'est exposée que sur DRAFT (aucun inscrit
+    // réel) et CANCELLED (déjà notifié à l'annulation). Un PUBLISHED ne se supprime
+    // pas (il s'annule), donc rien à prévenir.
+    const [momentToDelete, circleRepo, attachmentsToCleanup] = await Promise.all([
       prismaMomentRepository.findById(momentId),
-      prismaRegistrationRepository.findActiveWithUserByMomentId(momentId),
       resolveCircleRepository(session, prismaCircleRepository),
       prismaMomentAttachmentRepository.findByMoment(momentId),
     ]);
@@ -523,28 +527,6 @@ export async function deleteMomentAction(
       ).catch((err) => Sentry.captureException(err));
     }
 
-    // Filet de sécurité : la notif d'annulation part normalement au passage en
-    // CANCELLED (cancelMomentAction). Ici on ne notifie que la suppression directe
-    // d'un événement PUBLISHED (chemins hors-UI : admin/API). Un CANCELLED supprimé
-    // a déjà été notifié à l'annulation ; un DRAFT/PAST n'a pas à l'être.
-    if (
-      momentToDelete &&
-      momentToDelete.status === "PUBLISHED" &&
-      registrationsToNotify.length > 0
-    ) {
-      const { allowed } = await shouldNotifyRegistrants(
-        session,
-        momentToDelete.circleId,
-        userId
-      );
-      if (allowed) {
-        const resolver = await buildEmailLocaleResolver(userId);
-        sendMomentCancelledEmails(momentToDelete, registrationsToNotify, resolver).catch(
-          (err) => Sentry.captureException(err)
-        );
-      }
-    }
-
     if (momentToDelete) {
       revalidatePath(`/m/${momentToDelete.slug}`);
       revalidatePath(`/en/m/${momentToDelete.slug}`);
@@ -560,9 +542,6 @@ async function sendMomentCancelledEmails(
   resolver: EmailLocaleResolver,
   hostMessage?: string
 ): Promise<void> {
-  const circle = await prismaCircleRepository.findById(moment.circleId);
-  if (!circle) return;
-
   // Tous les destinataires sont des participants ≠ déclencheur Host → FR par défaut.
   const t = await resolver.defaultTranslations();
   const ctx = buildMomentEmailContext(moment, DEFAULT_RECIPIENT_LOCALE);
@@ -591,8 +570,6 @@ async function sendMomentCancelledEmails(
       momentDateMonth: ctx.momentDateMonth.toUpperCase(),
       momentDateDay: ctx.momentDateDay,
       locationText: ctx.locationText,
-      circleName: circle.name,
-      circleSlug: circle.slug,
       momentSlug: moment.slug,
       hostMessage: hostMessage || undefined,
       strings,
@@ -662,7 +639,6 @@ export async function cancelMomentAction(
         momentRepository: prismaMomentRepository,
         circleRepository: circleRepo,
         registrationRepository: prismaRegistrationRepository,
-        paymentService,
       }
     );
 
@@ -672,17 +648,33 @@ export async function cancelMomentAction(
       userId
     );
 
-    // 1) Email d'annulation EN PREMIER (fire-and-forget). Ne doit jamais être
-    //    bloqué par le commentaire optionnel ci-dessous : si le commentaire échoue,
-    //    les inscrits doivent quand même avoir été prévenus.
+    // 0) Remboursement des inscrits payants — best-effort, APRÈS la bascule en
+    //    CANCELLED (déjà persistée) et hors de la garde de statut. On réutilise les
+    //    inscriptions actives déjà chargées (pas de SELECT redondant). Un échec
+    //    Stripe est capturé dans Sentry sans faire échouer l'annulation ; le
+    //    remboursement est idempotent et rejoué au besoin par la suppression de
+    //    l'événement annulé. Différé via after() pour survivre au teardown serverless.
+    after(() =>
+      refundAllPaidRegistrations(
+        result.moment,
+        { registrationRepository: prismaRegistrationRepository, paymentService },
+        activeToNotify
+      ).catch((err) => Sentry.captureException(err))
+    );
+
+    // 1) Email d'annulation aux inscrits (actifs + demandes en attente, qui viennent
+    //    d'être rejetées). Indépendant du commentaire optionnel ci-dessous. Différé
+    //    via after() pour survivre au teardown serverless.
     if (registrationsToNotify.length > 0 && allowed) {
       const resolver = await buildEmailLocaleResolver(userId);
-      sendMomentCancelledEmails(
-        result.moment,
-        registrationsToNotify,
-        resolver,
-        message
-      ).catch((err) => Sentry.captureException(err));
+      after(() =>
+        sendMomentCancelledEmails(
+          result.moment,
+          registrationsToNotify,
+          resolver,
+          message
+        ).catch((err) => Sentry.captureException(err))
+      );
     }
 
     // 2) Optionnel : publier le message en commentaire sur la page. Best-effort
