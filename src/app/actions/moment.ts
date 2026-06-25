@@ -497,6 +497,14 @@ export async function deleteMomentAction(
       prismaMomentAttachmentRepository.findByMoment(momentId),
     ]);
 
+    // Un événement publié ne se supprime pas : il s'annule (cancelMomentAction, qui
+    // prévient et rembourse les inscrits). Vrai contrôle serveur, pas seulement un
+    // bouton masqué côté UI — vaut pour tous, admin compris : la modération d'un
+    // publié passe par le panel admin (adminDeleteMoment), chemin délibéré et distinct.
+    if (momentToDelete?.status === "PUBLISHED") {
+      throw new MomentCannotBeDeletedError(momentId, "PUBLISHED");
+    }
+
     // Un événement passé fait partie de l'historique de la Communauté : l'organisateur
     // ne peut pas le supprimer (il l'annule). L'admin garde ce droit (modération),
     // y compris en host-mode — la garde dépend du rôle, d'où sa place ici (et non
@@ -516,15 +524,18 @@ export async function deleteMomentAction(
     );
 
     // Blob cleanup is external to the DB cascade and must run explicitly.
-    // Fire-and-forget: errors captured in Sentry but don't block the response.
+    // Best-effort, différé via after() pour survivre au teardown serverless : les
+    // erreurs sont capturées dans Sentry sans bloquer la réponse.
     if (momentToDelete) {
       const blobsToDelete = [
         ...(momentToDelete.coverImage ? [momentToDelete.coverImage] : []),
         ...attachmentsToCleanup.map((a) => a.url),
       ];
-      Promise.all(
-        blobsToDelete.map((url) => vercelBlobStorageService.delete(url))
-      ).catch((err) => Sentry.captureException(err));
+      after(() =>
+        Promise.all(
+          blobsToDelete.map((url) => vercelBlobStorageService.delete(url))
+        ).catch((err) => Sentry.captureException(err))
+      );
     }
 
     if (momentToDelete) {
@@ -642,18 +653,13 @@ export async function cancelMomentAction(
       }
     );
 
-    const { allowed, isOrganizerOfEvent } = await shouldNotifyRegistrants(
-      session,
-      result.moment.circleId,
-      userId
-    );
-
     // 0) Remboursement des inscrits payants — best-effort, APRÈS la bascule en
     //    CANCELLED (déjà persistée) et hors de la garde de statut. On réutilise les
     //    inscriptions actives déjà chargées (pas de SELECT redondant). Un échec
     //    Stripe est capturé dans Sentry sans faire échouer l'annulation ; le
     //    remboursement est idempotent et rejoué au besoin par la suppression de
     //    l'événement annulé. Différé via after() pour survivre au teardown serverless.
+    //    Indépendant de la notif : pas besoin du contrôle de membership.
     after(() =>
       refundAllPaidRegistrations(
         result.moment,
@@ -662,32 +668,44 @@ export async function cancelMomentAction(
       ).catch((err) => Sentry.captureException(err))
     );
 
-    // 1) Email d'annulation aux inscrits (actifs + demandes en attente, qui viennent
-    //    d'être rejetées). Indépendant du commentaire optionnel ci-dessous. Différé
-    //    via after() pour survivre au teardown serverless.
-    if (registrationsToNotify.length > 0 && allowed) {
-      const resolver = await buildEmailLocaleResolver(userId);
-      after(() =>
-        sendMomentCancelledEmails(
-          result.moment,
-          registrationsToNotify,
-          resolver,
-          message
-        ).catch((err) => Sentry.captureException(err))
+    // Le contrôle de membership (allowed / isOrganizerOfEvent) ne sert qu'à la notif
+    // et au commentaire : on l'évite quand il n'y a ni inscrit à prévenir ni message
+    // à publier (sinon un SELECT findMembership inutile par annulation à vide).
+    const wantsComment = Boolean(postAsComment && message);
+    if (registrationsToNotify.length > 0 || wantsComment) {
+      const { allowed, isOrganizerOfEvent } = await shouldNotifyRegistrants(
+        session,
+        result.moment.circleId,
+        userId
       );
-    }
 
-    // 2) Optionnel : publier le message en commentaire sur la page. Best-effort
-    //    (n'échoue jamais l'annulation déjà persistée) et UNIQUEMENT si l'acteur est
-    //    réellement l'organisateur — un admin qui modère ne s'attribue pas un « mot
-    //    de l'organisateur » public sous son identité. Création directe → PUBLISHED,
-    //    silencieuse (pas de second email), contourne volontairement le verrou
-    //    « commentaires fermés » du usecase addComment.
-    if (postAsComment && message && isOrganizerOfEvent) {
-      try {
-        await prismaCommentRepository.create({ momentId, userId, content: message });
-      } catch (err) {
-        Sentry.captureException(err);
+      // 1) Email d'annulation aux inscrits (actifs + demandes en attente, qui
+      //    viennent d'être rejetées). Indépendant du commentaire ci-dessous. Différé
+      //    via after() pour survivre au teardown serverless.
+      if (registrationsToNotify.length > 0 && allowed) {
+        const resolver = await buildEmailLocaleResolver(userId);
+        after(() =>
+          sendMomentCancelledEmails(
+            result.moment,
+            registrationsToNotify,
+            resolver,
+            message
+          ).catch((err) => Sentry.captureException(err))
+        );
+      }
+
+      // 2) Optionnel : publier le message en commentaire sur la page. Best-effort
+      //    (n'échoue jamais l'annulation déjà persistée) et UNIQUEMENT si l'acteur est
+      //    réellement l'organisateur — un admin qui modère ne s'attribue pas un « mot
+      //    de l'organisateur » public sous son identité. Création directe → PUBLISHED,
+      //    silencieuse (pas de second email), contourne volontairement le verrou
+      //    « commentaires fermés » du usecase addComment.
+      if (postAsComment && message && isOrganizerOfEvent) {
+        try {
+          await prismaCommentRepository.create({ momentId, userId, content: message });
+        } catch (err) {
+          Sentry.captureException(err);
+        }
       }
     }
 

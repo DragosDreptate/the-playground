@@ -95,7 +95,11 @@ export class MomentCannotBeCancelledError extends DomainError {
 export class MomentCannotBeDeletedError extends DomainError {
   readonly code = "MOMENT_CANNOT_BE_DELETED";
 
-  constructor(momentId: string) {
-    super(`A past Moment cannot be deleted: ${momentId}`);
+  constructor(momentId: string, currentStatus?: string) {
+    super(
+      currentStatus
+        ? `Moment cannot be deleted (status: ${currentStatus}): ${momentId}`
+        : `A past Moment cannot be deleted: ${momentId}`
+    );
   }
 }
