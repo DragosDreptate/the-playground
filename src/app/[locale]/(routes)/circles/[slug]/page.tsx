@@ -193,9 +193,10 @@ export default async function PublicCirclePage({
   const showMemberBadge = isMember && !isOrganizer;
 
   const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
-  const pastMoments = allMoments.filter(
-    (m) => m.status === "PAST" || m.status === "CANCELLED"
-  );
+  // Historique en antichronologique : le plus récent d'abord (les upcoming restent chronologiques).
+  const pastMoments = allMoments
+    .filter((m) => m.status === "PAST" || m.status === "CANCELLED")
+    .sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
