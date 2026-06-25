@@ -306,9 +306,14 @@ export function CommentThread({
 
         {/* Comment list */}
         {comments.length === 0 ? (
-          <p className="text-muted-foreground py-2 text-sm">
-            {t("comments.empty")}
-          </p>
+          // Pas d'invite « Soyez le premier à réagir » quand les commentaires sont
+          // fermés (événement annulé) : le message de fermeture ci-dessous suffit,
+          // sinon les deux textes se contredisent.
+          canComment ? (
+            <p className="text-muted-foreground py-2 text-sm">
+              {t("comments.empty")}
+            </p>
+          ) : null
         ) : (
           <div className="space-y-4">
             {comments.map((comment) => {
