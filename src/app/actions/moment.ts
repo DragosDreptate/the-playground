@@ -8,6 +8,7 @@ import {
   prismaRegistrationRepository,
   prismaUserRepository,
   prismaMomentAttachmentRepository,
+  prismaCommentRepository,
 } from "@/infrastructure/repositories";
 import { vercelBlobStorageService } from "@/infrastructure/services/storage/vercel-blob-storage-service";
 import { createResendEmailService, createStripePaymentService } from "@/infrastructure/services";
@@ -44,6 +45,9 @@ import { buildMomentEmailContext } from "@/lib/email/format-moment-email";
 
 const emailService = createResendEmailService();
 const paymentService = createStripePaymentService();
+
+/** Longueur max du mot d'annulation saisi par l'Organisateur (UI + serveur). */
+const MAX_CANCELLATION_MESSAGE_LENGTH = 1000;
 
 export async function createMomentAction(
   circleId: string,
@@ -522,7 +526,8 @@ export async function deleteMomentAction(
 async function sendMomentCancelledEmails(
   moment: Moment,
   registrations: RegistrationWithUser[],
-  resolver: EmailLocaleResolver
+  resolver: EmailLocaleResolver,
+  hostMessage?: string
 ): Promise<void> {
   const circle = await prismaCircleRepository.findById(moment.circleId);
   if (!circle) return;
@@ -535,6 +540,7 @@ async function sendMomentCancelledEmails(
     subject: t("momentCancelled.subject", { momentTitle: moment.title }),
     heading: t("momentCancelled.heading"),
     message: t("momentCancelled.message", { momentTitle: moment.title }),
+    hostMessageLabel: t("momentCancelled.hostMessageLabel"),
     ctaLabel: t("momentCancelled.ctaLabel"),
     footer: t("common.footer"),
   };
@@ -556,6 +562,7 @@ async function sendMomentCancelledEmails(
       locationText: ctx.locationText,
       circleName: circle.name,
       circleSlug: circle.slug,
+      hostMessage: hostMessage || undefined,
       strings,
     });
   }
@@ -591,7 +598,9 @@ export async function publishMomentAction(
 }
 
 export async function cancelMomentAction(
-  momentId: string
+  momentId: string,
+  hostMessage?: string,
+  postAsComment?: boolean
 ): Promise<ActionResult<Moment>> {
   const session = await auth();
   if (!session?.user?.id) {
@@ -599,6 +608,10 @@ export async function cancelMomentAction(
   }
 
   const userId = session.user.id;
+  // Défense en profondeur : l'UI borne déjà la saisie, on retrim/tronque côté serveur.
+  const message =
+    hostMessage?.trim().slice(0, MAX_CANCELLATION_MESSAGE_LENGTH) || undefined;
+
   return toActionResult(async () => {
     const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
@@ -616,6 +629,16 @@ export async function cancelMomentAction(
       }
     );
 
+    // Optionnel : publier le message comme commentaire de l'organisateur sur la
+    // page de l'événement. Création directe (repository) → statut PUBLISHED,
+    // SILENCIEUSE : pas de second email « nouveau commentaire » (l'email
+    // d'annulation porte déjà le message). Contourne volontairement le verrou
+    // « commentaires fermés » du usecase addComment — légitime, c'est le mot
+    // officiel de l'organisateur sur l'annulation.
+    if (postAsComment && message) {
+      await prismaCommentRepository.create({ momentId, userId, content: message });
+    }
+
     // Email d'annulation aux inscrits (fire-and-forget).
     // Skip quand un admin modère l'événement de quelqu'un d'autre.
     const isOrganizerOfEvent = isActiveOrganizer(
@@ -626,9 +649,12 @@ export async function cancelMomentAction(
       (!isAdminUser(session) || isOrganizerOfEvent)
     ) {
       const resolver = await buildEmailLocaleResolver(userId);
-      sendMomentCancelledEmails(result.moment, registrationsToNotify, resolver).catch(
-        (err) => Sentry.captureException(err)
-      );
+      sendMomentCancelledEmails(
+        result.moment,
+        registrationsToNotify,
+        resolver,
+        message
+      ).catch((err) => Sentry.captureException(err));
     }
 
     revalidatePath(`/dashboard/circles/${result.moment.circleId}`);

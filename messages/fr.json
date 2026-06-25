@@ -570,7 +570,10 @@
     "cancel": {
       "title": "Annuler cet événement",
       "description": "Cet événement sera marqué comme annulé. Les inscrits seront prévenus par email et remboursés automatiquement si l'événement était payant. Il restera visible dans ta Communauté avec le statut « Annulé ».",
-      "confirm": "Oui, annuler cet événement"
+      "confirm": "Oui, annuler cet événement",
+      "messageLabel": "Un mot pour les inscrits (optionnel)",
+      "messagePlaceholder": "Expliquez la raison de l'annulation. Ce message sera inclus dans l'email envoyé aux inscrits.",
+      "alsoPostComment": "Ajouter aussi ce message en commentaire sur la page de l'événement"
     },
     "detail": {
       "when": "Quand",
@@ -1176,6 +1179,7 @@
       "subject": "Annulé : {momentTitle}",
       "heading": "Cet événement a été annulé",
       "message": "L'organisateur a annulé {momentTitle}. Nous espérons vous retrouver lors d'un prochain événement de la communauté.",
+      "hostMessageLabel": "Message de l'organisateur",
       "ctaLabel": "Voir la communauté"
     },
     "momentHostMessage": {

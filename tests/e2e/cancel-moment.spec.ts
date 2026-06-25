@@ -53,7 +53,8 @@ test.describe("Flux Host — annulation d'un Moment", () => {
     );
     const momentSlug = new URL(page.url()).pathname.split("/").pop()!;
 
-    // 2. Annuler via le bouton contextuel + confirmation
+    // 2. Annuler via le bouton contextuel : saisir un mot aux inscrits, cocher
+    //    « ajouter aussi en commentaire », puis confirmer.
     const cancelButton = page.getByRole("button", {
       name: /annuler l'événement/i,
     });
@@ -61,13 +62,17 @@ test.describe("Flux Host — annulation d'un Moment", () => {
     await cancelButton.click();
 
     const dialog = page.getByRole("alertdialog");
+    const cancelMessage = "Annulation E2E : le lieu s'est désisté, on reprogramme.";
+    await dialog.locator("#cancel-message").fill(cancelMessage);
+    await dialog.getByRole("checkbox").check();
     await dialog.getByRole("button", { name: /oui, annuler/i }).click();
 
     // 3. État annulé côté host : bandeau visible, plus de bouton « Annuler »,
-    //    « Supprimer » disponible à la place.
+    //    « Supprimer » disponible à la place, et le message publié en commentaire.
     await expect(
       page.getByText(/cet événement a été annulé/i).first()
     ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(cancelMessage).first()).toBeVisible();
     await expect(
       page.getByRole("button", { name: /annuler l'événement/i })
     ).toHaveCount(0);
