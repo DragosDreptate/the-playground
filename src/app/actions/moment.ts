@@ -282,10 +282,14 @@ export async function updateMomentAction(
             new Date(endsAtRaw).getTime() !== existingMoment.endsAt.getTime()
           : endsAtRaw === "" && existingMoment.endsAt !== null);
 
+      // Normaliser "" → null avant comparaison : le formulaire envoie une chaîne
+      // vide pour un champ de lieu non renseigné, alors qu'en base c'est null.
+      // Sans ça, un simple changement de date sur un événement « À définir »
+      // déclenchait un faux « Nouveau lieu ».
       const locationChanged =
         (locationType && locationType !== existingMoment.locationType) ||
-        (locationName !== null && locationName !== existingMoment.locationName) ||
-        (locationAddress !== null && locationAddress !== existingMoment.locationAddress);
+        (locationName !== null && (locationName || null) !== existingMoment.locationName) ||
+        (locationAddress !== null && (locationAddress || null) !== existingMoment.locationAddress);
 
       if ((dateChanged || locationChanged) && existingMoment.status === "PUBLISHED") {
         // Notifier les inscrits, sauf si un admin modère l'événement de quelqu'un
