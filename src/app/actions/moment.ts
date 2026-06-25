@@ -257,11 +257,14 @@ export async function updateMomentAction(
     const existingMoment = await prismaMomentRepository.findById(momentId);
     const oldCoverImage = existingMoment?.coverImage ?? null;
 
-    const coverData = await processCoverImage(formData);
-    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
-
-    // Événement passé : ignorer les dates soumises — elles sont non modifiables
+    // Événement passé : seuls le lieu et la description sont modifiables (règle
+    // appliquée dans le usecase updateMoment). On évite ici tout traitement de
+    // la cover pour ne pas uploader un blob qui serait ensuite ignoré, et on ne
+    // transmet pas les dates (défense en profondeur).
     const isPastMoment = existingMoment?.status === "PAST";
+
+    const coverData = isPastMoment ? {} : await processCoverImage(formData);
+    const circleRepo = await resolveCircleRepository(session, prismaCircleRepository);
 
     const result = await updateMoment(
       {

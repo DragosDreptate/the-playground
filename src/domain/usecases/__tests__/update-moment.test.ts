@@ -503,4 +503,101 @@ describe("UpdateMoment", () => {
       expect(result.moment.requiresApproval).toBe(true);
     });
   });
+
+  describe("given a HOST updating a PAST Moment", () => {
+    it("should update only location and description, ignoring title/dates/capacity/price/approval/cover", async () => {
+      const existing = makeMoment({
+        id: "moment-1",
+        circleId: "circle-1",
+        status: "PAST",
+        capacity: 10,
+        price: 0,
+        requiresApproval: false,
+      });
+      const updated = makeMoment({ id: "moment-1", status: "PAST" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      await updateMoment(
+        {
+          momentId: "moment-1",
+          userId: "user-1",
+          title: "Hacked title",
+          description: "Compte-rendu de l'événement",
+          locationName: "Nouvelle salle",
+          locationAddress: "10 rue de Paris",
+          startsAt: new Date("2020-01-01"),
+          capacity: 999,
+          price: 5000,
+          requiresApproval: true,
+        },
+        { momentRepository: momentRepo, circleRepository: circleRepo }
+      );
+
+      const updates = (momentRepo.update as ReturnType<typeof vi.fn>).mock.calls[0][1];
+      // Lieu + description appliqués
+      expect(updates.description).toBe("Compte-rendu de l'événement");
+      expect(updates.locationName).toBe("Nouvelle salle");
+      expect(updates.locationAddress).toBe("10 rue de Paris");
+      // Tout le reste ignoré
+      expect(updates).not.toHaveProperty("title");
+      expect(updates).not.toHaveProperty("startsAt");
+      expect(updates).not.toHaveProperty("capacity");
+      expect(updates).not.toHaveProperty("price");
+      expect(updates).not.toHaveProperty("requiresApproval");
+    });
+
+    it("should reject editing a CANCELLED Moment (defense in depth)", async () => {
+      const existing = makeMoment({
+        id: "moment-1",
+        circleId: "circle-1",
+        status: "CANCELLED",
+      });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn(),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", description: "tentative" },
+          { momentRepository: momentRepo, circleRepository: circleRepo }
+        )
+      ).rejects.toThrow(MomentNotFoundError);
+      expect(momentRepo.update).not.toHaveBeenCalled();
+    });
+
+    it("should not throw price validation errors when a past Moment submits an invalid price", async () => {
+      const existing = makeMoment({
+        id: "moment-1",
+        circleId: "circle-1",
+        status: "PAST",
+        price: 0,
+      });
+      const updated = makeMoment({ id: "moment-1", status: "PAST" });
+      const momentRepo = createMockMomentRepository({
+        findById: vi.fn().mockResolvedValue(existing),
+        update: vi.fn().mockResolvedValue(updated),
+      });
+      const circleRepo = createMockCircleRepository({
+        findMembership: vi.fn().mockResolvedValue(makeMembership()),
+      });
+
+      // price = 10 cents (< 50, normalement InvalidPriceError) mais ignoré sur un PAST
+      await expect(
+        updateMoment(
+          { momentId: "moment-1", userId: "user-1", price: 10 },
+          { momentRepository: momentRepo, circleRepository: circleRepo }
+        )
+      ).resolves.toBeDefined();
+    });
+  });
 });

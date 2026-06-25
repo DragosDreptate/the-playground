@@ -68,20 +68,44 @@ export async function updateMoment(
     throw new UnauthorizedMomentActionError();
   }
 
+  // Événement annulé : non modifiable (l'UI ne propose que Supprimer). Garde-fou
+  // de défense en profondeur contre un POST direct sur l'URL d'édition, calqué
+  // sur addComment.
+  if (existing.status === "CANCELLED") {
+    throw new MomentNotFoundError(input.momentId);
+  }
+
+  // Événement passé : seuls le lieu et la description restent modifiables.
+  // Toute autre modification soumise (titre, dates, capacité, prix, validation,
+  // visuels) est ignorée silencieusement. Règle métier centralisée ici pour
+  // protéger aussi les appels directs qui contourneraient le formulaire.
+  const safeInput: UpdateMomentInput =
+    existing.status === "PAST"
+      ? {
+          momentId: input.momentId,
+          userId: input.userId,
+          description: input.description,
+          locationType: input.locationType,
+          locationName: input.locationName,
+          locationAddress: input.locationAddress,
+          videoLink: input.videoLink,
+        }
+      : input;
+
   // Price validation: free (0) or at least 50 cents (Stripe minimum)
-  if (input.price !== undefined && input.price !== 0 && input.price < 50) {
+  if (safeInput.price !== undefined && safeInput.price !== 0 && safeInput.price < 50) {
     throw new InvalidPriceError();
   }
 
   // Paid events cannot require approval (check resulting state)
-  const resultingPrice = input.price ?? existing.price;
-  const resultingApproval = input.requiresApproval ?? existing.requiresApproval;
+  const resultingPrice = safeInput.price ?? existing.price;
+  const resultingApproval = safeInput.requiresApproval ?? existing.requiresApproval;
   if (resultingPrice > 0 && resultingApproval) {
     throw new PaidMomentCannotRequireApprovalError();
   }
 
   // Paid events require Stripe Connect on the Circle
-  if (input.price !== undefined && input.price > 0) {
+  if (safeInput.price !== undefined && safeInput.price > 0) {
     const circle = await circleRepository.findById(existing.circleId);
     if (!circle?.stripeConnectAccountId) {
       throw new PaidMomentRequiresStripeError(existing.circleId);
@@ -90,16 +114,16 @@ export async function updateMoment(
 
   // Price locking rules (only when price is being changed)
   // activeCount > 1 because the host is always auto-registered (count = 1 minimum)
-  if (input.price !== undefined && input.price !== existing.price && deps.registrationRepository) {
-    const activeCount = await deps.registrationRepository.countActiveByMomentId(input.momentId);
+  if (safeInput.price !== undefined && safeInput.price !== existing.price && deps.registrationRepository) {
+    const activeCount = await deps.registrationRepository.countActiveByMomentId(safeInput.momentId);
     const hasRegistrations = activeCount > 1;
 
     if (hasRegistrations) {
       const wasFree = existing.price === 0;
-      const becomingPaid = input.price > 0;
+      const becomingPaid = safeInput.price > 0;
       const wasPaid = existing.price > 0;
-      const becomingFree = input.price === 0;
-      const priceChanging = wasPaid && becomingPaid && input.price !== existing.price;
+      const becomingFree = safeInput.price === 0;
+      const priceChanging = wasPaid && becomingPaid && safeInput.price !== existing.price;
 
       // Gratuit → payant avec inscrits : interdit
       if (wasFree && becomingPaid) {
@@ -121,13 +145,13 @@ export async function updateMoment(
     }
   }
 
-  if (input.startsAt !== undefined && input.startsAt < new Date()) {
+  if (safeInput.startsAt !== undefined && safeInput.startsAt < new Date()) {
     throw new MomentPastDateError();
   }
 
-  const { momentId: _, userId: __, ...updates } = input;
+  const { momentId: _, userId: __, ...updates } = safeInput;
 
-  const moment = await momentRepository.update(input.momentId, updates);
+  const moment = await momentRepository.update(safeInput.momentId, updates);
 
   return { moment };
 }

@@ -528,7 +528,7 @@
       "endBeforeStart": "La date de fin doit être après la date de début.",
       "createMoment": "Enregistrer le brouillon",
       "uploadingAttachments": "Envoi des documents...",
-      "pastDateReadOnly": "Date non modifiable — l'événement est passé.",
+      "pastEditNotice": "Cet événement est passé : seuls le lieu et la description restent modifiables.",
       "draftNotice": "Cet événement est en brouillon. Il n'est visible que par les Organisateurs tant qu'il n'est pas publié.",
       "requiresApproval": "Validation des inscriptions",
       "requiresApprovalDescription": "Les demandes devront être approuvées manuellement depuis votre espace.",

@@ -211,26 +211,44 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
         {/* Left column — Cover + Circle info */}
         <div className="order-2 w-full shrink-0 lg:order-1 lg:w-[340px] lg:sticky lg:top-6">
           <div className="flex flex-col gap-3">
-            <CoverImagePicker
-              circleName={circleName}
-              contextQuery={titleValue || undefined}
-              currentImage={previewImage}
-              currentAttribution={previewAttribution}
-              onSelect={setCoverSelection}
-            />
-            {previewAttribution && (
-              <p className="text-muted-foreground px-1 text-xs">
-                Photo par{" "}
-                <a
-                  href={previewAttribution.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-foreground underline"
-                >
-                  {previewAttribution.name}
-                </a>{" "}
-                sur Unsplash
-              </p>
+            {isPast ? (
+              // Événement passé : cover en lecture seule (pas de picker)
+              previewImage ? (
+                <img
+                  src={previewImage}
+                  alt={moment?.title ?? circleName}
+                  className="aspect-square w-full rounded-xl object-cover"
+                />
+              ) : (
+                <div
+                  className="aspect-square w-full rounded-xl"
+                  style={{ background: circleGradient }}
+                />
+              )
+            ) : (
+              <>
+                <CoverImagePicker
+                  circleName={circleName}
+                  contextQuery={titleValue || undefined}
+                  currentImage={previewImage}
+                  currentAttribution={previewAttribution}
+                  onSelect={setCoverSelection}
+                />
+                {previewAttribution && (
+                  <p className="text-muted-foreground px-1 text-xs">
+                    Photo par{" "}
+                    <a
+                      href={previewAttribution.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-foreground underline"
+                    >
+                      {previewAttribution.name}
+                    </a>{" "}
+                    sur Unsplash
+                  </p>
+                )}
+              </>
             )}
 
             {/* Circle — identique à la vue Escale */}
@@ -276,6 +294,16 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             </div>
           )}
 
+          {/* Banner ÉVÉNEMENT PASSÉ — seuls le lieu et la description sont modifiables */}
+          {isPast && (
+            <div className="border-border bg-muted/50 flex items-center gap-3 rounded-xl border px-4 py-3">
+              <Lock className="text-muted-foreground size-4 shrink-0" />
+              <p className="text-muted-foreground text-sm">
+                {t("form.pastEditNotice")}
+              </p>
+            </div>
+          )}
+
           {/* Le statut n'est plus piloté ici : les transitions (Publier / Annuler /
               Supprimer / Republier) passent par des boutons d'action contextuels
               sur la page de gestion de l'événement. */}
@@ -288,7 +316,11 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onChange={(e) => setTitleValue(e.target.value)}
             required
             maxLength={200}
-            className="placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-3xl font-bold tracking-tight outline-none lg:text-4xl"
+            readOnly={isPast}
+            className={cn(
+              "placeholder:text-muted-foreground/60 w-full border-none bg-transparent text-3xl font-bold tracking-tight outline-none lg:text-4xl",
+              isPast && "cursor-default opacity-70"
+            )}
           />
 
           {/* Hidden inputs for date/time */}
@@ -307,11 +339,6 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             onEndTimeChange={setEndTime}
             disabled={isPast}
           />
-          {isPast && (
-            <p className="text-muted-foreground pl-12 text-xs">
-              {t("form.pastDateReadOnly")}
-            </p>
-          )}
 
           {/* Location row */}
           <MomentFormLocationRow
@@ -354,73 +381,80 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
             </div>
           </div>
 
-          {/* Separator */}
-          <div className="border-border border-t" />
+          {/* Sections non modifiables sur un événement passé : radar de
+              planification, options (prix/capacité), pièces jointes, validation.
+              Masquées pour ne laisser éditable que le lieu et la description. */}
+          {!isPast && (
+            <>
+              {/* Separator */}
+              <div className="border-border border-t" />
 
-          {/* Radar de planification */}
-          <MomentFormRadar
-            title={titleValue}
-            description={descriptionValue}
-            locationName={locationNameValue}
-            locationAddress={locationAddressValue}
-            startsAt={startsAtValue}
-          />
-
-          {/* Separator */}
-          <div className="border-border border-t" />
-
-          {/* Options section (price + capacity) */}
-          <MomentFormOptionsSection
-            priceOpen={priceOpen}
-            onPriceOpenChange={setPriceOpen}
-            defaultPrice={moment?.price ?? 0}
-            defaultCurrency={moment?.currency ?? "EUR"}
-            stripeConnectActive={stripeConnectActive}
-            priceLocked={priceLocked}
-            defaultRefundable={moment?.refundable ?? true}
-            capacityOpen={capacityOpen}
-            onCapacityOpenChange={setCapacityOpen}
-            defaultCapacity={moment?.capacity}
-            approvalEnabled={approvalEnabled}
-            onPriceCentsChange={handlePriceCentsChange}
-          />
-
-          {/* Attachments editor — works in both create and edit modes.
-              Create mode: files are staged client-side and uploaded after the
-              moment is created (see handleSubmit above). Edit mode: upload
-              happens immediately via server action. */}
-          <MomentAttachmentsEditor
-            ref={attachmentsEditorRef}
-            momentId={moment?.id ?? null}
-            initialAttachments={initialAttachments}
-          />
-
-          {/* Validation des inscriptions */}
-          <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>
-            <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
-              <ShieldCheck className="text-primary size-4" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <label htmlFor="requiresApproval" className={cn("text-sm font-medium", !hasPaidPrice && "cursor-pointer")}>
-                {t("form.requiresApproval")}
-              </label>
-              <p className="text-muted-foreground text-xs">
-                {hasPaidPrice
-                  ? t("form.approvalDisabledByPrice")
-                  : t("form.requiresApprovalDescription")}
-              </p>
-            </div>
-            {hasPaidPrice ? (
-              <Lock className="text-muted-foreground size-4 shrink-0" />
-            ) : (
-              <Switch
-                id="requiresApproval"
-                name="requiresApproval"
-                checked={approvalEnabled}
-                onCheckedChange={setApprovalEnabled}
+              {/* Radar de planification */}
+              <MomentFormRadar
+                title={titleValue}
+                description={descriptionValue}
+                locationName={locationNameValue}
+                locationAddress={locationAddressValue}
+                startsAt={startsAtValue}
               />
-            )}
-          </div>
+
+              {/* Separator */}
+              <div className="border-border border-t" />
+
+              {/* Options section (price + capacity) */}
+              <MomentFormOptionsSection
+                priceOpen={priceOpen}
+                onPriceOpenChange={setPriceOpen}
+                defaultPrice={moment?.price ?? 0}
+                defaultCurrency={moment?.currency ?? "EUR"}
+                stripeConnectActive={stripeConnectActive}
+                priceLocked={priceLocked}
+                defaultRefundable={moment?.refundable ?? true}
+                capacityOpen={capacityOpen}
+                onCapacityOpenChange={setCapacityOpen}
+                defaultCapacity={moment?.capacity}
+                approvalEnabled={approvalEnabled}
+                onPriceCentsChange={handlePriceCentsChange}
+              />
+
+              {/* Attachments editor — works in both create and edit modes.
+                  Create mode: files are staged client-side and uploaded after the
+                  moment is created (see handleSubmit above). Edit mode: upload
+                  happens immediately via server action. */}
+              <MomentAttachmentsEditor
+                ref={attachmentsEditorRef}
+                momentId={moment?.id ?? null}
+                initialAttachments={initialAttachments}
+              />
+
+              {/* Validation des inscriptions */}
+              <div className={cn("flex items-center gap-3", hasPaidPrice && "opacity-50")}>
+                <div className="bg-primary/10 flex size-9 shrink-0 items-center justify-center rounded-lg">
+                  <ShieldCheck className="text-primary size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <label htmlFor="requiresApproval" className={cn("text-sm font-medium", !hasPaidPrice && "cursor-pointer")}>
+                    {t("form.requiresApproval")}
+                  </label>
+                  <p className="text-muted-foreground text-xs">
+                    {hasPaidPrice
+                      ? t("form.approvalDisabledByPrice")
+                      : t("form.requiresApprovalDescription")}
+                  </p>
+                </div>
+                {hasPaidPrice ? (
+                  <Lock className="text-muted-foreground size-4 shrink-0" />
+                ) : (
+                  <Switch
+                    id="requiresApproval"
+                    name="requiresApproval"
+                    checked={approvalEnabled}
+                    onCheckedChange={setApprovalEnabled}
+                  />
+                )}
+              </div>
+            </>
+          )}
 
           {/* Submit / Cancel */}
           <div className="flex gap-3 pt-2">
