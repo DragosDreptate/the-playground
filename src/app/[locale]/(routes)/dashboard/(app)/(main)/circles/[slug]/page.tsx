@@ -48,6 +48,7 @@ import {
   Tag,
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
+import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
@@ -133,8 +134,14 @@ export default async function CircleDetailPage({
   const anonymousFallback = tCommon("anonymousFallback");
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
     computeMembersMeta(hosts, players, totalMembers, t, anonymousFallback);
-  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer));
-  const pastMoments = allMoments.filter((m) => m.status === "PAST" || m.status === "CANCELLED");
+  // Un événement annulé encore daté dans le futur reste dans « prochains »
+  // (affiché barré), les autres annulés rejoignent l'historique « passés »,
+  // trié en antichronologique (le plus récent d'abord).
+  const now = Date.now();
+  const upcomingMoments = allMoments.filter(
+    (m) => m.status === "PUBLISHED" || (m.status === "DRAFT" && isOrganizer) || isUpcomingCancelled(m, now)
+  );
+  const pastMoments = allMoments.filter((m) => isPastMoment(m, now)).sort(byStartsAtDesc);
 
   // Récupère compteurs + inscriptions utilisateur + top inscrits (avatars) pour TOUS les moments
   const allMomentIds = allMoments.map((m) => m.id);

@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
+import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
 import { buildAlternates } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
@@ -192,11 +193,14 @@ export default async function PublicCirclePage({
   const showSignInToJoin = !isConnected;
   const showMemberBadge = isMember && !isOrganizer;
 
-  const upcomingMoments = allMoments.filter((m) => m.status === "PUBLISHED");
+  // Un événement annulé encore daté dans le futur reste dans « prochains »
+  // (affiché barré), les autres annulés rejoignent l'historique « passés ».
+  const now = Date.now();
+  const upcomingMoments = allMoments.filter(
+    (m) => m.status === "PUBLISHED" || isUpcomingCancelled(m, now)
+  );
   // Historique en antichronologique : le plus récent d'abord (les upcoming restent chronologiques).
-  const pastMoments = allMoments
-    .filter((m) => m.status === "PAST" || m.status === "CANCELLED")
-    .sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
+  const pastMoments = allMoments.filter((m) => isPastMoment(m, now)).sort(byStartsAtDesc);
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
   const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
