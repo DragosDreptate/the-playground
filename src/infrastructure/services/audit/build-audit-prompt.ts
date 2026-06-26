@@ -15,6 +15,7 @@ export function buildAuditPrompt(dossier: AuditDossier): string {
 - Le slop = créer une Communauté / un événement PUBLICITAIRE pointant vers un produit/site externe. Signaux forts : website du Circle vers un site commercial / billetterie externe ; description machine-translated / SEO / recopiée à l'identique Circle↔Moment ; "événement" qui est une annonce et pas un vrai rassemblement.
 - IMPORTANT : un lien externe n'est PAS suspect en soi. Distingue "pub vers un produit commercial" (slop) de "site perso de l'organisateur" ou "page d'inscription du vrai événement hébergé" (légitime).
 - Si le compte n'a AUCUN contenu (0 Communauté / 0 événement) : c'est un compte dormant, il n'a rien fait de répréhensible. Ne conclus PAS "spam" sans preuve.
+- TÉLÉMÉTRIE CLIENT NON FIABLE : une liste de villes client vide et un \`eventCount\` faible ne sont PAS des signaux. La navigation web est très souvent invisible (adblocker / Firefox, ou session anonyme jamais reliée à la person) — beaucoup de comptes parfaitement légitimes n'ont AUCUN event client et un seul \`auth_sign_in\` serveur. Ne conclus RIEN de cette absence, ni à charge ni à décharge. L'engagement réel se lit dans \`engagement\` (memberships / registrations / comments) et dans le contenu, jamais dans le volume PostHog.
 - En cas de doute, dis-le (ambigu) plutôt que d'inventer un signal.
 
 # Dossier (DB = source de vérité ; le geoip serveur "Frankfurt" a déjà été exclu, les villes listées sont côté client)
