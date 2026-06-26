@@ -63,6 +63,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: {
         status: { in: ["PUBLISHED", "PAST"] },
         circleId: { notIn: excludeCircleIds },
+        // N'expose pas les événements rattachés à une Communauté privée :
+        // accessibles par lien direct, mais hors sitemap et non indexés
+        // (cf. noindex dans /m/[slug]/page.tsx).
+        circle: { visibility: "PUBLIC" },
       },
       select: { slug: true, updatedAt: true },
     }),

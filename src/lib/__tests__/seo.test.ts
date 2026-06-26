@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, isCircleIndexable } from "@/lib/seo";
 
 const APP_URL = "https://the-playground.fr";
 
@@ -75,6 +75,30 @@ describe("buildAlternates", () => {
     it("falls back to FR as the canonical (defensive default)", () => {
       const result = buildAlternates("de", "/about");
       expect(result.canonical).toBe(`${APP_URL}/about`);
+    });
+  });
+});
+
+describe("isCircleIndexable", () => {
+  describe("given a public Circle", () => {
+    it("is indexable (noindex off, JSON-LD + sitemap allowed)", () => {
+      expect(isCircleIndexable({ visibility: "PUBLIC" })).toBe(true);
+    });
+  });
+
+  describe("given a private Circle", () => {
+    it("is NOT indexable (page reachable by direct link, hidden from crawlers)", () => {
+      expect(isCircleIndexable({ visibility: "PRIVATE" })).toBe(false);
+    });
+  });
+
+  describe("given a missing Circle (fail-safe)", () => {
+    it("is NOT indexable when null", () => {
+      expect(isCircleIndexable(null)).toBe(false);
+    });
+
+    it("is NOT indexable when undefined", () => {
+      expect(isCircleIndexable(undefined)).toBe(false);
     });
   });
 });

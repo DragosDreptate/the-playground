@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, isCircleIndexable } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
@@ -67,6 +67,9 @@ export async function generateMetadata({
   }
 
   const circle = await getCircle(moment.circleId);
+  // Événement rattaché à une Communauté privée : page accessible par lien direct
+  // (partage), mais jamais indexée par les crawlers (même pattern que /circles/[slug]).
+  const isInPrivateCircle = !isCircleIndexable(circle);
   const t = await getTranslations({ locale, namespace: "Moment" });
   const date = formatLongDate(moment.startsAt, locale);
   const time = formatLocalizedTime(moment.startsAt, locale);
@@ -84,6 +87,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: buildAlternates(locale, `/m/${slug}`),
+    ...(isInPrivateCircle && { robots: { index: false, follow: false } }),
     openGraph: {
       title,
       description,
@@ -233,8 +237,12 @@ export default async function PublicMomentPage({
       ? "https://schema.org/SoldOut"
       : "https://schema.org/InStock";
 
+  // Pas de données structurées schema.org pour un événement en Communauté privée :
+  // le noindex masque la page de l'index, mais le JSON-LD reste une surface
+  // exploitable par les crawlers / scrapers — on la ferme aussi (cf. generateMetadata).
   const jsonLd =
-    moment.status === "PUBLISHED" || moment.status === "PAST"
+    (moment.status === "PUBLISHED" || moment.status === "PAST") &&
+    isCircleIndexable(circle)
       ? {
           "@context": "https://schema.org",
           "@type": "Event",
