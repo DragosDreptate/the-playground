@@ -27,7 +27,7 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
-import { buildAlternates } from "@/lib/seo";
+import { buildAlternates, isCircleIndexable } from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -85,7 +85,7 @@ export async function generateMetadata({
   try {
     const circle = await getCachedCircle(slug);
     if (!circle) return {};
-    const isPrivate = circle.visibility !== "PUBLIC";
+    const isPrivate = !isCircleIndexable(circle);
 
     const [memberCount, t] = await Promise.all([
       getCachedMemberCount(circle.id),
