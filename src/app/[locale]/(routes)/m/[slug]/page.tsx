@@ -67,6 +67,10 @@ export async function generateMetadata({
   }
 
   const circle = await getCircle(moment.circleId);
+  // Événement rattaché à une Communauté privée : page accessible par lien direct
+  // (partage), mais jamais indexée par les crawlers (même pattern que /circles/[slug]).
+  // Fail-safe : si le Circle est introuvable, on n'indexe pas.
+  const isInPrivateCircle = circle?.visibility !== "PUBLIC";
   const t = await getTranslations({ locale, namespace: "Moment" });
   const date = formatLongDate(moment.startsAt, locale);
   const time = formatLocalizedTime(moment.startsAt, locale);
@@ -84,6 +88,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: buildAlternates(locale, `/m/${slug}`),
+    ...(isInPrivateCircle && { robots: { index: false, follow: false } }),
     openGraph: {
       title,
       description,
