@@ -183,24 +183,26 @@ function PublicVariant({
           )}
         </div>
         {/* Corps */}
-        <div className="flex flex-1 flex-col gap-1.5 p-4">
+        <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
           <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
           <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
-          <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
-            {circle.city && (
-              <div className="flex items-center gap-1">
-                <MapPin className="size-3.5 shrink-0" />
-                <span>{circle.city}</span>
-              </div>
-            )}
-            {circle.upcomingMomentCount > 0 && (
-              <div className="flex items-center gap-1">
-                <CalendarIcon className="size-3.5 shrink-0" />
-                <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-              </div>
-            )}
-          </div>
+          {circle.city && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
+                <MapPin className="size-4 text-foreground" />
+              </span>
+              <span>{circle.city}</span>
+            </div>
+          )}
+          {circle.upcomingMomentCount > 0 && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="size-4 text-foreground" />
+              </span>
+              <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
+            </div>
+          )}
           {circle.memberCount > 0 && (
             <AttendeeAvatarStack
               attendees={circle.topMembers}
@@ -209,12 +211,14 @@ function PublicVariant({
             />
           )}
           {!hideNextMoment && (
-            <div className="mt-auto pt-1.5">
+            <div className="mt-auto pt-2">
               {circle.nextMoment && nextMomentDate ? (
                 <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
                   <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
-                  <div className="flex items-center gap-1.5">
-                    <CalendarIcon className="size-3 shrink-0 text-primary" />
+                  <div className="flex items-center gap-2">
+                    <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                      <CalendarIcon className="size-3.5 text-foreground" />
+                    </span>
                     <span className="whitespace-nowrap">
                       {nextMomentDate} · {nextMomentTime}
                     </span>
@@ -338,17 +342,28 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
             </div>
           )}
         </div>
-        <div className="flex flex-1 flex-col gap-1.5 p-4">
+        <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryLabel && (
             <div className="flex items-center gap-2">
               <CategoryBadge label={categoryLabel} />
             </div>
           )}
-          <h3 className="truncate text-base font-semibold leading-snug">{circle.name}</h3>
+          <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
+          <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
           {circle.city && (
-            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-              <MapPin className="size-3.5 shrink-0" />
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
+                <MapPin className="size-4 text-foreground" />
+              </span>
               <span>{circle.city}</span>
+            </div>
+          )}
+          {circle.upcomingMomentCount > 0 && (
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
+              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
+                <CalendarIcon className="size-4 text-foreground" />
+              </span>
+              <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
             </div>
           )}
           {circle.memberCount > 0 && (
@@ -358,21 +373,18 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
               label={memberLabel}
             />
           )}
-          <div className="mt-auto pt-1.5">
+          <div className="mt-auto pt-2">
             {circle.nextMoment && nextMomentDate ? (
               <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                <p className="text-muted-foreground/70 text-[0.6rem] font-medium uppercase tracking-wider">
-                  {t("circleCard.nextMoment")}
-                </p>
-                <div className="flex items-center gap-1.5">
-                  <CalendarIcon className="size-3 shrink-0 text-foreground" />
+                <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
+                <div className="flex items-center gap-2">
+                  <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                    <CalendarIcon className="size-3.5 text-foreground" />
+                  </span>
                   <span className="whitespace-nowrap">
                     {nextMomentDate} · {nextMomentTime}
                   </span>
                 </div>
-                <p className="line-clamp-2 min-w-0 break-words font-medium leading-snug text-foreground">
-                  {circle.nextMoment.title}
-                </p>
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
