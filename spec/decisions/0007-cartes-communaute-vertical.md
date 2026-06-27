@@ -20,7 +20,10 @@ Le **motif du précédent passage à l'horizontal** (cover 1:1 trop haute, carte
 - Cartes de Communauté en **format vertical** (cover 1:1 en haut, contenu dessous), affichées en **grille**, **uniquement à partir de `sm`** (desktop/tablette).
 - **Mobile (`< sm`) : strictement inchangé visuellement** (format horizontal actuel). La refonte mobile est une **Phase 2** non tranchée.
 - **Option A retenue** : un **seul composant** (`CommunityCard`) porte **deux branches de présentation** — horizontale `< sm` / verticale `≥ sm` — pilotées par breakpoint. Donnée single-source.
-- **La branche horizontale `< sm` reprend le markup existant à l'identique** : on **déplace/copie fidèlement** le JSX de `PublicCircleCard` / `DashboardCircleCard` (mêmes classes responsive, mêmes tailles de cover, mêmes conditions d'affichage), on ne le réécrit pas de mémoire. Le rendu mobile doit être **pixel-identique** à l'actuel.
+- **`CommunityCard` est un client component** (`"use client"`, `useTranslations`/`useLocale`). Raison : `PublicCircleCard` est déjà client car rendu dans `ExplorerGrid` (`"use client"`, pagination par `useState`) ; un module client ne peut pas rendre un Server Component. La variante `dashboard`, aujourd'hui **Server Component** (`async`, `getTranslations`), est donc **convertie en client** (option 1 retenue, cf. discussion). Impact assumé : les cartes dashboard passent en client (un peu de JS/hydratation en plus, négligeable au volume — données déjà chargées server et passées en props sérialisables).
+- **Branche `< sm` — fidélité variable selon la variante** :
+  - **variante `public`** : copie **octet pour octet** du JSX existant (déjà client) → rendu mobile **pixel-identique**.
+  - **variante `dashboard`** : **conversion server→client à visuel identique** (`getTranslations`→`useTranslations`, `getLocale`→`useLocale`, retrait `async`/`Promise.all`) — le code n'est pas une copie littérale, mais les classes et le markup restent identiques. Vérif visuelle + `test:mobile` **renforcés sur le dashboard**.
 
 ### On change l'aspect, pas le contenu — #597 reste iso #596
 
@@ -59,9 +62,9 @@ Comme un seul composant rend désormais le mobile, le risque de régression mobi
 
 Le badge rôle (HOST/MEMBER) passe **en overlay sur la cover** (au lieu du corps), pour libérer le corps de la carte verticale.
 
-### « À la une » supprimée
+### « À la une » — hors périmètre de cette PR
 
-La section « À la une » d'Explorer (`ExplorerFeatured`) est **retirée** : elle n'apporte rien aujourd'hui. On ne l'harmonise pas en vertical, on la supprime.
+La section « À la une » d'Explorer (`ExplorerFeatured`) n'apporte rien aujourd'hui et sera **retirée à terme**, mais **pas dans cette PR**. Elle reste en place ; le toggle admin `featuredCirclesEnabled` (`SiteSettings`, `prisma/schema.prisma:421`) permet déjà de la **masquer** au besoin. Son retrait propre (composant + usecase `getFeaturedCircles`, éventuellement le champ schema) fera l'objet d'une **PR ultérieure dédiée**, pour ne pas mélanger un nettoyage Explorer avec la refonte des cartes.
 
 ### Chargement progressif
 
@@ -69,13 +72,15 @@ Le bouton **« Load More »** de l'onglet Communautés d'Explorer est remplacé 
 
 ### Effet hover unifié (toutes les cartes)
 
-Le highlight rose actuel (`hover:border-primary/30` + `transition-colors`) est remplacé par une **élévation neutre** (`translateY(-2px)` + ombre renforcée), sur **toutes** les cartes (événement + Communauté) : `public-circle-card`, `dashboard-circle-card`, `public-moment-card`, `dashboard-moment-card`, `moment-card`.
+Le highlight rose actuel est remplacé par une **élévation neutre** (`translateY(-2px)` + ombre renforcée), sur **toutes** les cartes (événement + Communauté) : `community-card` (nouveau), `public-moment-card`, `dashboard-moment-card`, `moment-card`.
+
+**Les deux effets roses sont retirés** (pour coller au mockup, qui ne fait qu'élever la carte) : la bordure `hover:border-primary/30` **et** le titre `group-hover:text-primary` (le titre ne passe plus en rose au survol). `transition-colors` → transition sur transform/ombre.
 
 ## Alternatives écartées
 
 - **Garder l'horizontal** : rejeté, la confusion avec les cartes événement persiste.
 - **Vertical aussi sur mobile** : reporté en Phase 2. C'est exactement ce qui avait tué le 1er vertical (cartes trop hautes/étroites) ; on ne le réintroduit pas sans nouveaux insights.
-- **Harmoniser « À la une » en vertical** : abandonné, on supprime la section.
+- **Harmoniser « À la une » en vertical** : abandonné (la section sera retirée à terme, dans une PR ultérieure dédiée — pas dans cette PR).
 - **Introduire les CTA Organisateur / le mode dans #597** : reporté à #596 (sinon les CTA n'ont pas de mode auquel se rattacher).
 - **Nommer le nouveau composant `CircleCard`** : impossible, le nom est déjà pris par le picker.
 
