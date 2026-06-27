@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicCircleCard } from "@/components/explorer/public-circle-card";
+import { CommunityCard } from "@/components/circles/community-card";
 import { PublicMomentCard } from "@/components/explorer/public-moment-card";
 import { loadMoreCirclesAction, loadMoreMomentsAction } from "@/app/actions/explorer";
 import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
@@ -82,24 +82,29 @@ export function ExplorerGrid(props: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:gap-3">
-        {props.tab === "circles"
-          ? circleItems.map((circle) => (
-              <PublicCircleCard
-                key={circle.id}
-                circle={circle}
-                membershipRole={circleMembershipMap[circle.id] ?? null}
-              />
-            ))
-          : momentItems.map((moment) => (
-              <PublicMomentCard
-                key={moment.id}
-                moment={moment}
-                registrationStatus={registrationStatusMap[moment.id] ?? null}
-                isOrganizer={membershipBySlug[moment.circle.slug] === "HOST"}
-              />
-            ))}
-      </div>
+      {props.tab === "circles" ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {circleItems.map((circle) => (
+            <CommunityCard
+              key={circle.id}
+              variant="public"
+              circle={circle}
+              membershipRole={circleMembershipMap[circle.id] ?? null}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 sm:gap-3">
+          {momentItems.map((moment) => (
+            <PublicMomentCard
+              key={moment.id}
+              moment={moment}
+              registrationStatus={registrationStatusMap[moment.id] ?? null}
+              isOrganizer={membershipBySlug[moment.circle.slug] === "HOST"}
+            />
+          ))}
+        </div>
+      )}
 
       {hasMore && (
         <div className="flex justify-center">
