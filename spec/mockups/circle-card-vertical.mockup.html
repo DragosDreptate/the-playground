@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte Communauté verticale — #597 | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --radius: 0.5rem;
+      --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+      --shadow-md: 0 4px 6px -1px rgba(26,27,46,.08), 0 2px 4px -2px rgba(26,27,46,.05);
+      /* surfaces translucides thématiques */
+      --primary-soft-bg: #fdf0f4;
+      --primary-soft-border: rgba(232,69,122,.2);
+      --warn-bg: #fffbeb;
+      --warn-fg: #d97706;
+      --warn-border: rgba(217,119,6,.2);
+      --contrast-bg: #fffdfb;
+    }
+    /* Dark mode — tokens réels de l'app (globals.css .dark) */
+    body.theme-dark {
+      --background: oklch(0.1649 0.0352 281.8285);
+      --foreground: oklch(0.9513 0.0074 260.7315);
+      --card: oklch(0.2542 0.0611 281.1423);
+      --muted: oklch(0.2123 0.0522 280.9917);
+      --muted-foreground: oklch(0.6245 0.05 278.1046);
+      --border: oklch(0.3279 0.0832 280.789);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+      --shadow-md: 0 4px 10px -2px rgba(0,0,0,.5);
+      --primary-soft-bg: rgba(232,69,122,.16);
+      --primary-soft-border: rgba(232,69,122,.32);
+      --warn-bg: rgba(217,119,6,.18);
+      --warn-fg: #f59e0b;
+      --warn-border: rgba(217,119,6,.35);
+      --contrast-bg: oklch(0.2123 0.0522 280.9917);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      font-size: 14px;
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+
+    /* ─── Header bandeau mockup ──────────────────────── */
+    .mockup-bar {
+      background: #11121f; color: white;
+      padding: 12px 24px; display: flex; align-items: center; gap: 16px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .theme-toggle { margin-left: auto; display: flex; background: rgba(255,255,255,.1); border-radius: 8px; padding: 3px; gap: 2px; }
+    .theme-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: rgba(255,255,255,.6); transition: all .15s; }
+    .theme-btn.active { background: rgba(255,255,255,.18); color: white; }
+    .mockup-bar .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; background: linear-gradient(135deg, var(--primary), #9333ea); padding: 3px 8px; border-radius: 999px; }
+    .mockup-bar .title { font-size: 13px; font-weight: 600; }
+    .mockup-bar .note { font-size: 12px; color: rgba(255,255,255,.6); margin-left: auto; }
+
+    /* ─── Surface section ─────────────────────────────── */
+    .surface { padding: 36px 0 8px; }
+    .surface-inner-explorer { max-width: 1024px; margin: 0 auto; padding: 0 16px; } /* max-w-5xl + px-4 */
+    .surface-inner-dashboard { max-width: 672px; margin: 0 auto; padding: 0 16px; } /* max-w-2xl + px-4 */
+    .surface-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+    .surface-title { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+    .surface-cols { font-size: 11px; font-weight: 600; color: var(--primary); background: var(--primary-soft-bg); border: 1px solid var(--primary-soft-border); padding: 2px 8px; border-radius: 999px; }
+    .surface-sub { font-size: 13px; color: var(--muted-foreground); margin-bottom: 20px; }
+
+    /* ─── Grilles ──────────────────────────────────────── */
+    .grid-explorer { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .grid-dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+    /* ─── Carte Communauté verticale ──────────────────── */
+    .ccard { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); transition: box-shadow .15s, transform .15s; display: flex; flex-direction: column; }
+    .ccard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+    /* Cover 1:1 + overlays */
+    .ccard-cover { position: relative; width: 100%; aspect-ratio: 1/1; }
+    .ccard-cover-img { position: absolute; inset: 0; }
+    .ccard-cover .overlay-tl { position: absolute; top: 10px; left: 10px; }
+    .ccard-cover .overlay-tr { position: absolute; top: 10px; right: 10px; }
+    .ov-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .ov-demo { background: rgba(26,27,46,.62); color: white; }
+    .ov-role { background: rgba(255,255,255,.85); color: var(--primary); }
+
+    /* Body */
+    .ccard-body { padding: 14px 16px 16px; display: flex; flex-direction: column; flex: 1; }
+    .ccard-cat { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; color: var(--muted-foreground); margin-bottom: 6px; }
+    .ccard-name { font-size: 16px; font-weight: 700; color: var(--foreground); line-height: 1.25; margin-bottom: 6px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .ccard-desc { font-size: 12.5px; color: var(--muted-foreground); line-height: 1.45; margin-bottom: 10px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .ccard-city { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted-foreground); margin-bottom: 8px; }
+    .ccard-stat { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--muted-foreground); margin-bottom: 12px; }
+
+    /* Avatar stack + compteur */
+    .ccard-members { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .avatar-stack { display: flex; }
+    .avatar-stack .av { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--card); margin-left: -7px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: white; }
+    .avatar-stack .av:first-child { margin-left: 0; }
+    .members-label { font-size: 12px; color: var(--muted-foreground); }
+
+    /* Encart prochain événement */
+    .next-event { margin-top: auto; background: var(--muted); border-radius: 10px; padding: 10px 12px; }
+    .next-event-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground); display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+    .next-event-title { font-size: 13px; font-weight: 600; color: var(--foreground); line-height: 1.3; margin-bottom: 1px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+    .next-event-date { font-size: 11.5px; color: var(--muted-foreground); }
+    .next-event.empty { background: transparent; border: 1px dashed var(--border); }
+    .next-event.empty .next-event-title { color: var(--muted-foreground); font-weight: 500; }
+
+    /* Badge rôle (bas de corps) */
+    .ccard-role { margin-top: 12px; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .badge-host { background: var(--primary-soft-bg); color: var(--primary); border: 1px solid var(--primary-soft-border); }
+    .badge-member { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+    .badge-pending { background: var(--warn-bg); color: var(--warn-fg); border: 1px solid var(--warn-border); }
+
+    /* CTA organisateur (variante dashboard) */
+    .ccard-actions { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 9px; border: none; cursor: pointer; transition: all .15s; width: 100%; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { opacity: .9; }
+    .btn-outline { background: transparent; color: var(--foreground); border: 1px solid var(--border); }
+    .btn-outline:hover { background: var(--muted); }
+
+    /* Carte "créer une Communauté" (dashboard) */
+    .ccard-new { border: 2px dashed var(--border); box-shadow: none; display: flex; align-items: center; justify-content: center; min-height: 320px; }
+    .ccard-new:hover { background: var(--muted); transform: none; box-shadow: none; }
+    .ccard-new-inner { text-align: center; padding: 24px; }
+    .ccard-new-plus { font-size: 30px; opacity: .4; margin-bottom: 10px; }
+    .ccard-new-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .ccard-new-sub { font-size: 12px; color: var(--muted-foreground); }
+
+    /* ─── Rappel carte événement horizontale ──────────── */
+    .contrast { background: var(--contrast-bg); border-top: 1px solid var(--border); margin-top: 28px; padding: 28px 24px 36px; }
+    .contrast-inner { max-width: 1024px; margin: 0 auto; padding: 0 16px; }
+    .contrast-note { font-size: 12px; color: var(--muted-foreground); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .contrast-note b { color: var(--foreground); font-weight: 600; }
+    .event-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .ecard { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; gap: 14px; align-items: stretch; box-shadow: var(--shadow-sm); cursor: pointer; transition: box-shadow .15s, transform .15s; }
+    .ecard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .ecard-cover { width: 84px; height: 84px; border-radius: 10px; flex-shrink: 0; aspect-ratio: 1/1; }
+    .ecard-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .ecard-time { font-size: 11px; font-weight: 500; color: var(--muted-foreground); margin-bottom: 2px; }
+    .ecard-title { font-size: 14px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; }
+    .ecard-loc { font-size: 12px; color: var(--muted-foreground); display: flex; align-items: center; gap: 4px; margin-bottom: auto; }
+    .ecard-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .ecard-com { font-size: 11px; font-weight: 500; color: var(--muted-foreground); }
+
+    /* ─── Encart décisions ────────────────────────────── */
+    .decisions { max-width: 1024px; margin: 24px auto 0; padding: 0 16px; }
+    .decisions-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .decisions-box h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .decisions-box ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .decisions-box li { font-size: 12.5px; color: var(--muted-foreground); padding-left: 18px; position: relative; }
+    .decisions-box li::before { content: '▸'; position: absolute; left: 0; color: var(--primary); }
+    .decisions-box li b { color: var(--foreground); font-weight: 600; }
+
+    /* Gradients déterministes (getMomentGradient, 8 variantes) */
+    .g1 { background: linear-gradient(135deg,#8b5cf6,#6366f1); }
+    .g2 { background: linear-gradient(135deg,#06b6d4,#3b82f6); }
+    .g3 { background: linear-gradient(135deg,#e8457a,#d946ef); }
+    .g4 { background: linear-gradient(135deg,#10b981,#06b6d4); }
+    .g5 { background: linear-gradient(135deg,#d946ef,#8b5cf6); }
+    .g6 { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+    .g7 { background: linear-gradient(135deg,#14b8a6,#6366f1); }
+    .g8 { background: linear-gradient(135deg,#6366f1,#06b6d4); }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-bar">
+    <span class="tag">#597</span>
+    <span class="title">Carte Communauté — format vertical en grille</span>
+    <span class="note">Phase 1 · desktop / tablette uniquement (mobile inchangé, hors mockup)</span>
+    <div class="theme-toggle">
+      <button class="theme-btn active" id="theme-btn-light" onclick="setTheme('light')">☀️ Clair</button>
+      <button class="theme-btn" id="theme-btn-dark" onclick="setTheme('dark')">🌙 Sombre</button>
+    </div>
+  </div>
+
+  <script>
+    function setTheme(theme) {
+      document.body.classList.toggle('theme-dark', theme === 'dark');
+      document.getElementById('theme-btn-light').classList.toggle('active', theme === 'light');
+      document.getElementById('theme-btn-dark').classList.toggle('active', theme === 'dark');
+    }
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════
+       SURFACE 1 — EXPLORER (public · pleine largeur · 3 col)
+       ═══════════════════════════════════════════════════ -->
+  <section class="surface">
+    <div class="surface-inner-explorer">
+      <div class="surface-head">
+        <h2 class="surface-title">Explorer · Communautés</h2>
+        <span class="surface-cols">3 colonnes · variante publique</span>
+      </div>
+      <p class="surface-sub">Pleine largeur. Différenciation nette vs les cartes événement (horizontales). Chargement progressif au défilement (infinite scroll) en remplacement du « Load More ».</p>
+
+      <div class="grid-explorer">
+
+        <!-- Carte 1 — membre, prochain événement -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g3"></div>
+            <div class="overlay-tr"><span class="ov-badge ov-role">★ Membre</span></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Tech</span>
+            <h3 class="ccard-name">Paris Creative Tech</h3>
+            <p class="ccard-desc">La communauté des créateurs tech de Paris : meetups, ateliers et soirées networking.</p>
+            <div class="ccard-city">📍 Paris</div>
+            <div class="ccard-stat">📅 3 événements à venir</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g1">AL</span><span class="av g4">MD</span><span class="av g6">JS</span>
+              </div>
+              <span class="members-label">42 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Meetup IA Générative & Créativité</div>
+              <div class="next-event-date">20 mars · 19h00</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Carte 2 — démo, sans rôle -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g4"></div>
+            <div class="overlay-tl"><span class="ov-badge ov-demo">Démo</span></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Bien-être</span>
+            <h3 class="ccard-name">Yoga Montmartre</h3>
+            <p class="ccard-desc">Séances de yoga et de méditation en plein air, tous niveaux bienvenus.</p>
+            <div class="ccard-city">📍 Paris</div>
+            <div class="ccard-stat">📅 2 événements à venir</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g2">CL</span><span class="av g5">NB</span><span class="av g8">RP</span>
+              </div>
+              <span class="members-label">28 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Méditation matinale au parc</div>
+              <div class="next-event-date">8 mars · 8h30</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Carte 3 — sans prochain événement -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g6"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Design</span>
+            <h3 class="ccard-name">Design &amp; Produit Lyon</h3>
+            <p class="ccard-desc">Designers et PM qui partagent leurs pratiques autour du produit et du design system.</p>
+            <div class="ccard-city">📍 Lyon</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g7">EM</span><span class="av g3">TD</span><span class="av g1">VK</span>
+              </div>
+              <span class="members-label">64 membres</span>
+            </div>
+            <div class="next-event empty">
+              <div class="next-event-title">Aucun événement à venir</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Carte 4 — organisateur public (badge host overlay) -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g8"></div>
+            <div class="overlay-tr"><span class="ov-badge ov-role">👑 Organisateur</span></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Entrepreneuriat</span>
+            <h3 class="ccard-name">Startup Founders Bordeaux</h3>
+            <p class="ccard-desc">Fondateurs et futurs fondateurs qui s'entraident pour lancer et faire grandir leur startup.</p>
+            <div class="ccard-city">📍 Bordeaux</div>
+            <div class="ccard-stat">📅 4 événements à venir</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g5">GL</span><span class="av g2">PR</span><span class="av g6">SA</span>
+              </div>
+              <span class="members-label">117 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Pitch Night #12</div>
+              <div class="next-event-date">25 mars · 18h30</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Carte 5 — nom long, 2 lignes -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g2"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Photographie</span>
+            <h3 class="ccard-name">Collectif Photographie Argentique &amp; Labo</h3>
+            <p class="ccard-desc">On shoote en argentique et on développe ensemble en labo partagé une fois par mois.</p>
+            <div class="ccard-city">📍 Nantes</div>
+            <div class="ccard-stat">📅 1 événement à venir</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g1">OL</span><span class="av g4">FM</span><span class="av g7">DH</span>
+              </div>
+              <span class="members-label">39 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Sortie photo de nuit</div>
+              <div class="next-event-date">14 mars · 21h00</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Carte 6 — petite communauté -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g1"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Lecture</span>
+            <h3 class="ccard-name">Club de lecture du 11e</h3>
+            <p class="ccard-desc">Un livre par mois, une rencontre conviviale pour en parler autour d'un verre.</p>
+            <div class="ccard-city">📍 Paris</div>
+            <div class="ccard-stat">📅 1 événement à venir</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g3">IM</span><span class="av g8">LB</span>
+              </div>
+              <span class="members-label">8 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Échange autour de « Beloved »</div>
+              <div class="next-event-date">19 mars · 20h00</div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       SURFACE 2 — MON ESPACE (dashboard · ~672px · 2 col)
+       ═══════════════════════════════════════════════════ -->
+  <section class="surface">
+    <div class="surface-inner-dashboard">
+      <div class="surface-head">
+        <h2 class="surface-title">Mon espace · Mes Communautés</h2>
+        <span class="surface-cols">2 colonnes · variante dashboard</span>
+      </div>
+      <p class="surface-sub">Conteneur ~672px → 2 colonnes (pas 3) pour éviter des cartes trop étroites. Contenu <b>strictement identique</b> à <code>DashboardCircleCard</code> (pas de description ni de compteur, pas de CTA, pas de badge de rôle). On ne change que l'aspect : liste 1 col → grille 2 col, horizontal → vertical.</p>
+
+      <div class="grid-dashboard">
+
+        <!-- Dashboard 1 — contenu strictement identique à DashboardCircleCard -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g3"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Tech</span>
+            <h3 class="ccard-name">Paris Creative Tech</h3>
+            <div class="ccard-city">📍 Paris</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g1">AL</span><span class="av g4">MD</span><span class="av g6">JS</span>
+              </div>
+              <span class="members-label">42 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Meetup IA Générative</div>
+              <div class="next-event-date">20 mars · 19h00</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dashboard 2 — sans prochain événement -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g4"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Bien-être</span>
+            <h3 class="ccard-name">Yoga Montmartre</h3>
+            <div class="ccard-city">📍 Paris</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g2">CL</span><span class="av g5">NB</span><span class="av g8">RP</span>
+              </div>
+              <span class="members-label">28 membres</span>
+            </div>
+            <div class="next-event empty">
+              <div class="next-event-title">Aucun événement à venir</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dashboard 3 -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g6"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Design</span>
+            <h3 class="ccard-name">Design &amp; Produit Lyon</h3>
+            <div class="ccard-city">📍 Lyon</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g7">EM</span><span class="av g3">TD</span><span class="av g1">VK</span>
+              </div>
+              <span class="members-label">64 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Atelier Design System Avancé</div>
+              <div class="next-event-date">12 mars · 14h00</div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Dashboard 4 — adhésion en attente de validation (seul badge affiché aujourd'hui) -->
+        <article class="ccard">
+          <div class="ccard-cover">
+            <div class="ccard-cover-img g8"></div>
+          </div>
+          <div class="ccard-body">
+            <span class="ccard-cat">⌗ Entrepreneuriat</span>
+            <h3 class="ccard-name">Startup Founders Bordeaux</h3>
+            <div class="ccard-city">📍 Bordeaux</div>
+            <div class="ccard-members">
+              <div class="avatar-stack">
+                <span class="av g5">GL</span><span class="av g2">PR</span><span class="av g6">SA</span>
+              </div>
+              <span class="members-label">117 membres</span>
+            </div>
+            <div class="next-event">
+              <div class="next-event-label">📅 Prochain événement</div>
+              <div class="next-event-title">Pitch Night #12</div>
+              <div class="next-event-date">25 mars · 18h30</div>
+            </div>
+            <div class="ccard-role"><span class="badge badge-pending">🕓 En attente</span></div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════
+       CONTRASTE — la carte événement reste horizontale
+       ═══════════════════════════════════════════════════ -->
+  <section class="contrast">
+    <div class="contrast-inner">
+      <div class="contrast-note">🎯 <span><b>Pour mémoire</b> — la carte événement reste <b>horizontale</b>. C'est le contraste avec la carte Communauté <b>verticale</b> qui crée la différenciation visuelle (objectif #597).</span></div>
+      <div class="event-row">
+        <article class="ecard">
+          <div class="ecard-cover g3"></div>
+          <div class="ecard-body">
+            <div class="ecard-time">20 mars · 19h00 · Paris</div>
+            <div class="ecard-title">Meetup IA Générative & Créativité</div>
+            <div class="ecard-loc">📍 Station F, Paris 13e</div>
+            <div class="ecard-foot"><span class="ecard-com">Paris Creative Tech</span><span class="badge badge-host">✓ Inscrit</span></div>
+          </div>
+        </article>
+        <article class="ecard">
+          <div class="ecard-cover g6"></div>
+          <div class="ecard-body">
+            <div class="ecard-time">12 mars · 14h00 · Lyon</div>
+            <div class="ecard-title">Atelier Design System Avancé</div>
+            <div class="ecard-loc">📍 Le Village, Lyon</div>
+            <div class="ecard-foot"><span class="ecard-com">Design &amp; Produit Lyon</span><span class="badge badge-pending">⏱ Liste d'attente</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Décisions de design tranchées ─── -->
+  <div class="decisions">
+    <div class="decisions-box">
+      <h3>Décisions de design (issue #597)</h3>
+      <ul>
+        <li><b>Cover 1:1 (carré)</b> — cohérent avec CoverBlock et le design system. Overlay possible : badge Démo / rôle.</li>
+        <li><b>Explorer</b> → vertical, <b>3 colonnes</b> (pleine largeur). <b>Mon Espace</b> (~672px) → vertical, <b>2 colonnes</b>. Nombres provisoires, à valider au rendu réel.</li>
+        <li><b>Mobile (&lt; sm)</b> inchangé en Phase 1 (format horizontal actuel conservé). Refonte éventuelle en Phase 2.</li>
+        <li><b>Contenu inchangé, on change l'aspect.</b> On reprend fidèlement les champs déjà affichés par chaque carte ; le seul déplacement est l'encart « prochain événement », qui passe de la colonne droite (desktop) au corps de la carte.</li>
+        <li><b>Explorer (PublicCircleCard)</b> : cover (+ Démo) → catégorie → nom → <b>description</b> → ville → <b>compteur d'événements à venir</b> → avatars + membres → badge rôle (overlay) → prochain événement.</li>
+        <li><b>Mon Espace (DashboardCircleCard)</b> : cover → catégorie → nom → ville → avatars + membres → badge En attente → prochain événement. <b>Pas</b> de description, de compteur, de CTA ni de badge de rôle (comme aujourd'hui).</li>
+        <li><b>Périmètre strict : #597 reste iso #596.</b> On change <b>uniquement l'affichage des cartes</b> (horizontal → vertical, liste → grille). Aucun ajout lié au sélecteur Participant/Organisateur : pas de CTA Organisateur, pas de badge de rôle sur le dashboard. #596 viendra après.</li>
+        <li><b>Composant unifié</b> piloté par variantes (public / dashboard), remplaçant PublicCircleCard + DashboardCircleCard. Nom à trancher (conflit avec <code>circle-card.tsx</code> existant → ex. <code>CommunityCard</code>).</li>
+        <li><b>Section « À la une » supprimée</b> (ExplorerFeatured) : elle n'apporte rien aujourd'hui, on la retire (on ne l'harmonise pas).</li>
+        <li><b>Chargement progressif</b> (infinite scroll) sur l'onglet <b>Communautés</b> d'Explorer, en remplacement du « Load More ». Onglet Événements non concerné cette itération.</li>
+        <li><b>Effet hover unifié (toutes les cartes, événement + Communauté)</b> : remplacer le highlight rose actuel (<code>hover:border-primary/30</code> + <code>transition-colors</code>) par une <b>élévation neutre</b> — <code>translateY(-2px)</code> + ombre renforcée, comme dans ce mockup. Concerne <code>public-circle-card</code>, <code>dashboard-circle-card</code>, <code>public-moment-card</code>, <code>dashboard-moment-card</code>, <code>moment-card</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>
