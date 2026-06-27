@@ -1,6 +1,6 @@
 # Scoring de risque des comptes + audit manuel à la demande
 
-> Statut : **audit manuel `/audit-user` implémenté** (CLI + bouton admin, PR #573) ; **scoring automatique du compte à l'onboarding : à faire**. Deux mécanismes complémentaires : un **scoring automatique du compte** (à l'onboarding) et un **skill d'audit manuel** (`/audit-user`) pour le contenu/intent. Découle des incidents du 14/06/2026 (phishing usurpant le support) et du 22/06/2026 (slop publicitaire). Rapports d'incident (PII, locaux) : `spec/security/2026-06-14-incident-phishing-organisateurs.md`, `spec/security/2026-06-22-bug-notif-publicid-manquants-krishna.md`.
+> Statut : **audit manuel `/audit-user` implémenté** (CLI + bouton admin, PR #573) ; **scoring automatique du compte à l'onboarding : reporté** (issue #536 **fermée le 2026-06-27** — l'audit manuel suffit au volume actuel ; repris plus tard si besoin, cette spec reste le point de reprise). Deux mécanismes complémentaires : un **scoring automatique du compte** (à l'onboarding) et un **skill d'audit manuel** (`/audit-user`) pour le contenu/intent. Découle des incidents du 14/06/2026 (phishing usurpant le support) et du 22/06/2026 (slop publicitaire). Rapports d'incident (PII, locaux) : `spec/security/2026-06-14-incident-phishing-organisateurs.md`, `spec/security/2026-06-22-bug-notif-publicid-manquants-krishna.md`.
 
 ## Problème
 
@@ -171,7 +171,7 @@ Canal : **email admin ET Slack** (décision actée).
 
 ## Découpage en phases
 
-- **Phase 1 — scoring compte** *(à faire)* : moteur `assessUserRisk` + grille gradée + champs `User` + notif email/Slack enrichie + **section « Risque » sur la fiche admin**. 100% code, aucun blocage. Tests unitaires (avcin/shawnallen → LOW, spammeurs → HIGH).
+- **Phase 1 — scoring compte** *(reporté — issue #536 fermée le 2026-06-27, l'audit manuel suffit pour l'instant)* : moteur `assessUserRisk` + grille gradée + champs `User` + notif email/Slack enrichie + **section « Risque » sur la fiche admin**. 100% code, aucun blocage. Tests unitaires (avcin/shawnallen → LOW, spammeurs → HIGH).
 - **Phase 2 — skill `/audit-user`** *(fait)* : collecte + prompt + sortie structurée. **CLI** (local) puis **bouton admin → UI + #admin**, avec actions de blocage (compte/domaine). PR #573.
 
 ## Points ouverts (à trancher avant implémentation)
