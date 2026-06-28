@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarIcon, MapPin, Crown, Users, Clock } from "lucide-react";
-import { getMomentGradient } from "@/lib/gradient";
+import { CalendarIcon, MapPin, Crown, Users, Clock, type LucideIcon } from "lucide-react";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -72,19 +72,17 @@ function PublicVariant({
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
+  const RoleIcon = membershipRole === "HOST" ? Crown : Users;
+  const roleLabel =
+    membershipRole === "HOST"
+      ? t("circleCard.roleBadge.host")
+      : t("circleCard.roleBadge.member");
+
+  // Badge rôle inline (mobile, dans le body).
   const roleBadge = membershipRole ? (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-      {membershipRole === "HOST" ? (
-        <>
-          <Crown className="size-3" />
-          <span className="hidden sm:inline">{t("circleCard.roleBadge.host")}</span>
-        </>
-      ) : (
-        <>
-          <Users className="size-3" />
-          <span className="hidden sm:inline">{t("circleCard.roleBadge.member")}</span>
-        </>
-      )}
+      <RoleIcon className="size-3" />
+      <span className="hidden sm:inline">{roleLabel}</span>
     </Badge>
   ) : null;
 
@@ -92,11 +90,11 @@ function PublicVariant({
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
       {/* ─── Mobile (< sm) : horizontal — repris de PublicCircleCard ─── */}
       <div
-        className={`sm:hidden bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`sm:hidden bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <div className="flex items-center gap-6">
           <div
-            className="relative size-[88px] shrink-0 overflow-hidden rounded-xl"
+            className={`relative size-[88px] shrink-0 overflow-hidden rounded-xl ${circle.coverImage ? COVER_IMAGE_BG : ""}`}
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
@@ -141,11 +139,17 @@ function PublicVariant({
 
       {/* ─── Desktop / tablette (≥ sm) : vertical en grille — nouveau ─── */}
       <div
-        className={`hidden sm:flex sm:flex-col bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
           {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
-          {roleBadge && <CoverBadgeOverlay>{roleBadge}</CoverBadgeOverlay>}
+          {membershipRole && (
+            <CoverBadgeOverlay
+              icon={RoleIcon}
+              label={roleLabel}
+              className="border-primary/40 text-primary dark:text-[oklch(0.76_0.27_341)]"
+            />
+          )}
         </VerticalCover>
         <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
@@ -194,7 +198,7 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
       >
         <div className="flex items-center gap-4">
           <div
-            className="size-[100px] shrink-0 overflow-hidden rounded-xl"
+            className={`size-[100px] shrink-0 overflow-hidden rounded-xl ${circle.coverImage ? COVER_IMAGE_BG : ""}`}
             style={circle.coverImage ? undefined : { background: gradient }}
           >
             {circle.coverImage && (
@@ -234,7 +238,13 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
         className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {pendingBadge && <CoverBadgeOverlay>{pendingBadge}</CoverBadgeOverlay>}
+          {circle.membershipStatus === "PENDING" && (
+            <CoverBadgeOverlay
+              icon={Clock}
+              label={t("circleCard.roleBadge.pending")}
+              className="border-amber-500/40 text-amber-500"
+            />
+          )}
         </VerticalCover>
         <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryLabel && (
@@ -273,7 +283,7 @@ function VerticalCover({
 }) {
   return (
     <div
-      className="relative aspect-square w-full overflow-hidden"
+      className={`relative aspect-square w-full overflow-hidden ${coverImage ? COVER_IMAGE_BG : ""}`}
       style={coverImage ? undefined : { background: gradient }}
     >
       {coverImage && (
@@ -290,10 +300,24 @@ function VerticalCover({
   );
 }
 
-/** Pastille positionnée en haut à droite de la cover (badge rôle / en attente). */
-function CoverBadgeOverlay({ children }: { children: React.ReactNode }) {
+/** Pill positionné en haut à droite de la cover (badge rôle / en attente). Une seule
+ * couche : la bordure épouse le pill rounded-full (pas de Badge imbriqué). */
+function CoverBadgeOverlay({
+  icon: Icon,
+  label,
+  className,
+}: {
+  icon: LucideIcon;
+  label: string;
+  className?: string;
+}) {
   return (
-    <div className="absolute right-2 top-2 rounded-full bg-card/85 backdrop-blur-sm">{children}</div>
+    <div
+      className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border bg-card/85 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+    >
+      <Icon className="size-3 shrink-0" />
+      <span>{label}</span>
+    </div>
   );
 }
 
