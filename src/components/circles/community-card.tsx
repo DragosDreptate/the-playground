@@ -67,22 +67,10 @@ function PublicVariant({
 }) {
   const t = useTranslations("Explorer");
   const tCategory = useTranslations("CircleCategory");
-  const locale = useLocale();
 
   const gradient = getMomentGradient(circle.name);
-
-  const nextMomentStart = circle.nextMoment ? new Date(circle.nextMoment.startsAt) : null;
-  const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
-  const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
-
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
-
-  const memberOverflow = circle.memberCount - circle.topMembers.length;
-  const memberLabel =
-    memberOverflow > 0
-      ? t("circleCard.moreMembers", { count: memberOverflow })
-      : t("circleCard.members", { count: circle.memberCount });
 
   const roleBadge = membershipRole ? (
     <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
@@ -143,13 +131,7 @@ function PublicVariant({
             </div>
             {(circle.memberCount > 0 || roleBadge) && (
               <div className="flex items-center gap-2">
-                {circle.memberCount > 0 && (
-                  <AttendeeAvatarStack
-                    attendees={circle.topMembers}
-                    totalCount={circle.memberCount}
-                    label={memberLabel}
-                  />
-                )}
+                <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
                 {roleBadge}
               </div>
             )}
@@ -161,71 +143,19 @@ function PublicVariant({
       <div
         className={`hidden sm:flex sm:flex-col bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
-        {/* Cover 1:1 + overlays */}
-        <div
-          className="relative aspect-square w-full overflow-hidden"
-          style={circle.coverImage ? undefined : { background: gradient }}
-        >
-          {circle.coverImage && (
-            <Image
-              src={circle.coverImage}
-              alt={circle.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 50vw, 340px"
-            />
-          )}
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
           {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
-          {roleBadge && (
-            <div className="absolute right-2 top-2 rounded-full bg-card/85 backdrop-blur-sm">
-              {roleBadge}
-            </div>
-          )}
-        </div>
-        {/* Corps */}
+          {roleBadge && <CoverBadgeOverlay>{roleBadge}</CoverBadgeOverlay>}
+        </VerticalCover>
         <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
           <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
           <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
-          {circle.city && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-                <MapPin className="size-4 text-foreground" />
-              </span>
-              <span>{circle.city}</span>
-            </div>
-          )}
-          {circle.memberCount > 0 && (
-            <AttendeeAvatarStack
-              attendees={circle.topMembers}
-              totalCount={circle.memberCount}
-              label={memberLabel}
-            />
-          )}
+          {circle.city && <CityRowVertical city={circle.city} />}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
           {!hideNextMoment && (
             <div className="mt-auto pt-2">
-              {circle.nextMoment && nextMomentDate ? (
-                <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
-                  <div className="text-muted-foreground flex items-center gap-1.5">
-                    <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
-                      <CalendarIcon className="size-3.5 text-foreground" />
-                    </span>
-                    <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
-                      {t("circleCard.nextMoment")}
-                    </span>
-                  </div>
-                  <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
-                    {circle.nextMoment.title}
-                  </p>
-                  <p className="text-muted-foreground text-[0.7rem]">
-                    {nextMomentDate} · {nextMomentTime}
-                  </p>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
-                  {t("circleCard.noUpcomingMoments")}
-                </div>
-              )}
+              <NextMomentBlock nextMoment={circle.nextMoment} />
             </div>
           )}
         </div>
@@ -239,20 +169,9 @@ function PublicVariant({
 function DashboardVariant({ circle }: { circle: DashboardCircle }) {
   const t = useTranslations("Explorer");
   const tCategory = useTranslations("CircleCategory");
-  const locale = useLocale();
 
   const gradient = getMomentGradient(circle.name);
-
-  const nextMomentStart = circle.nextMoment ? new Date(circle.nextMoment.startsAt) : null;
-  const nextMomentDate = nextMomentStart ? formatDayMonth(nextMomentStart, locale) : null;
-  const nextMomentTime = nextMomentStart ? formatTime(nextMomentStart) : null;
-
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
-
-  const memberLabel =
-    circle.topMembers.length < circle.memberCount
-      ? t("circleCard.moreMembers", { count: circle.memberCount - circle.topMembers.length })
-      : t("circleCard.members", { count: circle.memberCount });
 
   const href =
     circle.membershipStatus === "PENDING"
@@ -303,13 +222,7 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
               </div>
             )}
             <div className="flex items-center gap-2">
-              {circle.memberCount > 0 && (
-                <AttendeeAvatarStack
-                  attendees={circle.topMembers}
-                  totalCount={circle.memberCount}
-                  label={memberLabel}
-                />
-              )}
+              <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
               {pendingBadge}
             </div>
           </div>
@@ -320,25 +233,9 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
       <div
         className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
-        <div
-          className="relative aspect-square w-full overflow-hidden"
-          style={circle.coverImage ? undefined : { background: gradient }}
-        >
-          {circle.coverImage && (
-            <Image
-              src={circle.coverImage}
-              alt={circle.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 50vw, 340px"
-            />
-          )}
-          {pendingBadge && (
-            <div className="absolute right-2 top-2 rounded-full bg-card/85 backdrop-blur-sm">
-              {pendingBadge}
-            </div>
-          )}
-        </div>
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {pendingBadge && <CoverBadgeOverlay>{pendingBadge}</CoverBadgeOverlay>}
+        </VerticalCover>
         <div className="flex flex-1 flex-col gap-2 p-4">
           {categoryLabel && (
             <div className="flex items-center gap-2">
@@ -347,47 +244,123 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
           )}
           <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
           <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
-          {circle.city && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-                <MapPin className="size-4 text-foreground" />
-              </span>
-              <span>{circle.city}</span>
-            </div>
-          )}
-          {circle.memberCount > 0 && (
-            <AttendeeAvatarStack
-              attendees={circle.topMembers}
-              totalCount={circle.memberCount}
-              label={memberLabel}
-            />
-          )}
+          {circle.city && <CityRowVertical city={circle.city} />}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
           <div className="mt-auto pt-2">
-            {circle.nextMoment && nextMomentDate ? (
-              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
-                <div className="text-muted-foreground flex items-center gap-1.5">
-                  <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
-                    <CalendarIcon className="size-3.5 text-foreground" />
-                  </span>
-                  <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
-                    {t("circleCard.nextMoment")}
-                  </span>
-                </div>
-                <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
-                  {circle.nextMoment.title}
-                </p>
-                <p className="text-muted-foreground text-[0.7rem]">
-                  {nextMomentDate} · {nextMomentTime}
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
-                {t("circleCard.noUpcomingMoments")}
-              </div>
-            )}
+            <NextMomentBlock nextMoment={circle.nextMoment} />
           </div>
         </div>
       </div>
     </Link>
+  );
+}
+
+/* ───────────────────── Sous-composants partagés (≥ sm) ──────────────────── */
+
+type AttendeeStackProp = React.ComponentProps<typeof AttendeeAvatarStack>["attendees"];
+
+/** Cover carrée 1:1 du format vertical, gradient en fallback. `children` = overlays. */
+function VerticalCover({
+  coverImage,
+  name,
+  gradient,
+  children,
+}: {
+  coverImage: string | null;
+  name: string;
+  gradient: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div
+      className="relative aspect-square w-full overflow-hidden"
+      style={coverImage ? undefined : { background: gradient }}
+    >
+      {coverImage && (
+        <Image
+          src={coverImage}
+          alt={name}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 50vw, 340px"
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+/** Pastille positionnée en haut à droite de la cover (badge rôle / en attente). */
+function CoverBadgeOverlay({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="absolute right-2 top-2 rounded-full bg-card/85 backdrop-blur-sm">{children}</div>
+  );
+}
+
+/** Ligne ville du format vertical : pastille grise + icône + libellé. */
+function CityRowVertical({ city }: { city: string }) {
+  return (
+    <div className="text-muted-foreground flex items-center gap-2 text-sm">
+      <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
+        <MapPin className="size-4 text-foreground" />
+      </span>
+      <span>{city}</span>
+    </div>
+  );
+}
+
+/** Pile d'avatars des membres + libellé (rien si la Communauté n'a aucun membre). */
+function MemberStack({
+  memberCount,
+  topMembers,
+}: {
+  memberCount: number;
+  topMembers: AttendeeStackProp;
+}) {
+  const t = useTranslations("Explorer");
+  if (memberCount <= 0) return null;
+  const overflow = memberCount - topMembers.length;
+  const label =
+    overflow > 0
+      ? t("circleCard.moreMembers", { count: overflow })
+      : t("circleCard.members", { count: memberCount });
+  return <AttendeeAvatarStack attendees={topMembers} totalCount={memberCount} label={label} />;
+}
+
+/** Encart « prochain événement » du format vertical (état plein ou vide). */
+function NextMomentBlock({
+  nextMoment,
+}: {
+  nextMoment: { startsAt: Date | string; title: string } | null;
+}) {
+  const t = useTranslations("Explorer");
+  const locale = useLocale();
+
+  if (nextMoment) {
+    const start = new Date(nextMoment.startsAt);
+    return (
+      <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
+        <div className="text-muted-foreground flex items-center gap-1.5">
+          <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+            <CalendarIcon className="size-3.5 text-foreground" />
+          </span>
+          <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
+            {t("circleCard.nextMoment")}
+          </span>
+        </div>
+        <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
+          {nextMoment.title}
+        </p>
+        <p className="text-muted-foreground text-[0.7rem]">
+          {formatDayMonth(start, locale)} · {formatTime(start)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
+      {t("circleCard.noUpcomingMoments")}
+    </div>
   );
 }
