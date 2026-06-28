@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { MapPin, Globe, Clock, Users } from "lucide-react";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
@@ -181,12 +181,16 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 }`}
               >
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <Clock className="size-3.5 shrink-0" />
+                  <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                    <Clock className="size-3.5 text-foreground" />
+                  </span>
                   <span suppressHydrationWarning>{timeStr}</span>
                 </span>
                 {locationLabel && (
                   <span className="flex min-w-0 items-center gap-1.5">
-                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                      <LocationIcon className="size-3.5 text-foreground" />
+                    </span>
                     <span className="truncate">{locationLabel}</span>
                   </span>
                 )}
@@ -236,7 +240,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 alt={momentData.title}
                 width={100}
                 height={100}
-                className={`size-[100px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-[100px] shrink-0 rounded-xl ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
