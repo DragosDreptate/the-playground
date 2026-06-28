@@ -124,7 +124,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
   return (
-    <div className="flex gap-0">
+    <div className="group flex gap-0">
       {/* Date column */}
       <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
         {!isPast && isToday ? (
@@ -157,7 +157,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
       {/* Dot + vertical line */}
       <div className="flex shrink-0 flex-col items-center">
-        <div className={`mt-2 size-2 shrink-0 rounded-full ${dotClass}`} />
+        <div
+          className={`mt-2 size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-150 ${dotClass}`}
+        />
         {!isLast && (
           <div className="mt-2 flex-1 border-l border-dashed border-border" />
         )}
@@ -167,10 +169,10 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
       <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
         <Link
           href={`/dashboard/circles/${momentData.circleSlug}/moments/${momentData.slug}`}
-          className="group block"
+          className="block"
         >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 group-hover:-translate-y-0.5 group-hover:shadow-xl ${cardBorderClass}`}
           >
             <div className="min-w-0 flex-1 space-y-1.5">
               <div
