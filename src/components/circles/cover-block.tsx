@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Users } from "lucide-react";
+import { COVER_IMAGE_BG } from "@/lib/gradient";
 
 import type { CoverImageAttribution } from "@/domain/models/circle";
 
@@ -39,7 +40,7 @@ export function CoverBlock({
             src={coverImage}
             alt={altText}
             fill
-            className="object-cover"
+            className={`${COVER_IMAGE_BG} object-cover`}
             sizes={sizes}
             priority={priority}
           />

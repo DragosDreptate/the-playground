@@ -12,7 +12,7 @@ import type { Moment, LocationType } from "@/domain/models/moment";
 import type { ActionResult } from "@/app/actions/types";
 import { Link, useRouter } from "@/i18n/navigation";
 import { combineDateAndTime, extractTime, snapToSlot } from "@/lib/time-options";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { CoverImagePicker, type CoverSelection } from "@/components/circles/cover-image-picker";
 import type { CoverImageAttribution } from "@/domain/models/moment";
 import { MomentFormDateCard } from "./moment-form-date-card";
@@ -217,7 +217,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 <img
                   src={previewImage}
                   alt={moment?.title ?? circleName}
-                  className="aspect-square w-full rounded-xl object-cover"
+                  className={`aspect-square w-full rounded-xl object-cover ${COVER_IMAGE_BG}`}
                 />
               ) : (
                 <div
@@ -260,7 +260,7 @@ export function MomentForm({ moment, circleSlug, circleName, circleDescription, 
                 <img
                   src={circleCoverImage}
                   alt={circleName}
-                  className="mt-0.5 size-9 shrink-0 rounded-lg object-cover"
+                  className={`mt-0.5 size-9 shrink-0 rounded-lg object-cover ${COVER_IMAGE_BG}`}
                 />
               ) : (
                 <div

@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Globe, Lock, Users, ImageIcon, Crown, User } from "lucide-react";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import type { Circle, CircleMemberRole } from "@/domain/models/circle";
 import { isOrganizerRole } from "@/domain/models/circle";
 
@@ -41,7 +41,7 @@ export function CircleCard({ circle, href, role, memberCount }: CircleCardProps)
               alt={circle.name}
               width={72}
               height={72}
-              className="object-cover"
+              className={`${COVER_IMAGE_BG} object-cover`}
             />
           ) : (
             <>

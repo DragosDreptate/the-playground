@@ -8,7 +8,7 @@ import { prismaCircleNetworkRepository } from "@/infrastructure/repositories";
 import { getNetworkBySlug } from "@/domain/usecases/get-network-by-slug";
 import { CommunityCard } from "@/components/circles/community-card";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { stripProtocol } from "@/lib/url";
 import { isValidSlug } from "@/lib/slug";
 import { Link } from "@/i18n/navigation";
@@ -110,7 +110,7 @@ export default async function NetworkPage({ params }: Props) {
                   src={network.coverImage}
                   alt={network.name}
                   fill
-                  className="object-cover"
+                  className={`${COVER_IMAGE_BG} object-cover`}
                   sizes="(max-width: 1024px) 100vw, 340px"
                   priority
                 />
