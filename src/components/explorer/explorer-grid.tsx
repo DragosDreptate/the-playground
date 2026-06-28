@@ -112,13 +112,14 @@ export function ExplorerGrid(props: Props) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-2 sm:gap-3">
-          {momentItems.map((moment) => (
+        <div className="flex flex-col gap-2 sm:gap-0">
+          {momentItems.map((moment, i) => (
             <PublicMomentCard
               key={moment.id}
               moment={moment}
               registrationStatus={registrationStatusMap[moment.id] ?? null}
               isOrganizer={membershipBySlug[moment.circle.slug] === "HOST"}
+              isLast={i === momentItems.length - 1}
             />
           ))}
         </div>
