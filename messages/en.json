@@ -213,14 +213,6 @@
     "createMoment": "Create an Event",
     "createCircleFirst": "Create a community first",
     "selectCircleDropdown": "Which community?",
-    "selectCircle": {
-      "title": "Choose a community",
-      "description": "Which community should this Event belong to?"
-    },
-    "noCircles": {
-      "title": "Create a community first",
-      "description": "You need a community before creating an Event."
-    },
     "myMoments": "Events",
     "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
