@@ -142,7 +142,7 @@ function PublicVariant({
         className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
+          {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
           {membershipRole && (
             <CoverBadgeOverlay
               icon={RoleIcon}
