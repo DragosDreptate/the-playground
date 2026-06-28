@@ -101,7 +101,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     ? "border-dashed border-muted-foreground/30 opacity-70"
     : isPast
       ? "border-border"
-      : "border-border hover:border-primary/30";
+      : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
@@ -170,7 +170,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="group block"
         >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl ${cardBorderClass}`}
           >
             <div className="min-w-0 flex-1 space-y-1.5">
               <div
@@ -192,7 +192,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
               <p
                 className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                  isPast ? "text-muted-foreground" : ""
                 }`}
               >
                 {momentData.title}

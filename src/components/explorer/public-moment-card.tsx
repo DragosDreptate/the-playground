@@ -86,7 +86,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
 
   return (
     <Link href={`/m/${moment.slug}`} className="group block min-w-0">
-      <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-colors hover:border-primary/30">
+      <div className="bg-card dark:bg-[oklch(0.22_0.04_281.8)] overflow-hidden rounded-2xl border p-3 sm:p-4 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl">
         <div className="flex items-center gap-5 sm:gap-6">
 
           {/* Cover — 80px mobile / 140px desktop */}
@@ -117,7 +117,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer }: Pr
             <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
               {moment.circle.name}
             </span>
-            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors">
+            <h3 className="line-clamp-2 text-sm sm:text-base font-semibold leading-snug">
               {moment.title}
             </h3>
             {moment.description && (

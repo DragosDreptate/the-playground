@@ -195,14 +195,6 @@ function PublicVariant({
               <span>{circle.city}</span>
             </div>
           )}
-          {circle.upcomingMomentCount > 0 && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="size-4 text-foreground" />
-              </span>
-              <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-            </div>
-          )}
           {circle.memberCount > 0 && (
             <AttendeeAvatarStack
               attendees={circle.topMembers}
@@ -213,16 +205,21 @@ function PublicVariant({
           {!hideNextMoment && (
             <div className="mt-auto pt-2">
               {circle.nextMoment && nextMomentDate ? (
-                <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                  <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
+                  <div className="text-muted-foreground flex items-center gap-1.5">
                     <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
                       <CalendarIcon className="size-3.5 text-foreground" />
                     </span>
-                    <span className="whitespace-nowrap">
-                      {nextMomentDate} · {nextMomentTime}
+                    <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
+                      {t("circleCard.nextMoment")}
                     </span>
                   </div>
+                  <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
+                    {circle.nextMoment.title}
+                  </p>
+                  <p className="text-muted-foreground text-[0.7rem]">
+                    {nextMomentDate} · {nextMomentTime}
+                  </p>
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
@@ -358,14 +355,6 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
               <span>{circle.city}</span>
             </div>
           )}
-          {circle.upcomingMomentCount > 0 && (
-            <div className="text-muted-foreground flex items-center gap-2 text-sm">
-              <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-                <CalendarIcon className="size-4 text-foreground" />
-              </span>
-              <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-            </div>
-          )}
           {circle.memberCount > 0 && (
             <AttendeeAvatarStack
               attendees={circle.topMembers}
@@ -375,16 +364,21 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
           )}
           <div className="mt-auto pt-2">
             {circle.nextMoment && nextMomentDate ? (
-              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
-                <p className="truncate font-medium text-foreground">{circle.nextMoment.title}</p>
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
+                <div className="text-muted-foreground flex items-center gap-1.5">
                   <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
                     <CalendarIcon className="size-3.5 text-foreground" />
                   </span>
-                  <span className="whitespace-nowrap">
-                    {nextMomentDate} · {nextMomentTime}
+                  <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
+                    {t("circleCard.nextMoment")}
                   </span>
                 </div>
+                <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
+                  {circle.nextMoment.title}
+                </p>
+                <p className="text-muted-foreground text-[0.7rem]">
+                  {nextMomentDate} · {nextMomentTime}
+                </p>
               </div>
             ) : (
               <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
