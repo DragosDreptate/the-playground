@@ -181,14 +181,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 }`}
               >
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                  <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast ? "opacity-60" : ""}`}>
                     <Clock className="size-3.5 text-foreground" />
                   </span>
                   <span suppressHydrationWarning>{timeStr}</span>
                 </span>
                 {locationLabel && (
                   <span className="flex min-w-0 items-center gap-1.5">
-                    <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
+                    <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast ? "opacity-60" : ""}`}>
                       <LocationIcon className="size-3.5 text-foreground" />
                     </span>
                     <span className="truncate">{locationLabel}</span>
