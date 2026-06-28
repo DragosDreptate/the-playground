@@ -28,9 +28,9 @@ Passer les cartes de Communauté du format **horizontal** au format **vertical e
 
 | Surface | Fichier | Aujourd'hui | Cible |
 |---|---|---|---|
-| Explorer · Communautés | `src/components/explorer/explorer-grid.tsx` | liste 1 col de `PublicCircleCard` + bouton « Load More » | grille **3 col** (`lg`) de `CommunityCard` variant `public` + infinite scroll |
-| Mon Espace · Communautés | `dashboard/(app)/(main)/_components/dashboard-content.tsx` | `flex flex-col gap-3` de `DashboardCircleCard` | grille **2 col** de `CommunityCard` variant `dashboard` |
-| Réseau | `networks/[slug]/page.tsx` | `flex flex-col gap-2 sm:gap-3` de `PublicCircleCard hideNextMoment` | grille verticale de `CommunityCard` variant `public`, `hideNextMoment` |
+| Explorer · Communautés | `src/components/explorer/explorer-grid.tsx` | liste 1 col de `PublicCircleCard` + bouton « Load More » | grille **`sm:2 / md:3 / lg:4`** de `CommunityCard` variant `public` + infinite scroll |
+| Mon Espace · Communautés | `dashboard/(app)/(main)/_components/dashboard-content.tsx` | `flex flex-col gap-3` de `DashboardCircleCard` | grille **`sm:3`** de `CommunityCard` variant `dashboard` |
+| Réseau | `networks/[slug]/page.tsx` | `flex flex-col gap-2 sm:gap-3` de `PublicCircleCard hideNextMoment` | grille **`sm:2`** de `CommunityCard` variant `public`, `hideNextMoment` |
 | « À la une » | `src/components/explorer/explorer-featured.tsx` | grille 3 mini-cartes horizontales | **hors périmètre** (inchangé ; retrait en PR ultérieure) |
 
 ## Composant `CommunityCard`
@@ -71,25 +71,27 @@ type CommunityCardProps =
 
 ### Contenu vertical par variante (fidèle à l'existant)
 
-**`public`** (Explorer, Réseau) : cover 1:1 (overlay badge Démo si `isDemo`, overlay badge rôle si `membershipRole`) → catégorie (`CategoryBadge`) → nom → description → ville (`MapPin`) → compteur d'événements à venir (`Calendar`, si `> 0`) → `AttendeeAvatarStack` + « N membres » (si `> 0`) → encart « prochain événement » dans le corps (sauf si `hideNextMoment`).
+**`public`** (Explorer, Réseau) : cover 1:1 (overlay badge Démo si `isDemo`, overlay badge rôle si `membershipRole`) → catégorie (`CategoryBadge`) → nom → description → ville (pastille `MapPin`) → `AttendeeAvatarStack` + « N membres » (si `> 0`) → encart « prochain événement » dans le corps (sauf si `hideNextMoment`).
 
-**`dashboard`** (Mon Espace) : cover 1:1 → catégorie → nom → ville → `AttendeeAvatarStack` + « N membres » → badge « En attente » (si `membershipStatus === "PENDING"`) → encart « prochain événement » dans le corps. **Pas** de description, de compteur, de CTA ni de badge de rôle.
+**`dashboard`** (Mon Espace) : cover 1:1 (overlay badge « En attente » si `PENDING`) → catégorie → nom → **description** → ville (pastille) → `AttendeeAvatarStack` + « N membres » → encart « prochain événement » dans le corps. **Pas** de CTA ni de badge de rôle.
+
+> **Amendements à l'implémentation (cf. ADR §Amendements)** : le **compteur d'événements à venir est retiré du format vertical** (conservé en mobile horizontal) ; la **description est ajoutée au dashboard** (parité avec Explorer) ; la ville et l'en-tête de l'encart passent en **pastille** (`bg-foreground/10` + icône).
 
 > Seul déplacement vs aujourd'hui : l'encart « prochain événement », qui passe de la colonne droite (desktop horizontal) au corps de la carte.
 
-### Primitives réutilisées
+### Sous-composants internes (factorisation)
 
-`CoverBlock` (1:1), `getMomentGradient`, `CategoryBadge`, `AttendeeAvatarStack`. Aucune nouvelle primitive.
+Le rendu vertical est factorisé en sous-composants **privés au fichier**, à markup partagé entre les deux variantes pour éliminer la duplication : `VerticalCover` (cover 1:1 + gradient + slot overlay), `CoverBadgeOverlay` (pastille en haut à droite), `CityRowVertical` (pastille ville), `MemberStack` (avatars + label membres unifié), `NextMomentBlock` (encart prochain événement, états plein/vide). Primitives réutilisées : `getMomentGradient`, `CategoryBadge`, `AttendeeAvatarStack`, `DemoBadge`. Aucune nouvelle primitive globale.
 
 ## Grilles et breakpoints
 
-| Surface | Conteneur | `< sm` | `sm`/`md` | `lg+` |
-|---|---|---|---|---|
-| Explorer | `max-w-5xl` (1024px) | liste (mobile actuel) | 2 col | 3 col |
-| Mon Espace | `max-w-2xl` (672px) | liste (mobile actuel) | 2 col | 2 col |
-| Réseau | colonne `lg:flex-row` (étroite) | liste (mobile actuel) | 2 col | 2 col |
+| Surface | Conteneur | `< sm` | `sm` | `md` | `lg+` |
+|---|---|---|---|---|---|
+| Explorer | `max-w-5xl` (1024px) | liste (mobile actuel) | 2 col | 3 col | 4 col |
+| Mon Espace | `max-w-2xl` (672px) | liste (mobile actuel) | 3 col | 3 col | 3 col |
+| Réseau | colonne `lg:flex-row` (étroite) | liste (mobile actuel) | 2 col | 2 col | 2 col |
 
-> Nombres de colonnes **provisoires** (ADR) : à valider sur rendu réel. Explorer passe à 3 col seulement en `lg` (en `sm`/`md` tablette, 2 col pour éviter des cartes trop étroites).
+> Colonnes **validées au rendu** (cf. ADR §Surfaces). Explorer densifie jusqu'à 4 col en `lg` (annuaire) ; Mon Espace tient à 3 col dès `sm` (lisible à 672px).
 
 ## Infinite scroll (Explorer · Communautés)
 
@@ -99,6 +101,7 @@ type CommunityCardProps =
   - `tab === "circles"` → **grille verticale** (`grid` responsive) de `CommunityCard` + **infinite scroll** (sentinel `IntersectionObserver` qui déclenche `handleLoadMore` quand visible et `hasMore`).
   - `tab === "moments"` → **liste** inchangée de `PublicMomentCard` + **bouton « Load More »** conservé.
 - Réutiliser l'existant : `loadMoreCirclesAction` + état `circleItems`/`hasMore`.
+- **Lot de chargement Communautés = 12** (et non 10, partagé avec les événements) : multiple de 2/3/4 → **lignes entières** à chaque palier (`sm:2 / md:3 / lg:4`), jamais de ligne tronquée au scroll. Aligné à la fois sur le chargement initial (`explorer/page.tsx`) et `loadMoreCirclesAction`. Les événements gardent un lot de 10 (liste à une colonne).
 - Garder un fallback accessible (bouton visible si JS/observer indisponible) — à confirmer à l'implé.
 
 ## Hover unifié (toutes les cartes)
@@ -130,6 +133,6 @@ type CommunityCardProps =
 
 - **Régression mobile** (Option A) : neutralisée par la copie fidèle du markup + tests mobile + revue adverse du diff « qu'est-ce qui change sous `sm` ? » → rien de visible. Voir ADR §Garde-fous.
 - **Conversion dashboard server→client** (option 1) : la carte dashboard quitte le rendu RSC pour du client. Vérifier (1) sérialisation des props (`nextMoment.startsAt` est une `Date`), (2) rendu/hydratation mobile identique à l'actuel via `test:mobile`, (3) pas de régression de perf notable (volume de cartes faible).
-- **Cartes hautes** sur conteneur étroit (Mon Espace 672px) : 2 col, à valider au rendu.
-- **Largeur Réseau** variable (`lg:flex-row`) : valider 2 col sur la colonne contenu.
+- **Cartes hautes** sur conteneur étroit (Mon Espace 672px) : **3 col validées au rendu**.
+- **Largeur Réseau** variable (`lg:flex-row`) : **2 col validées** sur la colonne contenu.
 - **Suppression de composants** (`PublicCircleCard`/`DashboardCircleCard`) : s'assurer qu'aucun autre call-site ne les référence avant suppression.

@@ -29,20 +29,20 @@ Le **motif du précédent passage à l'horizontal** (cover 1:1 trop haute, carte
 
 On reprend **fidèlement** les champs déjà affichés par chaque carte ; le seul déplacement est l'encart « prochain événement », qui passe de la colonne droite (desktop) au corps de la carte.
 
-- **Explorer (`PublicCircleCard`)** : cover (+ badge Démo) → catégorie → nom → description → ville → compteur d'événements à venir → avatars + membres → badge rôle → prochain événement.
-- **Mon Espace (`DashboardCircleCard`)** : cover → catégorie → nom → ville → avatars + membres → badge « En attente » (si pending) → prochain événement. Pas de description, de compteur, de CTA ni de badge de rôle.
+- **Explorer (`PublicCircleCard`)** : cover (+ badge Démo) → catégorie → nom → description → ville → avatars + membres → badge rôle → prochain événement. *(Le compteur d'événements à venir n'apparaît plus dans le format vertical, cf. amendement ci-dessous.)*
+- **Mon Espace (`DashboardCircleCard`)** : cover → catégorie → nom → description → ville → avatars + membres → badge « En attente » (si pending) → prochain événement. Pas de CTA ni de badge de rôle. *(La description est désormais affichée, par parité avec Explorer, cf. amendement.)*
 
 **Aucun élément lié à #596** n'est introduit : pas de CTA Organisateur, pas de badge de rôle sur le dashboard. Le sélecteur Participant/Organisateur (#596) et les CTA orga viendront **après**.
 
-### Surfaces et colonnes (provisoires, à valider au rendu)
+### Surfaces et colonnes (validées au rendu)
 
-| Surface | Conteneur | Grille | Variante |
+| Surface | Conteneur | Grille (`≥ sm`) | Variante |
 |---|---|---|---|
-| Explorer · Communautés | `max-w-5xl` (1024px) | 3 colonnes (`lg`) | publique |
-| Mon Espace · Mes Communautés | `max-w-2xl` (672px) | 2 colonnes | dashboard |
-| Page Réseau | (selon conteneur réseau) | grille verticale, encart « prochain événement » masqué | publique |
+| Explorer · Communautés | `max-w-5xl` (1024px) | `sm:2` → `md:3` → `lg:4` colonnes | publique |
+| Mon Espace · Mes Communautés | `max-w-2xl` (672px) | `sm:3` colonnes | dashboard |
+| Page Réseau | (selon conteneur réseau) | `sm:2` colonnes, encart « prochain événement » masqué | publique |
 
-Mon Espace passe à **2 colonnes** (pas 3) pour éviter des cartes trop étroites à 672px.
+Valeurs arrêtées **après itération visuelle** : Explorer monte jusqu'à **4 colonnes** en `lg` (cartes denses, annuaire), Mon Espace tient à **3 colonnes** dès `sm` (validé lisible à 672px).
 
 ### Composant unifié
 
@@ -70,11 +70,23 @@ La section « À la une » d'Explorer (`ExplorerFeatured`) n'apporte rien aujour
 
 Le bouton **« Load More »** de l'onglet Communautés d'Explorer est remplacé par un **chargement progressif au défilement** (infinite scroll, IntersectionObserver). L'onglet Événements n'est **pas** concerné cette itération.
 
+Le lot de chargement des Communautés passe à **12** (au lieu de 10, partagé avec les événements) : multiple de 2, 3 et 4, il garantit des **lignes entières** à chaque palier de la grille (`sm:2 / md:3 / lg:4`), jamais de ligne tronquée pendant le scroll. Les événements gardent un lot de 10 (liste à une colonne).
+
 ### Effet hover unifié (toutes les cartes)
 
 Le highlight rose actuel est remplacé par une **élévation neutre** (`translateY(-2px)` + ombre renforcée), sur **toutes** les cartes (événement + Communauté) : `community-card` (nouveau), `public-moment-card`, `dashboard-moment-card`, `moment-card`.
 
 **Les deux effets roses sont retirés** (pour coller au mockup, qui ne fait qu'élever la carte) : la bordure `hover:border-primary/30` **et** le titre `group-hover:text-primary` (le titre ne passe plus en rose au survol). `transition-colors` → transition sur transform/ombre.
+
+## Amendements à l'implémentation (2026-06-28)
+
+Écarts assumés par rapport à la décision initiale, tranchés par **itération visuelle** pendant l'implémentation :
+
+- **Colonnes** : Explorer monte à **4** en `lg` (et non 3), Mon Espace tient à **3** en `sm` (et non 2). Cf. table ci-dessus, validée au rendu.
+- **Description sur le dashboard** : la variante `dashboard` affiche désormais la **description** (comme Explorer), pour une parité visuelle complète entre les deux variantes verticales. La décision initiale l'excluait.
+- **Compteur d'événements à venir retiré du vertical** : il alourdissait l'encart et faisait doublon avec le bloc « prochain événement ». Conservé uniquement dans la branche **mobile horizontale** (inchangée).
+- **Encart « prochain événement » redessiné** : pastille grise (`bg-foreground/10`) + icône calendrier, label `PROCHAIN ÉVÉNEMENT`, titre puis date. Markup identique aux deux variantes (factorisé en sous-composant `NextMomentBlock`).
+- **Factorisation** : le composant unifié extrait des sous-composants partagés (`VerticalCover`, `CoverBadgeOverlay`, `CityRowVertical`, `MemberStack`, `NextMomentBlock`) pour absorber la duplication entre variantes sans toucher au rendu.
 
 ## Alternatives écartées
 
