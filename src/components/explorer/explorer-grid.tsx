@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,24 @@ export function ExplorerGrid(props: Props) {
     });
   }
 
+  // Onglet Communautés : chargement progressif au défilement (le sentinel
+  // ci-dessous est observé ; l'onglet Événements garde son bouton « Voir plus »).
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (props.tab !== "circles" || !hasMore || isPending) return;
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) handleLoadMore();
+      },
+      { rootMargin: "300px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.tab, hasMore, isPending, circleItems.length]);
+
   return (
     <div className="space-y-6">
       {props.tab === "circles" ? (
@@ -106,22 +124,24 @@ export function ExplorerGrid(props: Props) {
         </div>
       )}
 
-      {hasMore && (
-        <div className="flex justify-center">
-          <Button
-            variant="outline"
-            onClick={handleLoadMore}
-            disabled={isPending}
-            className="min-w-32"
-          >
-            {isPending ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              t("loadMore")
-            )}
-          </Button>
-        </div>
-      )}
+      {hasMore &&
+        (props.tab === "circles" ? (
+          // Sentinel observé pour le chargement progressif au défilement
+          <div ref={sentinelRef} className="flex justify-center py-2" aria-hidden>
+            {isPending && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              onClick={handleLoadMore}
+              disabled={isPending}
+              className="min-w-32"
+            >
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : t("loadMore")}
+            </Button>
+          </div>
+        ))}
     </div>
   );
 }
