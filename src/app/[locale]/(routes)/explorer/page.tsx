@@ -24,8 +24,13 @@ import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
 import type { ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
-const PAGE_SIZE = 10;
-const FETCH_SIZE = PAGE_SIZE + 1;
+// Communautés : grille jusqu'à 4 colonnes (sm:2, md:3, lg:4). 12 = lignes
+// complètes à chaque palier (multiple de 2, 3 et 4), jamais de ligne tronquée.
+const CIRCLES_PAGE_SIZE = 12;
+const CIRCLES_FETCH_SIZE = CIRCLES_PAGE_SIZE + 1;
+// Événements : liste verticale à une colonne, pas de contrainte de grille.
+const MOMENTS_PAGE_SIZE = 10;
+const MOMENTS_FETCH_SIZE = MOMENTS_PAGE_SIZE + 1;
 
 export async function generateMetadata() {
   const [locale, t] = await Promise.all([getLocale(), getTranslations("Explorer")]);
@@ -68,13 +73,13 @@ export default async function ExplorerPage({
       Promise.all([
         activeTab === "circles"
           ? getPublicCircles(
-              { category, sortBy, limit: FETCH_SIZE },
+              { category, sortBy, limit: CIRCLES_FETCH_SIZE },
               { circleRepository: prismaCircleRepository }
             )
           : Promise.resolve([]),
         activeTab === "moments"
           ? getPublicUpcomingMoments(
-              { category, sortBy, limit: FETCH_SIZE },
+              { category, sortBy, limit: MOMENTS_FETCH_SIZE },
               { momentRepository: prismaMomentRepository }
             )
           : Promise.resolve([]),
@@ -90,12 +95,12 @@ export default async function ExplorerPage({
 
   const featuredCircles = siteSettings.featuredCirclesEnabled ? featuredCirclesRaw : [];
 
-  // Over-fetch pattern: fetch FETCH_SIZE, display PAGE_SIZE
-  const circlesHasMore = circlesRaw.length > PAGE_SIZE;
-  const circles = circlesHasMore ? circlesRaw.slice(0, PAGE_SIZE) : circlesRaw;
+  // Over-fetch pattern: fetch *_FETCH_SIZE, display *_PAGE_SIZE
+  const circlesHasMore = circlesRaw.length > CIRCLES_PAGE_SIZE;
+  const circles = circlesHasMore ? circlesRaw.slice(0, CIRCLES_PAGE_SIZE) : circlesRaw;
 
-  const momentsHasMore = momentsRaw.length > PAGE_SIZE;
-  const moments = momentsHasMore ? momentsRaw.slice(0, PAGE_SIZE) : momentsRaw;
+  const momentsHasMore = momentsRaw.length > MOMENTS_PAGE_SIZE;
+  const moments = momentsHasMore ? momentsRaw.slice(0, MOMENTS_PAGE_SIZE) : momentsRaw;
 
   // Membership maps
   const membershipRoleMap: Record<string, CircleMemberRole> = {};
