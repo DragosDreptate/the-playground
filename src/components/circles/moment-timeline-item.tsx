@@ -129,9 +129,24 @@ export async function MomentTimelineItem({
             )}
 
             {/* Corps de la carte */}
-            <div className="flex items-center gap-4 p-4">
-              {/* Content */}
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:gap-4">
+              {/* Titre — pleine largeur au-dessus, une ligne (mobile uniquement) */}
+              <p
+                className={`truncate text-base font-semibold leading-snug sm:hidden ${
+                  isCancelled
+                    ? "text-muted-foreground line-through"
+                    : isPast
+                      ? "text-muted-foreground"
+                      : ""
+                }`}
+              >
+                {moment.title}
+              </p>
+
+              {/* Rangée content | cover. En desktop, `contents` dissout ce wrapper (layout #598). */}
+              <div className="flex items-start gap-4 sm:contents">
+                {/* Content */}
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
                 {/* Mobile : lieu inline (l'heure est dans la colonne date) */}
                 {locationLabel && (
                   <div
@@ -139,7 +154,7 @@ export async function MomentTimelineItem({
                       isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                     }`}
                   >
-                    <LocationIcon className="size-3.5 shrink-0" />
+                    <IconPill icon={LocationIcon} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                     <span className="truncate">{locationLabel}</span>
                   </div>
                 )}
@@ -164,7 +179,7 @@ export async function MomentTimelineItem({
 
 
                 <p
-                  className={`line-clamp-2 font-semibold leading-snug ${
+                  className={`hidden line-clamp-2 font-semibold leading-snug sm:block ${
                     isCancelled
                       ? "text-muted-foreground line-through"
                       : isPast
@@ -216,6 +231,7 @@ export async function MomentTimelineItem({
                   style={{ background: gradient }}
                 />
               )}
+              </div>
             </div>
           </div>
         </Link>

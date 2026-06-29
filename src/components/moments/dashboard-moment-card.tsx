@@ -121,6 +121,25 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
   ) : null;
 
+  // Badge Organisateur (mobile) : seul badge de statut affiché sur Mon espace, pour
+  // distinguer les événements que j'organise de mes simples inscriptions.
+  const organizerBadge = isOrganizerView || isOrganizer ? (
+    <StatusPill {...REGISTRATION_PILL.host} label={t("role.host")} hideLabelOnMobile />
+  ) : null;
+
+  const attendeeStack =
+    momentData.registrationCount > 0 ? (
+      <AttendeeAvatarStack
+        attendees={momentData.topAttendees}
+        totalCount={momentData.registrationCount}
+        label={
+          momentData.topAttendees.length < momentData.registrationCount
+            ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+            : tMoment("registrations.registered", { count: momentData.registrationCount })
+        }
+      />
+    ) : null;
+
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
   return (
@@ -166,72 +185,96 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         className="block"
       >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}
+            className={`bg-card flex flex-col gap-2 rounded-xl border p-3 shadow-lg dark:shadow-none sm:flex-row sm:items-center sm:gap-3 ${CARD_HOVER_GROUP} ${cardBorderClass}`}
           >
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div
-                className={`hidden items-center gap-3 text-xs sm:flex ${
-                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                }`}
-              >
-                <span className="flex shrink-0 items-center gap-1.5">
-                  <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
-                  <span suppressHydrationWarning>{timeStr}</span>
-                </span>
-                {locationLabel && (
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
-                    <span className="truncate">{locationLabel}</span>
-                  </span>
-                )}
+            {/* Titre — pleine largeur au-dessus, une ligne (mobile uniquement) */}
+            <p
+              className={`truncate text-base font-semibold leading-snug sm:hidden ${
+                isPast ? "text-muted-foreground" : ""
+              }`}
+            >
+              {momentData.title}
+            </p>
+
+            {/* Rangée infos | cover. En desktop, `contents` dissout ce wrapper (layout #598). */}
+            <div className="flex items-start gap-3 sm:contents">
+              <div className="min-w-0 flex-1">
+                {/* === MOBILE — body identique aux cartes Explorer (sm:hidden) === */}
+                <div className="space-y-[7px] sm:hidden">
+                  <CirclePill name={momentData.circleName} withIcon muted={isPast} />
+                  {locationLabel && (
+                    <div
+                      className={`flex items-center gap-1.5 text-xs ${
+                        isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                      }`}
+                    >
+                      <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
+                      <span className="truncate">{locationLabel}</span>
+                    </div>
+                  )}
+                  {(attendeeStack || organizerBadge) && (
+                    <div className="flex items-center gap-2">
+                      {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
+                      {organizerBadge}
+                    </div>
+                  )}
+                </div>
+
+                {/* === DESKTOP — rendu #598 (hidden sm:block) === */}
+                <div className="hidden space-y-1.5 sm:block">
+                  <div
+                    className={`flex items-center gap-3 text-xs ${
+                      isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="flex shrink-0 items-center gap-1.5">
+                      <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
+                      <span suppressHydrationWarning>{timeStr}</span>
+                    </span>
+                    {locationLabel && (
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
+                        <span className="truncate">{locationLabel}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <p
+                    className={`line-clamp-2 font-semibold leading-snug ${
+                      isPast ? "text-muted-foreground" : ""
+                    }`}
+                  >
+                    {momentData.title}
+                  </p>
+
+                  {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
+
+                  <div className="flex items-center gap-2">
+                    <CirclePill name={momentData.circleName} withIcon muted={isPast} />
+                    <div className="flex items-center gap-2">
+                      {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                      {pendingApprovalBadge}
+                      {waitlistedBadge}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <p
-                className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : ""
-                }`}
-              >
-                {momentData.title}
-              </p>
-
-              {momentData.registrationCount > 0 && (
-                <div className={isPast ? "opacity-60" : ""}>
-                  <AttendeeAvatarStack
-                    attendees={momentData.topAttendees}
-                    totalCount={momentData.registrationCount}
-                    label={
-                      momentData.topAttendees.length < momentData.registrationCount
-                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
-                        : tMoment("registrations.registered", { count: momentData.registrationCount })
-                    }
-                  />
-                </div>
+              {momentData.coverImage ? (
+                <Image
+                  src={momentData.coverImage}
+                  alt={momentData.title}
+                  width={100}
+                  height={100}
+                  className={`size-[80px] shrink-0 rounded-xl sm:size-[100px] ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                />
+              ) : (
+                <div
+                  className={`size-[80px] shrink-0 rounded-xl sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
+                  style={{ background: gradient }}
+                />
               )}
-
-              <div className="flex items-center gap-2">
-                <CirclePill name={momentData.circleName} withIcon muted={isPast} />
-                <div className="hidden items-center gap-2 sm:flex">
-                  {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                  {pendingApprovalBadge}
-                  {waitlistedBadge}
-                </div>
-              </div>
             </div>
-
-            {momentData.coverImage ? (
-              <Image
-                src={momentData.coverImage}
-                alt={momentData.title}
-                width={100}
-                height={100}
-                className={`size-[100px] shrink-0 rounded-xl ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-[100px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
           </div>
         </Link>
     </TimelineScaffold>
