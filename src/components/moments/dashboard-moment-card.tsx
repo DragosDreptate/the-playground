@@ -6,7 +6,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Clock, Users } from "lucide-react";
+import { MapPin, Globe, Clock } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill, CirclePill } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -172,7 +173,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           className="block"
         >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 group-hover:-translate-y-0.5 group-hover:shadow-xl ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}
           >
             <div className="min-w-0 flex-1 space-y-1.5">
               <div
@@ -181,16 +182,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 }`}
               >
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast ? "opacity-60" : ""}`}>
-                    <Clock className="size-3.5 text-foreground" />
-                  </span>
+                  <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
                   <span suppressHydrationWarning>{timeStr}</span>
                 </span>
                 {locationLabel && (
                   <span className="flex min-w-0 items-center gap-1.5">
-                    <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast ? "opacity-60" : ""}`}>
-                      <LocationIcon className="size-3.5 text-foreground" />
-                    </span>
+                    <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
                     <span className="truncate">{locationLabel}</span>
                   </span>
                 )}
@@ -219,14 +216,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               )}
 
               <div className="flex items-center gap-2">
-                <span
-                  className={`flex min-w-0 items-center gap-1.5 rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
-                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
-                  }`}
-                >
-                  <Users className="size-3 shrink-0" />
-                  <span className="truncate">{momentData.circleName}</span>
-                </span>
+                <CirclePill name={momentData.circleName} withIcon muted={isPast} />
                 <div className="hidden items-center gap-2 sm:flex">
                   {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
                   {waitlistedBadge}

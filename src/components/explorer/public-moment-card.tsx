@@ -6,7 +6,8 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatShortDate, formatTime, formatWeekdayAndDate } from "@/lib/format-date";
-import { MapPin, Globe, Crown, Clock, Check, Users } from "lucide-react";
+import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
+import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill } from "@/components/cards/card-primitives";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
@@ -76,20 +77,13 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   );
   const categoryBadge = categoryLabelText ? <CategoryBadge label={categoryLabelText} /> : null;
 
-  const circlePill = (
-    <span className="inline-flex max-w-full truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
-      {moment.circle.name}
-    </span>
-  );
+  const circlePill = <CirclePill name={moment.circle.name} />;
 
   // Timeline desktop : une seule ligne de rattachement — thème (icône) + pill Communauté.
   const contextLine = (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
       {categoryBadge}
-      <span className="inline-flex max-w-full items-center gap-1.5 truncate rounded-full border border-foreground/20 bg-muted/50 px-3 py-0.5 text-xs text-muted-foreground">
-        <Users className="size-3 shrink-0" />
-        <span className="truncate">{moment.circle.name}</span>
-      </span>
+      <CirclePill name={moment.circle.name} withIcon />
     </div>
   );
 
@@ -112,7 +106,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       {/* ─── Mobile (< sm) : carte horizontale. Structure d'origine, mais fond aligné
            sur le token --card et hover neutre unifiés (#597, comme desktop). ─── */}
       <Link href={`/m/${moment.slug}`} className="sm:hidden group block min-w-0">
-        <div className="bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl">
+        <div className={`bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER}`}>
           <div className="flex items-center gap-5">
             <div
               className={`relative size-[80px] shrink-0 overflow-hidden rounded-xl ${moment.coverImage ? COVER_IMAGE_BG : ""}`}
@@ -189,7 +183,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
         {/* Carte */}
         <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
           <Link href={`/m/${moment.slug}`} className="block">
-            <div className="bg-card flex items-center gap-6 overflow-hidden rounded-2xl border p-4 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 group-hover:-translate-y-0.5 group-hover:shadow-xl">
+            <div className={`bg-card flex items-center gap-6 overflow-hidden rounded-2xl border p-4 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP}`}>
               <div className="min-w-0 flex-1 space-y-1.5">
                 {contextLine}
                 <h3 className="line-clamp-2 text-base font-semibold leading-snug">{moment.title}</h3>
@@ -198,9 +192,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
                 )}
                 {locationLabel && (
                   <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-                      <LocationIcon className="size-4 text-foreground" />
-                    </span>
+                    <IconPill icon={LocationIcon} size="md" />
                     <span className="truncate">{locationLabel}</span>
                   </div>
                 )}

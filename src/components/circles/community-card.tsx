@@ -11,6 +11,7 @@ import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack"
 import { CategoryBadge } from "@/components/badges/category-badge";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { Badge } from "@/components/ui/badge";
+import { CARD_HOVER, IconPill } from "@/components/cards/card-primitives";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole, DashboardCircle } from "@/domain/models/circle";
 
@@ -36,10 +37,6 @@ type CommunityCardProps =
       variant: "dashboard";
       circle: DashboardCircle;
     };
-
-// Hover unifié (#597) : élévation neutre, plus de highlight rose.
-const CARD_HOVER =
-  "transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl";
 
 export function CommunityCard(props: CommunityCardProps) {
   if (props.variant === "dashboard") {
@@ -325,9 +322,7 @@ function CoverBadgeOverlay({
 function CityRowVertical({ city }: { city: string }) {
   return (
     <div className="text-muted-foreground flex items-center gap-2 text-sm">
-      <span className="bg-foreground/10 flex size-6 shrink-0 items-center justify-center rounded-lg">
-        <MapPin className="size-4 text-foreground" />
-      </span>
+      <IconPill icon={MapPin} size="md" />
       <span>{city}</span>
     </div>
   );
@@ -365,9 +360,7 @@ function NextMomentBlock({
     return (
       <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
         <div className="text-muted-foreground flex items-center gap-1.5">
-          <span className="bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md">
-            <CalendarIcon className="size-3.5 text-foreground" />
-          </span>
+          <IconPill icon={CalendarIcon} size="sm" />
           <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
             {t("circleCard.nextMoment")}
           </span>

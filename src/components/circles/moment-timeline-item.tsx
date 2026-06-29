@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill } from "@/components/cards/card-primitives";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -134,7 +135,7 @@ export async function MomentTimelineItem({
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 group-hover:-translate-y-0.5 group-hover:shadow-xl ${cardBorderClass}`}>
+          <div className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
@@ -168,16 +169,12 @@ export async function MomentTimelineItem({
                   }`}
                 >
                   <span className="flex shrink-0 items-center gap-1.5">
-                    <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast || isCancelled ? "opacity-60" : ""}`}>
-                      <Clock className="size-3.5 text-foreground" />
-                    </span>
+                    <IconPill icon={Clock} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                     {timeStr}
                   </span>
                   {locationLabel && (
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <span className={`bg-foreground/10 flex size-5 shrink-0 items-center justify-center rounded-md ${isPast || isCancelled ? "opacity-60" : ""}`}>
-                        <LocationIcon className="size-3.5 text-foreground" />
-                      </span>
+                      <IconPill icon={LocationIcon} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                       <span className="truncate">{locationLabel}</span>
                     </span>
                   )}
