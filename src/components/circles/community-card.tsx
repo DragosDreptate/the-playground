@@ -148,18 +148,16 @@ function PublicVariant({
             />
           )}
         </VerticalCover>
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
-          <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
-          <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
-          {circle.city && <CityRowVertical city={circle.city} />}
-          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
-          {!hideNextMoment && (
-            <div className="mt-auto pt-2">
-              <NextMomentBlock nextMoment={circle.nextMoment} />
-            </div>
-          )}
-        </div>
+        <VerticalCardBody
+          categoryLabel={categoryLabel}
+          name={circle.name}
+          description={circle.description}
+          city={circle.city}
+          memberCount={circle.memberCount}
+          topMembers={circle.topMembers}
+          nextMoment={circle.nextMoment}
+          hideNextMoment={hideNextMoment}
+        />
       </div>
     </Link>
   );
@@ -243,20 +241,15 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
             />
           )}
         </VerticalCover>
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          {categoryLabel && (
-            <div className="flex items-center gap-2">
-              <CategoryBadge label={categoryLabel} />
-            </div>
-          )}
-          <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{circle.name}</h3>
-          <p className="text-muted-foreground line-clamp-2 text-sm">{circle.description}</p>
-          {circle.city && <CityRowVertical city={circle.city} />}
-          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
-          <div className="mt-auto pt-2">
-            <NextMomentBlock nextMoment={circle.nextMoment} />
-          </div>
-        </div>
+        <VerticalCardBody
+          categoryLabel={categoryLabel}
+          name={circle.name}
+          description={circle.description}
+          city={circle.city}
+          memberCount={circle.memberCount}
+          topMembers={circle.topMembers}
+          nextMoment={circle.nextMoment}
+        />
       </div>
     </Link>
   );
@@ -265,6 +258,46 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
 /* ───────────────────── Sous-composants partagés (≥ sm) ──────────────────── */
 
 type AttendeeStackProp = React.ComponentProps<typeof AttendeeAvatarStack>["attendees"];
+
+/** Corps du format vertical (≥ sm), commun aux variantes public et dashboard. */
+function VerticalCardBody({
+  categoryLabel,
+  name,
+  description,
+  city,
+  memberCount,
+  topMembers,
+  nextMoment,
+  hideNextMoment = false,
+}: {
+  categoryLabel: string | null;
+  name: string;
+  description: string | null;
+  city: string | null;
+  memberCount: number;
+  topMembers: AttendeeStackProp;
+  nextMoment: { startsAt: Date | string; title: string } | null;
+  hideNextMoment?: boolean;
+}) {
+  return (
+    <div className="flex flex-1 flex-col gap-2 p-4">
+      {categoryLabel && (
+        <div className="flex items-center gap-2">
+          <CategoryBadge label={categoryLabel} />
+        </div>
+      )}
+      <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{name}</h3>
+      <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
+      {city && <CityRowVertical city={city} />}
+      <MemberStack memberCount={memberCount} topMembers={topMembers} />
+      {!hideNextMoment && (
+        <div className="mt-auto pt-2">
+          <NextMomentBlock nextMoment={nextMoment} />
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Cover carrée 1:1 du format vertical, gradient en fallback. `children` = overlays. */
 function VerticalCover({
