@@ -824,7 +824,8 @@
       "roleBadge": {
         "host": "Organisateur",
         "registered": "Inscrit",
-        "waitlisted": "Liste d'attente"
+        "waitlisted": "Liste d'attente",
+        "pendingApproval": "En attente de validation"
       }
     },
     "loadMore": "Voir plus"

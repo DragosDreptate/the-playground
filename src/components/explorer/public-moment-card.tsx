@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatShortDate, formatTime, formatWeekdayAndDate } from "@/lib/format-date";
 import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
-import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
+import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
@@ -59,15 +59,26 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       <span className="hidden sm:inline">{t("momentCard.roleBadge.host")}</span>
     </Badge>
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-      <Check className="size-3" />
-      <span className="hidden sm:inline">{t("momentCard.roleBadge.registered")}</span>
-    </Badge>
+    <StatusPill
+      icon={Check}
+      label={t("momentCard.roleBadge.registered")}
+      className="border-primary/40 text-primary"
+      hideLabelOnMobile
+    />
+  ) : registrationStatus === "PENDING_APPROVAL" ? (
+    <StatusPill
+      icon={Clock}
+      label={t("momentCard.roleBadge.pendingApproval")}
+      className="border-amber-500/40 text-amber-500"
+      hideLabelOnMobile
+    />
   ) : registrationStatus === "WAITLISTED" ? (
-    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-      <Clock className="size-3" />
-      <span className="hidden sm:inline">{t("momentCard.roleBadge.waitlisted")}</span>
-    </Badge>
+    <StatusPill
+      icon={Clock}
+      label={t("momentCard.roleBadge.waitlisted")}
+      className="border-border text-muted-foreground"
+      hideLabelOnMobile
+    />
   ) : null;
 
   const categoryLabelText = resolveCategoryLabel(

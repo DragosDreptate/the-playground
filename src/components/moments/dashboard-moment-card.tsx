@@ -4,10 +4,9 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { MapPin, Globe, Clock } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -85,6 +84,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     (props.registration.status === "REGISTERED" ||
       props.registration.status === "CHECKED_IN");
   const isWaitlisted = !isOrganizerView && !isOrganizer && props.registration.status === "WAITLISTED";
+  const isPendingApproval =
+    !isOrganizerView && !isOrganizer && props.registration.status === "PENDING_APPROVAL";
 
   const dotClass = isPast
     ? "bg-border"
@@ -94,7 +95,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? "bg-primary"
         : isRegistered
           ? "bg-primary"
-          : isWaitlisted
+          : isWaitlisted || isPendingApproval
             ? "bg-amber-400"
             : "bg-border";
 
@@ -116,10 +117,21 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         : momentData.locationName;
 
   const waitlistedBadge = !isPast && !isDraft && isWaitlisted ? (
-    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-      <Clock className="size-3" />
-      <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
-    </Badge>
+    <StatusPill
+      icon={Clock}
+      label={t("registrationStatus.waitlisted")}
+      className="border-border text-muted-foreground"
+      hideLabelOnMobile
+    />
+  ) : null;
+
+  const pendingApprovalBadge = !isPast && !isDraft && isPendingApproval ? (
+    <StatusPill
+      icon={Clock}
+      label={t("registrationStatus.pending_approval")}
+      className="border-amber-500/40 text-amber-500"
+      hideLabelOnMobile
+    />
   ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
@@ -210,6 +222,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 <CirclePill name={momentData.circleName} withIcon muted={isPast} />
                 <div className="hidden items-center gap-2 sm:flex">
                   {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                  {pendingApprovalBadge}
                   {waitlistedBadge}
                 </div>
               </div>

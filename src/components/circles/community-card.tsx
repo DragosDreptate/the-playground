@@ -144,7 +144,7 @@ function PublicVariant({
             <CoverBadgeOverlay
               icon={RoleIcon}
               label={roleLabel}
-              className="border-primary/40 text-primary dark:text-[oklch(0.76_0.27_341)]"
+              className="border-primary/40 text-primary"
             />
           )}
         </VerticalCover>
@@ -343,7 +343,7 @@ function CoverBadgeOverlay({
 }) {
   return (
     <div
-      className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border bg-card/85 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+      className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border bg-white/85 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
     >
       <Icon className="size-3 shrink-0" />
       <span>{label}</span>

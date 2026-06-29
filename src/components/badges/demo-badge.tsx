@@ -13,10 +13,12 @@ export function DemoBadge({ label, size = "sm", inline = false }: Props) {
     );
   }
 
-  // Calé sur la hauteur du pill overlay (CoverBadgeOverlay) — cartes Communauté desktop.
+  // Pill homogène avec les badges overlay (CoverBadgeOverlay) — cartes Communauté
+  // desktop. Fond slate + texte blanc, identique en light et dark (badge système,
+  // distinct des badges de statut utilisateur à fond blanc).
   if (size === "md") {
     return (
-      <span className="absolute top-2 left-2 inline-flex items-center rounded-md border border-primary/70 bg-black/80 px-2.5 py-1 text-xs font-semibold leading-none text-primary">
+      <span className="absolute top-2 left-2 inline-flex items-center rounded-full bg-slate-700/90 px-2.5 py-1 text-xs font-semibold leading-none text-white backdrop-blur-sm">
         {label}
       </span>
     );

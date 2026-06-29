@@ -4,8 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, TimelineScaffold } from "@/components/cards/card-primitives";
-import { Badge } from "@/components/ui/badge";
+import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Attendee } from "@/components/moments/attendee-avatar-stack";
@@ -47,6 +46,7 @@ export async function MomentTimelineItem({
     userRegistrationStatus === "REGISTERED" ||
     userRegistrationStatus === "CHECKED_IN";
   const isWaitlisted = userRegistrationStatus === "WAITLISTED";
+  const isPendingApproval = userRegistrationStatus === "PENDING_APPROVAL";
 
   const dotClass = isCancelled
     ? "bg-destructive/50"
@@ -86,19 +86,29 @@ export async function MomentTimelineItem({
         ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
         : isRegistered
           ? (
-              <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
-                <Check className="size-3" />
-                {tDashboard("registrationStatus.registered")}
-              </Badge>
+              <StatusPill
+                icon={Check}
+                label={tDashboard("registrationStatus.registered")}
+                className="border-primary/40 text-primary"
+              />
             )
-          : isWaitlisted
+          : isPendingApproval
             ? (
-                <Badge variant="secondary" className="gap-1 text-xs">
-                  <Clock className="size-3" />
-                  {tDashboard("registrationStatus.waitlisted")}
-                </Badge>
+                <StatusPill
+                  icon={Clock}
+                  label={tDashboard("registrationStatus.pending_approval")}
+                  className="border-amber-500/40 text-amber-500"
+                />
               )
-            : null;
+            : isWaitlisted
+              ? (
+                  <StatusPill
+                    icon={Clock}
+                    label={tDashboard("registrationStatus.waitlisted")}
+                    className="border-border text-muted-foreground"
+                  />
+                )
+              : null;
 
   return (
     <TimelineScaffold

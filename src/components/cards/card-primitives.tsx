@@ -100,3 +100,29 @@ export function CirclePill({
     </span>
   );
 }
+
+/**
+ * Pill de statut (inscription / rôle) : même look que les badges overlay des covers
+ * (fond blanc + bordure colorée + blur), mais en flux inline. La couleur (bordure +
+ * texte) est passée via `className`.
+ */
+export function StatusPill({
+  icon: Icon,
+  label,
+  className,
+  hideLabelOnMobile = false,
+}: {
+  icon: LucideIcon;
+  label: string;
+  className?: string;
+  hideLabelOnMobile?: boolean;
+}) {
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/85 px-2 py-0.5 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+    >
+      <Icon className="size-3 shrink-0" />
+      <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>
+    </span>
+  );
+}
