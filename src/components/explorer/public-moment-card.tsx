@@ -8,7 +8,6 @@ import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatShortDate, formatTime, formatWeekdayAndDate } from "@/lib/format-date";
 import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
 import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
-import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -54,10 +53,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       : t("momentCard.registeredCount", { count: moment.registrationCount });
 
   const roleBadge = isOrganizer ? (
-    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-      <Crown className="size-3" />
-      <span className="hidden sm:inline">{t("momentCard.roleBadge.host")}</span>
-    </Badge>
+    <StatusPill
+      icon={Crown}
+      label={t("momentCard.roleBadge.host")}
+      className="border-primary/40 text-primary"
+      hideLabelOnMobile
+    />
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
     <StatusPill
       icon={Check}
