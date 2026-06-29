@@ -6,7 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { MapPin, Globe, Clock } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
@@ -87,17 +87,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const isPendingApproval =
     !isOrganizerView && !isOrganizer && props.registration.status === "PENDING_APPROVAL";
 
-  const dotClass = isPast
-    ? "bg-border"
-    : isDraft
-      ? "bg-muted-foreground/40"
-      : isOrganizerView || isOrganizer
-        ? "bg-primary"
-        : isRegistered
-          ? "bg-primary"
-          : isWaitlisted || isPendingApproval
-            ? "bg-amber-400"
-            : "bg-border";
+  const dotClass = momentDotClass({
+    isPast,
+    isDraft,
+    isAmber: isWaitlisted || isPendingApproval,
+    // Actif : rose pour le Host/inscrit, neutre pour une inscription inactive.
+    defaultClass: isOrganizerView || isOrganizer || isRegistered ? "bg-primary" : "bg-border",
+  });
 
   const cardBorderClass = isDraft
     ? "border-dashed border-muted-foreground/30 opacity-70"
@@ -117,21 +113,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         : momentData.locationName;
 
   const waitlistedBadge = !isPast && !isDraft && isWaitlisted ? (
-    <StatusPill
-      icon={Clock}
-      label={t("registrationStatus.waitlisted")}
-      className="border-border text-muted-foreground"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} hideLabelOnMobile />
   ) : null;
 
   const pendingApprovalBadge = !isPast && !isDraft && isPendingApproval ? (
-    <StatusPill
-      icon={Clock}
-      label={t("registrationStatus.pending_approval")}
-      className="border-amber-500/40 text-amber-500"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
   ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;

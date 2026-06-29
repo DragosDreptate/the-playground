@@ -3,8 +3,8 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
+import { MapPin, Globe, Clock, XCircle } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Attendee } from "@/components/moments/attendee-avatar-stack";
@@ -48,15 +48,12 @@ export async function MomentTimelineItem({
   const isWaitlisted = userRegistrationStatus === "WAITLISTED";
   const isPendingApproval = userRegistrationStatus === "PENDING_APPROVAL";
 
-  const dotClass = isCancelled
-    ? "bg-destructive/50"
-    : isPast
-      ? "bg-border"
-      : isDraft
-        ? "bg-muted-foreground/40"
-        : isWaitlisted
-          ? "bg-amber-400"
-          : "bg-primary";
+  const dotClass = momentDotClass({
+    isCancelled,
+    isPast,
+    isDraft,
+    isAmber: isWaitlisted || isPendingApproval,
+  });
 
   const cardBorderClass = isCancelled
     ? "border-destructive/20"
@@ -85,29 +82,11 @@ export async function MomentTimelineItem({
       : isDraft
         ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
         : isRegistered
-          ? (
-              <StatusPill
-                icon={Check}
-                label={tDashboard("registrationStatus.registered")}
-                className="border-primary/40 text-primary"
-              />
-            )
+          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} />
           : isPendingApproval
-            ? (
-                <StatusPill
-                  icon={Clock}
-                  label={tDashboard("registrationStatus.pending_approval")}
-                  className="border-amber-500/40 text-amber-500"
-                />
-              )
+            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} />
             : isWaitlisted
-              ? (
-                  <StatusPill
-                    icon={Clock}
-                    label={tDashboard("registrationStatus.waitlisted")}
-                    className="border-border text-muted-foreground"
-                  />
-                )
+              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} />
               : null;
 
   return (

@@ -6,8 +6,8 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatShortDate, formatTime, formatWeekdayAndDate } from "@/lib/format-date";
-import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
-import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold } from "@/components/cards/card-primitives";
+import { MapPin, Globe } from "lucide-react";
+import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -53,33 +53,13 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       : t("momentCard.registeredCount", { count: moment.registrationCount });
 
   const roleBadge = isOrganizer ? (
-    <StatusPill
-      icon={Crown}
-      label={t("momentCard.roleBadge.host")}
-      className="border-primary/40 text-primary"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.host} label={t("momentCard.roleBadge.host")} hideLabelOnMobile />
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <StatusPill
-      icon={Check}
-      label={t("momentCard.roleBadge.registered")}
-      className="border-primary/40 text-primary"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.registered} label={t("momentCard.roleBadge.registered")} hideLabelOnMobile />
   ) : registrationStatus === "PENDING_APPROVAL" ? (
-    <StatusPill
-      icon={Clock}
-      label={t("momentCard.roleBadge.pendingApproval")}
-      className="border-amber-500/40 text-amber-500"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("momentCard.roleBadge.pendingApproval")} hideLabelOnMobile />
   ) : registrationStatus === "WAITLISTED" ? (
-    <StatusPill
-      icon={Clock}
-      label={t("momentCard.roleBadge.waitlisted")}
-      className="border-border text-muted-foreground"
-      hideLabelOnMobile
-    />
+    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("momentCard.roleBadge.waitlisted")} hideLabelOnMobile />
   ) : null;
 
   const categoryLabelText = resolveCategoryLabel(

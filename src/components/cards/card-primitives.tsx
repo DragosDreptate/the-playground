@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Users } from "lucide-react";
+import { Users, Check, Clock, Crown } from "lucide-react";
 
 /**
  * Primitives partagées des cartes (événement / Communauté), factorisées pour éviter
@@ -125,4 +125,44 @@ export function StatusPill({
       <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>
     </span>
   );
+}
+
+/**
+ * Apparence (icône + couleur) du `StatusPill` selon le statut d'inscription / rôle.
+ * Factorisé pour garantir la cohérence entre Explorer, Mon Espace et la page
+ * Communauté. Le `label` et `hideLabelOnMobile` restent à l'appelant : les libellés
+ * proviennent de namespaces i18n différents selon la surface.
+ */
+export const REGISTRATION_PILL = {
+  host: { icon: Crown, className: "border-primary/40 text-primary" },
+  registered: { icon: Check, className: "border-primary/40 text-primary" },
+  pendingApproval: { icon: Clock, className: "border-amber-500/40 text-amber-500" },
+  waitlisted: { icon: Clock, className: "border-border text-muted-foreground" },
+} as const;
+
+/**
+ * Couleur du dot de timeline selon l'état du moment / de l'inscription. Partagé par
+ * Mon Espace et la page Communauté pour éviter les divergences (ex. oubli du statut
+ * « en attente de validation »). `defaultClass` encode la couleur de l'état actif,
+ * qui diffère selon la surface (rose côté Host, neutre pour une inscription inactive
+ * côté participant).
+ */
+export function momentDotClass({
+  isCancelled = false,
+  isPast = false,
+  isDraft = false,
+  isAmber = false,
+  defaultClass = "bg-primary",
+}: {
+  isCancelled?: boolean;
+  isPast?: boolean;
+  isDraft?: boolean;
+  isAmber?: boolean;
+  defaultClass?: string;
+}): string {
+  if (isCancelled) return "bg-destructive/50";
+  if (isPast) return "bg-border";
+  if (isDraft) return "bg-muted-foreground/40";
+  if (isAmber) return "bg-amber-400";
+  return defaultClass;
 }
