@@ -65,6 +65,26 @@ export function formatDayMonth(date: Date, locale: string): string {
   }).format(date);
 }
 
+/**
+ * "25 fév." / "28 Feb" — variante compacte de formatDayMonth pour les colonnes de
+ * timeline étroites (mobile) : abréviations FR ramenées à 3 lettres + point ("sept."
+ * → "sep."). Les mois écrits en toutes lettres (mars, mai, juin, août) restent
+ * intacts ; juillet reste "juil." (à "jui." il collisionnerait avec juin).
+ */
+export function formatDayMonthShort(date: Date, locale: string): string {
+  const intlLocale = toIntlLocale(locale);
+  const day = new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, day: "numeric" }).format(date);
+  const month = new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, month: "short" }).format(date);
+  // Mots complets (mars, mai, juin, août, EN « Sep »…) : laissés tels quels, sans point.
+  // Abréviations FR (terminées par « . ») : tronquées à 3 lettres + point, sauf juillet.
+  let shortMonth = month;
+  if (month.endsWith(".")) {
+    const base = month.slice(0, -1);
+    shortMonth = /^juil/i.test(base) ? `${base}.` : `${base.slice(0, 3)}.`;
+  }
+  return `${day} ${shortMonth}`;
+}
+
 /** { weekday, dateStr } pour les timelines — "sam." + "28 févr." */
 export function formatWeekdayAndDate(
   date: Date,

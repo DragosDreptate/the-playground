@@ -9,7 +9,7 @@ import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatTime, formatDayMonthShort } from "@/lib/format-date";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
@@ -103,6 +103,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
+  const dateStrShort = formatDayMonthShort(momentData.startsAt, locale);
   const timeStr = formatTime(momentData.startsAt);
 
   const locationLabel =
@@ -126,8 +127,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     <TimelineScaffold
       dotClass={dotClass}
       isLast={isLast}
+      cardPadding="pl-1 sm:pl-4"
       dateColumn={
-        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+        <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
           {!isPast && isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
               <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
@@ -145,7 +147,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}
                 suppressHydrationWarning
               >
-                {dateStr}
+                <span className="sm:hidden">{dateStrShort}</span>
+                <span className="hidden sm:inline">{dateStr}</span>
               </p>
             </>
           )}

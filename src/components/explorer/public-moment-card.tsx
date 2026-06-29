@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatTime, formatWeekdayAndDate } from "@/lib/format-date";
+import { formatTime, formatWeekdayAndDate, formatDayMonthShort } from "@/lib/format-date";
 import { MapPin, Globe } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
@@ -41,6 +41,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   const startsAt = new Date(moment.startsAt);
   const timeStr = formatTime(startsAt);
   const { weekday, dateStr: columnDate } = formatWeekdayAndDate(startsAt, locale);
+  const columnDateShort = formatDayMonthShort(startsAt, locale);
 
   // « Aujourd'hui » calculé côté client pour éviter un mismatch d'hydratation.
   const [isToday, setIsToday] = useState(false);
@@ -75,10 +76,10 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   );
   const categoryBadge = categoryLabelText ? <CategoryBadge label={categoryLabelText} /> : null;
 
-  // Ligne de rattachement — thème (icône) + pill Communauté.
+  // Ligne de rattachement — pill Communauté seul en mobile ; thème + pill en desktop.
   const contextLine = (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
-      {categoryBadge}
+      {categoryBadge && <span className="hidden sm:inline-flex">{categoryBadge}</span>}
       <CirclePill name={moment.circle.name} withIcon />
     </div>
   );
@@ -101,9 +102,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
     <TimelineScaffold
       dotClass="bg-primary"
       isLast={isLast}
-      cardPadding="pl-2 sm:pl-4"
+      cardPadding="pl-1 sm:pl-4"
       dateColumn={
-        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+        <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
           {isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
               <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
@@ -115,7 +116,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
                 {weekday}
               </p>
               <p className="text-sm font-medium leading-snug" suppressHydrationWarning>
-                {columnDate}
+                <span className="sm:hidden">{columnDateShort}</span>
+                <span className="hidden sm:inline">{columnDate}</span>
               </p>
             </>
           )}
