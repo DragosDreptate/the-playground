@@ -109,7 +109,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
 
   return (
     <>
-      {/* ─── Mobile (< sm) : carte horizontale — INCHANGÉE ─── */}
+      {/* ─── Mobile (< sm) : carte horizontale. Structure d'origine, mais fond aligné
+           sur le token --card et hover neutre unifiés (#597, comme desktop). ─── */}
       <Link href={`/m/${moment.slug}`} className="sm:hidden group block min-w-0">
         <div className="bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none transition-[transform,box-shadow] duration-150 hover:-translate-y-0.5 hover:shadow-xl">
           <div className="flex items-center gap-5">

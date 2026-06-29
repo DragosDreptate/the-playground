@@ -56,6 +56,7 @@ export function ExplorerGrid(props: Props) {
   );
 
   function handleLoadMore() {
+    if (isPending) return; // garde anti-chargements concurrents (observer + clic)
     startTransition(async () => {
       if (props.tab === "circles") {
         const result = await loadMoreCirclesAction({
@@ -80,23 +81,27 @@ export function ExplorerGrid(props: Props) {
     });
   }
 
-  // Onglet Communautés : chargement progressif au défilement (le sentinel
-  // ci-dessous est observé ; l'onglet Événements garde son bouton « Voir plus »).
+  // Onglet Communautés : chargement progressif au défilement EN PLUS du bouton
+  // « Voir plus » (fallback clavier/lecteur d'écran et grand écran). L'observer
+  // est créé une seule fois par état (tab/hasMore) et appelle la version courante
+  // de handleLoadMore via une ref — pas de recréation par append, donc pas de
+  // cascade d'auto-chargements. Le guard `isPending` évite les appels concurrents.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const loadMoreRef = useRef(handleLoadMore);
+  loadMoreRef.current = handleLoadMore;
   useEffect(() => {
-    if (props.tab !== "circles" || !hasMore || isPending) return;
+    if (props.tab !== "circles" || !hasMore) return;
     const el = sentinelRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) handleLoadMore();
+        if (entries[0]?.isIntersecting) loadMoreRef.current();
       },
       { rootMargin: "300px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.tab, hasMore, isPending, circleItems.length]);
+  }, [props.tab, hasMore]);
 
   return (
     <div className="space-y-6">
@@ -125,24 +130,24 @@ export function ExplorerGrid(props: Props) {
         </div>
       )}
 
-      {hasMore &&
-        (props.tab === "circles" ? (
-          // Sentinel observé pour le chargement progressif au défilement
-          <div ref={sentinelRef} className="flex justify-center py-2" aria-hidden>
-            {isPending && <Loader2 className="size-5 animate-spin text-muted-foreground" />}
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <Button
-              variant="outline"
-              onClick={handleLoadMore}
-              disabled={isPending}
-              className="min-w-32"
-            >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : t("loadMore")}
-            </Button>
-          </div>
-        ))}
+      {hasMore && (
+        // Bouton « Voir plus » focusable (toujours utilisable au clavier/lecteur
+        // d'écran). Pour les Communautés, le wrapper sert aussi de sentinel observé
+        // pour le chargement progressif au défilement.
+        <div
+          ref={props.tab === "circles" ? sentinelRef : undefined}
+          className="flex justify-center py-2"
+        >
+          <Button
+            variant="outline"
+            onClick={handleLoadMore}
+            disabled={isPending}
+            className="min-w-32"
+          >
+            {isPending ? <Loader2 className="size-4 animate-spin" /> : t("loadMore")}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

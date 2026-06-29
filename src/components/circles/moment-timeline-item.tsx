@@ -197,7 +197,13 @@ export async function MomentTimelineItem({
                 </p>
 
                 {((!isCancelled && registrationCount > 0) || statusBadge) && (
-                  <div className="flex items-center gap-2">
+                  // Sans inscrit, le seul enfant (badge) est `hidden sm:block` :
+                  // masquer le wrapper en mobile pour ne pas laisser un gap vide.
+                  <div
+                    className={`items-center gap-2 ${
+                      !isCancelled && registrationCount > 0 ? "flex" : "hidden sm:flex"
+                    }`}
+                  >
                     {!isCancelled && registrationCount > 0 && (
                       <div className={isPast ? "opacity-60" : ""}>
                         <AttendeeAvatarStack
