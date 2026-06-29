@@ -91,16 +91,17 @@ export function ExplorerGrid(props: Props) {
     });
   }
 
-  // Onglet Communautés : chargement progressif au défilement EN PLUS du bouton
-  // « Voir plus » (fallback clavier/lecteur d'écran et grand écran). L'observer
-  // est créé une seule fois par état (tab/hasMore) et appelle la version courante
-  // de handleLoadMore via une ref — pas de recréation par append, donc pas de
-  // cascade d'auto-chargements. Le guard `loadingRef` évite les appels concurrents.
+  // Chargement progressif au défilement sur les DEUX onglets (Communautés et
+  // Événements), EN PLUS du bouton « Voir plus » (fallback clavier/lecteur d'écran et
+  // grand écran). `ExplorerGrid` étant instancié une fois par onglet, `props.tab` est
+  // constant : l'observer ne dépend que de `hasMore`. Il appelle la version courante
+  // de handleLoadMore via une ref (pas de recréation par append → pas de cascade) ;
+  // le guard `loadingRef` évite les appels concurrents.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef(handleLoadMore);
   loadMoreRef.current = handleLoadMore;
   useEffect(() => {
-    if (props.tab !== "circles" || !hasMore) return;
+    if (!hasMore) return;
     const el = sentinelRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
@@ -111,7 +112,7 @@ export function ExplorerGrid(props: Props) {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [props.tab, hasMore]);
+  }, [hasMore]);
 
   return (
     <div className="space-y-6">
@@ -142,12 +143,9 @@ export function ExplorerGrid(props: Props) {
 
       {hasMore && (
         // Bouton « Voir plus » focusable (toujours utilisable au clavier/lecteur
-        // d'écran). Pour les Communautés, le wrapper sert aussi de sentinel observé
-        // pour le chargement progressif au défilement.
-        <div
-          ref={props.tab === "circles" ? sentinelRef : undefined}
-          className="flex justify-center py-2"
-        >
+        // d'écran). Le wrapper sert aussi de sentinel observé pour le chargement
+        // progressif au défilement (les deux onglets).
+        <div ref={sentinelRef} className="flex justify-center py-2">
           <Button
             variant="outline"
             onClick={handleLoadMore}
