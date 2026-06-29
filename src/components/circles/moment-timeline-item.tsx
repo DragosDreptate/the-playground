@@ -98,7 +98,8 @@ export async function MomentTimelineItem({
         <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
           {isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              {tCircle("detail.today")}
+              <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
+              <span className="hidden sm:inline">{tCircle("detail.today")}</span>
             </span>
           ) : (
             <>

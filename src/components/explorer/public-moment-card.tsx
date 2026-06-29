@@ -153,7 +153,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
           <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
             {isToday ? (
               <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-                {tCircle("detail.today")}
+                <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
+                <span className="hidden sm:inline">{tCircle("detail.today")}</span>
               </span>
             ) : (
               <>

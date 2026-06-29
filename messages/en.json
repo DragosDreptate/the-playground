@@ -336,6 +336,7 @@
       "noPastMoments": "No past Events.",
       "noPendingMemberships": "Approval enabled — no pending requests.",
       "today": "Today",
+      "todayShort": "Today",
       "manageMoment": "Manage this Event",
       "join": "Join",
       "joinRequiresApproval": "Join (subject to approval)",

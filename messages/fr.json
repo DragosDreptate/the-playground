@@ -336,6 +336,7 @@
       "noPastMoments": "Aucun événement passé.",
       "noPendingMemberships": "Validation activée — aucune demande en attente.",
       "today": "Aujourd'hui",
+      "todayShort": "Auj.",
       "manageMoment": "Gérer cet événement",
       "join": "Rejoindre",
       "joinRequiresApproval": "Rejoindre (soumis à validation)",
