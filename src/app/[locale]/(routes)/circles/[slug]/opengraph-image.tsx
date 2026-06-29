@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
+import { isValidSlug } from "@/lib/slug";
 import { getMomentGradient } from "@/lib/gradient";
 import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
 import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
@@ -22,6 +23,7 @@ export default async function OgImage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
+  if (!isValidSlug(slug)) return new Response("Not found", { status: 404 });
 
   let circle;
   try {

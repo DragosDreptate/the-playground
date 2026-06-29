@@ -27,7 +27,11 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
-import { buildAlternates, isCircleIndexable } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildSocialMetadata,
+  isCircleIndexable,
+} from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -111,16 +115,7 @@ export async function generateMetadata({
       // doit afficher le même aperçu qu'un Circle public. On découple l'indexation
       // de la génération de l'image de partage (même pattern que /m/[slug]).
       ...(isPrivate && { robots: { index: false, follow: false } }),
-      openGraph: {
-        title,
-        description,
-        type: "website",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
-      },
+      ...buildSocialMetadata(title, description),
     };
   } catch {
     return {};
