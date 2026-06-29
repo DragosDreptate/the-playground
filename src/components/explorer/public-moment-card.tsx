@@ -132,12 +132,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
           className={`bg-card flex flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-lg dark:shadow-none sm:flex-row sm:items-center sm:gap-6 sm:rounded-2xl sm:p-4 ${CARD_HOVER_GROUP}`}
         >
           {/* Titre — pleine largeur au-dessus, une seule ligne (mobile uniquement) */}
-          <h3 className="truncate text-sm font-semibold leading-snug sm:hidden">{moment.title}</h3>
+          <h3 className="truncate text-base font-semibold leading-snug sm:hidden">{moment.title}</h3>
 
           {/* Rangée infos | cover. En desktop, `contents` dissout ce wrapper :
               body et cover redeviennent enfants directs de la carte (layout #598). */}
-          <div className="flex items-center gap-3 sm:contents">
-            <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="flex items-start gap-3 sm:contents">
+            <div className="min-w-0 flex-1 space-y-[7px] sm:space-y-1.5">
               {contextLine}
               <h3 className="hidden line-clamp-2 text-base font-semibold leading-snug sm:block">{moment.title}</h3>
               {moment.description && (
@@ -145,9 +145,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
               )}
               {locationLabel && (
                 <>
-                  {/* Mobile : lieu en icône simple */}
+                  {/* Mobile : lieu en pastille (format desktop, taille mobile) */}
                   <div className="text-muted-foreground flex items-center gap-1.5 text-xs sm:hidden">
-                    <LocationIcon className="size-3.5 shrink-0" />
+                    <IconPill icon={LocationIcon} size="sm" />
                     <span className="truncate">{locationLabel}</span>
                   </div>
                   {/* Desktop : lieu en pastille */}
