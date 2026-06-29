@@ -105,19 +105,22 @@ export async function generateMetadata({
       title,
       description,
       alternates: buildAlternates(locale, `/circles/${slug}`),
+      // Visibilité PRIVÉ → non indexable par les crawlers (robots). Mais l'aperçu
+      // social (Open Graph / Twitter + og:image via la convention opengraph-image)
+      // reste émis inconditionnellement : un lien privé partagé sur les réseaux
+      // doit afficher le même aperçu qu'un Circle public. On découple l'indexation
+      // de la génération de l'image de partage (même pattern que /m/[slug]).
       ...(isPrivate && { robots: { index: false, follow: false } }),
-      ...(!isPrivate && {
-        openGraph: {
-          title,
-          description,
-          type: "website",
-        },
-        twitter: {
-          card: "summary_large_image",
-          title,
-          description,
-        },
-      }),
+      openGraph: {
+        title,
+        description,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+      },
     };
   } catch {
     return {};

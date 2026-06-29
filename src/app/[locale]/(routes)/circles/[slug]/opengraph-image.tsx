@@ -35,10 +35,11 @@ export default async function OgImage({
     throw error;
   }
 
-  if (circle.visibility !== "PUBLIC") {
-    return new Response("Not found", { status: 404 });
-  }
-
+  // Pas de gate sur la visibilité ici : un Circle privé reste accessible par
+  // lien direct (partage), et son aperçu social doit s'afficher comme celui d'un
+  // Circle public. La règle « privé » agit sur l'indexation crawler (robots) et
+  // l'affichage Explorer, pas sur la génération de l'image de partage. Même
+  // pattern que la route OG de /m/[slug] (aucun gate de visibilité).
   const coverJpeg = circle.coverImage
     ? await loadCoverAsOgJpeg(circle.coverImage)
     : null;
