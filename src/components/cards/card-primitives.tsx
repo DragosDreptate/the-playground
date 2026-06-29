@@ -68,7 +68,7 @@ export function TimelineScaffold({
       {dateColumn}
       <div className="flex shrink-0 flex-col items-center">
         <div
-          className={`mt-2 size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-150 ${dotClass}`}
+          className={`mt-2 size-2 shrink-0 translate-y-3 rounded-full transition-transform duration-150 group-hover:scale-150 sm:translate-y-0 ${dotClass}`}
         />
         {!isLast && <div className="mt-2 flex-1 border-l border-dashed border-border" />}
       </div>

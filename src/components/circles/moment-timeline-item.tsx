@@ -94,7 +94,6 @@ export async function MomentTimelineItem({
     <TimelineScaffold
       dotClass={dotClass}
       isLast={isLast}
-      spacing="pb-8"
       cardPadding="pl-1 sm:pl-4"
       dateColumn={
         <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
@@ -134,7 +133,7 @@ export async function MomentTimelineItem({
             )}
 
             {/* Corps de la carte */}
-            <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
               {/* Titre — pleine largeur au-dessus, une ligne (mobile uniquement) */}
               <p
                 className={`truncate text-base font-semibold leading-snug sm:hidden ${
@@ -184,7 +183,7 @@ export async function MomentTimelineItem({
 
 
                 <p
-                  className={`hidden line-clamp-2 font-semibold leading-snug sm:block ${
+                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
                     isCancelled
                       ? "text-muted-foreground line-through"
                       : isPast

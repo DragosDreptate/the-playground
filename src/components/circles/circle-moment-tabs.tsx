@@ -51,7 +51,9 @@ export function CircleMomentTabs({
         {activeTab === "upcoming" && upcomingAction}
       </div>
 
-      {activeTab === "upcoming" ? upcomingContent : pastContent}
+      {/* Wrappé : sinon le Fragment de la liste devient enfant direct de `space-y-6`,
+          qui ajoute 24px entre chaque carte en plus du `pb` de la timeline. */}
+      <div>{activeTab === "upcoming" ? upcomingContent : pastContent}</div>
     </div>
   );
 }
