@@ -127,7 +127,7 @@ export function ExplorerGrid(props: Props) {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-2 sm:gap-0">
+        <div className="flex flex-col">
           {momentItems.map((moment, i) => (
             <PublicMomentCard
               key={moment.id}

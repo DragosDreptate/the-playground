@@ -66,9 +66,8 @@ test.describe("Découvrir — page Explorer", () => {
       .first();
     await momentsTab.click();
 
-    // La carte Moment a deux branches (mobile horizontal / desktop timeline),
-    // donc deux liens /m/ dans le DOM dont un masqué par breakpoint : cibler le visible.
-    const momentLinks = page.locator("a[href*='/m/']:visible");
+    // La carte Moment est une timeline responsive unique : un seul lien /m/ par carte.
+    const momentLinks = page.locator("a[href*='/m/']");
     await expect(momentLinks.first()).toBeVisible();
   });
 });
