@@ -139,9 +139,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
           <div className="flex items-start gap-3 sm:contents">
             <div className="min-w-0 flex-1 space-y-[7px] sm:space-y-1.5">
               {contextLine}
-              <h3 className="hidden text-base font-semibold leading-snug sm:line-clamp-2">{moment.title}</h3>
+              <h3 className="hidden text-base font-semibold leading-snug sm:line-clamp-1">{moment.title}</h3>
               {moment.description && (
-                <p className="text-muted-foreground hidden text-sm sm:line-clamp-1">{moment.description}</p>
+                <p className="text-muted-foreground hidden text-sm sm:line-clamp-2">{moment.description}</p>
               )}
               {locationLabel && (
                 <>

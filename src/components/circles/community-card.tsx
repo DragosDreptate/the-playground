@@ -94,8 +94,8 @@ function PublicVariant({
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
           <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
           {circle.city && (
-            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-              <MapPin className="size-3.5 shrink-0" />
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <IconPill icon={MapPin} size="sm" />
               <span className="truncate">{circle.city}</span>
             </div>
           )}
@@ -169,8 +169,8 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
           )}
           <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
           {circle.city && (
-            <div className="text-muted-foreground flex items-center gap-1 text-xs">
-              <MapPin className="size-3.5 shrink-0" />
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <IconPill icon={MapPin} size="sm" />
               <span className="truncate">{circle.city}</span>
             </div>
           )}

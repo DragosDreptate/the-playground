@@ -151,6 +151,16 @@ export async function MomentTimelineItem({
               <div className="flex items-start gap-4 sm:contents">
                 {/* Content */}
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
+                {/* Mobile : description (1 ligne), avant le lieu */}
+                {moment.description && (
+                  <p
+                    className={`line-clamp-2 text-xs sm:hidden ${
+                      isPast || isCancelled ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    {moment.description}
+                  </p>
+                )}
                 {/* Mobile : lieu inline (l'heure est dans la colonne date) */}
                 {locationLabel && (
                   <div
