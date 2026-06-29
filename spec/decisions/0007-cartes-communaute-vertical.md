@@ -1,6 +1,6 @@
 # ADR 0007 — Cartes de Communauté en format vertical (grille)
 
-- **Statut** : Accepté
+- **Statut** : Accepté — **livré** en PR #598 (mergée dans `epic/refonte-ui`, pas encore en prod — cf. [release train](../features/refonte-ui-train.md))
 - **Date** : 2026-06-27
 - **Issue** : #597 (lié à #596 — sélecteur Participant/Organisateur, traité séparément, après)
 - **Mockup de référence** : [`spec/mockups/circle-card-vertical.mockup.html`](../mockups/circle-card-vertical.mockup.html)
@@ -87,6 +87,17 @@ Le highlight rose actuel est remplacé par une **élévation neutre** (`translat
 - **Compteur d'événements à venir retiré du vertical** : il alourdissait l'encart et faisait doublon avec le bloc « prochain événement ». Conservé uniquement dans la branche **mobile horizontale** (inchangée).
 - **Encart « prochain événement » redessiné** : pastille grise (`bg-foreground/10`) + icône calendrier, label `PROCHAIN ÉVÉNEMENT`, titre puis date. Markup identique aux deux variantes (factorisé en sous-composant `NextMomentBlock`).
 - **Factorisation** : le composant unifié extrait des sous-composants partagés (`VerticalCover`, `CoverBadgeOverlay`, `CityRowVertical`, `MemberStack`, `NextMomentBlock`) pour absorber la duplication entre variantes sans toucher au rendu.
+
+## Périmètre réellement livré (#598, 2026-06-29)
+
+Le chantier a **débordé** la décision initiale (cartes Communauté) — extensions assumées, validées par itération visuelle et deux `/code-review`. Détail et reprise : [`refonte-ui-train.md`](../features/refonte-ui-train.md).
+
+- **Événements en timeline verticale** (au-delà des seules cartes Communauté) : Explorer (`public-moment-card`), aligné sur Mon Espace (`dashboard-moment-card`) et la page Communauté (`moment-timeline-item`).
+- **Primitives de cartes partagées** : `src/components/cards/card-primitives.tsx` (`TimelineScaffold`, `IconPill`, `CirclePill`, `StatusPill`, `CARD_HOVER`/`CARD_HOVER_GROUP`, helpers `REGISTRATION_PILL` et `momentDotClass`) + pagination centralisée (`src/lib/explorer-pagination.ts`).
+- **Badges harmonisés en pills** + gestion de **`PENDING_APPROVAL`** (dot + pill ambre) sur les 3 timelines et la carte Communauté.
+- **Covers** : dégradé blanc/gris derrière les images, fond unifié sur le token `--card`.
+- **Nettoyage** : suppression de la page orpheline `/dashboard/moments/new` et des composants morts.
+- **Hover conservé sur les cartes passées / annulées** : arbitrage explicite (cartes cliquables → élévation cohérente), malgré le signalement du code-review.
 
 ## Alternatives écartées
 

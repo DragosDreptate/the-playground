@@ -2,6 +2,8 @@
 
 > **Issue** : #597 · **ADR** : [`spec/decisions/0007-cartes-communaute-vertical.md`](../decisions/0007-cartes-communaute-vertical.md) · **Mockup** : [`spec/mockups/circle-card-vertical.mockup.html`](../mockups/circle-card-vertical.mockup.html)
 >
+> **Statut : Phase 1 LIVRÉE** (PR **#598**, mergée dans `epic/refonte-ui`, CI vert — **pas encore en prod**). Le chantier a débordé cette spec (timelines d'événements, primitives partagées, badges) : vue d'ensemble + reprise dans [`refonte-ui-train.md`](refonte-ui-train.md).
+>
 > Cette spec décrit le **comment** (call-sites, composant, breakpoints, découpe, tests). Le **pourquoi** et les alternatives sont dans l'ADR.
 
 ## Objectif
@@ -128,6 +130,8 @@ Le rendu vertical est factorisé en sous-composants **privés au fichier**, à m
 - **E2E mobile** (`pnpm test:mobile`) sur Explorer / Mon Espace / Réseau : le rendu `< sm` doit être identique à l'actuel.
 - **Vérif visuelle avant/après** des 3 surfaces en `< sm` (garde-fou anti-régression mobile, ADR).
 - Pas de test composant aujourd'hui : ajouter au besoin si la logique de variante se complexifie.
+
+> **Maintenance de tests (#598)** — la structure **2 branches responsive** (`sm:hidden` / `hidden sm:flex`) met certains textes/liens **en double** dans le DOM (un par branche). Les sélecteurs E2E qui prenaient `.first()` tombaient sur l'occurrence masquée au breakpoint desktop → cibler l'occurrence **visible** : `a[href*='/m/']:visible` (`explore.spec.ts`), `.filter({ visible: true })` (`approval-registration.spec.ts`, badge « en attente »). Les **baselines visuelles** (`refonte-visual-baseline.spec.ts`) sont **skippées en CI** (`test.skip(!!process.env.CI)`, snapshots `-darwin` local-only) et ont été régénérées.
 
 ## Risques / vigilance
 
