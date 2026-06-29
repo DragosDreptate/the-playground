@@ -55,28 +55,38 @@ export function ExplorerGrid(props: Props) {
     props.tab === "moments" ? props.membershipBySlug : {}
   );
 
+  // Garde SYNCHRONE : `isPending` ne bascule qu'au render suivant, donc un observer
+  // et un clic tombant dans la même frame passeraient tous deux. Le ref bloque le
+  // 2e appel immédiatement → pas de double fetch au même offset (doublons / clé React).
+  const loadingRef = useRef(false);
+
   function handleLoadMore() {
-    if (isPending) return; // garde anti-chargements concurrents (observer + clic)
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     startTransition(async () => {
-      if (props.tab === "circles") {
-        const result = await loadMoreCirclesAction({
-          offset: circleItems.length,
-          category: props.category,
-          sortBy: props.sortBy,
-        });
-        setCircleItems((prev) => [...prev, ...result.circles]);
-        setHasMore(result.hasMore);
-        setCircleMembershipMap((prev) => ({ ...prev, ...result.membershipRoleMap }));
-      } else {
-        const result = await loadMoreMomentsAction({
-          offset: momentItems.length,
-          category: props.category,
-          sortBy: props.sortBy,
-        });
-        setMomentItems((prev) => [...prev, ...result.moments]);
-        setHasMore(result.hasMore);
-        setRegistrationStatusMap((prev) => ({ ...prev, ...result.registrationStatusMap }));
-        setMembershipBySlug((prev) => ({ ...prev, ...result.membershipBySlug }));
+      try {
+        if (props.tab === "circles") {
+          const result = await loadMoreCirclesAction({
+            offset: circleItems.length,
+            category: props.category,
+            sortBy: props.sortBy,
+          });
+          setCircleItems((prev) => [...prev, ...result.circles]);
+          setHasMore(result.hasMore);
+          setCircleMembershipMap((prev) => ({ ...prev, ...result.membershipRoleMap }));
+        } else {
+          const result = await loadMoreMomentsAction({
+            offset: momentItems.length,
+            category: props.category,
+            sortBy: props.sortBy,
+          });
+          setMomentItems((prev) => [...prev, ...result.moments]);
+          setHasMore(result.hasMore);
+          setRegistrationStatusMap((prev) => ({ ...prev, ...result.registrationStatusMap }));
+          setMembershipBySlug((prev) => ({ ...prev, ...result.membershipBySlug }));
+        }
+      } finally {
+        loadingRef.current = false;
       }
     });
   }
@@ -85,7 +95,7 @@ export function ExplorerGrid(props: Props) {
   // « Voir plus » (fallback clavier/lecteur d'écran et grand écran). L'observer
   // est créé une seule fois par état (tab/hasMore) et appelle la version courante
   // de handleLoadMore via une ref — pas de recréation par append, donc pas de
-  // cascade d'auto-chargements. Le guard `isPending` évite les appels concurrents.
+  // cascade d'auto-chargements. Le guard `loadingRef` évite les appels concurrents.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef(handleLoadMore);
   loadMoreRef.current = handleLoadMore;
