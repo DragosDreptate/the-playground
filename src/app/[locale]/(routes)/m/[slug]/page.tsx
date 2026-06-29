@@ -7,7 +7,11 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
-import { buildAlternates, isCircleIndexable } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildSocialMetadata,
+  isCircleIndexable,
+} from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
@@ -88,16 +92,7 @@ export async function generateMetadata({
     description,
     alternates: buildAlternates(locale, `/m/${slug}`),
     ...(isInPrivateCircle && { robots: { index: false, follow: false } }),
-    openGraph: {
-      title,
-      description,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
+    ...buildSocialMetadata(title, description),
   };
 }
 

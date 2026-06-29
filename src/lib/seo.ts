@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { routing, isSupportedLocale, type Locale } from "@/i18n/routing";
 import type { CircleVisibility } from "@/domain/models/circle";
 import { getAppUrl } from "./app-url";
@@ -13,6 +14,22 @@ export function isCircleIndexable(
   circle: { visibility: CircleVisibility } | null | undefined,
 ): boolean {
   return circle?.visibility === "PUBLIC";
+}
+
+// Open Graph + Twitter Card pour l'aperçu social (unfurl Slack/WhatsApp/iMessage…).
+// Partagé par /m/[slug] et /circles/[slug] : l'aperçu est émis pour toute page
+// accessible par lien, indépendamment de l'indexation crawler (robots). On
+// découple volontairement « privé = non indexable » de « génère l'aperçu de
+// partage ». L'og:image est injectée par la convention opengraph-image.tsx de
+// chaque route.
+export function buildSocialMetadata(
+  title: string,
+  description: string,
+): Pick<Metadata, "openGraph" | "twitter"> {
+  return {
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
+  };
 }
 
 // Per-locale absolute URLs for a path. `path` is the URL after the locale

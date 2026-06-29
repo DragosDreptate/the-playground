@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { prismaCircleRepository } from "@/infrastructure/repositories";
 import { getCircleBySlug } from "@/domain/usecases/get-circle";
 import { CircleNotFoundError } from "@/domain/errors";
+import { isValidSlug } from "@/lib/slug";
 import { getMomentGradient } from "@/lib/gradient";
 import { loadCoverAsOgJpeg } from "@/lib/og-image-loader";
 import { ogJpegResponse, ogFallbackResponse } from "@/lib/og/render";
@@ -22,6 +23,7 @@ export default async function OgImage({
   params: Promise<{ slug: string; locale: string }>;
 }) {
   const { slug, locale } = await params;
+  if (!isValidSlug(slug)) return new Response("Not found", { status: 404 });
 
   let circle;
   try {
@@ -35,10 +37,11 @@ export default async function OgImage({
     throw error;
   }
 
-  if (circle.visibility !== "PUBLIC") {
-    return new Response("Not found", { status: 404 });
-  }
-
+  // Pas de gate sur la visibilité ici : un Circle privé reste accessible par
+  // lien direct (partage), et son aperçu social doit s'afficher comme celui d'un
+  // Circle public. La règle « privé » agit sur l'indexation crawler (robots) et
+  // l'affichage Explorer, pas sur la génération de l'image de partage. Même
+  // pattern que la route OG de /m/[slug] (aucun gate de visibilité).
   const coverJpeg = circle.coverImage
     ? await loadCoverAsOgJpeg(circle.coverImage)
     : null;

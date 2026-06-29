@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { buildAlternates, isCircleIndexable } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildSocialMetadata,
+  isCircleIndexable,
+} from "@/lib/seo";
 
 const APP_URL = "https://the-playground.fr";
 
@@ -75,6 +79,38 @@ describe("buildAlternates", () => {
     it("falls back to FR as the canonical (defensive default)", () => {
       const result = buildAlternates("de", "/about");
       expect(result.canonical).toBe(`${APP_URL}/about`);
+    });
+  });
+});
+
+describe("buildSocialMetadata", () => {
+  describe("given a title and a description", () => {
+    it("emits an Open Graph website block carrying both", () => {
+      const result = buildSocialMetadata("Mon titre", "Ma description");
+      expect(result.openGraph).toEqual({
+        title: "Mon titre",
+        description: "Ma description",
+        type: "website",
+      });
+    });
+
+    it("emits a summary_large_image Twitter card carrying both", () => {
+      const result = buildSocialMetadata("Mon titre", "Ma description");
+      expect(result.twitter).toEqual({
+        card: "summary_large_image",
+        title: "Mon titre",
+        description: "Ma description",
+      });
+    });
+
+    // Le découplage indexation/aperçu repose sur ce contrat : le helper produit
+    // l'aperçu social sans aucune notion de visibilité. Un Circle/Moment privé
+    // partagé par lien doit afficher le même aperçu qu'un public ; seul `robots`
+    // (côté generateMetadata) dépend de la visibilité, jamais l'Open Graph.
+    it("never gates the social preview on visibility (no robots/index keys)", () => {
+      const result = buildSocialMetadata("x", "y") as Record<string, unknown>;
+      expect(result.robots).toBeUndefined();
+      expect(Object.keys(result).sort()).toEqual(["openGraph", "twitter"]);
     });
   });
 });
