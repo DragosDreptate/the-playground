@@ -10,7 +10,6 @@ import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import { DemoBadge } from "@/components/badges/demo-badge";
-import { Badge } from "@/components/ui/badge";
 import { CARD_HOVER, IconPill } from "@/components/cards/card-primitives";
 import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
 import type { CircleMemberRole, DashboardCircle } from "@/domain/models/circle";
@@ -75,62 +74,32 @@ function PublicVariant({
       ? t("circleCard.roleBadge.host")
       : t("circleCard.roleBadge.member");
 
-  // Badge rôle inline (mobile, dans le body).
-  const roleBadge = membershipRole ? (
-    <Badge variant="outline" className="shrink-0 gap-1 border-primary/40 text-xs text-primary">
-      <RoleIcon className="size-3" />
-      <span className="hidden sm:inline">{roleLabel}</span>
-    </Badge>
-  ) : null;
-
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
-      {/* ─── Mobile (< sm) : horizontal — repris de PublicCircleCard ─── */}
+      {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
       <div
-        className={`sm:hidden bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
-        <div className="flex items-center gap-6">
-          <div
-            className={`relative size-[88px] shrink-0 overflow-hidden rounded-xl ${circle.coverImage ? COVER_IMAGE_BG : ""}`}
-            style={circle.coverImage ? undefined : { background: gradient }}
-          >
-            {circle.coverImage && (
-              <Image
-                src={circle.coverImage}
-                alt={circle.name}
-                width={150}
-                height={150}
-                className="size-full object-cover"
-                sizes="150px"
-              />
-            )}
-            {circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
-          </div>
-          <div className="min-w-0 flex-1 space-y-1">
-            {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
-            <h3 className="min-w-0 truncate text-sm font-semibold leading-snug">{circle.name}</h3>
-            <p className="text-muted-foreground line-clamp-1 text-xs">{circle.description}</p>
-            <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
-              {circle.city && (
-                <div className="flex items-center gap-1">
-                  <MapPin className="size-3.5 shrink-0" />
-                  <span>{circle.city}</span>
-                </div>
-              )}
-              {circle.upcomingMomentCount > 0 && (
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="size-3.5 shrink-0" />
-                  <span>{t("circleCard.upcomingMoments", { count: circle.upcomingMomentCount })}</span>
-                </div>
-              )}
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
+          {membershipRole && (
+            <CoverBadgeOverlay
+              icon={RoleIcon}
+              label={roleLabel}
+              className="border-primary/40 text-primary"
+            />
+          )}
+        </VerticalCover>
+        <div className="flex flex-col gap-1.5 p-3">
+          {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
+          <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
+          {circle.city && (
+            <div className="text-muted-foreground flex items-center gap-1 text-xs">
+              <MapPin className="size-3.5 shrink-0" />
+              <span className="truncate">{circle.city}</span>
             </div>
-            {(circle.memberCount > 0 || roleBadge) && (
-              <div className="flex items-center gap-2">
-                <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
-                {roleBadge}
-              </div>
-            )}
-          </div>
+          )}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
         </div>
       </div>
 
@@ -177,54 +146,35 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
       ? `/circles/${circle.slug}`
       : `/dashboard/circles/${circle.slug}`;
 
-  const pendingBadge =
-    circle.membershipStatus === "PENDING" ? (
-      <Badge variant="outline" className="shrink-0 gap-1 border-amber-500/40 text-xs text-amber-500">
-        <Clock className="size-3" />
-        <span className="hidden sm:inline">{t("circleCard.roleBadge.pending")}</span>
-      </Badge>
-    ) : null;
-
   return (
     <Link href={href} className="group block min-w-0">
-      {/* ─── Mobile (< sm) : horizontal — repris de DashboardCircleCard ─── */}
+      {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
       <div
-        className={`sm:hidden bg-card overflow-hidden rounded-2xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
-        <div className="flex items-center gap-4">
-          <div
-            className={`size-[100px] shrink-0 overflow-hidden rounded-xl ${circle.coverImage ? COVER_IMAGE_BG : ""}`}
-            style={circle.coverImage ? undefined : { background: gradient }}
-          >
-            {circle.coverImage && (
-              <Image
-                src={circle.coverImage}
-                alt={circle.name}
-                width={100}
-                height={100}
-                className="size-full object-cover"
-                sizes="100px"
-              />
-            )}
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-            {categoryLabel && (
-              <div className="flex items-center gap-2">
-                <CategoryBadge label={categoryLabel} />
-              </div>
-            )}
-            <h3 className="truncate text-sm font-semibold leading-snug">{circle.name}</h3>
-            {circle.city && (
-              <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                <MapPin className="size-3.5 shrink-0" />
-                <span>{circle.city}</span>
-              </div>
-            )}
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {circle.membershipStatus === "PENDING" && (
+            <CoverBadgeOverlay
+              icon={Clock}
+              label={t("circleCard.roleBadge.pending")}
+              className="border-amber-500/40 text-amber-500"
+            />
+          )}
+        </VerticalCover>
+        <div className="flex flex-col gap-1.5 p-3">
+          {categoryLabel && (
             <div className="flex items-center gap-2">
-              <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
-              {pendingBadge}
+              <CategoryBadge label={categoryLabel} />
             </div>
-          </div>
+          )}
+          <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
+          {circle.city && (
+            <div className="text-muted-foreground flex items-center gap-1 text-xs">
+              <MapPin className="size-3.5 shrink-0" />
+              <span className="truncate">{circle.city}</span>
+            </div>
+          )}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
         </div>
       </div>
 
