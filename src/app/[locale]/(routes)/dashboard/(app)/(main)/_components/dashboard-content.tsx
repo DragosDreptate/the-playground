@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { measureTime } from "@/lib/perf-logger";
 import { prismaRegistrationRepository } from "@/infrastructure/repositories";
 import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
-import { DashboardCircleCard } from "@/components/circles/dashboard-circle-card";
+import { CommunityCard } from "@/components/circles/community-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import { Link } from "@/i18n/navigation";
 import { PastEventsList } from "./past-events-list";
@@ -191,9 +191,9 @@ export async function DashboardContent({
           )}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {filteredCircles.map((circle) => (
-            <DashboardCircleCard key={circle.id} circle={circle} />
+            <CommunityCard key={circle.id} variant="dashboard" circle={circle} />
           ))}
         </div>
       )}

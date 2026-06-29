@@ -4,11 +4,11 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Clock, Users } from "lucide-react";
+import { MapPin, Globe, Clock } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
@@ -84,24 +84,22 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     (props.registration.status === "REGISTERED" ||
       props.registration.status === "CHECKED_IN");
   const isWaitlisted = !isOrganizerView && !isOrganizer && props.registration.status === "WAITLISTED";
+  const isPendingApproval =
+    !isOrganizerView && !isOrganizer && props.registration.status === "PENDING_APPROVAL";
 
-  const dotClass = isPast
-    ? "bg-border"
-    : isDraft
-      ? "bg-muted-foreground/40"
-      : isOrganizerView || isOrganizer
-        ? "bg-primary"
-        : isRegistered
-          ? "bg-primary"
-          : isWaitlisted
-            ? "bg-amber-400"
-            : "bg-border";
+  const dotClass = momentDotClass({
+    isPast,
+    isDraft,
+    isAmber: isWaitlisted || isPendingApproval,
+    // Actif : rose pour le Host/inscrit, neutre pour une inscription inactive.
+    defaultClass: isOrganizerView || isOrganizer || isRegistered ? "bg-primary" : "bg-border",
+  });
 
   const cardBorderClass = isDraft
     ? "border-dashed border-muted-foreground/30 opacity-70"
     : isPast
       ? "border-border"
-      : "border-border hover:border-primary/30";
+      : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
@@ -115,62 +113,56 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         : momentData.locationName;
 
   const waitlistedBadge = !isPast && !isDraft && isWaitlisted ? (
-    <Badge variant="secondary" className="shrink-0 gap-1 text-xs">
-      <Clock className="size-3" />
-      <span className="hidden sm:inline">{t("registrationStatus.waitlisted")}</span>
-    </Badge>
+    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} hideLabelOnMobile />
+  ) : null;
+
+  const pendingApprovalBadge = !isPast && !isDraft && isPendingApproval ? (
+    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
   ) : null;
 
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
   return (
-    <div className="flex gap-0">
-      {/* Date column */}
-      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
-        {!isPast && isToday ? (
-          <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-            {tCircle("detail.today")}
-          </span>
-        ) : (
-          <>
-            <p
-              className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-              suppressHydrationWarning
-            >
-              {weekday}
-            </p>
-            <p
-              className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}
-              suppressHydrationWarning
-            >
-              {dateStr}
-            </p>
-          </>
-        )}
-        <p
-          className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
-          suppressHydrationWarning
-        >
-          {timeStr}
-        </p>
-      </div>
-
-      {/* Dot + vertical line */}
-      <div className="flex shrink-0 flex-col items-center">
-        <div className={`mt-2 size-2 shrink-0 rounded-full ${dotClass}`} />
-        {!isLast && (
-          <div className="mt-2 flex-1 border-l border-dashed border-border" />
-        )}
-      </div>
-
-      {/* Card */}
-      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
-        <Link
-          href={`/dashboard/circles/${momentData.circleSlug}/moments/${momentData.slug}`}
-          className="group block"
-        >
+    <TimelineScaffold
+      dotClass={dotClass}
+      isLast={isLast}
+      dateColumn={
+        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+          {!isPast && isToday ? (
+            <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+              {tCircle("detail.today")}
+            </span>
+          ) : (
+            <>
+              <p
+                className={`text-xs ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+                suppressHydrationWarning
+              >
+                {weekday}
+              </p>
+              <p
+                className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}
+                suppressHydrationWarning
+              >
+                {dateStr}
+              </p>
+            </>
+          )}
+          <p
+            className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}
+            suppressHydrationWarning
+          >
+            {timeStr}
+          </p>
+        </div>
+      }
+    >
+      <Link
+        href={`/dashboard/circles/${momentData.circleSlug}/moments/${momentData.slug}`}
+        className="block"
+      >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none transition-colors ${cardBorderClass}`}
+            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}
           >
             <div className="min-w-0 flex-1 space-y-1.5">
               <div
@@ -179,12 +171,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 }`}
               >
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <Clock className="size-3.5 shrink-0" />
+                  <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
                   <span suppressHydrationWarning>{timeStr}</span>
                 </span>
                 {locationLabel && (
                   <span className="flex min-w-0 items-center gap-1.5">
-                    <LocationIcon className="size-3.5 shrink-0" />
+                    <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
                     <span className="truncate">{locationLabel}</span>
                   </span>
                 )}
@@ -192,7 +184,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
               <p
                 className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                  isPast ? "text-muted-foreground" : ""
                 }`}
               >
                 {momentData.title}
@@ -213,16 +205,10 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
               )}
 
               <div className="flex items-center gap-2">
-                <span
-                  className={`flex min-w-0 items-center gap-1.5 rounded-full border bg-muted/50 px-3 py-0.5 text-xs ${
-                    isPast ? "border-foreground/10 text-muted-foreground/60" : "border-foreground/20 text-muted-foreground"
-                  }`}
-                >
-                  <Users className="size-3 shrink-0" />
-                  <span className="truncate">{momentData.circleName}</span>
-                </span>
+                <CirclePill name={momentData.circleName} withIcon muted={isPast} />
                 <div className="hidden items-center gap-2 sm:flex">
                   {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                  {pendingApprovalBadge}
                   {waitlistedBadge}
                 </div>
               </div>
@@ -234,7 +220,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 alt={momentData.title}
                 width={100}
                 height={100}
-                className={`size-[100px] shrink-0 rounded-xl object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                className={`size-[100px] shrink-0 rounded-xl ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
               />
             ) : (
               <div
@@ -244,7 +230,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
             )}
           </div>
         </Link>
-      </div>
-    </div>
+    </TimelineScaffold>
   );
 }

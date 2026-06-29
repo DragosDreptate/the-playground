@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { MapPin, Globe, Clock, XCircle } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Attendee } from "@/components/moments/attendee-avatar-stack";
@@ -46,24 +46,20 @@ export async function MomentTimelineItem({
     userRegistrationStatus === "REGISTERED" ||
     userRegistrationStatus === "CHECKED_IN";
   const isWaitlisted = userRegistrationStatus === "WAITLISTED";
+  const isPendingApproval = userRegistrationStatus === "PENDING_APPROVAL";
 
-  const dotClass = isCancelled
-    ? "bg-destructive/50"
-    : isPast
-      ? "bg-border"
-      : isDraft
-        ? "bg-muted-foreground/40"
-        : isWaitlisted
-          ? "bg-amber-400"
-          : "bg-primary";
+  const dotClass = momentDotClass({
+    isCancelled,
+    isPast,
+    isDraft,
+    isAmber: isWaitlisted || isPendingApproval,
+  });
 
   const cardBorderClass = isCancelled
     ? "border-destructive/20"
     : isDraft
       ? "border-dashed border-muted-foreground/30 opacity-70"
-      : isPast
-        ? "border-border"
-        : "border-border hover:border-primary/30";
+      : "border-border";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -86,55 +82,41 @@ export async function MomentTimelineItem({
       : isDraft
         ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
         : isRegistered
-          ? (
-              <Badge variant="outline" className="gap-1 border-primary/40 text-xs text-primary">
-                <Check className="size-3" />
-                {tDashboard("registrationStatus.registered")}
-              </Badge>
-            )
-          : isWaitlisted
-            ? (
-                <Badge variant="secondary" className="gap-1 text-xs">
-                  <Clock className="size-3" />
-                  {tDashboard("registrationStatus.waitlisted")}
-                </Badge>
-              )
-            : null;
+          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} />
+          : isPendingApproval
+            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} />
+            : isWaitlisted
+              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} />
+              : null;
 
   return (
-    <div className="flex gap-0">
-      {/* Date column */}
-      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
-        {isToday ? (
-          <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-            {tCircle("detail.today")}
-          </span>
-        ) : (
-          <>
-            <p className="text-muted-foreground text-xs">{weekday}</p>
-            <p className="text-sm font-medium leading-snug">{dateStr}</p>
-          </>
-        )}
-        <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-          {timeStr}
-        </p>
-      </div>
-
-      {/* Dot + vertical line */}
-      <div className="flex shrink-0 flex-col items-center">
-        <div className={`mt-2 size-2 shrink-0 rounded-full ${dotClass}`} />
-        {!isLast && (
-          <div className="mt-2 flex-1 border-l border-dashed border-border" />
-        )}
-      </div>
-
-      {/* Card */}
-      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
-        <Link
+    <TimelineScaffold
+      dotClass={dotClass}
+      isLast={isLast}
+      spacing="pb-8"
+      dateColumn={
+        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+          {isToday ? (
+            <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+              {tCircle("detail.today")}
+            </span>
+          ) : (
+            <>
+              <p className="text-muted-foreground text-xs">{weekday}</p>
+              <p className="text-sm font-medium leading-snug">{dateStr}</p>
+            </>
+          )}
+          <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+            {timeStr}
+          </p>
+        </div>
+      }
+    >
+      <Link
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
-          className="group block"
+          className="block"
         >
-          <div className={`bg-card flex flex-col rounded-xl border transition-colors ${cardBorderClass}`}>
+          <div className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}>
             {/* Bandeau annulation */}
             {isCancelled && (
               <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
@@ -149,18 +131,31 @@ export async function MomentTimelineItem({
             <div className="flex items-center gap-4 p-4">
               {/* Content */}
               <div className="flex min-w-0 flex-1 flex-col gap-2">
+                {/* Mobile : lieu inline (l'heure est dans la colonne date) */}
+                {locationLabel && (
+                  <div
+                    className={`flex items-center gap-1.5 text-xs sm:hidden ${
+                      isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
+                  </div>
+                )}
+
+                {/* Desktop : heure + lieu en pastilles sur une ligne */}
                 <div
-                  className={`flex items-center gap-3 text-xs ${
+                  className={`hidden items-center gap-3 text-xs sm:flex ${
                     isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                   }`}
                 >
-                  <span className="hidden shrink-0 items-center gap-1.5 sm:flex">
-                    <Clock className="size-3.5 shrink-0" />
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <IconPill icon={Clock} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                     {timeStr}
                   </span>
                   {locationLabel && (
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <LocationIcon className="size-3.5 shrink-0" />
+                      <IconPill icon={LocationIcon} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                       <span className="truncate">{locationLabel}</span>
                     </span>
                   )}
@@ -173,27 +168,36 @@ export async function MomentTimelineItem({
                       ? "text-muted-foreground line-through"
                       : isPast
                         ? "text-muted-foreground"
-                        : "group-hover:text-primary dark:group-hover:text-[oklch(0.76_0.27_341)] transition-colors"
+                        : ""
                   }`}
                 >
                   {moment.title}
                 </p>
 
-                {!isCancelled && registrationCount > 0 && (
-                  <div className={isPast ? "opacity-60" : ""}>
-                    <AttendeeAvatarStack
-                      attendees={topAttendees}
-                      totalCount={registrationCount}
-                      label={
-                        topAttendees.length < registrationCount
-                          ? t("registrations.moreRegistered", { count: registrationCount - topAttendees.length })
-                          : t("registrations.registered", { count: registrationCount })
-                      }
-                    />
+                {((!isCancelled && registrationCount > 0) || statusBadge) && (
+                  // Sans inscrit, le seul enfant (badge) est `hidden sm:block` :
+                  // masquer le wrapper en mobile pour ne pas laisser un gap vide.
+                  <div
+                    className={`items-center gap-2 ${
+                      !isCancelled && registrationCount > 0 ? "flex" : "hidden sm:flex"
+                    }`}
+                  >
+                    {!isCancelled && registrationCount > 0 && (
+                      <div className={isPast ? "opacity-60" : ""}>
+                        <AttendeeAvatarStack
+                          attendees={topAttendees}
+                          totalCount={registrationCount}
+                          label={
+                            topAttendees.length < registrationCount
+                              ? t("registrations.moreRegistered", { count: registrationCount - topAttendees.length })
+                              : t("registrations.registered", { count: registrationCount })
+                          }
+                        />
+                      </div>
+                    )}
+                    {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
                   </div>
                 )}
-
-                {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
               </div>
 
               {/* Thumbnail */}
@@ -203,7 +207,7 @@ export async function MomentTimelineItem({
                   alt={moment.title}
                   width={100}
                   height={100}
-                  className={`size-[100px] shrink-0 rounded-lg object-cover ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[100px] shrink-0 rounded-lg object-cover ${COVER_IMAGE_BG} ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
@@ -214,8 +218,6 @@ export async function MomentTimelineItem({
             </div>
           </div>
         </Link>
-
-      </div>
-    </div>
+    </TimelineScaffold>
   );
 }

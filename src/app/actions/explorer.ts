@@ -13,8 +13,12 @@ import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/c
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
 
-const PAGE_SIZE = 10;
-const FETCH_SIZE = PAGE_SIZE + 1;
+import {
+  CIRCLES_PAGE_SIZE,
+  CIRCLES_FETCH_SIZE,
+  MOMENTS_PAGE_SIZE,
+  MOMENTS_FETCH_SIZE,
+} from "@/lib/explorer-pagination";
 
 export async function loadMoreCirclesAction({
   offset,
@@ -33,7 +37,7 @@ export async function loadMoreCirclesAction({
 
   const [fetched, userCircles] = await Promise.all([
     getPublicCircles(
-      { category, sortBy, limit: FETCH_SIZE, offset },
+      { category, sortBy, limit: CIRCLES_FETCH_SIZE, offset },
       { circleRepository: prismaCircleRepository }
     ),
     session?.user?.id
@@ -41,8 +45,8 @@ export async function loadMoreCirclesAction({
       : Promise.resolve([]),
   ]);
 
-  const hasMore = fetched.length > PAGE_SIZE;
-  const circles = hasMore ? fetched.slice(0, PAGE_SIZE) : fetched;
+  const hasMore = fetched.length > CIRCLES_PAGE_SIZE;
+  const circles = hasMore ? fetched.slice(0, CIRCLES_PAGE_SIZE) : fetched;
 
   const membershipRoleMap: Record<string, CircleMemberRole> = {};
   for (const c of userCircles) {
@@ -70,7 +74,7 @@ export async function loadMoreMomentsAction({
 
   const [fetched, userCircles] = await Promise.all([
     getPublicUpcomingMoments(
-      { category, sortBy, limit: FETCH_SIZE, offset },
+      { category, sortBy, limit: MOMENTS_FETCH_SIZE, offset },
       { momentRepository: prismaMomentRepository }
     ),
     session?.user?.id
@@ -78,8 +82,8 @@ export async function loadMoreMomentsAction({
       : Promise.resolve([]),
   ]);
 
-  const hasMore = fetched.length > PAGE_SIZE;
-  const moments = hasMore ? fetched.slice(0, PAGE_SIZE) : fetched;
+  const hasMore = fetched.length > MOMENTS_PAGE_SIZE;
+  const moments = hasMore ? fetched.slice(0, MOMENTS_PAGE_SIZE) : fetched;
 
   const registrationStatusMap: Record<string, RegistrationStatus | null> = {};
   if (session?.user?.id && moments.length > 0) {

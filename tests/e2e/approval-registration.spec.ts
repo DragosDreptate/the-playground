@@ -434,9 +434,17 @@ test.describe("Dashboard participant — pending states", () => {
     await circlesTab.click();
     await playerPage.waitForLoadState("domcontentloaded");
 
-    // Le badge dashboard utilise "En attente de validation" (Circle.circleCard.roleBadge.pending)
+    // Le badge dashboard utilise "En attente de validation" (Explorer.circleCard.roleBadge.pending)
     // alors que le banner Moment/Circle utilise "Demande en cours de validation".
-    await expect(playerPage.getByText(/en attente de validation|en cours de validation|pending approval/i).first()).toBeVisible({ timeout: 15_000 });
+    // La carte Communauté a deux branches (mobile sm:hidden / desktop hidden sm:flex) : le label
+    // existe dans les deux, mais le span mobile est masqué au breakpoint desktop. On cible donc
+    // explicitement l'occurrence visible, sinon .first() tombe sur le span mobile caché.
+    await expect(
+      playerPage
+        .getByText(/en attente de validation|en cours de validation|pending approval/i)
+        .filter({ visible: true })
+        .first()
+    ).toBeVisible({ timeout: 15_000 });
     await playerCtx.close();
   });
 });

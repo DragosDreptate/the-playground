@@ -23,3 +23,10 @@ export function getMomentGradient(seed: string): string {
   return GRADIENTS[hashString(seed) % GRADIENTS.length];
 }
 
+/**
+ * Fond appliqué derrière une cover qui affiche une image (event ou Communauté).
+ * Dégradé blanc → gris pâle (style Luma) pour que les logos PNG/WebP transparents
+ * ne laissent pas voir le fond sombre de la carte. Source unique : à ajuster ici.
+ */
+export const COVER_IMAGE_BG = "bg-radial from-white via-neutral-100 to-neutral-300";
+
