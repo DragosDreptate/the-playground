@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Check, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { Badge } from "@/components/ui/badge";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
@@ -101,37 +101,29 @@ export async function MomentTimelineItem({
             : null;
 
   return (
-    <div className="group flex gap-0">
-      {/* Date column */}
-      <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
-        {isToday ? (
-          <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-            {tCircle("detail.today")}
-          </span>
-        ) : (
-          <>
-            <p className="text-muted-foreground text-xs">{weekday}</p>
-            <p className="text-sm font-medium leading-snug">{dateStr}</p>
-          </>
-        )}
-        <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
-          {timeStr}
-        </p>
-      </div>
-
-      {/* Dot + vertical line */}
-      <div className="flex shrink-0 flex-col items-center">
-        <div
-          className={`mt-2 size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-150 ${dotClass}`}
-        />
-        {!isLast && (
-          <div className="mt-2 flex-1 border-l border-dashed border-border" />
-        )}
-      </div>
-
-      {/* Card */}
-      <div className={`min-w-0 flex-1 pl-2 sm:pl-4 ${isLast ? "pb-0" : "pb-8"}`}>
-        <Link
+    <TimelineScaffold
+      dotClass={dotClass}
+      isLast={isLast}
+      spacing="pb-8"
+      dateColumn={
+        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+          {isToday ? (
+            <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+              {tCircle("detail.today")}
+            </span>
+          ) : (
+            <>
+              <p className="text-muted-foreground text-xs">{weekday}</p>
+              <p className="text-sm font-medium leading-snug">{dateStr}</p>
+            </>
+          )}
+          <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
+            {timeStr}
+          </p>
+        </div>
+      }
+    >
+      <Link
           href={variant === "public" ? `/m/${moment.slug}` : `/dashboard/circles/${circleSlug}/moments/${moment.slug}`}
           className="block"
         >
@@ -237,8 +229,6 @@ export async function MomentTimelineItem({
             </div>
           </div>
         </Link>
-
-      </div>
-    </div>
+    </TimelineScaffold>
   );
 }

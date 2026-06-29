@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatShortDate, formatTime, formatWeekdayAndDate } from "@/lib/format-date";
 import { MapPin, Globe, Crown, Clock, Check } from "lucide-react";
-import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill } from "@/components/cards/card-primitives";
+import { CARD_HOVER, CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { Badge } from "@/components/ui/badge";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
@@ -152,36 +152,33 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       </Link>
 
       {/* ─── Desktop / tablette (≥ sm) : timeline — NOUVEAU ─── */}
-      <div className="hidden sm:flex group gap-0">
-        {/* Colonne date */}
-        <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
-          {isToday ? (
-            <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              {tCircle("detail.today")}
-            </span>
-          ) : (
-            <>
-              <p className="text-muted-foreground text-xs" suppressHydrationWarning>
-                {weekday}
-              </p>
-              <p className="text-sm font-medium leading-snug" suppressHydrationWarning>
-                {columnDate}
-              </p>
-            </>
-          )}
-          <p className="text-muted-foreground mt-0.5 text-xs" suppressHydrationWarning>
-            {timeStr}
-          </p>
-        </div>
-
-        {/* Dot + ligne verticale */}
-        <div className="flex shrink-0 flex-col items-center">
-          <div className="bg-primary mt-2 size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-150" />
-          {!isLast && <div className="mt-2 flex-1 border-l border-dashed border-border" />}
-        </div>
-
-        {/* Carte */}
-        <div className={`min-w-0 flex-1 pl-4 ${isLast ? "pb-0" : "pb-7"}`}>
+      <TimelineScaffold
+        dotClass="bg-primary"
+        isLast={isLast}
+        className="hidden sm:flex group gap-0"
+        cardPadding="pl-4"
+        dateColumn={
+          <div className="w-[100px] shrink-0 pr-4 pt-1 text-right">
+            {isToday ? (
+              <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
+                {tCircle("detail.today")}
+              </span>
+            ) : (
+              <>
+                <p className="text-muted-foreground text-xs" suppressHydrationWarning>
+                  {weekday}
+                </p>
+                <p className="text-sm font-medium leading-snug" suppressHydrationWarning>
+                  {columnDate}
+                </p>
+              </>
+            )}
+            <p className="text-muted-foreground mt-0.5 text-xs" suppressHydrationWarning>
+              {timeStr}
+            </p>
+          </div>
+        }
+      >
           <Link href={`/m/${moment.slug}`} className="block">
             <div className={`bg-card flex items-center gap-6 overflow-hidden rounded-2xl border p-4 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP}`}>
               <div className="min-w-0 flex-1 space-y-1.5">
@@ -218,8 +215,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
               </div>
             </div>
           </Link>
-        </div>
-      </div>
+      </TimelineScaffold>
     </>
   );
 }

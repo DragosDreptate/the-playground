@@ -40,6 +40,43 @@ export function IconPill({
   );
 }
 
+/**
+ * Échafaudage de rangée de timeline (colonne date + dot avec effet loupe + ligne
+ * verticale pointillée + carte). Partagé par les 3 timelines (Mon Espace, page
+ * Communauté, Explorer desktop). Les parties qui diffèrent (colonne date, couleur
+ * du dot, paddings) sont passées en props ; la carte est passée en `children`.
+ */
+export function TimelineScaffold({
+  dateColumn,
+  dotClass,
+  isLast,
+  className = "group flex gap-0",
+  cardPadding = "pl-2 sm:pl-4",
+  spacing = "pb-7",
+  children,
+}: {
+  dateColumn: React.ReactNode;
+  dotClass: string;
+  isLast: boolean;
+  className?: string;
+  cardPadding?: string;
+  spacing?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={className}>
+      {dateColumn}
+      <div className="flex shrink-0 flex-col items-center">
+        <div
+          className={`mt-2 size-2 shrink-0 rounded-full transition-transform duration-150 group-hover:scale-150 ${dotClass}`}
+        />
+        {!isLast && <div className="mt-2 flex-1 border-l border-dashed border-border" />}
+      </div>
+      <div className={`min-w-0 flex-1 ${cardPadding} ${isLast ? "pb-0" : spacing}`}>{children}</div>
+    </div>
+  );
+}
+
 /** Capsule de rattachement à une Communauté (bordure + fond muted, icône optionnelle). */
 export function CirclePill({
   name,
