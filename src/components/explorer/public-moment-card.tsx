@@ -129,47 +129,54 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
     >
       <Link href={`/m/${moment.slug}`} className="block">
         <div
-          className={`bg-card flex items-center gap-3 overflow-hidden rounded-xl border p-3 shadow-lg dark:shadow-none sm:gap-6 sm:rounded-2xl sm:p-4 ${CARD_HOVER_GROUP}`}
+          className={`bg-card flex flex-col gap-2 overflow-hidden rounded-xl border p-3 shadow-lg dark:shadow-none sm:flex-row sm:items-center sm:gap-6 sm:rounded-2xl sm:p-4 ${CARD_HOVER_GROUP}`}
         >
-          <div className="min-w-0 flex-1 space-y-1.5">
-            {contextLine}
-            <h3 className="line-clamp-2 text-sm font-semibold leading-snug sm:text-base">{moment.title}</h3>
-            {moment.description && (
-              <p className="text-muted-foreground hidden line-clamp-1 text-sm sm:block">{moment.description}</p>
-            )}
-            {locationLabel && (
-              <>
-                {/* Mobile : lieu en icône simple */}
-                <div className="text-muted-foreground flex items-center gap-1.5 text-xs sm:hidden">
-                  <LocationIcon className="size-3.5 shrink-0" />
-                  <span className="truncate">{locationLabel}</span>
-                </div>
-                {/* Desktop : lieu en pastille */}
-                <div className="text-muted-foreground hidden items-center gap-2 text-sm sm:flex">
-                  <IconPill icon={LocationIcon} size="md" />
-                  <span className="truncate">{locationLabel}</span>
-                </div>
-              </>
-            )}
-            {socialRow}
-          </div>
+          {/* Titre — pleine largeur au-dessus, une seule ligne (mobile uniquement) */}
+          <h3 className="truncate text-sm font-semibold leading-snug sm:hidden">{moment.title}</h3>
 
-          {/* Cover — à droite (80px mobile / 160px desktop) */}
-          <div
-            className={`relative size-[80px] shrink-0 overflow-hidden rounded-xl sm:size-[160px] ${moment.coverImage ? COVER_IMAGE_BG : ""}`}
-            style={moment.coverImage ? undefined : { background: gradient }}
-          >
-            {moment.coverImage && (
-              <Image
-                src={moment.coverImage}
-                alt={moment.title}
-                width={160}
-                height={160}
-                className="size-full object-cover"
-                sizes="(max-width: 640px) 80px, 160px"
-              />
-            )}
-            {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
+          {/* Rangée infos | cover. En desktop, `contents` dissout ce wrapper :
+              body et cover redeviennent enfants directs de la carte (layout #598). */}
+          <div className="flex items-center gap-3 sm:contents">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              {contextLine}
+              <h3 className="hidden line-clamp-2 text-base font-semibold leading-snug sm:block">{moment.title}</h3>
+              {moment.description && (
+                <p className="text-muted-foreground hidden line-clamp-1 text-sm sm:block">{moment.description}</p>
+              )}
+              {locationLabel && (
+                <>
+                  {/* Mobile : lieu en icône simple */}
+                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs sm:hidden">
+                    <LocationIcon className="size-3.5 shrink-0" />
+                    <span className="truncate">{locationLabel}</span>
+                  </div>
+                  {/* Desktop : lieu en pastille */}
+                  <div className="text-muted-foreground hidden items-center gap-2 text-sm sm:flex">
+                    <IconPill icon={LocationIcon} size="md" />
+                    <span className="truncate">{locationLabel}</span>
+                  </div>
+                </>
+              )}
+              {socialRow}
+            </div>
+
+            {/* Cover — à droite (80px mobile / 160px desktop) */}
+            <div
+              className={`relative size-[80px] shrink-0 overflow-hidden rounded-xl sm:size-[160px] ${moment.coverImage ? COVER_IMAGE_BG : ""}`}
+              style={moment.coverImage ? undefined : { background: gradient }}
+            >
+              {moment.coverImage && (
+                <Image
+                  src={moment.coverImage}
+                  alt={moment.title}
+                  width={160}
+                  height={160}
+                  className="size-full object-cover"
+                  sizes="(max-width: 640px) 80px, 160px"
+                />
+              )}
+              {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
+            </div>
           </div>
         </div>
       </Link>
