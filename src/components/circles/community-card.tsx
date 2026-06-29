@@ -92,7 +92,7 @@ function PublicVariant({
         </VerticalCover>
         <div className="flex flex-col gap-1.5 p-3">
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
-          <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
+          <h3 className="line-clamp-2 min-h-[2.5em] text-base font-semibold leading-snug">{circle.name}</h3>
           {circle.city && (
             <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <IconPill icon={MapPin} size="sm" />
@@ -167,7 +167,7 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
               <CategoryBadge label={categoryLabel} />
             </div>
           )}
-          <h3 className="line-clamp-2 min-h-[2.5em] text-sm font-semibold leading-snug">{circle.name}</h3>
+          <h3 className="line-clamp-2 min-h-[2.5em] text-base font-semibold leading-snug">{circle.name}</h3>
           {circle.city && (
             <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
               <IconPill icon={MapPin} size="sm" />
