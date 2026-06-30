@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatTime, formatWeekdayAndDate, formatDayMonthShort } from "@/lib/format-date";
+import { formatTime, formatWeekdayAndDate, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
@@ -42,12 +41,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   const timeStr = formatTime(startsAt);
   const { weekday, dateStr: columnDate } = formatWeekdayAndDate(startsAt, locale);
   const columnDateShort = formatDayMonthShort(startsAt, locale);
-
-  // « Aujourd'hui » calculé côté client pour éviter un mismatch d'hydratation.
-  const [isToday, setIsToday] = useState(false);
-  useEffect(() => {
-    setIsToday(startsAt.toDateString() === new Date().toDateString());
-  }, [startsAt]);
+  // « Aujourd'hui » ancré sur Europe/Paris (cohérent serveur/client et avec la carte
+  // sœur de la page Communauté), pas sur le fuseau du navigateur.
+  const isToday = isSameDayInParis(startsAt, new Date());
 
   const isOnline = moment.locationType === "ONLINE" || moment.locationType === "HYBRID";
   const locationLabel = isOnline ? t("momentCard.online") : (moment.locationName ?? null);

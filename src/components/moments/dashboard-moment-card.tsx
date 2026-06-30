@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -9,7 +8,7 @@ import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime, formatDayMonthShort } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatTime, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
@@ -71,11 +70,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         topAttendees: props.registration.moment.topAttendees,
       };
 
-  const [isToday, setIsToday] = useState(false);
-  useEffect(() => {
-    const now = new Date();
-    setIsToday(momentData.startsAt.toDateString() === now.toDateString());
-  }, [momentData.startsAt]);
+  // « Aujourd'hui » ancré sur Europe/Paris, pas sur le fuseau du navigateur.
+  const isToday = isSameDayInParis(momentData.startsAt, new Date());
 
   const isOrganizer = !isOrganizerView && (props as ParticipantProps).isOrganizer === true;
   const isRegistered =
@@ -97,9 +93,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const cardBorderClass = isDraft
     ? "border-dashed border-muted-foreground/30 opacity-70"
-    : isPast
-      ? "border-border"
-      : "border-border";
+    : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
