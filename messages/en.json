@@ -231,6 +231,10 @@
     "emptyCirclesHintExplore": "Explore communities →",
     "noCirclesOrganizer": "You don't organize any community yet.",
     "noCirclesOrganizerHint": "Create your first community to get started.",
+    "exploreCommunitiesCard": {
+      "title": "Explore communities",
+      "subtitle": "Discover more communities to join"
+    },
     "onboardingMoments": {
       "emptyTitle": "No events yet",
       "emptyHintNoCircles": "Create your community and launch your first event.",

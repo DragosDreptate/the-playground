@@ -5,6 +5,7 @@ import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard
 import { CommunityCard } from "@/components/circles/community-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import { Link } from "@/i18n/navigation";
+import { Compass } from "lucide-react";
 import { PastEventsList } from "./past-events-list";
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
@@ -195,6 +196,21 @@ export async function DashboardContent({
           {filteredCircles.map((circle) => (
             <CommunityCard key={circle.id} variant="dashboard" circle={circle} />
           ))}
+          {/* Carte fantôme « Explorer » pour combler la première ligne incomplète :
+              mobile (2 col) → seulement avec 1 communauté ; desktop (3 col) → avec 1 ou 2.
+              Elle s'étire à la hauteur de la carte voisine (grille `align-items: stretch`). */}
+          {(filteredCircles.length === 1 || filteredCircles.length === 2) && (
+            <Link
+              href="/explorer"
+              className={`group h-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center transition-colors hover:border-muted-foreground hover:bg-card/60 ${
+                filteredCircles.length === 1 ? "flex" : "hidden sm:flex"
+              }`}
+            >
+              <Compass className="text-muted-foreground group-hover:text-foreground mb-1 size-7 transition-colors" />
+              <p className="text-sm font-semibold leading-snug">{t("exploreCommunitiesCard.title")}</p>
+              <p className="text-muted-foreground text-xs leading-snug">{t("exploreCommunitiesCard.subtitle")}</p>
+            </Link>
+          )}
         </div>
       )}
     </section>
