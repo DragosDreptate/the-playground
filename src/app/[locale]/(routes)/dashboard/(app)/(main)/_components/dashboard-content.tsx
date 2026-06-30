@@ -3,6 +3,7 @@ import { measureTime } from "@/lib/perf-logger";
 import { prismaRegistrationRepository } from "@/infrastructure/repositories";
 import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
 import { CommunityCard } from "@/components/circles/community-card";
+import { CARD_HOVER } from "@/components/cards/card-primitives";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
 import { Link } from "@/i18n/navigation";
 import { Compass } from "lucide-react";
@@ -202,7 +203,7 @@ export async function DashboardContent({
           {(filteredCircles.length === 1 || filteredCircles.length === 2) && (
             <Link
               href="/explorer"
-              className={`group h-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center transition-colors hover:border-muted-foreground hover:bg-card/60 ${
+              className={`group h-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-card/40 p-6 text-center ${CARD_HOVER} ${
                 filteredCircles.length === 1 ? "flex" : "hidden sm:flex"
               }`}
             >
