@@ -52,6 +52,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         status: props.moment.status,
         locationType: props.moment.locationType,
         locationName: props.moment.locationName,
+        locationAddress: props.moment.locationAddress,
         circleSlug: props.moment.circle.slug,
         circleName: props.moment.circle.name,
         circleCoverImage: props.moment.circle.coverImage,
@@ -66,6 +67,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         status: props.registration.moment.status,
         locationType: props.registration.moment.locationType,
         locationName: props.registration.moment.locationName,
+        locationAddress: props.registration.moment.locationAddress,
         circleSlug: props.registration.moment.circleSlug,
         circleName: props.registration.moment.circleName,
         circleCoverImage: props.registration.moment.circleCoverImage,
@@ -112,12 +114,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   const dateStrShort = formatDayMonthShort(momentData.startsAt, locale);
   const timeStr = formatTime(momentData.startsAt);
 
+  // Repli sur l'adresse quand aucun lieu nommé n'est saisi, comme la timeline
+  // de la page Communauté (moment-timeline-item).
   const locationLabel =
     momentData.locationType === "ONLINE"
       ? t("online")
       : momentData.locationType === "HYBRID"
         ? t("hybrid")
-        : momentData.locationName;
+        : momentData.locationName ?? momentData.locationAddress;
 
   const waitlistedBadge = !isCancelled && !isPast && !isDraft && isWaitlisted ? (
     <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} hideLabelOnMobile />

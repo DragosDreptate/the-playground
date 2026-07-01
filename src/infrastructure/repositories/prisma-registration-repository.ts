@@ -252,6 +252,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             status: true,
             locationType: true,
             locationName: true,
+            locationAddress: true,
             circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
@@ -270,6 +271,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
+        locationAddress: r.moment.locationAddress,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
@@ -300,6 +302,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             status: true,
             locationType: true,
             locationName: true,
+            locationAddress: true,
             circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
@@ -318,6 +321,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
+        locationAddress: r.moment.locationAddress,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
@@ -350,6 +354,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       mEndsAt: Date | null;
       mLocationType: string;
       mLocationName: string | null;
+      mLocationAddress: string | null;
       mStatus: string;
       cName: string;
       cSlug: string;
@@ -378,6 +383,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         m."endsAt"              AS "mEndsAt",
         m."locationType"        AS "mLocationType",
         m."locationName"        AS "mLocationName",
+        m."locationAddress"     AS "mLocationAddress",
         m.status                AS "mStatus",
         c.name                  AS "cName",
         c.slug                  AS "cSlug",
@@ -430,6 +436,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         status: row.mStatus as MomentStatus,
         locationType: row.mLocationType as LocationType,
         locationName: row.mLocationName,
+        locationAddress: row.mLocationAddress,
         circleName: row.cName,
         circleSlug: row.cSlug,
         circleCoverImage: row.cCoverImage,

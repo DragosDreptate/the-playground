@@ -70,6 +70,7 @@ export type RegistrationWithMoment = Registration & {
     status: MomentStatus;
     locationType: LocationType;
     locationName: string | null;
+    locationAddress: string | null;
     circleName: string;
     circleSlug: string;
     circleCoverImage: string | null;
