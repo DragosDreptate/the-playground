@@ -12,7 +12,7 @@ import type {
   RegistrationWithUser,
 } from "@/domain/models/registration";
 import type { LocationType, MomentStatus } from "@/domain/models/moment";
-import { isPastMoment } from "@/lib/moment-timeline";
+import { partitionUpcomingPast } from "@/lib/moment-timeline";
 import type { Registration as PrismaRegistration } from "@prisma/client";
 
 function toDomainRegistration(record: PrismaRegistration): Registration {
@@ -410,7 +410,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
           OR
           -- Événement annulé auquel l'utilisateur était inscrit : reste visible barré
           -- (à venir tant que la date n'est pas passée, sinon dans les passés).
-          (r.status IN ('REGISTERED', 'CHECKED_IN', 'WAITLISTED') AND m.status = 'CANCELLED')
+          (r.status IN ('REGISTERED', 'CHECKED_IN', 'WAITLISTED', 'PENDING_APPROVAL') AND m.status = 'CANCELLED')
         )
       ORDER BY m."startsAt" ASC
     `;
@@ -445,17 +445,16 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       },
     });
 
-    const now = Date.now();
-    const upcoming: RegistrationWithMoment[] = [];
-    const past: RegistrationWithMoment[] = [];
-    for (const row of rows) {
-      // Un annulé passé rejoint l'historique ; un annulé encore à venir reste
-      // dans l'agenda (barré). Voir isPastMoment / isUpcomingCancelled.
-      if (isPastMoment({ status: row.mStatus, startsAt: row.mStartsAt }, now)) past.push(toItem(row));
-      else upcoming.push(toItem(row));
-    }
-    // Les moments passés triés par date décroissante
-    past.sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
+    const { upcoming: upcomingRows, past: pastRows } = partitionUpcomingPast(
+      rows,
+      (r) => ({ status: r.mStatus, startsAt: r.mStartsAt }),
+      Date.now()
+    );
+    const upcoming = upcomingRows.map(toItem);
+    // Les moments passés triés par date décroissante.
+    const past = pastRows
+      .map(toItem)
+      .sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
 
     return { upcoming, past };
   },

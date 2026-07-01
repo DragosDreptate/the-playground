@@ -17,7 +17,7 @@ import type {
   MomentStatus,
 } from "@/domain/models/moment";
 import type { PublicMomentRegistration } from "@/domain/models/user";
-import { isPastMoment } from "@/lib/moment-timeline";
+import { byStartsAtDesc, partitionUpcomingPast } from "@/lib/moment-timeline";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -378,17 +378,14 @@ export const prismaMomentRepository: MomentRepository = {
       circle: { slug: row.cSlug, name: row.cName, coverImage: row.cCoverImage },
     });
 
-    const now = Date.now();
-    const upcoming: HostMomentSummary[] = [];
-    const past: HostMomentSummary[] = [];
-    for (const row of rows) {
-      // Un annulé passé rejoint l'historique ; un annulé encore à venir reste
-      // dans l'agenda (barré). Voir isPastMoment / isUpcomingCancelled.
-      if (isPastMoment({ status: row.status, startsAt: row.startsAt }, now)) past.push(toItem(row));
-      else upcoming.push(toItem(row));
-    }
-    // Les moments passés triés par date décroissante
-    past.sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
+    const { upcoming: upcomingRows, past: pastRows } = partitionUpcomingPast(
+      rows,
+      (r) => ({ status: r.status, startsAt: r.startsAt }),
+      Date.now()
+    );
+    const upcoming = upcomingRows.map(toItem);
+    // Les moments passés triés par date décroissante.
+    const past = pastRows.map(toItem).sort(byStartsAtDesc);
 
     return { upcoming, past };
   },

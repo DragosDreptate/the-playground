@@ -123,12 +123,14 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName ?? momentData.locationAddress;
 
+  // Ces pills n'apparaissent que dans le bloc desktop (`hidden sm:block`) : pas de
+  // `hideLabelOnMobile` (jamais montées sur mobile, le prop serait mort).
   const waitlistedBadge = !isCancelled && !isPast && !isDraft && isWaitlisted ? (
-    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} />
   ) : null;
 
   const pendingApprovalBadge = !isCancelled && !isPast && !isDraft && isPendingApproval ? (
-    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} />
   ) : null;
 
   // Pas de badge Organisateur sur Mon espace : la distinction organisateur/participant
@@ -157,7 +159,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
       cardPadding="pl-1 sm:pl-4"
       dateColumn={
         <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
-          {!isPast && isToday ? (
+          {!isPast && !isCancelled && isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
               <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
               <span className="hidden sm:inline">{tCircle("detail.today")}</span>
