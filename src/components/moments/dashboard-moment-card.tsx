@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -9,7 +9,7 @@ import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatTime, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
 
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
@@ -71,10 +71,12 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         topAttendees: props.registration.moment.topAttendees,
       };
 
+  // « Aujourd'hui » ancré sur Europe/Paris, pas sur le fuseau du navigateur. Calculé
+  // côté client après montage pour éviter tout mismatch d'hydratation si le HTML est
+  // servi après le passage de minuit.
   const [isToday, setIsToday] = useState(false);
   useEffect(() => {
-    const now = new Date();
-    setIsToday(momentData.startsAt.toDateString() === now.toDateString());
+    setIsToday(isSameDayInParis(momentData.startsAt, new Date()));
   }, [momentData.startsAt]);
 
   const isOrganizer = !isOrganizerView && (props as ParticipantProps).isOrganizer === true;
@@ -97,12 +99,11 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
   const cardBorderClass = isDraft
     ? "border-dashed border-muted-foreground/30 opacity-70"
-    : isPast
-      ? "border-border"
-      : "border-border";
+    : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
+  const dateStrShort = formatDayMonthShort(momentData.startsAt, locale);
   const timeStr = formatTime(momentData.startsAt);
 
   const locationLabel =
@@ -120,17 +121,38 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
   ) : null;
 
+  // Badge Organisateur (mobile) : seul badge de statut affiché sur Mon espace, pour
+  // distinguer les événements que j'organise de mes simples inscriptions.
+  const organizerBadge = isOrganizerView || isOrganizer ? (
+    <StatusPill {...REGISTRATION_PILL.host} label={t("role.host")} hideLabelOnMobile />
+  ) : null;
+
+  const attendeeStack =
+    momentData.registrationCount > 0 ? (
+      <AttendeeAvatarStack
+        attendees={momentData.topAttendees}
+        totalCount={momentData.registrationCount}
+        label={
+          momentData.topAttendees.length < momentData.registrationCount
+            ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
+            : tMoment("registrations.registered", { count: momentData.registrationCount })
+        }
+      />
+    ) : null;
+
   const LocationIcon = momentData.locationType === "IN_PERSON" ? MapPin : Globe;
 
   return (
     <TimelineScaffold
       dotClass={dotClass}
       isLast={isLast}
+      cardPadding="pl-1 sm:pl-4"
       dateColumn={
-        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+        <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
           {!isPast && isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              {tCircle("detail.today")}
+              <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
+              <span className="hidden sm:inline">{tCircle("detail.today")}</span>
             </span>
           ) : (
             <>
@@ -144,7 +166,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                 className={`text-sm font-medium leading-snug ${isPast ? "text-muted-foreground" : ""}`}
                 suppressHydrationWarning
               >
-                {dateStr}
+                <span className="sm:hidden">{dateStrShort}</span>
+                <span className="hidden sm:inline">{dateStr}</span>
               </p>
             </>
           )}
@@ -162,72 +185,96 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         className="block"
       >
           <div
-            className={`bg-card flex items-center gap-3 rounded-xl border p-3 shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}
+            className={`bg-card flex flex-col gap-2 rounded-xl border p-3 shadow-lg dark:shadow-none sm:flex-row sm:items-center sm:gap-3 ${CARD_HOVER_GROUP} ${cardBorderClass}`}
           >
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div
-                className={`hidden items-center gap-3 text-xs sm:flex ${
-                  isPast ? "text-muted-foreground/60" : "text-muted-foreground"
-                }`}
-              >
-                <span className="flex shrink-0 items-center gap-1.5">
-                  <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
-                  <span suppressHydrationWarning>{timeStr}</span>
-                </span>
-                {locationLabel && (
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
-                    <span className="truncate">{locationLabel}</span>
-                  </span>
-                )}
+            {/* Titre — pleine largeur au-dessus, une ligne (mobile uniquement) */}
+            <p
+              className={`truncate text-base font-semibold leading-snug sm:hidden ${
+                isPast ? "text-muted-foreground" : ""
+              }`}
+            >
+              {momentData.title}
+            </p>
+
+            {/* Rangée infos | cover. En desktop, `contents` dissout ce wrapper (layout #598). */}
+            <div className="flex items-start gap-3 sm:contents">
+              <div className="min-w-0 flex-1">
+                {/* === MOBILE — body identique aux cartes Explorer (sm:hidden) === */}
+                <div className="space-y-[7px] sm:hidden">
+                  <CirclePill name={momentData.circleName} withIcon muted={isPast} />
+                  {locationLabel && (
+                    <div
+                      className={`flex items-center gap-1.5 text-xs ${
+                        isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                      }`}
+                    >
+                      <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
+                      <span className="truncate">{locationLabel}</span>
+                    </div>
+                  )}
+                  {(attendeeStack || organizerBadge) && (
+                    <div className="flex items-center gap-2">
+                      {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
+                      {organizerBadge}
+                    </div>
+                  )}
+                </div>
+
+                {/* === DESKTOP — rendu #598 (hidden sm:block) === */}
+                <div className="hidden space-y-1.5 sm:block">
+                  <div
+                    className={`flex items-center gap-3 text-xs ${
+                      isPast ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="flex shrink-0 items-center gap-1.5">
+                      <IconPill icon={Clock} size="sm" className={isPast ? "opacity-60" : ""} />
+                      <span suppressHydrationWarning>{timeStr}</span>
+                    </span>
+                    {locationLabel && (
+                      <span className="flex min-w-0 items-center gap-1.5">
+                        <IconPill icon={LocationIcon} size="sm" className={isPast ? "opacity-60" : ""} />
+                        <span className="truncate">{locationLabel}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <p
+                    className={`line-clamp-2 font-semibold leading-snug ${
+                      isPast ? "text-muted-foreground" : ""
+                    }`}
+                  >
+                    {momentData.title}
+                  </p>
+
+                  {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
+
+                  <div className="flex items-center gap-2">
+                    <CirclePill name={momentData.circleName} withIcon muted={isPast} />
+                    <div className="flex items-center gap-2">
+                      {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                      {pendingApprovalBadge}
+                      {waitlistedBadge}
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <p
-                className={`line-clamp-2 font-semibold leading-snug ${
-                  isPast ? "text-muted-foreground" : ""
-                }`}
-              >
-                {momentData.title}
-              </p>
-
-              {momentData.registrationCount > 0 && (
-                <div className={isPast ? "opacity-60" : ""}>
-                  <AttendeeAvatarStack
-                    attendees={momentData.topAttendees}
-                    totalCount={momentData.registrationCount}
-                    label={
-                      momentData.topAttendees.length < momentData.registrationCount
-                        ? tMoment("registrations.moreRegistered", { count: momentData.registrationCount - momentData.topAttendees.length })
-                        : tMoment("registrations.registered", { count: momentData.registrationCount })
-                    }
-                  />
-                </div>
+              {momentData.coverImage ? (
+                <Image
+                  src={momentData.coverImage}
+                  alt={momentData.title}
+                  width={100}
+                  height={100}
+                  className={`size-[80px] shrink-0 rounded-xl sm:size-[100px] ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
+                />
+              ) : (
+                <div
+                  className={`size-[80px] shrink-0 rounded-xl sm:size-[100px] ${isPast ? "opacity-40 grayscale" : ""}`}
+                  style={{ background: gradient }}
+                />
               )}
-
-              <div className="flex items-center gap-2">
-                <CirclePill name={momentData.circleName} withIcon muted={isPast} />
-                <div className="hidden items-center gap-2 sm:flex">
-                  {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                  {pendingApprovalBadge}
-                  {waitlistedBadge}
-                </div>
-              </div>
             </div>
-
-            {momentData.coverImage ? (
-              <Image
-                src={momentData.coverImage}
-                alt={momentData.title}
-                width={100}
-                height={100}
-                className={`size-[100px] shrink-0 rounded-xl ${COVER_IMAGE_BG} object-cover ${isPast ? "opacity-40 grayscale" : ""}`}
-              />
-            ) : (
-              <div
-                className={`size-[100px] shrink-0 rounded-xl ${isPast ? "opacity-40 grayscale" : ""}`}
-                style={{ background: gradient }}
-              />
-            )}
           </div>
         </Link>
     </TimelineScaffold>

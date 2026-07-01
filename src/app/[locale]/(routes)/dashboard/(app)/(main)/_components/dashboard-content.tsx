@@ -4,8 +4,9 @@ import { prismaRegistrationRepository } from "@/infrastructure/repositories";
 import { getCachedDashboardCircles, getCachedHostMoments } from "@/lib/dashboard-cache";
 import { CommunityCard } from "@/components/circles/community-card";
 import { DashboardMomentCard } from "@/components/moments/dashboard-moment-card";
-import { Link } from "@/i18n/navigation";
+import { Compass } from "lucide-react";
 import { PastEventsList } from "./past-events-list";
+import { DashboardGhostCard } from "./dashboard-ghost-card";
 import type { RegistrationWithMoment } from "@/domain/models/registration";
 import type { HostMomentSummary } from "@/domain/models/moment";
 
@@ -91,18 +92,13 @@ export async function DashboardContent({
     return (
       <section>
         {!hasMoments ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-            <p className="text-muted-foreground text-sm">
-              {hostOnly ? t("noMomentsHostOnly") : t("noMoments")}
-            </p>
-            {!hostOnly && (
-              <p className="text-muted-foreground mt-1 text-xs">
-                <Link href="/explorer?tab=moments" className="hover:text-foreground underline underline-offset-4">
-                  {t("noMomentsHintExplore")}
-                </Link>
-              </p>
-            )}
-          </div>
+          <DashboardGhostCard
+            className="flex py-12"
+            icon={hostOnly ? undefined : Compass}
+            title={hostOnly ? t("noMomentsHostOnly") : t("noMoments")}
+            subtitle={hostOnly ? undefined : t("noMomentsHintExplore")}
+            href={hostOnly ? undefined : "/explorer?tab=moments"}
+          />
         ) : (
           <div>
             {filteredUpcoming.map((item, i) =>
@@ -178,23 +174,30 @@ export async function DashboardContent({
   return (
     <section>
       {filteredCircles.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
-          <p className="text-muted-foreground text-sm">
-            {hostOnly ? t("emptyCirclesHostOnly") : t("emptyCircles")}
-          </p>
-          {!hostOnly && (
-            <p className="text-muted-foreground mt-1 text-xs">
-              <Link href="/explorer" className="hover:text-foreground underline underline-offset-4">
-                {t("emptyCirclesHintExplore")}
-              </Link>
-            </p>
-          )}
-        </div>
+        <DashboardGhostCard
+          className="flex py-12"
+          icon={hostOnly ? undefined : Compass}
+          title={hostOnly ? t("emptyCirclesHostOnly") : t("emptyCircles")}
+          subtitle={hostOnly ? undefined : t("emptyCirclesHintExplore")}
+          href={hostOnly ? undefined : "/explorer"}
+        />
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {filteredCircles.map((circle) => (
             <CommunityCard key={circle.id} variant="dashboard" circle={circle} />
           ))}
+          {/* Carte fantôme « Explorer » pour combler la première ligne incomplète :
+              mobile (2 col) → seulement avec 1 communauté ; desktop (3 col) → avec 1 ou 2.
+              Elle s'étire à la hauteur de la carte voisine (grille `align-items: stretch`). */}
+          {(filteredCircles.length === 1 || filteredCircles.length === 2) && (
+            <DashboardGhostCard
+              className={`h-full p-6 ${filteredCircles.length === 1 ? "flex" : "hidden sm:flex"}`}
+              icon={Compass}
+              title={t("exploreCommunitiesCard.title")}
+              subtitle={t("exploreCommunitiesCard.subtitle")}
+              href="/explorer"
+            />
+          )}
         </div>
       )}
     </section>

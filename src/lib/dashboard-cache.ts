@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { unstable_cache, revalidateTag } from "next/cache";
+import { unstable_cache, revalidateTag, updateTag } from "next/cache";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
@@ -28,9 +28,22 @@ export function dashboardCacheTag(userId: string): string {
  * d'événement, join/leave communauté, etc.
  */
 export function invalidateDashboardCache(userId: string): void {
-  // Next.js 16 : profile "max" requis comme 2e argument de revalidateTag.
-  // 'max' = invalidation immédiate avec la durée de vie maximale.
+  // revalidateTag exige un profil en Next 16. ATTENTION : "max" est une invalidation
+  // ÉVENTUELLE (le 1er rendu suivant peut encore être périmé). Convient quand la vue
+  // est de toute façon re-fetchée ensuite (router.refresh) ou tolère une latence.
+  // Pour un « read-your-own-writes » immédiat, préférer updateDashboardCache.
   revalidateTag(dashboardCacheTag(userId), "max");
+}
+
+/**
+ * Variante « read-your-own-writes » : `updateTag` applique une expiration
+ * IMMÉDIATE (contrairement à revalidateTag + profil "max", éventuel). À utiliser
+ * quand l'utilisateur doit voir le résultat de sa propre mutation dès le rendu
+ * suivant — typiquement quitter une Communauté puis revenir sur /dashboard.
+ * `updateTag` ne peut être appelé que depuis une Server Action.
+ */
+export function updateDashboardCache(userId: string): void {
+  updateTag(dashboardCacheTag(userId));
 }
 
 // ---------------------------------------------------------------------------

@@ -253,7 +253,7 @@ export default async function NetworkPage({ params }: Props) {
           </p>
 
           {network.circles.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4">
               {network.circles.map((circle) => (
                 <CommunityCard key={circle.id} variant="public" circle={circle} hideNextMoment />
               ))}

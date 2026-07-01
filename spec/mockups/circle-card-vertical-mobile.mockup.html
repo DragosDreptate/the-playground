@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carte Communauté mobile — 2 colonnes / body minimal | Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e8457a;
+      --background: #f5f5fa;
+      --foreground: #1a1b2e;
+      --card: #ffffff;
+      --muted: #f0eff7;
+      --muted-foreground: #6b6f87;
+      --border: #e3e3ec;
+      --shadow-sm: 0 1px 2px rgba(26,27,46,.05);
+      --shadow-md: 0 4px 6px -1px rgba(26,27,46,.08), 0 2px 4px -2px rgba(26,27,46,.05);
+      --primary-soft-bg: #fdf0f4;
+      --primary-soft-border: rgba(232,69,122,.2);
+      --warn-bg: #fffbeb;
+      --warn-fg: #d97706;
+      --warn-border: rgba(217,119,6,.2);
+    }
+    body.theme-dark {
+      --background: oklch(0.1649 0.0352 281.8285);
+      --foreground: oklch(0.9513 0.0074 260.7315);
+      --card: oklch(0.2542 0.0611 281.1423);
+      --muted: oklch(0.2123 0.0522 280.9917);
+      --muted-foreground: oklch(0.6245 0.05 278.1046);
+      --border: oklch(0.3279 0.0832 280.789);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.4);
+      --shadow-md: 0 4px 10px -2px rgba(0,0,0,.5);
+      --primary-soft-bg: rgba(232,69,122,.16);
+      --primary-soft-border: rgba(232,69,122,.32);
+      --warn-bg: rgba(217,119,6,.18);
+      --warn-fg: #f59e0b;
+      --warn-border: rgba(217,119,6,.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #11121f;
+      color: var(--foreground);
+      font-size: 14px; line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    /* ─── Header bandeau mockup ──────────────────────── */
+    .mockup-bar {
+      background: #11121f; color: white;
+      padding: 12px 24px; display: flex; align-items: center; gap: 16px;
+      position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .mockup-bar .tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; background: linear-gradient(135deg, var(--primary), #9333ea); padding: 3px 8px; border-radius: 999px; }
+    .mockup-bar .title { font-size: 13px; font-weight: 600; }
+    .theme-toggle { margin-left: auto; display: flex; background: rgba(255,255,255,.1); border-radius: 8px; padding: 3px; gap: 2px; }
+    .theme-btn { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: rgba(255,255,255,.6); transition: all .15s; }
+    .theme-btn.active { background: rgba(255,255,255,.18); color: white; }
+
+    /* ─── Cadre téléphone (390px) ─────────────────────── */
+    .stage { display: flex; flex-wrap: wrap; gap: 36px; justify-content: center; padding: 40px 16px; }
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .phone-label { color: rgba(255,255,255,.55); font-size: 12px; font-weight: 600; }
+    .phone-label b { color: white; }
+    .phone {
+      width: 390px; height: 760px; overflow-y: auto; overflow-x: hidden;
+      background: var(--background); border-radius: 38px;
+      border: 10px solid #2a2b3d; box-shadow: 0 20px 50px rgba(0,0,0,.45);
+      position: relative;
+    }
+    .phone::-webkit-scrollbar { width: 0; }
+    .phone-inner { padding: 20px 16px 32px; }
+    .phone-head { font-size: 19px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 2px; }
+    .phone-sub { font-size: 12.5px; color: var(--muted-foreground); margin-bottom: 16px; }
+
+    /* ─── Grille 2 colonnes ───────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    /* ─── Carte Communauté verticale (body minimal) ───── */
+    .ccard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm); transition: box-shadow .15s, transform .15s; display: flex; flex-direction: column; }
+    .ccard:active { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+    .ccard-cover { position: relative; width: 100%; aspect-ratio: 1/1; }
+    .ccard-cover-img { position: absolute; inset: 0; }
+    /* dégradé blanc/gris derrière les covers à image (cohérence desktop) */
+    .ccard-cover.has-img::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.10), rgba(120,120,140,.16) 100%); pointer-events: none; }
+    .overlay-tl { position: absolute; top: 8px; left: 8px; }
+    .overlay-tr { position: absolute; top: 8px; right: 8px; }
+    .ov-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .ov-demo { background: rgba(51,65,85,.9); color: white; }
+    .ov-role { background: rgba(255,255,255,.85); color: var(--primary); }
+    .ov-pending { background: var(--warn-bg); color: var(--warn-fg); border: 1px solid var(--warn-border); }
+
+    /* Body MINIMAL : catégorie + nom + membres */
+    .ccard-body { padding: 10px 11px 12px; display: flex; flex-direction: column; gap: 6px; }
+    .ccard-cat { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; color: var(--muted-foreground); }
+    .ccard-name { font-size: 14px; font-weight: 700; color: var(--foreground); line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; min-height: 2.4em; }
+    .ccard-city { display: flex; align-items: center; gap: 4px; font-size: 11.5px; color: var(--muted-foreground); }
+    .ccard-members { display: flex; align-items: center; gap: 6px; }
+    .avatar-stack { display: flex; }
+    .avatar-stack .av { width: 19px; height: 19px; border-radius: 50%; border: 2px solid var(--card); margin-left: -6px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: white; }
+    .avatar-stack .av:first-child { margin-left: 0; }
+    .members-label { font-size: 11px; color: var(--muted-foreground); }
+
+    /* Gradients déterministes */
+    .g1 { background: linear-gradient(135deg,#8b5cf6,#6366f1); }
+    .g2 { background: linear-gradient(135deg,#06b6d4,#3b82f6); }
+    .g3 { background: linear-gradient(135deg,#e8457a,#d946ef); }
+    .g4 { background: linear-gradient(135deg,#10b981,#06b6d4); }
+    .g5 { background: linear-gradient(135deg,#d946ef,#8b5cf6); }
+    .g6 { background: linear-gradient(135deg,#f59e0b,#ef4444); }
+    .g7 { background: linear-gradient(135deg,#14b8a6,#6366f1); }
+    .g8 { background: linear-gradient(135deg,#6366f1,#06b6d4); }
+
+    /* ─── Timeline d'événements (Explorer, comme Mon espace) ─── */
+    .tl-row { display: flex; gap: 0; }
+    .tl-date { width: 55px; flex-shrink: 0; text-align: right; padding: 3px 6px 0 0; }
+    .tl-weekday { font-size: 10.5px; color: var(--muted-foreground); }
+    .tl-day { font-size: 12.5px; font-weight: 600; line-height: 1.15; }
+    .tl-time { font-size: 10.5px; color: var(--muted-foreground); margin-top: 1px; }
+    .tl-today { display: inline-block; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+    .tl-rail { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 16px; }
+    .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 7px; }
+    .dot-primary { background: var(--primary); }
+    .dot-amber { background: #fbbf24; }
+    .tl-line { flex: 1; width: 0; border-left: 1px dashed var(--border); margin-top: 6px; }
+    .tl-wrap { flex: 1; min-width: 0; padding: 0 0 16px 8px; }
+    .tl-wrap.last { padding-bottom: 0; }
+    .tl-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 9px; display: flex; flex-direction: column; gap: 7px; box-shadow: var(--shadow-sm); }
+    .tl-main { display: flex; gap: 10px; align-items: flex-start; }
+    .tl-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; align-items: flex-start; }
+    .circle-pill { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; font-size: 10.5px; color: var(--muted-foreground); border: 1px solid var(--border); background: var(--muted); padding: 1px 8px; border-radius: 999px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .tl-title { font-size: 13.5px; font-weight: 600; line-height: 1.2; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .tl-loc { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--muted-foreground); max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    /* Badge de statut icône-only sur mobile (= StatusPill hideLabelOnMobile : pill blanc/85 + bordure colorée) */
+    .tl-badge { display: inline-flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; padding: 3px 7px; border-radius: 999px; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); flex-shrink: 0; }
+    .tl-badge.reg { color: var(--primary); border: 1px solid var(--primary-soft-border); }
+    .tl-badge.wait { color: var(--muted-foreground); border: 1px solid var(--border); }
+    .tl-cover { width: 64px; height: 64px; border-radius: 11px; flex-shrink: 0; }
+    .tl-social { display: flex; align-items: center; gap: 7px; margin-top: 1px; min-width: 0; }
+    .tl-social .members-label { white-space: nowrap; }
+
+    /* ─── Encart annotation ───────────────────────────── */
+    .note { max-width: 820px; margin: 0 auto; padding: 0 16px; }
+    .note-box { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 16px 20px; color: rgba(255,255,255,.82); }
+    .note-box h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: white; }
+    .note-box ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .note-box li { font-size: 12.5px; padding-left: 18px; position: relative; }
+    .note-box li::before { content: '▸'; position: absolute; left: 0; color: var(--primary); }
+    .note-box b { color: white; }
+    .kept { color: #34d399; } .dropped { color: #fb7185; }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-bar">
+    <span class="tag">mobile</span>
+    <span class="title">Vue mobile (&lt; sm) — Communautés en grille 2 col + Événements en timeline</span>
+    <div class="theme-toggle">
+      <button class="theme-btn active" id="theme-btn-light" onclick="setTheme('light')">☀️ Clair</button>
+      <button class="theme-btn" id="theme-btn-dark" onclick="setTheme('dark')">🌙 Sombre</button>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- Téléphone 1 — Explorer (variante publique) -->
+    <div class="phone-wrap">
+      <div class="phone-label"><b>Explorer</b> · ~390px · 2 colonnes</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="phone-head">Explorer</div>
+          <div class="phone-sub">Communautés près de chez toi</div>
+
+          <div class="grid-2">
+
+            <article class="ccard">
+              <div class="ccard-cover has-img"><div class="ccard-cover-img g3"></div>
+                <div class="overlay-tr"><span class="ov-badge ov-role">★ Membre</span></div>
+              </div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Tech</span>
+                <h3 class="ccard-name">Paris Creative Tech</h3>
+                <div class="ccard-city">📍 Paris</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g1">AL</span><span class="av g4">MD</span><span class="av g6">JS</span></div>
+                  <span class="members-label">42 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover has-img"><div class="ccard-cover-img g4"></div>
+                <div class="overlay-tl"><span class="ov-badge ov-demo">Démo</span></div>
+              </div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Bien-être</span>
+                <h3 class="ccard-name">Yoga Montmartre</h3>
+                <div class="ccard-city">📍 Paris</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g2">CL</span><span class="av g5">NB</span><span class="av g8">RP</span></div>
+                  <span class="members-label">28 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover"><div class="ccard-cover-img g6"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Design</span>
+                <h3 class="ccard-name">Design &amp; Produit Lyon</h3>
+                <div class="ccard-city">📍 Lyon</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g7">EM</span><span class="av g3">TD</span><span class="av g1">VK</span></div>
+                  <span class="members-label">64 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover has-img"><div class="ccard-cover-img g8"></div>
+                <div class="overlay-tr"><span class="ov-badge ov-role">👑 Organisateur</span></div>
+              </div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Entrepreneuriat</span>
+                <h3 class="ccard-name">Startup Founders Bordeaux</h3>
+                <div class="ccard-city">📍 Bordeaux</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g5">GL</span><span class="av g2">PR</span><span class="av g6">SA</span></div>
+                  <span class="members-label">117 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover"><div class="ccard-cover-img g2"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Photographie</span>
+                <h3 class="ccard-name">Collectif Photographie Argentique &amp; Labo</h3>
+                <div class="ccard-city">📍 Nantes</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g1">OL</span><span class="av g4">FM</span></div>
+                  <span class="members-label">39 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover"><div class="ccard-cover-img g1"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Lecture</span>
+                <h3 class="ccard-name">Club de lecture du 11e</h3>
+                <div class="ccard-city">📍 Paris</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g3">IM</span><span class="av g8">LB</span></div>
+                  <span class="members-label">8 membres</span>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Téléphone 2 — Explorer · Événements (timeline, comme Mon espace) -->
+    <div class="phone-wrap">
+      <div class="phone-label"><b>Explorer · Événements</b> · timeline</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="phone-head">Explorer</div>
+          <div class="phone-sub">Les prochains événements</div>
+
+          <div class="tl-row">
+            <div class="tl-date"><span class="tl-today">Auj.</span><div class="tl-time">19h00</div></div>
+            <div class="tl-rail"><div class="tl-dot dot-primary"></div><div class="tl-line"></div></div>
+            <div class="tl-wrap">
+              <div class="tl-card">
+                <div class="tl-title">Meetup IA Générative &amp; Créativité</div>
+                <div class="tl-main">
+                  <div class="tl-body">
+                    <span class="circle-pill">👥 Paris Creative Tech</span>
+                    <div class="tl-loc">📍 Station F, Paris 13e</div>
+                    <div class="tl-social">
+                      <div class="avatar-stack"><span class="av g1">AL</span><span class="av g4">MD</span><span class="av g6">JS</span></div>
+                      <span class="members-label">28 inscrits</span>
+                      <span class="tl-badge reg" title="Inscrit">✓</span>
+                    </div>
+                  </div>
+                  <div class="tl-cover g3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date"><div class="tl-weekday">ven.</div><div class="tl-day">20 mars</div><div class="tl-time">18h30</div></div>
+            <div class="tl-rail"><div class="tl-dot dot-primary"></div><div class="tl-line"></div></div>
+            <div class="tl-wrap">
+              <div class="tl-card">
+                <div class="tl-title">Pitch Night #12</div>
+                <div class="tl-main">
+                  <div class="tl-body">
+                    <span class="circle-pill">👥 Startup Founders Bordeaux</span>
+                    <div class="tl-loc">📍 Le Village, Bordeaux</div>
+                    <div class="tl-social">
+                      <div class="avatar-stack"><span class="av g5">GL</span><span class="av g2">PR</span><span class="av g6">SA</span></div>
+                      <span class="members-label">53 inscrits</span>
+                    </div>
+                  </div>
+                  <div class="tl-cover g8"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date"><div class="tl-weekday">sam.</div><div class="tl-day">21 mars</div><div class="tl-time">8h30</div></div>
+            <div class="tl-rail"><div class="tl-dot dot-amber"></div><div class="tl-line"></div></div>
+            <div class="tl-wrap">
+              <div class="tl-card">
+                <div class="tl-title">Méditation matinale au parc</div>
+                <div class="tl-main">
+                  <div class="tl-body">
+                    <span class="circle-pill">👥 Yoga Montmartre</span>
+                    <div class="tl-loc">📍 Parc Montsouris, Paris 14e</div>
+                    <div class="tl-social">
+                      <div class="avatar-stack"><span class="av g2">CL</span><span class="av g5">NB</span></div>
+                      <span class="members-label">12 inscrits</span>
+                      <span class="tl-badge wait" title="Liste d'attente">🕓</span>
+                    </div>
+                  </div>
+                  <div class="tl-cover g4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-row">
+            <div class="tl-date"><div class="tl-weekday">mer.</div><div class="tl-day">25 mars</div><div class="tl-time">14h00</div></div>
+            <div class="tl-rail"><div class="tl-dot dot-primary"></div></div>
+            <div class="tl-wrap last">
+              <div class="tl-card">
+                <div class="tl-title">Atelier Design System Avancé</div>
+                <div class="tl-main">
+                  <div class="tl-body">
+                    <span class="circle-pill">👥 Design &amp; Produit Lyon</span>
+                    <div class="tl-loc">📍 Le Village, Lyon</div>
+                    <div class="tl-social">
+                      <div class="avatar-stack"><span class="av g7">EM</span><span class="av g3">TD</span><span class="av g1">VK</span></div>
+                      <span class="members-label">19 inscrits</span>
+                    </div>
+                  </div>
+                  <div class="tl-cover g6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Téléphone 3 — Mon espace (variante dashboard, badge En attente) -->
+    <div class="phone-wrap">
+      <div class="phone-label"><b>Mon espace</b> · ~390px · 2 colonnes</div>
+      <div class="phone">
+        <div class="phone-inner">
+          <div class="phone-head">Mes Communautés</div>
+          <div class="phone-sub">Les Communautés que tu as rejointes</div>
+
+          <div class="grid-2">
+
+            <article class="ccard">
+              <div class="ccard-cover has-img"><div class="ccard-cover-img g3"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Tech</span>
+                <h3 class="ccard-name">Paris Creative Tech</h3>
+                <div class="ccard-city">📍 Paris</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g1">AL</span><span class="av g4">MD</span><span class="av g6">JS</span></div>
+                  <span class="members-label">42 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover has-img"><div class="ccard-cover-img g8"></div>
+                <div class="overlay-tr"><span class="ov-badge ov-pending">🕓 En attente</span></div>
+              </div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Entrepreneuriat</span>
+                <h3 class="ccard-name">Startup Founders Bordeaux</h3>
+                <div class="ccard-city">📍 Bordeaux</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g5">GL</span><span class="av g2">PR</span></div>
+                  <span class="members-label">117 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover"><div class="ccard-cover-img g4"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Bien-être</span>
+                <h3 class="ccard-name">Yoga Montmartre</h3>
+                <div class="ccard-city">📍 Paris</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g2">CL</span><span class="av g5">NB</span></div>
+                  <span class="members-label">28 membres</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="ccard">
+              <div class="ccard-cover"><div class="ccard-cover-img g6"></div></div>
+              <div class="ccard-body">
+                <span class="ccard-cat">⌗ Design</span>
+                <h3 class="ccard-name">Design &amp; Produit Lyon</h3>
+                <div class="ccard-city">📍 Lyon</div>
+                <div class="ccard-members">
+                  <div class="avatar-stack"><span class="av g7">EM</span><span class="av g3">TD</span></div>
+                  <span class="members-label">64 membres</span>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <div class="note-box">
+      <h3>Body minimal — ce qu'on garde / ce qu'on retire (vs vertical desktop)</h3>
+      <ul>
+        <li><span class="kept">GARDÉ</span> : cover 1:1 + overlays (Démo / rôle / <b>En attente</b>), <b>catégorie</b>, <b>nom</b> (2 lignes max), <b>ville</b>, <b>avatars + nombre de membres</b>.</li>
+        <li><span class="dropped">RETIRÉ</span> sur mobile : <b>description</b>, <b>compteur d'événements à venir</b>, <b>encart « prochain événement »</b> — trop à l'étroit à ~173px de large.</li>
+        <li><b>Densité</b> : ~4 à 6 cartes visibles d'un coup (vs 1 seule en 1 colonne cover 1:1) — c'est le gain qui justifie le 2 colonnes.</li>
+        <li><b>Différenciation conservée</b> : Communauté = vignette verticale en <b>grille 2 col</b> ; <b>événement = timeline</b> (colonne date + dot + ligne, pleine largeur, comme Mon espace) — deux langages visuels distincts.</li>
+        <li><b>Événements Explorer (timeline)</b> : colonne date (jour + heure) → dot (rose = à venir / ambre = liste d'attente ou en attente) → carte avec pastille Communauté, titre, lieu, <b>avatars des inscrits + nombre</b>, badge de statut <b>en icône seule</b> (✓ inscrit, 🕓 liste d'attente — comme aujourd'hui sur mobile, sur la même ligne que les inscrits), cover à droite. Le lieu est gardé (utile en découverte), là où Mon espace ne l'affiche pas sur mobile.</li>
+        <li><b>À juger</b> : (1) côté Communautés, le body minimal (nom + ville + membres) est-il assez parlant à 2 col ? (2) côté Événements, la timeline pleine largeur passe-t-elle bien sur mobile ?</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function setTheme(theme) {
+      document.body.classList.toggle('theme-dark', theme === 'dark');
+      document.getElementById('theme-btn-light').classList.toggle('active', theme === 'light');
+      document.getElementById('theme-btn-dark').classList.toggle('active', theme === 'dark');
+    }
+  </script>
+
+</body>
+</html>

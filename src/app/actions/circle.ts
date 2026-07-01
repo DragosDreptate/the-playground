@@ -44,7 +44,7 @@ import {
 import { isAdminUser, resolveCircleRepository } from "@/lib/admin-host-mode";
 import { getDisplayName } from "@/lib/display-name";
 import { isValidUrl } from "@/lib/url";
-import { invalidateDashboardCache } from "@/lib/dashboard-cache";
+import { invalidateDashboardCache, updateDashboardCache } from "@/lib/dashboard-cache";
 import {
   buildEmailLocaleResolver,
   DEFAULT_RECIPIENT_LOCALE,
@@ -308,7 +308,12 @@ export async function leaveCircleAction(
         registrationRepository: prismaRegistrationRepository,
       }
     );
-    invalidateDashboardCache(userId);
+    // updateDashboardCache (updateTag = expiration IMMÉDIATE), pas invalidateDashboardCache
+    // (revalidateTag + profil "max" = éventuel). Le dialog recharge /dashboard juste
+    // après : avec l'invalidation éventuelle, ce reload immédiat servait l'ancienne
+    // liste (Communauté quittée encore visible), alors qu'un reload manuel ~1s plus
+    // tard était frais. L'expiration immédiate supprime cette course.
+    updateDashboardCache(userId);
   });
 }
 

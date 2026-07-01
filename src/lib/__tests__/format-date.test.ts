@@ -3,6 +3,7 @@ import {
   formatShortDate,
   formatTime,
   formatDayMonth,
+  formatDayMonthShort,
   formatWeekdayAndDate,
   formatDateRange,
   formatMomentDateTime,
@@ -59,6 +60,12 @@ describe("formatShortDate", () => {
     expect(frResult).toMatch(/dim|lun|mar|mer|jeu|ven|sam/i);
     expect(enResult).toMatch(/Mon|Tue|Wed|Thu|Fri|Sat|Sun/i);
   });
+
+  it("should normalize English September from « Sept » to « Sep »", () => {
+    const result = formatShortDate(new Date("2026-09-15T12:00:00.000Z"), "en");
+    expect(result).toContain("Sep");
+    expect(result).not.toContain("Sept");
+  });
 });
 
 describe("formatDayMonth", () => {
@@ -72,6 +79,58 @@ describe("formatDayMonth", () => {
     const result = formatDayMonth(EVENT_UTC, "en");
     expect(result).toMatch(/25/);
     expect(result).toMatch(/Jan/);
+  });
+
+  it("should normalize English September from « Sept » to « Sep »", () => {
+    const result = formatDayMonth(new Date("2026-09-15T12:00:00.000Z"), "en");
+    expect(result).toBe("15 Sep");
+  });
+});
+
+describe("formatDayMonthShort", () => {
+  describe("given a French locale", () => {
+    it.each([
+      // [date UTC (midi, pas de bascule de fuseau), attendu FR]
+      ["2026-01-15T12:00:00.000Z", "15 jan."], // « janv. » → tronqué à 3 lettres + point
+      ["2026-02-15T12:00:00.000Z", "15 fév."], // « févr. » → 3 lettres + point (accent conservé)
+      ["2026-03-15T12:00:00.000Z", "15 mars"], // mot complet → intact, sans point
+      ["2026-05-15T12:00:00.000Z", "15 mai"], // mot complet → intact
+      ["2026-06-15T12:00:00.000Z", "15 juin"], // mot complet → intact
+      ["2026-08-15T12:00:00.000Z", "15 août"], // mot complet → intact (accent conservé)
+      ["2026-09-15T12:00:00.000Z", "15 sep."], // « sept. » → tronqué à 3 lettres + point
+    ])("should format %s as '%s'", (iso, expected) => {
+      expect(formatDayMonthShort(new Date(iso), "fr")).toBe(expected);
+    });
+
+    it("should keep juillet as 'juil.' so it never collides with juin", () => {
+      const juillet = formatDayMonthShort(new Date("2026-07-15T12:00:00.000Z"), "fr");
+      const juin = formatDayMonthShort(new Date("2026-06-15T12:00:00.000Z"), "fr");
+      expect(juillet).toBe("15 juil.");
+      expect(juin).toBe("15 juin");
+      // Le cœur du cas spécial : les deux mois voisins restent distinguables.
+      expect(juillet.slice(3)).not.toBe(juin.slice(3));
+    });
+  });
+
+  describe("given an English locale", () => {
+    it.each([
+      ["2026-01-15T12:00:00.000Z", "15 Jan"],
+      ["2026-05-15T12:00:00.000Z", "15 May"],
+    ])("should keep the native 3-letter month without a dot (%s → %s)", (iso, expected) => {
+      expect(formatDayMonthShort(new Date(iso), "en")).toBe(expected);
+    });
+
+    it("should normalize September from « Sept » to « Sep » for a uniform width", () => {
+      // Le CLDR récent rend September « Sept » (4 lettres) : on l'uniformise en « Sep ».
+      expect(formatDayMonthShort(new Date("2026-09-15T12:00:00.000Z"), "en")).toBe("15 Sep");
+    });
+  });
+
+  describe("Paris timezone correctness", () => {
+    it("should derive both day and month from Paris time, not UTC", () => {
+      // 30 juin 22:30 UTC = 1er juillet 00:30 Paris (CEST, UTC+2) : le jour ET le mois basculent.
+      expect(formatDayMonthShort(new Date("2026-06-30T22:30:00.000Z"), "fr")).toBe("1 juil.");
+    });
   });
 });
 

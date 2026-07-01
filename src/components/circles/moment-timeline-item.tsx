@@ -2,7 +2,7 @@ import Image from "next/image";
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
-import { formatWeekdayAndDate, formatTime, isSameDayInParis } from "@/lib/format-date";
+import { formatWeekdayAndDate, formatDayMonthShort, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Clock, XCircle } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -65,6 +65,7 @@ export async function MomentTimelineItem({
   const now = new Date();
   const isToday = isSameDayInParis(moment.startsAt, now);
   const { weekday, dateStr } = formatWeekdayAndDate(moment.startsAt, locale);
+  const dateStrShort = formatDayMonthShort(moment.startsAt, locale);
   const timeStr = formatTime(moment.startsAt);
 
   const locationLabel =
@@ -82,28 +83,32 @@ export async function MomentTimelineItem({
       : isDraft
         ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
         : isRegistered
-          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} />
+          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} hideLabelOnMobile />
           : isPendingApproval
-            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} />
+            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} hideLabelOnMobile />
             : isWaitlisted
-              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} />
+              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} hideLabelOnMobile />
               : null;
 
   return (
     <TimelineScaffold
       dotClass={dotClass}
       isLast={isLast}
-      spacing="pb-8"
+      cardPadding="pl-1 sm:pl-4"
       dateColumn={
-        <div className="w-[72px] shrink-0 pr-2 pt-1 text-right sm:w-[100px] sm:pr-4">
+        <div className="w-[55px] shrink-0 pr-1 pt-1 text-right sm:w-[100px] sm:pr-4">
           {isToday ? (
             <span className="inline-block rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
-              {tCircle("detail.today")}
+              <span className="sm:hidden">{tCircle("detail.todayShort")}</span>
+              <span className="hidden sm:inline">{tCircle("detail.today")}</span>
             </span>
           ) : (
             <>
               <p className="text-muted-foreground text-xs">{weekday}</p>
-              <p className="text-sm font-medium leading-snug">{dateStr}</p>
+              <p className="text-sm font-medium leading-snug">
+                <span className="sm:hidden">{dateStrShort}</span>
+                <span className="hidden sm:inline">{dateStr}</span>
+              </p>
             </>
           )}
           <p className={`mt-0.5 text-xs sm:hidden ${isPast ? "text-muted-foreground/60" : "text-muted-foreground"}`}>
@@ -128,9 +133,34 @@ export async function MomentTimelineItem({
             )}
 
             {/* Corps de la carte */}
-            <div className="flex items-center gap-4 p-4">
-              {/* Content */}
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
+              {/* Titre — pleine largeur au-dessus, une ligne (mobile uniquement) */}
+              <p
+                className={`truncate text-base font-semibold leading-snug sm:hidden ${
+                  isCancelled
+                    ? "text-muted-foreground line-through"
+                    : isPast
+                      ? "text-muted-foreground"
+                      : ""
+                }`}
+              >
+                {moment.title}
+              </p>
+
+              {/* Rangée content | cover. En desktop, `contents` dissout ce wrapper (layout #598). */}
+              <div className="flex items-start gap-4 sm:contents">
+                {/* Content */}
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                {/* Mobile : description (1 ligne), avant le lieu */}
+                {moment.description && (
+                  <p
+                    className={`line-clamp-2 text-xs sm:hidden ${
+                      isPast || isCancelled ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    {moment.description}
+                  </p>
+                )}
                 {/* Mobile : lieu inline (l'heure est dans la colonne date) */}
                 {locationLabel && (
                   <div
@@ -138,7 +168,7 @@ export async function MomentTimelineItem({
                       isPast ? "text-muted-foreground/60" : "text-muted-foreground"
                     }`}
                   >
-                    <LocationIcon className="size-3.5 shrink-0" />
+                    <IconPill icon={LocationIcon} size="sm" className={isPast || isCancelled ? "opacity-60" : ""} />
                     <span className="truncate">{locationLabel}</span>
                   </div>
                 )}
@@ -163,7 +193,7 @@ export async function MomentTimelineItem({
 
 
                 <p
-                  className={`line-clamp-2 font-semibold leading-snug ${
+                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
                     isCancelled
                       ? "text-muted-foreground line-through"
                       : isPast
@@ -175,13 +205,7 @@ export async function MomentTimelineItem({
                 </p>
 
                 {((!isCancelled && registrationCount > 0) || statusBadge) && (
-                  // Sans inscrit, le seul enfant (badge) est `hidden sm:block` :
-                  // masquer le wrapper en mobile pour ne pas laisser un gap vide.
-                  <div
-                    className={`items-center gap-2 ${
-                      !isCancelled && registrationCount > 0 ? "flex" : "hidden sm:flex"
-                    }`}
-                  >
+                  <div className="flex items-center gap-2">
                     {!isCancelled && registrationCount > 0 && (
                       <div className={isPast ? "opacity-60" : ""}>
                         <AttendeeAvatarStack
@@ -195,7 +219,7 @@ export async function MomentTimelineItem({
                         />
                       </div>
                     )}
-                    {statusBadge && <div className="hidden sm:block">{statusBadge}</div>}
+                    {statusBadge}
                   </div>
                 )}
               </div>
@@ -207,14 +231,15 @@ export async function MomentTimelineItem({
                   alt={moment.title}
                   width={100}
                   height={100}
-                  className={`size-[100px] shrink-0 rounded-lg object-cover ${COVER_IMAGE_BG} ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[80px] shrink-0 rounded-lg sm:size-[100px] object-cover ${COVER_IMAGE_BG} ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                 />
               ) : (
                 <div
-                  className={`size-[100px] shrink-0 rounded-lg ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
+                  className={`size-[80px] shrink-0 rounded-lg sm:size-[100px] ${isCancelled || isPast ? "grayscale opacity-40" : ""}`}
                   style={{ background: gradient }}
                 />
               )}
+              </div>
             </div>
           </div>
         </Link>
