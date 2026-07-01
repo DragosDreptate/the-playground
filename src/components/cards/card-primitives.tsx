@@ -119,7 +119,7 @@ export function StatusPill({
 }) {
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/85 px-2 py-0.5 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/60 px-2 py-0.5 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
     >
       <Icon className="size-3 shrink-0" />
       <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>

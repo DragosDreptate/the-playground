@@ -87,17 +87,12 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   );
 
   const socialRow =
-    moment.registrationCount > 0 || roleBadge ? (
-      <div className="flex items-center gap-2">
-        {moment.registrationCount > 0 && (
-          <AttendeeAvatarStack
-            attendees={moment.topAttendees}
-            totalCount={moment.registrationCount}
-            label={attendeeLabel}
-          />
-        )}
-        {roleBadge}
-      </div>
+    moment.registrationCount > 0 ? (
+      <AttendeeAvatarStack
+        attendees={moment.topAttendees}
+        totalCount={moment.registrationCount}
+        label={attendeeLabel}
+      />
     ) : null;
 
   return (
@@ -178,6 +173,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
                 />
               )}
               {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
+              {/* Badge de statut (Organisateur / Inscrit…) en overlay sur la cover,
+                  comme les cartes Communauté. Icône seule en mobile (hideLabelOnMobile). */}
+              {roleBadge && <div className="absolute right-2 top-2">{roleBadge}</div>}
             </div>
           </div>
         </div>

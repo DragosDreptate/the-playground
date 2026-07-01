@@ -131,11 +131,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} hideLabelOnMobile />
   ) : null;
 
-  // Badge Organisateur (mobile) : seul badge de statut affiché sur Mon espace, pour
-  // distinguer les événements que j'organise de mes simples inscriptions.
-  const organizerBadge = !isCancelled && (isOrganizerView || isOrganizer) ? (
-    <StatusPill {...REGISTRATION_PILL.host} label={t("role.host")} hideLabelOnMobile />
-  ) : null;
+  // Pas de badge Organisateur sur Mon espace : la distinction organisateur/participant
+  // est déjà portée par le toggle « Organisateur » du filtre. On ne montre donc que
+  // les statuts d'inscription non redondants (en attente, liste d'attente).
 
   const attendeeStack =
     !isCancelled && momentData.registrationCount > 0 ? (
@@ -238,11 +236,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                         <span className="truncate">{locationLabel}</span>
                       </div>
                     )}
-                    {(attendeeStack || organizerBadge) && (
-                      <div className="flex items-center gap-2">
-                        {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
-                        {organizerBadge}
-                      </div>
+                    {attendeeStack && (
+                      <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>
                     )}
                   </div>
 
@@ -281,11 +276,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
                     <div className="flex items-center gap-2">
                       <CirclePill name={momentData.circleName} withIcon muted={isPast || isCancelled} />
-                      <div className="flex items-center gap-2">
-                        {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                        {pendingApprovalBadge}
-                        {waitlistedBadge}
-                      </div>
+                      {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                      {pendingApprovalBadge}
+                      {waitlistedBadge}
                     </div>
                   </div>
                 </div>
