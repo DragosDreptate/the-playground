@@ -243,6 +243,28 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
 
                   {/* === DESKTOP — rendu #598 (hidden sm:block) === */}
                   <div className="hidden space-y-1.5 sm:block">
+                    {/* 1. Pill Communauté (+ statut Brouillon / en attente / liste d'attente) */}
+                    <div className="flex items-center gap-2">
+                      <CirclePill name={momentData.circleName} withIcon muted={isPast || isCancelled} />
+                      {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
+                      {pendingApprovalBadge}
+                      {waitlistedBadge}
+                    </div>
+
+                    {/* 2. Titre */}
+                    <p
+                      className={`line-clamp-1 font-semibold leading-snug ${
+                        isCancelled
+                          ? "text-muted-foreground line-through"
+                          : isPast
+                            ? "text-muted-foreground"
+                            : ""
+                      }`}
+                    >
+                      {momentData.title}
+                    </p>
+
+                    {/* 3. Heure + lieu */}
                     <div
                       className={`flex items-center gap-3 text-xs ${
                         isPast ? "text-muted-foreground/60" : "text-muted-foreground"
@@ -260,26 +282,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                       )}
                     </div>
 
-                    <p
-                      className={`line-clamp-1 font-semibold leading-snug ${
-                        isCancelled
-                          ? "text-muted-foreground line-through"
-                          : isPast
-                            ? "text-muted-foreground"
-                            : ""
-                      }`}
-                    >
-                      {momentData.title}
-                    </p>
-
+                    {/* 4. Inscrits */}
                     {attendeeStack && <div className={isPast ? "opacity-60" : ""}>{attendeeStack}</div>}
-
-                    <div className="flex items-center gap-2">
-                      <CirclePill name={momentData.circleName} withIcon muted={isPast || isCancelled} />
-                      {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                      {pendingApprovalBadge}
-                      {waitlistedBadge}
-                    </div>
                   </div>
                 </div>
 
