@@ -83,8 +83,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   // Ligne de rattachement — pill Communauté seul en mobile ; thème + pill en desktop.
   const contextLine = (
     <div className="flex min-w-0 flex-wrap items-center gap-2">
-      {categoryBadge && <span className="hidden sm:inline-flex">{categoryBadge}</span>}
       <CirclePill name={moment.circle.name} withIcon />
+      {categoryBadge && <span className="hidden sm:inline-flex">{categoryBadge}</span>}
     </div>
   );
 
@@ -137,7 +137,7 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
           {/* Rangée infos | cover. En desktop, `contents` dissout ce wrapper :
               body et cover redeviennent enfants directs de la carte (layout #598). */}
           <div className="flex items-start gap-3 sm:contents">
-            <div className="min-w-0 flex-1 space-y-[7px] sm:space-y-1.5">
+            <div className="min-w-0 flex-1 space-y-[8px] sm:space-y-[7px]">
               {contextLine}
               <h3 className="hidden text-base font-semibold leading-snug sm:line-clamp-1">{moment.title}</h3>
               {moment.description && (
