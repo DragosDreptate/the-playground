@@ -153,13 +153,21 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
         className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {circle.membershipStatus === "PENDING" && (
+          {circle.membershipStatus === "PENDING" ? (
             <CoverBadgeOverlay
               icon={Clock}
               label={t("circleCard.roleBadge.pending")}
               className="border-amber-500/40 text-amber-500"
+              size="sm"
             />
-          )}
+          ) : circle.memberRole === "HOST" ? (
+            <CoverBadgeOverlay
+              icon={Crown}
+              label={t("circleCard.roleBadge.host")}
+              className="border-primary/40 text-primary"
+              size="sm"
+            />
+          ) : null}
         </VerticalCover>
         <div className="flex flex-col gap-1.5 p-3">
           {categoryLabel && (
@@ -183,13 +191,21 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
         className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {circle.membershipStatus === "PENDING" && (
+          {circle.membershipStatus === "PENDING" ? (
             <CoverBadgeOverlay
               icon={Clock}
               label={t("circleCard.roleBadge.pending")}
               className="border-amber-500/40 text-amber-500"
+              size="sm"
             />
-          )}
+          ) : circle.memberRole === "HOST" ? (
+            <CoverBadgeOverlay
+              icon={Crown}
+              label={t("circleCard.roleBadge.host")}
+              className="border-primary/40 text-primary"
+              size="sm"
+            />
+          ) : null}
         </VerticalCover>
         <VerticalCardBody
           categoryLabel={categoryLabel}
@@ -286,16 +302,22 @@ function CoverBadgeOverlay({
   icon: Icon,
   label,
   className,
+  size = "default",
 }: {
   icon: LucideIcon;
   label: string;
   className?: string;
+  /** `sm` : version compacte pour les covers plus petites (dashboard). */
+  size?: "default" | "sm";
 }) {
+  const sizeClasses =
+    size === "sm" ? "gap-1 px-2 py-0.5 text-[11px]" : "gap-1 px-2.5 py-1 text-xs";
+  const iconSize = size === "sm" ? "size-2.5" : "size-3";
   return (
     <div
-      className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border bg-white/60 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+      className={`absolute right-2 top-2 inline-flex items-center rounded-full border bg-white/60 font-medium backdrop-blur-sm ${sizeClasses} ${className ?? ""}`}
     >
-      <Icon className="size-3 shrink-0" />
+      <Icon className={`${iconSize} shrink-0`} />
       <span>{label}</span>
     </div>
   );
