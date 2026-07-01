@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatDayMonthShort, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, TimelineScaffold, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Attendee } from "@/components/moments/attendee-avatar-stack";
@@ -35,16 +35,12 @@ export async function MomentTimelineItem({
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
-  const tDashboard = await getTranslations("Dashboard");
   const locale = await getLocale();
 
   const isCancelled = moment.status === "CANCELLED";
   const isPast = moment.status === "PAST";
   const isDraft = moment.status === "DRAFT";
 
-  const isRegistered =
-    userRegistrationStatus === "REGISTERED" ||
-    userRegistrationStatus === "CHECKED_IN";
   const isWaitlisted = userRegistrationStatus === "WAITLISTED";
   const isPendingApproval = userRegistrationStatus === "PENDING_APPROVAL";
 
@@ -77,18 +73,12 @@ export async function MomentTimelineItem({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
+  // Page Communauté : on ne garde que le statut « Brouillon » (info Host). Les
+  // statuts d'inscription (Inscrit / en attente / liste d'attente) sont retirés.
   const statusBadge =
-    isCancelled || variant !== "dashboard"
-      ? null
-      : isDraft
-        ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
-        : isRegistered
-          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} hideLabelOnMobile />
-          : isPendingApproval
-            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} hideLabelOnMobile />
-            : isWaitlisted
-              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} hideLabelOnMobile />
-              : null;
+    !isCancelled && variant === "dashboard" && isDraft ? (
+      <DraftBadge label={t("status.draft")} showLabelOnMobile />
+    ) : null;
 
   return (
     <TimelineScaffold
