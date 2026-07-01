@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { LogOut } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +25,7 @@ type LeaveCircleDialogProps = {
 
 export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogProps) {
   const t = useTranslations("Circle.leave");
-  const locale = useLocale();
+  const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,11 +36,12 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
     const result = await leaveCircleAction(circleId);
 
     if (result.success) {
-      // Reload dur : ne dépend pas du Router Cache client (qui, sur un router.push,
-      // sert la liste /dashboard préchargée où la Communauté quittée reste visible).
-      // L'action a invalidé le cache de données en immédiat (updateTag), donc ce
-      // rendu serveur reflète bien le départ.
-      window.location.href = `/${locale}/dashboard?tab=circles`;
+      // Navigation locale-aware (respecte le préfixe de langue), puis refresh() pour
+      // invalider le Router Cache client : sans lui, router.push servirait la liste
+      // /dashboard préchargée où la Communauté quittée reste visible. L'action a déjà
+      // invalidé le cache de données (updateTag), le re-render serveur reflète le départ.
+      router.push("/dashboard?tab=circles");
+      router.refresh();
     } else {
       setError(result.error);
       setIsPending(false);
