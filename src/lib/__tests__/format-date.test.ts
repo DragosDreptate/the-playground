@@ -60,6 +60,12 @@ describe("formatShortDate", () => {
     expect(frResult).toMatch(/dim|lun|mar|mer|jeu|ven|sam/i);
     expect(enResult).toMatch(/Mon|Tue|Wed|Thu|Fri|Sat|Sun/i);
   });
+
+  it("should normalize English September from « Sept » to « Sep »", () => {
+    const result = formatShortDate(new Date("2026-09-15T12:00:00.000Z"), "en");
+    expect(result).toContain("Sep");
+    expect(result).not.toContain("Sept");
+  });
 });
 
 describe("formatDayMonth", () => {
@@ -73,6 +79,11 @@ describe("formatDayMonth", () => {
     const result = formatDayMonth(EVENT_UTC, "en");
     expect(result).toMatch(/25/);
     expect(result).toMatch(/Jan/);
+  });
+
+  it("should normalize English September from « Sept » to « Sep »", () => {
+    const result = formatDayMonth(new Date("2026-09-15T12:00:00.000Z"), "en");
+    expect(result).toBe("15 Sep");
   });
 });
 
@@ -102,9 +113,16 @@ describe("formatDayMonthShort", () => {
   });
 
   describe("given an English locale", () => {
-    it("should keep the short month without adding a French-style dot", () => {
-      // ICU en rend « Sept » (sans point) : mot sans point → laissé intact, ni tronqué ni ponctué.
-      expect(formatDayMonthShort(new Date("2026-09-15T12:00:00.000Z"), "en")).toBe("15 Sept");
+    it.each([
+      ["2026-01-15T12:00:00.000Z", "15 Jan"],
+      ["2026-05-15T12:00:00.000Z", "15 May"],
+    ])("should keep the native 3-letter month without a dot (%s → %s)", (iso, expected) => {
+      expect(formatDayMonthShort(new Date(iso), "en")).toBe(expected);
+    });
+
+    it("should normalize September from « Sept » to « Sep » for a uniform width", () => {
+      // Le CLDR récent rend September « Sept » (4 lettres) : on l'uniformise en « Sep ».
+      expect(formatDayMonthShort(new Date("2026-09-15T12:00:00.000Z"), "en")).toBe("15 Sep");
     });
   });
 
