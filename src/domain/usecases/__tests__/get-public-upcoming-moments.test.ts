@@ -14,6 +14,7 @@ function makePublicMoment(overrides: Partial<PublicMoment> = {}): PublicMoment {
     endsAt: new Date("2026-03-15T20:00:00Z"),
     locationType: "IN_PERSON",
     locationName: "Café Central",
+    locationAddress: null,
     registrationCount: 12,
     capacity: 30,
     circle: {

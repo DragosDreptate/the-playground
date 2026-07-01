@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatTime, formatWeekdayAndDate, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
-import { MapPin, Globe } from "lucide-react";
+import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
@@ -52,7 +52,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   }, [startsAt]);
 
   const isOnline = moment.locationType === "ONLINE" || moment.locationType === "HYBRID";
-  const locationLabel = isOnline ? t("momentCard.online") : (moment.locationName ?? null);
+  const locationLabel = isOnline
+    ? t("momentCard.online")
+    : (moment.locationName ?? moment.locationAddress ?? null);
   const LocationIcon = isOnline ? Globe : MapPin;
 
   const overflow = moment.registrationCount - moment.topAttendees.length;
@@ -118,7 +120,8 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
               </p>
             </>
           )}
-          <p className="text-muted-foreground mt-0.5 text-xs" suppressHydrationWarning>
+          {/* Heure en colonne : mobile uniquement (en desktop elle est dans la carte). */}
+          <p className="text-muted-foreground mt-0.5 text-xs sm:hidden" suppressHydrationWarning>
             {timeStr}
           </p>
         </div>
@@ -140,20 +143,26 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
               {moment.description && (
                 <p className="text-muted-foreground hidden text-sm sm:line-clamp-2">{moment.description}</p>
               )}
+              {/* Mobile : lieu en pastille (l'heure est dans la colonne date). */}
               {locationLabel && (
-                <>
-                  {/* Mobile : lieu en pastille (format desktop, taille mobile) */}
-                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs sm:hidden">
+                <div className="text-muted-foreground flex items-center gap-1.5 text-xs sm:hidden">
+                  <IconPill icon={LocationIcon} size="sm" />
+                  <span className="truncate">{locationLabel}</span>
+                </div>
+              )}
+              {/* Desktop : heure + lieu en pastilles, même rendu que Mon espace. */}
+              <div className="text-muted-foreground hidden items-center gap-3 text-xs sm:flex">
+                <span className="flex shrink-0 items-center gap-1.5">
+                  <IconPill icon={Clock} size="sm" />
+                  <span suppressHydrationWarning>{timeStr}</span>
+                </span>
+                {locationLabel && (
+                  <span className="flex min-w-0 items-center gap-1.5">
                     <IconPill icon={LocationIcon} size="sm" />
                     <span className="truncate">{locationLabel}</span>
-                  </div>
-                  {/* Desktop : lieu en pastille */}
-                  <div className="text-muted-foreground hidden items-center gap-2 text-sm sm:flex">
-                    <IconPill icon={LocationIcon} size="md" />
-                    <span className="truncate">{locationLabel}</span>
-                  </div>
-                </>
-              )}
+                  </span>
+                )}
+              </div>
               {socialRow}
             </div>
 

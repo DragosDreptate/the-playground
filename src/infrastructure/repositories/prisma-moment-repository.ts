@@ -191,6 +191,7 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: m.endsAt,
       locationType: m.locationType,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       registrationCount: m._count.registrations,
       capacity: m.capacity,
       explorerScore: m.explorerScore,
