@@ -133,7 +133,7 @@ export default async function ExplorerPage({
 
       {/* Tabs + filter bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-1 rounded-full border p-1 w-fit">
+        <div className="flex w-full items-center gap-1 rounded-full border p-1 sm:w-auto">
           {(["circles", "moments"] as const).map((tabKey) => {
             const params = new URLSearchParams();
             if (tabKey !== "circles") params.set("tab", tabKey);
@@ -144,7 +144,7 @@ export default async function ExplorerPage({
               <Link
                 key={tabKey}
                 href={href}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                className={`flex-1 rounded-full px-4 py-1 text-center text-sm font-medium transition-colors sm:flex-none ${
                   activeTab === tabKey
                     ? "bg-foreground text-background"
                     : "text-muted-foreground hover:text-foreground"
