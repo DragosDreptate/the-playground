@@ -17,6 +17,7 @@ import type {
   MomentStatus,
 } from "@/domain/models/moment";
 import type { PublicMomentRegistration } from "@/domain/models/user";
+import { isPastMoment } from "@/lib/moment-timeline";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -346,7 +347,7 @@ export const prismaMomentRepository: MomentRepository = {
         ) sub) AS "topAttendees"
       FROM moments m
       JOIN circles c ON c.id = m."circleId"
-      WHERE m.status IN ('DRAFT', 'PUBLISHED', 'PAST')
+      WHERE m.status IN ('DRAFT', 'PUBLISHED', 'PAST', 'CANCELLED')
         AND EXISTS (
           SELECT 1 FROM circle_memberships cm
           WHERE cm."circleId" = c.id
@@ -371,10 +372,13 @@ export const prismaMomentRepository: MomentRepository = {
       circle: { slug: row.cSlug, name: row.cName, coverImage: row.cCoverImage },
     });
 
+    const now = Date.now();
     const upcoming: HostMomentSummary[] = [];
     const past: HostMomentSummary[] = [];
     for (const row of rows) {
-      if (row.status === "PAST") past.push(toItem(row));
+      // Un annulé passé rejoint l'historique ; un annulé encore à venir reste
+      // dans l'agenda (barré). Voir isPastMoment / isUpcomingCancelled.
+      if (isPastMoment({ status: row.status, startsAt: row.startsAt }, now)) past.push(toItem(row));
       else upcoming.push(toItem(row));
     }
     // Les moments passés triés par date décroissante
