@@ -176,6 +176,17 @@ export async function MomentTimelineItem({
                   {moment.title}
                 </p>
 
+                {/* Desktop : description sur 2 lignes, sous le titre */}
+                {moment.description && (
+                  <p
+                    className={`hidden text-xs sm:line-clamp-2 ${
+                      isPast || isCancelled ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    {moment.description}
+                  </p>
+                )}
+
                 {/* Desktop : heure + lieu en pastilles sur une ligne */}
                 <div
                   className={`hidden items-center gap-3 text-xs sm:flex ${
