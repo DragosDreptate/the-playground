@@ -163,6 +163,19 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
+                {/* Desktop : titre d'abord */}
+                <p
+                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
+                    isCancelled
+                      ? "text-muted-foreground line-through"
+                      : isPast
+                        ? "text-muted-foreground"
+                        : ""
+                  }`}
+                >
+                  {moment.title}
+                </p>
+
                 {/* Desktop : heure + lieu en pastilles sur une ligne */}
                 <div
                   className={`hidden items-center gap-3 text-xs sm:flex ${
@@ -180,19 +193,6 @@ export async function MomentTimelineItem({
                     </span>
                   )}
                 </div>
-
-
-                <p
-                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
-                    isCancelled
-                      ? "text-muted-foreground line-through"
-                      : isPast
-                        ? "text-muted-foreground"
-                        : ""
-                  }`}
-                >
-                  {moment.title}
-                </p>
 
                 {((!isCancelled && registrationCount > 0) || statusBadge) && (
                   <div className="flex items-center gap-2">
