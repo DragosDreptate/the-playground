@@ -111,17 +111,22 @@ export function StatusPill({
   label,
   className,
   hideLabelOnMobile = false,
+  size = "default",
 }: {
   icon: LucideIcon;
   label: string;
   className?: string;
   hideLabelOnMobile?: boolean;
+  /** `sm` : version compacte pour les overlays sur cover (plus discrète sur l'image). */
+  size?: "default" | "sm";
 }) {
+  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2 py-0.5 text-xs";
+  const iconSize = size === "sm" ? "size-2.5" : "size-3";
   return (
     <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/60 px-2 py-0.5 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
+      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/60 font-medium backdrop-blur-sm ${sizeClasses} ${className ?? ""}`}
     >
-      <Icon className="size-3 shrink-0" />
+      <Icon className={`${iconSize} shrink-0`} />
       <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>
     </span>
   );

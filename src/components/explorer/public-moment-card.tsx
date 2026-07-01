@@ -62,13 +62,13 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       : t("momentCard.registeredCount", { count: moment.registrationCount });
 
   const roleBadge = isOrganizer ? (
-    <StatusPill {...REGISTRATION_PILL.host} label={t("momentCard.roleBadge.host")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.host} label={t("momentCard.roleBadge.host")} hideLabelOnMobile size="sm" />
   ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <StatusPill {...REGISTRATION_PILL.registered} label={t("momentCard.roleBadge.registered")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.registered} label={t("momentCard.roleBadge.registered")} hideLabelOnMobile size="sm" />
   ) : registrationStatus === "PENDING_APPROVAL" ? (
-    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("momentCard.roleBadge.pendingApproval")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("momentCard.roleBadge.pendingApproval")} hideLabelOnMobile size="sm" />
   ) : registrationStatus === "WAITLISTED" ? (
-    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("momentCard.roleBadge.waitlisted")} hideLabelOnMobile />
+    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("momentCard.roleBadge.waitlisted")} hideLabelOnMobile size="sm" />
   ) : null;
 
   const categoryLabelText = resolveCategoryLabel(
