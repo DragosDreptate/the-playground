@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
@@ -41,9 +42,14 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
   const timeStr = formatTime(startsAt);
   const { weekday, dateStr: columnDate } = formatWeekdayAndDate(startsAt, locale);
   const columnDateShort = formatDayMonthShort(startsAt, locale);
-  // « Aujourd'hui » ancré sur Europe/Paris (cohérent serveur/client et avec la carte
-  // sœur de la page Communauté), pas sur le fuseau du navigateur.
-  const isToday = isSameDayInParis(startsAt, new Date());
+  // « Aujourd'hui » ancré sur Europe/Paris (cohérent avec la carte sœur de la page
+  // Communauté), pas sur le fuseau du navigateur. Calculé côté client après montage :
+  // la page Explorer est mise en cache (ISR), un calcul au render figerait le badge au
+  // snapshot et provoquerait un mismatch d'hydratation au passage de minuit.
+  const [isToday, setIsToday] = useState(false);
+  useEffect(() => {
+    setIsToday(isSameDayInParis(startsAt, new Date()));
+  }, [startsAt]);
 
   const isOnline = moment.locationType === "ONLINE" || moment.locationType === "HYBRID";
   const locationLabel = isOnline ? t("momentCard.online") : (moment.locationName ?? null);

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DraftBadge } from "@/components/badges/draft-badge";
@@ -70,8 +71,13 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         topAttendees: props.registration.moment.topAttendees,
       };
 
-  // « Aujourd'hui » ancré sur Europe/Paris, pas sur le fuseau du navigateur.
-  const isToday = isSameDayInParis(momentData.startsAt, new Date());
+  // « Aujourd'hui » ancré sur Europe/Paris, pas sur le fuseau du navigateur. Calculé
+  // côté client après montage pour éviter tout mismatch d'hydratation si le HTML est
+  // servi après le passage de minuit.
+  const [isToday, setIsToday] = useState(false);
+  useEffect(() => {
+    setIsToday(isSameDayInParis(momentData.startsAt, new Date()));
+  }, [momentData.startsAt]);
 
   const isOrganizer = !isOrganizerView && (props as ParticipantProps).isOrganizer === true;
   const isRegistered =
