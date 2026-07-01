@@ -261,7 +261,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                     </div>
 
                     <p
-                      className={`line-clamp-2 font-semibold leading-snug ${
+                      className={`line-clamp-1 font-semibold leading-snug ${
                         isCancelled
                           ? "text-muted-foreground line-through"
                           : isPast
