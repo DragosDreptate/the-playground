@@ -6,6 +6,7 @@ import type {
 } from "@/domain/ports/repositories/user-repository";
 import type { User, NotificationPreferences, DashboardMode, PublicUser } from "@/domain/models/user";
 import { generatePublicId } from "@/lib/public-id";
+import { avatarGradientSeed } from "@/lib/avatar";
 import type { User as PrismaUser } from "@prisma/client";
 
 function toDomainUser(record: PrismaUser): User {
@@ -218,6 +219,7 @@ export const prismaUserRepository: UserRepository = {
         firstName: record.firstName ?? "",
         lastName: record.lastName ?? "",
         image: record.image,
+        gradient: avatarGradientSeed({ id: record.id }),
         bio: record.bio,
         city: record.city,
         socialLinks: {

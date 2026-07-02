@@ -70,6 +70,7 @@ export function makePublicUser(overrides: Partial<PublicUser> = {}): PublicUser 
     firstName: "Jean",
     lastName: "Dupont",
     image: null,
+    gradient: "linear-gradient(135deg, #7c3aed, #4f46e5)",
     bio: null,
     city: null,
     socialLinks: { website: null, linkedinUrl: null, twitterUrl: null, githubUrl: null },

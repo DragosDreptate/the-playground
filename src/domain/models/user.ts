@@ -27,6 +27,8 @@ export type PublicUser = {
   firstName: string;
   lastName: string;
   image: string | null;
+  /** Dégradé d'avatar pré-calculé serveur (graine `id`), cohérent avec toutes les autres surfaces. Cf. SEC-10. */
+  gradient: string;
   bio: string | null;
   city: string | null;
   socialLinks: SocialLinks;
