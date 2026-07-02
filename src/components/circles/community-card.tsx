@@ -1,0 +1,335 @@
+"use client";
+
+import Image from "next/image";
+import { Link } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { CalendarIcon, MapPin, Clock } from "lucide-react";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
+import { formatDayMonth, formatTime } from "@/lib/format-date";
+import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
+import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
+import { CategoryBadge } from "@/components/badges/category-badge";
+import { DemoBadge } from "@/components/badges/demo-badge";
+import { CARD_HOVER, IconPill } from "@/components/cards/card-primitives";
+import type { PublicCircle } from "@/domain/ports/repositories/circle-repository";
+import type { CircleMemberRole, DashboardCircle } from "@/domain/models/circle";
+
+/**
+ * Carte de Communauté unifiée (issue #597).
+ *
+ * Deux variantes (`public` / `dashboard`) et deux branches de présentation :
+ * - `< sm` : format HORIZONTAL — markup repris des cartes actuelles
+ *   (PublicCircleCard / DashboardCircleCard), inchangé visuellement sur mobile.
+ * - `≥ sm` : format VERTICAL en grille — nouveau (différenciation vs événements).
+ *
+ * Composant client : il est rendu aussi bien depuis ExplorerGrid (client) que
+ * depuis DashboardContent (server). Voir spec/features/circle-card-vertical.md.
+ */
+type CommunityCardProps =
+  | {
+      variant: "public";
+      circle: PublicCircle;
+      membershipRole?: CircleMemberRole | null;
+      hideNextMoment?: boolean;
+    }
+  | {
+      variant: "dashboard";
+      circle: DashboardCircle;
+    };
+
+export function CommunityCard(props: CommunityCardProps) {
+  if (props.variant === "dashboard") {
+    return <DashboardVariant circle={props.circle} />;
+  }
+  return (
+    <PublicVariant
+      circle={props.circle}
+      membershipRole={props.membershipRole}
+      hideNextMoment={props.hideNextMoment}
+    />
+  );
+}
+
+/* ─────────────────────────── Variante publique ─────────────────────────── */
+
+function PublicVariant({
+  circle,
+  hideNextMoment,
+}: {
+  circle: PublicCircle;
+  // Conservé (prop transmise par Explorer) mais non rendu : les badges Membre /
+  // Organisateur ont été retirés des cartes Communauté. Plumbing gardé pour restore.
+  membershipRole?: CircleMemberRole | null;
+  hideNextMoment?: boolean;
+}) {
+  const t = useTranslations("Explorer");
+  const tCategory = useTranslations("CircleCategory");
+
+  const gradient = getMomentGradient(circle.name);
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+  const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
+
+  return (
+    <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
+      {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
+      <div
+        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
+      >
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
+        </VerticalCover>
+        <div className="flex flex-col gap-1.5 p-3">
+          {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
+          <h3 className="line-clamp-2 min-h-[2.5em] text-base font-semibold leading-snug">{circle.name}</h3>
+          {circle.city && (
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <IconPill icon={MapPin} size="sm" />
+              <span className="truncate">{circle.city}</span>
+            </div>
+          )}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
+        </div>
+      </div>
+
+      {/* ─── Desktop / tablette (≥ sm) : vertical en grille — nouveau ─── */}
+      <div
+        className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
+      >
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
+        </VerticalCover>
+        <VerticalCardBody
+          categoryLabel={categoryLabel}
+          name={circle.name}
+          description={circle.description}
+          city={circle.city}
+          memberCount={circle.memberCount}
+          topMembers={circle.topMembers}
+          nextMoment={circle.nextMoment}
+          hideNextMoment={hideNextMoment}
+        />
+      </div>
+    </Link>
+  );
+}
+
+/* ─────────────────────────── Variante dashboard ────────────────────────── */
+
+function DashboardVariant({ circle }: { circle: DashboardCircle }) {
+  const t = useTranslations("Explorer");
+  const tCategory = useTranslations("CircleCategory");
+
+  const gradient = getMomentGradient(circle.name);
+  const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
+
+  const href =
+    circle.membershipStatus === "PENDING"
+      ? `/circles/${circle.slug}`
+      : `/dashboard/circles/${circle.slug}`;
+
+  // Bandeau « En attente » superposé en haut de la cover, label centré. Fond sombre
+  // quasi opaque pour rester lisible sur n'importe quel visuel.
+  const pendingBanner =
+    circle.membershipStatus === "PENDING" ? (
+      // Fond opaque couleur de carte (masque la cover) + voile ambre 10% : reproduit
+      // exactement la teinte du bandeau des cartes événement (amber/10 sur le fond de
+      // carte bleu/violet), sans transparence sur l'image.
+      <div className="absolute inset-x-0 top-0 z-10 bg-card">
+        <div className="flex items-center justify-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+          <Clock className="size-3.5 shrink-0" />
+          <span className="truncate">{t("circleCard.roleBadge.pending")}</span>
+        </div>
+      </div>
+    ) : null;
+
+  // Carte encadrée de la teinte du message quand l'adhésion est en attente (comme la
+  // bordure des events annulés) : la bordure ambre remplace le gris par défaut, intègre
+  // le bandeau et supprime l'effet filigrane au bord.
+  const cardBorderClass =
+    circle.membershipStatus === "PENDING" ? "border-amber-500/30" : "";
+
+  return (
+    <Link href={href} className="group block min-w-0">
+      {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
+      <div
+        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border ${cardBorderClass} shadow-lg dark:shadow-none ${CARD_HOVER}`}
+      >
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {pendingBanner}
+        </VerticalCover>
+        <div className="flex flex-col gap-1.5 p-3">
+          {categoryLabel && (
+            <div className="flex items-center gap-2">
+              <CategoryBadge label={categoryLabel} />
+            </div>
+          )}
+          <h3 className="line-clamp-2 min-h-[2.5em] text-base font-semibold leading-snug">{circle.name}</h3>
+          {circle.city && (
+            <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+              <IconPill icon={MapPin} size="sm" />
+              <span className="truncate">{circle.city}</span>
+            </div>
+          )}
+          <MemberStack memberCount={circle.memberCount} topMembers={circle.topMembers} />
+        </div>
+      </div>
+
+      {/* ─── Desktop / tablette (≥ sm) : vertical en grille — nouveau ─── */}
+      <div
+        className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border ${cardBorderClass} shadow-lg dark:shadow-none ${CARD_HOVER}`}
+      >
+        <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
+          {pendingBanner}
+        </VerticalCover>
+        <VerticalCardBody
+          categoryLabel={categoryLabel}
+          name={circle.name}
+          description={circle.description}
+          city={circle.city}
+          memberCount={circle.memberCount}
+          topMembers={circle.topMembers}
+          nextMoment={circle.nextMoment}
+        />
+      </div>
+    </Link>
+  );
+}
+
+/* ───────────────────── Sous-composants partagés (≥ sm) ──────────────────── */
+
+type AttendeeStackProp = React.ComponentProps<typeof AttendeeAvatarStack>["attendees"];
+
+/** Corps du format vertical (≥ sm), commun aux variantes public et dashboard. */
+function VerticalCardBody({
+  categoryLabel,
+  name,
+  description,
+  city,
+  memberCount,
+  topMembers,
+  nextMoment,
+  hideNextMoment = false,
+}: {
+  categoryLabel: string | null;
+  name: string;
+  description: string | null;
+  city: string | null;
+  memberCount: number;
+  topMembers: AttendeeStackProp;
+  nextMoment: { startsAt: Date | string; title: string } | null;
+  hideNextMoment?: boolean;
+}) {
+  return (
+    <div className="flex flex-1 flex-col gap-2 p-4">
+      {categoryLabel && (
+        <div className="flex items-center gap-2">
+          <CategoryBadge label={categoryLabel} />
+        </div>
+      )}
+      <h3 className="min-w-0 truncate text-base font-semibold leading-snug">{name}</h3>
+      <p className="text-muted-foreground line-clamp-2 text-sm">{description}</p>
+      {city && <CityRowVertical city={city} />}
+      <MemberStack memberCount={memberCount} topMembers={topMembers} />
+      {!hideNextMoment && (
+        <div className="mt-auto pt-2">
+          <NextMomentBlock nextMoment={nextMoment} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Cover carrée 1:1 du format vertical, gradient en fallback. `children` = overlays. */
+function VerticalCover({
+  coverImage,
+  name,
+  gradient,
+  children,
+}: {
+  coverImage: string | null;
+  name: string;
+  gradient: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`relative aspect-square w-full overflow-hidden ${coverImage ? COVER_IMAGE_BG : ""}`}
+      style={coverImage ? undefined : { background: gradient }}
+    >
+      {coverImage && (
+        <Image
+          src={coverImage}
+          alt={name}
+          fill
+          className="object-cover"
+          sizes="(max-width: 1024px) 50vw, 340px"
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
+/** Ligne ville du format vertical : pastille grise + icône + libellé. */
+function CityRowVertical({ city }: { city: string }) {
+  return (
+    <div className="text-muted-foreground flex items-center gap-2 text-sm">
+      <IconPill icon={MapPin} size="md" />
+      <span>{city}</span>
+    </div>
+  );
+}
+
+/** Pile d'avatars des membres + libellé (rien si la Communauté n'a aucun membre). */
+function MemberStack({
+  memberCount,
+  topMembers,
+}: {
+  memberCount: number;
+  topMembers: AttendeeStackProp;
+}) {
+  const t = useTranslations("Explorer");
+  if (memberCount <= 0) return null;
+  const overflow = memberCount - topMembers.length;
+  const label =
+    overflow > 0
+      ? t("circleCard.moreMembers", { count: overflow })
+      : t("circleCard.members", { count: memberCount });
+  return <AttendeeAvatarStack attendees={topMembers} totalCount={memberCount} label={label} />;
+}
+
+/** Encart « prochain événement » du format vertical (état plein ou vide). */
+function NextMomentBlock({
+  nextMoment,
+}: {
+  nextMoment: { startsAt: Date | string; title: string } | null;
+}) {
+  const t = useTranslations("Explorer");
+  const locale = useLocale();
+
+  if (nextMoment) {
+    const start = new Date(nextMoment.startsAt);
+    return (
+      <div className="flex flex-col gap-1 rounded-xl border border-border bg-muted/50 px-3 py-2">
+        <div className="text-muted-foreground flex items-center gap-1.5">
+          <IconPill icon={CalendarIcon} size="sm" />
+          <span className="text-[0.6rem] font-semibold uppercase tracking-wider">
+            {t("circleCard.nextMoment")}
+          </span>
+        </div>
+        <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground">
+          {nextMoment.title}
+        </p>
+        <p className="text-muted-foreground text-[0.7rem]">
+          {formatDayMonth(start, locale)} · {formatTime(start)}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-dashed border-border px-3 py-2 text-xs text-muted-foreground">
+      {t("circleCard.noUpcomingMoments")}
+    </div>
+  );
+}

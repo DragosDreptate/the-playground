@@ -7,7 +7,7 @@ import { signInUrlWithAutoJoin } from "@/lib/auto-join";
 import { degradedQuery } from "@/lib/degraded-query";
 import { stripProtocol } from "@/lib/url";
 import type { Metadata } from "next";
-import type { RegistrationWithUser } from "@/domain/models/registration";
+import type { RegistrationWithUser, RegistrationStatus } from "@/domain/models/registration";
 import type { CircleNetwork } from "@/domain/models/circle-network";
 import {
   prismaCircleRepository,
@@ -211,34 +211,51 @@ export default async function PublicCirclePage({
   const pastMoments = allMoments.filter((m) => isPastMoment(m, now)).sort(byStartsAtDesc);
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
-  const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
-    degradedQuery(
-      prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
-      new Map<string, number>(),
-      "circle_page:registration_counts",
-    ),
-    degradedQuery(
-      prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
-      new Map<string, RegistrationWithUser[]>(),
-      "circle_page:top_registrants",
-    ),
-    degradedQuery(
-      prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
-      [] as CircleNetwork[],
-      "circle_page:circle_networks",
-    ),
-    canSeeMembers
-      ? degradedQuery(
-          prismaCircleRepository.findMembersPaginated(circle.id, {
-            offset: 0,
-            limit: 20,
-            priorityUserId: session?.user?.id ?? null,
-          }),
-          { members: [], total: 0, hasMore: false },
-          "circle_page:members_first_page",
-        )
-      : Promise.resolve({ members: [], total: 0, hasMore: false }),
-  ]);
+  const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage, userStatusByMomentId] =
+    await Promise.all([
+      degradedQuery(
+        prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+        new Map<string, number>(),
+        "circle_page:registration_counts",
+      ),
+      degradedQuery(
+        prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+        new Map<string, RegistrationWithUser[]>(),
+        "circle_page:top_registrants",
+      ),
+      degradedQuery(
+        prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+        [] as CircleNetwork[],
+        "circle_page:circle_networks",
+      ),
+      canSeeMembers
+        ? degradedQuery(
+            prismaCircleRepository.findMembersPaginated(circle.id, {
+              offset: 0,
+              limit: 20,
+              priorityUserId: session?.user?.id ?? null,
+            }),
+            { members: [], total: 0, hasMore: false },
+            "circle_page:members_first_page",
+          )
+        : Promise.resolve({ members: [], total: 0, hasMore: false }),
+      // Statut d'inscription perso par moment (bandeau « en attente / liste d'attente »
+      // de la timeline). Vide si non connecté. Joint au Promise.all pour rester parallèle.
+      session?.user?.id
+        ? degradedQuery(
+            prismaRegistrationRepository
+              .findByMomentIdsAndUser(allMomentIds, session.user.id)
+              .then(
+                (regs) =>
+                  new Map<string, RegistrationStatus | null>(
+                    [...regs].map(([id, reg]) => [id, reg?.status ?? null])
+                  )
+              ),
+            new Map<string, RegistrationStatus | null>(),
+            "circle_page:user_registration_status",
+          )
+        : Promise.resolve(new Map<string, RegistrationStatus | null>()),
+    ]);
 
   // Dialog des membres : email redacté pour les non-Organisateurs (SEC-11).
   const visibleMembers = visibleMembersFor(isOrganizer, membersFirstPage.members);
@@ -608,7 +625,7 @@ export default async function PublicCirclePage({
                       moment={moment}
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
-                      userRegistrationStatus={null}
+                      userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
@@ -632,7 +649,7 @@ export default async function PublicCirclePage({
                       moment={moment}
                       circleSlug={circle.slug}
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
-                      userRegistrationStatus={null}
+                      userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
                       topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}

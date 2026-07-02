@@ -36,7 +36,12 @@ export function LeaveCircleDialog({ circleId, circleName }: LeaveCircleDialogPro
     const result = await leaveCircleAction(circleId);
 
     if (result.success) {
+      // Navigation locale-aware (respecte le préfixe de langue), puis refresh() pour
+      // invalider le Router Cache client : sans lui, router.push servirait la liste
+      // /dashboard préchargée où la Communauté quittée reste visible. L'action a déjà
+      // invalidé le cache de données (updateTag), le re-render serveur reflète le départ.
       router.push("/dashboard?tab=circles");
+      router.refresh();
     } else {
       setError(result.error);
       setIsPending(false);

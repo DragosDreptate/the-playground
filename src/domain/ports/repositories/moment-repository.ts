@@ -63,6 +63,7 @@ export type PublicMoment = {
   endsAt: Date | null;
   locationType: LocationType;
   locationName: string | null;
+  locationAddress: string | null;
   registrationCount: number;
   capacity: number | null;
   explorerScore: number;

@@ -12,7 +12,8 @@ import type {
   RegistrationWithMoment,
   RegistrationWithUser,
 } from "@/domain/models/registration";
-import type { LocationType } from "@/domain/models/moment";
+import type { LocationType, MomentStatus } from "@/domain/models/moment";
+import { partitionUpcomingPast } from "@/lib/moment-timeline";
 import type { Registration as PrismaRegistration } from "@prisma/client";
 
 function toDomainRegistration(record: PrismaRegistration): Registration {
@@ -249,8 +250,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             coverImage: true,
             startsAt: true,
             endsAt: true,
+            status: true,
             locationType: true,
             locationName: true,
+            locationAddress: true,
             circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
@@ -266,8 +269,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: r.moment.coverImage ?? null,
         startsAt: r.moment.startsAt,
         endsAt: r.moment.endsAt,
+        status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
+        locationAddress: r.moment.locationAddress,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
@@ -295,8 +300,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
             coverImage: true,
             startsAt: true,
             endsAt: true,
+            status: true,
             locationType: true,
             locationName: true,
+            locationAddress: true,
             circle: { select: { name: true, slug: true, coverImage: true } },
           },
         },
@@ -312,8 +319,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: r.moment.coverImage ?? null,
         startsAt: r.moment.startsAt,
         endsAt: r.moment.endsAt,
+        status: r.moment.status,
         locationType: r.moment.locationType,
         locationName: r.moment.locationName,
+        locationAddress: r.moment.locationAddress,
         circleName: r.moment.circle.name,
         circleSlug: r.moment.circle.slug,
         circleCoverImage: r.moment.circle.coverImage ?? null,
@@ -346,6 +355,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       mEndsAt: Date | null;
       mLocationType: string;
       mLocationName: string | null;
+      mLocationAddress: string | null;
       mStatus: string;
       cName: string;
       cSlug: string;
@@ -374,6 +384,7 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         m."endsAt"              AS "mEndsAt",
         m."locationType"        AS "mLocationType",
         m."locationName"        AS "mLocationName",
+        m."locationAddress"     AS "mLocationAddress",
         m.status                AS "mStatus",
         c.name                  AS "cName",
         c.slug                  AS "cSlug",
@@ -397,6 +408,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
           (r.status IN ('REGISTERED', 'WAITLISTED', 'PENDING_APPROVAL') AND m.status = 'PUBLISHED' AND m."startsAt" > NOW())
           OR
           (r.status IN ('REGISTERED', 'CHECKED_IN') AND m.status = 'PAST')
+          OR
+          -- Événement annulé auquel l'utilisateur était inscrit : reste visible barré
+          -- (à venir tant que la date n'est pas passée, sinon dans les passés).
+          (r.status IN ('REGISTERED', 'CHECKED_IN', 'WAITLISTED', 'PENDING_APPROVAL') AND m.status = 'CANCELLED')
         )
       ORDER BY m."startsAt" ASC
     `;
@@ -419,8 +434,10 @@ export const prismaRegistrationRepository: RegistrationRepository = {
         coverImage: row.mCoverImage,
         startsAt: row.mStartsAt,
         endsAt: row.mEndsAt,
+        status: row.mStatus as MomentStatus,
         locationType: row.mLocationType as LocationType,
         locationName: row.mLocationName,
+        locationAddress: row.mLocationAddress,
         circleName: row.cName,
         circleSlug: row.cSlug,
         circleCoverImage: row.cCoverImage,
@@ -429,14 +446,16 @@ export const prismaRegistrationRepository: RegistrationRepository = {
       },
     });
 
-    const upcoming: RegistrationWithMoment[] = [];
-    const past: RegistrationWithMoment[] = [];
-    for (const row of rows) {
-      if (row.mStatus === "PAST") past.push(toItem(row));
-      else upcoming.push(toItem(row));
-    }
-    // Les moments passés triés par date décroissante
-    past.sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
+    const { upcoming: upcomingRows, past: pastRows } = partitionUpcomingPast(
+      rows,
+      (r) => ({ status: r.mStatus, startsAt: r.mStartsAt }),
+      Date.now()
+    );
+    const upcoming = upcomingRows.map(toItem);
+    // Les moments passés triés par date décroissante.
+    const past = pastRows
+      .map(toItem)
+      .sort((a, b) => b.moment.startsAt.getTime() - a.moment.startsAt.getTime());
 
     return { upcoming, past };
   },

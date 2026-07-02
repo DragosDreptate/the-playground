@@ -18,6 +18,7 @@ import type {
   MomentStatus,
 } from "@/domain/models/moment";
 import type { PublicMomentRegistration } from "@/domain/models/user";
+import { byStartsAtDesc, partitionUpcomingPast } from "@/lib/moment-timeline";
 import type { Moment as PrismaMoment } from "@prisma/client";
 
 function toDomainMoment(record: PrismaMoment): Moment {
@@ -191,6 +192,7 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: m.endsAt,
       locationType: m.locationType,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       registrationCount: m._count.registrations,
       capacity: m.capacity,
       explorerScore: m.explorerScore,
@@ -266,6 +268,7 @@ export const prismaMomentRepository: MomentRepository = {
         endsAt: true,
         locationType: true,
         locationName: true,
+        locationAddress: true,
         status: true,
         circle: { select: { slug: true, name: true, coverImage: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
@@ -282,6 +285,7 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: m.endsAt,
       locationType: m.locationType,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       status: m.status,
       registrationCount: m._count.registrations,
       topAttendees: [],
@@ -307,6 +311,7 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: Date | null;
       locationType: string;
       locationName: string | null;
+      locationAddress: string | null;
       status: string;
       cSlug: string;
       cName: string;
@@ -331,6 +336,7 @@ export const prismaMomentRepository: MomentRepository = {
         m."endsAt",
         m."locationType",
         m."locationName",
+        m."locationAddress",
         m.status,
         c.slug           AS "cSlug",
         c.name           AS "cName",
@@ -348,7 +354,7 @@ export const prismaMomentRepository: MomentRepository = {
         ) sub) AS "topAttendees"
       FROM moments m
       JOIN circles c ON c.id = m."circleId"
-      WHERE m.status IN ('DRAFT', 'PUBLISHED', 'PAST')
+      WHERE m.status IN ('DRAFT', 'PUBLISHED', 'PAST', 'CANCELLED')
         AND EXISTS (
           SELECT 1 FROM circle_memberships cm
           WHERE cm."circleId" = c.id
@@ -367,20 +373,21 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: row.endsAt,
       locationType: row.locationType as LocationType,
       locationName: row.locationName,
+      locationAddress: row.locationAddress,
       status: row.status as MomentStatus,
       registrationCount: row.registrationCount,
       topAttendees: (row.topAttendees ?? []).map((u) => ({ user: toUserAvatarInfo(u) })),
       circle: { slug: row.cSlug, name: row.cName, coverImage: row.cCoverImage },
     });
 
-    const upcoming: HostMomentSummary[] = [];
-    const past: HostMomentSummary[] = [];
-    for (const row of rows) {
-      if (row.status === "PAST") past.push(toItem(row));
-      else upcoming.push(toItem(row));
-    }
-    // Les moments passés triés par date décroissante
-    past.sort((a, b) => b.startsAt.getTime() - a.startsAt.getTime());
+    const { upcoming: upcomingRows, past: pastRows } = partitionUpcomingPast(
+      rows,
+      (r) => ({ status: r.status, startsAt: r.startsAt }),
+      Date.now()
+    );
+    const upcoming = upcomingRows.map(toItem);
+    // Les moments passés triés par date décroissante.
+    const past = pastRows.map(toItem).sort(byStartsAtDesc);
 
     return { upcoming, past };
   },
@@ -409,6 +416,7 @@ export const prismaMomentRepository: MomentRepository = {
         endsAt: true,
         locationType: true,
         locationName: true,
+        locationAddress: true,
         status: true,
         circle: { select: { slug: true, name: true, coverImage: true } },
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
@@ -425,6 +433,7 @@ export const prismaMomentRepository: MomentRepository = {
       endsAt: m.endsAt,
       locationType: m.locationType,
       locationName: m.locationName,
+      locationAddress: m.locationAddress,
       status: m.status,
       registrationCount: m._count.registrations,
       topAttendees: [],

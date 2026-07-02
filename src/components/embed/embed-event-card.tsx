@@ -4,7 +4,7 @@ import type { Moment } from "@/domain/models/moment";
 import type { Circle } from "@/domain/models/circle";
 import type { UserAvatarInfo } from "@/domain/models/user";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
-import { getMomentGradient } from "@/lib/gradient";
+import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { getPublicUserInitials } from "@/lib/display-name";
 import { getAppUrl } from "@/lib/app-url";
 import { EMBED_MAX_WIDTH } from "@/components/embed/constants";
@@ -92,7 +92,7 @@ export async function EmbedEventCard({
         <div className="relative flex-shrink-0">
           {moment.coverImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={moment.coverImage} alt="" className={coverClass} />
+            <img src={moment.coverImage} alt="" className={`${COVER_IMAGE_BG} ${coverClass}`} />
           ) : (
             <div
               className={coverClass}

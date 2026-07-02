@@ -24,6 +24,15 @@ function toIntlLocale(locale: string): string {
   return INTL_LOCALES[locale as IntlLocaleKey] ?? locale;
 }
 
+/**
+ * Le CLDR récent rend September « Sept » (4 lettres) en anglais, là où l'usage attend
+ * « Sep » (3 lettres, comme tous les autres mois abrégés). On l'uniformise pour garder
+ * une largeur de mois homogène sur toutes les surfaces (desktop, mobile, og:image).
+ */
+function normalizeShortMonthEn(formatted: string, locale: string): string {
+  return locale.startsWith("en") ? formatted.replace(/\bSept\b/g, "Sep") : formatted;
+}
+
 /** "22:00" (toujours 24h, fuseau Europe/Paris) */
 export function formatTime(date: Date): string {
   const parts = new Intl.DateTimeFormat("fr-FR", {
@@ -48,21 +57,50 @@ export function formatLocalizedTime(date: Date, locale: string): string {
 
 /** "sam. 25 févr." / "Sat 25 Feb" */
 export function formatShortDate(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  }).format(date);
+  return normalizeShortMonthEn(
+    new Intl.DateTimeFormat(toIntlLocale(locale), {
+      timeZone: TIMEZONE,
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    }).format(date),
+    locale,
+  );
 }
 
 /** "25 févr." / "28 Feb" */
 export function formatDayMonth(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(toIntlLocale(locale), {
-    timeZone: TIMEZONE,
-    day: "numeric",
-    month: "short",
-  }).format(date);
+  return normalizeShortMonthEn(
+    new Intl.DateTimeFormat(toIntlLocale(locale), {
+      timeZone: TIMEZONE,
+      day: "numeric",
+      month: "short",
+    }).format(date),
+    locale,
+  );
+}
+
+/**
+ * "25 fév." / "28 Feb" — variante compacte de formatDayMonth pour les colonnes de
+ * timeline étroites (mobile) : abréviations FR ramenées à 3 lettres + point ("sept."
+ * → "sep."). Les mois écrits en toutes lettres (mars, mai, juin, août) restent
+ * intacts ; juillet reste "juil." (à "jui." il collisionnerait avec juin).
+ */
+export function formatDayMonthShort(date: Date, locale: string): string {
+  const intlLocale = toIntlLocale(locale);
+  const day = new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, day: "numeric" }).format(date);
+  const month = normalizeShortMonthEn(
+    new Intl.DateTimeFormat(intlLocale, { timeZone: TIMEZONE, month: "short" }).format(date),
+    locale,
+  );
+  // Mots complets (mars, mai, juin, août, EN « Sep »…) : laissés tels quels, sans point.
+  // Abréviations FR (terminées par « . ») : tronquées à 3 lettres + point, sauf juillet.
+  let shortMonth = month;
+  if (month.endsWith(".")) {
+    const base = month.slice(0, -1);
+    shortMonth = /^juil/i.test(base) ? `${base}.` : `${base.slice(0, 3)}.`;
+  }
+  return `${day} ${shortMonth}`;
 }
 
 /** { weekday, dateStr } pour les timelines — "sam." + "28 févr." */
@@ -149,10 +187,13 @@ export function formatOgDateBadge(
   const stripDot = (s: string) => s.replace(/\.$/, "").toUpperCase();
   return {
     month: stripDot(
-      new Intl.DateTimeFormat(intlLocale, {
-        timeZone: TIMEZONE,
-        month: "short",
-      }).format(date),
+      normalizeShortMonthEn(
+        new Intl.DateTimeFormat(intlLocale, {
+          timeZone: TIMEZONE,
+          month: "short",
+        }).format(date),
+        locale,
+      ),
     ),
     day: new Intl.DateTimeFormat(intlLocale, {
       timeZone: TIMEZONE,

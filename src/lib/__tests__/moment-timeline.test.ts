@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
+import { isUpcomingCancelled, isPastMoment, byStartsAtDesc, partitionUpcomingPast } from "@/lib/moment-timeline";
 
 const NOW = new Date("2026-06-25T12:00:00Z").getTime();
 const future = new Date("2026-07-23T20:00:00Z");
@@ -50,6 +50,33 @@ describe("moment-timeline", () => {
       const b = { startsAt: new Date("2026-03-01") };
       const c = { startsAt: new Date("2026-02-01") };
       expect([a, b, c].sort(byStartsAtDesc)).toEqual([b, c, a]);
+    });
+  });
+
+  describe("partitionUpcomingPast", () => {
+    it("should split rows into upcoming and past following the timeline rule", () => {
+      const rows = [
+        { id: "published-future", status: "PUBLISHED", startsAt: future },
+        { id: "past", status: "PAST", startsAt: past },
+        { id: "cancelled-future", status: "CANCELLED", startsAt: future },
+        { id: "cancelled-past", status: "CANCELLED", startsAt: past },
+      ];
+      const { upcoming, past: pastRows } = partitionUpcomingPast(
+        rows,
+        (r) => ({ status: r.status, startsAt: r.startsAt }),
+        NOW
+      );
+      expect(upcoming.map((r) => r.id)).toEqual(["published-future", "cancelled-future"]);
+      expect(pastRows.map((r) => r.id)).toEqual(["past", "cancelled-past"]);
+    });
+
+    it("should preserve input order within each group", () => {
+      const rows = [
+        { id: "a", status: "PUBLISHED", startsAt: future },
+        { id: "b", status: "PUBLISHED", startsAt: future },
+      ];
+      const { upcoming } = partitionUpcomingPast(rows, (r) => r, NOW);
+      expect(upcoming.map((r) => r.id)).toEqual(["a", "b"]);
     });
   });
 });

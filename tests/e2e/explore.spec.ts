@@ -66,6 +66,7 @@ test.describe("Découvrir — page Explorer", () => {
       .first();
     await momentsTab.click();
 
+    // La carte Moment est une timeline responsive unique : un seul lien /m/ par carte.
     const momentLinks = page.locator("a[href*='/m/']");
     await expect(momentLinks.first()).toBeVisible();
   });

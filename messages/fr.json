@@ -213,14 +213,6 @@
     "createMoment": "Créer un événement",
     "createCircleFirst": "Créer une communauté d'abord",
     "selectCircleDropdown": "Dans quelle communauté ?",
-    "selectCircle": {
-      "title": "Choisir une communauté",
-      "description": "À quelle communauté rattacher cet événement ?"
-    },
-    "noCircles": {
-      "title": "Créez d'abord une communauté",
-      "description": "Vous devez créer une communauté avant de créer un événement."
-    },
     "myMoments": "Événements",
     "myMomentsOrganizer": "Mes événements",
     "upcomingMoments": "Mes prochains événements",
@@ -230,15 +222,19 @@
     "noMoments": "Aucun événement pour l'instant.",
     "noMomentsHostOnly": "Aucun événement organisé.",
     "noMomentsHint": "Inscrivez-vous à un événement ou créez votre communauté.",
-    "noMomentsHintExplore": "Explorer des événements →",
+    "noMomentsHintExplore": "Explorer des événements",
     "noMomentsOrganizer": "Aucun événement organisé pour l'instant.",
     "noMomentsOrganizerHint": "Créez votre premier événement depuis une communauté.",
     "emptyCircles": "Vous n'êtes membre d'aucune communauté.",
     "emptyCirclesHostOnly": "Vous n'organisez aucune communauté.",
     "emptyCirclesHint": "Créez une communauté ou rejoignez un événement pour en rejoindre une.",
-    "emptyCirclesHintExplore": "Explorer des communautés →",
+    "emptyCirclesHintExplore": "Explorer des communautés",
     "noCirclesOrganizer": "Vous n'organisez aucune communauté.",
     "noCirclesOrganizerHint": "Créez votre première communauté pour commencer.",
+    "exploreCommunitiesCard": {
+      "title": "Explorer les communautés",
+      "subtitle": "Découvrez d'autres communautés à rejoindre"
+    },
     "onboardingMoments": {
       "emptyTitle": "Aucun événement pour l'instant",
       "emptyHintNoCircles": "Crée ta communauté et lance ton premier événement.",
@@ -344,6 +340,7 @@
       "noPastMoments": "Aucun événement passé.",
       "noPendingMemberships": "Validation activée — aucune demande en attente.",
       "today": "Aujourd'hui",
+      "todayShort": "Auj.",
       "manageMoment": "Gérer cet événement",
       "join": "Rejoindre",
       "joinRequiresApproval": "Rejoindre (soumis à validation)",
@@ -832,7 +829,8 @@
       "roleBadge": {
         "host": "Organisateur",
         "registered": "Inscrit",
-        "waitlisted": "Liste d'attente"
+        "waitlisted": "Liste d'attente",
+        "pendingApproval": "En attente de validation"
       }
     },
     "loadMore": "Voir plus"

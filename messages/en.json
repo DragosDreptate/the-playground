@@ -213,14 +213,6 @@
     "createMoment": "Create an Event",
     "createCircleFirst": "Create a community first",
     "selectCircleDropdown": "Which community?",
-    "selectCircle": {
-      "title": "Choose a community",
-      "description": "Which community should this Event belong to?"
-    },
-    "noCircles": {
-      "title": "Create a community first",
-      "description": "You need a community before creating an Event."
-    },
     "myMoments": "Events",
     "myMomentsOrganizer": "My Events",
     "upcomingMoments": "My upcoming Events",
@@ -230,15 +222,19 @@
     "noMoments": "No Events yet.",
     "noMomentsHostOnly": "No organized Events.",
     "noMomentsHint": "Join an Event or create your community.",
-    "noMomentsHintExplore": "Explore events →",
+    "noMomentsHintExplore": "Explore events",
     "noMomentsOrganizer": "No Events organized yet.",
     "noMomentsOrganizerHint": "Create your first Event from a community.",
     "emptyCircles": "You're not a member of any community.",
     "emptyCirclesHostOnly": "You don't organize any community.",
     "emptyCirclesHint": "Create a community or join an Event to become a member of one.",
-    "emptyCirclesHintExplore": "Explore communities →",
+    "emptyCirclesHintExplore": "Explore communities",
     "noCirclesOrganizer": "You don't organize any community yet.",
     "noCirclesOrganizerHint": "Create your first community to get started.",
+    "exploreCommunitiesCard": {
+      "title": "Explore communities",
+      "subtitle": "Discover more communities to join"
+    },
     "onboardingMoments": {
       "emptyTitle": "No events yet",
       "emptyHintNoCircles": "Create your community and launch your first event.",
@@ -344,6 +340,7 @@
       "noPastMoments": "No past Events.",
       "noPendingMemberships": "Approval enabled — no pending requests.",
       "today": "Today",
+      "todayShort": "Today",
       "manageMoment": "Manage this Event",
       "join": "Join",
       "joinRequiresApproval": "Join (subject to approval)",
@@ -832,7 +829,8 @@
       "roleBadge": {
         "host": "Organizer",
         "registered": "Joined",
-        "waitlisted": "Waitlisted"
+        "waitlisted": "Waitlisted",
+        "pendingApproval": "Pending approval"
       }
     },
     "loadMore": "Show more"
