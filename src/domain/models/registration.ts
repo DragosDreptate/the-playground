@@ -77,6 +77,21 @@ export function redactRegistrationForNonHost(
   };
 }
 
+/**
+ * Applique la règle de redaction à une liste d'inscriptions selon le rôle du
+ * viewer : l'Organisateur (HOST/CO_HOST) reçoit tout, les autres reçoivent des
+ * inscriptions réduites. Source unique de la règle, partagée par le usecase de
+ * pagination et les pages serveur — pour qu'un changement (nouveau champ
+ * sensible, gestion CO_HOST) ne se fasse qu'à un seul endroit et ne puisse pas
+ * rouvrir la fuite par oubli.
+ */
+export function visibleRegistrationsFor(
+  isOrganizer: boolean,
+  registrations: RegistrationWithUser[],
+): RegistrationWithUser[] {
+  return isOrganizer ? registrations : registrations.map(redactRegistrationForNonHost);
+}
+
 export type RegistrationMomentAttendee = { user: UserAvatarInfo };
 
 export type RegistrationWithMoment = Registration & {

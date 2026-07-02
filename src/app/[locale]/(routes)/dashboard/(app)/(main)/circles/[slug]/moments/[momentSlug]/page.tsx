@@ -15,7 +15,7 @@ import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { isActiveOrganizer } from "@/domain/models/circle";
-import { redactRegistrationForNonHost } from "@/domain/models/registration";
+import { visibleRegistrationsFor } from "@/domain/models/registration";
 import { redirectToPublicMoment } from "@/lib/dashboard-event-public-redirect";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
 
@@ -75,9 +75,7 @@ export default async function MomentDetailPage({
   // aussi servie aux membres non-Organisateurs et aux inscrits (variant "public"
   // ci-dessous) : sans redaction, ils reçoivent les emails de tous les inscrits.
   // Cf. red team #1. Pour l'Organisateur, visibleAttendees === allAttendees.
-  const visibleAttendees = isOrganizer
-    ? allAttendees
-    : allAttendees.map(redactRegistrationForNonHost);
+  const visibleAttendees = visibleRegistrationsFor(isOrganizer, allAttendees);
 
   const registeredParticipants = visibleAttendees.filter((r) => r.status === "REGISTERED");
   const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session.user.id);

@@ -2,7 +2,7 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { RegistrationWithUser } from "@/domain/models/registration";
-import { redactRegistrationForNonHost } from "@/domain/models/registration";
+import { visibleRegistrationsFor } from "@/domain/models/registration";
 import { isActiveOrganizer } from "@/domain/models/circle";
 import {
   MomentNotFoundError,
@@ -65,7 +65,8 @@ export async function getMomentParticipantsPage(
 
   // Un non-Organisateur (membre ou simple visiteur d'un Circle public) ne reçoit
   // qu'un participant réduit : ni email ni identifiants Stripe. Cf. red team #1.
-  if (isActiveOrganizer(membership)) return page;
-
-  return { ...page, participants: page.participants.map(redactRegistrationForNonHost) };
+  return {
+    ...page,
+    participants: visibleRegistrationsFor(isActiveOrganizer(membership), page.participants),
+  };
 }

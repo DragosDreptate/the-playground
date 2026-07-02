@@ -34,7 +34,7 @@ import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
-import { redactRegistrationForNonHost } from "@/domain/models/registration";
+import { visibleRegistrationsFor } from "@/domain/models/registration";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -156,9 +156,7 @@ export default async function PublicMomentPage({
   // PII (email) + identifiants Stripe réservés à l'Organisateur : tout autre viewer
   // reçoit des inscriptions réduites AVANT sérialisation vers le composant client
   // (les counts/avatars ne dépendent que du statut et de UserAvatarInfo). Cf. red team #1.
-  const visibleAttendees = isOrganizer
-    ? allAttendees
-    : allAttendees.map(redactRegistrationForNonHost);
+  const visibleAttendees = visibleRegistrationsFor(isOrganizer, allAttendees);
 
   const registeredParticipants = visibleAttendees.filter((r) => r.status === "REGISTERED");
   const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session?.user?.id ?? null);
