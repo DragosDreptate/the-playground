@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatDayMonthShort, formatTime, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, TimelineScaffold, momentDotClass } from "@/components/cards/card-primitives";
 import { DraftBadge } from "@/components/badges/draft-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import type { Attendee } from "@/components/moments/attendee-avatar-stack";
@@ -18,7 +18,9 @@ type Props = {
   userRegistrationStatus: RegistrationStatus | null;
   isLast: boolean;
   /** "dashboard" (défaut) → lien vers le dashboard Host.
-   *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
+   *  "public" → lien vers /m/[slug]. Le badge « Brouillon » reste réservé au dashboard,
+   *  mais les bandeaux de statut d'inscription (en attente / liste d'attente) s'affichent
+   *  sur les deux variantes. */
   variant?: "dashboard" | "public";
   /** Premiers inscrits pour l'avatar stack. */
   topAttendees?: Attendee[];
@@ -42,9 +44,6 @@ export async function MomentTimelineItem({
   const isPast = moment.status === "PAST";
   const isDraft = moment.status === "DRAFT";
 
-  const isRegistered =
-    userRegistrationStatus === "REGISTERED" ||
-    userRegistrationStatus === "CHECKED_IN";
   const isWaitlisted = userRegistrationStatus === "WAITLISTED";
   const isPendingApproval = userRegistrationStatus === "PENDING_APPROVAL";
 
@@ -59,7 +58,9 @@ export async function MomentTimelineItem({
     ? "border-destructive/20"
     : isDraft
       ? "border-dashed border-muted-foreground/30 opacity-70"
-      : "border-border";
+      : !isPast && (isPendingApproval || isWaitlisted)
+        ? "border-amber-500/30"
+        : "border-border";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -77,18 +78,23 @@ export async function MomentTimelineItem({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
+  // Page Communauté : badge « Brouillon » (info Host) conservé dans le corps.
   const statusBadge =
-    isCancelled || variant !== "dashboard"
-      ? null
-      : isDraft
-        ? <DraftBadge label={t("status.draft")} showLabelOnMobile />
-        : isRegistered
-          ? <StatusPill {...REGISTRATION_PILL.registered} label={tDashboard("registrationStatus.registered")} hideLabelOnMobile />
-          : isPendingApproval
-            ? <StatusPill {...REGISTRATION_PILL.pendingApproval} label={tDashboard("registrationStatus.pending_approval")} hideLabelOnMobile />
-            : isWaitlisted
-              ? <StatusPill {...REGISTRATION_PILL.waitlisted} label={tDashboard("registrationStatus.waitlisted")} hideLabelOnMobile />
-              : null;
+    !isCancelled && variant === "dashboard" && isDraft ? (
+      <DraftBadge label={t("status.draft")} showLabelOnMobile />
+    ) : null;
+
+  // Bandeau de tête (calqué sur les cartes Mon espace) : annulé, ou statut d'inscription
+  // perso (en attente de validation / liste d'attente). Priorité annulé > en attente >
+  // liste d'attente. Fond tinté de l'état + cadre de carte assorti (cardBorderClass).
+  const statusBanner = isCancelled
+    ? { Icon: XCircle, label: t("public.eventCancelled"), cls: "border-destructive/20 bg-destructive/10 text-destructive" }
+    : !isPast && !isDraft && isPendingApproval
+      ? { Icon: Clock, label: tDashboard("registrationStatus.pending_approval"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400" }
+      : !isPast && !isDraft && isWaitlisted
+        ? { Icon: Clock, label: tDashboard("registrationStatus.waitlisted"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400" }
+        : null;
+  const BannerIcon = statusBanner?.Icon;
 
   return (
     <TimelineScaffold
@@ -122,13 +128,11 @@ export async function MomentTimelineItem({
           className="block"
         >
           <div className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}>
-            {/* Bandeau annulation */}
-            {isCancelled && (
-              <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
-                <XCircle className="size-3.5 shrink-0 text-destructive" />
-                <span className="text-destructive text-xs font-medium">
-                  {t("public.eventCancelled")}
-                </span>
+            {/* Bandeau de statut (annulé / en attente / liste d'attente) */}
+            {statusBanner && BannerIcon && (
+              <div className={`flex items-center gap-2 rounded-t-xl border-b px-4 py-2 ${statusBanner.cls}`}>
+                <BannerIcon className="size-3.5 shrink-0" />
+                <span className="text-xs font-medium">{statusBanner.label}</span>
               </div>
             )}
 
@@ -173,6 +177,30 @@ export async function MomentTimelineItem({
                   </div>
                 )}
 
+                {/* Desktop : titre d'abord */}
+                <p
+                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
+                    isCancelled
+                      ? "text-muted-foreground line-through"
+                      : isPast
+                        ? "text-muted-foreground"
+                        : ""
+                  }`}
+                >
+                  {moment.title}
+                </p>
+
+                {/* Desktop : description sur 2 lignes, sous le titre */}
+                {moment.description && (
+                  <p
+                    className={`hidden text-xs sm:line-clamp-2 ${
+                      isPast || isCancelled ? "text-muted-foreground/60" : "text-muted-foreground"
+                    }`}
+                  >
+                    {moment.description}
+                  </p>
+                )}
+
                 {/* Desktop : heure + lieu en pastilles sur une ligne */}
                 <div
                   className={`hidden items-center gap-3 text-xs sm:flex ${
@@ -190,19 +218,6 @@ export async function MomentTimelineItem({
                     </span>
                   )}
                 </div>
-
-
-                <p
-                  className={`hidden font-semibold leading-snug sm:line-clamp-2 ${
-                    isCancelled
-                      ? "text-muted-foreground line-through"
-                      : isPast
-                        ? "text-muted-foreground"
-                        : ""
-                  }`}
-                >
-                  {moment.title}
-                </p>
 
                 {((!isCancelled && registrationCount > 0) || statusBadge) && (
                   <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import type { LocationType } from "@/domain/models/moment";
+import type { LocationType, MomentStatus } from "@/domain/models/moment";
 import type { UserAvatarInfo } from "@/domain/models/user";
 
 export type RegistrationStatus =
@@ -67,8 +67,10 @@ export type RegistrationWithMoment = Registration & {
     coverImage: string | null;
     startsAt: Date;
     endsAt: Date | null;
+    status: MomentStatus;
     locationType: LocationType;
     locationName: string | null;
+    locationAddress: string | null;
     circleName: string;
     circleSlug: string;
     circleCoverImage: string | null;

@@ -10,7 +10,6 @@ import { loadMoreCirclesAction, loadMoreMomentsAction } from "@/app/actions/expl
 import type { PublicCircle, ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
-import type { RegistrationStatus } from "@/domain/models/registration";
 
 type CirclesProps = {
   tab: "circles";
@@ -25,8 +24,6 @@ type MomentsProps = {
   tab: "moments";
   initialItems: PublicMoment[];
   initialHasMore: boolean;
-  registrationStatusMap: Record<string, RegistrationStatus | null>;
-  membershipBySlug: Record<string, CircleMemberRole>;
   category?: CircleCategory;
   sortBy?: ExplorerSortBy;
 };
@@ -47,12 +44,6 @@ export function ExplorerGrid(props: Props) {
 
   const [circleMembershipMap, setCircleMembershipMap] = useState<Record<string, CircleMemberRole>>(
     props.tab === "circles" ? props.membershipRoleMap : {}
-  );
-  const [registrationStatusMap, setRegistrationStatusMap] = useState<Record<string, RegistrationStatus | null>>(
-    props.tab === "moments" ? props.registrationStatusMap : {}
-  );
-  const [membershipBySlug, setMembershipBySlug] = useState<Record<string, CircleMemberRole>>(
-    props.tab === "moments" ? props.membershipBySlug : {}
   );
 
   // Garde SYNCHRONE : `isPending` ne bascule qu'au render suivant, donc un observer
@@ -82,8 +73,6 @@ export function ExplorerGrid(props: Props) {
           });
           setMomentItems((prev) => [...prev, ...result.moments]);
           setHasMore(result.hasMore);
-          setRegistrationStatusMap((prev) => ({ ...prev, ...result.registrationStatusMap }));
-          setMembershipBySlug((prev) => ({ ...prev, ...result.membershipBySlug }));
         }
       } finally {
         loadingRef.current = false;
@@ -133,8 +122,6 @@ export function ExplorerGrid(props: Props) {
             <PublicMomentCard
               key={moment.id}
               moment={moment}
-              registrationStatus={registrationStatusMap[moment.id] ?? null}
-              isOrganizer={membershipBySlug[moment.circle.slug] === "HOST"}
               isLast={i === momentItems.length - 1}
             />
           ))}

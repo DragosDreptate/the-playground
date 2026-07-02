@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarIcon, MapPin, Crown, Users, Clock, type LucideIcon } from "lucide-react";
+import { CalendarIcon, MapPin, Clock } from "lucide-react";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatDayMonth, formatTime } from "@/lib/format-date";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
@@ -54,10 +54,11 @@ export function CommunityCard(props: CommunityCardProps) {
 
 function PublicVariant({
   circle,
-  membershipRole,
   hideNextMoment,
 }: {
   circle: PublicCircle;
+  // Conservé (prop transmise par Explorer) mais non rendu : les badges Membre /
+  // Organisateur ont été retirés des cartes Communauté. Plumbing gardé pour restore.
   membershipRole?: CircleMemberRole | null;
   hideNextMoment?: boolean;
 }) {
@@ -68,12 +69,6 @@ function PublicVariant({
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const categoryBadge = categoryLabel ? <CategoryBadge label={categoryLabel} /> : null;
 
-  const RoleIcon = membershipRole === "HOST" ? Crown : Users;
-  const roleLabel =
-    membershipRole === "HOST"
-      ? t("circleCard.roleBadge.host")
-      : t("circleCard.roleBadge.member");
-
   return (
     <Link href={`/circles/${circle.slug}`} className="group block min-w-0">
       {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
@@ -82,13 +77,6 @@ function PublicVariant({
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
           {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
-          {membershipRole && (
-            <CoverBadgeOverlay
-              icon={RoleIcon}
-              label={roleLabel}
-              className="border-primary/40 text-primary"
-            />
-          )}
         </VerticalCover>
         <div className="flex flex-col gap-1.5 p-3">
           {categoryBadge && <div className="flex items-center gap-2">{categoryBadge}</div>}
@@ -109,13 +97,6 @@ function PublicVariant({
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
           {circle.isDemo && <DemoBadge label={t("circleCard.demo")} size="md" />}
-          {membershipRole && (
-            <CoverBadgeOverlay
-              icon={RoleIcon}
-              label={roleLabel}
-              className="border-primary/40 text-primary"
-            />
-          )}
         </VerticalCover>
         <VerticalCardBody
           categoryLabel={categoryLabel}
@@ -146,20 +127,35 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
       ? `/circles/${circle.slug}`
       : `/dashboard/circles/${circle.slug}`;
 
+  // Bandeau « En attente » superposé en haut de la cover, label centré. Fond sombre
+  // quasi opaque pour rester lisible sur n'importe quel visuel.
+  const pendingBanner =
+    circle.membershipStatus === "PENDING" ? (
+      // Fond opaque couleur de carte (masque la cover) + voile ambre 10% : reproduit
+      // exactement la teinte du bandeau des cartes événement (amber/10 sur le fond de
+      // carte bleu/violet), sans transparence sur l'image.
+      <div className="absolute inset-x-0 top-0 z-10 bg-card">
+        <div className="flex items-center justify-center gap-1.5 border-b border-amber-500/20 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-600 dark:text-amber-400">
+          <Clock className="size-3.5 shrink-0" />
+          <span className="truncate">{t("circleCard.roleBadge.pending")}</span>
+        </div>
+      </div>
+    ) : null;
+
+  // Carte encadrée de la teinte du message quand l'adhésion est en attente (comme la
+  // bordure des events annulés) : la bordure ambre remplace le gris par défaut, intègre
+  // le bandeau et supprime l'effet filigrane au bord.
+  const cardBorderClass =
+    circle.membershipStatus === "PENDING" ? "border-amber-500/30" : "";
+
   return (
     <Link href={href} className="group block min-w-0">
       {/* ─── Mobile (< sm) : vertical 2 col, body minimal (#597 Phase 2) ─── */}
       <div
-        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`sm:hidden bg-card flex flex-col overflow-hidden rounded-2xl border ${cardBorderClass} shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {circle.membershipStatus === "PENDING" && (
-            <CoverBadgeOverlay
-              icon={Clock}
-              label={t("circleCard.roleBadge.pending")}
-              className="border-amber-500/40 text-amber-500"
-            />
-          )}
+          {pendingBanner}
         </VerticalCover>
         <div className="flex flex-col gap-1.5 p-3">
           {categoryLabel && (
@@ -180,16 +176,10 @@ function DashboardVariant({ circle }: { circle: DashboardCircle }) {
 
       {/* ─── Desktop / tablette (≥ sm) : vertical en grille — nouveau ─── */}
       <div
-        className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border shadow-lg dark:shadow-none ${CARD_HOVER}`}
+        className={`hidden sm:flex sm:flex-col bg-card overflow-hidden rounded-2xl border ${cardBorderClass} shadow-lg dark:shadow-none ${CARD_HOVER}`}
       >
         <VerticalCover coverImage={circle.coverImage} name={circle.name} gradient={gradient}>
-          {circle.membershipStatus === "PENDING" && (
-            <CoverBadgeOverlay
-              icon={Clock}
-              label={t("circleCard.roleBadge.pending")}
-              className="border-amber-500/40 text-amber-500"
-            />
-          )}
+          {pendingBanner}
         </VerticalCover>
         <VerticalCardBody
           categoryLabel={categoryLabel}
@@ -276,27 +266,6 @@ function VerticalCover({
         />
       )}
       {children}
-    </div>
-  );
-}
-
-/** Pill positionné en haut à droite de la cover (badge rôle / en attente). Une seule
- * couche : la bordure épouse le pill rounded-full (pas de Badge imbriqué). */
-function CoverBadgeOverlay({
-  icon: Icon,
-  label,
-  className,
-}: {
-  icon: LucideIcon;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`absolute right-2 top-2 inline-flex items-center gap-1 rounded-full border bg-white/85 px-2.5 py-1 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
-    >
-      <Icon className="size-3 shrink-0" />
-      <span>{label}</span>
     </div>
   );
 }

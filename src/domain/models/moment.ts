@@ -18,6 +18,7 @@ export type HostMomentSummary = {
   endsAt: Date | null;
   locationType: LocationType;
   locationName: string | null;
+  locationAddress: string | null;
   status: MomentStatus;
   registrationCount: number;
   topAttendees: MomentTopAttendee[];

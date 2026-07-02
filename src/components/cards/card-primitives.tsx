@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Users, Check, Clock, Crown } from "lucide-react";
+import { Users } from "lucide-react";
 
 /**
  * Primitives partagées des cartes (événement / Communauté), factorisées pour éviter
@@ -100,45 +100,6 @@ export function CirclePill({
     </span>
   );
 }
-
-/**
- * Pill de statut (inscription / rôle) : même look que les badges overlay des covers
- * (fond blanc + bordure colorée + blur), mais en flux inline. La couleur (bordure +
- * texte) est passée via `className`.
- */
-export function StatusPill({
-  icon: Icon,
-  label,
-  className,
-  hideLabelOnMobile = false,
-}: {
-  icon: LucideIcon;
-  label: string;
-  className?: string;
-  hideLabelOnMobile?: boolean;
-}) {
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/85 px-2 py-0.5 text-xs font-medium backdrop-blur-sm ${className ?? ""}`}
-    >
-      <Icon className="size-3 shrink-0" />
-      <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>
-    </span>
-  );
-}
-
-/**
- * Apparence (icône + couleur) du `StatusPill` selon le statut d'inscription / rôle.
- * Factorisé pour garantir la cohérence entre Explorer, Mon Espace et la page
- * Communauté. Le `label` et `hideLabelOnMobile` restent à l'appelant : les libellés
- * proviennent de namespaces i18n différents selon la surface.
- */
-export const REGISTRATION_PILL = {
-  host: { icon: Crown, className: "border-primary/40 text-primary" },
-  registered: { icon: Check, className: "border-primary/40 text-primary" },
-  pendingApproval: { icon: Clock, className: "border-amber-500/40 text-amber-500" },
-  waitlisted: { icon: Clock, className: "border-border text-muted-foreground" },
-} as const;
 
 /**
  * Couleur du dot de timeline selon l'état du moment / de l'inscription. Partagé par

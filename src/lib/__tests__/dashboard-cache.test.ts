@@ -78,6 +78,7 @@ function makeHostMoment(overrides: Partial<HostMomentSummary> = {}): HostMomentS
     endsAt: new Date("2026-04-20T20:00:00.000Z"),
     locationType: "IN_PERSON",
     locationName: "Le Wagon",
+    locationAddress: null,
     status: "PUBLISHED",
     registrationCount: 5,
     topAttendees: [

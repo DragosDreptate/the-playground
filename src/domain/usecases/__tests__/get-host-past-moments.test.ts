@@ -15,6 +15,7 @@ function makeHostMomentSummary(
     endsAt: new Date("2026-01-10T20:00:00Z"),
     locationType: "IN_PERSON",
     locationName: "Café Central",
+    locationAddress: null,
     status: "PAST",
     registrationCount: 30,
     topAttendees: [],
