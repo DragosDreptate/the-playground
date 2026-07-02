@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
@@ -275,7 +276,7 @@ function ParticipantRow({
   const tMoment = useTranslations("Moment");
   const { user } = registration;
   const displayName = getPublicDisplayName(user.firstName, user.lastName, anonymousFallback);
-  const avatar = <UserAvatar name={displayName} email={user.email} image={user.image} size="md" />;
+  const avatar = <UserAvatar name={displayName} image={user.image} gradient={avatarGradientSeed(user)} size="md" />;
   const hostBadge = isHost && (
     <span className="group/role relative shrink-0">
       <Badge

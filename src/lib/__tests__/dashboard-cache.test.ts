@@ -55,8 +55,8 @@ function makeDashboardCircle(overrides: Partial<DashboardCircle> = {}): Dashboar
         user: {
           firstName: "Alice",
           lastName: "Dupont",
-          email: "alice@example.com",
           image: null,
+          gradient: "linear-gradient(135deg, #7c3aed, #4f46e5)",
         },
       },
     ],
@@ -86,8 +86,8 @@ function makeHostMoment(overrides: Partial<HostMomentSummary> = {}): HostMomentS
         user: {
           firstName: "Bob",
           lastName: "Martin",
-          email: "bob@example.com",
           image: null,
+          gradient: "linear-gradient(135deg, #06b6d4, #2563eb)",
         },
       },
     ],

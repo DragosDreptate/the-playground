@@ -7,7 +7,11 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
-import { buildAlternates, isCircleIndexable } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildSocialMetadata,
+  isCircleIndexable,
+} from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 
 // Revalide toutes les 30 secondes — équilibre entre fraîcheur et performance.
@@ -22,6 +26,7 @@ import {
   prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
 import { getCachedSession } from "@/lib/auth-cache";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
@@ -30,6 +35,8 @@ import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
+import { visibleRegistrationsFor } from "@/domain/models/registration";
+import { visibleMembersFor } from "@/domain/models/circle";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -88,16 +95,7 @@ export async function generateMetadata({
     description,
     alternates: buildAlternates(locale, `/m/${slug}`),
     ...(isInPrivateCircle && { robots: { index: false, follow: false } }),
-    openGraph: {
-      title,
-      description,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
+    ...buildSocialMetadata(title, description),
   };
 }
 
@@ -153,17 +151,27 @@ export default async function PublicMomentPage({
       ])
     );
 
-  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  if (!circle) notFound();
+
+  // Un admin en « host mode » voit les données comme un Organisateur — cohérent avec
+  // getMomentParticipantsPageAction (HOST synthétique via resolveCircleRepository).
+  // Sinon la page 1 (rendue ici) et les pages suivantes (action) divergeraient pour lui.
+  const isOrganizer =
+    (isAuthenticated && hosts.some((h) => h.userId === session!.user!.id)) ||
+    (await isAdminInHostMode(session));
+
+  // PII (email) + identifiants Stripe réservés à l'Organisateur : tout autre viewer
+  // reçoit des inscriptions réduites AVANT sérialisation vers le composant client
+  // (les counts/avatars ne dépendent que du statut et de UserAvatarInfo). Cf. red team #1.
+  const visibleAttendees = visibleRegistrationsFor(isOrganizer, allAttendees);
+
+  const registeredParticipants = visibleAttendees.filter((r) => r.status === "REGISTERED");
   const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session?.user?.id ?? null);
   const participantsFirstPage = {
     participants: sortedForDisplay.slice(0, 20),
     total: registeredParticipants.length,
     hasMore: registeredParticipants.length > 20,
   };
-
-  if (!circle) notFound();
-
-  const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   const registeredCount = registeredParticipants.length;
 
@@ -298,8 +306,8 @@ export default async function PublicMomentPage({
         variant="public"
         moment={moment}
         circle={circle}
-        hosts={hosts}
-        registrations={allAttendees}
+        hosts={visibleMembersFor(false, hosts)}
+        registrations={visibleAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
         comments={comments}

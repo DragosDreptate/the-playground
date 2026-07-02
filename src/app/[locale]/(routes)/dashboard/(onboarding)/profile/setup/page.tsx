@@ -58,6 +58,7 @@ export default async function ProfileSetupPage({
     <div className="mx-auto max-w-sm space-y-6">
       <div className="flex flex-col items-center gap-4 text-center">
         <AvatarUpload
+          id={session.user.id}
           name={fullName}
           email={user.email}
           image={user.image ?? session.user.image ?? null}

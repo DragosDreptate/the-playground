@@ -22,7 +22,6 @@ describe("GetMomentComments", () => {
             id: "user-2",
             firstName: "Bob",
             lastName: "Martin",
-            email: "bob@example.com",
             image: null,
           },
         }),
@@ -90,7 +89,6 @@ describe("GetMomentComments", () => {
           id: "user-1",
           firstName: "Claire",
           lastName: "Leroy",
-          email: "claire@example.com",
           image: null,
         },
       });

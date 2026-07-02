@@ -12,6 +12,7 @@ import { MomentNotFoundError } from "@/domain/errors";
 import { isValidSlug } from "@/lib/slug";
 import { captureServerEvent } from "@/lib/posthog-server";
 import { EmbedEventCard } from "@/components/embed/embed-event-card";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import { EmbedHeightReporter } from "@/components/embed/embed-height-reporter";
 import type { EmbedLocale, EmbedTheme } from "@/components/embed/types";
 
@@ -107,7 +108,7 @@ export default async function EmbedMomentPage({
         moment={moment}
         circle={circle}
         registeredCount={registered.total}
-        registeredPreview={registered.preview}
+        registeredPreview={registered.preview.map((r) => ({ user: toUserAvatarInfo(r.user) }))}
         locale={locale}
         theme={theme}
       />

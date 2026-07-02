@@ -1,5 +1,6 @@
 import { prisma, Prisma } from "@/infrastructure/db/prisma";
 import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import type {
   CircleRepository,
   CreateCircleInput,
@@ -256,7 +257,7 @@ export const prismaCircleRepository: CircleRepository = {
       memberCount: number;
       upcomingMomentCount: number;
       nextMoment: { title: string; startsAt: string } | null;
-      topMembers: { firstName: string | null; lastName: string | null; email: string; image: string | null }[];
+      topMembers: { id: string; firstName: string | null; lastName: string | null; image: string | null; publicId: string | null }[];
     };
 
     const rows = await prisma.$queryRaw<Row[]>`
@@ -295,7 +296,7 @@ export const prismaCircleRepository: CircleRepository = {
           LIMIT 1
         ) x) AS "nextMoment",
         (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
-          SELECT u."firstName", u."lastName", u.email, u.image
+          SELECT u.id, u."firstName", u."lastName", u.image, u.public_id AS "publicId"
           FROM circle_memberships cm2
           JOIN users u ON u.id = cm2."userId"
           WHERE cm2."circleId" = c.id AND cm2.status = 'ACTIVE'
@@ -330,7 +331,7 @@ export const prismaCircleRepository: CircleRepository = {
       membershipStatus: row.membershipStatus,
       memberCount: row.memberCount,
       upcomingMomentCount: row.upcomingMomentCount,
-      topMembers: (row.topMembers ?? []).map((u) => ({ user: u })),
+      topMembers: (row.topMembers ?? []).map((u) => ({ user: toUserAvatarInfo(u) })),
       nextMoment: row.nextMoment
         ? { title: row.nextMoment.title, startsAt: new Date(row.nextMoment.startsAt) }
         : null,
@@ -544,7 +545,7 @@ export const prismaCircleRepository: CircleRepository = {
           where: { status: "ACTIVE" },
           orderBy: { joinedAt: "asc" },
           take: 3,
-          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+          select: { user: { select: { id: true, firstName: true, lastName: true, image: true, publicId: true } } },
         },
       },
       orderBy:
@@ -572,7 +573,7 @@ export const prismaCircleRepository: CircleRepository = {
       memberCount: c._count.memberships,
       // upcomingMomentCount issu du _count SQL, pas de moments.length
       upcomingMomentCount: c._count.moments,
-      topMembers: c.memberships.map((m) => ({ user: m.user })),
+      topMembers: c.memberships.map((m) => ({ user: toUserAvatarInfo(m.user) })),
       nextMoment: c.moments[0] ?? null,
       isDemo: c.isDemo,
       explorerScore: c.explorerScore,
@@ -660,7 +661,7 @@ export const prismaCircleRepository: CircleRepository = {
           where: { status: "ACTIVE" },
           orderBy: { joinedAt: "asc" },
           take: 3,
-          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+          select: { user: { select: { id: true, firstName: true, lastName: true, image: true, publicId: true } } },
         },
       },
     });
@@ -683,7 +684,7 @@ export const prismaCircleRepository: CircleRepository = {
         coverImageAttribution: c.coverImageAttribution as CoverImageAttribution | null,
         memberCount: c._count.memberships,
         upcomingMomentCount: c._count.moments,
-        topMembers: c.memberships.map((m) => ({ user: m.user })),
+        topMembers: c.memberships.map((m) => ({ user: toUserAvatarInfo(m.user) })),
       }];
     });
   },

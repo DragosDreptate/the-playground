@@ -133,3 +133,26 @@ test.describe("Magic link — protection contre les scanners email", () => {
     await expect(page.getByRole("link", { name: /nouveau lien/i })).toBeVisible();
   });
 });
+
+test.describe("Magic link — reconnexion transparente sur lien expiré", () => {
+  test.use({ storageState: AUTH.HOST });
+
+  test("should redirect an already-authenticated user from a Verification error to the dashboard", async ({
+    page,
+  }) => {
+    // Lien magic expiré recliqué alors que la session est encore active : on
+    // reconnecte en transparence vers le dashboard au lieu d'afficher le
+    // cul-de-sac. Aucun token n'est réutilisé, on s'appuie sur la session.
+    await page.goto("/fr/auth/error?error=Verification");
+    await expect(page).toHaveURL(/\/dashboard/, { timeout: 10_000 });
+  });
+
+  test("should still show the error page for a non-Verification error even when authenticated", async ({
+    page,
+  }) => {
+    // Garde-fou de non-régression : SEUL Verification déclenche la reconnexion.
+    // Tout autre code d'erreur reste affiché, même avec une session active.
+    await page.goto("/fr/auth/error?error=AccessDenied");
+    await expect(page).toHaveURL(/\/auth\/error/);
+  });
+});

@@ -2,12 +2,19 @@ import type { CircleMemberRole } from "@/domain/models/circle";
 
 export type UserRole = "USER" | "ADMIN";
 
-/** Sous-ensemble minimal d'un User pour l'affichage d'avatar (initiales + gradient ou image). */
+/**
+ * Sous-ensemble minimal d'un User pour l'affichage d'avatar (initiales + dégradé ou
+ * image). NE porte PAS l'email : le dégradé de fallback est **pré-calculé côté serveur**
+ * (`gradient`, via `avatarGradientSeed` = `getMomentGradient(user.id)`) pour ne jamais
+ * sérialiser de PII vers le client sur les surfaces publiques (Explorer, cartes, embed).
+ * Graine `id` (et non `publicId`) : seul identifiant présent partout, cohérence des
+ * couleurs sur toutes les surfaces. Cf. SEC-10.
+ */
 export type UserAvatarInfo = {
   firstName: string | null;
   lastName: string | null;
-  email: string;
   image: string | null;
+  gradient: string;
 };
 
 export type SocialLinks = {
@@ -22,6 +29,8 @@ export type PublicUser = {
   firstName: string;
   lastName: string;
   image: string | null;
+  /** Dégradé d'avatar pré-calculé serveur (graine `id`), cohérent avec toutes les autres surfaces. Cf. SEC-10. */
+  gradient: string;
   bio: string | null;
   city: string | null;
   socialLinks: SocialLinks;

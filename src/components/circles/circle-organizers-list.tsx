@@ -1,5 +1,6 @@
 import { Link } from "@/i18n/navigation";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 import { getPublicDisplayName } from "@/lib/display-name";
 import type { CircleMemberWithUser } from "@/domain/models/circle";
@@ -46,8 +47,8 @@ export function CircleOrganizersList({ organizers, linkable, label, anonymousFal
             const avatar = (
               <UserAvatar
                 name={hostDisplayName}
-                email={host.user.email}
                 image={host.user.image}
+                gradient={avatarGradientSeed(host.user)}
                 size="sm"
               />
             );

@@ -725,10 +725,14 @@ export async function getCircleMembersPageAction(
   limit: number,
 ): Promise<GetCircleMembersPageResult> {
   const session = await auth();
+  // Même résolution que la page dashboard : un admin en « host mode » voit les
+  // emails membres dès la 1re page ET sur les pages suivantes (sinon la redaction
+  // par rôle réel casserait la modération admin au-delà de la 1re page).
+  const circleRepository = await resolveCircleRepository(session, prismaCircleRepository);
   try {
     return await getCircleMembersPage(
       { circleId, offset, limit, callerUserId: session?.user?.id ?? null },
-      { circleRepository: prismaCircleRepository },
+      { circleRepository },
     );
   } catch {
     return { members: [], total: 0, hasMore: false };

@@ -66,6 +66,7 @@ export default async function ProfilePage({
       {/* Profile header */}
       <div className="flex flex-col items-center gap-3 text-center">
         <AvatarUpload
+          id={userId}
           name={fullName || null}
           email={user.email}
           image={user.image}

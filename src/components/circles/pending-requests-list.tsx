@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Check, X } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import { getDisplayName } from "@/lib/display-name";
 import {
   approveCircleMembershipAction,
@@ -26,6 +27,7 @@ type PendingItem = {
   displayName: string;
   email: string;
   image: string | null;
+  gradient: string;
 };
 
 function PendingRequestsListBase({
@@ -65,7 +67,7 @@ function PendingRequestsListBase({
       <div className="divide-border divide-y">
         {visible.map((item) => (
           <div key={item.key} className="flex items-center gap-3 py-2.5">
-            <UserAvatar name={item.displayName} email={item.email} image={item.image} size="sm" />
+            <UserAvatar name={item.displayName} image={item.image} gradient={item.gradient} size="sm" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium leading-snug">{item.displayName}</p>
               <p className="text-muted-foreground truncate text-xs">{item.email}</p>
@@ -111,6 +113,7 @@ export function PendingMembershipsList({ circleId, pendingMemberships }: Pending
     displayName: getDisplayName(m.user.firstName, m.user.lastName, m.user.email),
     email: m.user.email,
     image: m.user.image,
+    gradient: avatarGradientSeed(m.user),
   }));
 
   async function handleAction(userId: string, action: "approve" | "reject") {
@@ -139,6 +142,7 @@ export function PendingRegistrationsList({ pendingRegistrations }: PendingRegist
     displayName: getDisplayName(r.user.firstName, r.user.lastName, r.user.email),
     email: r.user.email,
     image: r.user.image,
+    gradient: avatarGradientSeed(r.user),
   }));
 
   async function handleAction(registrationId: string, action: "approve" | "reject") {

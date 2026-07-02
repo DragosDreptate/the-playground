@@ -30,6 +30,7 @@ import { formatPrice } from "@/lib/format-price";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
 import { ContactOrganizerLink } from "@/components/contact-organizer-link";
 import { UserAvatar } from "@/components/user-avatar";
+import { avatarGradientSeed } from "@/lib/avatar";
 import Image from "next/image";
 import {
   CalendarIcon,
@@ -355,8 +356,8 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     const avatar = (
                       <UserAvatar
                         name={hostDisplayName}
-                        email={h.user.email}
                         image={h.user.image}
+                        gradient={avatarGradientSeed(h.user)}
                         size="sm"
                       />
                     );

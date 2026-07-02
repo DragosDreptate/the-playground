@@ -86,6 +86,34 @@ describe("safeCallbackUrl", () => {
   });
 
   // ─────────────────────────────────────────────────────────────
+  // Open redirect — astuce backslash (RT-03)
+  // "/\evil.com" (brut ou %5C-encodé) est résolu en "https://evil.com/"
+  // par le parser WHATWG car "\" est traité comme "/".
+  // ─────────────────────────────────────────────────────────────
+
+  describe("given a backslash bypass attempt", () => {
+    it("should return undefined for /\\evil.com (raw backslash)", () => {
+      expect(safeCallbackUrl("/\\evil.com")).toBeUndefined();
+    });
+
+    it("should return undefined for /%5Cevil.com (encoded backslash, upper)", () => {
+      expect(safeCallbackUrl("/%5Cevil.com")).toBeUndefined();
+    });
+
+    it("should return undefined for /%5cevil.com (encoded backslash, lower)", () => {
+      expect(safeCallbackUrl("/%5cevil.com")).toBeUndefined();
+    });
+
+    it("should return undefined for /\\/evil.com", () => {
+      expect(safeCallbackUrl("/\\/evil.com")).toBeUndefined();
+    });
+
+    it("should return undefined for \\/evil.com (leading backslash)", () => {
+      expect(safeCallbackUrl("\\/evil.com")).toBeUndefined();
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────
   // Valeurs nulles et vides
   // ─────────────────────────────────────────────────────────────
 
@@ -119,6 +147,10 @@ describe("safeCallbackUrl", () => {
       { input: "//evil.com", expected: undefined },
       { input: "//", expected: undefined },
       { input: "javascript:void(0)", expected: undefined },
+      // Rejets — astuce backslash (RT-03)
+      { input: "/\\evil.com", expected: undefined },
+      { input: "/%5Cevil.com", expected: undefined },
+      { input: "\\/evil.com", expected: undefined },
       // Rejets — valeurs vides
       { input: null, expected: undefined },
       { input: undefined, expected: undefined },

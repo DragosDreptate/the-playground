@@ -1,5 +1,6 @@
 import { prisma, Prisma } from "@/infrastructure/db/prisma";
 import { excludeTestHostFilter } from "@/infrastructure/db/explorer-filters";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import type {
   MomentRepository,
   MomentForReminder,
@@ -171,7 +172,7 @@ export const prismaMomentRepository: MomentRepository = {
         _count: { select: { registrations: { where: { status: "REGISTERED" } } } },
         registrations: {
           where: { status: "REGISTERED" },
-          select: { user: { select: { firstName: true, lastName: true, email: true, image: true } } },
+          select: { user: { select: { id: true, firstName: true, lastName: true, image: true, publicId: true } } },
           orderBy: { registeredAt: "asc" },
           take: 3,
         },
@@ -195,7 +196,7 @@ export const prismaMomentRepository: MomentRepository = {
       registrationCount: m._count.registrations,
       capacity: m.capacity,
       explorerScore: m.explorerScore,
-      topAttendees: m.registrations.map((r) => ({ user: r.user })),
+      topAttendees: m.registrations.map((r) => ({ user: toUserAvatarInfo(r.user) })),
       circle: {
         slug: m.circle.slug,
         name: m.circle.name,
@@ -317,10 +318,11 @@ export const prismaMomentRepository: MomentRepository = {
       cCoverImage: string | null;
       registrationCount: number;
       topAttendees: {
+        id: string;
         firstName: string | null;
         lastName: string | null;
-        email: string;
         image: string | null;
+        publicId: string | null;
       }[];
     };
 
@@ -343,7 +345,7 @@ export const prismaMomentRepository: MomentRepository = {
          WHERE r2."momentId" = m.id AND r2.status = 'REGISTERED')
           AS "registrationCount",
         (SELECT COALESCE(json_agg(sub), '[]'::json) FROM (
-          SELECT u."firstName", u."lastName", u.email, u.image
+          SELECT u.id, u."firstName", u."lastName", u.image, u.public_id AS "publicId"
           FROM registrations r3
           JOIN users u ON u.id = r3."userId"
           WHERE r3."momentId" = m.id AND r3.status = 'REGISTERED'
@@ -374,7 +376,7 @@ export const prismaMomentRepository: MomentRepository = {
       locationAddress: row.locationAddress,
       status: row.status as MomentStatus,
       registrationCount: row.registrationCount,
-      topAttendees: (row.topAttendees ?? []).map((u) => ({ user: u })),
+      topAttendees: (row.topAttendees ?? []).map((u) => ({ user: toUserAvatarInfo(u) })),
       circle: { slug: row.cSlug, name: row.cName, coverImage: row.cCoverImage },
     });
 

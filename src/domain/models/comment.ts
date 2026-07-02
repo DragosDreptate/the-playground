@@ -17,7 +17,6 @@ export type CommentWithUser = Comment & {
     id: string;
     firstName: string | null;
     lastName: string | null;
-    email: string;
     image: string | null;
   };
   attachments: CommentAttachment[];

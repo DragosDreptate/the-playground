@@ -27,7 +27,11 @@ import { getMomentGradient } from "@/lib/gradient";
 import { formatLongDate } from "@/lib/format-date";
 import { collapseWhitespace } from "@/lib/text";
 import { isUpcomingCancelled, isPastMoment, byStartsAtDesc } from "@/lib/moment-timeline";
-import { buildAlternates, isCircleIndexable } from "@/lib/seo";
+import {
+  buildAlternates,
+  buildSocialMetadata,
+  isCircleIndexable,
+} from "@/lib/seo";
 import { getAppUrl } from "@/lib/app-url";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { CollapsibleDescription } from "@/components/moments/collapsible-description";
@@ -54,6 +58,8 @@ import {
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
+import { visibleMembersFor } from "@/domain/models/circle";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -105,19 +111,13 @@ export async function generateMetadata({
       title,
       description,
       alternates: buildAlternates(locale, `/circles/${slug}`),
+      // Visibilité PRIVÉ → non indexable par les crawlers (robots). Mais l'aperçu
+      // social (Open Graph / Twitter + og:image via la convention opengraph-image)
+      // reste émis inconditionnellement : un lien privé partagé sur les réseaux
+      // doit afficher le même aperçu qu'un Circle public. On découple l'indexation
+      // de la génération de l'image de partage (même pattern que /m/[slug]).
       ...(isPrivate && { robots: { index: false, follow: false } }),
-      ...(!isPrivate && {
-        openGraph: {
-          title,
-          description,
-          type: "website",
-        },
-        twitter: {
-          card: "summary_large_image",
-          title,
-          description,
-        },
-      }),
+      ...buildSocialMetadata(title, description),
     };
   } catch {
     return {};
@@ -185,8 +185,16 @@ export default async function PublicCirclePage({
   const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const anonymousFallback = tCommon("anonymousFallback");
+  // PII : l'email des membres n'est sérialisé qu'à l'Organisateur (SEC-11).
+  // La pile d'avatars et le dialog reçoivent des membres réduits pour les autres.
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
-    computeMembersMeta(hosts, players, memberCount, t, anonymousFallback);
+    computeMembersMeta(
+      visibleMembersFor(isOrganizer, hosts),
+      visibleMembersFor(isOrganizer, players),
+      memberCount,
+      t,
+      anonymousFallback,
+    );
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -248,6 +256,9 @@ export default async function PublicCirclePage({
           )
         : Promise.resolve(new Map<string, RegistrationStatus | null>()),
     ]);
+
+  // Dialog des membres : email redacté pour les non-Organisateurs (SEC-11).
+  const visibleMembers = visibleMembersFor(isOrganizer, membersFirstPage.members);
 
   const gradient = getMomentGradient(circle.name);
 
@@ -321,7 +332,7 @@ export default async function PublicCirclePage({
 
           {/* Organisateurs — HOST en premier, puis CO_HOSTs triés alphabétiquement */}
           <CircleOrganizersList
-            organizers={circleOrganizers}
+            organizers={visibleMembersFor(false, circleOrganizers)}
             linkable={isConnected}
             label={t("detail.hostedBy")}
             anonymousFallback={anonymousFallback}
@@ -344,7 +355,7 @@ export default async function PublicCirclePage({
             {canSeeMembers ? (
               <CircleMembersDialog
                 circleId={circle.id}
-                initialMembers={membersFirstPage.members}
+                initialMembers={visibleMembers}
                 initialTotal={membersFirstPage.total}
                 initialHasMore={membersFirstPage.hasMore}
                 triggerClassName="group/stat flex cursor-pointer items-baseline gap-2"
@@ -467,7 +478,7 @@ export default async function PublicCirclePage({
                   {canSeeMembers ? (
                     <CircleMembersDialog
                       circleId={circle.id}
-                      initialMembers={membersFirstPage.members}
+                      initialMembers={visibleMembers}
                       initialTotal={membersFirstPage.total}
                       initialHasMore={membersFirstPage.hasMore}
                       triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"
@@ -617,7 +628,7 @@ export default async function PublicCirclePage({
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>
@@ -641,7 +652,7 @@ export default async function PublicCirclePage({
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>
