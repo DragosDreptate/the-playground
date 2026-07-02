@@ -26,6 +26,7 @@ import {
   prismaMomentAttachmentRepository,
 } from "@/infrastructure/repositories";
 import { getCachedSession } from "@/lib/auth-cache";
+import { isAdminInHostMode } from "@/lib/admin-host-mode";
 import { getMomentBySlug } from "@/domain/usecases/get-moment";
 import { getUserRegistration } from "@/domain/usecases/get-user-registration";
 import { getMomentComments } from "@/domain/usecases/get-moment-comments";
@@ -152,7 +153,12 @@ export default async function PublicMomentPage({
 
   if (!circle) notFound();
 
-  const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
+  // Un admin en « host mode » voit les données comme un Organisateur — cohérent avec
+  // getMomentParticipantsPageAction (HOST synthétique via resolveCircleRepository).
+  // Sinon la page 1 (rendue ici) et les pages suivantes (action) divergeraient pour lui.
+  const isOrganizer =
+    (isAuthenticated && hosts.some((h) => h.userId === session!.user!.id)) ||
+    (await isAdminInHostMode(session));
 
   // PII (email) + identifiants Stripe réservés à l'Organisateur : tout autre viewer
   // reçoit des inscriptions réduites AVANT sérialisation vers le composant client

@@ -12,8 +12,8 @@ type UserAvatarProps = {
   image?: string | null;
   size?: "sm" | "default" | "md" | "lg" | "xl";
   /**
-   * Dégradé de fond du fallback (initiales), pré-calculé côté serveur sur une
-   * graine non-PII (`getMomentGradient(publicId ?? id)`). Fourni → mêmes couleurs
+   * Dégradé de fond du fallback (initiales), calculé sur une graine non-PII
+   * (`avatarGradientSeed` = `getMomentGradient(user.id)`). Fourni → mêmes couleurs
    * que les piles d'avatars ; absent → aplat `bg-primary/10` par défaut.
    */
   gradient?: string | null;
