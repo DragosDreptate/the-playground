@@ -33,7 +33,9 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 
 **Pour l'organisateur**
 - Créer et gérer sa communauté — privée ou publique, avec invitations par lien
+- **Co-organisateurs** — déléguez la gestion sans partager les accès sensibles (Stripe, suppression)
 - Créer des événements avec une page autonome et partageable
+- **Pièces jointes** — documents et vidéos consultables directement sur la page événement
 - **Billetterie intégrée** via Stripe Connect — 0% commission plateforme
 - **Inscriptions sur validation** pour filtrer les participants si besoin
 - Gérer ses participants de façon persistante (pas événement par événement)
@@ -46,9 +48,10 @@ Le modèle communautaire de Meetup + l'expérience de Luma + 100% gratuit. Pas d
 - Inscription en quelques secondes — magic link, pas de compte requis
 - Devient automatiquement membre de la communauté
 - **Profil public** avec bio, ville, liens sociaux
+- Ajout à son calendrier en un clic (Google Calendar, Apple Calendar, .ics)
 - Notifications email (confirmation, rappel 24h avant, changements, annulations)
 - Page communauté : prochains événements, membres, historique
-- Fil de commentaires sur chaque événement
+- Fil de commentaires (avec photos) sur chaque événement
 
 **Plateforme**
 - [Explorer](https://the-playground.fr/explorer) — répertoire public de communautés avec tri, filtres et section À la une
