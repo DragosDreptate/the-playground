@@ -1,4 +1,5 @@
 import { prisma } from "@/infrastructure/db/prisma";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import type {
   CircleNetworkRepository,
   CreateCircleNetworkInput,
@@ -41,7 +42,7 @@ function toPublicCircle(c: {
   explorerScore: number;
   _count: { memberships: number; moments: number };
   moments: { title: string; startsAt: Date }[];
-  memberships: { user: { firstName: string | null; lastName: string | null; email: string; image: string | null } }[];
+  memberships: { user: { id: string; firstName: string | null; lastName: string | null; image: string | null; publicId: string | null } }[];
 }): PublicCircle {
   return {
     id: c.id,
@@ -57,7 +58,7 @@ function toPublicCircle(c: {
       : null,
     memberCount: c._count.memberships,
     upcomingMomentCount: c._count.moments,
-    topMembers: c.memberships.map((m) => ({ user: m.user })),
+    topMembers: c.memberships.map((m) => ({ user: toUserAvatarInfo(m.user) })),
     nextMoment: c.moments[0] ?? null,
     isDemo: c.isDemo,
     explorerScore: c.explorerScore,
@@ -85,7 +86,7 @@ const circleIncludeForPublic = (now: Date) => ({
     take: 3,
     select: {
       user: {
-        select: { firstName: true, lastName: true, email: true, image: true },
+        select: { id: true, firstName: true, lastName: true, image: true, publicId: true },
       },
     },
   },

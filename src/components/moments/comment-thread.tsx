@@ -329,7 +329,6 @@ export function CommentThread({
                   {/* Avatar */}
                   <UserAvatar
                     name={authorName}
-                    email={comment.user.email}
                     image={comment.user.image}
                     size="sm"
                   />

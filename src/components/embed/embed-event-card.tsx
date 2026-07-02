@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import type { Moment } from "@/domain/models/moment";
 import type { Circle } from "@/domain/models/circle";
-import type { RegistrationWithUser } from "@/domain/models/registration";
+import type { UserAvatarInfo } from "@/domain/models/user";
 import { formatLongDate, formatLocalizedTime } from "@/lib/format-date";
 import { getMomentGradient } from "@/lib/gradient";
 import { getPublicUserInitials } from "@/lib/display-name";
@@ -14,7 +14,7 @@ type Props = {
   moment: Moment;
   circle: Pick<Circle, "slug" | "name">;
   registeredCount: number;
-  registeredPreview: RegistrationWithUser[];
+  registeredPreview: { user: UserAvatarInfo }[];
   locale: EmbedLocale;
   theme: EmbedTheme;
 };
@@ -192,7 +192,7 @@ function SocialProof({
   labelColor,
   passive,
 }: {
-  attendees: RegistrationWithUser[];
+  attendees: { user: UserAvatarInfo }[];
   totalCount: number;
   label: string;
   ringClass: string;
@@ -209,7 +209,7 @@ function SocialProof({
       <div className={`flex -space-x-1.5 ${stackOpacity}`}>
         {visible.map((a, i) => {
           const initials = getPublicUserInitials(a.user);
-          const gradient = getMomentGradient(a.user.email);
+          const gradient = a.user.gradient;
           return (
             <div
               key={i}

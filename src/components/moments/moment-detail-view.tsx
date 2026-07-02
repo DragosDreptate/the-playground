@@ -355,7 +355,6 @@ export async function MomentDetailView(props: MomentDetailViewProps) {
                     const avatar = (
                       <UserAvatar
                         name={hostDisplayName}
-                        email={h.user.email}
                         image={h.user.image}
                         size="sm"
                       />

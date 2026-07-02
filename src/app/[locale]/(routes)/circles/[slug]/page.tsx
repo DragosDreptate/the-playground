@@ -59,6 +59,7 @@ import {
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
 import { visibleMembersFor } from "@/domain/models/circle";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -610,7 +611,7 @@ export default async function PublicCirclePage({
                       userRegistrationStatus={null}
                       isLast={i === upcomingMoments.length - 1}
                       variant="public"
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>
@@ -634,7 +635,7 @@ export default async function PublicCirclePage({
                       userRegistrationStatus={null}
                       isLast={i === pastMoments.length - 1}
                       variant="public"
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>

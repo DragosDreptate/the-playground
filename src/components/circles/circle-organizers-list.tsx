@@ -46,7 +46,6 @@ export function CircleOrganizersList({ organizers, linkable, label, anonymousFal
             const avatar = (
               <UserAvatar
                 name={hostDisplayName}
-                email={host.user.email}
                 image={host.user.image}
                 size="sm"
               />

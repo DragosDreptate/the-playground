@@ -35,6 +35,7 @@ import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { redirectToPublicCircle } from "@/lib/dashboard-circle-public-redirect";
 import { isActiveOrganizer, visibleMembersFor } from "@/domain/models/circle";
+import { toUserAvatarInfo } from "@/lib/avatar";
 import {
   Globe,
   Lock,
@@ -539,7 +540,7 @@ export default async function CircleDetailPage({
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === upcomingMoments.length - 1}
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>
@@ -562,7 +563,7 @@ export default async function CircleDetailPage({
                       registrationCount={countByMomentId.get(moment.id) ?? 0}
                       userRegistrationStatus={userStatusByMomentId.get(moment.id) ?? null}
                       isLast={i === pastMoments.length - 1}
-                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: { firstName: r.user.firstName, lastName: r.user.lastName, email: r.user.email, image: r.user.image } }))}
+                      topAttendees={(topAttendeesByMomentId.get(moment.id) ?? []).map((r) => ({ user: toUserAvatarInfo(r.user) }))}
                     />
                   ))}
                 </PaginatedMomentList>
