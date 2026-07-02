@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatTime, formatWeekdayAndDate, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
 import { MapPin, Globe, Clock } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL } from "@/components/cards/card-primitives";
+import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
 import type { RegistrationStatus } from "@/domain/models/registration";
@@ -27,10 +27,10 @@ type Props = {
  * Carte d'événement d'Explorer en **timeline** (structure responsive unique, sur le
  * modèle de `dashboard-moment-card`) : colonne date + dot + ligne, puis carte avec
  * contexte Communauté, titre, lieu, social proof et cover à droite. Mobile (`< sm`) :
- * compact (colonne 72px, cover 80px, lieu en icône, description masquée, badge de
- * statut en icône seule) ; desktop (`≥ sm`) : rendu inchangé (#598).
+ * compact (colonne 72px, cover 80px, lieu en icône, description masquée) ; desktop
+ * (`≥ sm`) : rendu inchangé (#598). Pas de badge de statut/rôle (découverte).
  */
-export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLast = false }: Props) {
+export function PublicMomentCard({ moment, isLast = false }: Props) {
   const t = useTranslations("Explorer");
   const tCircle = useTranslations("Circle");
   const tCategory = useTranslations("CircleCategory");
@@ -63,15 +63,9 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
       ? t("momentCard.moreRegistered", { count: overflow })
       : t("momentCard.registeredCount", { count: moment.registrationCount });
 
-  const roleBadge = isOrganizer ? (
-    <StatusPill {...REGISTRATION_PILL.host} label={t("momentCard.roleBadge.host")} hideLabelOnMobile size="sm" />
-  ) : registrationStatus === "REGISTERED" || registrationStatus === "CHECKED_IN" ? (
-    <StatusPill {...REGISTRATION_PILL.registered} label={t("momentCard.roleBadge.registered")} hideLabelOnMobile size="sm" />
-  ) : registrationStatus === "PENDING_APPROVAL" ? (
-    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("momentCard.roleBadge.pendingApproval")} hideLabelOnMobile size="sm" />
-  ) : registrationStatus === "WAITLISTED" ? (
-    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("momentCard.roleBadge.waitlisted")} hideLabelOnMobile size="sm" />
-  ) : null;
+  // Explorer (découverte) : aucun badge de statut/rôle perso sur les cartes événement.
+  // Le rôle (Organisateur / Inscrit) est de l'info secondaire en découverte ; il vit dans
+  // Mon espace. Voir spec/design/badges-strategie.md.
 
   const categoryLabelText = resolveCategoryLabel(
     moment.circle.category,
@@ -182,9 +176,6 @@ export function PublicMomentCard({ moment, registrationStatus, isOrganizer, isLa
                 />
               )}
               {moment.circle.isDemo && <DemoBadge label={t("circleCard.demo")} />}
-              {/* Badge de statut (Organisateur / Inscrit…) en overlay sur la cover,
-                  comme les cartes Communauté. Icône seule en mobile (hideLabelOnMobile). */}
-              {roleBadge && <div className="absolute right-2 top-2">{roleBadge}</div>}
             </div>
           </div>
         </div>

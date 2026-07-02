@@ -35,6 +35,7 @@ export async function MomentTimelineItem({
 }: Props) {
   const t = await getTranslations("Moment");
   const tCircle = await getTranslations("Circle");
+  const tDashboard = await getTranslations("Dashboard");
   const locale = await getLocale();
 
   const isCancelled = moment.status === "CANCELLED";
@@ -55,7 +56,9 @@ export async function MomentTimelineItem({
     ? "border-destructive/20"
     : isDraft
       ? "border-dashed border-muted-foreground/30 opacity-70"
-      : "border-border";
+      : !isPast && (isPendingApproval || isWaitlisted)
+        ? "border-amber-500/30"
+        : "border-border";
 
   const gradient = getMomentGradient(moment.title);
   const now = new Date();
@@ -73,12 +76,23 @@ export async function MomentTimelineItem({
 
   const LocationIcon = moment.locationType === "IN_PERSON" ? MapPin : Globe;
 
-  // Page Communauté : on ne garde que le statut « Brouillon » (info Host). Les
-  // statuts d'inscription (Inscrit / en attente / liste d'attente) sont retirés.
+  // Page Communauté : badge « Brouillon » (info Host) conservé dans le corps.
   const statusBadge =
     !isCancelled && variant === "dashboard" && isDraft ? (
       <DraftBadge label={t("status.draft")} showLabelOnMobile />
     ) : null;
+
+  // Bandeau de tête (calqué sur les cartes Mon espace) : annulé, ou statut d'inscription
+  // perso (en attente de validation / liste d'attente). Priorité annulé > en attente >
+  // liste d'attente. Fond tinté de l'état + cadre de carte assorti (cardBorderClass).
+  const statusBanner = isCancelled
+    ? { Icon: XCircle, label: t("public.eventCancelled"), cls: "border-destructive/20 bg-destructive/10 text-destructive" }
+    : !isPast && !isDraft && isPendingApproval
+      ? { Icon: Clock, label: tDashboard("registrationStatus.pending_approval"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" }
+      : !isPast && !isDraft && isWaitlisted
+        ? { Icon: Clock, label: tDashboard("registrationStatus.waitlisted"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" }
+        : null;
+  const BannerIcon = statusBanner?.Icon;
 
   return (
     <TimelineScaffold
@@ -112,13 +126,11 @@ export async function MomentTimelineItem({
           className="block"
         >
           <div className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}>
-            {/* Bandeau annulation */}
-            {isCancelled && (
-              <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
-                <XCircle className="size-3.5 shrink-0 text-destructive" />
-                <span className="text-destructive text-xs font-medium">
-                  {t("public.eventCancelled")}
-                </span>
+            {/* Bandeau de statut (annulé / en attente / liste d'attente) */}
+            {statusBanner && BannerIcon && (
+              <div className={`flex items-center gap-2 rounded-t-xl border-b px-4 py-2 ${statusBanner.cls}`}>
+                <BannerIcon className="size-3.5 shrink-0" />
+                <span className="text-xs font-medium">{statusBanner.label}</span>
               </div>
             )}
 

@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DraftBadge } from "@/components/badges/draft-badge";
-import { MapPin, Globe, Clock, XCircle } from "lucide-react";
-import { CARD_HOVER_GROUP, IconPill, CirclePill, StatusPill, TimelineScaffold, REGISTRATION_PILL, momentDotClass } from "@/components/cards/card-primitives";
+import { MapPin, Globe, Clock, XCircle, type LucideIcon } from "lucide-react";
+import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold, momentDotClass } from "@/components/cards/card-primitives";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { getMomentGradient, COVER_IMAGE_BG } from "@/lib/gradient";
 import { formatWeekdayAndDate, formatTime, formatDayMonthShort, isSameDayInParis } from "@/lib/format-date";
@@ -107,7 +107,9 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
     ? "border-destructive/20"
     : isDraft
       ? "border-dashed border-muted-foreground/30 opacity-70"
-      : "border-border";
+      : !isPast && (isPendingApproval || isWaitlisted)
+        ? "border-amber-500/30"
+        : "border-border";
 
   const gradient = getMomentGradient(momentData.title);
   const { weekday, dateStr } = formatWeekdayAndDate(momentData.startsAt, locale);
@@ -123,19 +125,20 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
         ? t("hybrid")
         : momentData.locationName ?? momentData.locationAddress;
 
-  // Ces pills n'apparaissent que dans le bloc desktop (`hidden sm:block`) : pas de
-  // `hideLabelOnMobile` (jamais montées sur mobile, le prop serait mort).
-  const waitlistedBadge = !isCancelled && !isPast && !isDraft && isWaitlisted ? (
-    <StatusPill {...REGISTRATION_PILL.waitlisted} label={t("registrationStatus.waitlisted")} />
+  // Bandeau de statut pleine largeur en tête de carte (comme l'annulation) : lisible
+  // desktop ET mobile, contrairement à un pill inline. Priorité annulé > en attente >
+  // liste d'attente (statuts mutuellement exclusifs côté participant).
+  const statusBanner = isCancelled ? (
+    <CardStatusBanner icon={XCircle} label={tMoment("public.eventCancelled")} tone="destructive" />
+  ) : !isPast && !isDraft && isPendingApproval ? (
+    <CardStatusBanner icon={Clock} label={t("registrationStatus.pending_approval")} tone="amber" />
+  ) : !isPast && !isDraft && isWaitlisted ? (
+    <CardStatusBanner icon={Clock} label={t("registrationStatus.waitlisted")} tone="neutral" />
   ) : null;
 
-  const pendingApprovalBadge = !isCancelled && !isPast && !isDraft && isPendingApproval ? (
-    <StatusPill {...REGISTRATION_PILL.pendingApproval} label={t("registrationStatus.pending_approval")} />
-  ) : null;
-
-  // Pas de badge Organisateur sur Mon espace : la distinction organisateur/participant
-  // est déjà portée par le toggle « Organisateur » du filtre. On ne montre donc que
-  // les statuts d'inscription non redondants (en attente, liste d'attente).
+  // Pas de badge de statut sur la cover Mon espace : la distinction organisateur/
+  // participant est déjà portée par le toggle « Organisateur » du filtre, et les
+  // statuts transitoires (en attente, liste d'attente, annulé) sont en bandeau de tête.
 
   const attendeeStack =
     !isCancelled && momentData.registrationCount > 0 ? (
@@ -197,15 +200,8 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           <div
             className={`bg-card flex flex-col rounded-xl border shadow-lg dark:shadow-none ${CARD_HOVER_GROUP} ${cardBorderClass}`}
           >
-            {/* Bandeau annulation — calqué sur la timeline de la page Communauté */}
-            {isCancelled && (
-              <div className="flex items-center gap-2 rounded-t-xl border-b border-destructive/20 bg-destructive/10 px-4 py-2">
-                <XCircle className="size-3.5 shrink-0 text-destructive" />
-                <span className="text-destructive text-xs font-medium">
-                  {tMoment("public.eventCancelled")}
-                </span>
-              </div>
-            )}
+            {/* Bandeau de statut (annulé / en attente / liste d'attente) */}
+            {statusBanner}
 
             {/* Corps de la carte */}
             <div className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:gap-3">
@@ -249,8 +245,6 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
                     <div className="flex items-center gap-2">
                       <CirclePill name={momentData.circleName} withIcon muted={isPast || isCancelled} />
                       {!isPast && isDraft && <DraftBadge label={tMoment("status.draft")} />}
-                      {pendingApprovalBadge}
-                      {waitlistedBadge}
                     </div>
 
                     {/* 2. Titre */}
@@ -308,5 +302,32 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
           </div>
         </Link>
     </TimelineScaffold>
+  );
+}
+
+/**
+ * Bandeau de statut en tête de carte (pleine largeur, lisible desktop + mobile).
+ * Calqué sur le bandeau d'annulation : `rounded-t-xl` + `border-b`, fond teinté
+ * opaque (pas de transparence qui écrase le contraste sur les fonds sombres).
+ */
+function CardStatusBanner({
+  icon: Icon,
+  label,
+  tone,
+}: {
+  icon: LucideIcon;
+  label: string;
+  tone: "destructive" | "amber" | "neutral";
+}) {
+  const toneClasses = {
+    destructive: "border-destructive/20 bg-destructive/10 text-destructive",
+    amber: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    neutral: "border-border bg-muted/50 text-muted-foreground",
+  }[tone];
+  return (
+    <div className={`flex items-center gap-2 rounded-t-xl border-b px-4 py-2 ${toneClasses}`}>
+      <Icon className="size-3.5 shrink-0" />
+      <span className="text-xs font-medium">{label}</span>
+    </div>
   );
 }
