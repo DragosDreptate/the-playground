@@ -9,12 +9,33 @@ import {
   makeCircle,
   makeMembership,
 } from "./helpers/mock-circle-repository";
-import { createMockRegistrationRepository } from "./helpers/mock-registration-repository";
+import {
+  createMockRegistrationRepository,
+  makeRegistration,
+} from "./helpers/mock-registration-repository";
+import type { RegistrationWithUser } from "@/domain/models/registration";
 import {
   MomentNotFoundError,
   CircleNotFoundError,
   UnauthorizedMomentActionError,
 } from "@/domain/errors";
+
+function makeParticipant(): RegistrationWithUser {
+  return {
+    ...makeRegistration({
+      stripePaymentIntentId: "pi_123",
+      stripeReceiptUrl: "https://stripe.test/receipt/123",
+    }),
+    user: {
+      id: "user-2",
+      firstName: "Ada",
+      lastName: "Lovelace",
+      email: "ada@example.com",
+      image: null,
+      publicId: "pub-ada",
+    },
+  };
+}
 
 const MOMENT_ID = "moment-1";
 const CIRCLE_ID = "circle-1";
@@ -132,6 +153,63 @@ describe("getMomentParticipantsPage", () => {
       );
 
       expect(result).toEqual({ participants: [], total: 5, hasMore: true });
+    });
+  });
+
+  describe("given the caller is an active Organizer", () => {
+    it("should return participants with email and Stripe identifiers intact", async () => {
+      const deps = makeDeps({ membershipStatus: "ACTIVE" }); // rôle HOST par défaut
+      deps.registrationRepository.findParticipantsPaginated = vi
+        .fn()
+        .mockResolvedValue({ participants: [makeParticipant()], total: 1, hasMore: false });
+
+      const result = await getMomentParticipantsPage(
+        { momentId: MOMENT_ID, offset: 0, limit: 20, callerUserId: CALLER_ID },
+        deps,
+      );
+
+      expect(result.participants[0].user.email).toBe("ada@example.com");
+      expect(result.participants[0].stripePaymentIntentId).toBe("pi_123");
+      expect(result.participants[0].stripeReceiptUrl).toBe("https://stripe.test/receipt/123");
+    });
+  });
+
+  describe("given the caller is authorized but not an Organizer", () => {
+    it("should redact email and Stripe identifiers on a PUBLIC Circle (no membership)", async () => {
+      const deps = makeDeps(); // Circle PUBLIC, findMembership → null
+      deps.registrationRepository.findParticipantsPaginated = vi
+        .fn()
+        .mockResolvedValue({ participants: [makeParticipant()], total: 1, hasMore: false });
+
+      const result = await getMomentParticipantsPage(
+        { momentId: MOMENT_ID, offset: 0, limit: 20, callerUserId: CALLER_ID },
+        deps,
+      );
+
+      expect(result.participants[0].user.email).toBe("");
+      expect(result.participants[0].stripePaymentIntentId).toBeNull();
+      expect(result.participants[0].stripeReceiptUrl).toBeNull();
+      // Les champs non sensibles restent intacts (affichage social proof).
+      expect(result.participants[0].user.firstName).toBe("Ada");
+      expect(result.participants[0].user.id).toBe("user-2");
+    });
+
+    it("should redact even for an ACTIVE PLAYER member (organizer role required)", async () => {
+      const deps = makeDeps();
+      deps.circleRepository.findMembership = vi
+        .fn()
+        .mockResolvedValue(makeMembership({ userId: CALLER_ID, role: "PLAYER", status: "ACTIVE" }));
+      deps.registrationRepository.findParticipantsPaginated = vi
+        .fn()
+        .mockResolvedValue({ participants: [makeParticipant()], total: 1, hasMore: false });
+
+      const result = await getMomentParticipantsPage(
+        { momentId: MOMENT_ID, offset: 0, limit: 20, callerUserId: CALLER_ID },
+        deps,
+      );
+
+      expect(result.participants[0].user.email).toBe("");
+      expect(result.participants[0].stripePaymentIntentId).toBeNull();
     });
   });
 });

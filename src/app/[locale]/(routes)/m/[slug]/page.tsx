@@ -34,6 +34,7 @@ import { MomentViewTracker } from "@/components/moments/moment-view-tracker";
 import { MomentDetailView } from "@/components/moments/moment-detail-view";
 import { isSessionAccountNew } from "@/lib/account-trust";
 import { promoteCurrentUserFirst } from "@/lib/sort-participants";
+import { redactRegistrationForNonHost } from "@/domain/models/registration";
 
 // Deduplicate DB calls between generateMetadata and the page
 const getMoment = cache(async (slug: string) => {
@@ -148,17 +149,24 @@ export default async function PublicMomentPage({
       ])
     );
 
-  const registeredParticipants = allAttendees.filter((r) => r.status === "REGISTERED");
+  if (!circle) notFound();
+
+  const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
+
+  // PII (email) + identifiants Stripe réservés à l'Organisateur : tout autre viewer
+  // reçoit des inscriptions réduites AVANT sérialisation vers le composant client
+  // (les counts/avatars ne dépendent que du statut et de UserAvatarInfo). Cf. red team #1.
+  const visibleAttendees = isOrganizer
+    ? allAttendees
+    : allAttendees.map(redactRegistrationForNonHost);
+
+  const registeredParticipants = visibleAttendees.filter((r) => r.status === "REGISTERED");
   const sortedForDisplay = promoteCurrentUserFirst(registeredParticipants, session?.user?.id ?? null);
   const participantsFirstPage = {
     participants: sortedForDisplay.slice(0, 20),
     total: registeredParticipants.length,
     hasMore: registeredParticipants.length > 20,
   };
-
-  if (!circle) notFound();
-
-  const isOrganizer = isAuthenticated && hosts.some((h) => h.userId === session!.user!.id);
 
   const registeredCount = registeredParticipants.length;
 
@@ -294,7 +302,7 @@ export default async function PublicMomentPage({
         moment={moment}
         circle={circle}
         hosts={hosts}
-        registrations={allAttendees}
+        registrations={visibleAttendees}
         registeredCount={registeredCount}
         waitlistedCount={waitlistedCount}
         comments={comments}

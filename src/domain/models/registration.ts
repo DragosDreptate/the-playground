@@ -57,6 +57,26 @@ export type RegistrationWithUser = Registration & {
   };
 };
 
+/**
+ * Retire d'une inscription les données réservées à l'Organisateur (HOST/CO_HOST)
+ * avant sérialisation vers un viewer non-Organisateur : l'email du participant et
+ * les identifiants Stripe. L'email est blanchi (`""`) plutôt que rendu nullable
+ * pour préserver le type ; l'avatar retombe alors sur les initiales du nom et son
+ * dégradé se seede sur `user.id` (cf. participant-avatar-stack). À appliquer côté
+ * serveur : sans lui, la liste des inscrits d'un événement fuite les emails de tous
+ * les participants à n'importe quel compte connecté.
+ */
+export function redactRegistrationForNonHost(
+  registration: RegistrationWithUser,
+): RegistrationWithUser {
+  return {
+    ...registration,
+    stripePaymentIntentId: null,
+    stripeReceiptUrl: null,
+    user: { ...registration.user, email: "" },
+  };
+}
+
 export type RegistrationMomentAttendee = { user: UserAvatarInfo };
 
 export type RegistrationWithMoment = Registration & {

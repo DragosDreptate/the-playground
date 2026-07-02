@@ -2,6 +2,8 @@ import type { MomentRepository } from "@/domain/ports/repositories/moment-reposi
 import type { CircleRepository } from "@/domain/ports/repositories/circle-repository";
 import type { RegistrationRepository } from "@/domain/ports/repositories/registration-repository";
 import type { RegistrationWithUser } from "@/domain/models/registration";
+import { redactRegistrationForNonHost } from "@/domain/models/registration";
+import { isActiveOrganizer } from "@/domain/models/circle";
 import {
   MomentNotFoundError,
   CircleNotFoundError,
@@ -47,16 +49,23 @@ export async function getMomentParticipantsPage(
   const circle = await deps.circleRepository.findById(moment.circleId);
   if (!circle) throw new CircleNotFoundError(moment.circleId);
 
-  if (circle.visibility !== "PUBLIC") {
-    const membership = await deps.circleRepository.findMembership(circle.id, callerUserId);
-    if (membership?.status !== "ACTIVE") {
-      throw new UnauthorizedMomentActionError();
-    }
+  // Le rôle est désormais toujours chargé : il conditionne l'accès (Circle privé)
+  // ET la redaction PII (seul l'Organisateur reçoit email + Stripe des inscrits).
+  const membership = await deps.circleRepository.findMembership(circle.id, callerUserId);
+
+  if (circle.visibility !== "PUBLIC" && membership?.status !== "ACTIVE") {
+    throw new UnauthorizedMomentActionError();
   }
 
-  return deps.registrationRepository.findParticipantsPaginated(momentId, {
+  const page = await deps.registrationRepository.findParticipantsPaginated(momentId, {
     offset,
     limit,
     priorityUserId: callerUserId,
   });
+
+  // Un non-Organisateur (membre ou simple visiteur d'un Circle public) ne reçoit
+  // qu'un participant réduit : ni email ni identifiants Stripe. Cf. red team #1.
+  if (isActiveOrganizer(membership)) return page;
+
+  return { ...page, participants: page.participants.map(redactRegistrationForNonHost) };
 }
