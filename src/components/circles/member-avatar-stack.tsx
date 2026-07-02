@@ -17,7 +17,10 @@ export function MemberAvatarStack({
           <span key={m.id} className="group/avatar relative">
             <span
               className="ring-card relative flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-[0.55rem] font-semibold text-white ring-2"
-              style={{ background: getMomentGradient(m.user.email) }}
+              // Seed sur l'email quand dispo (vue Organisateur), sinon sur l'id
+              // stable : un non-Organisateur reçoit un email blanchi ("") mais garde
+              // un dégradé distinct, sans PII. Cf. SEC-11.
+              style={{ background: getMomentGradient(m.user.email || m.user.id) }}
             >
               {m.user.image ? (
                 // eslint-disable-next-line @next/next/no-img-element

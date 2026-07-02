@@ -58,6 +58,7 @@ import {
 } from "lucide-react";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 import { computeMembersMeta, sortCircleOrganizers } from "@/lib/circle-helpers";
+import { visibleMembersFor } from "@/domain/models/circle";
 import { MemberAvatarStack } from "@/components/circles/member-avatar-stack";
 import { CircleOrganizersList } from "@/components/circles/circle-organizers-list";
 
@@ -183,8 +184,16 @@ export default async function PublicCirclePage({
   const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const anonymousFallback = tCommon("anonymousFallback");
+  // PII : l'email des membres n'est sérialisé qu'à l'Organisateur (SEC-11).
+  // La pile d'avatars et le dialog reçoivent des membres réduits pour les autres.
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
-    computeMembersMeta(hosts, players, memberCount, t, anonymousFallback);
+    computeMembersMeta(
+      visibleMembersFor(isOrganizer, hosts),
+      visibleMembersFor(isOrganizer, players),
+      memberCount,
+      t,
+      anonymousFallback,
+    );
   // Membres visibles : connecté + (circle public OU membre/organisateur)
   const canSeeMembers = isConnected && (circle.visibility === "PUBLIC" || isMember || isOrganizer);
   const showJoinButton = isConnected && !isMember && !isPendingMember;
@@ -229,6 +238,9 @@ export default async function PublicCirclePage({
         )
       : Promise.resolve({ members: [], total: 0, hasMore: false }),
   ]);
+
+  // Dialog des membres : email redacté pour les non-Organisateurs (SEC-11).
+  const visibleMembers = visibleMembersFor(isOrganizer, membersFirstPage.members);
 
   const gradient = getMomentGradient(circle.name);
 
@@ -325,7 +337,7 @@ export default async function PublicCirclePage({
             {canSeeMembers ? (
               <CircleMembersDialog
                 circleId={circle.id}
-                initialMembers={membersFirstPage.members}
+                initialMembers={visibleMembers}
                 initialTotal={membersFirstPage.total}
                 initialHasMore={membersFirstPage.hasMore}
                 triggerClassName="group/stat flex cursor-pointer items-baseline gap-2"
@@ -448,7 +460,7 @@ export default async function PublicCirclePage({
                   {canSeeMembers ? (
                     <CircleMembersDialog
                       circleId={circle.id}
-                      initialMembers={membersFirstPage.members}
+                      initialMembers={visibleMembers}
                       initialTotal={membersFirstPage.total}
                       initialHasMore={membersFirstPage.hasMore}
                       triggerClassName="group flex cursor-pointer flex-wrap items-center gap-x-2 gap-y-1 text-left"

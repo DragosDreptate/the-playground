@@ -34,7 +34,7 @@ import { CollapsibleDescription } from "@/components/moments/collapsible-descrip
 import { HostLink } from "@/components/circles/host-link";
 import { resolveCircleRepository } from "@/lib/admin-host-mode";
 import { redirectToPublicCircle } from "@/lib/dashboard-circle-public-redirect";
-import { isActiveOrganizer } from "@/domain/models/circle";
+import { isActiveOrganizer, visibleMembersFor } from "@/domain/models/circle";
 import {
   Globe,
   Lock,
@@ -132,8 +132,16 @@ export default async function CircleDetailPage({
   const circleOrganizers = sortCircleOrganizers(hosts);
   const categoryLabel = resolveCategoryLabel(circle.category, circle.customCategory, tCategory);
   const anonymousFallback = tCommon("anonymousFallback");
+  // PII : l'email des membres n'est sérialisé qu'à l'Organisateur (SEC-11).
   const { visibleAvatars: visibleMemberAvatars, metaText: membersMetaText, metaMobileText: membersMetaMobileText } =
-    computeMembersMeta(hosts, players, totalMembers, t, anonymousFallback);
+    computeMembersMeta(
+      visibleMembersFor(isOrganizer, hosts),
+      visibleMembersFor(isOrganizer, players),
+      totalMembers,
+      t,
+      anonymousFallback,
+    );
+  const visibleMembers = visibleMembersFor(isOrganizer, membersFirstPage.members);
   // Un événement annulé encore daté dans le futur reste dans « prochains »
   // (affiché barré), les autres annulés rejoignent l'historique « passés »,
   // trié en antichronologique (le plus récent d'abord).
@@ -236,7 +244,7 @@ export default async function CircleDetailPage({
           <div className="flex gap-6 px-1">
             <CircleMembersDialog
               circleId={circle.id}
-              initialMembers={membersFirstPage.members}
+              initialMembers={visibleMembers}
               initialTotal={membersFirstPage.total}
               initialHasMore={membersFirstPage.hasMore}
               callerRole={callerRole}
@@ -337,7 +345,7 @@ export default async function CircleDetailPage({
                   </p>
                   <CircleMembersDialog
                     circleId={circle.id}
-                    initialMembers={membersFirstPage.members}
+                    initialMembers={visibleMembers}
                     initialTotal={membersFirstPage.total}
                     initialHasMore={membersFirstPage.hasMore}
                     callerRole={callerRole}

@@ -91,6 +91,30 @@ export type CircleMemberWithUser = CircleMembership & {
   };
 };
 
+/**
+ * Retire l'email d'un membre avant sérialisation vers un viewer non-Organisateur
+ * (HOST/CO_HOST). L'email est blanchi (`""`) ; les liens sociaux restent (publics).
+ * Sans cette redaction, la liste des membres d'une Communauté fuite l'email de tous
+ * les membres à n'importe quel compte connecté (jumeau de la fuite inscrits, RT-01).
+ */
+export function redactCircleMemberForNonHost(
+  member: CircleMemberWithUser,
+): CircleMemberWithUser {
+  return { ...member, user: { ...member.user, email: "" } };
+}
+
+/**
+ * Applique la règle de redaction à une liste de membres selon le rôle du viewer :
+ * l'Organisateur reçoit tout, les autres reçoivent des membres réduits. Source unique
+ * partagée par le usecase de pagination et les pages serveur.
+ */
+export function visibleMembersFor(
+  isOrganizer: boolean,
+  members: CircleMemberWithUser[],
+): CircleMemberWithUser[] {
+  return isOrganizer ? members : members.map(redactCircleMemberForNonHost);
+}
+
 export type DashboardCircleMember = { user: UserAvatarInfo };
 
 export type DashboardCircle = CircleWithRole & {
