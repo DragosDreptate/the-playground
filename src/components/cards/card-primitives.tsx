@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Users, Check, Clock, Crown } from "lucide-react";
+import { Users } from "lucide-react";
 
 /**
  * Primitives partagées des cartes (événement / Communauté), factorisées pour éviter
@@ -100,50 +100,6 @@ export function CirclePill({
     </span>
   );
 }
-
-/**
- * Pill de statut (inscription / rôle) : même look que les badges overlay des covers
- * (fond blanc + bordure colorée + blur), mais en flux inline. La couleur (bordure +
- * texte) est passée via `className`.
- */
-export function StatusPill({
-  icon: Icon,
-  label,
-  className,
-  hideLabelOnMobile = false,
-  size = "default",
-}: {
-  icon: LucideIcon;
-  label: string;
-  className?: string;
-  hideLabelOnMobile?: boolean;
-  /** `sm` : version compacte pour les overlays sur cover (plus discrète sur l'image). */
-  size?: "default" | "sm";
-}) {
-  const sizeClasses = size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-2 py-0.5 text-xs";
-  const iconSize = size === "sm" ? "size-2.5" : "size-3";
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center gap-1 rounded-full border bg-white/60 font-medium backdrop-blur-sm ${sizeClasses} ${className ?? ""}`}
-    >
-      <Icon className={`${iconSize} shrink-0`} />
-      <span className={hideLabelOnMobile ? "hidden sm:inline" : ""}>{label}</span>
-    </span>
-  );
-}
-
-/**
- * Apparence (icône + couleur) du `StatusPill` selon le statut d'inscription / rôle.
- * Factorisé pour garantir la cohérence entre Explorer, Mon Espace et la page
- * Communauté. Le `label` et `hideLabelOnMobile` restent à l'appelant : les libellés
- * proviennent de namespaces i18n différents selon la surface.
- */
-export const REGISTRATION_PILL = {
-  host: { icon: Crown, className: "border-primary/40 text-primary" },
-  registered: { icon: Check, className: "border-primary/40 text-primary" },
-  pendingApproval: { icon: Clock, className: "border-amber-500/40 text-amber-500" },
-  waitlisted: { icon: Clock, className: "border-border text-muted-foreground" },
-} as const;
 
 /**
  * Couleur du dot de timeline selon l'état du moment / de l'inscription. Partagé par

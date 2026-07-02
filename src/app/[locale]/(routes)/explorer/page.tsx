@@ -2,7 +2,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import {
   prismaCircleRepository,
   prismaMomentRepository,
-  prismaRegistrationRepository,
 } from "@/infrastructure/repositories";
 import { measureTime } from "@/lib/perf-logger";
 import { buildAlternates } from "@/lib/seo";
@@ -22,7 +21,6 @@ import { ExplorerGrid } from "@/components/explorer/explorer-grid";
 import { Link } from "@/i18n/navigation";
 import type { CircleCategory, CircleMemberRole } from "@/domain/models/circle";
 import type { ExplorerSortBy } from "@/domain/ports/repositories/circle-repository";
-import type { RegistrationStatus } from "@/domain/models/registration";
 import {
   CIRCLES_PAGE_SIZE,
   CIRCLES_FETCH_SIZE,
@@ -100,24 +98,10 @@ export default async function ExplorerPage({
   const momentsHasMore = momentsRaw.length > MOMENTS_PAGE_SIZE;
   const moments = momentsHasMore ? momentsRaw.slice(0, MOMENTS_PAGE_SIZE) : momentsRaw;
 
-  // Membership maps
+  // Membership map (cartes Communauté)
   const membershipRoleMap: Record<string, CircleMemberRole> = {};
-  const membershipBySlug: Record<string, CircleMemberRole> = {};
   for (const c of userCircles) {
     membershipRoleMap[c.id] = c.memberRole;
-    membershipBySlug[c.slug] = c.memberRole;
-  }
-
-  // Registration statuses for moment cards
-  const registrationStatusMap: Record<string, RegistrationStatus | null> = {};
-  if (session?.user?.id && moments.length > 0) {
-    const regMap = await prismaRegistrationRepository.findByMomentIdsAndUser(
-      moments.map((m) => m.id),
-      session.user.id
-    );
-    for (const [momentId, reg] of regMap) {
-      registrationStatusMap[momentId] = reg?.status ?? null;
-    }
   }
 
   return (
@@ -185,8 +169,6 @@ export default async function ExplorerPage({
           tab="moments"
           initialItems={moments}
           initialHasMore={momentsHasMore}
-          registrationStatusMap={registrationStatusMap}
-          membershipBySlug={membershipBySlug}
           category={category}
           sortBy={sortBy}
         />

@@ -203,51 +203,51 @@ export default async function PublicCirclePage({
   const pastMoments = allMoments.filter((m) => isPastMoment(m, now)).sort(byStartsAtDesc);
   // Fetch registration counts + top attendees (avatars) pour TOUS les moments (upcoming + past)
   const allMomentIds = allMoments.map((m) => m.id);
-  const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage] = await Promise.all([
-    degradedQuery(
-      prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
-      new Map<string, number>(),
-      "circle_page:registration_counts",
-    ),
-    degradedQuery(
-      prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
-      new Map<string, RegistrationWithUser[]>(),
-      "circle_page:top_registrants",
-    ),
-    degradedQuery(
-      prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
-      [] as CircleNetwork[],
-      "circle_page:circle_networks",
-    ),
-    canSeeMembers
-      ? degradedQuery(
-          prismaCircleRepository.findMembersPaginated(circle.id, {
-            offset: 0,
-            limit: 20,
-            priorityUserId: session?.user?.id ?? null,
-          }),
-          { members: [], total: 0, hasMore: false },
-          "circle_page:members_first_page",
-        )
-      : Promise.resolve({ members: [], total: 0, hasMore: false }),
-  ]);
-
-  // Statut d'inscription perso par moment (pour le bandeau « en attente / liste
-  // d'attente » de la timeline). Vide si non connecté.
-  const userStatusByMomentId = session?.user?.id
-    ? await degradedQuery(
-        prismaRegistrationRepository
-          .findByMomentIdsAndUser(allMomentIds, session.user.id)
-          .then(
-            (regs) =>
-              new Map<string, RegistrationStatus | null>(
-                [...regs].map(([id, reg]) => [id, reg?.status ?? null])
-              )
-          ),
-        new Map<string, RegistrationStatus | null>(),
-        "circle_page:user_registration_status",
-      )
-    : new Map<string, RegistrationStatus | null>();
+  const [countByMomentId, topAttendeesByMomentId, circleNetworks, membersFirstPage, userStatusByMomentId] =
+    await Promise.all([
+      degradedQuery(
+        prismaRegistrationRepository.findRegisteredCountsByMomentIds(allMomentIds),
+        new Map<string, number>(),
+        "circle_page:registration_counts",
+      ),
+      degradedQuery(
+        prismaRegistrationRepository.findTopRegistrantsByMomentIds(allMomentIds, 3),
+        new Map<string, RegistrationWithUser[]>(),
+        "circle_page:top_registrants",
+      ),
+      degradedQuery(
+        prismaCircleNetworkRepository.findNetworksByCircleId(circle.id),
+        [] as CircleNetwork[],
+        "circle_page:circle_networks",
+      ),
+      canSeeMembers
+        ? degradedQuery(
+            prismaCircleRepository.findMembersPaginated(circle.id, {
+              offset: 0,
+              limit: 20,
+              priorityUserId: session?.user?.id ?? null,
+            }),
+            { members: [], total: 0, hasMore: false },
+            "circle_page:members_first_page",
+          )
+        : Promise.resolve({ members: [], total: 0, hasMore: false }),
+      // Statut d'inscription perso par moment (bandeau « en attente / liste d'attente »
+      // de la timeline). Vide si non connecté. Joint au Promise.all pour rester parallèle.
+      session?.user?.id
+        ? degradedQuery(
+            prismaRegistrationRepository
+              .findByMomentIdsAndUser(allMomentIds, session.user.id)
+              .then(
+                (regs) =>
+                  new Map<string, RegistrationStatus | null>(
+                    [...regs].map(([id, reg]) => [id, reg?.status ?? null])
+                  )
+              ),
+            new Map<string, RegistrationStatus | null>(),
+            "circle_page:user_registration_status",
+          )
+        : Promise.resolve(new Map<string, RegistrationStatus | null>()),
+    ]);
 
   const gradient = getMomentGradient(circle.name);
 

@@ -18,7 +18,9 @@ type Props = {
   userRegistrationStatus: RegistrationStatus | null;
   isLast: boolean;
   /** "dashboard" (défaut) → lien vers le dashboard Host.
-   *  "public" → lien vers /m/[slug], sans badges de statut utilisateur. */
+   *  "public" → lien vers /m/[slug]. Le badge « Brouillon » reste réservé au dashboard,
+   *  mais les bandeaux de statut d'inscription (en attente / liste d'attente) s'affichent
+   *  sur les deux variantes. */
   variant?: "dashboard" | "public";
   /** Premiers inscrits pour l'avatar stack. */
   topAttendees?: Attendee[];
@@ -88,9 +90,9 @@ export async function MomentTimelineItem({
   const statusBanner = isCancelled
     ? { Icon: XCircle, label: t("public.eventCancelled"), cls: "border-destructive/20 bg-destructive/10 text-destructive" }
     : !isPast && !isDraft && isPendingApproval
-      ? { Icon: Clock, label: tDashboard("registrationStatus.pending_approval"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" }
+      ? { Icon: Clock, label: tDashboard("registrationStatus.pending_approval"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400" }
       : !isPast && !isDraft && isWaitlisted
-        ? { Icon: Clock, label: tDashboard("registrationStatus.waitlisted"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-400" }
+        ? { Icon: Clock, label: tDashboard("registrationStatus.waitlisted"), cls: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400" }
         : null;
   const BannerIcon = statusBanner?.Icon;
 

@@ -133,7 +133,7 @@ export function DashboardMomentCard(props: DashboardMomentCardProps) {
   ) : !isPast && !isDraft && isPendingApproval ? (
     <CardStatusBanner icon={Clock} label={t("registrationStatus.pending_approval")} tone="amber" />
   ) : !isPast && !isDraft && isWaitlisted ? (
-    <CardStatusBanner icon={Clock} label={t("registrationStatus.waitlisted")} tone="neutral" />
+    <CardStatusBanner icon={Clock} label={t("registrationStatus.waitlisted")} tone="amber" />
   ) : null;
 
   // Pas de badge de statut sur la cover Mon espace : la distinction organisateur/
@@ -317,12 +317,11 @@ function CardStatusBanner({
 }: {
   icon: LucideIcon;
   label: string;
-  tone: "destructive" | "amber" | "neutral";
+  tone: "destructive" | "amber";
 }) {
   const toneClasses = {
     destructive: "border-destructive/20 bg-destructive/10 text-destructive",
     amber: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    neutral: "border-border bg-muted/50 text-muted-foreground",
   }[tone];
   return (
     <div className={`flex items-center gap-2 rounded-t-xl border-b px-4 py-2 ${toneClasses}`}>

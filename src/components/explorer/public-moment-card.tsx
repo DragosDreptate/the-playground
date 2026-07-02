@@ -10,15 +10,12 @@ import { MapPin, Globe, Clock } from "lucide-react";
 import { CARD_HOVER_GROUP, IconPill, CirclePill, TimelineScaffold } from "@/components/cards/card-primitives";
 import { CategoryBadge } from "@/components/badges/category-badge";
 import type { PublicMoment } from "@/domain/ports/repositories/moment-repository";
-import type { RegistrationStatus } from "@/domain/models/registration";
 import { DemoBadge } from "@/components/badges/demo-badge";
 import { AttendeeAvatarStack } from "@/components/moments/attendee-avatar-stack";
 import { resolveCategoryLabel } from "@/lib/circle-category-helpers";
 
 type Props = {
   moment: PublicMoment;
-  registrationStatus?: RegistrationStatus | null;
-  isOrganizer?: boolean;
   /** Dernier de la liste : la ligne verticale de la timeline ne descend pas. */
   isLast?: boolean;
 };
